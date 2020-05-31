@@ -1,0 +1,104 @@
+<div class="menu-filtres bottom-bar">
+  <div class="section-titre">
+    <span>Filtres</span>
+    <div class="spacer"></div>
+    <a class="icone bouton-retour">
+      <i class="material-icons">close</i>
+    </a>
+  </div>
+
+  <div class="sous-titre only-mes-chromatiques">
+    <span>Ordonner par :</span>
+    <span class="reverse-order__container">
+      <button class="reverse-order">
+        <i class="material-icons">vertical_align_bottom</i>
+      </button>
+    </span>
+  </div>
+
+  <div class="liste-options only-mes-chromatiques">
+    <input type="radio" name="ordre" id="ordre-date" value="date" checked>
+    <label for="ordre-date" class="radio ordre">
+      <span>Date</span>
+    </label>
+
+    <input type="radio" name="ordre" id="ordre-jeu" value="jeu">
+    <label for="ordre-jeu" class="radio ordre">
+      <span>Jeu</span>
+    </label>
+
+    <input type="radio" name="ordre" id="ordre-taux" value="taux">
+    <label for="ordre-taux" class="radio ordre">
+      <span>Taux</span>
+    </label>
+
+    <input type="radio" name="ordre" id="ordre-dex" value="dex">
+    <label for="ordre-dex" class="radio ordre">
+      <span>N° du Pokédex</span>
+    </label>
+  </div>
+
+  <div class="sous-titre">
+    <span>Afficher :</span>
+  </div>
+
+  <div class="cote-a-cote">
+    <div class="liste-options">
+      <span class="titre-options">Dresseur d'origine :</span>
+
+      <input type="checkbox" id="filtre-do-moi" class="filtre filtre-do" value="do:moi" checked>
+      <label for="filtre-do-moi" class="checkbox filtre filtre-do">
+        <span>Moi</span>
+      </label>
+
+      <input type="checkbox" id="filtre-do-autres" class="filtre filtre-do" value="do:autre">
+      <label for="filtre-do-autres" class="checkbox filtre filtre-do">
+        <span>Autres</span>
+      </label>
+    </div>
+
+    <div class="liste-options">
+      <span class="titre-options">Legit :</span>
+
+      <input type="checkbox" id="filtre-legit-oui" class="filtre filtre-legit" value="legit:oui" checked>
+      <label for="filtre-legit-oui" class="checkbox filtre filtre-legit">
+        <span>Oui</span>
+      </label>
+
+      <input type="checkbox" id="filtre-legit-non" class="filtre filtre-legit" value="legit:maybe|legit:hack|legit:clone">
+      <label for="filtre-legit-non" class="checkbox filtre filtre-legit">
+        <span>Non</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="liste-options" style="display: none;">
+    <span class="titre-options">Taux de chromatiques :</span>
+
+    <input type="checkbox" id="filtre-taux-full" class="filtre filtre-taux" value="taux:full" checked>
+    <label for="filtre-taux-full" class="checkbox filtre filtre-taux">
+      <span>Full odds</span>
+    </label>
+
+    <input type="checkbox" id="filtre-taux-charm" class="filtre filtre-taux" value="taux:charm" checked>
+    <label for="filtre-taux-charm" class="checkbox filtre filtre-taux">
+      <span>Charm odds</span>
+    </label>
+
+    <input type="checkbox" id="filtre-taux-boosted" class="filtre filtre-taux" value="taux:boosted|taux:inconnu" checked>
+    <label for="filtre-taux-boosted" class="checkbox filtre filtre-taux">
+      <span>Autres</span>
+    </label>
+  </div>
+
+  <div class="liste-options" id="liste-options-jeux" style="display: none;">
+    <span class="titre-options">Jeux :</span>
+
+    <template id="template-checkbox-jeu">
+      <input type="checkbox" id="filtre-jeu" class="filtre filtre-jeu" value="jeu:" checked>
+      <label for="filtre-jeu" class="checkbox filtre filtre-jeu">
+        <span class="icones jeu"></span>
+      </label>
+    </template>
+  </div>
+</div>

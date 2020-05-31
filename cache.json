@@ -1,0 +1,29 @@
+{
+    "version": "2018-09-19 19:55:00",
+    "fichiers": [
+        "./",
+        "./icons/apple-touch-icon.png",
+        "./icons/icon-192.png",
+        "./pokesprite/pokesprite.css",
+        "./pokesprite/pokesprite.png",
+        "./all-icons.png",
+        "./instinct.gif",
+        "./material_icons.woff2",
+        "./mod_appContent.js",
+        "./mod_appLifeCycle.js",
+        "./mod_DexDatalist.js",
+        "./mod_easterEgg.js",
+        "./mod_filtres.js",
+        "./mod_Hunt.js",
+        "./mod_navigate.js",
+        "./mod_notification.js",
+        "./mod_Params.js",
+        "./mod_Pokemon.js",
+        "./mod_pokemonCard.js",
+        "./mod_spriteViewer.js",
+        "./scripts.js",
+        "./shinystars.svg",
+        "./sprites.png",
+        "./styles.css"
+    ]
+}

@@ -1,0 +1,54 @@
+<header class="section-titre with-button">
+  <a class="icone bouton-retour">
+    <i class="material-icons">arrow_back</i>
+  </a>
+  <h1>À propos du Rémidex</h1>
+</header>
+
+<div class="section-contenu">
+  <div class="easter-egg">
+    <img id="instinct">
+  </div>
+  
+  <p>La première version du Rémidex, non optimisée pour mobile, a été développée à partir du 14 mars 2014. Son but premier était d'afficher l'apparence de mon personnage dans Pokémon Y, ainsi que la liste des Pokémon de mon équipe, avec une petite description indiquant d'où venaient leurs surnoms. J'ai ensuite eu l'idée d'ajouter, en-dessous de l'équipe, une liste de mes Pokémon chromatiques.</p>
+
+  <p>Après un certain temps, j'ai eu envie d'accéder au Rémidex depuis mon smartphone. La première version n'étant pas du tout adaptée à l'écran d'un smartphone, j'ai pensé à développer une application Android. Mais comme je m'y connaissais peu, et que j'avais déjà de l'expérience (et de la passion) dans le développement web, j'ai plutôt choisi de créer une application web adaptée au format mobile.</p>
+
+  <p>Ainsi, le 28 janvier 2016, le développement de la deuxième version du Rémidex a commencé. Après de nombreuses améliorations, le 15 juillet 2016, le Rémidex a migré : il a quitté les serveurs des pages persos de Free pour rejoindre les serveurs d'OVH. Ce fut le début d'une nouvelle ère pour l'application, qui a ainsi pu gagner de nombreuses optimisations (elle fonctionne maintenant sans connexion internet, par exemple).</p>
+
+  <p>La troisième version du Rémidex, visuellement semblable à la précédente mais conçue différemment, est née d'un simple constat : les données présentées par l'application changent très rarement. L'application est donc désormais intégralement installée localement lors de sa première ouverture, et les visites suivantes chargent le contenu local sans contacter le serveur. Le tout est complété par une fonction de mise à jour qui permet de remplacer le contenu local par les données les plus récentes si nécessaire.</p>
+
+  <p>La quatrième (et actuelle) version du Rémidex voit son interface recréée de zéro. Le but était de simplifier le code, se débarrasser du framework Material Design Lite, supprimer des fonctions inutiles et ajouter des fonctions pratiques.</p>
+
+  <p>Depuis, l'application continue de se développer, petit à petit, à mesure que mes ambitions de web designer grandissent. Je salue mon moi du futur, qui lira ces lignes pour les remplacer par le récit des prochaines péripéties du Rémidex !</p>
+  
+  <div class="separateur"></div>
+  
+  <span class="sources-titre">Sources utilisées pour concevoir le Rémidex :</span>
+  
+  <div class="sources">
+    <a class="lien-source" href="https://www.spriters-resource.com/nintendo_switch/pokemonhome/" target="_blank" rel="noopener">
+      <i class="material-icons">open_in_new</i><span>Sprites des Pokémon : spriters-resource.com</span>
+    </a>
+
+    <a class="lien-source" href="https://github.com/msikma/pokesprite" target="_blank" rel="noopener">
+      <i class="material-icons">open_in_new</i><span>Icônes chromatiques : pokesprite</span>
+    </a>
+
+    <a class="lien-source" href="https://www.reddit.com/r/pokemongo/comments/4sfbrn/saw_the_team_mystic_animation_instinctively_i_had/" target="_blank" rel="noopener">
+      <i class="material-icons">open_in_new</i><span>Emblême animé Team Intuition : u/ParkourSloth</span>
+    </a>
+  </div>
+
+  <div class="separateur"></div>
+
+  <button class="bouton-recherche-maj">
+    <i class="material-icons">update</i><span class="texte">Rechercher une mise à jour</span>
+  </button>
+
+  <span class="version">
+    <div>temps de chargement : <span id="version-tempschargement"></span> ms</div>
+    <div>application : v. <span id="version-fichiers"></span></div>
+    <div>base de données : v. <span id="version-bdd"></span></div>
+  </span>
+</div>

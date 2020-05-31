@@ -1,0 +1,32 @@
+{
+  "name": "Rémidex",
+  "short_name": "Rémidex",
+  "display": "standalone",
+  "start_url": "./",
+  "orientation": "portrait",
+  "icons": [{
+    "src": "./icons/icon-192-maskable.png",
+    "sizes": "192x192",
+    "type": "image/png",
+    "purpose": "maskable"
+  }, {
+    "src": "./icons/icon-192.png",
+    "sizes": "192x192",
+    "type": "image/png"
+  }, {
+    "src": "/remidex/icons/icon-512-maskable.png",
+    "sizes": "512x512",
+    "type": "image/png",
+    "purpose": "maskable"
+  }, {
+    "src": "./icons/icon-512.png",
+	  "sizes": "512x512",
+	  "type": "image/png"
+  }, {
+    "src": "./icons/icon-maskable.svg",
+    "type": "image/svg",
+    "purpose": "maskable"
+  }],
+  "theme_color": "#222222",
+  "background_color": "#222222"
+}

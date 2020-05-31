@@ -1,0 +1,12 @@
+### No caching, leave it to service workers
+
+<IfModule mod_headers.c>
+    <filesMatch "\.(jpg|jpeg|png|webp|gif|ico|svg|css|json|js|php|html)$">
+        Header unset Cache-Control
+    </filesMatch>
+
+    # Still cache sprites for 2 628 000 s = 1 month
+    <filesMatch "^poke_(capture|icon)(.+)\.png$">
+        Header set Cache-Control "max-age=2628000, public"
+    </filesMatch>
+</IfModule>

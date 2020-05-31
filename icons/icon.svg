@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="fond" x1="0" y1="0" x2="0.4609" y2="1.2060">
+      <stop offset="0%" stop-color="#4051B3"/>
+      <stop offset="50%" stop-color="#4051B3"/>
+      <stop offset="50%" stop-color="white"/>
+      <stop offset="100%" stop-color="white"/>
+    </linearGradient>
+  </defs>
+  
+  <rect x="0" y="0" width="100%" height="100%" fill="url(#fond)"/>
+  <line x1="-30" y1="256" x2="542" y2="256" stroke="#292929" stroke-width="40" transform="rotate(-20 256 256)"/>
+  <circle cx="50%" cy="50%" r="89" fill="white" stroke="#292929" stroke-width="25"/>
+  <circle cx="50%" cy="50%" r="52" fill="#292929" fill-opacity="0.066"/>
+  <circle cx="50%" cy="50%" r="24" fill="#292929"/>
+  <circle cx="251" cy="251" r="8" fill="white"/>
+  <svg width="104" height="104" viewBox="0 0 8 8" fill="white" x="312" y="66">
+    <rect height="3" width="1" x="1" y="0"/>
+    <rect height="1" width="3" x="0" y="1"/>
+    <rect height="3" width="1" x="6" y="2"/>
+    <rect height="1" width="3" x="5" y="3"/>
+    <rect height="3" width="1" x="3" y="5"/>
+    <rect height="1" width="3" x="2" y="6"/>
+  </svg>
+  <line x1="177" y1="300" x2="177" y2="470" stroke="#292929" stroke-width="25" stroke-linecap="round" transform="rotate(-20 177 300)"/>
+  <line x1="345" y1="300" x2="345" y2="365" stroke="#292929" stroke-width="25" stroke-linecap="round" transform="rotate(-65 340 300)"/>
+</svg>
