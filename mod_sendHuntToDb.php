@@ -1,5 +1,6 @@
 <?php
 require_once('./class_BDD.php');
+require_once('./parametres.php');
 
 $error = false;
 $storedData = false;
@@ -12,7 +13,8 @@ if (isset($_POST['hunt']) && $_POST['hunt'] != '')
   $mdp = $_POST['mdp'];
 
   // Le mot de passe envoyé est-il le bon ?
-  $passcheck = password_verify($mdp, '$2y$10$cEGI4luNAGGTa5hObkhw8.T/weQKQNQJzqsFnwt4e8JUS2LUYn3Qe');
+  $params = parse_ini_file(Params::path(), TRUE);
+  $passcheck = password_verify($mdp, $params['hunts']['hash']);
 
   if ($passcheck != true)
   {
