@@ -19,6 +19,8 @@
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
     <link rel="manifest" href="./manifest.json">
 
+    <link rel="preconnect" href="https://remiscan.fr">
+
     <script>
       window.tempsDebut = Date.now();
 
