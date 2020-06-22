@@ -31,7 +31,7 @@ function check_file_times($check = false)
 {
   $listeFichiers = json_decode(file_get_contents('cache.json'), true);
   $listeFichiers = $listeFichiers['fichiers'];
-  $listeFichiers[] = 'index.php';
+  $listeFichiers[0] = './index.php';
   foreach(glob('section_*.html') as $f) {
     $listeFichiers[] = $f;
   }
@@ -41,7 +41,7 @@ function check_file_times($check = false)
     if ($check === true)
     {
       $isDateValid = true;
-      foreach(['sprites.png', 'sprites-equipes.png', 'sprites-wanted.png', 'sprites-prouesses.jpg'] as $checkname)
+      foreach(['sprites.png'] as $checkname)
       {
         if (strpos($fichier, $checkname) !== false)
         {
@@ -122,7 +122,7 @@ else
 {
 
   // Forcer la création des tiles de sprites mêmes si ils existent déjà ?
-  if (isset($_GET['force']) && $_GET['force'] == 'true')
+  if (isset($_GET['force']) && $_GET['force'] === 'true')
     $force = true;
   else
     $force = false;
