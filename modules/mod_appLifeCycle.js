@@ -24,7 +24,7 @@ export function initServiceWorker()
       appStart();
     }
 
-    navigator.serviceWorker.register('service-worker.js')
+    navigator.serviceWorker.register('/remidex/service-worker.js')
     .then(registration => {
       console.log('Le service worker a été enregistré', registration);
       registration.addEventListener('updatefound', () => {
@@ -164,7 +164,7 @@ function appUpdate(update = false, force = false)
       return reject('[:(] Service worker indisponible');
 
     // On lance mod_update.php pour récupérer les données les plus récentes
-    fetch('mod_update.php?type=full&date=' + Date.now() + '&force=' + force)
+    fetch('/remidex/mod_update.php?type=full&date=' + Date.now() + '&force=' + force)
     .then(response => {
       if (response.status == 200)
         return response;
@@ -271,7 +271,7 @@ export function checkUpdate(checkNotification = false)
       return resolve(texteSucces);
 
     // On lance mod_update.php pour récupérer les données les plus récentes
-    fetch('mod_update.php?type=check&date=' + Date.now())
+    fetch('/remidex/mod_update.php?type=check&date=' + Date.now())
     .then(response => {
       if (response.status == 200)
         return response;

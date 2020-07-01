@@ -1,9 +1,9 @@
-import { Params, changeTheme, changeAutoMaj, callResize, saveDBpassword } from './mod_Params.js';
-import { navigate } from './mod_navigate.js';
-import { easterEgg } from './mod_easterEgg.js';
-import { initServiceWorker, checkUpdate, manualUpdate } from './mod_appLifeCycle.js';
-import { openFiltres, reverseOrder } from './mod_filtres.js';
-import { Hunt } from './mod_Hunt.js';
+import { Params, changeTheme, changeAutoMaj, callResize, saveDBpassword } from './modules/mod_Params.js';
+import { navigate } from './modules/mod_navigate.js';
+import { easterEgg } from './modules/mod_easterEgg.js';
+import { initServiceWorker, checkUpdate, manualUpdate } from './modules/mod_appLifeCycle.js';
+import { openFiltres, reverseOrder } from './modules/mod_filtres.js';
+import { Hunt } from './modules/mod_Hunt.js';
 
 
 

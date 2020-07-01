@@ -10,7 +10,7 @@ self.addEventListener('install', function(event)
     caches.open(PRE_CACHE)
     .then(cache => {
       // On récupère le contenu du fichier cache.json
-      return fetch('cache.json')
+      return fetch('cache.json?' + Date.now())
       .then(response => {
         return response.json();
       })
@@ -90,7 +90,7 @@ self.addEventListener('message', function(event)
     return caches.open(newCACHE)
     .then(cache => {
       // On récupère le contenu du fichier cache.json
-      return fetch('cache.json')
+      return fetch('cache.json?' + Date.now())
       .then(response => {
         return response.json();
       })

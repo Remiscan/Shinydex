@@ -379,76 +379,94 @@ export class Hunt {
     formData.append('mdp', localStorage.getItem('remidex/mdp-bdd'));
 
     console.log(data);
-    return fetch('mod_sendHuntToDb.php', {
-      method: 'POST',
-      body: formData
-    })
-    .then(response => {
-      //response.text().then(r => console.log(r));
-      if (response.status == 200)
-        return response;
-      else
-        throw '[:(] Erreur ' + response.status + ' lors de la requête';
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data['mdp'] == false)
-        throw '[:(] Mauvais mot de passe...';
-      
-      // Traiter la réponse et vérifier le bon ajout à la BDD
-      console.log('Réponse reçue du serveur :', data);
-      if (data['stored-data'] == false)
-        throw '[:(] Chasse non stockée dans la BDD...';
-      
-      if (
-        parseInt(data['stored-data']['numero_national']) == this.dexid
-        && data['stored-data']['forme'] == this.forme
-        && data['stored-data']['surnom'] == this.surnom
-        && data['stored-data']['methode'] == this.methode
-        && data['stored-data']['compteur'] == this.compteur
-        && data['stored-data']['date'] == this.date
-        && data['stored-data']['jeu'] == this.jeu
-        && data['stored-data']['ball'] == this.ball
-        && data['stored-data']['description'] == this.description
-        && parseInt(data['stored-data']['origin']) == this.origin
-        && parseInt(data['stored-data']['monjeu']) == this.monjeu
-        && parseInt(data['stored-data']['charm']) == this.charm
-        && parseInt(data['stored-data']['hacked']) == this.hacked
-        && parseInt(data['stored-data']['aupif']) == this.aupif
-      ) {
-        return wait(2000)
-        .then(() => {
-          console.log('[:)] Chasse sauvegardée !');
-          this.destroyHunt();
-          checkUpdate();
-          return;
-        });
-      } else {
-        console.log(
-          parseInt(data['stored-data']['numero_national']) == this.dexid,
-          data['stored-data']['forme'] == this.forme,
-          data['stored-data']['surnom'] == this.surnom,
-          data['stored-data']['methode'] == this.methode,
-          data['stored-data']['compteur'] == this.compteur,
-          data['stored-data']['date'] == this.date,
-          data['stored-data']['jeu'] == this.jeu,
-          data['stored-data']['ball'] == this.ball,
-          data['stored-data']['description'] == this.description,
-          parseInt(data['stored-data']['origin']) == this.origin,
-          parseInt(data['stored-data']['monjeu']) == this.monjeu,
-          parseInt(data['stored-data']['charm']) == this.charm,
-          parseInt(data['stored-data']['hacked']) == this.hacked,
-          parseInt(data['stored-data']['aupif']) == this.aupif
-        );
-        throw '[:(] Erreur de copie pendant la sauvegarde de la chasse...';
-      }
-    })
-    .catch(error => {
-      console.error(error);
-      notify(error);
-      return;
-    })
-    .then(() => document.body.removeAttribute('data-hunt-uploading'));
+
+    // Utiliser localForage pour stocker les Hunts avant de passer à ce système de sync
+
+    /*if ('serviceWorker' in navigator && 'SyncManager' in window) {
+      navigator.serviceWorker.ready.then(reg => {
+        console.log('[Sync] Sending Hunt to sw');
+        return reg.sync.register('HUNT-ADD-' + this.id);
+      }).catch(() => {
+        console.log('[No-sync] Sending hunt to server');
+        postHunt();
+      });
+    } else {
+      console.log('[No-sw] Sending hunt to server');
+      postHunt();
+    }*/
+
+    /*function postHunt() {*/
+      return fetch('mod_sendHuntToDb.php', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => {
+        //response.text().then(r => console.log(r));
+        if (response.status == 200)
+          return response;
+        else
+          throw '[:(] Erreur ' + response.status + ' lors de la requête';
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data['mdp'] == false)
+          throw '[:(] Mauvais mot de passe...';
+        
+        // Traiter la réponse et vérifier le bon ajout à la BDD
+        console.log('Réponse reçue du serveur :', data);
+        if (data['stored-data'] == false)
+          throw '[:(] Chasse non stockée dans la BDD...';
+        
+        if (
+          parseInt(data['stored-data']['numero_national']) == this.dexid
+          && data['stored-data']['forme'] == this.forme
+          && data['stored-data']['surnom'] == this.surnom
+          && data['stored-data']['methode'] == this.methode
+          && data['stored-data']['compteur'] == this.compteur
+          && data['stored-data']['date'] == this.date
+          && data['stored-data']['jeu'] == this.jeu
+          && data['stored-data']['ball'] == this.ball
+          && data['stored-data']['description'] == this.description
+          && parseInt(data['stored-data']['origin']) == this.origin
+          && parseInt(data['stored-data']['monjeu']) == this.monjeu
+          && parseInt(data['stored-data']['charm']) == this.charm
+          && parseInt(data['stored-data']['hacked']) == this.hacked
+          && parseInt(data['stored-data']['aupif']) == this.aupif
+        ) {
+          return wait(2000)
+          .then(() => {
+            console.log('[:)] Chasse sauvegardée !');
+            this.destroyHunt();
+            checkUpdate();
+            return;
+          });
+        } else {
+          console.log(
+            parseInt(data['stored-data']['numero_national']) == this.dexid,
+            data['stored-data']['forme'] == this.forme,
+            data['stored-data']['surnom'] == this.surnom,
+            data['stored-data']['methode'] == this.methode,
+            data['stored-data']['compteur'] == this.compteur,
+            data['stored-data']['date'] == this.date,
+            data['stored-data']['jeu'] == this.jeu,
+            data['stored-data']['ball'] == this.ball,
+            data['stored-data']['description'] == this.description,
+            parseInt(data['stored-data']['origin']) == this.origin,
+            parseInt(data['stored-data']['monjeu']) == this.monjeu,
+            parseInt(data['stored-data']['charm']) == this.charm,
+            parseInt(data['stored-data']['hacked']) == this.hacked,
+            parseInt(data['stored-data']['aupif']) == this.aupif
+          );
+          throw '[:(] Erreur de copie pendant la sauvegarde de la chasse...';
+        }
+      })
+      .catch(error => {
+        console.error(error);
+        notify(error);
+        return;
+      })
+      .then(() => document.body.removeAttribute('data-hunt-uploading'));
+    /*}*/
   }
 
 

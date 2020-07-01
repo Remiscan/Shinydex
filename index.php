@@ -47,18 +47,18 @@
       setTheme(theme);
     </script>
 
-    <link rel="modulepreload" href="./mod_appContent.js">
-    <link rel="modulepreload" href="./mod_appLifeCycle.js">
-    <link rel="modulepreload" href="./mod_DexDatalist.js">
-    <link rel="modulepreload" href="./mod_easterEgg.js">
-    <link rel="modulepreload" href="./mod_filtres.js">
-    <link rel="modulepreload" href="./mod_Hunt.js">
-    <link rel="modulepreload" href="./mod_navigate.js">
-    <link rel="modulepreload" href="./mod_notification.js">
-    <link rel="modulepreload" href="./mod_Params.js">
-    <link rel="modulepreload" href="./mod_Pokemon.js">
-    <link rel="modulepreload" href="./mod_pokemonCard.js">
-    <link rel="modulepreload" href="./mod_spriteViewer.js">
+    <link rel="modulepreload" href="./modules/mod_appContent.js">
+    <link rel="modulepreload" href="./modules/mod_appLifeCycle.js">
+    <link rel="modulepreload" href="./modules/mod_DexDatalist.js">
+    <link rel="modulepreload" href="./modules/mod_easterEgg.js">
+    <link rel="modulepreload" href="./modules/mod_filtres.js">
+    <link rel="modulepreload" href="./modules/mod_Hunt.js">
+    <link rel="modulepreload" href="./modules/mod_navigate.js">
+    <link rel="modulepreload" href="./modules/mod_notification.js">
+    <link rel="modulepreload" href="./modules/mod_Params.js">
+    <link rel="modulepreload" href="./modules/mod_Pokemon.js">
+    <link rel="modulepreload" href="./modules/mod_pokemonCard.js">
+    <link rel="modulepreload" href="./modules/mod_spriteViewer.js">
 
     <link rel="stylesheet" href="./styles.css">
     <link rel="stylesheet" href="./pokesprite/pokesprite.css">
