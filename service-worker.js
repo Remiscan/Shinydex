@@ -87,48 +87,50 @@ self.addEventListener('message', function(event)
     var newCACHE = PRE_CACHE + '-' + event.data.version;
     var responsePORT = event.ports[0];
     console.log('[update] Mise à jour du cache demandée...');
-    return caches.open(newCACHE)
-    .then(cache => {
-      // On récupère le contenu du fichier cache.json
-      return fetch('cache.json?' + Date.now())
-      .then(response => {
-        return response.json();
-      })
-      .then(jsondata => {
-        // Ensuite, on ajoute au cache la liste des fichiers du cache.json
-        console.log('[update] Mise en cache des fichiers listés dans cache.json : ', jsondata.fichiers);
-        var totalFichiers = jsondata.fichiers.length;
-        return Promise.all(
-          jsondata.fichiers.map(url => {
-            let request = new Request(url, {cache: 'reload'});
-            return fetch(request)
-            .then(response => {
-              if (!response.ok)
-                throw Error('[update] Le fichier n\'a pas pu être récupéré...', request.url);
-              source.postMessage({loaded: true, total: totalFichiers, url: request.url});
-              return cache.put(request, response);
+    event.wainUntil(
+      caches.open(newCACHE)
+      .then(cache => {
+        // On récupère le contenu du fichier cache.json
+        return fetch('cache.json?' + Date.now())
+        .then(response => {
+          return response.json();
+        })
+        .then(jsondata => {
+          // Ensuite, on ajoute au cache la liste des fichiers du cache.json
+          console.log('[update] Mise en cache des fichiers listés dans cache.json : ', jsondata.fichiers);
+          var totalFichiers = jsondata.fichiers.length;
+          return Promise.all(
+            jsondata.fichiers.map(url => {
+              let request = new Request(url, {cache: 'reload'});
+              return fetch(request)
+              .then(response => {
+                if (!response.ok)
+                  throw Error('[update] Le fichier n\'a pas pu être récupéré...', request.url);
+                source.postMessage({loaded: true, total: totalFichiers, url: request.url});
+                return cache.put(request, response);
+              })
             })
-          })
-        )
+          )
+        })
       })
-    })
-    .then(() => {
-      console.log('[update] Mise à jour du cache terminée !');
-      // Supprimons les vieux caches
-      return deleteOldCaches(newCACHE, 'update')
-      .catch(raison => console.log('[update] ' + raison))
       .then(() => {
-        responsePORT.postMessage({message: '[update] Nettoyage terminé !'});
+        console.log('[update] Mise à jour du cache terminée !');
+        // Supprimons les vieux caches
+        return deleteOldCaches(newCACHE, 'update')
+        .catch(raison => console.log('[update] ' + raison))
+        .then(() => {
+          responsePORT.postMessage({message: '[update] Nettoyage terminé !'});
+        })
       })
-    })
-    .catch(error => {
-      source.postMessage({loaded: false, erreur: true});
-      console.error(error);
-      return caches.delete(newCACHE)
-      .then(() => 
-        console.log('[:(] Mise à jour annulée')
-      );
-    })
+      .catch(error => {
+        source.postMessage({loaded: false, erreur: true});
+        console.error(error);
+        return caches.delete(newCACHE)
+        .then(() => 
+          console.log('[:(] Mise à jour annulée')
+        );
+      })
+    )
   }
 });
 
