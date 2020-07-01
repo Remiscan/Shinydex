@@ -121,12 +121,12 @@
 
       <!-- Mes chromatiques -->
       <section id="mes-chromatiques">
-        <?php include './section_mes-chromatiques.html'; ?>
+        <?php include './pages/mes-chromatiques.html'; ?>
       </section>
 
       <!-- Pokédex chromatique -->
       <section id="pokedex">
-        <?php include './section_pokedex.html'; ?>
+        <?php include './pages/pokedex.html'; ?>
       </section>
 
       <!-- FAB des filtres -->
@@ -142,17 +142,17 @@
 
       <!-- Chasses en cours -->
       <section id="chasses-en-cours">
-        <?php include './section_chasses-en-cours.html'; ?>
+        <?php include './pages/chasses-en-cours.html'; ?>
       </section>
 
       <!-- Paramètres -->
       <section id="parametres">
-        <?php include './section_parametres.html'; ?>
+        <?php include './pages/parametres.html'; ?>
       </section>
 
       <!-- À propos -->
       <section id="a-propos">
-        <?php include './section_a-propos.html'; ?>
+        <?php include './pages/a-propos.html'; ?>
       </section>
 
     </main>
@@ -180,14 +180,14 @@
     </div>
 
     <!-- Menu des filtres -->
-    <?php include './section_menu-filtres.html'; ?>
+    <?php include './pages/menu-filtres.html'; ?>
 
     <!-- Obfuscator -->
     <div class="obfuscator off"></div>
 
     <!-- Sprite viewer -->
     <section id="sprite-viewer">
-      <?php include './section_sprite-viewer.html'; ?>
+      <?php include './pages/sprite-viewer.html'; ?>
     </section>
 
     <!-- Mesure de la fenêtre -->
