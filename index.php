@@ -21,17 +21,32 @@
 
     <link rel="preconnect" href="https://remiscan.fr">
 
+    <script src="./ext/localforage.min.js"></script>
     <script>
       window.tempsDebut = Date.now();
 
-      // Définition du thème
-      let theme;
-      if (!localStorage.getItem('remidex/theme'))
-        theme = 'dark';
-      else
-        theme = localStorage.getItem('remidex/theme');
+      // Stockage de données
+      //// Pokédex
+      const pokemonData = localforage.createInstance({
+        name: 'remidex',
+        storeName: 'pokemon-data',
+        driver: localforage.INDEXEDDB
+      });
+      //// Liste de shiny
+      const shinyStorage = localforage.createInstance({
+        name: 'remidex',
+        storeName: 'shiny-list',
+        driver: localforage.INDEXEDDB
+      });
+      //// Données diverses
+      const dataStorage = localforage.createInstance({
+        name: 'remidex',
+        storeName: 'misc',
+        driver: localforage.INDEXEDDB
+      });
 
-      function setTheme(theme)
+      // Définition du thème
+      async function setTheme(theme)
       {
         let html = document.documentElement;
         html.classList.remove('light', 'dark');
@@ -42,9 +57,17 @@
         else
           themeColor = 'rgb(224, 224, 224)';
         document.querySelector("meta[name=theme-color]").setAttribute('content', themeColor);
-        localStorage.setItem('remidex/theme', theme);
+        await dataStorage.ready();
+        return await dataStorage.setItem('theme', theme);
       }
-      setTheme(theme);
+
+      let theme;
+      Promise.all([dataStorage.ready(), shinyStorage.ready(), pokemonData.ready()])
+      .then(() => dataStorage.getItem('theme'))
+      .then(t => {
+        theme = (t == null) ? 'dark' : t;
+        return setTheme(theme);
+      });
     </script>
 
     <link rel="modulepreload" href="./modules/mod_appContent.js">
