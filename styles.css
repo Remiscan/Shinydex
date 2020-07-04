@@ -345,7 +345,7 @@ h1 {
   padding-bottom: calc(56px + 2 * 15px - 6px);
 }
 
-#mes-chromatiques>.section-contenu {
+#mes-chromatiques.defered>.section-contenu {
   height: calc(var(--compteur, 0) * 126px);
 }
 
