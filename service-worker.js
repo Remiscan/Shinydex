@@ -164,7 +164,8 @@ async function installData([data, files], action = 'install', event = null) {
   // On commence par mettre à jour les fichiers :
   // - en cas de succès, on mettra à jour les données
   // - sinon, on supprimera le nouveau cache, ce qui laissera l'ancien cache et les anciennes données
-  const newCACHE = PRE_CACHE + '-' + data['version'];
+  const versionMax = Math.max(data['version-fichiers'], data['version-bdd']);
+  const newCACHE = PRE_CACHE + '-' + versionMax;
   const totalFichiers = files.fichiers.length;
 
   try {
@@ -190,8 +191,8 @@ async function installData([data, files], action = 'install', event = null) {
     console.log(`[${action}] Installation des données...`);
     await Promise.all([dataStorage.ready(), shinyStorage.ready(), pokemonData.ready()]);
     await dataStorage.setItem('version-fichiers', data['version-fichiers']);
-    await dataStorage.setItem('version', data['version']);
     await dataStorage.setItem('version-bdd', data['version-bdd']);
+    await dataStorage.setItem('version', versionMax);
     await Promise.all(
       data['data-shinies'].map(shiny => shinyStorage.setItem(String(shiny.id), shiny))
     );

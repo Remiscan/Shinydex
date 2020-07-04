@@ -247,15 +247,12 @@ else
   // Pendant une mise à jour, je vérifie la date des fichiers après leur création potentielle
   $versionFichiers = check_file_times();
   $dates_derniereUpdate[] = $versionFichiers;
-  $version = max(array_map('strtotime', $dates_derniereUpdate));
-  //$version = date('Y-m-d H:i:s', $version);
 
 
   ///////////////////////////////////////////
   // On passe tous ces résultats à javascript
   header('Content-Type: application/json');
   echo json_encode(array(
-    'version' => $version,
     'version-bdd' => $versionBDD,
     'version-fichiers' => $versionFichiers,
     'data-shinies' => $data_shinies,
