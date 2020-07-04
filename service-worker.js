@@ -19,6 +19,12 @@ const dataStorage = localforage.createInstance({
   storeName: 'misc',
   driver: localforage.INDEXEDDB
 });
+//// Chasses en cours
+const huntStorage = localforage.createInstance({
+  name: 'remidex',
+  storeName: 'hunts',
+  driver: localforage.INDEXEDDB
+});
 
 const PRE_CACHE = 'remidex-sw';
 
@@ -48,7 +54,6 @@ self.addEventListener('install', function(event)
 self.addEventListener('activate', function(event)
 {
   console.log('[activate] Activation du service worker');
-  console.log('[activate] Définition de ce service worker comme service worker actif de cette page');
   event.waitUntil(self.clients.claim()); // force le service worker à prendre le contrôle de la page immédiatement
 });
 
@@ -95,6 +100,30 @@ self.addEventListener('message', function(event) {
         console.error(error);
       })
     );
+  }
+});
+
+
+// SYNC
+self.addEventListener('sync', async function(event) {
+  const PRE_HUNT_ADD = 'HUNT-ADD-';
+  const PRE_HUNT_EDIT = 'HUNT-EDIT-';
+  const PRE_HUNT_DELETE = 'HUNT-DELETE-';
+  // Upload d'une chasse dans la BDD en ligne
+  if (event.tag.startsWith(PRE_HUNT_ADD)) {
+    const huntid = event.tag.replace(PRE_HUNT_ADD, '');
+    return await sendHunt(huntid);
+  }
+  // Édition d'une chasse dans la BDD en ligne
+  // (code identique pour l'instant, le serveur différencie entre ADD et EDIT)
+  else if (event.tag.startsWith(PRE_HUNT_EDIT)) {
+    const huntid = event.tag.replace(PRE_HUNT_EDIT, '');
+    return await sendHunt(huntid);
+  }
+  // Suppression d'une chasse dans la BDD en ligne
+  else if (event.tag.startsWith(PRE_HUNT_DELETE)) {
+    const huntid = event.tag.replace(PRE_HUNT_DELETE, '');
+    return await deleteHunt(huntid);
   }
 });
 
@@ -214,4 +243,84 @@ async function deleteOldCaches(newCache, action)
   catch (error) {
     return console.log(error);
   }
+}
+
+
+// Envoie une chasse de la BDD locale vers la BDD en ligne
+async function sendHunt(huntid) {
+  try {
+    const hunt = await huntStorage.getItem(huntid);
+
+    const formData = new FormData();
+    formData.append('hunt', JSON.stringify(hunt));
+    formData.append('mdp', await dataStorage.getItem('mdp-bdd'));
+
+    console.log(JSON.stringify(hunt));
+
+    const response = await fetch('mod_sendHuntToDb.php', {
+      method: 'POST',
+      body: formData
+    });
+    if (response.status != 200)
+      throw '[:(] Erreur ' + response.status + ' lors de la requête';
+    const data = response.json();
+
+    if (data['mdp'] == false)
+      throw '[:(] Mauvais mot de passe...';
+    
+    // Traiter la réponse et vérifier le bon ajout à la BDD
+    console.log('Réponse reçue du serveur :', data);
+    if (data['stored-data'] == false)
+      throw '[:(] Chasse non stockée dans la BDD...';
+    
+    if (
+      parseInt(data['stored-data']['numero_national']) == hunt.dexid
+      && data['stored-data']['forme'] == hunt.forme
+      && data['stored-data']['surnom'] == hunt.surnom
+      && data['stored-data']['methode'] == hunt.methode
+      && data['stored-data']['compteur'] == hunt.compteur
+      && data['stored-data']['date'] == hunt.date
+      && data['stored-data']['jeu'] == hunt.jeu
+      && data['stored-data']['ball'] == hunt.ball
+      && data['stored-data']['description'] == hunt.description
+      && parseInt(data['stored-data']['origin']) == hunt.origin
+      && parseInt(data['stored-data']['monjeu']) == hunt.monjeu
+      && parseInt(data['stored-data']['charm']) == hunt.charm
+      && parseInt(data['stored-data']['hacked']) == hunt.hacked
+      && parseInt(data['stored-data']['aupif']) == hunt.aupif
+    ) {
+      // La chasse est bien dans la BDD,
+      // on peut la supprimer de indexedDB.
+      return await huntStorage.removeItem(huntid);
+    } else {
+      console.log(
+        parseInt(data['stored-data']['numero_national']) == hunt.dexid,
+        data['stored-data']['forme'] == hunt.forme,
+        data['stored-data']['surnom'] == hunt.surnom,
+        data['stored-data']['methode'] == hunt.methode,
+        data['stored-data']['compteur'] == hunt.compteur,
+        data['stored-data']['date'] == hunt.date,
+        data['stored-data']['jeu'] == hunt.jeu,
+        data['stored-data']['ball'] == hunt.ball,
+        data['stored-data']['description'] == hunt.description,
+        parseInt(data['stored-data']['origin']) == hunt.origin,
+        parseInt(data['stored-data']['monjeu']) == hunt.monjeu,
+        parseInt(data['stored-data']['charm']) == hunt.charm,
+        parseInt(data['stored-data']['hacked']) == hunt.hacked,
+        parseInt(data['stored-data']['aupif']) == hunt.aupif
+      );
+      throw '[:(] Erreur de copie pendant la sauvegarde de la chasse...';
+    }
+
+  } catch(error) {
+    console.error(error);
+    return;
+  }
+}
+
+
+// Supprime un shiny de la BDD à partir de l'édition de sa chasse en local
+async function deleteHunt(huntid) {
+  // Cette fonction n'est pas implémentée pour l'instant.
+  return;
 }

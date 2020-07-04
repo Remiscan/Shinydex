@@ -6,7 +6,7 @@ import { navigate } from './mod_navigate.js';
 import { DexDatalist } from './mod_DexDatalist.js';
 
 const huntStorage = localforage.createInstance({
-  name: 'remidex-data',
+  name: 'remidex',
   storeName: 'hunts',
   driver: localforage.INDEXEDDB
 });
@@ -392,104 +392,34 @@ export class Hunt {
 
 
   // Envoie la chasse dans la BDD
-  submitHunt()
+  async submitHunt()
   {
     document.body.dataset.huntUploading = true;
 
-    const data = JSON.stringify(this);
-    const formData = new FormData();
-    formData.append('hunt', data);
-    formData.append('mdp', localStorage.getItem('remidex/mdp-bdd'));
+    // On demande au service worker d'upload la chasse dans la BDD en ligne
+    if (!'serviceWorker' in navigator || !'syncManager' in window)
+      throw 'Upload de la chasse impossible.';
 
-    console.log(data);
-
-    // Utiliser localForage pour stocker les Hunts avant de passer à ce système de sync
-
-    /*if ('serviceWorker' in navigator && 'SyncManager' in window) {
-      navigator.serviceWorker.ready.then(reg => {
-        console.log('[Sync] Sending Hunt to sw');
-        return reg.sync.register('HUNT-ADD-' + this.id);
-      }).catch(() => {
-        console.log('[No-sync] Sending hunt to server');
-        postHunt();
-      });
-    } else {
-      console.log('[No-sw] Sending hunt to server');
-      postHunt();
-    }*/
-
-    /*function postHunt() {*/
-      return fetch('mod_sendHuntToDb.php', {
-        method: 'POST',
-        body: formData
-      })
-      .then(response => {
-        //response.text().then(r => console.log(r));
-        if (response.status == 200)
-          return response;
-        else
-          throw '[:(] Erreur ' + response.status + ' lors de la requête';
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data['mdp'] == false)
-          throw '[:(] Mauvais mot de passe...';
-        
-        // Traiter la réponse et vérifier le bon ajout à la BDD
-        console.log('Réponse reçue du serveur :', data);
-        if (data['stored-data'] == false)
-          throw '[:(] Chasse non stockée dans la BDD...';
-        
-        if (
-          parseInt(data['stored-data']['numero_national']) == this.dexid
-          && data['stored-data']['forme'] == this.forme
-          && data['stored-data']['surnom'] == this.surnom
-          && data['stored-data']['methode'] == this.methode
-          && data['stored-data']['compteur'] == this.compteur
-          && data['stored-data']['date'] == this.date
-          && data['stored-data']['jeu'] == this.jeu
-          && data['stored-data']['ball'] == this.ball
-          && data['stored-data']['description'] == this.description
-          && parseInt(data['stored-data']['origin']) == this.origin
-          && parseInt(data['stored-data']['monjeu']) == this.monjeu
-          && parseInt(data['stored-data']['charm']) == this.charm
-          && parseInt(data['stored-data']['hacked']) == this.hacked
-          && parseInt(data['stored-data']['aupif']) == this.aupif
-        ) {
-          return wait(2000)
-          .then(() => {
-            console.log('[:)] Chasse sauvegardée !');
-            this.destroyHunt();
-            checkUpdate();
-            return;
-          });
-        } else {
-          console.log(
-            parseInt(data['stored-data']['numero_national']) == this.dexid,
-            data['stored-data']['forme'] == this.forme,
-            data['stored-data']['surnom'] == this.surnom,
-            data['stored-data']['methode'] == this.methode,
-            data['stored-data']['compteur'] == this.compteur,
-            data['stored-data']['date'] == this.date,
-            data['stored-data']['jeu'] == this.jeu,
-            data['stored-data']['ball'] == this.ball,
-            data['stored-data']['description'] == this.description,
-            parseInt(data['stored-data']['origin']) == this.origin,
-            parseInt(data['stored-data']['monjeu']) == this.monjeu,
-            parseInt(data['stored-data']['charm']) == this.charm,
-            parseInt(data['stored-data']['hacked']) == this.hacked,
-            parseInt(data['stored-data']['aupif']) == this.aupif
-          );
-          throw '[:(] Erreur de copie pendant la sauvegarde de la chasse...';
-        }
-      })
-      .catch(error => {
-        console.error(error);
-        notify(error);
-        return;
-      })
-      .then(() => document.body.removeAttribute('data-hunt-uploading'));
-    /*}*/
+    const reg = await navigator.serviceWorker.ready;
+    console.log('[sync] Envoi de la chasse au sw');
+    try {
+      await reg.sync.register('HUNT-ADD-' + this.id);
+      // Faire "comme si" la chasse était envoyée, c'est-à-dire :
+      // - masquer la carte de la chasse après une animation d'envoi
+      // - ajouter le shiny à la BDD locale
+      // - ajouter la carte du shiny à la liste, et re-filtrer, etc
+      // Si la chasse a bien été envoyée, la prochaine mise à jour correspondra automatiquement
+      // à ces modifications manuelles et l'utilisateur ne verra pas la différence.
+      // Sinon, la prochaine mise à jour effacera le nouveau shiny de la BDD locale,
+      // et la chasse sera affichée dans la section "chasse" comme si de rien n'était.
+      // /!\ Il faut gérer le masquage de la chasse tant qu'elle est ajoutée manuellement à la BDD
+      //     locale mais n'a pas encore été confirmée ajoutée à la BDD distante.
+      //     Pour cela, je peux ajouter une propriété "huntid" au shiny dans shinyStorage,
+      //     récupérer la liste des shiny ayant cette propriété, et comparer chaque chasse
+      //     à cette liste avant de l'afficher.
+    } catch(error) {
+      console.log('[sync] Erreur lors de la requête de synchronisation');
+    }
   }
 }
 
