@@ -21,18 +21,18 @@ export const Params = {
 
 //////////////////
 // Change le thème
-export function changeTheme()
+export async function changeTheme()
 {
   const checkbox = document.getElementById('switch-theme');
   if (checkbox.checked)
   {
     checkbox.checked = false;
-    setTheme('light');
+    return await setTheme('light');
   }
   else
   {
     checkbox.checked = true;
-    setTheme('dark');
+    return await setTheme('dark');
   }
 }
 
@@ -40,18 +40,18 @@ export function changeTheme()
 ///////////////////////////////////////////////////////
 // Change le paramètre de vérification des mises à jour
 let settingClicked = false;
-export function changeAutoMaj()
+export async function changeAutoMaj()
 {
   const checkbox = document.getElementById('switch-auto-maj');
   if (checkbox.checked)
   {
     checkbox.checked = false;
-    localStorage.setItem('remidex/check-updates', 0);
+    await dataStorage.setItem('check-updates', 0);
   }
   else
   {
     checkbox.checked = true;
-    localStorage.setItem('remidex/check-updates', 1);
+    await dataStorage.setItem('check-updates', 1);
     if (!settingClicked)
     {
       settingClicked = true;
@@ -59,14 +59,15 @@ export function changeAutoMaj()
       checkUpdate();
     }
   }
+  return;
 }
 
 
-//////////////////////////////////////////////
-// Sauvegarde le mdp de la BDD en localStorage
-export function saveDBpassword()
+//////////////////////////////
+// Sauvegarde le mdp de la BDD
+export async function saveDBpassword()
 {
-  localStorage.setItem('remidex/mdp-bdd', document.getElementById('mdp-bdd').value);
+  return await dataStorage.setItem('mdp-bdd', document.getElementById('mdp-bdd').value);
 }
 
 

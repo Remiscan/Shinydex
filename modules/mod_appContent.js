@@ -5,13 +5,15 @@ import { Pokemon } from './mod_Pokemon.js';
 import { openSpriteViewer } from './mod_spriteViewer.js';
 import { updateHunt } from './mod_Hunt.js';
 
-////////////////////////////////////////////////////////////
-// Peuple l'application à partir des données de localStorage
-export function appPopulate()
+/////////////////////////////////////////////////////////
+// Peuple l'application à partir des données de indexedDB
+export async function appPopulate()
 {
-  return new Promise((resolve, reject) => {
+  try {
     // Liste principale
-    let data = JSON.parse(localStorage.getItem('remidex/data-shinies'));
+    let data = await shinyStorage.keys();
+    data = data.map(async key => { return await shinyStorage.getItem(key) });
+    data = await Promise.all(data);
     let conteneur = document.querySelector('#mes-chromatiques>.section-contenu');
 
     if (data.length == 0) {
@@ -20,8 +22,8 @@ export function appPopulate()
       document.querySelector('#mes-chromatiques .message-vide>span').innerHTML = 'Aucun Pokémon chromatique dans la base de données. Pour en ajouter, complétez une Chasse !';
     }
 
-    data.forEach((pokemon, j) => {
-      const card = createCard(pokemon, j);
+    for (const pokemon of data) {
+      const card = await createCard(pokemon);
       card.addEventListener('click', () => toggleNotes(card.id));
       card.classList.add('defer');
       conteneur.appendChild(card);
@@ -84,9 +86,9 @@ export function appPopulate()
         {
           clearTimeout(longClic);
           longClic = setTimeout(() => { card.classList.add('editing'); }, 1000);
-          tresLongClic = setTimeout(() => {
+          tresLongClic = setTimeout(async () => {
             card.classList.remove('editing');
-            updateHunt(parseInt(card.id.replace('pokemon-card-', ''))); 
+            await updateHunt(parseInt(card.id.replace('pokemon-card-', ''))); 
           }, 3000);
       
           card.addEventListener('mouseup', () => { clearTimeout(longClic); clearTimeout(tresLongClic); card.classList.remove('editing'); });
@@ -97,9 +99,9 @@ export function appPopulate()
       card.addEventListener('touchstart', event => {
         clearTimeout(longClic);
         longClic = setTimeout(() => { card.classList.add('editing'); }, 1000);
-        tresLongClic = setTimeout(() => {
+        tresLongClic = setTimeout(async () => {
           card.classList.remove('editing');
-          updateHunt(parseInt(card.id.replace('pokemon-card-', ''))); 
+          await updateHunt(parseInt(card.id.replace('pokemon-card-', ''))); 
         }, 3000);
     
         const clear = () => { clearTimeout(longClic); clearTimeout(tresLongClic); card.classList.remove('editing'); };
@@ -107,7 +109,7 @@ export function appPopulate()
         card.addEventListener('touchend', clear);
         card.addEventListener('touchcancel', clear);
       }, { passive: true });
-    });
+    };
 
     // Pokédex
     conteneur = document.querySelector('#pokedex>.section-contenu');
@@ -121,40 +123,43 @@ export function appPopulate()
       { num: 7, start: 722, end: 809 },
       { num: 8, start: 810, end: 890 }
     ];
-    generations.forEach(gen => {
+    for (const gen of generations) {
       const genConteneur = document.createElement('div');
       genConteneur.classList.add('pokedex-gen');
       for (let i = gen.start; i <= gen.end; i++) {
         const pkmn = document.createElement('span');
-        pkmn.classList.add('pkspr', 'pokemon', Pokemon.pokemonData[i].name + '-shiny');
+        const pokemon = await pokemonData.getItem(String(i));
+        pkmn.classList.add('pkspr', 'pokemon', pokemon.name + '-shiny');
         pkmn.dataset.dexid = i;
         pkmn.addEventListener('click', event => openSpriteViewer(i, event));
         genConteneur.appendChild(pkmn);
       }
       if (gen.num > 2) genConteneur.classList.add('defer');
       conteneur.appendChild(genConteneur);
-    });
+    }
 
-    resolve('[:)] L\'application est prête !');
-  })
-  .catch(error => console.error(error));
+    return '[:)] L\'application est prête !';
+  } catch(error) {
+    console.error('[:(] Erreur critique de chargement');
+    throw error;
+  }
 }
 
 
 
 ////////////////////////
 // Affiche l'application
-export function appDisplay()
+export async function appDisplay()
 {
   const loadScreen = document.getElementById('load-screen');
   const listeImages = ['./pokesprite/pokesprite.png', './sprites.png'];
 
   const promiseImages = loadAllImages(listeImages);
-  const promiseInit = new Promise((resolve, reject) => {
-    const savedFiltres = JSON.parse(localStorage.getItem('remidex/filtres'));
+  async function promiseInit() {
+    const savedFiltres = JSON.parse(await dataStorage.getItem('filtres'));
     if (savedFiltres != null && savedFiltres.length > 0)
     {
-      filterCards(savedFiltres);
+      await filterCards(savedFiltres);
       Array.from(document.querySelectorAll('input.filtre')).forEach(input => {
         let correspondances = 0;
         for (const filtre of savedFiltres) {
@@ -166,34 +171,35 @@ export function appDisplay()
       });
     }
     else
-      filterCards();
+      await filterCards();
 
-    const savedOrdre = JSON.parse(localStorage.getItem('remidex/ordre'));
+    const savedOrdre = JSON.parse(await dataStorage.getItem('ordre'));
     if (savedOrdre != null)
     {
-      orderCards(savedOrdre);
+      await orderCards(savedOrdre);
       Array.from(document.querySelectorAll('input[name=ordre]')).forEach(input => {
         if (input.id == 'ordre-' + savedOrdre) input.checked = true;
       });
     }
     else
-      orderCards();
+      await orderCards();
 
-    const savedOrdreReverse = JSON.parse(localStorage.getItem('remidex/ordre-reverse'));
+    const savedOrdreReverse = JSON.parse(await dataStorage.getItem('ordre-reverse'));
     if (savedOrdreReverse == true)
-      reverseOrder();
+      await reverseOrder();
 
     deferCards();
     
-    document.getElementById('version-fichiers').innerHTML = localStorage.getItem('remidex/version-fichiers');
-    document.getElementById('version-bdd').innerHTML = localStorage.getItem('remidex/version-bdd');
+    document.getElementById('version-fichiers').innerHTML = await dataStorage.getItem('version-fichiers');
+    document.getElementById('version-bdd').innerHTML = await dataStorage.getItem('remidex/version-bdd');
     window.tempsFin = Date.now();
     document.getElementById('version-tempschargement').innerHTML = Number(window.tempsFin - window.tempsDebut);
-    resolve();
-  });
+    
+    return;
+  };
 
-  return Promise.all([promiseImages, promiseInit])
-  .then(() => { 
+  try {
+    await Promise.all([promiseImages, promiseInit()]);
     //document.querySelector('#mes-chromatiques').classList.add('start');
     const byeLoad = loadScreen.animate([
       { opacity: 1 },
@@ -209,6 +215,7 @@ export function appDisplay()
       //setTimeout(() => document.querySelector('#mes-chromatiques').classList.remove('start'), 200 + Params.nombreADefer * 80 + 800);
     }
     return '[:)] Bienvenue sur le Rémidex !';
-  })
-  .catch(error => console.error(error));
+  } catch(error) {
+    console.error(error);
+  }
 }

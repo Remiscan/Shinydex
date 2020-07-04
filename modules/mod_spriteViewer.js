@@ -100,9 +100,9 @@ export function closeSpriteViewer()
   });
 }
 
-function fillSpriteViewer(dexid)
+async function fillSpriteViewer(dexid)
 {
-  const pokemon = new Pokemon(Pokemon.pokemonData[dexid]);
+  const pokemon = new Pokemon(await pokemonData.getItem(String(dexid)));
   const imagesShiny = [];
   const imagesRegular = [];
   const nomFormeNormale = 'Normale';

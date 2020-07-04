@@ -5,7 +5,11 @@ import { wait } from './mod_Params.js';
 import { navigate } from './mod_navigate.js';
 import { DexDatalist } from './mod_DexDatalist.js';
 
-let currentHunts = JSON.parse(localStorage.getItem('remidex/chasses-en-cours')) || [];
+const huntStorage = localforage.createInstance({
+  name: 'remidex-data',
+  storeName: 'hunts',
+  driver: localforage.INDEXEDDB
+});
 
 export class Hunt {
   constructor({
@@ -42,11 +46,31 @@ export class Hunt {
     this.aupif = aupif;
     this.id = id;
     this.caught = caught;
+  }
 
-    const k = currentHunts.findIndex(hunt => hunt.id == this.id);
-    if (k == -1) currentHunts.push(this);
+  static async build({
+    dexid = 0,
+    forme = '',
+    surnom = '',
+    methode = '',
+    compteur = 0,
+    date = '',
+    jeu = '',
+    ball = 'poke',
+    description = '',
+    origin = 0,
+    monjeu = 1,
+    charm = 0,
+    hacked = 0,
+    aupif = 0,
+    id = new Date().getTime(),
+    caught = false
+  } = {}) {
 
-    this.buildHunt();
+    const hunt = new Hunt({ dexid, forme, surnom, methode, compteur, date, jeu, ball, description, origin, monjeu, charm, hacked, aupif, id, caught });
+    await huntStorage.setItem(id, hunt);
+    hunt.buildHunt();
+    return hunt;
   }
 
 
@@ -67,20 +91,20 @@ export class Hunt {
     const boutonAdd = card.querySelector('.bouton-compteur.add');
     const boutonSub = card.querySelector('.bouton-compteur.sub');
     const inputCompteur = card.querySelector('input[id$="-compteur"]');
-    boutonAdd.addEventListener('click', event => {
+    boutonAdd.addEventListener('click', async event => {
       event.preventDefault();
       inputCompteur.value = (inputCompteur.value < 999999) ? parseInt(inputCompteur.value) + 1 : 999999;
-      this.updateHunt();
+      await this.updateHunt();
     });
-    boutonSub.addEventListener('click', event => {
+    boutonSub.addEventListener('click', async event => {
       event.preventDefault();
       inputCompteur.value = (inputCompteur.value > 0) ? parseInt(inputCompteur.value) - 1 : 0;
-      this.updateHunt();
+      await this.updateHunt();
     });
 
     // Active le bouton "shiny capturé"
     const boutonCaught = card.querySelector('.bouton-hunt-caught');
-    boutonCaught.addEventListener('click', event => {
+    boutonCaught.addEventListener('click', async event => {
       event.preventDefault();
       boutonCaught.parentElement.parentElement.classList.toggle('caught');
       if (card.querySelector('input[type="date"]').value == '')
@@ -89,14 +113,14 @@ export class Hunt {
         this.caught = true;
       else
         this.caught = false;
-      this.updateHunt();
+      await this.updateHunt();
     });
 
     // Active le bouton "supprimer"
     const boutonSupprimer = card.querySelector('.bouton-hunt-remove');
     const boutonAnnuler = card.querySelector('.bouton-hunt-edit');
     [boutonSupprimer, boutonAnnuler].forEach(bouton => {
-      bouton.addEventListener('click', event => {
+      bouton.addEventListener('click', async event => {
         event.preventDefault();
   
         const span = bouton.querySelector('span');
@@ -107,14 +131,14 @@ export class Hunt {
         }
         else if (span.innerHTML == 'Vraiment ?')
         {
-          this.destroyHunt();
+          await this.destroyHunt();
         }
       });
     });
 
     // Active le bouton "enregistrer"
     const boutonSubmit = card.querySelector('.bouton-hunt-submit');
-    boutonSubmit.addEventListener('click', event => {
+    boutonSubmit.addEventListener('click', async event => {
       event.preventDefault();
 
       if (!navigator.onLine)
@@ -142,12 +166,12 @@ export class Hunt {
       }
       else if (span.innerHTML == 'Confirmer ?')
       {
-        this.submitHunt();
+        await this.submitHunt();
       }
     });
 
     // Détecte les modifications du formulaire
-    card.addEventListener('input', () => this.updateHunt());
+    card.addEventListener('input', async () => await this.updateHunt());
 
     document.querySelector('#chasses-en-cours>.section-contenu').appendChild(card);
     document.querySelector('#chasses-en-cours').classList.remove('vide');
@@ -264,7 +288,7 @@ export class Hunt {
 
 
   // Met à jour l'objet Hunt à partir des modifications faites au formulaire
-  updateHunt()
+  async updateHunt()
   {
     const card = document.getElementById('hunt-' + this.id);
 
@@ -304,10 +328,9 @@ export class Hunt {
     this.updateJeu();
     this.updateBall();
 
-    k = currentHunts.findIndex(hunt => hunt.id == this.id);
-    if (k == -1) throw 'Chasse inexistante';
-    currentHunts[k] = this;
-    Hunt.saveHunts();
+    k = await huntStorage.getItem(this.id);
+    if (k == null) throw 'Chasse inexistante';
+    return await huntStorage.setItem(this.id, this);
   }
 
 
@@ -353,18 +376,18 @@ export class Hunt {
 
 
   // Supprime la chasse complètement
-  destroyHunt()
+  async destroyHunt()
   {
-    const k = currentHunts.findIndex(hunt => hunt.id == this.id);
-    if (k == -1) throw 'Chasse inexistante';
-    currentHunts.splice(k, 1);
+    const k = await huntStorage.getItem(this.id);
+    if (k == null) throw 'Chasse inexistante';
 
-    if (currentHunts.length == 0) document.querySelector('#chasses-en-cours').classList.add('vide');
+    const keys = await huntStorage.keys();
+    if (keys.length == 0) document.querySelector('#chasses-en-cours').classList.add('vide');
 
     const card = document.getElementById('hunt-' + this.id);
     card.remove();
 
-    Hunt.saveHunts();
+    return await huntStorage.removeItem(this.id);
   }
 
 
@@ -468,33 +491,25 @@ export class Hunt {
       .then(() => document.body.removeAttribute('data-hunt-uploading'));
     /*}*/
   }
-
-
-  // Sauvegarde les chasses
-  static saveHunts() {
-    localStorage.setItem('remidex/chasses-en-cours', JSON.stringify(currentHunts));
-  }
 }
 
 
 
 ////////////////////////////////////////////////////////////
 // Créer une chasse pour mettre à jour une carte dans la BDD
-export function updateHunt(id) {
-  let k = currentHunts.findIndex(hunt => hunt.id == id);
-  if (k != -1) {
+export async function updateHunt(id) {
+  let k = await huntStorage.getItem(id);
+  if (k != null) {
     const message = 'Cette chasse est déjà en cours d\'édition.';
     notify(message);
     return;
   }
 
-  const allShiny = JSON.parse(localStorage.getItem('remidex/data-shinies'));
-   k = allShiny.findIndex(shiny => parseInt(shiny.id) == id);
-  const pkmn = allShiny[k];
+  const pkmn = await shinyStorage.getItem(id);
   const parseTheseInts = ['id', 'origin', 'monjeu', 'charm', 'hacked', 'aupif'];
   parseTheseInts.forEach(int => pkmn[int] = parseInt(pkmn[int]));
   pkmn.dexid = parseInt(pkmn['numero_national']);
-  const hunt = new Hunt(pkmn);
+  const hunt = await Hunt.build(pkmn);
   navigate('chasses-en-cours');
   console.log(hunt);
 }
@@ -518,10 +533,10 @@ Pokemon.jeux.forEach(jeu => {
 
 //////////////////////////////////////
 // Initialise les chasses sauvegardées
-if (currentHunts.length == 0) {
-  Hunt.saveHunts();
-  document.querySelector('#chasses-en-cours').classList.add('vide');
-} else {
-  // Créer une chasse par chasse sauvegardée
-  currentHunts.forEach(hunt => new Hunt(hunt));
+async function initHunts() {
+  const keys = await huntStorage.keys();
+  if (keys.length == 0)
+    document.querySelector('#chasses-en-cours').classList.add('vide');
+  else
+    keys.forEach(async k => Hunt.build(await huntStorage.getItem(k)));
 }

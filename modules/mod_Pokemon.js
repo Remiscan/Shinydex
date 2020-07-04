@@ -5,8 +5,6 @@ String.prototype.pad = function(long) {
   return chaine;
 }
 
-export let pokemonData = JSON.parse(localStorage.getItem('remidex/pokemon-data'));
-
 class Pokemon {
   constructor(pkmn) {
     this.dexid = pkmn.dexid;
@@ -45,14 +43,6 @@ class Pokemon {
       spriteUrl = this.getSprite(forme, {shiny: false, big: options.big, backside: options.backside});
 
     return spriteUrl;
-  }
-
-  static updatePokemonData() {
-    pokemonData = JSON.parse(localStorage.getItem('remidex/pokemon-data'));
-  }
-
-  static get pokemonData() {
-    return pokemonData;
   }
 
   static get jeux() {
@@ -95,18 +85,11 @@ class Pokemon {
 }
 
 class Shiny {
-  constructor(shiny) {
-    const dexid = parseInt(shiny['numero_national']);
-    let k = Pokemon.pokemonData.findIndex(p => p.dexid == dexid);
-    if (k == -1)
-      throw 'Aucun Pokémon ne correspond à ce Shiny';
-
-    const pokemon = Pokemon.pokemonData[k];
-
-    this.dexid = dexid;
+  constructor(shiny, pokemon) {
+    this.dexid = pokemon.dexid;
     this.dbid = shiny.id;
 
-    k = pokemon.formes.findIndex(p => p.dbid == shiny.forme);
+    let k = pokemon.formes.findIndex(p => p.dbid == shiny.forme);
     if (k == -1)
       throw `La forme de ce Shiny est invalide (${pokemon.surnom} / ${pokemon.namefr} / ${shiny.forme})`;
     this.forme = pokemon.formes[k];
@@ -124,6 +107,18 @@ class Shiny {
     this.charm = shiny.charm;
     this.hacked = shiny.hacked;
     this.random = shiny.aupif;
+  }
+
+  static async build(shiny) {
+    const dexid = shiny['numero_national'];
+    let pokemon;
+    try {
+      pokemon = await pokemonData.getItem(dexid);
+      if (pokemon == null) throw 'Aucun Pokémon ne correspond à ce Shiny';
+      return new Shiny(shiny, pokemon);
+    } catch(error) {
+      console.error(error);
+    }
   }
 
   get mine() {

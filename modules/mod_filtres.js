@@ -10,7 +10,7 @@ let cardsOrdered = [];
 const defautFiltres = ['do:moi', 'legit:oui'];
 let currentFiltres = defautFiltres;
 
-export function filterCards(filtres = defautFiltres)
+export async function filterCards(filtres = defautFiltres)
 {
   const allCards = Array.from(document.querySelectorAll('#mes-chromatiques .pokemon-card'));
   const filteredCards = [];
@@ -37,7 +37,7 @@ export function filterCards(filtres = defautFiltres)
   });
   //console.log('Cartes filtrées :', filtres);
   filterDex();
-  localStorage.setItem('remidex/filtres', JSON.stringify(filtres));
+  await dataStorage.setItem('filtres', JSON.stringify(filtres));
   currentFiltres = filtres;
 
   const compteur = allCards.length - filteredCards.length;
@@ -55,7 +55,7 @@ export function filterCards(filtres = defautFiltres)
 const defautOrdre = 'date';
 let currentOrdre = defautOrdre;
 
-export function orderCards(ordre = defautOrdre, reversed = false)
+export async function orderCards(ordre = defautOrdre, reversed = false)
 {
   const allCards = Array.from(document.querySelectorAll('#mes-chromatiques .pokemon-card'));
   let ordrement;
@@ -116,7 +116,7 @@ export function orderCards(ordre = defautOrdre, reversed = false)
     sortedCards = sortedCards.reverse();
   
   sortedCards.forEach((card, ordre) => card.style.setProperty('--order', ordre));
-  localStorage.setItem('remidex/ordre', JSON.stringify(ordre));
+  await dataStorage.setItem('ordre', JSON.stringify(ordre));
   currentOrdre = ordre;
   //console.log('Cartes ordonnées :', ordre, reverse);
 }
@@ -126,18 +126,18 @@ export function orderCards(ordre = defautOrdre, reversed = false)
 //////////////////
 // Inverse l'ordre
 let currentReversed = false;
-export function reverseOrder()
+export async function reverseOrder()
 {
   if (currentReversed) {
     document.body.removeAttribute('data-reversed');
     currentReversed = false;
-    localStorage.setItem('remidex/ordre-reverse', JSON.stringify(false));
+    await dataStorage.setItem('remidex/ordre-reverse', JSON.stringify(false));
   } else {
     document.body.dataset.reversed = true;
     currentReversed = true;
-    localStorage.setItem('remidex/ordre-reverse', JSON.stringify(true));
+    await dataStorage.setItem('remidex/ordre-reverse', JSON.stringify(true));
   }
-  orderCards(currentOrdre, currentReversed);
+  return orderCards(currentOrdre, currentReversed);
 }
 
 
@@ -239,8 +239,8 @@ export function cardsInOrder() { return cardsOrdered; }
 // Surveille les options d'ordre
 Array.from(document.querySelectorAll('label.ordre')).forEach(label => {
   label.addEventListener('click', () => {
-    orderCards(label.getAttribute('for').replace('ordre-', ''));
-    deferCards();
+    orderCards(label.getAttribute('for').replace('ordre-', ''))
+    .then(deferCards);
   });
 });
 
@@ -248,15 +248,15 @@ Array.from(document.querySelectorAll('label.ordre')).forEach(label => {
 // Surveille les options de filtres
 Array.from(document.querySelectorAll('input.filtre')).forEach(radio => {
   radio.addEventListener('change', () => {
-    filterCards(buildFiltres());
-    deferCards();
+    filterCards(buildFiltres())
+    .then(deferCards);
   });
 });
 
 // Active le bouton d'inversion de l'ordre
 document.querySelector('.reverse-order').addEventListener('click', () => {
-  reverseOrder();
-  deferCards();
+  reverseOrder
+  .then(deferCards);
 });
 
 ///////////////////////////////

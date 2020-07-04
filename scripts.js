@@ -1,8 +1,8 @@
 import { Params, changeTheme, changeAutoMaj, callResize, saveDBpassword } from './modules/mod_Params.js';
 import { navigate } from './modules/mod_navigate.js';
 import { easterEgg } from './modules/mod_easterEgg.js';
-import { initServiceWorker, checkUpdate, manualUpdate } from './modules/mod_appLifeCycle.js';
-import { openFiltres, reverseOrder } from './modules/mod_filtres.js';
+import { appStart, checkUpdate, manualUpdate } from './modules/mod_appLifeCycle.js';
+import { openFiltres } from './modules/mod_filtres.js';
 import { Hunt } from './modules/mod_Hunt.js';
 
 
@@ -37,7 +37,7 @@ document.querySelector('.obfuscator').addEventListener('click', () => history.ba
 // CHASSES EN COURS
 
 // Active le bouton de création de chasse
-document.querySelector('.bouton-new-hunt').addEventListener('click', () => new Hunt());
+document.querySelector('.bouton-new-hunt').addEventListener('click', () => Hunt.build());
 
 
 
@@ -45,21 +45,25 @@ document.querySelector('.bouton-new-hunt').addEventListener('click', () => new H
 // PARAMÈTRES & À PROPOS
 
 // Active les switch des paramètres
-if (localStorage.getItem('remidex/theme') == 'light')
-  document.getElementById('switch-theme').checked = false;
-else
-  document.getElementById('switch-theme').checked = true;
+dataStorage.getItem('theme').then(theme => {
+  if (theme == 'light')
+    document.getElementById('switch-theme').checked = false;
+  else
+    document.getElementById('switch-theme').checked = true;
+});
 
-if (localStorage.getItem('remidex/check-updates') == 1)
-  document.getElementById('switch-auto-maj').checked = true;
-else
-  document.getElementById('switch-auto-maj').checked = false;
+dataStorage.getItem('check-updates').then(value => {
+  if (value == 1)
+    document.getElementById('switch-auto-maj').checked = true;
+  else
+    document.getElementById('switch-auto-maj').checked = false;
+});
 
-document.querySelector('[for=switch-theme]').onclick = event => { event.preventDefault(); changeTheme(); };
-document.querySelector('[for=switch-auto-maj]').onclick = event => { event.preventDefault(); changeAutoMaj(); };
+document.querySelector('[for=switch-theme]').onclick = async event => { event.preventDefault(); return await changeTheme(); };
+document.querySelector('[for=switch-auto-maj]').onclick = async event => { event.preventDefault(); return await changeAutoMaj(); };
 
-document.getElementById('mdp-bdd').addEventListener('input', () => {
-  saveDBpassword();
+document.getElementById('mdp-bdd').addEventListener('input', async () => {
+  return await saveDBpassword();
 });
 
 // Active l'easter egg de la section a-propos
@@ -100,7 +104,7 @@ majButton.addEventListener('touchstart', () => {
 history.replaceState({section: 'mes-chromatiques'}, '');
 
 // Lancement du service worker
-window.addEventListener('load', initServiceWorker);
+window.addEventListener('load', appStart);
 
 // Gère le redimensionnement de la fenêtre
 window.addEventListener('resize', callResize);
