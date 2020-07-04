@@ -170,7 +170,7 @@ export function deferCards()
 {
   document.querySelector('main').scroll(0, 0);
   cardsOrdered = Array.from(document.querySelectorAll('#mes-chromatiques .pokemon-card:not(.filtered)'))
-                      .sort((a, b) => parseInt(a.style.order) - parseInt(b.style.order));
+                      .sort((a, b) => parseInt(a.style.getPropertyValue('--order')) - parseInt(b.style.getPropertyValue('--order')));
   if (document.body.classList.contains('reverse'))
     cardsOrdered.reverse();
 
@@ -238,25 +238,25 @@ export function cardsInOrder() { return cardsOrdered; }
 ////////////////////////////////
 // Surveille les options d'ordre
 Array.from(document.querySelectorAll('label.ordre')).forEach(label => {
-  label.addEventListener('click', () => {
-    orderCards(label.getAttribute('for').replace('ordre-', ''))
-    .then(deferCards);
+  label.addEventListener('click', async () => {
+    await orderCards(label.getAttribute('for').replace('ordre-', ''));
+    deferCards();
   });
 });
 
 ///////////////////////////////////
 // Surveille les options de filtres
 Array.from(document.querySelectorAll('input.filtre')).forEach(radio => {
-  radio.addEventListener('change', () => {
-    filterCards(buildFiltres())
-    .then(deferCards);
+  radio.addEventListener('change', async () => {
+    await filterCards(buildFiltres());
+    deferCards();
   });
 });
 
 // Active le bouton d'inversion de l'ordre
-document.querySelector('.reverse-order').addEventListener('click', () => {
-  reverseOrder
-  .then(deferCards);
+document.querySelector('.reverse-order').addEventListener('click', async () => {
+  await reverseOrder();
+  deferCards();
 });
 
 ///////////////////////////////
