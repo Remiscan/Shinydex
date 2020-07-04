@@ -155,17 +155,13 @@ function appUpdate(update = false, force = false)
     const chan = new MessageChannel();
 
     // On se prépare à recevoir la réponse
-    chan.port1.onmessage = function(event)
-    {
-      if (event.data.error)
-      {
+    chan.port1.onmessage = function(event) {
+      if (event.data.error) {
         console.error(event.data.error);
         reject('[:(] Erreur de contact du service worker');
       }
-      else
-      {
-        if (update)
-        {
+      else {
+        if (update) {
           document.querySelector('.progression-maj').style.setProperty('--progression', 1);
           setTimeout(function() { location.reload(true); }, 100);
         }
@@ -202,7 +198,8 @@ export async function manualUpdate(force = false)
     if (!'serviceWorker' in navigator)
       throw 'Service worker indisponible';
 
-    notify('Mise à jour forcée...');
+    if (force) notify('Mise à jour forcée...');
+    else document.querySelector('.notif-texte').innerHTML = 'Installation en cours...';
     document.getElementById('notification').classList.add('installing');
     const result = await appUpdate(true, force);
     return console.log(result);
@@ -210,7 +207,7 @@ export async function manualUpdate(force = false)
   catch (raison) {
     console.error(raison);
     document.getElementById('notification').classList.remove('installing');
-    notify('Échec de mise à jour', 'Réessayer', 'update', manualUpdate, 10000);
+    notify('Échec de mise à jour', 'Réessayer', 'update', () => manualUpdate(false), 10000);
   }
 }
 
@@ -219,58 +216,55 @@ export async function manualUpdate(force = false)
 /////////////////////////////////////////////
 // Vérifie la disponibilité d'une mise à jour
 let checkingUpdate = 0;
-export function checkUpdate(checkNotification = false)
+export async function checkUpdate(checkNotification = false)
 {
   const notif = document.getElementById('notification');
   if (notif.classList.contains('on') || checkingUpdate)
     return;
   checkingUpdate = 1;
   const texteSucces = 'Mise à jour disponible...';
+  const notifyMaj = () => {
+    notify(texteSucces, 'Installer', 'update', () => manualUpdate(false), 10000);
+    checkingUpdate = 0;
+    return texteSucces;
+  }
 
-  return new Promise((resolve, reject) => {
+  try {
     if (!navigator.onLine)
-      return reject('Pas de connexion internet');
+      throw 'Pas de connexion internet';
     if (updateAvailable)
-      return resolve(texteSucces);
+      notifyMaj();
 
     // On lance mod_update.php pour récupérer les données les plus récentes
-    fetch('/remidex/mod_update.php?type=check&date=' + Date.now())
-    .then(response => {
-      if (response.status == 200)
-        return response;
-      else
-        throw '[:(] Erreur ' + response.status + ' lors de la requête';
-    })
-    .then(response => { return response.json(); })
-    .then(data => {
-      if ((localStorage.getItem('remidex/version-fichiers') != data['version-fichiers']) || (localStorage.getItem('remidex/version-bdd') != data['version-bdd']))
-      {
-        updateAvailable = 1;
-        console.log('[:|] Mise à jour détectée');
-        console.log('     Installé : fichiers v. ' + localStorage.getItem('remidex/version-fichiers') + ', bdd v. ' + localStorage.getItem('remidex/version-bdd'));
-        console.log('   Disponible : fichiers v. ' + data['version-fichiers'] + ', bdd v. ' + data['version-bdd']);
-        return texteSucces;
-      }
-      else
-      {
-        updateAvailable = 0;
-        console.log('[:)] Aucune mise à jour disponible');
-        console.log('     Installé : fichiers v. ' + localStorage.getItem('remidex/version-fichiers') + ', bdd v. ' + localStorage.getItem('remidex/version-bdd'));
-        throw 'Pas de mise à jour';
-      }
-    })
-    .then(result => resolve(result))
-    .catch(error => reject(error))
-  })
-  .then(result => {
-    notify(result, 'Installer', 'update', manualUpdate, 10000);
-    checkingUpdate = 0;
-  })
-  .catch(error => {
+    const response = await fetch('/remidex/mod_update.php?type=check&date=' + Date.now());
+    if (response.status != 200)
+      throw '[:(] Erreur ' + response.status + ' lors de la requête';
+    const data = await response.json();
+
+    const versionFichiers = await dataStorage.getItem('version-fichiers');
+    const versionBDD = await dataStorage.getItem('version-bdd');
+
+    if ((versionFichiers != data['version-fichiers']) || (versionBDD != data['version-bdd']))
+    {
+      updateAvailable = 1;
+      console.log('[:|] Mise à jour détectée');
+      console.log('     Installé : fichiers v. ' + versionFichiers + ', bdd v. ' + versionBDD);
+      console.log('   Disponible : fichiers v. ' + data['version-fichiers'] + ', bdd v. ' + data['version-bdd']);
+
+      notifyMaj();
+    }
+    else
+    {
+      updateAvailable = 0;
+      console.log('[:)] Aucune mise à jour disponible');
+      console.log('     Installé : fichiers v. ' + versionFichiers + ', bdd v. ' + versionBDD);
+      throw 'Pas de mise à jour';
+    }
+  } catch(error) {
     if (checkNotification)
       notify(error);
     checkingUpdate = 0;
-  });
+  }
 }
 
 
