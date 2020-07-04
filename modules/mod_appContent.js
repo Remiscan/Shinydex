@@ -1,6 +1,6 @@
 import { createCard, toggleNotes } from './mod_pokemonCard.js';
-import { filterCards, orderCards, reverseOrder, deferCards, cardsInOrder } from './mod_filtres.js';
-import { Params, loadAllImages } from './mod_Params.js';
+import { filterCards, orderCards, reverseOrder, deferCards, deferMonitor } from './mod_filtres.js';
+import { Params, loadAllImages, wait } from './mod_Params.js';
 import { Pokemon } from './mod_Pokemon.js';
 import { openSpriteViewer } from './mod_spriteViewer.js';
 import { updateHunt } from './mod_Hunt.js';
@@ -27,55 +27,6 @@ export async function appPopulate()
       card.addEventListener('click', () => toggleNotes(card.id));
       card.classList.add('defer');
       conteneur.appendChild(card);
-
-      /*// Surveille la position de chaque carte pour charger / décharger les autres
-      let previousY = null;
-      let previousRatio = 0;
-      const deferMonitor = function(entries, observer) {
-        entries.forEach(entry => {
-          const currentY = entry.boundingClientRect.y;
-          const currentRatio = entry.intersectionRatio;
-          const isVisible = entry.isIntersecting;
-
-          const card = entry.target;
-          const k = cardsInOrder().findIndex(c => c.id == card.id);
-          const nextCard = cardsInOrder()[k + 6];
-          const prevCard = cardsInOrder()[k - 1];
-
-          if (previousY == null) previousY = currentY;
-          //if (previousRatio == null) previousRatio = currentRatio;
-
-          if (currentY < previousY) {
-            if (currentRatio > previousRatio) {
-              // Vers le bas - entrée
-              //console.log('Afficher', nextCard);
-              for (let i = k + 1; i <= k + 10; i++) {
-                const nextCard = cardsInOrder()[i]
-                if (typeof nextCard != 'undefined')
-                  nextCard.classList.replace('defer', 'defered');
-              }
-            } else {
-              // Vers le bas - sortie
-              //console.log('Cacher', prevCard);
-            }
-          } else if (currentY > previousY) {
-            if (currentRatio < previousRatio) {
-              // Vers le haut - sortie
-              //console.log('Afficher', prevCard);
-            } else {
-              // Vers le bas - sortie
-              //console.log('Cacher', prevCard);
-            }
-          }
-
-          previousY = currentY;
-          previousRatio = currentRatio;
-        });
-      }
-      const observer = new IntersectionObserver(deferMonitor, {
-        threshold: [0.1, 0.5, 1.0],
-      });
-      observer.observe(card);*/
 
       // Active le long clic pour éditer
       let longClic;
@@ -191,7 +142,7 @@ export async function appDisplay()
     deferCards();
     
     document.getElementById('version-fichiers').innerHTML = await dataStorage.getItem('version-fichiers');
-    document.getElementById('version-bdd').innerHTML = await dataStorage.getItem('remidex/version-bdd');
+    document.getElementById('version-bdd').innerHTML = await dataStorage.getItem('version-bdd');
     window.tempsFin = Date.now();
     document.getElementById('version-tempschargement').innerHTML = Number(window.tempsFin - window.tempsDebut);
     
@@ -211,8 +162,13 @@ export async function appDisplay()
     });
     byeLoad.onfinish = () => {
       loadScreen.remove();
-      document.getElementById('mes-chromatiques').classList.add('defered');
-      //setTimeout(() => document.querySelector('#mes-chromatiques').classList.remove('start'), 200 + Params.nombreADefer * 80 + 800);
+
+      // Surveille le defer-loader pour charger le reste des shiny quand il apparaît à l'écran
+      const deferLoader = document.querySelector('.defer-loader');
+      const observer = new IntersectionObserver(deferMonitor, {
+        threshold: 1,
+      });
+      observer.observe(deferLoader);
     }
     return '[:)] Bienvenue sur le Rémidex !';
   } catch(error) {

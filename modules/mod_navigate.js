@@ -51,7 +51,8 @@ export function navigate(sectionCible, position = 0, historique = true)
     if (sectionCible == 'a-propos' || (sectionCible == 'parametres' && Params.owidth >= Params.layoutPClarge))
       easterEgg();
 
-    nouvelleSection.classList.add('defered');
+    if (sectionCible != 'mes-chromatiques')
+      nouvelleSection.classList.add('defered');
     ancienneSection.classList.remove('defered');
     Array.from(ancienneSection.querySelectorAll('.defered')).forEach(defered => defered.classList.replace('defered', 'defer'));
   });

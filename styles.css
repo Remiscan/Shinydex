@@ -836,6 +836,26 @@ html.dark .icones.explain.galarborn { background-position: -120px -44px; }
   font-size: 16px;
 }
 
+
+
+.defer-loader {
+  border: 1px solid var(--card-bg-color);
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  order: 999999999;
+  margin: 0 0 6px;
+  padding: 6px;
+  color: var(--text-color-soft);
+}
+
+.defered .defer-loader {
+  display: none;
+}
+
+
+
 .vide {
   height: 100%;
 }
@@ -869,6 +889,10 @@ html.dark .icones.explain.galarborn { background-position: -120px -44px; }
 }
 
 section:not(.vide) .message-vide {
+  display: none;
+}
+
+section.vide .defer-loader {
   display: none;
 }
 

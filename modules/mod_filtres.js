@@ -181,6 +181,16 @@ export function deferCards()
   });
 }
 
+export function deferMonitor(entries)
+{
+  if (document.body.dataset.sectionActuelle != 'mes-chromatiques')
+    return;
+  entries.forEach(async entry => {
+    if (!entry.isIntersecting) return;
+    document.getElementById('mes-chromatiques').classList.add('defered');
+  });
+}
+
 
 ////////////////////////////
 // Ouvre le menu des filtres
