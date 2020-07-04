@@ -12,51 +12,29 @@ let appChargee;
 let isStarted = 0;
 let updateAvailable = 0;
 
-export function initServiceWorker()
+async function initServiceWorker()
 {
-  if ('serviceWorker' in navigator)
-  {
-    if (navigator.serviceWorker.controller != null)
-    {
-      currentWorker = navigator.serviceWorker.controller;
-      isStarted = 1;
-      console.log('[sw] Démarrage...');
-      appStart();
-    }
+  try {
+    const registration = await navigator.serviceWorker.register('/remidex/service-worker.js');
+    console.log('Le service worker a été enregistré', registration);
 
-    navigator.serviceWorker.register('/remidex/service-worker.js')
-    .then(registration => {
-      console.log('Le service worker a été enregistré', registration);
-      registration.addEventListener('updatefound', () => {
-        const newWorker = registration.installing;
-        newWorker.addEventListener('statechange', () => {
-          if (newWorker.state == 'activated')
-          {
-            console.log('[sw] Service worker mis à jour');
-            currentWorker = newWorker;
-          }
-        });
+    // On détecte les mises à jour du service worker lui-même
+    registration.addEventListener('updatefound', () => {
+      const newWorker = registration.installing;
+      newWorker.addEventListener('statechange', () => {
+        if (newWorker.state == 'activated')
+        {
+          console.log('[sw] Service worker mis à jour');
+          currentWorker = newWorker;
+        }
       });
-      return registration.installing || navigator.serviceWorker.controller || registration.active;
-    })
-    .then(sw => {
-      currentWorker = sw;
-      if (!isStarted)
-      {
-        console.log('[sw] Démarrage...');
-        appStart();
-      }
-      else if (appChargee === true && localStorage.getItem('remidex/check-updates') == 1)
-        checkUpdate();
-    })
-    .catch(error => {
-      console.error(error);
-      if (!isStarted)
-      {
-        console.log('[non-sw] Démarrage...');
-        appStart();
-      }
-    })
+    });
+
+    currentWorker = registration.installing || navigator.serviceWorker.controller || registration.active;
+    return currentWorker;
+  } catch(error) {
+    console.error(error);
+    throw null;
   }
 }
 
@@ -64,92 +42,102 @@ export function initServiceWorker()
 
 /////////////////////////////////////////////////////////
 // Démarre l'application (update? => populate => display)
-function appStart()
+export async function appStart()
 {
+  if (!'serviceWorker' in navigator)
+    throw 'Application non supportée.';
+
   // Étape 1 : on vérifie si l'application est installée localement
 
-  caches.keys()
-  .then(keys => {
-    const trueKeys = keys.filter(e => e.includes('remidex'));
-    return trueKeys.length;
-  })
-  .then(result => {
-    if (result >= 1 && localStorage.getItem('remidex/version') !== null)
+  let log;
+  try {
+    let filesInstalled = false;
+    let dataInstalled = false;
+    let serviceWorkerReady = navigator.serviceWorker.controller != null;
+
+    // On vérifie si les données sont installées
+    await Promise.all([dataStorage.ready(), shinyStorage.ready(), pokemonData.ready()]);
+    const installedVersion = await dataStorage.getItem('version');
+    if (installedVersion !== null)
+      dataInstalled = true;
+
+    // On vérifie si les fichiers sont installés
+    const keys = await caches.keys();
+    const trueKeys = keys.filter(e => e.includes('remidex-sw-' + installedVersion));
+    if (trueKeys.length >= 1)
+      filesInstalled = true;
+
+    if (filesInstalled && dataInstalled && serviceWorkerReady)
     {
       appCached = true;
-      return '[:)] L\'application est déjà installée localement.';
+      log = '[:)] L\'application est déjà installée localement.';
+      initServiceWorker();
     }
     else
     {
       appCached = false;
       throw '[:(] L\'application n\'est pas installée localement';
     }
-  })
+  }
 
   // Étape 2 : si la réponse est non, on installe l'application
   //   si l'installation est impossible, on arrête et on retentera une fois le service worker disponible
 
-  .catch(raison => {
-    console.log(raison);
+  catch(error) {
+    console.log(error);
     console.log('[:|] Préparation de l\'installation...');
-    return appUpdate();
-  })
+    await initServiceWorker();
+    log = await appUpdate();
+  }
 
-  // Étape 3 : on peuple l'application à partir de localStorage
-
-  .then(result => {
+  try {
     appChargee = 'loading';
-    console.log(result);
+    console.log(log);
     console.log('[:)] Chargement de l\'application...');
     recalcOnResize();
-    return appPopulate();
-  })
+
+    // Étape 3 : on peuple l'application à partir des données locales
+    log = await appPopulate();
+    console.log(log);
+
+    // Étape 4 : on affiche l'application
+    log = await appDisplay();
+    console.log(log);
+    appChargee = 'loaded';
+
+    // Fini !! :)
+    appChargee = true;
+
+    const willCheckUpdate = await dataStorage.getItem('check-updates');
+    if (willCheckUpdate == 1) {
+      await navigator.serviceWorker.ready;
+      return checkUpdate();
+    } else {
+      return;
+    }
+  }
 
   // En cas d'erreur critique, on propose de réinstaller
-
-  .catch(error => {
-    throw '[:(] Erreur critique de chargement';
-  })
-
-  // Étape 4 : on affiche l'application
-  
-  .then(result => {
-    console.log(result);
-    return appDisplay();
-  })
-
-  // Fini !! :)
-
-  .then(result => {
-    appChargee = 'loaded';
-    console.log(result);
-    if (typeof currentWorker !== 'undefined' && currentWorker != null)
-    {
-      checkInstall();
-      if (localStorage.getItem('remidex/check-updates') == 1)
-        return checkUpdate();
-    }
-    appChargee = true;
-  })
-
-  .catch(error => {
+  catch(error) {
     console.error(error);
     appChargee = false;
     if (error == '[:(] Erreur critique de chargement')
     {
-      const forceUpdateNow = () => {
-        const allStorage = Object.keys(localStorage).filter(s => s.startsWith('remidex/'));
-        allStorage.forEach(s => localStorage.removeItem(s));
+      async function forceUpdateNow() {
+        [dataStorage, shinyStorage, pokemonData].forEach(async store => {
+          const keys = await store.keys();
+          keys.forEach(k => store.removeItem(k));
+        });
         manualUpdate(true);
       };
-      document.getElementById('load_screen').remove();
+      document.getElementById('load-screen').remove();
       return notify('Échec critique du chargement...', 'Réinstaller', 'refresh', forceUpdateNow, 2147483647);
     }
     else if (error != '[:(] Service worker indisponible')
     {
       return notify('Échec du chargement...', 'Réessayer', 'refresh', () => { location.reload() }, 2147483647);
     }
-  });
+  }
 }
 
 
@@ -163,92 +151,67 @@ function appUpdate(update = false, force = false)
     if (typeof currentWorker === 'undefined' || currentWorker == null)
       return reject('[:(] Service worker indisponible');
 
-    // On lance mod_update.php pour récupérer les données les plus récentes
-    fetch('/remidex/mod_update.php?type=full&date=' + Date.now() + '&force=' + force)
-    .then(response => {
-      if (response.status == 200)
-        return response;
-      else
-        throw '[:(] Erreur ' + response.status + ' lors de la requête';
-    })
-    .then(response => { return response.json(); })
-    .then(data => {
-      // On demande au service worker de mettre à jour le cache et on attend sa réponse
-      console.log('[:|] Installation des fichiers...');
+    // On demande au service worker de mettre à jour l'appli' et on attend sa réponse
+    const chan = new MessageChannel();
 
-      // On se prépare à contacter le SW
-      const chan = new MessageChannel();
-
-      // À la réception de la réponse du SW
-      chan.port1.onmessage = function(event)
+    // On se prépare à recevoir la réponse
+    chan.port1.onmessage = function(event)
+    {
+      if (event.data.error)
       {
-        if (event.data.error)
-        {
-          console.error(event.data.error);
-          reject('[:(] Erreur de contact du service worker');
-        }
-        else
-        {
-          console.log('[:)] Fichiers correctement installés !');
-          console.log('[:|] Installation des données...');
-          localStorage.setItem('remidex/version-fichiers', data['version-fichiers']);
-          localStorage.setItem('remidex/version', data['version']);
-          localStorage.setItem('remidex/version-bdd', data['version-bdd']);
-          localStorage.setItem('remidex/data-shinies', JSON.stringify(data['data-shinies']));
-          localStorage.setItem('remidex/pokemon-data', JSON.stringify(data['pokemon-data']));
-          Pokemon.updatePokemonData();
-          if (update)
-          {
-            document.querySelector('.progression-maj').style.setProperty('--progression', 1);
-            setTimeout(function() { location.reload(true); }, 100);
-          }
-          resolve('[:)] Installation terminée !');
-        }
+        console.error(event.data.error);
+        reject('[:(] Erreur de contact du service worker');
       }
-
-      // On contacte le SW
-      currentWorker.postMessage({'action': 'update', 'version': version}, [chan.port2]);
-
-      // On surveille l'avancée du SW grâce aux messages qu'il envoie
-      let totalLoaded = 0;
-      navigator.serviceWorker.addEventListener('message', event => {
-        if (event.data.loaded)
+      else
+      {
+        if (update)
         {
-          totalLoaded++;
-          document.querySelector('.progression-maj').style.setProperty('--progression', totalLoaded / (event.data.total + 1));
+          document.querySelector('.progression-maj').style.setProperty('--progression', 1);
+          setTimeout(function() { location.reload(true); }, 100);
         }
-        else if (!event.data.loaded && event.data.erreur)
-          reject('[:(] Certains fichiers n\'ont pas pu être récupérés');
-      });
-    })
-  })
+        resolve('[:)] Installation terminée !');
+      }
+    }
+
+    // On contacte le SW
+    currentWorker.postMessage({'action': 'update', 'force': force}, [chan.port2]);
+
+    // On surveille l'avancée du SW grâce aux messages qu'il envoie
+    let totalLoaded = 0;
+    navigator.serviceWorker.addEventListener('message', event => {
+      if (event.data.loaded)
+      {
+        totalLoaded++;
+        document.querySelector('.progression-maj').style.setProperty('--progression', totalLoaded / (event.data.total + 1));
+      }
+      else if (!event.data.loaded && event.data.erreur)
+        reject('[:(] Certains fichiers n\'ont pas pu être récupérés');
+    });
+  });
 }
 
 
 
 ////////////////////////////////////////
 // Met à jour l'application manuellement
-export function manualUpdate(force = false)
+export async function manualUpdate(force = false)
 {
-  return new Promise((resolve, reject) => {
+  try {
     if (!navigator.onLine)
-      reject('Connexion internet indisponible');
-    if ('serviceWorker' in navigator)
-      resolve();
-    else
-      reject('Service worker indisponible');
-  })
-  .then(() => {
+      throw 'Connexion internet indisponible';
+    if (!'serviceWorker' in navigator)
+      throw 'Service worker indisponible';
+
     notify('Mise à jour forcée...');
     document.getElementById('notification').classList.add('installing');
-    return appUpdate(true, force);
-  })
-  .then(result => console.log(result))
-  .catch(raison => {
+    const result = await appUpdate(true, force);
+    return console.log(result);
+  }
+  catch (raison) {
     console.error(raison);
     document.getElementById('notification').classList.remove('installing');
     notify('Échec de mise à jour', 'Réessayer', 'update', manualUpdate, 10000);
-  });
+  }
 }
 
 

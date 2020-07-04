@@ -1,39 +1,39 @@
-var PRE_CACHE = 'remidex-sw';
+importScripts('./ext/localforage.min.js');
+
+// Stockage de données
+//// Pokédex
+const pokemonData = localforage.createInstance({
+  name: 'remidex',
+  storeName: 'pokemon-data',
+  driver: localforage.INDEXEDDB
+});
+//// Liste de shiny
+const shinyStorage = localforage.createInstance({
+  name: 'remidex',
+  storeName: 'shiny-list',
+  driver: localforage.INDEXEDDB
+});
+//// Données diverses
+const dataStorage = localforage.createInstance({
+  name: 'remidex',
+  storeName: 'misc',
+  driver: localforage.INDEXEDDB
+});
+
+const PRE_CACHE = 'remidex-sw';
+
+
 
 ///// EVENTS
+
 
 // INSTALLATION
 self.addEventListener('install', function(event)
 {
-  console.log('[install] Début de l\'installation du service worker...');
+  console.log('[install] Installation du service worker...');
   event.waitUntil(
-    caches.open(PRE_CACHE)
-    .then(cache => {
-      // On récupère le contenu du fichier cache.json
-      return fetch('cache.json?' + Date.now())
-      .then(response => {
-        return response.json();
-      })
-      .then(jsondata => {
-        // Ensuite, on ajoute au cache la liste des fichiers du cache.json
-        console.log('[install] Mise en cache des fichiers listés dans cache.json : ', jsondata.fichiers);
-        return Promise.all(
-          jsondata.fichiers.map(url => {
-            let request = new Request(url, {cache: 'reload'});
-            return fetch(request)
-            .then(response => {
-              if (!response.ok)
-                throw Error('[install] Le fichier n\'a pas pu être récupéré...');
-              return cache.put(request, response);
-            })
-          })
-        )
-      })
-    })
-    .then(() => {
-      console.log('[install] Tous les fichiers sont dans le cache !');
-      return deleteOldCaches(PRE_CACHE, 'install');
-    })
+    getData(true)
+    .then(data => installData(data, 'install'))
     .catch(raison => console.log('[install] ' + raison))
     .then(() => {
       console.log('[install] Le service worker est bien installé !');
@@ -43,6 +43,7 @@ self.addEventListener('install', function(event)
   )
 });
 
+
 // ACTIVATION
 self.addEventListener('activate', function(event)
 {
@@ -50,6 +51,7 @@ self.addEventListener('activate', function(event)
   console.log('[activate] Définition de ce service worker comme service worker actif de cette page');
   event.waitUntil(self.clients.claim()); // force le service worker à prendre le contrôle de la page immédiatement
 });
+
 
 // FETCH
 self.addEventListener('fetch', function(event)
@@ -76,84 +78,140 @@ self.addEventListener('fetch', function(event)
   }
 });
 
-// MESSAGE
-self.addEventListener('message', function(event)
-{
-  var source = event.source; // client source du message
 
+// MESSAGE
+self.addEventListener('message', function(event) {
   // UPDATE
   if (event.data.action == 'update')
   {
-    var newCACHE = PRE_CACHE + '-' + event.data.version;
-    var responsePORT = event.ports[0];
-    console.log('[update] Mise à jour du cache demandée...');
-    event.wainUntil(
-      caches.open(newCACHE)
-      .then(cache => {
-        // On récupère le contenu du fichier cache.json
-        return fetch('cache.json?' + Date.now())
-        .then(response => {
-          return response.json();
-        })
-        .then(jsondata => {
-          // Ensuite, on ajoute au cache la liste des fichiers du cache.json
-          console.log('[update] Mise en cache des fichiers listés dans cache.json : ', jsondata.fichiers);
-          var totalFichiers = jsondata.fichiers.length;
-          return Promise.all(
-            jsondata.fichiers.map(url => {
-              let request = new Request(url, {cache: 'reload'});
-              return fetch(request)
-              .then(response => {
-                if (!response.ok)
-                  throw Error('[update] Le fichier n\'a pas pu être récupéré...', request.url);
-                source.postMessage({loaded: true, total: totalFichiers, url: request.url});
-                return cache.put(request, response);
-              })
-            })
-          )
-        })
-      })
-      .then(() => {
-        console.log('[update] Mise à jour du cache terminée !');
-        // Supprimons les vieux caches
-        return deleteOldCaches(newCACHE, 'update')
-        .catch(raison => console.log('[update] ' + raison))
-        .then(() => {
-          responsePORT.postMessage({message: '[update] Nettoyage terminé !'});
-        })
-      })
+    console.log('[update] Mise à jour de l\'application demandée...');
+    const source = event.source;
+
+    event.waitUntil(
+      getData(event.data.force)
+      .then(data => installData(data, 'update', event))
       .catch(error => {
         source.postMessage({loaded: false, erreur: true});
         console.error(error);
-        return caches.delete(newCACHE)
-        .then(() => 
-          console.log('[:(] Mise à jour annulée')
-        );
       })
-    )
+    );
   }
 });
 
+
+
 ///// FONCTIONS
 
+
+// Récupérer les données du Rémidex
+function getData(force = false) {
+  // On récupère les données les plus récentes
+  const promiseData = fetch('/remidex/mod_update.php?type=full&date=' + Date.now() + '&force=' + force)
+  .then(response => {
+    if (response.status == 200)
+      return response;
+    else
+      throw '[:(] Erreur ' + response.status + ' lors de la requête (mod_update.php)';
+  })
+  .then(response => response.json());
+
+  // On récupère la liste des fichiers à mettre en cache
+  const promiseFiles = fetch('cache.json?' + Date.now())
+  .then(response => {
+    if (response.status == 200)
+      return response;
+    else
+      throw '[:(] Erreur ' + response.status + ' lors de la requête (cache.json)';
+  })
+  .then(response => response.json());
+
+  // On récupère en parallèle les données et la liste des fichiers
+  return Promise.all([promiseData, promiseFiles]);
+}
+
+
+// Installer les données du Rémidex
+async function installData([data, files], action = 'install', event = null) {
+  // On commence par mettre à jour les fichiers :
+  // - en cas de succès, on mettra à jour les données
+  // - sinon, on supprimera le nouveau cache, ce qui laissera l'ancien cache et les anciennes données
+  const newCACHE = PRE_CACHE + '-' + data['version'];
+  const totalFichiers = files.fichiers.length;
+
+  try {
+    // Mise à jour des fichiers
+    console.log(`[${action}] Mise en cache des fichiers :`, files.fichiers);
+    const cache = await caches.open(newCACHE);
+    await Promise.all(
+      files.fichiers.map(async url => {
+        const request = new Request(url, {cache: 'reload'});
+        const response = await fetch(request);
+        if (!response.ok)
+          throw Error(`[${action}] Le fichier n\'a pas pu être récupéré...`, request.url);
+        if (event != null) {
+          const source = event.source;
+          source.postMessage({ loaded: true, total: totalFichiers, url: request.url });
+        }
+        return cache.put(request, response);
+      })
+    );
+    console.log(`[${action}] Mise en cache des fichiers terminée !`);
+
+    // Mise à jour des données
+    console.log(`[${action}] Installation des données...`);
+    await Promise.all([dataStorage.ready(), shinyStorage.ready(), pokemonData.ready()]);
+    await dataStorage.setItem('version-fichiers', data['version-fichiers']);
+    await dataStorage.setItem('version', data['version']);
+    await dataStorage.setItem('version-bdd', data['version-bdd']);
+    await Promise.all(
+      data['data-shinies'].map(shiny => shinyStorage.setItem(String(shiny.id), shiny))
+    );
+    await Promise.all(
+      data['pokemon-data'].map(pkmn => pokemonData.setItem(String(pkmn.dexid), pkmn))
+    );
+    console.log(`[${action}] Installation des données terminée !`);
+  }
+
+  // Si le nouveau cache n'a pas été complété, ou que les données n'ont pas pu être récupérées,
+  // on supprime le nouveau cache.
+  catch(error) {
+    await caches.delete(newCACHE);
+    throw Error(`[${action}] Installation annulée.`);
+  }
+
+  // Si le nouveau cache et les nouvelles données ont tous deux été correctement installés
+  try {
+    await deleteOldCaches(newCACHE, action);
+    if (event != null) {
+      const responsePORT = event.ports[0];
+      responsePORT.postMessage({message: `[${action}] Installation de l'appli. terminée !`});
+    }
+  } catch(error) {
+    throw error;
+  }
+}
+
+
 // Supprimer tous les caches qui ne sont pas newCache
-function deleteOldCaches(newCache, action)
+async function deleteOldCaches(newCache, action)
 {
-  return caches.keys()
-  .then(allCaches => {
+  try {
+    const allCaches = await caches.keys();
     if (allCaches.length <= 1)
       throw 'Aucun cache redondant à supprimer';
     console.log('[' + action + '] Nettoyage des anciennes versions du cache');
-    return Promise.all(
+    await Promise.all(
       allCaches.map(ceCache => {
         if (ceCache.startsWith(PRE_CACHE) && newCache != ceCache)
           return caches.delete(ceCache);
+        else
+          return;
       })
-    )
-    .then(() => {
-      console.log('[' + action + '] Nettoyage terminé !');
-      return '[' + action + '] Nettoyage terminé !';
-    })
-  })
-  .catch(error => console.log(error));
+    );
+    console.log('[' + action + '] Nettoyage terminé !');
+    return '[' + action + '] Nettoyage terminé !';
+  }
+  catch (error) {
+    return console.log(error);
+  }
 }

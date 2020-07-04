@@ -62,7 +62,7 @@ function check_file_times($check = false)
     if ($date_fichier > $versionFichiers)
       $versionFichiers = $date_fichier;
   }
-  $versionFichiers = date('Y-m-d H:i:s', $versionFichiers);
+  //$versionFichiers = date('Y-m-d H:i:s', $versionFichiers);
   return $versionFichiers;
 }
 
@@ -80,7 +80,8 @@ $recup_shinies = $link->prepare('SELECT * FROM mes_shinies ORDER BY id DESC');
 $dates_derniereUpdate = $link->prepare('SELECT UPDATE_TIME FROM information_schema.tables WHERE TABLE_SCHEMA = ?');
   $dates_derniereUpdate->execute(['remiscanmk17']);
   $dates_derniereUpdate = array_column($dates_derniereUpdate->fetchAll(PDO::FETCH_ASSOC), 'UPDATE_TIME');
-  $versionBDD = date('Y-m-d H:i:s', max(array_map('strtotime', $dates_derniereUpdate)));
+  $versionBDD = max(array_map('strtotime', $dates_derniereUpdate));
+  //$versionBDD = date('Y-m-d H:i:s', $versionBDD);
 
 
 /////////////////////////////////////////////////////////////
@@ -240,14 +241,14 @@ else
 
   ///////////////////////////////////////////////////////
   // Génération des tiles grâce aux fonctions précédentes
-  tile_image($allsprites, $nbredeshinies, 'sprites.png', 'png', $force);
+  tile_image(array_reverse($allsprites), $nbredeshinies, 'sprites.png', 'png', $force);
 
 
   // Pendant une mise à jour, je vérifie la date des fichiers après leur création potentielle
   $versionFichiers = check_file_times();
   $dates_derniereUpdate[] = $versionFichiers;
   $version = max(array_map('strtotime', $dates_derniereUpdate));
-  $version = date('Y-m-d H:i:s', $version);
+  //$version = date('Y-m-d H:i:s', $version);
 
 
   ///////////////////////////////////////////
