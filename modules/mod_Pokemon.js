@@ -45,6 +45,17 @@ class Pokemon {
     return spriteUrl;
   }
 
+  static async namesfr() {
+    const allNames = [];
+    await pokemonData.ready();
+    const pkmnNumber = await pokemonData.length();
+    for (let i = 0; i < pkmnNumber; i++) {
+      const pkmn = await pokemonData.getItem(String(i));
+      allNames.push(pkmn.namefr);
+    }
+    return allNames;
+  }
+
   static get jeux() {
     const allGames = [
       { nom: 'Bleue', gen: 1, id: 'rb' },
