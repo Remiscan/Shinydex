@@ -1,7 +1,6 @@
 import { appPopulate, appDisplay } from './mod_appContent.js';
 import { recalcOnResize } from './mod_Params.js';
 import { notify } from './mod_notification.js';
-import { Pokemon } from './mod_Pokemon.js';
 
 /////////////////////////////////////////////////////
 // On enregistre le service worker
@@ -9,7 +8,6 @@ import { Pokemon } from './mod_Pokemon.js';
 let currentWorker;
 let appCached;
 let appChargee;
-let isStarted = 0;
 let updateAvailable = 0;
 
 async function initServiceWorker()
@@ -108,6 +106,7 @@ export async function appStart()
     // Fini !! :)
     appChargee = true;
 
+    checkInstall();
     const willCheckUpdate = await dataStorage.getItem('check-updates');
     if (willCheckUpdate == 1) {
       await navigator.serviceWorker.ready;
@@ -125,10 +124,9 @@ export async function appStart()
     {
       async function forceUpdateNow() {
         [dataStorage, shinyStorage, pokemonData].forEach(async store => {
-          const keys = await store.keys();
-          keys.forEach(k => store.removeItem(k));
+          await store.clear();
         });
-        manualUpdate(true);
+        manualUpdate();
       };
       document.getElementById('load-screen').remove();
       return notify('Échec critique du chargement...', 'Réinstaller', 'refresh', forceUpdateNow, 2147483647);
@@ -144,7 +142,7 @@ export async function appStart()
 
 ///////////////////////////
 // Met à jour l'application
-function appUpdate(update = false, force = false)
+function appUpdate(update = false)
 {
   const version = Date.now()
   return new Promise((resolve, reject) => {
@@ -170,7 +168,7 @@ function appUpdate(update = false, force = false)
     }
 
     // On contacte le SW
-    currentWorker.postMessage({'action': 'update', 'force': force}, [chan.port2]);
+    currentWorker.postMessage({ 'action': 'update' }, [chan.port2]);
 
     // On surveille l'avancée du SW grâce aux messages qu'il envoie
     let totalLoaded = 0;
@@ -190,7 +188,7 @@ function appUpdate(update = false, force = false)
 
 ////////////////////////////////////////
 // Met à jour l'application manuellement
-export async function manualUpdate(force = false)
+export async function manualUpdate()
 {
   try {
     if (!navigator.onLine)
@@ -198,16 +196,15 @@ export async function manualUpdate(force = false)
     if (!'serviceWorker' in navigator)
       throw 'Service worker indisponible';
 
-    if (force) notify('Mise à jour forcée...');
-    else document.querySelector('.notif-texte').innerHTML = 'Installation en cours...';
+    document.querySelector('.notif-texte').innerHTML = 'Installation en cours...';
     document.getElementById('notification').classList.add('installing');
-    const result = await appUpdate(true, force);
+    const result = await appUpdate(true);
     return console.log(result);
   }
   catch (raison) {
     console.error(raison);
     document.getElementById('notification').classList.remove('installing');
-    notify('Échec de mise à jour', 'Réessayer', 'update', () => manualUpdate(false), 10000);
+    notify('Échec de mise à jour', 'Réessayer', 'update', manualUpdate, 10000);
   }
 }
 
@@ -224,7 +221,7 @@ export async function checkUpdate(checkNotification = false)
   checkingUpdate = 1;
   const texteSucces = 'Mise à jour disponible...';
   const notifyMaj = () => {
-    notify(texteSucces, 'Installer', 'update', () => manualUpdate(false), 10000);
+    notify(texteSucces, 'Installer', 'update', manualUpdate, 10000);
     checkingUpdate = 0;
     return texteSucces;
   }

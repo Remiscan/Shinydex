@@ -1,7 +1,6 @@
 import { createCard, toggleNotes } from './mod_pokemonCard.js';
 import { filterCards, orderCards, reverseOrder, deferCards, deferMonitor } from './mod_filtres.js';
 import { Params, loadAllImages, wait } from './mod_Params.js';
-import { Pokemon } from './mod_Pokemon.js';
 import { openSpriteViewer } from './mod_spriteViewer.js';
 import { updateHunt } from './mod_Hunt.js';
 
@@ -103,7 +102,7 @@ export async function appPopulate()
 export async function appDisplay()
 {
   const loadScreen = document.getElementById('load-screen');
-  const listeImages = ['./pokesprite/pokesprite.png', './sprites.png'];
+  const listeImages = ['./pokesprite/pokesprite.png', './sprites.php'];
 
   const promiseImages = loadAllImages(listeImages);
   async function promiseInit() {

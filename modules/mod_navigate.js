@@ -15,7 +15,7 @@ export function navigate(sectionCible, position = 0, historique = true)
 
   const listeImages = ['./pokesprite/pokesprite.png'];
   if (sectionCible == 'mes-chromatiques')
-    listeImages.push('./sprites.png', './all-icons.png');
+    listeImages.push('./sprites.php', './all-icons.png');
 
   return loadAllImages(listeImages)
   .then(() => {

@@ -96,7 +96,7 @@ self.addEventListener('message', function(event) {
       getData(event.data.force)
       .then(data => installData(data, 'update', event))
       .catch(error => {
-        source.postMessage({loaded: false, erreur: true});
+        source.postMessage({ loaded: false, erreur: true });
         console.error(error);
       })
     );
@@ -133,9 +133,9 @@ self.addEventListener('sync', async function(event) {
 
 
 // Récupérer les données du Rémidex
-function getData(force = false) {
+function getData() {
   // On récupère les données les plus récentes
-  const promiseData = fetch('/remidex/mod_update.php?type=full&date=' + Date.now() + '&force=' + force)
+  const promiseData = fetch('/remidex/mod_update.php?type=full&date=' + Date.now())
   .then(response => {
     if (response.status == 200)
       return response;

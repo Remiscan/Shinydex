@@ -42,8 +42,7 @@ html.dark {
 }
 html {
   --link-all-icons: url(./all-icons.png);
-  --link-sprites: url(./sprites.png);
-  --link-sprites-equipes: url(./sprites-equipes.png);
+  --link-sprites: url(./sprites.php);
   --link-pokesprite: url(./pokesprite.png);
   --easing-standard: cubic-bezier(0.4, 0.0, 0.2, 1);
   --easing-decelerate: cubic-bezier(0.0, 0.0, 0.2, 1);

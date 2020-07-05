@@ -24,7 +24,7 @@
         "./modules/mod_spriteViewer.js",
         "./scripts.js",
         "./shinystars.svg",
-        "./sprites.png",
+        "./sprites.php",
         "./styles.css"
     ]
 }
