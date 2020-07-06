@@ -241,7 +241,7 @@ export async function checkUpdate(checkNotification = false)
     const versionFichiers = await dataStorage.getItem('version-fichiers');
     const versionBDD = await dataStorage.getItem('version-bdd');
 
-    if ((versionFichiers != data['version-fichiers']) || (versionBDD != data['version-bdd']))
+    if ((versionFichiers != data['version-fichiers'])/* || (versionBDD != data['version-bdd'])*/)
     {
       updateAvailable = 1;
       console.log('[:|] Mise à jour détectée');

@@ -86,17 +86,37 @@ self.addEventListener('fetch', function(event)
 
 // MESSAGE
 self.addEventListener('message', function(event) {
-  // UPDATE
+  // FULL UPDATE
   if (event.data.action == 'update')
   {
     console.log('[update] Mise à jour de l\'application demandée...');
     const source = event.source;
 
     event.waitUntil(
-      getData(event.data.force)
+      getData()
       .then(data => installData(data, 'update', event))
       .catch(error => {
         source.postMessage({ loaded: false, erreur: true });
+        console.error(error);
+      })
+    );
+  }
+
+  // UPDATE DB
+  else if (event.data.action == 'update-db')
+  {
+    console.log('[update-db] Mise à jour de la base de données demandée...');
+    const source = event.source;
+
+    event.waitUntil(
+      updateShinyData()
+      .then(result => {
+        if (result === true) {
+          source.postMessage(true);
+        }
+      })
+      .catch(error => {
+        source.postMessage(false);
         console.error(error);
       })
     );
@@ -109,22 +129,36 @@ self.addEventListener('sync', async function(event) {
   const PRE_HUNT_ADD = 'HUNT-ADD-';
   const PRE_HUNT_EDIT = 'HUNT-EDIT-';
   const PRE_HUNT_DELETE = 'HUNT-DELETE-';
-  // Upload d'une chasse dans la BDD en ligne
-  if (event.tag.startsWith(PRE_HUNT_ADD)) {
-    const huntid = event.tag.replace(PRE_HUNT_ADD, '');
-    return await sendHunt(huntid);
-  }
-  // Édition d'une chasse dans la BDD en ligne
-  // (code identique pour l'instant, le serveur différencie entre ADD et EDIT)
-  else if (event.tag.startsWith(PRE_HUNT_EDIT)) {
-    const huntid = event.tag.replace(PRE_HUNT_EDIT, '');
-    return await sendHunt(huntid);
-  }
-  // Suppression d'une chasse dans la BDD en ligne
-  else if (event.tag.startsWith(PRE_HUNT_DELETE)) {
-    const huntid = event.tag.replace(PRE_HUNT_DELETE, '');
-    return await deleteHunt(huntid);
-  }
+
+  const whatDo = event => {
+    // Upload d'une chasse dans la BDD en ligne
+    if (event.tag.startsWith(PRE_HUNT_ADD)) {
+      const huntid = event.tag.replace(PRE_HUNT_ADD, '');
+      return sendHunt(huntid);
+    }
+
+    // Édition d'une chasse dans la BDD en ligne
+    // (identique à ADD pour l'instant, le serveur sait différencier)
+    else if (event.tag.startsWith(PRE_HUNT_EDIT)) {
+      const huntid = event.tag.replace(PRE_HUNT_EDIT, '');
+      return sendHunt(huntid);
+    }
+
+    // Suppression d'une chasse dans la BDD en ligne
+    else if (event.tag.startsWith(PRE_HUNT_DELETE)) {
+      const huntid = event.tag.replace(PRE_HUNT_DELETE, '');
+      return deleteHunt(huntid);
+    }
+  };
+
+  event.waitUntil(
+    whatDo(event)
+    .then(updateShinyData)
+    .then(result => {
+      return self.clients.matchAll()
+      .then(all => all.map(client => client.postMessage({ successfulDBUpdate: result })));
+    })
+  );
 });
 
 
@@ -218,6 +252,69 @@ async function installData([data, files], action = 'install', event = null) {
     }
   } catch(error) {
     throw error;
+  }
+}
+
+
+// Met à jour les données des Pokémon chromatiques possédés
+async function updateShinyData()
+{
+  let data;
+
+  // Récupération des données
+
+  try {
+    console.log('[update-db] Récupération des données...')
+    data = fetch('/remidex/mod_update.php?type=updateDB&date=' + Date.now());
+    if (response.status != 200)
+      throw '[:(] Erreur ' + response.status + ' lors de la requête (mod_update.php)';
+    data = data.json();
+  }
+  catch(error) {
+    console.error('Erreur de récupération des données', error);
+    throw false;
+  }
+
+  const versionBDD = data['version-bdd'];
+  const versionMax = Math.max(data['version-fichiers'], data['version-bdd']);
+  let oldVersion;
+
+  // Installation des données
+
+  try {
+    console.log('[update-db] Installation des données...');
+    await Promise.all([dataStorage.ready(), shinyStorage.ready()]);
+    oldVersion = dataStorage.getItem('version-bdd');
+    await dataStorage.setItem('version-bdd', data['version-bdd']);
+    await dataStorage.setItem('version', versionMax);
+    await Promise.all(
+      data['data-shinies'].map(shiny => shinyStorage.setItem(String(shiny.id), shiny))
+    );
+  }
+  catch(error) {
+    console.error('Erreur d\'installation des données', error);
+    throw false;
+  }
+
+  // Mise à jour du spritesheet
+
+  const currentCACHE = PRE_CACHE + '-' + versionMax;
+
+  try {
+    const cache = await caches.open(currentCACHE);
+    const request = new Request(`./sprites--${versionBDD}.php`, {cache: 'reload'});
+    const response = await fetch(request);
+    if (!response.ok)
+      throw Error(`[update-db] Le fichier n\'a pas pu être récupéré...`, request.url);
+    await cache.put(request, response);
+    return true;
+  }
+  catch(error) {
+    console.error('Erreur de mise à jour du spritesheet', error);
+    await dataStorage.ready();
+    await dataStorage.setItem('version-bdd', oldVersion);
+    await dataStorage.setItem('version', Math.max(data['version-fichiers'], oldVersion));
+    throw false;
   }
 }
 
