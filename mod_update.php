@@ -25,9 +25,6 @@ function charge_classe($className)
 spl_autoload_register('charge_classe');
 
 
-$link = new BDD();
-
-
 //////////////////////////////////////////////////////////
 // Vérifie les dates de dernière modification des fichiers
 function getFilesVersion()
@@ -55,6 +52,7 @@ function getFilesVersion()
 // Je récupère la date de dernière mise à jour de la base de données
 function getDBVersion()
 {
+  $link = new BDD();
   $dates_derniereUpdate = $link->prepare('SELECT UPDATE_TIME FROM information_schema.tables WHERE TABLE_SCHEMA = ?');
   $dates_derniereUpdate->execute(['remiscanmk17']);
   $dates_derniereUpdate = array_column($dates_derniereUpdate->fetchAll(PDO::FETCH_ASSOC), 'UPDATE_TIME');
@@ -67,6 +65,7 @@ function getDBVersion()
 // Je récupère les infos sur mes chromatiques dans la base de données
 function getShinyData()
 {
+  $link = new BDD();
   $recup_shinies = $link->prepare('SELECT * FROM mes_shinies ORDER BY id DESC');
   $recup_shinies->execute();
   $data_shinies = $recup_shinies->fetchAll(PDO::FETCH_ASSOC);
