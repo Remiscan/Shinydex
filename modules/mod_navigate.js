@@ -6,7 +6,7 @@ import { closeSpriteViewer, openSpriteViewer } from './mod_spriteViewer.js';
 let sectionActuelle = 'mes-chromatiques';
 export const sections = ['mes-chromatiques', 'pokedex', 'mes-equipes', 'une-equipe', 'parametres', 'a-propos'];
 
-export function navigate(sectionCible, position = 0, historique = true)
+export async function navigate(sectionCible, position = 0, historique = true)
 {
   if (sectionActuelle == sectionCible) return Promise.resolve();
 
@@ -14,48 +14,47 @@ export function navigate(sectionCible, position = 0, historique = true)
   const nouvelleSection = document.getElementById(sectionCible);
 
   const listeImages = ['./pokesprite/pokesprite.png'];
-  if (sectionCible == 'mes-chromatiques')
-    listeImages.push('./sprites.php', './all-icons.png');
+  if (sectionCible == 'mes-chromatiques') {
+    const versionDB = await dataStorage.getItem('version');
+    listeImages.push(`./sprites--${versionDB}.php`, './all-icons.png');
+  }
 
-  return loadAllImages(listeImages)
-  .then(() => {
-    return new Promise((resolve, reject) => {
-      closeFiltres();
+  await loadAllImages(listeImages);
+  await new Promise((resolve, reject) => {
+    closeFiltres();
 
-      if (sectionCible == 'a-propos')
-        document.getElementById('instinct').src = '#';
+    if (sectionCible == 'a-propos')
+      document.getElementById('instinct').src = '#';
 
-      if (historique)
-        history.pushState({section: sectionCible}, '');
+    if (historique)
+      history.pushState({section: sectionCible}, '');
 
-      sectionActuelle = sectionCible;
+    sectionActuelle = sectionCible;
 
-      document.querySelector('main').scroll(0, 0);
-      document.body.dataset.sectionActuelle = sectionActuelle;
+    document.querySelector('main').scroll(0, 0);
+    document.body.dataset.sectionActuelle = sectionActuelle;
 
-      if (Params.owidth >= Params.layoutPClarge) return resolve();
+    if (Params.owidth >= Params.layoutPClarge) return resolve();
 
-      const apparitionSection = nouvelleSection.animate([
-        { transform: 'translate3D(0, 20px, 0)', opacity: '0' },
-        { transform: 'translate3D(0, 0, 0)', opacity: '1' }
-      ], {
-          easing: Params.easingDecelerate,
-          duration: 200,
-          fill: 'both'
-      });
-
-      apparitionSection.addEventListener('finish', resolve);
+    const apparitionSection = nouvelleSection.animate([
+      { transform: 'translate3D(0, 20px, 0)', opacity: '0' },
+      { transform: 'translate3D(0, 0, 0)', opacity: '1' }
+    ], {
+        easing: Params.easingDecelerate,
+        duration: 200,
+        fill: 'both'
     });
-  })
-  .then(() => {
-    if (sectionCible == 'a-propos' || (sectionCible == 'parametres' && Params.owidth >= Params.layoutPClarge))
-      easterEgg();
 
-    if (sectionCible != 'mes-chromatiques')
-      nouvelleSection.classList.add('defered');
-    ancienneSection.classList.remove('defered');
-    Array.from(ancienneSection.querySelectorAll('.defered')).forEach(defered => defered.classList.replace('defered', 'defer'));
+    apparitionSection.addEventListener('finish', resolve);
   });
+
+  if (sectionCible == 'a-propos' || (sectionCible == 'parametres' && Params.owidth >= Params.layoutPClarge))
+    easterEgg();
+
+  if (sectionCible != 'mes-chromatiques')
+    nouvelleSection.classList.add('defered');
+  ancienneSection.classList.remove('defered');
+  Array.from(ancienneSection.querySelectorAll('.defered')).forEach(defered => defered.classList.replace('defered', 'defer'));
 }
 
 
