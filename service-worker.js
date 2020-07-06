@@ -208,7 +208,10 @@ async function installData([data, files], action = 'install', event = null) {
     const cache = await caches.open(newCACHE);
     await Promise.all(
       files.fichiers.map(async url => {
-        const request = new Request(url, {cache: 'reload'});
+        let _url = url;
+        if (url == './sprites.php')
+          _url = `./sprites--${versionMax}.php`;
+        const request = new Request(_url, {cache: 'reload'});
         const response = await fetch(request);
         if (!response.ok)
           throw Error(`[${action}] Le fichier n\'a pas pu être récupéré...`, request.url);
@@ -306,6 +309,8 @@ async function updateShinyData()
     const response = await fetch(request);
     if (!response.ok)
       throw Error(`[update-db] Le fichier n\'a pas pu être récupéré...`, request.url);
+    const oldRequest = new Request(`./sprites--${oldVersion}.php`);
+    await cache.delete(oldRequest);
     await cache.put(request, response);
     return true;
   }

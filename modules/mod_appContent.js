@@ -109,7 +109,9 @@ export async function appPopulate(start = true)
 export async function appDisplay(start = true)
 {
   const loadScreen = (start == true) ? document.getElementById('load-screen') : null;
-  const listeImages = ['./pokesprite/pokesprite.png', './sprites.php'];
+  const version = await dataStorage.getItem('version');
+  const listeImages = [`./pokesprite/pokesprite.png`, `./sprites--${version}.php`];
+  document.documentElement.style.setProperty('--link-sprites', `url(./sprites--${version}.php);`);
 
   const promiseImages = loadAllImages(listeImages);
   async function promiseInit() {
