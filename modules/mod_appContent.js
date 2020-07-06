@@ -99,9 +99,9 @@ export async function appPopulate()
 
 ////////////////////////
 // Affiche l'application
-export async function appDisplay()
+export async function appDisplay(start = true)
 {
-  const loadScreen = document.getElementById('load-screen');
+  const loadScreen = (start == true) ? document.getElementById('load-screen') : null;
   const listeImages = ['./pokesprite/pokesprite.png', './sprites.php'];
 
   const promiseImages = loadAllImages(listeImages);
@@ -142,15 +142,28 @@ export async function appDisplay()
     
     document.getElementById('version-fichiers').innerHTML = await dataStorage.getItem('version-fichiers');
     document.getElementById('version-bdd').innerHTML = await dataStorage.getItem('version-bdd');
-    window.tempsFin = Date.now();
-    document.getElementById('version-tempschargement').innerHTML = Number(window.tempsFin - window.tempsDebut);
+    if (start) {
+      window.tempsFin = Date.now();
+      document.getElementById('version-tempschargement').innerHTML = Number(window.tempsFin - window.tempsDebut);
+    }
     
     return;
   };
 
   try {
-    await Promise.all([promiseImages, promiseInit()]);
-    //document.querySelector('#mes-chromatiques').classList.add('start');
+    if (start) await Promise.all([promiseImages, promiseInit()]);
+    else await promiseInit();
+
+    // Surveille le defer-loader pour charger le reste des shiny quand il apparaît à l'écran
+    const deferLoader = document.querySelector('.defer-loader');
+    const observer = new IntersectionObserver(deferMonitor, {
+      threshold: 1,
+    });
+    observer.observe(deferLoader);
+
+    if (!start) return;
+    
+    // Efface l'écran de chargement
     const byeLoad = loadScreen.animate([
       { opacity: 1 },
       { opacity: 0 }
@@ -161,16 +174,11 @@ export async function appDisplay()
     });
     byeLoad.onfinish = () => {
       loadScreen.remove();
-
-      // Surveille le defer-loader pour charger le reste des shiny quand il apparaît à l'écran
-      const deferLoader = document.querySelector('.defer-loader');
-      const observer = new IntersectionObserver(deferMonitor, {
-        threshold: 1,
-      });
-      observer.observe(deferLoader);
     }
+
     return '[:)] Bienvenue sur le Rémidex !';
-  } catch(error) {
+  }
+  catch(error) {
     console.error(error);
   }
 }
