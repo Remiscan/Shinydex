@@ -4,6 +4,7 @@ import { notify } from './mod_notification.js';
 import { wait } from './mod_Params.js';
 import { navigate } from './mod_navigate.js';
 import { DexDatalist } from './mod_DexDatalist.js';
+import { appPopulate, appDisplay } from './mod_appContent.js';
 
 const huntStorage = localforage.createInstance({
   name: 'remidex',
@@ -405,21 +406,33 @@ export class Hunt {
     const reg = await navigator.serviceWorker.ready;
     console.log('[sync] Envoi de la chasse au sw');
     try {
+      // On écoute le service worker pour savoir quand il aura réussi l'envoi
+      navigator.serviceWorker.addEventListener('message', event => {
+        if ('successfulDBUpdate' in event.data) {
+          if (event.data.successfulDBUpdate === true) {
+            // On reçoit la confirmation du succès de l'ajout à la DB
+            // - animer le succès
+            // - faire disparaître la carte de la chasse
+            // - animation de chargement
+            // - re-lancer appPopulate
+            await appPopulate();
+            // - re-lancer appDisplay(start = false)
+            await appDisplay(false);
+            // - forcer l'affichage du nouveau sprite--versionBDD.php
+            // - fin de l'animation de chargement
+          }
+          else {
+            // On reçoit la confirmation de l'échec de l'ajour à la DB
+            // - animer l'échec
+            // - laisser la carte de la chasse
+          }
+        }
+      });
+
+      // On demande au service worker d'envoyer la chasse vers la DB
       await reg.sync.register('HUNT-ADD-' + this.id);
-      // Faire "comme si" la chasse était envoyée, c'est-à-dire :
-      // - masquer la carte de la chasse après une animation d'envoi
-      // - ajouter le shiny à la BDD locale
-      // - ajouter la carte du shiny à la liste, et re-filtrer, etc
-      // Si la chasse a bien été envoyée, la prochaine mise à jour correspondra automatiquement
-      // à ces modifications manuelles et l'utilisateur ne verra pas la différence.
-      // Sinon, la prochaine mise à jour effacera le nouveau shiny de la BDD locale,
-      // et la chasse sera affichée dans la section "chasse" comme si de rien n'était.
-      // /!\ Il faut gérer le masquage de la chasse tant qu'elle est ajoutée manuellement à la BDD
-      //     locale mais n'a pas encore été confirmée ajoutée à la BDD distante.
-      //     Pour cela, je peux ajouter une propriété "huntid" au shiny dans shinyStorage,
-      //     récupérer la liste des shiny ayant cette propriété, et comparer chaque chasse
-      //     à cette liste avant de l'afficher.
-    } catch(error) {
+    }
+    catch(error) {
       console.log('[sync] Erreur lors de la requête de synchronisation');
     }
   }
