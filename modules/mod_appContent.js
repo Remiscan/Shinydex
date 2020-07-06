@@ -6,10 +6,15 @@ import { updateHunt } from './mod_Hunt.js';
 
 /////////////////////////////////////////////////////////
 // Peuple l'application à partir des données de indexedDB
-export async function appPopulate()
+export async function appPopulate(start = true)
 {
   try {
     // Liste principale
+    if (!start) {
+      // Vider la liste principale
+      Array.from(document.querySelectorAll('#mes-chromatiques .pokemon-card')).forEach(c => c.remove());
+    }
+
     let data = await shinyStorage.keys();
     data = data.map(async key => { return await shinyStorage.getItem(key) });
     data = await Promise.all(data);
@@ -60,6 +65,8 @@ export async function appPopulate()
         card.addEventListener('touchcancel', clear);
       }, { passive: true });
     };
+
+    if (!start) return;
 
     // Pokédex
     conteneur = document.querySelector('#pokedex>.section-contenu');

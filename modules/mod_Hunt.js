@@ -414,8 +414,8 @@ export class Hunt {
             // - animer le succès
             // - faire disparaître la carte de la chasse
             // - animation de chargement
-            // - re-lancer appPopulate
-            await appPopulate();
+            // - re-lancer appPopulate(start = false)
+            await appPopulate(false);
             // - re-lancer appDisplay(start = false)
             await appDisplay(false);
             // - forcer l'affichage du nouveau sprite--versionBDD.php
