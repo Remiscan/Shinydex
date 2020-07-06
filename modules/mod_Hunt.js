@@ -85,7 +85,9 @@ export class Hunt {
     Array.from(card.querySelectorAll('[for^="hunt-{id}"]')).forEach(el => el.setAttribute('for', el.getAttribute('for').replace('{id}', this.id)));
     Array.from(card.querySelectorAll('[name^="hunt-{id}"]')).forEach(el => el.name = el.name.replace('{id}', this.id));
 
-    if (this.id < 825379200) card.classList.add('edit');
+    // 825379200 = timestamp du jour de la sortie de Pokémon au Japon
+    const edit = (this.id < 825379200) ? true : false;
+    if (edit) card.classList.add('edit');
 
     // Active le bouton "compteur++";
     const boutonAdd = card.querySelector('.bouton-compteur.add');
@@ -166,7 +168,8 @@ export class Hunt {
       }
       else if (span.innerHTML == 'Confirmer ?')
       {
-        await this.submitHunt();
+        if (edit) await this.submitHunt(true);
+        else await this.submitHunt();
       }
     });
 
@@ -395,7 +398,7 @@ export class Hunt {
 
 
   // Envoie la chasse dans la BDD
-  async submitHunt()
+  async submitHunt(edit = false)
   {
     document.body.dataset.huntUploading = true;
 
@@ -430,7 +433,8 @@ export class Hunt {
       });
 
       // On demande au service worker d'envoyer la chasse vers la DB
-      await reg.sync.register('HUNT-ADD-' + this.id);
+      if (edit) await reg.sync.register('HUNT-EDIT-' + this.id);
+      else await reg.sync.register('HUNT-ADD-' + this.id);
     }
     catch(error) {
       console.log('[sync] Erreur lors de la requête de synchronisation');

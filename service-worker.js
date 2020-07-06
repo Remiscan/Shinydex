@@ -138,10 +138,9 @@ self.addEventListener('sync', async function(event) {
     }
 
     // Édition d'une chasse dans la BDD en ligne
-    // (identique à ADD pour l'instant, le serveur sait différencier)
     else if (event.tag.startsWith(PRE_HUNT_EDIT)) {
       const huntid = event.tag.replace(PRE_HUNT_EDIT, '');
-      return sendHunt(huntid);
+      return sendHunt(huntid, true);
     }
 
     // Suppression d'une chasse dans la BDD en ligne
@@ -350,13 +349,14 @@ async function deleteOldCaches(newCache, action)
 
 
 // Envoie une chasse de la BDD locale vers la BDD en ligne
-async function sendHunt(huntid) {
+async function sendHunt(huntid, edit = false) {
   try {
     const hunt = await huntStorage.getItem(huntid);
 
     const formData = new FormData();
     formData.append('hunt', JSON.stringify(hunt));
     formData.append('mdp', await dataStorage.getItem('mdp-bdd'));
+    formData.append('type', edit ? 'EDIT' : 'ADD');
 
     console.log(JSON.stringify(hunt));
 
