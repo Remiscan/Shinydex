@@ -90,14 +90,7 @@
   <body data-section-actuelle="mes-chromatiques">
     <!-- Écran de chargement -->
     <div id="load-screen" style="grid-row: 1 / 3; grid-column: 1 / 2; position: absolute; z-index: 1000; top: 0; left: 0; width: 100vw; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: var(--bg-color);">
-      <div class="spinner" id="spinner">
-        <div class="spinner-wrapper">
-          <div class="rotator">
-            <div class="inner-spin"></div>
-            <div class="inner-spin"></div>
-          </div>
-        </div>
-      </div>
+      <load-spinner id="spinner"></load-spinner>
     </div>
 
     <!-- Barre de navigation -->
@@ -126,14 +119,7 @@
 
     <!-- Barre de chargement (superposé à nav) -->
     <div class="loading-bar">
-      <div class="spinner">
-        <div class="spinner-wrapper">
-          <div class="rotator">
-            <div class="inner-spin"></div>
-            <div class="inner-spin"></div>
-          </div>
-        </div>
-      </div>
+      <load-spinner></load-spinner>
       <a class="icone bouton-retour">
         <i class="material-icons">close</i>
       </a>
@@ -191,14 +177,7 @@
       <div class="progression-maj"></div>
 
       <div class="maj-loading">
-        <div class="spinner">
-          <div class="spinner-wrapper">
-            <div class="rotator">
-              <div class="inner-spin"></div>
-              <div class="inner-spin"></div>
-            </div>
-          </div>
-        </div>
+        <load-spinner></load-spinner>
       </div>
     </div>
 

@@ -1,3 +1,4 @@
+import './modules/comp_loadSpinner.js';
 import { Params, changeTheme, changeAutoMaj, callResize, saveDBpassword } from './modules/mod_Params.js';
 import { navigate } from './modules/mod_navigate.js';
 import { easterEgg } from './modules/mod_easterEgg.js';
