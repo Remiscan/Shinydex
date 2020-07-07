@@ -1,5 +1,5 @@
 import { appPopulate, appDisplay } from './mod_appContent.js';
-import { recalcOnResize } from './mod_Params.js';
+import { recalcOnResize, version2date } from './mod_Params.js';
 import { notify } from './mod_notification.js';
 
 /////////////////////////////////////////////////////
@@ -245,8 +245,8 @@ export async function checkUpdate(checkNotification = false)
     {
       updateAvailable = 1;
       console.log('[:|] Mise à jour détectée');
-      console.log('     Installé : fichiers v. ' + versionFichiers + ', bdd v. ' + versionBDD);
-      console.log('   Disponible : fichiers v. ' + data['version-fichiers'] + ', bdd v. ' + data['version-bdd']);
+      console.log('     Installé : fichiers v. ' + version2date(versionFichiers) + ', bdd v. ' + version2date(versionBDD));
+      console.log('   Disponible : fichiers v. ' + version2date(data['version-fichiers']) + ', bdd v. ' + version2date(data['version-bdd']));
 
       notifyMaj();
     }
@@ -254,7 +254,7 @@ export async function checkUpdate(checkNotification = false)
     {
       updateAvailable = 0;
       console.log('[:)] Aucune mise à jour disponible');
-      console.log('     Installé : fichiers v. ' + versionFichiers + ', bdd v. ' + versionBDD);
+      console.log('     Installé : fichiers v. ' + version2date(versionFichiers) + ', bdd v. ' + version2date(versionBDD));
       throw 'Pas de mise à jour';
     }
   } catch(error) {

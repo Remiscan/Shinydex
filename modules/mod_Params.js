@@ -1,5 +1,3 @@
-import { checkUpdate } from './mod_appLifeCycle.js';
-
 //////////////////////
 // Constantes globales
 export const Params = {
@@ -52,12 +50,12 @@ export async function changeAutoMaj()
   {
     checkbox.checked = true;
     await dataStorage.setItem('check-updates', 1);
-    if (!settingClicked)
+    /*if (!settingClicked)
     {
       settingClicked = true;
       setTimeout(function() { settingClicked = false }, 100);
       checkUpdate();
-    }
+    }*/
   }
   return;
 }
@@ -118,3 +116,11 @@ export function loadAllImages(liste)
 ////////////
 // Sync wait
 export function wait(time) { return new Promise(resolve => setTimeout(resolve, time)); }
+
+
+/////////////////////////////////
+// Convertit un timestamp en date
+export function version2date(timestamp) {
+  const d = new Date(timestamp * 1000);
+  return d.toISOString().replace('T', ' ').replace('.000Z', '');
+}

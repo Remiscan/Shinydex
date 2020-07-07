@@ -1,6 +1,6 @@
 import { createCard, toggleNotes } from './mod_pokemonCard.js';
 import { filterCards, orderCards, reverseOrder, deferCards, deferMonitor } from './mod_filtres.js';
-import { Params, loadAllImages, wait } from './mod_Params.js';
+import { Params, loadAllImages, wait, version2date } from './mod_Params.js';
 import { openSpriteViewer } from './mod_spriteViewer.js';
 import { updateHunt } from './mod_Hunt.js';
 
@@ -149,8 +149,8 @@ export async function appDisplay(start = true)
 
     deferCards();
     
-    document.getElementById('version-fichiers').innerHTML = await dataStorage.getItem('version-fichiers');
-    document.getElementById('version-bdd').innerHTML = await dataStorage.getItem('version-bdd');
+    document.getElementById('version-fichiers').innerHTML = version2date(await dataStorage.getItem('version-fichiers'));
+    document.getElementById('version-bdd').innerHTML = version2date(await dataStorage.getItem('version-bdd'));
     if (start) {
       window.tempsFin = Date.now();
       document.getElementById('version-tempschargement').innerHTML = Number(window.tempsFin - window.tempsDebut);
