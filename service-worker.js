@@ -414,8 +414,8 @@ async function sendHunt(huntid, edit = false) {
       );
       throw '[:(] Erreur de copie pendant la sauvegarde de la chasse...';
     }
-
-  } catch(error) {
+  }
+  catch(error) {
     console.error(error);
     return;
   }
@@ -424,6 +424,38 @@ async function sendHunt(huntid, edit = false) {
 
 // Supprime un shiny de la BDD à partir de l'édition de sa chasse en local
 async function deleteHunt(huntid) {
-  // Cette fonction n'est pas implémentée pour l'instant.
-  return;
+  try {
+    const hunt = await huntStorage.getItem(huntid);
+
+    const formData = new FormData();
+    formData.append('hunt', JSON.stringify(hunt));
+    formData.append('mdp', await dataStorage.getItem('mdp-bdd'));
+    formData.append('type', 'REMOVE');
+
+    console.log(JSON.stringify(hunt));
+
+    const response = await fetch('mod_sendHuntToDb.php', {
+      method: 'POST',
+      body: formData
+    });
+    if (response.status != 200)
+      throw '[:(] Erreur ' + response.status + ' lors de la requête';
+    const data = response.json();
+
+    if (data['mdp'] == false)
+      throw '[:(] Mauvais mot de passe...';
+    
+    // Traiter la réponse et vérifier le bon ajout à la BDD
+    console.log('Réponse reçue du serveur :', data);
+    if (data['error'] != false)
+      throw '[:(] Chasse non supprimée de la BDD...';
+    
+    // La chasse n'est plus dans la BDD,
+    // on peut la supprimer de indexedDB.
+    return await huntStorage.removeItem(huntid);
+  }
+  catch(error) {
+    console.error(error);
+    return;
+  }
 }

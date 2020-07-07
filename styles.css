@@ -381,8 +381,12 @@ button.ghost {
   box-shadow: none;
 }
 
-button.danger {
+button.danger.ghost {
   border-color: var(--danger-color);
+}
+
+button:not(.ghost).danger {
+  background-color: var(--danger-color);
 }
 
 button>.material-icons + span {
@@ -1415,7 +1419,8 @@ picture.no-shiny>span {
   gap: 8px;
 }
 
-.bouton-hunt-caught {
+.bouton-hunt-caught,
+.bouton-hunt-submit {
   flex-grow: 1;
   margin: 0;
   margin-left: 8px;
@@ -1538,7 +1543,6 @@ picture.no-shiny>span {
   align-self: center;
 }
 
-.bouton-hunt-submit,
 .bouton-hunt-submit-loading {
   flex-basis: 100%;
   margin-top: 16px;

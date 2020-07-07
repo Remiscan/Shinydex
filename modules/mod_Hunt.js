@@ -118,10 +118,10 @@ export class Hunt {
       await this.updateHunt();
     });
 
-    // Active le bouton "supprimer"
-    const boutonSupprimer = card.querySelector('.bouton-hunt-remove');
+    // Active le bouton "annuler"
+    const boutonEffacer = card.querySelector('.bouton-hunt-remove');
     const boutonAnnuler = card.querySelector('.bouton-hunt-edit');
-    [boutonSupprimer, boutonAnnuler].forEach(bouton => {
+    [boutonEffacer, boutonAnnuler].forEach(bouton => {
       bouton.addEventListener('click', async event => {
         event.preventDefault();
   
@@ -170,6 +170,29 @@ export class Hunt {
       {
         if (edit) await this.submitHunt(true);
         else await this.submitHunt();
+      }
+    });
+
+    // Active le bouton "supprimer"
+    const boutonSupprimer = document.querySelector('bouton-hunt-eraseDB');
+    boutonSupprimer.addEventListener('click', async event => {
+      event.preventDefault();
+
+      if (!edit)
+        return notify('Cette chasse n\'est pas dans la base de données');
+
+      if (!navigator.onLine)
+        return notify('Pas de connexion internet');
+
+      const span = boutonSubmit.querySelector('span');
+      if (span.innerHTML == 'Supprimer')
+      {
+        span.innerHTML = 'Vraiment ?';
+        setTimeout(() => span.innerHTML = 'Supprimer', 3000);
+      }
+      else if (span.innerHTML == 'Vraiment ?')
+      {
+        await this.deleteHuntFromDB();
       }
     });
 
@@ -425,7 +448,7 @@ export class Hunt {
             // - fin de l'animation de chargement
           }
           else {
-            // On reçoit la confirmation de l'échec de l'ajour à la DB
+            // On reçoit la confirmation de l'échec de l'ajout à la DB
             // - animer l'échec
             // ✅ laisser la carte de la chasse (= ne rien faire)
           }
@@ -435,6 +458,48 @@ export class Hunt {
       // On demande au service worker d'envoyer la chasse vers la DB
       if (edit) await reg.sync.register('HUNT-EDIT-' + this.id);
       else await reg.sync.register('HUNT-ADD-' + this.id);
+    }
+    catch(error) {
+      console.log('[sync] Erreur lors de la requête de synchronisation');
+    }
+  }
+
+
+  // Supprime la chasse de la BDD
+  async deleteHuntFromDB()
+  {
+    // On demande au service worker de supprimer la chasse de la BDD en ligne
+    if (!'serviceWorker' in navigator || !'syncManager' in window)
+      throw 'Suppression de la chasse impossible.';
+
+    const reg = await navigator.serviceWorker.ready;
+    console.log('[sync] Suppression de la chasse demandée au sw');
+    try {
+      // On écoute le service worker pour savoir quand il aura réussi l'envoi
+      navigator.serviceWorker.addEventListener('message', async event => {
+        if ('successfulDBUpdate' in event.data) {
+          if (event.data.successfulDBUpdate === true) {
+            // On reçoit la confirmation du succès de la suppression à la DB
+            // - animer le succès
+            // - faire disparaître la carte de la chasse
+            // - animation de chargement
+            // ✅ re-lancer appPopulate(start = false)
+            await appPopulate(false);
+            // ✅ re-lancer appDisplay(start = false)
+            await appDisplay(false);
+            // ✅ forcer l'affichage du nouveau sprite--versionBDD.php (appDisplay s'en charge)
+            // - fin de l'animation de chargement
+          }
+          else {
+            // On reçoit la confirmation de l'échec de la suppression à la DB
+            // - animer l'échec
+            // ✅ laisser la carte de la chasse (= ne rien faire)
+          }
+        }
+      });
+
+      // On demande au service worker de supprimer la chasse de la DB
+      await reg.sync.register('HUNT-REMOVE-' + this.id);
     }
     catch(error) {
       console.log('[sync] Erreur lors de la requête de synchronisation');

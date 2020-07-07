@@ -25,7 +25,16 @@ if (isset($_POST['hunt']) && $_POST['hunt'] != '')
 
   $data = json_decode($_POST['hunt']);
   $mdp = $_POST['mdp'];
-  $edit = ($_POST['type'] == 'EDIT') ? true : false;
+  switch($_POST['type']) {
+    case 'EDIT':
+      $type = 'EDIT';
+      break;
+    case 'REMOVE':
+      $type = 'REMOVE';
+      break;
+    default:
+      $type = 'ADD';
+  }
 
   // Le mot de passe envoyé est-il le bon ?
   $params = parse_ini_file(Params::path(), TRUE);
@@ -44,46 +53,57 @@ if (isset($_POST['hunt']) && $_POST['hunt'] != '')
 
     $link = new BDD();
 
-    // Si c'est une édition
-    if ($edit) {
-      $insert = $link->prepare('UPDATE mes_shinies SET 
-        numero_national = :dexid, forme =:forme, surnom = :surnom, methode = :methode, compteur = :compteur, date = :date, jeu = :jeu, ball = :ball, description = :description, origin = :origin, monjeu = :monjeu, charm = :charm, hacked = :hacked, aupif = :aupif, huntid = :huntid
-      WHERE id = :id');
-      $insert->bindValue(':id', $data->{'id'}, PDO::PARAM_INT);
+    // Si c'est une suppression
+    if ($type == 'REMOVE') {
+      $insert = $link->prepare('DELETE FROM mes_shinies WHERE huntid = :huntid');
+      $insert->bindParam(':huntid', $data->{'id'}, PDO::PARAM_INT);
     }
-    
-    // Si c'est une création
+
+    // Si c'est une édition ou création
     else {
-      // On vérifie d'abord qu'aucun shiny n'est déjà présent avec la même huntid
-      $check = $link->prepare('SELECT * FROM mes_shinies WHERE huntid = :huntid');
-      $check->bindParam(':huntid', $data->{'id'}, PDO::PARAM_INT);
 
-      // Si ce n'est pas le cas, on prépare l'ajout
-      $insert = $link->prepare('INSERT INTO mes_shinies (
-        numero_national, forme, surnom, methode, compteur, date, jeu, ball, description, origin, monjeu, charm, hacked, aupif, huntid
-      ) VALUES (
-        :dexid, :forme, :surnom, :methode, :compteur, :date, :jeu, :ball, :description, :origin, :monjeu, :charm, :hacked, :aupif, :huntid
-      )');
+      // Si c'est une édition
+      if ($type == 'EDIT') {
+        $insert = $link->prepare('UPDATE mes_shinies SET 
+          numero_national = :dexid, forme =:forme, surnom = :surnom, methode = :methode, compteur = :compteur, date = :date, jeu = :jeu, ball = :ball, description = :description, origin = :origin, monjeu = :monjeu, charm = :charm, hacked = :hacked, aupif = :aupif, huntid = :huntid
+        WHERE id = :id');
+        $insert->bindValue(':id', $data->{'id'}, PDO::PARAM_INT);
+      }
+      
+      // Si c'est une création
+      else {
+        // On vérifie d'abord qu'aucun shiny n'est déjà présent avec la même huntid
+        $check = $link->prepare('SELECT * FROM mes_shinies WHERE huntid = :huntid');
+        $check->bindParam(':huntid', $data->{'id'}, PDO::PARAM_INT);
+
+        // Si ce n'est pas le cas, on prépare l'ajout
+        $insert = $link->prepare('INSERT INTO mes_shinies (
+          numero_national, forme, surnom, methode, compteur, date, jeu, ball, description, origin, monjeu, charm, hacked, aupif, huntid
+        ) VALUES (
+          :dexid, :forme, :surnom, :methode, :compteur, :date, :jeu, :ball, :description, :origin, :monjeu, :charm, :hacked, :aupif, :huntid
+        )');
+      }
+
+      $insert->bindParam(':dexid', $data->{'dexid'}, PDO::PARAM_INT, 4);
+      $insert->bindParam(':forme', $data->{'forme'}, PDO::PARAM_STR, 50);
+      $insert->bindParam(':surnom', $data->{'surnom'}, PDO::PARAM_STR, 50);
+      $insert->bindParam(':methode', $data->{'methode'});
+      $insert->bindParam(':compteur', $data->{'compteur'}, PDO::PARAM_STR, 50);
+      $insert->bindParam(':date', $data->{'date'});
+      $insert->bindParam(':jeu', $data->{'jeu'}, PDO::PARAM_STR, 50);
+      $insert->bindParam(':ball', $data->{'ball'});
+      $insert->bindParam(':description', $data->{'description'});
+      $insert->bindParam(':origin', $data->{'origin'}, PDO::PARAM_INT, 1);
+      $insert->bindParam(':monjeu', $data->{'monjeu'}, PDO::PARAM_INT, 1);
+      $insert->bindParam(':charm', $data->{'charm'}, PDO::PARAM_INT, 1);
+      $insert->bindParam(':hacked', $data->{'hacked'}, PDO::PARAM_INT, 1);
+      $insert->bindParam(':aupif', $data->{'aupif'}, PDO::PARAM_INT, 1);
+      $insert->bindParam(':huntid', $data->{'id'}, PDO::PARAM_INT);
+
     }
-
-    $insert->bindParam(':dexid', $data->{'dexid'}, PDO::PARAM_INT, 4);
-    $insert->bindParam(':forme', $data->{'forme'}, PDO::PARAM_STR, 50);
-    $insert->bindParam(':surnom', $data->{'surnom'}, PDO::PARAM_STR, 50);
-    $insert->bindParam(':methode', $data->{'methode'});
-    $insert->bindParam(':compteur', $data->{'compteur'}, PDO::PARAM_STR, 50);
-    $insert->bindParam(':date', $data->{'date'});
-    $insert->bindParam(':jeu', $data->{'jeu'}, PDO::PARAM_STR, 50);
-    $insert->bindParam(':ball', $data->{'ball'});
-    $insert->bindParam(':description', $data->{'description'});
-    $insert->bindParam(':origin', $data->{'origin'}, PDO::PARAM_INT, 1);
-    $insert->bindParam(':monjeu', $data->{'monjeu'}, PDO::PARAM_INT, 1);
-    $insert->bindParam(':charm', $data->{'charm'}, PDO::PARAM_INT, 1);
-    $insert->bindParam(':hacked', $data->{'hacked'}, PDO::PARAM_INT, 1);
-    $insert->bindParam(':aupif', $data->{'aupif'}, PDO::PARAM_INT, 1);
-    $insert->bindParam(':huntid', $data->{'id'}, PDO::PARAM_INT);
 
     try {
-      if (!$edit) {
+      if ($type == 'ADD') {
         $check->execute();
         $already = $check->fetchAll();
         if (count($already) > 0) throw new Exception('Cette chasse existe déjà');
@@ -98,11 +118,13 @@ if (isset($_POST['hunt']) && $_POST['hunt'] != '')
   
       // On renvoie les données insérées à JavaScript pour comparer
   
-      $check = $link->prepare('SELECT * FROM mes_shinies WHERE huntid = :huntid');
-      $check->bindParam(':huntid', $data->{'id'}, PDO::PARAM_INT);
-      $check->execute();
-  
-      $storedData = $check->fetch(PDO::FETCH_ASSOC);
+      if ($type != 'REMOVE') {
+        $check = $link->prepare('SELECT * FROM mes_shinies WHERE huntid = :huntid');
+        $check->bindParam(':huntid', $data->{'id'}, PDO::PARAM_INT);
+        $check->execute();
+    
+        $storedData = $check->fetch(PDO::FETCH_ASSOC);
+      }
     }
     catch(PDOException $error) {
       var_dump($error);
@@ -112,6 +134,7 @@ if (isset($_POST['hunt']) && $_POST['hunt'] != '')
       $error = true;
       $response = '[:(] Cette chasse existe déjà';
     }
+
   }
 }
 else
