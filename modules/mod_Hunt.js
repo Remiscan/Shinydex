@@ -174,7 +174,7 @@ export class Hunt {
     });
 
     // Active le bouton "supprimer"
-    const boutonSupprimer = document.querySelector('bouton-hunt-eraseDB');
+    const boutonSupprimer = card.querySelector('.bouton-hunt-eraseDB');
     boutonSupprimer.addEventListener('click', async event => {
       event.preventDefault();
 
@@ -423,7 +423,7 @@ export class Hunt {
   // Envoie la chasse dans la BDD
   async submitHunt(edit = false)
   {
-    document.body.dataset.huntUploading = true;
+    const card = document.getElementById('hunt-' + this.id);
 
     // On demande au service worker d'upload la chasse dans la BDD en ligne
     if (!'serviceWorker' in navigator || !'syncManager' in window)
@@ -455,6 +455,7 @@ export class Hunt {
         }
       });
 
+      card.dataset.loading = 'true';
       // On demande au service worker d'envoyer la chasse vers la DB
       if (edit) await reg.sync.register('HUNT-EDIT-' + this.id);
       else await reg.sync.register('HUNT-ADD-' + this.id);
@@ -468,6 +469,8 @@ export class Hunt {
   // Supprime la chasse de la BDD
   async deleteHuntFromDB()
   {
+    const card = document.getElementById('hunt-' + this.id);
+
     // On demande au service worker de supprimer la chasse de la BDD en ligne
     if (!'serviceWorker' in navigator || !'syncManager' in window)
       throw 'Suppression de la chasse impossible.';
@@ -498,6 +501,7 @@ export class Hunt {
         }
       });
 
+      card.dataset.loading = 'true';
       // On demande au service worker de supprimer la chasse de la DB
       await reg.sync.register('HUNT-REMOVE-' + this.id);
     }
