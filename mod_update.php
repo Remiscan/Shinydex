@@ -32,7 +32,7 @@ function getFilesVersion()
   $listeFichiers = json_decode(file_get_contents('cache.json'), true);
   $listeFichiers = $listeFichiers['fichiers'];
   $listeFichiers[0] = './index.php';
-  foreach(glob('section_*.html') as $f) {
+  foreach(glob('pages/*.html') as $f) {
     $listeFichiers[] = $f;
   }
 
