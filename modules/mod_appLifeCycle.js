@@ -144,7 +144,10 @@ export async function appStart()
 // Met à jour l'application
 function appUpdate(update = false)
 {
-  const version = Date.now()
+  const version = Date.now();
+  const progressBar = document.querySelector('.progression-maj');
+  progressBar.style.setProperty('--progression', 0);
+
   return new Promise((resolve, reject) => {
     if (typeof currentWorker === 'undefined' || currentWorker == null)
       return reject('[:(] Service worker indisponible');
@@ -160,7 +163,7 @@ function appUpdate(update = false)
       }
       else {
         if (update) {
-          document.querySelector('.progression-maj').style.setProperty('--progression', 1);
+          progressBar.style.setProperty('--progression', 1);
           setTimeout(function() { location.reload(true); }, 100);
         }
         resolve('[:)] Installation terminée !');
@@ -176,7 +179,7 @@ function appUpdate(update = false)
       if (event.data.loaded)
       {
         totalLoaded++;
-        document.querySelector('.progression-maj').style.setProperty('--progression', totalLoaded / (event.data.total + 1));
+        progressBar.style.setProperty('--progression', totalLoaded / (event.data.total + 1));
       }
       else if (!event.data.loaded && event.data.erreur)
         reject('[:(] Certains fichiers n\'ont pas pu être récupérés');
