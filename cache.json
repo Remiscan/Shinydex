@@ -9,6 +9,7 @@
         "./ext/material_icons.woff2",
         "./all-icons.png",
         "./instinct.gif",
+        "./modules/comp_loadSpinner.js",
         "./modules/mod_appContent.js",
         "./modules/mod_appLifeCycle.js",
         "./modules/mod_DexDatalist.js",
