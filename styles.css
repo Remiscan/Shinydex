@@ -2292,6 +2292,10 @@ input:checked + label.checkbox::after {
     display: grid;
   }
 
+  body[data-section-actuelle=parametres] main {
+    grid-template-columns: 1fr 1fr;
+  }
+
   #parametres {
     grid-column: 2 / 3;
     grid-row: 1 / 2;
