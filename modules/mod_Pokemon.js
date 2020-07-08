@@ -13,8 +13,7 @@ class Pokemon {
     this.formes = pkmn.formes;
   }
 
-  getSprite(forme, options = {})
-  {
+  getSprite(forme, options = {}) {
     const shiny = (typeof options.shiny != 'undefined') ? options.shiny : false;
     const shinySuffix = shiny ? 'r' : 'n';
     const big = (typeof options.big != 'undefined') ? options.big : false;
@@ -43,6 +42,13 @@ class Pokemon {
       spriteUrl = this.getSprite(forme, {shiny: false, big: options.big, backside: options.backside});
 
     return spriteUrl;
+  }
+
+  get gen() {
+    const gens = Pokemon.generations;
+    for (let gen of gens) {
+      if (this.dexid >= gen.start && this.dexid <= gen.end) return gen.num;
+    }
   }
 
   static async namesfr() {
@@ -92,6 +98,20 @@ class Pokemon {
       { nom: 'Home', gen: 8, id: 'home' }
     ];
     return allGames;
+  }
+
+  static get generations() {
+    const generations = [
+      { num: 1, start: 1, end: 151 },
+      { num: 2, start: 152, end: 251 },
+      { num: 3, start: 252, end: 386 },
+      { num: 4, start: 387, end: 493 },
+      { num: 5, start: 494, end: 649 },
+      { num: 6, start: 650, end: 721 },
+      { num: 7, start: 722, end: 809 },
+      { num: 8, start: 810, end: 890 }
+    ];
+    return generations;
   }
 }
 

@@ -1,3 +1,4 @@
+import { Pokemon } from './mod_Pokemon.js';
 import { createCard, toggleNotes } from './mod_pokemonCard.js';
 import { filterCards, orderCards, reverseOrder, deferCards, deferMonitor } from './mod_filtres.js';
 import { Params, loadAllImages, wait, version2date } from './mod_Params.js';
@@ -70,16 +71,7 @@ export async function appPopulate(start = true)
 
     // Pokédex
     conteneur = document.querySelector('#pokedex>.section-contenu');
-    const generations = [
-      { num: 1, start: 1, end: 151 },
-      { num: 2, start: 152, end: 251 },
-      { num: 3, start: 252, end: 386 },
-      { num: 4, start: 387, end: 493 },
-      { num: 5, start: 494, end: 649 },
-      { num: 6, start: 650, end: 721 },
-      { num: 7, start: 722, end: 809 },
-      { num: 8, start: 810, end: 890 }
-    ];
+    const generations = Pokemon.generations;
     for (const gen of generations) {
       const genConteneur = document.createElement('div');
       genConteneur.classList.add('pokedex-gen');
