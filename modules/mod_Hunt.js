@@ -247,8 +247,8 @@ export class Hunt {
     // et génère la liste des Pokémon correspondants quand on commence à écrire un nom
     const inputEspece = card.querySelector('[list="datalist-pokedex"]');
     inputEspece.addEventListener('input', async () => {
-      this.genereFormes();
       DexDatalist.build(inputEspece.value);
+      this.genereFormes();
     });
 
     // Génère la liste des méthodes au choix du jeu
@@ -410,13 +410,13 @@ export class Hunt {
     const k = await huntStorage.getItem(String(this.id));
     if (k == null) throw 'Chasse inexistante';
 
-    const keys = await huntStorage.keys();
-    if (keys.length == 0) document.querySelector('#chasses-en-cours').classList.add('vide');
-
     const card = document.getElementById('hunt-' + this.id);
     card.remove();
 
-    return await huntStorage.removeItem(this.id);
+    await huntStorage.removeItem(String(this.id));
+
+    const keys = await huntStorage.keys();
+    if (keys.length == 0) document.querySelector('#chasses-en-cours').classList.add('vide');
   }
 
 
