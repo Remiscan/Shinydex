@@ -455,7 +455,7 @@ export class Hunt {
         }
       });
 
-      card.dataset.loading = 'true';
+      card.dataset.loading = 'cloud_upload';
       // On demande au service worker d'envoyer la chasse vers la DB
       if (edit) await reg.sync.register('HUNT-EDIT-' + this.id);
       else await reg.sync.register('HUNT-ADD-' + this.id);
@@ -501,7 +501,7 @@ export class Hunt {
         }
       });
 
-      card.dataset.loading = 'true';
+      card.dataset.loading = 'delete_forever';
       // On demande au service worker de supprimer la chasse de la DB
       await reg.sync.register('HUNT-REMOVE-' + this.id);
     }

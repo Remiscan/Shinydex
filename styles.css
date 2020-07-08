@@ -1694,18 +1694,34 @@ textarea {
   width: 100%;
   height: 100%;
   display: none;
+  justify-content: center;
+  align-items: center;
   background: var(--card-bg-color);
   z-index: 2;
   border-radius: 10px;
 }
 
-.hunt-card[data-loading=true]>.hunt-loader {
+.hunt-card[data-loading]>.hunt-loader {
   display: flex;
 }
 
 .hunt-loader>load-spinner {
   --bg-color: var(--card-bg-color);
   margin: auto;
+}
+
+.hunt-loader>.material-icons {
+  position: absolute;
+  opacity: .5;
+  content: attr(data-loading);
+}
+
+.hunt-card[data-loading='cloud_upload']>.hunt-loader>.material-icons::before {
+  content: 'cloud_upload';
+}
+
+.hunt-card[data-loading='delete_forever']>.hunt-loader>.material-icons::before {
+  content: 'delete_forever';
 }
 
 
