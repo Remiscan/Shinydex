@@ -1,5 +1,5 @@
 import { Params, loadAllImages, wait } from './mod_Params.js';
-import { easterEgg } from './mod_easterEgg.js';
+import { playEasterEgg, prepareEasterEgg } from './mod_easterEgg.js';
 import { closeFiltres, openFiltres } from './mod_filtres.js';
 import { closeSpriteViewer, openSpriteViewer } from './mod_spriteViewer.js';
 
@@ -23,8 +23,8 @@ export async function navigate(sectionCible, position = 0, historique = true)
   await new Promise((resolve, reject) => {
     closeFiltres();
 
-    if (sectionCible == 'a-propos')
-      document.getElementById('instinct').src = '#';
+    if (sectionCible == 'a-propos' || (sectionCible == 'parametres' && Params.owidth >= Params.layoutPClarge))
+      prepareEasterEgg();
 
     if (historique)
       history.pushState({section: sectionCible}, '');
@@ -49,7 +49,7 @@ export async function navigate(sectionCible, position = 0, historique = true)
   });
 
   if (sectionCible == 'a-propos' || (sectionCible == 'parametres' && Params.owidth >= Params.layoutPClarge))
-    easterEgg();
+    playEasterEgg();
 
   if (sectionCible != 'mes-chromatiques')
     nouvelleSection.classList.add('defered');

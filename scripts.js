@@ -1,7 +1,7 @@
 import './modules/comp_loadSpinner.js';
 import { Params, changeTheme, changeAutoMaj, callResize, saveDBpassword } from './modules/mod_Params.js';
 import { navigate } from './modules/mod_navigate.js';
-import { easterEgg } from './modules/mod_easterEgg.js';
+import { playEasterEgg } from './modules/mod_easterEgg.js';
 import { appStart, checkUpdate, manualUpdate } from './modules/mod_appLifeCycle.js';
 import { openFiltres } from './modules/mod_filtres.js';
 import { Hunt } from './modules/mod_Hunt.js';
@@ -68,7 +68,7 @@ document.getElementById('mdp-bdd').addEventListener('input', async () => {
 });
 
 // Active l'easter egg de la section a-propos
-document.querySelector('.easter-egg').onclick = easterEgg;
+document.querySelector('.easter-egg').onclick = playEasterEgg;
 
 // Prépare le bouton de recherche de mise à jour
 let longClic;
