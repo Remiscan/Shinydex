@@ -29,7 +29,8 @@ export class Hunt {
     hacked = 0,
     aupif = 0,
     id = new Date().getTime(),
-    caught = false
+    caught = false,
+    uploaded = false
   } = {}) {
     this.dexid = dexid;
     this.forme = forme;
@@ -47,6 +48,7 @@ export class Hunt {
     this.aupif = aupif;
     this.id = id;
     this.caught = caught;
+    this.uploaded = uploaded;
   }
 
   static async build({
@@ -65,7 +67,8 @@ export class Hunt {
     hacked = 0,
     aupif = 0,
     id = new Date().getTime(),
-    caught = false
+    caught = false,
+    uploaded = false
   } = {}) {
     const hunt = new Hunt({ dexid, forme, surnom, methode, compteur, date, jeu, ball, description, origin, monjeu, charm, hacked, aupif, id, caught });
     await huntStorage.setItem(String(id), hunt);
@@ -242,6 +245,8 @@ export class Hunt {
     document.querySelector(`input[name="hunt-${this.id}-aupif"][value="${this.aupif}"]`).checked = true;
     card.dataset.methode = this.methode;
     card.dataset.jeu = this.jeu;
+
+    if (this.uploaded !== false) card.dataset.loading = this.uploaded;
 
     // Génère la liste des formes au choix d'un Pokémon
     // et génère la liste des Pokémon correspondants quand on commence à écrire un nom
@@ -455,7 +460,9 @@ export class Hunt {
         }
       });
 
-      card.dataset.loading = 'cloud_upload';
+      this.uploaded = 'cloud_upload';
+      await huntStorage.setItem(String(this.id), this);
+      card.dataset.loading = this.uploaded;
       // On demande au service worker d'envoyer la chasse vers la DB
       if (edit) await reg.sync.register('HUNT-EDIT-' + this.id);
       else await reg.sync.register('HUNT-ADD-' + this.id);
@@ -501,7 +508,9 @@ export class Hunt {
         }
       });
 
-      card.dataset.loading = 'delete_forever';
+      this.uploaded = 'delete_forever';
+      await huntStorage.setItem(String(this.id), this);
+      card.dataset.loading = this.uploaded;
       // On demande au service worker de supprimer la chasse de la DB
       await reg.sync.register('HUNT-REMOVE-' + this.id);
     }

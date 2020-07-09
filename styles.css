@@ -1713,7 +1713,6 @@ textarea {
 .hunt-loader>.material-icons {
   position: absolute;
   opacity: .5;
-  content: attr(data-loading);
 }
 
 .hunt-card[data-loading='cloud_upload']>.hunt-loader>.material-icons::before {
