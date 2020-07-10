@@ -193,8 +193,8 @@
     </section>
 
     <!-- Mesure de la fenêtre -->
-    <div id="hauteur-fenetre" style="width: 0; height: 100vh; position: absolute; padding: 0; margin: 0;"></div>
-    <div id="largeur-fenetre" style="width: 100vw; height: 0; position: absolute; padding: 0; margin: 0;"></div>
+    <div id="hauteur-fenetre" style="width: 0; height: 100vh; position: absolute;"></div>
+    <div id="largeur-fenetre" style="width: 100vw; height: 0; position: absolute;"></div>
 
     <!-- Scripts -->
     <script type="module" src="./scripts.js"></script>
