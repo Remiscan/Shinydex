@@ -55,8 +55,6 @@ export async function navigate(sectionCible, position = 0, historique = true)
   if (sectionCible == 'a-propos' || (sectionCible == 'parametres' && Params.owidth >= Params.layoutPClarge))
     playEasterEgg();
 
-  if (sectionCible != 'mes-chromatiques')
-    nouvelleSection.classList.add('defered');
   ancienneSection.classList.remove('defered');
   Array.from(ancienneSection.querySelectorAll('.defered')).forEach(defered => defered.classList.replace('defered', 'defer'));
 }

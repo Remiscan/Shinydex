@@ -166,28 +166,45 @@ function filterDex()
 
 ///////////////////////////////
 // Choisit quelles cartes defer
-export function deferCards()
+export function deferCards(section = 'mes-chromatiques')
 {
   document.querySelector('main').scroll(0, 0);
-  cardsOrdered = Array.from(document.querySelectorAll('#mes-chromatiques .pokemon-card:not(.filtered)'))
-                      .sort((a, b) => parseInt(a.style.getPropertyValue('--order')) - parseInt(b.style.getPropertyValue('--order')));
-  if (document.body.classList.contains('reverse'))
-    cardsOrdered.reverse();
+  const sectionActuelle = section || document.body.dataset.sectionActuelle;
+  let cardList = [];
 
-  cardsOrdered.forEach((card, i) => {
+  switch (sectionActuelle) {
+    case 'mes-chromatiques':
+      cardsOrdered = Array.from(document.querySelectorAll('#mes-chromatiques .pokemon-card:not(.filtered)'))
+                          .sort((a, b) => parseInt(a.style.getPropertyValue('--order')) - parseInt(b.style.getPropertyValue('--order')));
+      if (document.body.classList.contains('reverse')) cardsOrdered.reverse();
+      cardList = cardsOrdered;
+      break;
+    case 'pokedex':
+      cardList = Array.from(document.querySelectorAll('.pokedex-gen'));
+      break;
+    case 'chasses-en-cours':
+      cardList = Array.from(document.querySelectorAll('.hunt-card')).reverse();
+      break;
+  }
+
+  cardList.forEach((card, i) => {
     card.classList.remove('defered');
     card.classList.add('defer');
-    if (i <= Params.nombreADefer()) card.classList.remove('defer');
+    if (i <= Params.nombreADefer[sectionActuelle]()) card.classList.remove('defer');
   });
 }
 
 export function deferMonitor(entries)
 {
-  if (document.body.dataset.sectionActuelle != 'mes-chromatiques')
-    return;
+  const sectionActuelle = document.body.dataset.sectionActuelle;
+  /*const deferSections = ['mes-chromatiques', 'pokedex', 'chasses-en-cours'];
+  if (!deferSections.includes(document.body.dataset.sectionActuelle))
+    return;*/
+
   entries.forEach(async entry => {
+    if (entry.target.parentElement.parentElement.id != sectionActuelle) return;
     if (!entry.isIntersecting) return;
-    document.getElementById('mes-chromatiques').classList.add('defered');
+    document.getElementById(sectionActuelle).classList.add('defered');
   });
 }
 

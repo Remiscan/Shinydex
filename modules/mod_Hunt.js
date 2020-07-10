@@ -5,6 +5,7 @@ import { wait } from './mod_Params.js';
 import { navigate } from './mod_navigate.js';
 import { DexDatalist } from './mod_DexDatalist.js';
 import { appPopulate, appDisplay } from './mod_appContent.js';
+import { deferCards } from './mod_filtres.js';
 
 const huntStorage = localforage.createInstance({
   name: 'remidex',
@@ -263,6 +264,8 @@ export class Hunt {
     if (this.caught) card.classList.add('caught');
 
     if (this.dexid == 0) setTimeout(() => card.classList.remove('new'), 400);
+
+    deferCards('chasses-en-cours');
   }
 
 

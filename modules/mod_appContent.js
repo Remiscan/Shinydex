@@ -83,7 +83,7 @@ export async function appPopulate(start = true)
         pkmn.addEventListener('click', event => openSpriteViewer(i, event));
         genConteneur.appendChild(pkmn);
       }
-      if (gen.num > 2) genConteneur.classList.add('defer');
+      genConteneur.classList.add('defer');
       conteneur.appendChild(genConteneur);
     }
 
@@ -139,7 +139,7 @@ export async function appDisplay(start = true)
     if (savedOrdreReverse == true)
       await reverseOrder();
 
-    deferCards();
+    ['mes-chromatiques', 'pokedex', 'chasses-en-cours'].forEach(section => deferCards(section));
     
     document.getElementById('version-fichiers').innerHTML = version2date(await dataStorage.getItem('version-fichiers'));
     document.getElementById('version-bdd').innerHTML = version2date(await dataStorage.getItem('version-bdd'));
@@ -156,11 +156,13 @@ export async function appDisplay(start = true)
     else await promiseInit();
 
     // Surveille le defer-loader pour charger le reste des shiny quand il apparaît à l'écran
-    const deferLoader = document.querySelector('.defer-loader');
-    const observer = new IntersectionObserver(deferMonitor, {
-      threshold: 1,
+    const deferLoaders = Array.from(document.querySelectorAll('.defer-loader'));
+    deferLoaders.forEach(deferLoader => {
+      const observer = new IntersectionObserver(deferMonitor, {
+        threshold: 1
+      });
+      observer.observe(deferLoader);
     });
-    observer.observe(deferLoader);
 
     if (!start) return;
 

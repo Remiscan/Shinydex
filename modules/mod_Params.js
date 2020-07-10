@@ -14,7 +14,25 @@ export const Params = {
   owidth: false,
   oheight: false,
 
-  nombreADefer: () => { return Math.ceil((Params.oheight ? Params.oheight : 0) / 126); }
+  nombreADefer: {
+    'mes-chromatiques': () => { return Math.ceil((Params.oheight ? Params.oheight : 0) / 126); },
+    'pokedex': () => { 
+      const iconWidth = 68 + 2 * (-2);
+      const availWidth = Params.owidth - 2 * 8;
+      const iconHeight = 56;
+      const availHeight = Params.oheight - 56 - 5;
+      const iconsPerRow = Math.floor(availWidth / iconWidth);
+      const iconsPerCol = Math.floor(availHeight / iconHeight);
+      const iconsPerScreen = iconsPerRow * iconsPerCol;
+      const generationEnds = [151, 251, 386, 493, 649, 721, 809, 890];
+      let visibleGens = 0;
+      for (let gen of generationEnds) {
+        if (gen < iconsPerScreen) visibleGens++;
+      }
+      return visibleGens;
+    },
+    'chasses-en-cours': () => { return Math.ceil((Params.oheight ? Params.oheight : 0) / 318); }
+  }
 };
 
 //////////////////

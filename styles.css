@@ -846,6 +846,10 @@ html.dark .icones.explain.galarborn { background-position: -120px -44px; }
   color: var(--text-color-soft);
 }
 
+#chasses-en-cours .defer-loader {
+  order: -1;
+}
+
 .defered .defer-loader {
   display: none;
 }
