@@ -98,6 +98,32 @@ majButton.addEventListener('touchstart', () => {
 
 
 
+///////////////////////////////////////
+// COMMUNICATION AVEC LE SERVICE WORKER
+navigator.serviceWorker.addEventListener('message', async event => {
+  if ('successfulDBUpdate' in event.data) {
+    if (event.data.successfulDBUpdate === true) {
+      // On reçoit la confirmation du succès de l'ajout à la DB
+      // - animer le succès
+      // - faire disparaître la carte de la chasse
+      // - animation de chargement
+      // ✅ re-lancer appPopulate(start = false)
+      await appPopulate(false);
+      // ✅ re-lancer appDisplay(start = false)
+      await appDisplay(false);
+      // ✅ forcer l'affichage du nouveau sprite--versionBDD.php (appDisplay s'en charge)
+      // - fin de l'animation de chargement
+    }
+    else {
+      // On reçoit la confirmation de l'échec de l'ajout à la DB
+      // - animer l'échec
+      // ✅ laisser la carte de la chasse (= ne rien faire)
+    }
+  }
+});
+
+
+
 /////////////////////////////
 // LANCEMENT DE L'APPLICATION
 
