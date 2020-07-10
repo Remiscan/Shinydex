@@ -2340,6 +2340,7 @@ input:checked + label.checkbox::after {
     left: calc(100% + 16px);
     transform: none;
     border-radius: 10px;
+    overflow: visible;
   }
 
   .pokemon-notes::before {
