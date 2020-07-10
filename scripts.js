@@ -101,6 +101,7 @@ majButton.addEventListener('touchstart', () => {
 ///////////////////////////////////////
 // COMMUNICATION AVEC LE SERVICE WORKER
 navigator.serviceWorker.addEventListener('message', async event => {
+  // Réception d'une réponse à l'envoi d'une chasse au service worker
   if ('successfulDBUpdate' in event.data) {
     if (event.data.successfulDBUpdate === true) {
       // On reçoit la confirmation du succès de l'ajout à la DB

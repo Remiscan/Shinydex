@@ -129,23 +129,24 @@ self.addEventListener('sync', async function(event) {
   const PRE_HUNT_ADD = 'HUNT-ADD-';
   const PRE_HUNT_EDIT = 'HUNT-EDIT-';
   const PRE_HUNT_DELETE = 'HUNT-DELETE-';
+  let huntid;
 
   const whatDo = event => {
     // Upload d'une chasse dans la BDD en ligne
     if (event.tag.startsWith(PRE_HUNT_ADD)) {
-      const huntid = event.tag.replace(PRE_HUNT_ADD, '');
+      huntid = event.tag.replace(PRE_HUNT_ADD, '');
       return sendHunt(huntid);
     }
 
     // Édition d'une chasse dans la BDD en ligne
     else if (event.tag.startsWith(PRE_HUNT_EDIT)) {
-      const huntid = event.tag.replace(PRE_HUNT_EDIT, '');
+      huntid = event.tag.replace(PRE_HUNT_EDIT, '');
       return sendHunt(huntid, true);
     }
 
     // Suppression d'une chasse dans la BDD en ligne
     else if (event.tag.startsWith(PRE_HUNT_DELETE)) {
-      const huntid = event.tag.replace(PRE_HUNT_DELETE, '');
+      huntid = event.tag.replace(PRE_HUNT_DELETE, '');
       return deleteHunt(huntid);
     }
   };
@@ -153,9 +154,9 @@ self.addEventListener('sync', async function(event) {
   event.waitUntil(
     whatDo(event)
     .then(updateShinyData)
-    .then(result => {
+    .then(successfulDBUpdate => {
       return self.clients.matchAll()
-      .then(all => all.map(client => client.postMessage({ successfulDBUpdate: result })));
+      .then(all => all.map(client => client.postMessage({ successfulDBUpdate, huntid })));
     })
   );
 });
