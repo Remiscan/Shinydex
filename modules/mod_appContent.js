@@ -165,7 +165,7 @@ export async function appDisplay(start = true)
     if (!start) return;
 
     // Try to reduce TTFB for Pokédex sprites
-    loadAllImages(['./sprites-home/small/poke_icon_0670_005_fo_n_00000000_f_n.png']);
+    loadAllImages(['./sprites-home/small/poke_icon_0670_005_fo_n_00000000_f_n.png']).catch(() => {});
     
     // Efface l'écran de chargement
     const byeLoad = loadScreen.animate([
