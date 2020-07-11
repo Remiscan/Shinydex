@@ -41,7 +41,7 @@ html.dark {
   --loading-bar-color: hsl(0, 0%, 7%);
 }
 html {
-  --link-all-icons: url(./all-icons.png);
+  --link-iconsheet: url(./iconsheet.png);
   --link-pokesprite: url(./pokesprite.png);
   --easing-standard: cubic-bezier(0.4, 0.0, 0.2, 1);
   --easing-decelerate: cubic-bezier(0.0, 0.0, 0.2, 1);
@@ -661,83 +661,7 @@ section:not(.defered) .defer,
 
 /* Icônes */
 
-.icones.jeu {
-	display: block;
-	width: 32px;
-	height: 32px;
-  background-image: var(--link-all-icons);
-  float: left;
-}
-.icones.jeu.RougeFeu { background-position: 0 0; }
-.icones.jeu.Emeraude { background-position: -32px 0; }
-.icones.jeu.Diamant { background-position: -64px 0; }
-.icones.jeu.Platine { background-position: -96px 0; }
-.icones.jeu.OrHeartGold { background-position: -128px 0; }
-.icones.jeu.Noire { background-position: -160px 0; }
-.icones.jeu.Noire2 { background-position: -192px 0; }
-.icones.jeu.Y { background-position: -224px 0; }
-.icones.jeu.SaphirAlpha { background-position: -256px 0; }
-.icones.jeu.Saphir { background-position: -288px 0; }
-.icones.jeu.Or { background-position: -320px 0; }
-.icones.jeu.Jaune { background-position: -352px 0; }
-.icones.jeu.Soleil { background-position: -384px 0; }
-.icones.jeu.Lune { background-position: -416px 0; }
-.icones.jeu.Bleue { background-position: -448px 0; }
-.icones.jeu.UltraSoleil { background-position: -480px 0; }
-.icones.jeu.UltraLune { background-position: -512px 0; }
-.icones.jeu.Cristal { background-position: -544px 0; }
-.icones.jeu.GO { background-position: -576px 0; }
-.icones.jeu.LetsGoPikachu { background-position: -608px 0; }
-.icones.jeu.LetsGoEvoli { background-position: -640px 0; }
-.icones.jeu.Epee { background-position: -672px 0; }
-.icones.jeu.Bouclier { background-position: -704px 0; }
-.icones.explain {
-	display: inline-block;
-	width: 12px;
-	height: 12px;
-	margin: 3px 0;
-	image-rendering: pixelated;
-  background-image: var(--link-all-icons);
-}
-.icones.explain.clone { background-position: 0 -32px; }
-html.dark .icones.explain.clone { background-position: 0 -44px; }
-.icones.explain.ptethack { background-position: -12px -32px; }
-html.dark .icones.explain.ptethack { background-position: -12px -44px; }
-.icones.explain.hack { background-position: -24px -32px; }
-html.dark .icones.explain.hack { background-position: -24px -44px; }
-.icones.explain.kalosborn { background-position: -36px -32px; }
-html.dark .icones.explain.kalosborn { background-position: -36px -44px; }
-.icones.explain.alolaborn { background-position: -72px -32px; }
-html.dark .icones.explain.alolaborn { background-position: -72px -44px; }
-.icones.explain.vcborn { background-position: -84px -32px; }
-html.dark .icones.explain.vcborn { background-position: -84px -44px; }
-.icones.explain.letsgoborn { background-position: -96px -32px; }
-html.dark .icones.explain.letsgoborn { background-position: -96px -44px; }
-.icones.explain.goborn { background-position: -108px -32px; }
-html.dark .icones.explain.goborn { background-position: -108px -44px; }
-.icones.explain.galarborn { background-position: -120px -32px; }
-html.dark .icones.explain.galarborn { background-position: -120px -44px; }
-.icones.explain.mine { background-position: -48px -32px; }
-.icones.explain.lucky { background-position: -60px -32px; }
-.icones.explain.charm { 
-	width: 22px;
-	height: 22px;
-	background-position: -266px -32px;
-}
-.icones.explain.pc {
-	width: 26px;
-	height: 25px;
-	background-position: -326px -32px;
-}
-.icones.explain.gigamax {
-  width: 32px;
-  height: 25px;
-  background-position: -384px -32px;
-}
 .icones.explain.oeuf {
-  width: 13px;
-  height: 14px;
-  background-position: -307px -32px;
   margin: 0;
 }
 

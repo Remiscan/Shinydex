@@ -84,7 +84,8 @@
     <link rel="modulepreload" href="./modules/mod_spriteViewer.js">
 
     <link rel="stylesheet" href="./styles.css">
-    <link rel="stylesheet" href="./pokesprite/pokesprite.css">
+    <link rel="stylesheet" href="./images/iconsheet.css">
+    <link rel="stylesheet" href="./ext/pokesprite.css">
   </head>
 
   <body data-section-actuelle="mes-chromatiques">
@@ -102,7 +103,7 @@
 
       <a class="nav-link lien-section" data-section="pokedex">
         <i class="material-icons">language</i>
-        <span>Pokédex<svg class="shinystars"><use xlink:href="shinystars.svg#stars"></use></svg></span>
+        <span>Pokédex<svg class="shinystars"><use xlink:href="./images/shinystars.svg#stars"></use></svg></span>
       </a>
 
       <a class="nav-link lien-section" data-section="chasses-en-cours">

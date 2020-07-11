@@ -1,0 +1,72 @@
+{
+  "icones": {
+    "jeu": {
+      "taille": [32, 32]
+    },
+    "explain": {
+      "liste": [
+        {
+          "nom": "clone",
+          "dark": "true",
+          "taille": [12, 12]
+        }, {
+          "nom": "ptethack",
+          "dark": "true",
+          "taille": [12, 12]
+        }, {
+          "nom": "hack",
+          "dark": "true",
+          "taille": [12, 12]
+        }, {
+          "nom": "kalosborn",
+          "dark": "true",
+          "taille": [12, 12]
+        }, {
+          "nom": "alolaborn",
+          "dark": "true",
+          "taille": [12, 12]
+        }, {
+          "nom": "vcborn",
+          "dark": "true",
+          "taille": [12, 12]
+        }, {
+          "nom": "letsgoborn",
+          "dark": "true",
+          "taille": [12, 12]
+        }, {
+          "nom": "goborn",
+          "dark": "true",
+          "taille": [12, 12]
+        }, {
+          "nom": "galarborn",
+          "dark": "true",
+          "taille": [12, 12]
+        }, {
+          "nom": "mine",
+          "dark": "false",
+          "taille": [12, 12]
+        }, {
+          "nom": "lucky",
+          "dark": "false",
+          "taille": [12, 12]
+        }, {
+          "nom": "charm",
+          "dark": "false",
+          "taille": [22, 22]
+        }, {
+          "nom": "pc",
+          "dark": "false",
+          "taille": [26, 25]
+        }, {
+          "nom": "gigamax",
+          "dark": "false",
+          "taille": [32, 25]
+        }, {
+          "nom": "oeuf",
+          "dark": "false",
+          "taille": [13, 14]
+        }
+      ]
+    }
+  }
+}
