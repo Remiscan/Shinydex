@@ -1,2 +1,5 @@
 \[backups\]/
 test.php
+
+# Ignore generated icon sheet
+images/out/
