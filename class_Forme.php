@@ -135,6 +135,8 @@ class Forme extends Sprite
           $ids = ['', '', 'ash'];
           $noms = ['', '', 'de Sacha'];
         break;
+        case 664: // Lépidonille
+        case 665: // Pérégrain
         case 666: // Prismillon
           $ids = ['icysnow', 'polar', 'tundra', 'continental', 'garden', 'elegant', 'meadow', 'modern', 'marine', 'archipelago', 'highplains', 'sandstorm', 'river', 'monsoon', 'savanna', 'sun', 'ocean', 'jungle', 'fancy', 'pokeball'];
           $noms = ['Blizzard', 'Banquise', 'Glace', 'Continent', 'Verdure', 'Monarchie', 'Floraison', 'Métropole', 'Rivage', 'Archipel', 'Sécheresse', 'Sable', 'Delta', 'Cyclone', 'Mangrove', 'Zénith', 'Soleil Levant', 'Jungle', 'Fantaisie', 'Poké Ball'];
