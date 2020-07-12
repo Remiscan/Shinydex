@@ -2,6 +2,7 @@ import { Params, loadAllImages, wait } from './mod_Params.js';
 import { playEasterEgg, prepareEasterEgg } from './mod_easterEgg.js';
 import { closeFiltres, openFiltres } from './mod_filtres.js';
 import { closeSpriteViewer, openSpriteViewer } from './mod_spriteViewer.js';
+import { getNames } from './mod_DexDatalist.js';
 
 let sectionActuelle = 'mes-chromatiques';
 export const sections = ['mes-chromatiques', 'pokedex', 'mes-equipes', 'une-equipe', 'parametres', 'a-propos'];
@@ -54,6 +55,9 @@ export async function navigate(sectionCible, position = 0, historique = true)
 
   if (sectionCible == 'a-propos' || (sectionCible == 'parametres' && Params.owidth >= Params.layoutPClarge))
     playEasterEgg();
+
+  if (sectionCible == 'chasses-en-cours')
+    getNames();
 
   ancienneSection.classList.remove('defered');
   Array.from(ancienneSection.querySelectorAll('.defered')).forEach(defered => defered.classList.replace('defered', 'defer'));
