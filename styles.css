@@ -2199,7 +2199,7 @@ input:checked + label.checkbox::after {
   }
 
   #pokedex .defer {
-    display: unset;
+    display: flex;
   }
 
   #mes-chromatiques>.section-contenu,
