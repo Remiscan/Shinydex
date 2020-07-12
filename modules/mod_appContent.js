@@ -102,7 +102,7 @@ export async function appDisplay(start = true)
 {
   const loadScreen = (start == true) ? document.getElementById('load-screen') : null;
   const version = await dataStorage.getItem('version');
-  const listeImages = [`./pokesprite/pokesprite.png`, `./sprites--${version}.php`];
+  const listeImages = [`./ext/pokesprite.png`, `./sprites--${version}.php`];
   document.documentElement.style.setProperty('--link-sprites', `url('./sprites--${version}.php')`);
 
   const promiseImages = loadAllImages(listeImages);

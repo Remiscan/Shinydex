@@ -13,10 +13,10 @@ export async function navigate(sectionCible, position = 0, historique = true)
   const ancienneSection = document.getElementById(sectionActuelle);
   const nouvelleSection = document.getElementById(sectionCible);
 
-  const listeImages = ['./pokesprite/pokesprite.png'];
+  const listeImages = ['./ext/pokesprite.png'];
   if (sectionCible == 'mes-chromatiques') {
     const versionDB = await dataStorage.getItem('version');
-    listeImages.push(`./sprites--${versionDB}.php`, './all-icons.png');
+    listeImages.push(`./sprites--${versionDB}.php`, './images/iconsheet.png');
   }
 
   await loadAllImages(listeImages);

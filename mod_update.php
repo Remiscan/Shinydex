@@ -77,13 +77,13 @@ function getShinyData()
 // Je récupère les infos sur tous les Pokémon et leurs formes
 function getPokemonData()
 {
-  $dir = "./sprites-home/small";
+  $dir = "./sprites-home/big";
   $files = scandir($dir);
 
   $pokemons = [];
   forEach(Pokemon::ALL_POKEMON as $id => $name)
   {
-    $sprites = preg_grep('/poke_icon_([0]+)?' . intval($id) . '_.+_n\.png/', $files);
+    $sprites = preg_grep('/poke_capture_([0]+)?' . intval($id) . '_.+_n\.png/', $files);
     $pokemons[] = new Pokemon($id, $name, $sprites);
   }
   return $pokemons;

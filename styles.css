@@ -489,6 +489,7 @@ body:not([data-section-actuelle=mes-chromatiques]):not([data-section-actuelle=po
   background-image: var(--link-sprites);
   background-position: 0 var(--image-position, 0);
   background-repeat: no-repeat;
+  background-size: 112px;
 }
 
 .pokemon-infos {

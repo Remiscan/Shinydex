@@ -26,8 +26,25 @@ class Forme extends Sprite
     
     if ($spriteid == 'gigamax')
     {
-      $this->dbid = 'gigamax';
-      $this->nom = 'Gigamax';
+      switch($dexid)
+      {
+        case 892: // Shifours
+          switch($this->form)
+          {
+            case 0:
+              $this->dbid = 'gigamax';
+              $this->nom = 'Poing Final - Gigamax';
+            break;
+            case 1:
+              $this->dbid = 'water-gigamax';
+              $this->nom = 'Mille Poings - Gigamax';
+            break;
+          }
+        break;
+        default:
+          $this->dbid = 'gigamax';
+          $this->nom = 'Gigamax';
+      }
     }
 
     else
@@ -213,6 +230,10 @@ class Forme extends Sprite
           $ids = ['', 'infini'];
           $noms = ['', 'Infinimax'];
         break;
+        case 892: // Shifours
+          $ids = ['', 'water'];
+          $noms = ['Poing Final', 'Mille Poings'];
+        break;
         default:
           $done = false;
       }
@@ -242,7 +263,7 @@ class Forme extends Sprite
         $hasMegaX = [6, 150];
         $hasPrimal = [382, 383];
         $hasAlolan = [19, 20, 26, 27, 28, 37, 38, 50, 51, 52, 53, 74, 75, 76, 88, 89, 103, 105];
-        $hasGalarian = [52, 77, 78, 79, 83, 110, 122, 222, 263, 264, 554, 555, 562, 618];
+        $hasGalarian = [52, 77, 78, 79, 80, 83, 110, 122, 222, 263, 264, 554, 555, 562, 618];
 
         if (in_array($spriteid, ['mf', 'uk', 'mo', 'fo']))
         {
@@ -293,8 +314,9 @@ class Forme extends Sprite
         }
         // Formes de Galar
         else if (
-          (in_array($dexid, $hasGalarian) && !in_array($dexid, $hasAlolan) && $sprite->form == 1)
-          || (in_array($dexid, $hasGalarian) && in_array($dexid, $hasAlolan) && $sprite->form == 2)
+          (in_array($dexid, $hasGalarian) && !in_array($dexid, $hasAlolan) && !in_array($dexid, $hasMega) && $sprite->form == 1)
+          || (in_array($dexid, $hasGalarian) && in_array($dexid, $hasAlolan) && !in_array($dexid, $hasMega) && $sprite->form == 2)
+          || (in_array($dexid, $hasGalarian) && !in_array($dexid, $hasAlolan) && in_array($dexid, $hasMega) && $sprite->form == 2)
         )
         {
           $this->dbid = 'galar';

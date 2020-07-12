@@ -6,7 +6,7 @@ class Sprite
   public $gigamax;
   public $candy;
 
-  function __construct($fichier = 'poke_icon_0000_000_uk_n_00000000_f_n.png')
+  function __construct($fichier = 'poke_capture_0000_000_uk_n_00000000_f_n.png')
   {
     $sprite = str_replace('.png', '', $fichier);
     $sprite = explode('_', $sprite);

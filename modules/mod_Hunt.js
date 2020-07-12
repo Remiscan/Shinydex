@@ -382,9 +382,9 @@ export class Hunt {
     const k = formes.findIndex(forme => forme.dbid == this.forme);
     const forme = formes[k];
     if (k != -1)
-      sprite.style.setProperty('--sprite', `url('${pkmn.getSprite(forme, { shiny: this.caught })}'`);
+      sprite.style.setProperty('--sprite', `url('${pkmn.getSprite(forme, { shiny: this.caught, big: true })}'`);
     else
-      sprite.style.setProperty('--sprite', `url('${pkmn.getSprite(formes[0], { shiny: this.caught })}'`);
+      sprite.style.setProperty('--sprite', `url('${pkmn.getSprite(formes[0], { shiny: this.caught, big: true })}'`);
   }
 
 

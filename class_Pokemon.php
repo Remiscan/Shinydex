@@ -22,10 +22,10 @@ class Pokemon
       try {
         $forme = new Forme(new Sprite($s), $id);
 
-        if (!file_exists('./sprites-home/small/' . str_replace('_n.png', '_r.png', $s)) && $this->dexid != 869)
+        if (!file_exists('./sprites-home/big/' . str_replace('_n.png', '_r.png', $s)) && $this->dexid != 869)
         $forme->noShiny = true;
 
-        if (file_exists('./sprites-home/small/' . str_replace('_f_n.png', '_b_n.png', $s)))
+        if (file_exists('./sprites-home/big/' . str_replace('_f_n.png', '_b_n.png', $s)))
           $forme->hasBackside == true;
 
         $formeCaracs = [
@@ -53,7 +53,7 @@ class Pokemon
     {
       $options = (object) [
         'shiny' => false,
-        'big' => false,
+        'big' => true,
         'backside' => false
       ];
     }
@@ -62,7 +62,7 @@ class Pokemon
 
     $shiny = property_exists($options, 'shiny') ? $options->shiny : false;
     $shinySuffix = $shiny ? 'r' : 'n';
-    $big = property_exists($options, 'big') ? $options->big : false;
+    $big = property_exists($options, 'big') ? $options->big : true;
     $size = $big ? 'big' : 'small';
     $sizePrefix = $big ? 'capture' : 'icon';
 

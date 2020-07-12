@@ -16,7 +16,7 @@ class Pokemon {
   getSprite(forme, options = {}) {
     const shiny = (typeof options.shiny != 'undefined') ? options.shiny : false;
     const shinySuffix = shiny ? 'r' : 'n';
-    const big = (typeof options.big != 'undefined') ? options.big : false;
+    const big = (typeof options.big != 'undefined') ? options.big : true;
     const size = big ? 'big' : 'small';
     const sizePrefix = big ? 'capture' : 'icon';
 

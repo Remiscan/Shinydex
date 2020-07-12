@@ -31,12 +31,12 @@ $recup_shinies = $link->prepare('SELECT * FROM mes_shinies ORDER BY id DESC');
 
 /////////////////////////////////////////////////////////////
 // Je récupère les infos sur tous les Pokémon et leurs formes
-$dir = "./sprites-home/small";
+$dir = "./sprites-home/big";
 $files = scandir($dir);
 $pokemons = [];
 forEach(Pokemon::ALL_POKEMON as $id => $name)
 {
-  $sprites = preg_grep('/poke_icon_([0]+)?' . intval($id) . '_.+_n\.png/', $files);
+  $sprites = preg_grep('/poke_capture_([0]+)?' . intval($id) . '_.+_n\.png/', $files);
   $pokemons[] = new Pokemon($id, $name, $sprites);
 }
 
@@ -55,7 +55,7 @@ foreach ($data_shinies as $un_shiny)
       break;
     }
   }
-  $allsprites[] = $pokemon->getSprite($forme, (object) ['shiny' => true]);
+  $allsprites[] = $pokemon->getSprite($forme, (object) ['shiny' => true, 'big' => true]);
 }
 
 
@@ -65,6 +65,8 @@ function tile_image($array_d_images, $type)
 {
   $width = 112; // largeur d'un sprite
   $height = 112; // hauteur d'un sprite
+  $bigWidth = 512;
+  $bigHeight = 512;
 
   $fileArray = array($image_finale);
 
@@ -89,7 +91,8 @@ function tile_image($array_d_images, $type)
     $row = floor($i / $columns);
     $col = $i % $columns;
     $image_temp = imagecreatefrompng($array_d_images[$i]);
-    imagecopy($output_image, $image_temp, ($width * $col), ($height * $row), 0, 0, $width, $height);
+    //imagecopy($output_image, $image_temp, ($width * $col), ($height * $row), 0, 0, $width, $height);
+    imagecopyresampled($output_image, $image_temp, ($width * $col), ($height * $row), 0, 0, $width, $height, $bigWidth, $bigHeight);
   }
 
   header('Content-type: image/' . $type);
