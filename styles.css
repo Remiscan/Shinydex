@@ -1347,7 +1347,6 @@ picture.no-shiny>span {
 .bouton-hunt-submit {
   flex-grow: 1;
   margin: 0;
-  margin-left: 8px;
 }
 
 .caught .bouton-hunt-caught {
@@ -1359,6 +1358,11 @@ picture.no-shiny>span {
 
 .bouton-hunt-remove {
   margin: 0;
+}
+
+.bouton-hunt-remove,
+.bouton-hunt-eraseDB {
+  margin-right: 8px;
 }
 
 .hunt-card.edit .bouton-hunt-remove:not(.bouton-hunt-edit),
