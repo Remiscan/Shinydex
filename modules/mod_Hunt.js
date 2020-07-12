@@ -261,7 +261,7 @@ export class Hunt {
     const inputJeu = card.querySelector('[list=datalist-jeux]');
     inputJeu.addEventListener('input', () => this.genereMethodes());
 
-    if (this.caught) card.classList.add('caught');
+    if (this.caught && !this.uploaded) card.classList.add('caught');
 
     if (this.dexid == 0) setTimeout(() => card.classList.remove('new'), 400);
 
