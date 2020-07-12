@@ -2067,8 +2067,13 @@ input:checked + label.checkbox::after {
   display: none;
 }
 
-.installing .maj-loading {
+.installing .maj-loading,
+.notification.loading .maj-loading {
   display: block;
+}
+
+.notification.loading .material-icons {
+  display: none;
 }
 
 
@@ -2268,6 +2273,7 @@ input:checked + label.checkbox::after {
 
   .hunt-card>.pokemon-sprite {
     border-radius: 10px 0 10px 0;
+    z-index: 3;
   }
 
   .pokemon-notes {

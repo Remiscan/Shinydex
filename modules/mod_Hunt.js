@@ -71,7 +71,7 @@ export class Hunt {
     caught = false,
     uploaded = false
   } = {}) {
-    const hunt = new Hunt({ dexid, forme, surnom, methode, compteur, date, jeu, ball, description, origin, monjeu, charm, hacked, aupif, id, caught });
+    const hunt = new Hunt({ dexid, forme, surnom, methode, compteur, date, jeu, ball, description, origin, monjeu, charm, hacked, aupif, id, caught, uploaded });
     await huntStorage.setItem(String(id), hunt);
     await hunt.buildHunt();
     return hunt;
@@ -151,7 +151,7 @@ export class Hunt {
         return notify('Pas de connexion internet');
 
       const span = boutonSubmit.querySelector('span');
-      if (span.innerHTML == 'Enregistrer dans mes chromatiques')
+      if (span.innerHTML == 'Enregistrer')
       {
         // Gestion des erreurs de formulaire
         const erreurs = [];
@@ -168,7 +168,7 @@ export class Hunt {
         }
 
         span.innerHTML = 'Confirmer ?';
-        setTimeout(() => span.innerHTML = 'Enregistrer dans mes chromatiques', 3000);
+        setTimeout(() => span.innerHTML = 'Enregistrer', 3000);
       }
       else if (span.innerHTML == 'Confirmer ?')
       {
@@ -520,7 +520,21 @@ Pokemon.jeux.forEach(jeu => {
 //////////////////////////////////////
 // Initialise les chasses sauvegardées
 async function initHunts() {
-  await huntStorage.ready();
+  await Promise.all([huntStorage.ready(), dataStorage.ready()]);
+
+  // On vérifie quelles chasses ont été uploadées par le service worker depuis la dernière visite
+  let uploadConfirmed = await dataStorage.getItem('uploaded-hunts');
+  if (uploadConfirmed == null) {
+    uploadConfirmed = [];
+    await dataStorage.setItem('uploaded-hunts', []);
+  }
+
+  // On supprime ces chasses
+  for (huntid of uploadConfirmed) {
+    await huntStorage.removeItem(huntid);
+  }
+
+  // On génère les chasses restantes
   const keys = await huntStorage.keys();
   if (keys.length == 0)
     document.querySelector('#chasses-en-cours').classList.add('vide');

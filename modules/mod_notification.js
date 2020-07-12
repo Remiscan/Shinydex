@@ -25,6 +25,7 @@ export function notify(texteDesc, texteBouton = '', iconeBouton = 'close', actio
   requestAnimationFrame(() => {
     notif.classList.add('on');
     fab.classList.add('notif');
+    if (iconeBouton == 'loading') notif.classList.add('loading');
   });
   notifTimeLimit = setTimeout(() => {
     unNotify();
@@ -34,7 +35,7 @@ export function notify(texteDesc, texteBouton = '', iconeBouton = 'close', actio
 
 ////////////////////////////////////////////////////////
 // Masque la notification appelée par la fonction notify
-function unNotify()
+export function unNotify()
 {
   const notif = document.getElementById('notification');
   const fab = document.querySelector('.fab');

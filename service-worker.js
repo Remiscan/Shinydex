@@ -126,6 +126,7 @@ self.addEventListener('message', function(event) {
 
 // SYNC
 self.addEventListener('sync', async function(event) {
+  console.log('[sw] Requête de SYNC reçue');
   const PRE_HUNT_ADD = 'HUNT-ADD-';
   const PRE_HUNT_EDIT = 'HUNT-EDIT-';
   const PRE_HUNT_DELETE = 'HUNT-DELETE-';
@@ -155,7 +156,9 @@ self.addEventListener('sync', async function(event) {
     whatDo(event)
     .then(updateShinyData)
     .then(successfulDBUpdate => {
-      return self.clients.matchAll()
+      return dataStorage.getItem('uploaded-hunts')
+      .then(uploadedHunts => dataStorage.setItem('uploaded-hunts', [...uploadedHunts, huntid]))
+      .then(() => self.clients.matchAll())
       .then(all => all.map(client => client.postMessage({ successfulDBUpdate, huntid })));
     })
   );
@@ -268,8 +271,8 @@ async function updateShinyData()
 
   try {
     console.log('[update-db] Récupération des données...')
-    data = fetch('/remidex/mod_update.php?type=updateDB&date=' + Date.now());
-    if (response.status != 200)
+    data = await fetch('/remidex/mod_update.php?type=updateDB&date=' + Date.now());
+    if (data.status != 200)
       throw '[:(] Erreur ' + response.status + ' lors de la requête (mod_update.php)';
     data = data.json();
   }
@@ -361,7 +364,7 @@ async function sendHunt(huntid, edit = false) {
 
     console.log(JSON.stringify(hunt));
 
-    const response = await fetch('mod_sendHuntToDb.php', {
+    const response = await fetch('/remidex/mod_sendHuntToDb.php?date=' + Date.now(), {
       method: 'POST',
       body: formData
     });
