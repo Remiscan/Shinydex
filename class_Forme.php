@@ -11,9 +11,10 @@ class Forme extends Sprite
     // Formes à ne pas compter
     if (
       ($dexid == 25 && $sprite->form == 8)
+      || ($dexid == 25 && $sprite->form == 9)
       || ($dexid == 670 && $sprite->form == 5)
     )
-      throw new Exception('Forme ingorée');
+      throw new Exception('Forme ignorée');
     
     $this->form = $sprite->form;
     $this->gender = $sprite->gender;
