@@ -10,16 +10,15 @@ import { updateHunt } from './mod_Hunt.js';
 export async function appPopulate(start = true)
 {
   try {
-    // Liste principale
+    // Prépare la liste principale
+    let cardsToPopulate = [];
     if (!start) {
-      // Vider la liste principale
+      // Vide la liste principale
       Array.from(document.querySelectorAll('#mes-chromatiques .pokemon-card')).forEach(c => c.remove());
     }
 
     let data = await shinyStorage.keys();
-    data = data.map(async key => { return await shinyStorage.getItem(key) });
-    data = await Promise.all(data);
-    let conteneur = document.querySelector('#mes-chromatiques>.section-contenu');
+    data = await Promise.all(data.map(async key => { return await shinyStorage.getItem(key) }));
 
     if (data.length == 0) {
       document.querySelector('#mes-chromatiques').classList.add('vide');
@@ -31,7 +30,6 @@ export async function appPopulate(start = true)
       const card = await createCard(pokemon);
       card.addEventListener('click', () => toggleNotes(card.id));
       card.classList.add('defer');
-      conteneur.appendChild(card);
 
       // Active le long clic pour éditer
       let longClic;
@@ -65,30 +63,45 @@ export async function appPopulate(start = true)
         card.addEventListener('touchend', clear);
         card.addEventListener('touchcancel', clear);
       }, { passive: true });
+
+      cardsToPopulate.push(card);
     };
 
     if (!start) return;
 
-    // Pokédex
-    conteneur = document.querySelector('#pokedex>.section-contenu');
+    // Prépare le Pokédex
+    let gensToPopulate = [];
     const generations = Pokemon.generations;
+    const names = await Pokemon.names();
     for (const gen of generations) {
+      let monsToPopulate = [];
       const genConteneur = document.createElement('div');
       genConteneur.classList.add('pokedex-gen');
       for (let i = gen.start; i <= gen.end; i++) {
         const pkmn = document.createElement('span');
-        const pokemon = await pokemonData.getItem(String(i));
-        pkmn.classList.add('pkspr', 'pokemon', pokemon.name + '-shiny');
+        const name = names[i];
+        pkmn.classList.add('pkspr', 'pokemon', name + '-shiny');
         pkmn.dataset.dexid = i;
         pkmn.addEventListener('click', event => openSpriteViewer(i, event));
-        genConteneur.appendChild(pkmn);
+        monsToPopulate.push(pkmn);
       }
       genConteneur.classList.add('defer');
-      conteneur.appendChild(genConteneur);
+
+      for (let pkmn of monsToPopulate) { genConteneur.appendChild(pkmn); }
+      gensToPopulate.push(genConteneur);
     }
 
+    // Peuple les éléments après la préparation (pour optimiser le temps d'exécution)
+    //// Liste principale
+    let conteneur = document.querySelector('#mes-chromatiques>.section-contenu');
+    for (let card of cardsToPopulate) { conteneur.appendChild(card); }
+    //// Pokédex
+    conteneur = document.querySelector('#pokedex>.section-contenu');
+    for (let genConteneur of gensToPopulate) { conteneur.appendChild(genConteneur); }
+
     return '[:)] L\'application est prête !';
-  } catch(error) {
+  }
+  catch(error) {
     console.error('[:(] Erreur critique de chargement');
     throw error;
   }

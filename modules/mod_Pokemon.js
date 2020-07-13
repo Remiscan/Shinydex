@@ -5,6 +5,8 @@ String.prototype.pad = function(long) {
   return chaine;
 }
 
+let allGames, allMethodes;
+
 class Pokemon {
   constructor(pkmn) {
     this.dexid = pkmn.dexid;
@@ -51,6 +53,17 @@ class Pokemon {
     }
   }
 
+  static async names() {
+    const allNames = [];
+    await pokemonData.ready();
+    const pkmnNumber = await pokemonData.length();
+    for (let i = 0; i < pkmnNumber; i++) {
+      const pkmn = await pokemonData.getItem(String(i));
+      allNames.push(pkmn.name);
+    }
+    return allNames;
+  }
+
   static async namesfr() {
     const allNames = [];
     await pokemonData.ready();
@@ -63,7 +76,7 @@ class Pokemon {
   }
 
   static get jeux() {
-    const allGames = [
+    if (allGames == null) allGames = [
       { nom: 'Bleue', gen: 1, id: 'rb' },
       { nom: 'Rouge', gen: 1, id: 'rb' },
       { nom: 'Jaune', gen: 1, id: 'yellow' },
@@ -160,7 +173,7 @@ class Shiny {
 
   static get allMethodes() {
     const allGames = Pokemon.jeux;
-    const allMethodes = [
+    if (allMethodes == null) allMethodes = [
       { nom: 'Sauvage', jeux: allGames, mine: true, charm: true },
       { nom: 'Œuf', jeux: allGames.filter(g => ![1, 7.1, 0].includes(g.gen)), mine: true, charm: true },
       { nom: 'Masuda', jeux: allGames.filter(g => g.gen >= 4 && g.gen != 7.1), mine: true, charm: true },

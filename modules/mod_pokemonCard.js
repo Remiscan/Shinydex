@@ -1,7 +1,8 @@
 import { Shiny } from './mod_Pokemon.js';
 import { Params } from './mod_Params.js';
 
-let currentCard = null;
+let currentCard;
+let charmlessMethods;
 
 /////////////////////////////////////////////////////////
 // Afficher la description d'une carte en cliquant dessus
@@ -78,7 +79,7 @@ export async function createCard(pokemon)
 
   const shinyRateBox = card.querySelector('.shiny-rate');
   const shinyRate = shiny.shinyRate;
-  const charmlessMethods = Shiny.methodes('charmless');
+  if (charmlessMethods == null) charmlessMethods = Shiny.methodes('charmless');
 
   if (shiny.random == false)
     card.querySelector('.icones.lucky').remove();
