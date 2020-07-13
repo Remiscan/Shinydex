@@ -445,6 +445,7 @@ body:not([data-section-actuelle=mes-chromatiques]):not([data-section-actuelle=po
   width: 100%;
   max-width: 500px;
   height: 120px;
+  min-height: 120px;
   overflow: hidden;
   border-radius: 10px;
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14);

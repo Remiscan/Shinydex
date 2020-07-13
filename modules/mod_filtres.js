@@ -29,7 +29,6 @@ export async function filterCards(filtres = defautFiltres)
       });
       // Si aucun choix n'est vérifié, on élimine la carte
       if (alterCorrespondances == 0) {
-        card.classList.add('filtered');
         filteredCards.push(card);
         break;
       }
@@ -45,6 +44,7 @@ export async function filterCards(filtres = defautFiltres)
   document.querySelector('#mes-chromatiques .section-contenu').style.setProperty('--compteur', compteur);
   if (compteur == 0) document.querySelector('#mes-chromatiques').classList.add('vide');
   else document.querySelector('#mes-chromatiques').classList.remove('vide');
+  filteredCards.forEach(card => card.classList.add('filtered'));
   return compteur;
 }
 
