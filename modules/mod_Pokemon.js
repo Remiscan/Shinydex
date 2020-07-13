@@ -54,25 +54,13 @@ class Pokemon {
   }
 
   static async names() {
-    const allNames = [];
-    await pokemonData.ready();
-    const pkmnNumber = await pokemonData.length();
-    for (let i = 0; i < pkmnNumber; i++) {
-      const pkmn = await pokemonData.getItem(String(i));
-      allNames.push(pkmn.name);
-    }
-    return allNames;
+    await dataStorage.ready();
+    return await dataStorage.getItem('pokemon-names');
   }
 
   static async namesfr() {
-    const allNames = [];
-    await pokemonData.ready();
-    const pkmnNumber = await pokemonData.length();
-    for (let i = 0; i < pkmnNumber; i++) {
-      const pkmn = await pokemonData.getItem(String(i));
-      allNames.push(pkmn.namefr);
-    }
-    return allNames;
+    await dataStorage.ready();
+    return await dataStorage.getItem('pokemon-names-fr');
   }
 
   static get jeux() {

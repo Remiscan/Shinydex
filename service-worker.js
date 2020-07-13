@@ -242,6 +242,8 @@ async function installData([data, files], action = 'install', event = null) {
     await dataStorage.setItem('version-fichiers', data['version-fichiers']);
     await dataStorage.setItem('version-bdd', data['version-bdd']);
     await dataStorage.setItem('version', versionMax);
+    await dataStorage.setItem('pokemon-names', data['pokemon-names']);
+    await dataStorage.setItem('pokemon-names-fr', data['pokemon-names-fr']);
     await Promise.all(
       data['data-shinies'].map(shiny => shinyStorage.setItem(String(shiny.id), shiny))
     );

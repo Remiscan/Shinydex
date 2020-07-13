@@ -131,6 +131,8 @@ else
   $results['version-fichiers'] = getFilesVersion();
   $results['data-shinies'] = getShinyData();
   $results['pokemon-data'] = getPokemonData();
+  $results['pokemon-names'] = Pokemon::ALL_POKEMON;
+  $results['pokemon-names-fr'] = Pokemon::ALL_POKEMON_FR;
 
 }
 
