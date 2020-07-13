@@ -10,9 +10,22 @@ class Forme extends Sprite
   {
     // Formes à ne pas compter
     if (
-      ($dexid == 25 && $sprite->form == 8)
-      || ($dexid == 25 && $sprite->form == 9)
-      || ($dexid == 670 && $sprite->form == 5)
+      ($dexid == 25 && $sprite->form == 8) // Pikachu starter
+      || ($dexid == 25 && $sprite->form == 9) // Pikachu casquette World
+      || ($dexid == 20 && $sprite->form == 2) // Rattatac totem
+      || ($dexid == 105 && $sprite->form == 2) // Ossatueur totem
+      || ($dexid == 133 && $sprite->form == 1) // Évoli starter
+      || ($dexid == 414 && $sprite->form > 0) // Papilord (formes capes de Cheniti)
+      || ($dexid == 670 && $sprite->form == 5) // Floette de AZ
+      || ($dexid == 735 && $sprite->form == 1) // Argouste totem
+      || ($dexid == 738 && $sprite->form == 1) // Lucanon totem
+      || ($dexid == 743 && $sprite->form == 1) // Rubombelle totem
+      || ($dexid == 744 && $sprite->form == 1) // Rocabot (évolue en crépusculaire)
+      || ($dexid == 752 && $sprite->form == 1) // Tarenbulle totem
+      || ($dexid == 754 && $sprite->form == 1) // Floramantis totem
+      || ($dexid == 758 && $sprite->form == 1) // Malamandre totem
+      || ($dexid == 777 && $sprite->form == 1) // Togedemaru totem
+      || ($dexid == 784 && $sprite->form == 1) // Ékaïser totem
     )
       throw new Exception('Forme ignorée');
     
@@ -213,6 +226,11 @@ class Forme extends Sprite
           $ids = ['aigue', 'grave'];
           $noms = ['Aigüe', 'Grave'];
         break;
+        case 854: // Théffroi
+        case 855: // Polthégeist
+          $ids = ['', 'antique'];
+          $noms = ['Contrefaçon', 'Authentique'];
+        break;
         case 875: // Bekaglaçon
           $ids = ['gel', 'degel'];
           $noms = ['Tête de Gel', 'Tête Dégel'];
@@ -236,6 +254,10 @@ class Forme extends Sprite
         case 892: // Shifours
           $ids = ['', 'water'];
           $noms = ['Poing Final', 'Mille Poings'];
+        break;
+        case 893: // Zarude
+          $ids = ['', 'dada'];
+          $noms = ['', 'Dada'];
         break;
         default:
           $done = false;
