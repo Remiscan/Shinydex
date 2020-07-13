@@ -3,6 +3,7 @@ import { Params, changeTheme, changeAutoMaj, callResize, saveDBpassword } from '
 import { navigate } from './modules/mod_navigate.js';
 import { playEasterEgg } from './modules/mod_easterEgg.js';
 import { appStart, checkUpdate, manualUpdate } from './modules/mod_appLifeCycle.js';
+import { appPopulate, appDisplay } from './modules/mod_appContent.js';
 import { openFiltres } from './modules/mod_filtres.js';
 import { Hunt } from './modules/mod_Hunt.js';
 import { notify, unNotify } from './modules/mod_notification.js';
@@ -129,7 +130,8 @@ navigator.serviceWorker.addEventListener('message', async event => {
       if (uploadConfirmed == null) uploadConfirmed = [];
       await dataStorage.setItem('uploaded-hunts', uploadConfirmed.filter(v => v != huntid));
       card.remove();
-      await huntStorage.removeItem(String(huntid));
+      const keys = await huntStorage.keys();
+      if (keys.length == 0) document.querySelector('#chasses-en-cours').classList.add('vide');
       // ✅ animation de chargement
       notify('Mise à jour des données...', '', 'loading', () => {}, 999999999);
       // ✅ re-lancer appPopulate(start = false)

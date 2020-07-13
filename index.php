@@ -44,6 +44,12 @@
         storeName: 'misc',
         driver: localforage.INDEXEDDB
       });
+      // Chasses en cours
+      const huntStorage = localforage.createInstance({
+        name: 'remidex',
+        storeName: 'hunts',
+        driver: localforage.INDEXEDDB
+      });
 
       // Définition du thème
       async function setTheme(theme)

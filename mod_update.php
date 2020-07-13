@@ -69,6 +69,9 @@ function getShinyData()
   $recup_shinies = $link->prepare('SELECT * FROM mes_shinies ORDER BY id DESC');
   $recup_shinies->execute();
   $data_shinies = $recup_shinies->fetchAll(PDO::FETCH_ASSOC);
+  foreach($data_shinies as $key => $data) {
+    $data_shinies[$key]['sprite-position'] = $key;
+  }
   return $data_shinies;
 }
 

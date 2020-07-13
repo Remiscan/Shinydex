@@ -129,7 +129,7 @@ self.addEventListener('sync', async function(event) {
   console.log('[sw] Requête de SYNC reçue');
   const PRE_HUNT_ADD = 'HUNT-ADD-';
   const PRE_HUNT_EDIT = 'HUNT-EDIT-';
-  const PRE_HUNT_DELETE = 'HUNT-DELETE-';
+  const PRE_HUNT_DELETE = 'HUNT-REMOVE-';
   let huntid;
 
   const whatDo = event => {
@@ -160,6 +160,15 @@ self.addEventListener('sync', async function(event) {
       .then(uploadedHunts => dataStorage.setItem('uploaded-hunts', [...uploadedHunts, huntid]))
       .then(() => self.clients.matchAll())
       .then(all => all.map(client => client.postMessage({ successfulDBUpdate, huntid })));
+    })
+    .catch(error => {
+      if (event.lastChance) {
+        return huntStorage.getItem(String(huntid))
+        .then(hunt => { const _hunt = hunt; _hunt.uploaded = false; return huntStorage.setItem(String(huntid), _hunt); })
+        .then(() => { throw error; });
+      } else {
+        throw error;
+      }
     })
   );
 });
@@ -274,7 +283,7 @@ async function updateShinyData()
     data = await fetch('/remidex/mod_update.php?type=updateDB&date=' + Date.now());
     if (data.status != 200)
       throw '[:(] Erreur ' + response.status + ' lors de la requête (mod_update.php)';
-    data = data.json();
+    data = await data.json();
   }
   catch(error) {
     console.error('Erreur de récupération des données', error);
@@ -289,13 +298,17 @@ async function updateShinyData()
 
   try {
     console.log('[update-db] Installation des données...');
+
     await Promise.all([dataStorage.ready(), shinyStorage.ready()]);
     oldVersion = dataStorage.getItem('version-bdd');
     await dataStorage.setItem('version-bdd', data['version-bdd']);
     await dataStorage.setItem('version', versionMax);
+    await shinyStorage.clear();
     await Promise.all(
       data['data-shinies'].map(shiny => shinyStorage.setItem(String(shiny.id), shiny))
     );
+
+    console.log('[update-db] Données installées !');
   }
   catch(error) {
     console.error('Erreur d\'installation des données', error);
@@ -315,6 +328,7 @@ async function updateShinyData()
     const oldRequest = new Request(`./sprites--${oldVersion}.php`);
     await cache.delete(oldRequest);
     await cache.put(request, response);
+    console.log('[update-db] Cache mis à jour !');
     return true;
   }
   catch(error) {
@@ -362,7 +376,7 @@ async function sendHunt(huntid, edit = false) {
     formData.append('mdp', await dataStorage.getItem('mdp-bdd'));
     formData.append('type', edit ? 'EDIT' : 'ADD');
 
-    console.log(JSON.stringify(hunt));
+    console.log('Envoi de la chasse :', JSON.stringify(hunt));
 
     const response = await fetch('/remidex/mod_sendHuntToDb.php?date=' + Date.now(), {
       method: 'POST',
@@ -370,7 +384,7 @@ async function sendHunt(huntid, edit = false) {
     });
     if (response.status != 200)
       throw '[:(] Erreur ' + response.status + ' lors de la requête';
-    const data = response.json();
+    const data = await response.json();
 
     if (data['mdp'] == false)
       throw '[:(] Mauvais mot de passe...';
@@ -421,7 +435,7 @@ async function sendHunt(huntid, edit = false) {
   }
   catch(error) {
     console.error(error);
-    return;
+    throw error;
   }
 }
 
@@ -444,7 +458,7 @@ async function deleteHunt(huntid) {
     });
     if (response.status != 200)
       throw '[:(] Erreur ' + response.status + ' lors de la requête';
-    const data = response.json();
+    const data = await response.json();
 
     if (data['mdp'] == false)
       throw '[:(] Mauvais mot de passe...';

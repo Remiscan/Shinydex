@@ -18,6 +18,7 @@ require_once('./class_BDD.php');
 
 $error = false;
 $storedData = false;
+$type = false;
 
 if (isset($_POST['hunt']) && $_POST['hunt'] != '')
 {
@@ -55,7 +56,7 @@ if (isset($_POST['hunt']) && $_POST['hunt'] != '')
 
     // Si c'est une suppression
     if ($type == 'REMOVE') {
-      $insert = $link->prepare('DELETE FROM mes_shinies WHERE huntid = :huntid');
+      $insert = $link->prepare('DELETE FROM mes_shinies WHERE id = :huntid');
       $insert->bindParam(':huntid', $data->{'id'}, PDO::PARAM_INT);
     }
 
@@ -112,6 +113,7 @@ if (isset($_POST['hunt']) && $_POST['hunt'] != '')
 
       if (!$result) {
         $result = $insert->errorInfo();
+        $error = true;
       }
   
       $response = '[:)] Données supposément stockées dans la BDD !';
@@ -145,6 +147,7 @@ else
 
 header('Content-Type: application/json');
 echo json_encode(array(
+  'type' => $type,
   'error' => $error,
   'response' => $response,
   'insert' => $result,

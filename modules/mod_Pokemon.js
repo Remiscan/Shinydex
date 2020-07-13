@@ -36,7 +36,7 @@ class Pokemon {
       shinySuffix
     ];
 
-    let spriteUrl = spriteCaracs.join('_');
+    let spriteUrl = `${spriteCaracs.join('_')}.png`;
 
     if (typeof forme.noShiny != 'undefined' && forme.noShiny == true && shiny)
       spriteUrl = this.getSprite(forme, {shiny: false, big: options.big, backside: options.backside});

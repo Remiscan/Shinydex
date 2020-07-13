@@ -26,6 +26,7 @@ export function notify(texteDesc, texteBouton = '', iconeBouton = 'close', actio
     notif.classList.add('on');
     fab.classList.add('notif');
     if (iconeBouton == 'loading') notif.classList.add('loading');
+    else notif.classList.remove('loading');
   });
   notifTimeLimit = setTimeout(() => {
     unNotify();

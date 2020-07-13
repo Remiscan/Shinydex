@@ -113,4 +113,4 @@ function tile_image($array_d_images, $type)
 
 ///////////////////////////////////////////////////////////
 // On génère le spritesheet à partir des données récupérées
-tile_image(array_reverse($allsprites), 'png');
+tile_image($allsprites, 'png');

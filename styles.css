@@ -1656,6 +1656,14 @@ textarea {
   content: 'delete_forever';
 }
 
+.hunt-card[data-loading] .titre-options,
+.hunt-card[data-loading] .liste-options,
+.hunt-card[data-loading] .cote-a-cote,
+.hunt-card[data-loading] .form-element,
+.hunt-card[data-loading] .sous-titre {
+  display: none;
+}
+
 
 
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

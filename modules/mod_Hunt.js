@@ -188,7 +188,7 @@ export class Hunt {
       if (!navigator.onLine)
         return notify('Pas de connexion internet');
 
-      const span = boutonSubmit.querySelector('span');
+      const span = boutonSupprimer.querySelector('span');
       if (span.innerHTML == 'Supprimer')
       {
         span.innerHTML = 'Vraiment ?';
@@ -261,7 +261,7 @@ export class Hunt {
     const inputJeu = card.querySelector('[list=datalist-jeux]');
     inputJeu.addEventListener('input', () => this.genereMethodes());
 
-    if (this.caught && !this.uploaded) card.classList.add('caught');
+    if (this.caught) card.classList.add('caught');
 
     if (this.dexid == 0) setTimeout(() => card.classList.remove('new'), 400);
 
@@ -382,9 +382,9 @@ export class Hunt {
     const k = formes.findIndex(forme => forme.dbid == this.forme);
     const forme = formes[k];
     if (k != -1)
-      sprite.style.setProperty('--sprite', `url('${pkmn.getSprite(forme, { shiny: this.caught, big: true })}'`);
+      sprite.style.setProperty('--sprite', `url('${pkmn.getSprite(forme, { shiny: this.caught, big: true })}')`);
     else
-      sprite.style.setProperty('--sprite', `url('${pkmn.getSprite(formes[0], { shiny: this.caught, big: true })}'`);
+      sprite.style.setProperty('--sprite', `url('${pkmn.getSprite(formes[0], { shiny: this.caught, big: true })}')`);
   }
 
 
