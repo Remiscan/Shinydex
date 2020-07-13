@@ -6,28 +6,28 @@ class Forme extends Sprite
   public $dbid = '';
   public $nom = '';
 
-  function __construct(Sprite $sprite, int $dexid)
+  function __construct(Sprite $sprite)
   {
     // Formes à ne pas compter
     if (
-      ($dexid == 25 && $sprite->form == 8) // Pikachu starter
-      || ($dexid == 25 && $sprite->form == 9) // Pikachu casquette World
-      || ($dexid == 20 && $sprite->form == 2) // Rattatac totem
-      || ($dexid == 105 && $sprite->form == 2) // Ossatueur totem
-      || ($dexid == 133 && $sprite->form == 1) // Évoli starter
-      || ($dexid == 414 && $sprite->form > 0) // Papilord (formes capes de Cheniti)
-      || ($dexid == 664 && $sprite->form > 0) // Lépidonille (évolue en formes de Prismillon)
-      || ($dexid == 665 && $sprite->form > 0) // Pérégrain (évolue en formes de Prismillon)
-      || ($dexid == 670 && $sprite->form == 5) // Floette de AZ
-      || ($dexid == 735 && $sprite->form == 1) // Argouste totem
-      || ($dexid == 738 && $sprite->form == 1) // Lucanon totem
-      || ($dexid == 743 && $sprite->form == 1) // Rubombelle totem
-      || ($dexid == 744 && $sprite->form == 1) // Rocabot (évolue en crépusculaire)
-      || ($dexid == 752 && $sprite->form == 1) // Tarenbulle totem
-      || ($dexid == 754 && $sprite->form == 1) // Floramantis totem
-      || ($dexid == 758 && $sprite->form == 1) // Malamandre totem
-      || ($dexid == 777 && $sprite->form == 1) // Togedemaru totem
-      || ($dexid == 784 && $sprite->form == 1) // Ékaïser totem
+      ($sprite->dexid == 25 && $sprite->form == 8) // Pikachu starter
+      || ($sprite->dexid == 25 && $sprite->form == 9) // Pikachu casquette World
+      || ($sprite->dexid == 20 && $sprite->form == 2) // Rattatac totem
+      || ($sprite->dexid == 105 && $sprite->form == 2) // Ossatueur totem
+      || ($sprite->dexid == 133 && $sprite->form == 1) // Évoli starter
+      || ($sprite->dexid == 414 && $sprite->form > 0) // Papilord (formes capes de Cheniti)
+      || ($sprite->dexid == 664 && $sprite->form > 0) // Lépidonille (formes de Prismillon)
+      || ($sprite->dexid == 665 && $sprite->form > 0) // Pérégrain (formes de Prismillon)
+      || ($sprite->dexid == 670 && $sprite->form == 5) // Floette de AZ
+      || ($sprite->dexid == 735 && $sprite->form == 1) // Argouste totem
+      || ($sprite->dexid == 738 && $sprite->form == 1) // Lucanon totem
+      || ($sprite->dexid == 743 && $sprite->form == 1) // Rubombelle totem
+      || ($sprite->dexid == 744 && $sprite->form == 1) // Rocabot (évolue en crépusculaire)
+      || ($sprite->dexid == 752 && $sprite->form == 1) // Tarenbulle totem
+      || ($sprite->dexid == 754 && $sprite->form == 1) // Floramantis totem
+      || ($sprite->dexid == 758 && $sprite->form == 1) // Malamandre totem
+      || ($sprite->dexid == 777 && $sprite->form == 1) // Togedemaru totem
+      || ($sprite->dexid == 784 && $sprite->form == 1) // Ékaïser totem
     )
       throw new Exception('Forme ignorée');
     
@@ -42,7 +42,7 @@ class Forme extends Sprite
     
     if ($spriteid == 'gigamax')
     {
-      switch($dexid)
+      switch($sprite->dexid)
       {
         case 892: // Shifours
           switch($this->form)
@@ -66,7 +66,7 @@ class Forme extends Sprite
     else
     {
       $done = true;
-      switch ($dexid)
+      switch ($sprite->dexid)
       {
         case 201: // Zarbi
           $ids = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '!', '?'];
@@ -264,7 +264,7 @@ class Forme extends Sprite
       }
 
       // Charmilly
-      if ($dexid == 869)
+      if ($sprite->dexid == 869)
       {
         $ids = ['vanille', 'ruby', 'matcha', 'menthe', 'citron', 'sale', 'melruby', 'caramel', 'tricolore'];
         $noms = ['Lait Vanille', 'Lait Ruby', 'Lait Matcha', 'Lait Menthe', 'Lait Citron', 'Lait Salé', 'Mélange Ruby', 'Mélange Caramel', 'Mélange Tricolore'];
@@ -306,13 +306,13 @@ class Forme extends Sprite
           $this->nom = 'Femelle';
         }
         // Méga-évolutions
-        else if (in_array($dexid, $hasMega) && $sprite->form == 1)
+        else if (in_array($sprite->dexid, $hasMega) && $sprite->form == 1)
         {
           $this->dbid = 'mega';
           $this->nom = 'Méga';
         }
         // Méga-évolutions X et Y
-        else if (in_array($dexid, $hasMegaX) && in_array($sprite->form, [1, 2]))
+        else if (in_array($sprite->dexid, $hasMegaX) && in_array($sprite->form, [1, 2]))
         {
           if ($sprite->form == 1)
           {
@@ -326,29 +326,29 @@ class Forme extends Sprite
           }
         }
         // Primo-résurgences
-        else if (in_array($dexid, $hasPrimal) && $sprite->form == 1)
+        else if (in_array($sprite->dexid, $hasPrimal) && $sprite->form == 1)
         {
           $this->dbid = 'primal';
           $this->nom = 'Primo';
         }
         // Formes d'Alola
-        else if (in_array($dexid, $hasAlolan) && $sprite->form == 1)
+        else if (in_array($sprite->dexid, $hasAlolan) && $sprite->form == 1)
         {
           $this->dbid = 'alola';
           $this->nom = 'd\'Alola';
         }
         // Formes de Galar
         else if (
-          (in_array($dexid, $hasGalarian) && !in_array($dexid, $hasAlolan) && !in_array($dexid, $hasMega) && $sprite->form == 1)
-          || (in_array($dexid, $hasGalarian) && in_array($dexid, $hasAlolan) && !in_array($dexid, $hasMega) && $sprite->form == 2)
-          || (in_array($dexid, $hasGalarian) && !in_array($dexid, $hasAlolan) && in_array($dexid, $hasMega) && $sprite->form == 2)
+          (in_array($sprite->dexid, $hasGalarian) && !in_array($sprite->dexid, $hasAlolan) && !in_array($sprite->dexid, $hasMega) && $sprite->form == 1)
+          || (in_array($sprite->dexid, $hasGalarian) && in_array($sprite->dexid, $hasAlolan) && !in_array($sprite->dexid, $hasMega) && $sprite->form == 2)
+          || (in_array($sprite->dexid, $hasGalarian) && !in_array($sprite->dexid, $hasAlolan) && in_array($sprite->dexid, $hasMega) && $sprite->form == 2)
         )
         {
           $this->dbid = 'galar';
           $this->nom = 'de Galar';
         }
         // Pikachu
-        else if ($dexid == 25)
+        else if ($sprite->dexid == 25)
         {
           switch ($sprite->form)
           {
