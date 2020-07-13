@@ -35,16 +35,18 @@ export async function filterCards(filtres = defautFiltres)
     }
   });
   //console.log('Cartes filtrées :', filtres);
-  filterDex();
-  await dataStorage.setItem('filtres', JSON.stringify(filtres));
-  currentFiltres = filtres;
 
   const compteur = allCards.length - filteredCards.length;
   document.querySelector('.compteur').innerHTML = compteur;
   document.querySelector('#mes-chromatiques .section-contenu').style.setProperty('--compteur', compteur);
   if (compteur == 0) document.querySelector('#mes-chromatiques').classList.add('vide');
   else document.querySelector('#mes-chromatiques').classList.remove('vide');
+
   filteredCards.forEach(card => card.classList.add('filtered'));
+  filterDex();
+  await dataStorage.setItem('filtres', JSON.stringify(filtres));
+  currentFiltres = filtres;
+  
   return compteur;
 }
 
