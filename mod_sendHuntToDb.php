@@ -66,7 +66,7 @@ if (isset($_POST['hunt']) && $_POST['hunt'] != '')
       // Si c'est une édition
       if ($type == 'EDIT') {
         $insert = $link->prepare('UPDATE mes_shinies SET 
-          numero_national = :dexid, forme =:forme, surnom = :surnom, methode = :methode, compteur = :compteur, date = :date, jeu = :jeu, ball = :ball, description = :description, origin = :origin, monjeu = :monjeu, charm = :charm, hacked = :hacked, aupif = :aupif, huntid = :huntid
+          numero_national = :dexid, forme =:forme, surnom = :surnom, methode = :methode, compteur = :compteur, date = :date, jeu = :jeu, ball = :ball, description = :description, origin = :origin, monjeu = :monjeu, charm = :charm, hacked = :hacked, aupif = :aupif
         WHERE id = :id');
         $insert->bindValue(':id', $data->{'id'}, PDO::PARAM_INT);
       }
@@ -83,6 +83,7 @@ if (isset($_POST['hunt']) && $_POST['hunt'] != '')
         ) VALUES (
           :dexid, :forme, :surnom, :methode, :compteur, :date, :jeu, :ball, :description, :origin, :monjeu, :charm, :hacked, :aupif, :huntid
         )');
+        $insert->bindParam(':huntid', $data->{'id'}, PDO::PARAM_INT);
       }
 
       $insert->bindParam(':dexid', $data->{'dexid'}, PDO::PARAM_INT, 4);
@@ -99,7 +100,6 @@ if (isset($_POST['hunt']) && $_POST['hunt'] != '')
       $insert->bindParam(':charm', $data->{'charm'}, PDO::PARAM_INT, 1);
       $insert->bindParam(':hacked', $data->{'hacked'}, PDO::PARAM_INT, 1);
       $insert->bindParam(':aupif', $data->{'aupif'}, PDO::PARAM_INT, 1);
-      $insert->bindParam(':huntid', $data->{'id'}, PDO::PARAM_INT);
 
     }
 
