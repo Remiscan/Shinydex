@@ -16,6 +16,8 @@ class Forme extends Sprite
       || ($dexid == 105 && $sprite->form == 2) // Ossatueur totem
       || ($dexid == 133 && $sprite->form == 1) // Évoli starter
       || ($dexid == 414 && $sprite->form > 0) // Papilord (formes capes de Cheniti)
+      || ($dexid == 664 && $sprite->form > 0) // Lépidonille (évolue en formes de Prismillon)
+      || ($dexid == 665 && $sprite->form > 0) // Pérégrain (évolue en formes de Prismillon)
       || ($dexid == 670 && $sprite->form == 5) // Floette de AZ
       || ($dexid == 735 && $sprite->form == 1) // Argouste totem
       || ($dexid == 738 && $sprite->form == 1) // Lucanon totem
@@ -148,8 +150,6 @@ class Forme extends Sprite
           $ids = ['', '', 'ash'];
           $noms = ['', '', 'de Sacha'];
         break;
-        case 664: // Lépidonille
-        case 665: // Pérégrain
         case 666: // Prismillon
           $ids = ['icysnow', 'polar', 'tundra', 'continental', 'garden', 'elegant', 'meadow', 'modern', 'marine', 'archipelago', 'highplains', 'sandstorm', 'river', 'monsoon', 'savanna', 'sun', 'ocean', 'jungle', 'fancy', 'pokeball'];
           $noms = ['Blizzard', 'Banquise', 'Glace', 'Continent', 'Verdure', 'Monarchie', 'Floraison', 'Métropole', 'Rivage', 'Archipel', 'Sécheresse', 'Sable', 'Delta', 'Cyclone', 'Mangrove', 'Zénith', 'Soleil Levant', 'Jungle', 'Fantaisie', 'Poké Ball'];
