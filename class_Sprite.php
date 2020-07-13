@@ -1,7 +1,6 @@
 <?php
 class Sprite
 {
-  public $dexid;
   public $form;
   public $gender;
   public $gigamax;
@@ -12,7 +11,6 @@ class Sprite
     $sprite = str_replace('.png', '', $fichier);
     $sprite = explode('_', $sprite);
 
-    $this->dexid = intval($sprite[2]);
     $this->form = intval($sprite[3]);
     $this->gender = $sprite[4]; // uk = asexué, mf = indifférent mâle/femelle, md = mâle, fd = femelle, mo = mâle only, fo = femelle only
     $this->gigamax = ($sprite[5] == 'g') ? true : false;

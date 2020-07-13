@@ -20,7 +20,7 @@ class Pokemon
     forEach($sprites as $s)
     {
       try {
-        $forme = new Forme(new Sprite($s));
+        $forme = new Forme(new Sprite($s), $id);
 
         if (!file_exists('./sprites-home/big/' . str_replace('_n.png', '_r.png', $s)) && $this->dexid != 869)
         $forme->noShiny = true;
