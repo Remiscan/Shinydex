@@ -739,8 +739,8 @@ section:not(.defered) .defer,
 .shiny-charm>.charm {
   top: -2px;
   position: relative;
-  margin-left: -6px;
-  margin-right: -3px;
+  margin-left: -6px !important; /* Compense le placement décrit dans iconsheet.css */
+  margin-right: -3px !important;
 }
 .shiny-rate-text {
   color: var(--card_supporting_text_color);
