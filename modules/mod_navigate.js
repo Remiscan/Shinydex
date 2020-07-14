@@ -25,7 +25,9 @@ export async function navigate(sectionCible, position = 0, historique = true)
     closeFiltres();
 
     if (sectionCible == 'a-propos' || (sectionCible == 'parametres' && Params.owidth >= Params.layoutPClarge))
-      prepareEasterEgg();
+      playEasterEgg();
+    else
+      setTimeout(prepareEasterEgg, 200);
 
     // Try to reduce TTFB for Pokédex sprites
     if (sectionCible == 'pokedex' || (sectionCible == 'mes-chromatiques' && Params.owidth >= Params.layoutPClarge))
@@ -61,9 +63,6 @@ export async function navigate(sectionCible, position = 0, historique = true)
 
     apparitionSection.addEventListener('finish', resolve);
   });
-
-  if (sectionCible == 'a-propos' || (sectionCible == 'parametres' && Params.owidth >= Params.layoutPClarge))
-    playEasterEgg();
 
   if (sectionCible == 'chasses-en-cours')
     getNames();
