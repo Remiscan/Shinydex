@@ -43,8 +43,8 @@ forEach($pokemons as $pokemon)
     <div style="display: grid; border: 1px solid rgba(0, 0, 0, 1); box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .15); margin: 5px; padding: 5px; border-radius: 5px;">
       <div style="grid-row: 1 / 2;">
       <?php echo '<pre>'; print_r($forme); echo '</pre>'; ?>
-        <img src="<?=$pokemon->getSprite($forme, (object) ['shiny' => false, 'big' => true])?>" width="112" height="112">
-        <img src="<?=$pokemon->getSprite($forme, (object) ['shiny' => true, 'big' => true])?>" width="112" height="112">
+        <img src="<?=$pokemon->getSprite($forme, (object) ['shiny' => false, 'big' => false])?>" width="112" height="112">
+        <img src="<?=$pokemon->getSprite($forme, (object) ['shiny' => true, 'big' => false])?>" width="112" height="112">
       </div>
       <div style="grid-row: 2 / 3;">
         <?=($forme->nom != '') ? $forme->nom : '(Normal)'?>

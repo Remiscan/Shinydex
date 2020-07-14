@@ -64,7 +64,7 @@ class Pokemon
     $shinySuffix = $shiny ? 'r' : 'n';
     $big = property_exists($options, 'big') ? $options->big : true;
     $size = $big ? 'big' : 'small';
-    $sizePrefix = $big ? 'capture' : 'icon';
+    $sizePrefix = 'capture';
 
     $side = (property_exists($forme, 'hasBackside') && property_exists($options, 'backside') && $options->backside) ? 'b' : 'f';
 
