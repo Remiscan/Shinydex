@@ -168,10 +168,10 @@ function filterDex()
 
 ///////////////////////////////
 // Choisit quelles cartes defer
-export function deferCards(section = 'mes-chromatiques')
+export function deferCards(section = false)
 {
-  document.querySelector('main').scroll(0, 0);
   const sectionActuelle = section || document.body.dataset.sectionActuelle;
+  if (sectionActuelle == 'mes-chromatiques') document.querySelector('main').scroll(0, 0);
   let cardList = [];
 
   switch (sectionActuelle) {
