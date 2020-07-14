@@ -61,19 +61,22 @@ foreach ($data_shinies as $un_shiny)
 
 ////////////////////////
 // Génère le spritesheet
-function tile_image($array_d_images, $type)
+function generateSheet($spritesArray, $type)
 {
-  $width = 112; // largeur d'un sprite
-  $height = 112; // hauteur d'un sprite
+  // Taille de sprite désirée
+  $width = 112;
+  $height = 112;
+
+  // Taille du sprite d'origine
   $bigWidth = 512;
   $bigHeight = 512;
 
-  $fileArray = array($image_finale);
+  $nbr = count($spritesArray);
 
-  $nombre_d_images = count($array_d_images); // utiliser plus haut pour remplacer $nombe_de_tiles ?
-
+  // Nombre de lignes et colonnes du spritesheet
+  // (une ligne par sprite, c'est plus simple comme ça)
   $columns = 1;
-  $rows = $nombre_d_images; // une ligne par sprite, c'est plus simple comme ça
+  $rows = $nbr;
 
   // On crée une image de la bonne taille
   $background = imagecreatetruecolor(($width * $columns), ($height * $rows)); 
@@ -82,35 +85,33 @@ function tile_image($array_d_images, $type)
   $transparentBackground = imagecolorallocatealpha($background, 0, 0, 0, 127);
   imagefill($background, 0, 0, $transparentBackground);
   imagesavealpha($background, true);
-  $output_image = $background; 
+  $spritesheet = $background; 
 
   // On place chaque sprite sur le tile à la bonne position
-  $image_objects = array();
   for($i = 0; $i < ($rows * $columns); $i++)
   {
     $row = floor($i / $columns);
     $col = $i % $columns;
-    $image_temp = imagecreatefrompng($array_d_images[$i]);
-    //imagecopy($output_image, $image_temp, ($width * $col), ($height * $row), 0, 0, $width, $height);
-    imagecopyresampled($output_image, $image_temp, ($width * $col), ($height * $row), 0, 0, $width, $height, $bigWidth, $bigHeight);
+    $image_temp = imagecreatefrompng($spritesArray[$i]);
+    imagecopyresampled($spritesheet, $image_temp, ($width * $col), ($height * $row), 0, 0, $width, $height, $bigWidth, $bigHeight);
   }
 
-  header('Content-type: image/' . $type);
   // On affiche l'image générée
+  header('Content-type: image/' . $type);
   switch ($type) {
     case 'webp':
-      imagewebp($output_image, NULL, 100);
+      imagewebp($spritesheet, NULL, 100);
       break;
     case 'png':
     default:
-      imagepng($output_image, NULL, 9, PNG_NO_FILTER);
+      imagepng($spritesheet, NULL, 9, PNG_NO_FILTER);
   }
 
   // On sort l'image de la mémoire du serveur
-  imagedestroy($output_image);
+  imagedestroy($spritesheet);
 }
 
 
 ///////////////////////////////////////////////////////////
 // On génère le spritesheet à partir des données récupérées
-tile_image($allsprites, 'png');
+generateSheet($allsprites, 'png');

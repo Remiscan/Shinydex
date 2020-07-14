@@ -20,7 +20,7 @@ class Pokemon {
     const shinySuffix = shiny ? 'r' : 'n';
     const big = (typeof options.big != 'undefined') ? options.big : true;
     const size = big ? 'big' : 'small';
-    const sizePrefix = big ? 'capture' : 'icon';
+    const sizePrefix = 'capture';
 
     const side = (typeof forme.hasBackside != 'undefined' && typeof options.backside != 'undefined' && options.backside) ? 'b' : 'f';
 
