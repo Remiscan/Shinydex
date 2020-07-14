@@ -151,7 +151,7 @@ export async function createCard(pokemon)
   if (!shiny.description.includes('Gigamax'))
     card.querySelector('.gigamax').remove();
 
-  const jeu = shiny.jeu.replace(/ /g, '');
+  const jeu = shiny.jeu.replace(/[ \']/g, '');
   card.querySelector('.icones.jeu').classList.add(jeu);
   filtres.push('jeu:' + jeu);
   card.dataset.jeu = shiny.jeu;

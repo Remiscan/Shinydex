@@ -396,7 +396,7 @@ export class Hunt {
 
     const k = Pokemon.jeux.findIndex(jeu => jeu.nom == this.jeu);
     if (k != -1)
-      icone.classList.add(this.jeu.replace(/ /g, ''));
+      icone.classList.add(this.jeu.replace(/[ \']/g, ''));
     else
       icone.className = 'icones jeu';
   }

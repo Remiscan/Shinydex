@@ -92,8 +92,8 @@ class Pokemon {
       { nom: 'Ultra Soleil', gen: 7, id: 'usum' },
       { nom: 'Ultra Lune', gen: 7, id: 'usum' },
       { nom: 'GO', gen: 0, id: 'go' },
-      { nom: 'Lets Go Pikachu', gen: 7.1, id: 'lgpe' },
-      { nom: 'Lets Go Evoli', gen: 7.1, id: 'lgpe' },
+      { nom: 'Let\'s Go Pikachu', gen: 7.1, id: 'lgpe' },
+      { nom: 'Let\'s Go Evoli', gen: 7.1, id: 'lgpe' },
       { nom: 'Epee', gen: 8, id: 'swsh' },
       { nom: 'Bouclier', gen: 8, id: 'swsh' },
       { nom: 'Home', gen: 8, id: 'home' }
