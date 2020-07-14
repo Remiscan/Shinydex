@@ -148,7 +148,7 @@
 
       <!-- FAB des filtres -->
       <button class="fab">
-        <i class="material-icons">filter_list</i>
+        <i class="material-icons"></i>
       </button>
 
       <!-- Bouton installer -->

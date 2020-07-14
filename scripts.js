@@ -1,6 +1,6 @@
 import './modules/comp_loadSpinner.js';
 import { Params, changeTheme, changeAutoMaj, callResize, saveDBpassword } from './modules/mod_Params.js';
-import { navigate } from './modules/mod_navigate.js';
+import { navigate, sectionActuelle } from './modules/mod_navigate.js';
 import { playEasterEgg } from './modules/mod_easterEgg.js';
 import { appStart, checkUpdate, manualUpdate } from './modules/mod_appLifeCycle.js';
 import { appPopulate, appDisplay } from './modules/mod_appContent.js';
@@ -25,11 +25,16 @@ Array.from(document.querySelectorAll('.bouton-retour')).forEach(bouton => {
 
 
 
-//////////
-// FILTRES
+///////////////////////////////////
+// FAB (filtres et nouvelle chasse)
 
-// Active le FAB des filtres
-document.querySelector('.fab').addEventListener('click', openFiltres);
+// Active le FAB
+document.querySelector('.fab').addEventListener('click', () => {
+  // Filtres
+  if (['mes-chromatiques', 'pokedex'].includes(sectionActuelle)) openFiltres();
+  // Nouvelle chasse
+  else if (sectionActuelle == 'chasses-en-cours') Hunt.build();
+});
 
 // L'obfuscator ramène en arrière quand on clique dessus
 document.querySelector('.obfuscator').addEventListener('click', () => history.back());
@@ -40,7 +45,7 @@ document.querySelector('.obfuscator').addEventListener('click', () => history.ba
 // CHASSES EN COURS
 
 // Active le bouton de création de chasse
-document.querySelector('.bouton-new-hunt').addEventListener('click', () => Hunt.build());
+//document.querySelector('.bouton-new-hunt').addEventListener('click', () => Hunt.build());
 
 
 

@@ -333,7 +333,8 @@ h1 {
 }
 
 #mes-chromatiques>.section-contenu,
-#pokedex>.section-contenu {
+#pokedex>.section-contenu,
+#chasses-en-cours>.section-contenu {
   padding-bottom: calc(56px + 2 * 15px - 6px);
 }
 
@@ -419,7 +420,7 @@ button>.material-icons + span {
   transition: transform .15s var(--easing-decelerate);
 }
 
-body:not([data-section-actuelle=mes-chromatiques]):not([data-section-actuelle=pokedex]) .fab {
+body:not([data-section-actuelle=mes-chromatiques]):not([data-section-actuelle=pokedex]):not([data-section-actuelle=chasses-en-cours]) .fab {
   display: none;
 }
 
@@ -1055,6 +1056,14 @@ body[data-hunt-uploading] .bouton-hunt-submit {
   filter: brightness(0.4) grayscale(.5);
 }
 
+.fab>.material-icons::after {
+  content: 'filter_list';
+}
+
+.fab.add>.material-icons::after {
+  content: 'add';
+}
+
 body[data-hunt-uploading] .loading-bar>.bouton-retour {
   display: none;
 }
@@ -1272,12 +1281,6 @@ picture.no-shiny>span {
 
 #chasses-en-cours>.section-contenu {
   flex-direction: column-reverse;
-}
-
-.bouton-new-hunt {
-  order: 1;
-  margin-bottom: 24px;
-  z-index: 3;
 }
 
 @keyframes hunt-apparition {

@@ -4,8 +4,8 @@ import { closeFiltres, openFiltres } from './mod_filtres.js';
 import { closeSpriteViewer, openSpriteViewer } from './mod_spriteViewer.js';
 import { getNames } from './mod_DexDatalist.js';
 
-let sectionActuelle = 'mes-chromatiques';
-export const sections = ['mes-chromatiques', 'pokedex', 'mes-equipes', 'une-equipe', 'parametres', 'a-propos'];
+export let sectionActuelle = 'mes-chromatiques';
+export const sections = ['mes-chromatiques', 'pokedex', 'chasses-en-cours', 'parametres', 'a-propos'];
 
 export async function navigate(sectionCible, position = 0, historique = true)
 {
@@ -34,6 +34,15 @@ export async function navigate(sectionCible, position = 0, historique = true)
     if (historique)
       history.pushState({section: sectionCible}, '');
 
+    const sectionsFabFilter = ['mes-chromatiques', 'pokedex'];
+    const sectionsFabAdd = ['chasses-en-cours'];
+    let animateFab = false;
+    if (
+      (sectionsFabFilter.includes(sectionActuelle) && sectionsFabAdd.includes(sectionCible))
+      || (sectionsFabFilter.includes(sectionCible) && sectionsFabAdd.includes(sectionActuelle))
+    ) animateFab = true;
+    animateFabIcon(sectionCible, animateFab);
+
     sectionActuelle = sectionCible;
 
     document.querySelector('main').scroll(0, 0);
@@ -61,6 +70,50 @@ export async function navigate(sectionCible, position = 0, historique = true)
 
   ancienneSection.classList.remove('defered');
   Array.from(ancienneSection.querySelectorAll('.defered')).forEach(defered => defered.classList.replace('defered', 'defer'));
+}
+
+
+
+// Anime l'icône du FAB selon la section en cours
+function animateFabIcon(sectionCible, animations = false) {
+  const fab = document.querySelector('.fab');
+  const fabIcon = fab.querySelector('.material-icons');
+  const animFabIcon = { start: null, end: null };
+
+  if (!animations) {
+    if (sectionCible == 'chasses-en-cours') fab.classList.add('add');
+    else fab.classList.remove('add');
+    return;
+  }
+
+  // On joue les animations
+  animFabIcon.start = fabIcon.animate([
+    { transform: 'translate3D(0, 0, 0) rotate(0)', opacity: '1' },
+    { transform: 'translate3D(0, 0, 0) rotate(90deg)', opacity: '0' }
+  ], {
+    easing: Params.easingAccelerate,
+    duration: 100,
+    fill: 'forwards'
+  });
+
+  animFabIcon.start.addEventListener('finish', () => {
+    if (sectionCible == 'chasses-en-cours') fab.classList.add('add');
+    else fab.classList.remove('add');
+    
+    animFabIcon.end = fabIcon.animate([
+      { transform: 'translate3D(0, 0, 0) rotate(-90deg)', opacity: '0' },
+      { transform: 'translate3D(0, 0, 0) rotate(0)', opacity: '1' }
+    ], {
+      easing: Params.easingDecelerate,
+      duration: 100,
+      fill: 'backwards'
+    });
+
+    animFabIcon.end.addEventListener('finish', () => {
+      animFabIcon.start.cancel();
+      animFabIcon.end.cancel();
+    });
+  });
 }
 
 
