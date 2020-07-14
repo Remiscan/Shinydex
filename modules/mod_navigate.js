@@ -20,7 +20,7 @@ export async function navigate(sectionCible, position = 0, historique = true)
     listeImages.push(`./sprites--${versionDB}.php`, './images/iconsheet.png');
   }
 
-  await loadAllImages(listeImages);
+  await Promise.all([loadAllImages(listeImages), loadVideo(sectionCible)]);
   await new Promise((resolve, reject) => {
     closeFiltres();
 
@@ -115,6 +115,15 @@ function animateFabIcon(sectionCible, animations = false) {
       animFabIcon.end.cancel();
     });
   });
+}
+
+
+
+// Précharge la vidéo de l'easter egg
+async function loadVideo(sectionCible) {
+  if (sectionCible == 'a-propos' || (sectionCible == 'parametres' && Params.owidth >= Params.layoutPClarge))
+    await fetch('./images/instinct.mp4');
+  return;
 }
 
 
