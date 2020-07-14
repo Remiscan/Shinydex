@@ -31,7 +31,7 @@ export async function navigate(sectionCible, position = 0, historique = true)
 
     // Try to reduce TTFB for Pokédex sprites
     if (sectionCible == 'pokedex' || (sectionCible == 'mes-chromatiques' && Params.owidth >= Params.layoutPClarge))
-      loadAllImages(['./sprites-home/small/poke_icon_0670_005_fo_n_00000000_f_n.png']).catch(() => {});
+      loadAllImages(['./sprites-home/small/poke_capture_0670_005_fo_n_00000000_f_n.png']).catch(() => {});
 
     if (historique)
       history.pushState({section: sectionCible}, '');
