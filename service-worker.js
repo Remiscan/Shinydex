@@ -226,7 +226,7 @@ async function installData([data, files], action = 'install', event = null) {
         const request = new Request(_url, {cache: 'reload'});
         const response = await fetch(request);
         if (!response.ok)
-          throw Error(`[${action}] Le fichier n\'a pas pu être récupéré...`, request.url);
+          throw Error(`[${action}] Le fichier n\'a pas pu être récupéré... (${request.url})`);
         if (event != null) {
           const source = event.source;
           source.postMessage({ loaded: true, total: totalFichiers, url: request.url });
@@ -257,6 +257,7 @@ async function installData([data, files], action = 'install', event = null) {
   // on supprime le nouveau cache.
   catch(error) {
     await caches.delete(newCACHE);
+    console.error(error);
     throw Error(`[${action}] Installation annulée.`);
   }
 
