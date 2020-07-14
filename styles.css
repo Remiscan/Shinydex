@@ -2227,8 +2227,7 @@ input:checked + label.checkbox::after {
     display: grid;
   }
 
-  #mes-chromatiques .titre-icones,
-  #parametres .titre-icones {
+  .titre-icones {
     display: none;
   }
 
