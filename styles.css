@@ -1681,6 +1681,15 @@ textarea {
 !!!!! PARAMÈTRES !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
+#parametres {
+  min-height: 100%;
+}
+
+#parametres .separateur {
+  background: none;
+  flex-grow: 1;
+}
+
 .un-parametre {
   display: grid;
   grid-template-columns: 1fr auto;
