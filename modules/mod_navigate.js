@@ -86,9 +86,10 @@ function animateFabIcon(sectionCible, animations = false) {
   }
 
   // On joue les animations
+  let deg = (sectionCible == 'chasses-en-cours') ? '90deg' : '-90deg';
   animFabIcon.start = fabIcon.animate([
     { transform: 'translate3D(0, 0, 0) rotate(0)', opacity: '1' },
-    { transform: 'translate3D(0, 0, 0) rotate(90deg)', opacity: '0' }
+    { transform: 'translate3D(0, 0, 0) rotate(' + deg + ')', opacity: '0' }
   ], {
     easing: Params.easingAccelerate,
     duration: 100,
@@ -99,8 +100,9 @@ function animateFabIcon(sectionCible, animations = false) {
     if (sectionCible == 'chasses-en-cours') fab.classList.add('add');
     else fab.classList.remove('add');
     
+    deg = (sectionCible == 'chasses-en-cours') ? '-90deg' : '+90deg';
     animFabIcon.end = fabIcon.animate([
-      { transform: 'translate3D(0, 0, 0) rotate(-90deg)', opacity: '0' },
+      { transform: 'translate3D(0, 0, 0) rotate(' + deg + ')', opacity: '0' },
       { transform: 'translate3D(0, 0, 0) rotate(0)', opacity: '1' }
     ], {
       easing: Params.easingDecelerate,
