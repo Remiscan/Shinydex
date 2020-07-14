@@ -71,29 +71,25 @@ function generateSheet($spritesArray, $type)
   $bigWidth = 512;
   $bigHeight = 512;
 
-  $nbr = count($spritesArray);
-
   // Nombre de lignes et colonnes du spritesheet
   // (une ligne par sprite, c'est plus simple comme ça)
   $columns = 1;
-  $rows = $nbr;
+  $rows = count($spritesArray);
 
   // On crée une image de la bonne taille
-  $background = imagecreatetruecolor(($width * $columns), ($height * $rows)); 
+  $spritesheet = imagecreatetruecolor(($width * $columns), ($height * $rows)); 
 
   // On rend le background de l'image transparent
-  $transparentBackground = imagecolorallocatealpha($background, 0, 0, 0, 127);
-  imagefill($background, 0, 0, $transparentBackground);
-  imagesavealpha($background, true);
-  $spritesheet = $background; 
+  $transparentBackground = imagecolorallocatealpha($spritesheet, 0, 0, 0, 127);
+  imagefill($spritesheet, 0, 0, $transparentBackground);
+  imagesavealpha($spritesheet, true);
 
-  // On place chaque sprite sur le tile à la bonne position
-  for($i = 0; $i < ($rows * $columns); $i++)
-  {
+  // On place chaque sprite sur le sheet à la bonne position
+  for($i = 0; $i < ($rows * $columns); $i++) {
     $row = floor($i / $columns);
     $col = $i % $columns;
-    $image_temp = imagecreatefrompng($spritesArray[$i]);
-    imagecopyresampled($spritesheet, $image_temp, ($width * $col), ($height * $row), 0, 0, $width, $height, $bigWidth, $bigHeight);
+    $tempSprite = imagecreatefrompng($spritesArray[$i]);
+    imagecopyresampled($spritesheet, $tempSprite, ($width * $col), ($height * $row), 0, 0, $width, $height, $bigWidth, $bigHeight);
   }
 
   // On affiche l'image générée

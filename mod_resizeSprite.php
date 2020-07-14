@@ -16,13 +16,12 @@ function resizeSprite($image)
   $bigHeight = 512;
 
   // On crée une image de la bonne taille
-  $background = imagecreatetruecolor($width, $height); 
+  $newSprite = imagecreatetruecolor($width, $height); 
 
   // On rend le background de l'image transparent
-  $transparentBackground = imagecolorallocatealpha($background, 0, 0, 0, 127);
-  imagefill($background, 0, 0, $transparentBackground);
-  imagesavealpha($background, true);
-  $newSprite = $background; 
+  $transparentBackground = imagecolorallocatealpha($newSprite, 0, 0, 0, 127);
+  imagefill($newSprite, 0, 0, $transparentBackground);
+  imagesavealpha($newSprite, true);
 
   // On place chaque sprite sur le tile à la bonne position
   $oldSprite = imagecreatefrompng($image);
