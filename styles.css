@@ -461,12 +461,6 @@ body:not([data-section-actuelle=mes-chromatiques]):not([data-section-actuelle=po
   order: var(--order, 0);
 }
 
-@keyframes scale-pulse {
-  0% { transform: scale(.8); }
-  50% { transform: scale(1); }
-  100% { transform: scale(.8); }
-}
-
 .pokemon-sprite,
 .edit-icon {
   grid-column: 1 / 2;
@@ -482,15 +476,12 @@ body:not([data-section-actuelle=mes-chromatiques]):not([data-section-actuelle=po
 .edit-icon {
   display: none;
   background-color: var(--card-edit-bg-color);
+  position: relative;
 }
 
 .editing .edit-icon {
   display: grid;
   animation: apparition2 .2s var(--easing-standard);
-}
-
-.editing .edit-icon>.material-icons {
-  animation: scale-pulse 1.5s var(--easing-standard) infinite;
 }
 
 .edit-icon>.material-icons {
@@ -500,6 +491,25 @@ body:not([data-section-actuelle=mes-chromatiques]):not([data-section-actuelle=po
   place-items: center;
   background-color: var(--card-sprite-bg-color);
   border-radius: 50%;
+}
+
+.edit-icon svg {
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  overflow: visible;
+}
+
+.edit-icon circle {
+  --diametre: 50;
+  fill: transparent;
+  stroke: white;
+  stroke-width: 2;
+  --perimetre: calc(3.14 * var(--diametre));
+  stroke-dasharray: var(--perimetre);
+  stroke-dashoffset: var(--perimetre);
+  transform: rotate(-90deg);
+  transform-origin: center;
 }
 
 .pokemon-sprite::before {

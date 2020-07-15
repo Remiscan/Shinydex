@@ -505,7 +505,7 @@ export class Hunt {
 
 ////////////////////////////////////////////////////////////
 // Créer une chasse pour mettre à jour une carte dans la BDD
-export async function updateHunt(id) {
+export async function editHunt(id) {
   let k = await huntStorage.getItem(String(id));
   if (k != null) {
     const message = 'Cette chasse est déjà en cours d\'édition.';

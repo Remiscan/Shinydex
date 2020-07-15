@@ -3,7 +3,9 @@ import { createCard, toggleNotes } from './mod_pokemonCard.js';
 import { filterCards, orderCards, reverseOrder, deferCards, deferMonitor } from './mod_filtres.js';
 import { Params, loadAllImages, wait, version2date } from './mod_Params.js';
 import { openSpriteViewer } from './mod_spriteViewer.js';
-import { updateHunt } from './mod_Hunt.js';
+import { editHunt } from './mod_Hunt.js';
+
+let longClic = false;
 
 /////////////////////////////////////////////////////////
 // Peuple l'application à partir des données de indexedDB
@@ -31,41 +33,9 @@ export async function appPopulate(start = true)
       card.classList.add('defer');
 
       // Active le long clic pour éditer
-      let longClic;
-      let tresLongClic;
-      let long = false;
-      card.addEventListener('click', () => { if (!long) toggleNotes(card.id); long = false; });
-      const clear = () => {
-        clearTimeout(longClic);
-        clearTimeout(tresLongClic);
-        card.classList.remove('editing');
-        setTimeout(() => { long = false; }, 50)
-      };
-      const makeEdit = async () => {
-        card.classList.remove('editing');
-        const ready = await updateHunt(parseInt(card.id.replace('pokemon-card-', '')));
-        if (ready) long = false;
-      };
-      // - à la souris
-      card.addEventListener('mousedown', event => {
-        if (event.button != 0) return;
-        clearTimeout(longClic);
-        longClic = setTimeout(() => { event.preventDefault(); long = true; card.classList.add('editing'); }, 1000);
-        tresLongClic = setTimeout(makeEdit, 3000);
-    
-        card.addEventListener('mouseup', clear);
-        card.addEventListener('mouseout', clear);
-      });
-      // - au toucher
-      card.addEventListener('touchstart', event => {
-        clearTimeout(longClic);
-        longClic = setTimeout(() => { event.preventDefault(); long = true; card.classList.add('editing'); }, 1000);
-        tresLongClic = setTimeout(makeEdit, 3000);
-    
-        card.addEventListener('touchmove', clear, { passive: true });
-        card.addEventListener('touchend', clear);
-        card.addEventListener('touchcancel', clear);
-      }, { passive: true });
+      card.addEventListener('click', () => { if (!longClic) toggleNotes(card.id); longClic = false; });
+      card.addEventListener('mousedown', async event => { if (event.button != 0) return; makeEdit(event, card); }); // souris
+      card.addEventListener('touchstart', async event => { makeEdit(event, card); }, { passive: true }); // toucher
 
       cardsToPopulate.push(card);
     };
@@ -203,4 +173,43 @@ export async function appDisplay(start = true)
   catch(error) {
     console.error(error);
   }
+}
+
+
+
+///////////////////////////////////////////////////////////////////
+// Créer une chasse pour éditer un shiny au long clic sur une carte
+async function makeEdit(event, card) {
+  let act = true;
+
+  const clear = () => { act = false; card.classList.remove('editing'); setTimeout(() => { longClic = false; }, 50) };
+  if (event.type == 'touchstart') {
+    card.addEventListener('touchmove', clear, { passive: true });
+    card.addEventListener('touchend', clear);
+    card.addEventListener('touchcancel', clear);
+  } else {
+    card.addEventListener('mouseup', clear);
+    card.addEventListener('mouseout', clear);
+  }
+  await wait(500);
+
+  if (!act) return;
+  event.preventDefault();
+  longClic = true;
+  card.classList.add('editing');
+
+  const circle = card.querySelector('.edit-icon circle');
+  let anim = circle.animate([
+    { strokeDashoffset: '157' },
+    { strokeDashoffset: '0' }
+  ], {
+    easing: 'linear',
+    duration: 1000
+  });
+  await anim.finished;
+
+  if (!act) return;
+  card.classList.remove('editing');
+  const ready = await editHunt(parseInt(card.id.replace('pokemon-card-', '')));
+  if (ready) longClic = false;
 }
