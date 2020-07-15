@@ -1,28 +1,10 @@
 <?php
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////// VÉRIFICATION DE LA DISPONIBILITÉ D'UNE MISE À JOUR //////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+require_once('./parametres.php');
+require_once('./class_BDD.php');
+require_once('./class_Pokemon.php');
 
-
+// Vide le cache des stats des fichiers
 clearstatcache();
-require_once('parametres.php');
-
-
-//////////////////////////////////////////////////////////////////////////////////////////
-// Chargement automatique de classes PHP, chaque classe est dans son fichier class_nom.php
-// et sera appelée automatiquement quand on utilisera la classe pour la première fois.
-function charge_classe($className)
-{
-  $classPath = 'class_'.$className.'.php';
-  if (file_exists($classPath))
-  {
-    require_once $classPath;
-    return true;
-  }
-  return false;
-}
-// Indique que la fonction précédente est une fonction d'autoload
-spl_autoload_register('charge_classe');
 
 
 //////////////////////////////////////////////////////////
@@ -48,8 +30,8 @@ function getFilesVersion()
 }
 
 
-////////////////////////////////////////////////////////////////////
-// Je récupère la date de dernière mise à jour de la base de données
+/////////////////////////////////////////////////////////////////
+// Récupère la date de dernière mise à jour de la base de données
 function getDBVersion()
 {
   $link = new BDD();
@@ -61,8 +43,8 @@ function getDBVersion()
 }
 
 
-/////////////////////////////////////////////////////////////////////
-// Je récupère les infos sur mes chromatiques dans la base de données
+//////////////////////////////////////////////////////////////////
+// Récupère les infos sur mes chromatiques dans la base de données
 function getShinyData()
 {
   $link = new BDD();
@@ -76,8 +58,8 @@ function getShinyData()
 }
 
 
-/////////////////////////////////////////////////////////////
-// Je récupère les infos sur tous les Pokémon et leurs formes
+//////////////////////////////////////////////////////////
+// Récupère les infos sur tous les Pokémon et leurs formes
 function getPokemonData()
 {
   $dir = "./sprites-home/big";
@@ -93,50 +75,36 @@ function getPokemonData()
 }
 
 
-
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////// APPLICATION DE LA MISE À JOUR ///////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+////////////////////////////////////////
+// Transmission des données à JavaScript
 
 $results = array();
-
 
 // Si on vérifie juste la disponibilité d'une mise à jour de l'application
 if (isset($_GET['type']) && $_GET['type'] == 'check')
 {
-
   $results['version-bdd'] = getDBVersion();
   $results['version-fichiers'] = getFilesVersion();
-
 }
 
 // Si on veut juste mettre à jour la base de données des shiny
 elseif (isset($_GET['type']) && $_GET['type'] == 'updateDB')
 {
-
   $results['version-bdd'] = getDBVersion();
   $results['version-fichiers'] = getFilesVersion();
   $results['data-shinies'] = getShinyData();
-
 }
 
 // Si on veut installer tous les fichiers et données
 else
 {
-
   $results['version-bdd'] = getDBVersion();
   $results['version-fichiers'] = getFilesVersion();
   $results['data-shinies'] = getShinyData();
   $results['pokemon-data'] = getPokemonData();
   $results['pokemon-names'] = Pokemon::ALL_POKEMON;
   $results['pokemon-names-fr'] = Pokemon::ALL_POKEMON_FR;
-
 }
 
-///////////////////////////////////////////
-// On passe tous ces résultats à javascript
 header('Content-Type: application/json');
 echo json_encode($results, JSON_PRETTY_PRINT);
