@@ -1385,11 +1385,6 @@ picture.no-shiny>span {
   margin: 0;
 }
 
-.bouton-hunt-remove,
-.bouton-hunt-eraseDB {
-  margin-right: 8px;
-}
-
 .hunt-card.edit .bouton-hunt-remove:not(.bouton-hunt-edit),
 .hunt-card:not(.edit) .bouton-hunt-edit {
   display: none;
