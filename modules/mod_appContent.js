@@ -35,7 +35,12 @@ export async function appPopulate(start = true)
       let tresLongClic;
       let long = false;
       card.addEventListener('click', () => { if (!long) toggleNotes(card.id); long = false; });
-      const clear = () => { clearTimeout(longClic); clearTimeout(tresLongClic); card.classList.remove('editing'); };
+      const clear = () => {
+        clearTimeout(longClic);
+        clearTimeout(tresLongClic);
+        card.classList.remove('editing');
+        setTimeout(() => { long = false; }, 50)
+      };
       const makeEdit = async () => {
         card.classList.remove('editing');
         const ready = await updateHunt(parseInt(card.id.replace('pokemon-card-', '')));
