@@ -188,7 +188,7 @@ async function makeEdit(event, card) {
     { opacity: '1' }
   ], {
     easing: Params.easingStandard,
-    duration: 200,
+    duration: 150,
     fill: 'backwards'
   });
   appear.pause();
@@ -221,9 +221,10 @@ async function makeEdit(event, card) {
   if (!act) return;
   longClic = true;
   card.classList.add('editing');
-  appear.play();
-  anim.play();
 
+  appear.play();
+  await new Promise(resolve => appear.addEventListener('finish', resolve));
+  anim.play();
   await new Promise(resolve => anim.addEventListener('finish', resolve));
 
   if (!act) return;
