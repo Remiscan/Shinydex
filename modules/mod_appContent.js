@@ -184,7 +184,6 @@ async function makeEdit(event, card) {
 
   const clear = () => { act = false; card.classList.remove('editing'); setTimeout(() => { longClic = false; }, 50) };
   if (event.type == 'touchstart') {
-    card.addEventListener('touchmove', clear, { passive: true });
     card.addEventListener('touchend', clear);
     card.addEventListener('touchcancel', clear);
   } else {
@@ -194,11 +193,19 @@ async function makeEdit(event, card) {
   await wait(500);
 
   if (!act) return;
-  event.preventDefault();
   longClic = true;
   card.classList.add('editing');
 
-  const circle = card.querySelector('.edit-icon circle');
+  const editIcon = card.querySelector('.edit-icon');
+  editIcon.animate([
+    { opacity: '0' },
+    { opacity: '1' }
+  ], {
+    easing: Params.easingStandard,
+    duration: 200,
+    fill: 'backwards'
+  });
+  const circle = editIcon.querySelector('.edit-icon circle');
   let anim = circle.animate([
     { strokeDashoffset: '157' },
     { strokeDashoffset: '0' }
@@ -206,7 +213,7 @@ async function makeEdit(event, card) {
     easing: 'linear',
     duration: 1000
   });
-  await anim.finished;
+  await new Promise(resolve => anim.addEventListener('finish', resolve));
 
   if (!act) return;
   card.classList.remove('editing');

@@ -481,7 +481,6 @@ body:not([data-section-actuelle=mes-chromatiques]):not([data-section-actuelle=po
 
 .editing .edit-icon {
   display: grid;
-  animation: apparition2 .2s var(--easing-standard);
 }
 
 .edit-icon>.material-icons {
