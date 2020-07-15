@@ -1724,10 +1724,6 @@ textarea {
   gap: 10px;
 }
 
-.un-parametre.theme .param-nom {
-  margin-right: 15px;
-}
-
 .un-parametre + .un-parametre {
   margin-top: 15px;
 }
@@ -1735,9 +1731,7 @@ textarea {
 .param-nom {
   font-weight: 500;
   display: block;
-  border-right: 1px solid var(--text-color-soft);
   text-align: left;
-  padding-right: 20px;
   box-sizing: border-box;
   grid-column: 1 / 2;
 }
