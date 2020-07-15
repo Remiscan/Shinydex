@@ -488,7 +488,7 @@ export async function updateHunt(id) {
   if (k != null) {
     const message = 'Cette chasse est déjà en cours d\'édition.';
     notify(message);
-    return;
+    return false;
   }
 
   const pkmn = await shinyStorage.getItem(String(id));
@@ -497,7 +497,7 @@ export async function updateHunt(id) {
   pkmn.dexid = parseInt(pkmn['numero_national']);
   const hunt = await Hunt.build(pkmn);
   navigate('chasses-en-cours');
-  console.log(hunt);
+  return true;
 }
 
 

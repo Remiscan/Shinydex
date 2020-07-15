@@ -28,37 +28,35 @@ export async function appPopulate(start = true)
 
     for (const pokemon of data) {
       const card = await createCard(pokemon);
-      card.addEventListener('click', () => toggleNotes(card.id));
       card.classList.add('defer');
 
       // Active le long clic pour éditer
       let longClic;
       let tresLongClic;
+      let long = false;
+      card.addEventListener('click', () => { if (!long) toggleNotes(card.id); long = false; });
+      const clear = () => { clearTimeout(longClic); clearTimeout(tresLongClic); card.classList.remove('editing'); };
+      const makeEdit = async () => {
+        card.classList.remove('editing');
+        const ready = await updateHunt(parseInt(card.id.replace('pokemon-card-', '')));
+        if (ready) long = false;
+      };
       // - à la souris
       card.addEventListener('mousedown', event => {
-        if (event.button == 0)
-        {
-          clearTimeout(longClic);
-          longClic = setTimeout(() => { card.classList.add('editing'); }, 1000);
-          tresLongClic = setTimeout(async () => {
-            card.classList.remove('editing');
-            await updateHunt(parseInt(card.id.replace('pokemon-card-', ''))); 
-          }, 3000);
-      
-          card.addEventListener('mouseup', () => { clearTimeout(longClic); clearTimeout(tresLongClic); card.classList.remove('editing'); });
-          card.addEventListener('mouseout', () => { clearTimeout(longClic); clearTimeout(tresLongClic); card.classList.remove('editing'); });
-        }
+        if (event.button != 0) return;
+        clearTimeout(longClic);
+        longClic = setTimeout(() => { event.preventDefault(); long = true; card.classList.add('editing'); }, 1000);
+        tresLongClic = setTimeout(makeEdit, 3000);
+    
+        card.addEventListener('mouseup', clear);
+        card.addEventListener('mouseout', clear);
       });
       // - au toucher
       card.addEventListener('touchstart', event => {
         clearTimeout(longClic);
-        longClic = setTimeout(() => { card.classList.add('editing'); }, 1000);
-        tresLongClic = setTimeout(async () => {
-          card.classList.remove('editing');
-          await updateHunt(parseInt(card.id.replace('pokemon-card-', ''))); 
-        }, 3000);
+        longClic = setTimeout(() => { event.preventDefault(); long = true; card.classList.add('editing'); }, 1000);
+        tresLongClic = setTimeout(makeEdit, 3000);
     
-        const clear = () => { clearTimeout(longClic); clearTimeout(tresLongClic); card.classList.remove('editing'); };
         card.addEventListener('touchmove', clear, { passive: true });
         card.addEventListener('touchend', clear);
         card.addEventListener('touchcancel', clear);
