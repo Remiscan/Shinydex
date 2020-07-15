@@ -1311,11 +1311,6 @@ picture.no-shiny>span {
   flex-direction: column-reverse;
 }
 
-@keyframes hunt-apparition {
-  0% { transform: translateY(-10%); opacity: 0; }
-  100% { transform: translateY(0); opacity: 1; }
-}
-
 .hunt-card {
   height: auto;
   grid-template-columns: 120px 1fr;
@@ -1323,17 +1318,6 @@ picture.no-shiny>span {
   order: 0;
   padding: 8px;
   box-sizing: border-box;
-}
-
-.new.hunt-card {
-  animation: hunt-apparition .1s var(--easing-decelerate);
-  animation-fill-mode: backwards;
-}
-
-.gone.hunt-card {
-  animation: hunt-apparition .2s var(--easing-decelerate);
-  animation-direction: reverse;
-  animation-fill-mode: forwards;
 }
 
 .hunt-card>.pokemon-sprite {
