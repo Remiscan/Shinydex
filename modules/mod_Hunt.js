@@ -214,7 +214,7 @@ export class Hunt {
       ], {
         easing: Params.easingStandard,
         fill: 'backwards',
-        duration: 400
+        duration: 200
       });
 
       const height = card.getBoundingClientRect().height;
@@ -224,7 +224,7 @@ export class Hunt {
       ], {
         easing: Params.easingStandard,
         fill: 'backwards',
-        duration: 400
+        duration: 200
       });
     }
 
