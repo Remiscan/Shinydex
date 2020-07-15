@@ -182,8 +182,34 @@ export async function appDisplay(start = true)
 async function makeEdit(event, card) {
   let act = true;
 
-  const clear = () => { act = false; card.classList.remove('editing'); setTimeout(() => { longClic = false; }, 50) };
+  const editIcon = card.querySelector('.edit-icon');
+  let appear = editIcon.animate([
+    { opacity: '0' },
+    { opacity: '1' }
+  ], {
+    easing: Params.easingStandard,
+    duration: 200,
+    fill: 'backwards'
+  });
+  appear.pause();
+  const circle = editIcon.querySelector('.edit-icon circle');
+  let anim = circle.animate([
+    { strokeDashoffset: '157' },
+    { strokeDashoffset: '0' }
+  ], {
+    easing: 'linear',
+    duration: 1000
+  });
+  anim.pause();
+
+  const clear = () => {
+    act = false; card.classList.remove('editing');
+    appear.cancel(); anim.cancel();
+    setTimeout(() => { longClic = false; }, 50)
+  };
+
   if (event.type == 'touchstart') {
+    card.addEventListener('touchmove', clear, { passive: true });
     card.addEventListener('touchend', clear);
     card.addEventListener('touchcancel', clear);
   } else {
@@ -195,24 +221,9 @@ async function makeEdit(event, card) {
   if (!act) return;
   longClic = true;
   card.classList.add('editing');
+  appear.play();
+  anim.play();
 
-  const editIcon = card.querySelector('.edit-icon');
-  editIcon.animate([
-    { opacity: '0' },
-    { opacity: '1' }
-  ], {
-    easing: Params.easingStandard,
-    duration: 200,
-    fill: 'backwards'
-  });
-  const circle = editIcon.querySelector('.edit-icon circle');
-  let anim = circle.animate([
-    { strokeDashoffset: '157' },
-    { strokeDashoffset: '0' }
-  ], {
-    easing: 'linear',
-    duration: 1000
-  });
   await new Promise(resolve => anim.addEventListener('finish', resolve));
 
   if (!act) return;
