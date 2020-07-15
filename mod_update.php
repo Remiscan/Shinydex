@@ -1,7 +1,7 @@
 <?php
-require_once('./parametres.php');
-require_once('./class_BDD.php');
-require_once('./class_Pokemon.php');
+require_once './parametres.php';
+require_once './class_BDD.php';
+require_once './class_Pokemon.php';
 
 // Vide le cache des stats des fichiers
 clearstatcache();

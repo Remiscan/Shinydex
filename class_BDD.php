@@ -1,5 +1,5 @@
 <?php
-require_once('./parametres.php');
+require_once './parametres.php';
 
 class BDD extends PDO
 {

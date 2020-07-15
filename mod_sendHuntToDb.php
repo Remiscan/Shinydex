@@ -1,6 +1,6 @@
 <?php
-require_once('./parametres.php');
-require_once('./class_BDD.php');
+require_once './parametres.php';
+require_once './class_BDD.php';
 
 ////////////////////////////////////////////////
 // ÉTAPES D'UN ENVOI DE CHASSE À LA BDD EN LIGNE
