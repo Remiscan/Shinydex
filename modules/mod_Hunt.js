@@ -1,7 +1,7 @@
 import { Pokemon, Shiny } from './mod_Pokemon.js';
 import { checkUpdate } from './mod_appLifeCycle.js';
 import { notify } from './mod_notification.js';
-import { wait } from './mod_Params.js';
+import { wait, Params } from './mod_Params.js';
 import { navigate } from './mod_navigate.js';
 import { DexDatalist } from './mod_DexDatalist.js';
 import { appPopulate, appDisplay } from './mod_appContent.js';
@@ -84,7 +84,7 @@ export class Hunt {
     const template = document.getElementById('template-hunt');
     const card = template.content.cloneNode(true).querySelector('.hunt-card');
     card.id = 'hunt-' + this.id;
-    if (this.dexid == 0) card.classList.add('new');
+    //if (this.dexid == 0) card.classList.add('new');
     Array.from(card.querySelectorAll('[id^="hunt-{id}"]')).forEach(el => el.id = el.id.replace('{id}', this.id));
     Array.from(card.querySelectorAll('[for^="hunt-{id}"]')).forEach(el => el.setAttribute('for', el.getAttribute('for').replace('{id}', this.id)));
     Array.from(card.querySelectorAll('[name^="hunt-{id}"]')).forEach(el => el.name = el.name.replace('{id}', this.id));
@@ -206,6 +206,28 @@ export class Hunt {
     document.querySelector('#chasses-en-cours>.section-contenu').appendChild(card);
     document.querySelector('#chasses-en-cours').classList.remove('vide');
 
+    // Animation de la carte
+    if (this.dexid == 0) {
+      card.animate([
+        { opacity: '0' },
+        { opacity: '1' }
+      ], {
+        easing: Params.easingStandard,
+        fill: 'backwards',
+        duration: 400
+      });
+
+      const height = card.getBoundingClientRect().height;
+      document.querySelector('#chasses-en-cours>.section-contenu').animate([
+        { transform: 'translate3D(0, -' + height + 'px, 0)' },
+        { transform: 'translate3D(0, 0, 0)' }
+      ], {
+        easing: Params.easingStandard,
+        fill: 'backwards',
+        duration: 400
+      });
+    }
+
     // On met à jour la carte avec les valeurs de this
     this.updateSprite();
     this.updateJeu();
@@ -263,7 +285,7 @@ export class Hunt {
 
     if (this.caught) card.classList.add('caught');
 
-    if (this.dexid == 0) setTimeout(() => card.classList.remove('new'), 400);
+    //if (this.dexid == 0) setTimeout(() => card.classList.remove('new'), 400);
 
     deferCards('chasses-en-cours');
   }
