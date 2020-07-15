@@ -1,5 +1,5 @@
 import './modules/comp_loadSpinner.js';
-import { Params, changeTheme, changeAutoMaj, callResize, saveDBpassword } from './modules/mod_Params.js';
+import { Params, changeAutoMaj, callResize, saveDBpassword } from './modules/mod_Params.js';
 import { navigate, sectionActuelle } from './modules/mod_navigate.js';
 import { playEasterEgg } from './modules/mod_easterEgg.js';
 import { appStart, checkUpdate, manualUpdate } from './modules/mod_appLifeCycle.js';
@@ -54,20 +54,19 @@ document.querySelector('.obfuscator').addEventListener('click', () => history.ba
 
 // Active les switch des paramètres
 dataStorage.getItem('theme').then(theme => {
-  if (theme == 'light')
-    document.getElementById('switch-theme').checked = false;
-  else
-    document.getElementById('switch-theme').checked = true;
+  const storedTheme = (theme != null) ? theme : 'system';
+  const input = document.getElementById(`theme-${storedTheme}`);
+  input.checked = true;
 });
 
 dataStorage.getItem('check-updates').then(value => {
-  if (value == 1)
-    document.getElementById('switch-auto-maj').checked = true;
-  else
-    document.getElementById('switch-auto-maj').checked = false;
+  if (value == 1) document.getElementById('switch-auto-maj').checked = true;
+  else            document.getElementById('switch-auto-maj').checked = false;
 });
 
-document.querySelector('[for=switch-theme]').onclick = async event => { event.preventDefault(); return await changeTheme(); };
+Array.from(document.querySelectorAll('input[name=theme]')).forEach(input => {
+  input.onclick = async event => { return await setTheme(input.value); };
+});
 document.querySelector('[for=switch-auto-maj]').onclick = async event => { event.preventDefault(); return await changeAutoMaj(); };
 
 document.getElementById('mdp-bdd').addEventListener('input', async () => {
@@ -83,15 +82,13 @@ let needCheck = 1;
 const majButton = document.querySelector('.bouton-recherche-maj');
 
 majButton.addEventListener('mousedown', event => {
+  if (event.button != 0) return;
   event.preventDefault();
-  if (event.button == 0)
-  {
-    clearTimeout(longClic);
-    longClic = setTimeout(() => { needCheck = 0; manualUpdate(); }, 3000);
+  clearTimeout(longClic);
+  longClic = setTimeout(() => { needCheck = 0; manualUpdate(); }, 3000);
 
-    majButton.addEventListener('mouseup', () => { clearTimeout(longClic); if (needCheck) checkUpdate(true); });
-    majButton.addEventListener('mouseout', () => clearTimeout(longClic));
-  }
+  majButton.addEventListener('mouseup', () => { clearTimeout(longClic); if (needCheck) checkUpdate(true); });
+  majButton.addEventListener('mouseout', () => clearTimeout(longClic));
 });
 
 majButton.addEventListener('touchstart', () => {

@@ -1719,6 +1719,15 @@ textarea {
   margin: 0 auto;
 }
 
+.un-parametre.theme {
+  grid-template-columns: 1fr auto auto auto;
+  gap: 10px;
+}
+
+.un-parametre.theme .param-nom {
+  margin-right: 15px;
+}
+
 .un-parametre + .un-parametre {
   margin-top: 15px;
 }
@@ -1927,6 +1936,10 @@ input:checked + label.checkbox {
 
 input:checked + label.checkbox::after {
   opacity: 1;
+}
+
+.un-parametre.theme label.radio {
+  margin: 0;
 }
 
 

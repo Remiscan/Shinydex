@@ -52,28 +52,42 @@
       });
 
       // Définition du thème
-      async function setTheme(theme)
+      async function setTheme(askedTheme = false)
       {
+        // Thème sélectionné par l'utilisateur
+        await dataStorage.ready();
+        const userTheme = await dataStorage.getItem('theme');
+
+        // Thème préféré selon l'OS
+        let osTheme;
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) osTheme = 'dark';
+        else if (window.matchMedia('(prefers-color-scheme: light)').matches) osTheme = 'light';
+
+        // Thème exigé par la fonction
+        const forcedTheme = (askedTheme == 'system') ? osTheme : askedTheme;
+
+        // Thème par défaut
+        const defaultTheme = 'dark';
+
+        // On applique le thème (forcedTheme > userTheme > osTheme > defaultTheme)
+        const theme = forcedTheme || userTheme || osTheme || defaultTheme;
+        const storedTheme = (askedTheme == 'system') ? null : (forcedTheme || userTheme);
+
         let html = document.documentElement;
         html.classList.remove('light', 'dark');
         html.classList.add(theme);
-        let themeColor;
-        if (theme == 'dark')
-          themeColor = 'rgb(34, 34, 34)';
-        else
-          themeColor = 'rgb(224, 224, 224)';
+        
+        let themeColor = (theme == 'dark') ? 'rgb(34, 34, 34)' : 'rgb(224, 224, 224)';
         document.querySelector("meta[name=theme-color]").setAttribute('content', themeColor);
-        await dataStorage.ready();
-        return await dataStorage.setItem('theme', theme);
+
+        return await dataStorage.setItem('theme', storedTheme);
       }
 
-      let theme;
       Promise.all([dataStorage.ready(), shinyStorage.ready(), pokemonData.ready()])
-      .then(() => dataStorage.getItem('theme'))
-      .then(t => {
-        theme = (t == null) ? 'dark' : t;
-        return setTheme(theme);
-      });
+      .then(() => setTheme());
+
+      window.matchMedia('(prefers-color-scheme: dark)').addListener(event => setTheme());
+      window.matchMedia('(prefers-color-scheme: light)').addListener(event => setTheme());
     </script>
 
     <link rel="modulepreload" href="./modules/comp_loadSpinner.js">

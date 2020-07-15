@@ -13,9 +13,23 @@
 </header>
 
 <div class="section-contenu">
-  <p class="un-parametre">
-    <span class="param-nom">Mode sombre</span>
-    <input type="checkbox" id="switch-theme" checked><label for="switch-theme" class="switch"></label>
+  <p class="un-parametre theme">
+    <span class="param-nom">Thème</span>
+
+    <input type="radio" name="theme" id="theme-system" value="system" checked>
+    <label for="theme-system" class="radio">
+      <span>Système</span>
+    </label>
+
+    <input type="radio" name="theme" id="theme-light" value="light">
+    <label for="theme-light" class="radio">
+      <span>Clair</span>
+    </label>
+
+    <input type="radio" name="theme" id="theme-dark" value="dark">
+    <label for="theme-dark" class="radio">
+      <span>Sombre</span>
+    </label>
   </p>
 
   <p class="un-parametre">

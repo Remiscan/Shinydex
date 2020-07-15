@@ -35,23 +35,6 @@ export const Params = {
   }
 };
 
-//////////////////
-// Change le thème
-export async function changeTheme()
-{
-  const checkbox = document.getElementById('switch-theme');
-  if (checkbox.checked)
-  {
-    checkbox.checked = false;
-    return await setTheme('light');
-  }
-  else
-  {
-    checkbox.checked = true;
-    return await setTheme('dark');
-  }
-}
-
 
 ///////////////////////////////////////////////////////
 // Change le paramètre de vérification des mises à jour
