@@ -1610,6 +1610,10 @@ label.radio>.charm {
   grid-column: 3 / 4;
 }
 
+label {
+  color: var(--text-color);
+}
+
 input[type=text],
 input[type=date],
 input[type=password],
