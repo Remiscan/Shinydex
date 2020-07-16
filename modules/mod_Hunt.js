@@ -234,7 +234,7 @@ export class Hunt {
     this.updateBall();
     let pkmn = await pokemonData.getItem(String(this.dexid));
     document.getElementById(`hunt-${this.id}-espece`).value = (pkmn.dexid > 0) ? pkmn.namefr : '';
-    this.genereFormes();
+    await this.genereFormes();
     document.getElementById(`hunt-${this.id}-forme`).value = this.forme;
     document.getElementById(`hunt-${this.id}-surnom`).value = this.surnom;
     
@@ -399,15 +399,16 @@ export class Hunt {
   {
     const card = document.getElementById('hunt-' + this.id);
     const sprite = card.querySelector('.pokemon-sprite');
+    const displayShiny = card.classList.contains('edit') || this.caught;
 
     const pkmn = new Pokemon(await pokemonData.getItem(String(this.dexid)));
     const formes = pkmn.formes;
     const k = formes.findIndex(forme => forme.dbid == this.forme);
     const forme = formes[k];
     if (k != -1)
-      sprite.style.setProperty('--sprite', `url('${pkmn.getSprite(forme, { shiny: this.caught, big: false })}')`);
+      sprite.style.setProperty('--sprite', `url('${pkmn.getSprite(forme, { shiny: displayShiny, big: false })}')`);
     else
-      sprite.style.setProperty('--sprite', `url('${pkmn.getSprite(formes[0], { shiny: this.caught, big: false })}')`);
+      sprite.style.setProperty('--sprite', `url('${pkmn.getSprite(formes[0], { shiny: displayShiny, big: false })}')`);
   }
 
 
