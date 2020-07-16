@@ -70,16 +70,16 @@ export class Hunt {
     id = new Date().getTime(),
     caught = false,
     uploaded = false
-  } = {}) {
+  } = {}, start = false) {
     const hunt = new Hunt({ dexid, forme, surnom, methode, compteur, date, jeu, ball, description, origin, monjeu, charm, hacked, aupif, id, caught, uploaded });
     await huntStorage.setItem(String(id), hunt);
-    await hunt.buildHunt();
+    await hunt.buildHunt(start);
     return hunt;
   }
 
 
   // Construit la carte qui affiche la chasse en HTML
-  async buildHunt()
+  async buildHunt(start = false)
   {
     const template = document.getElementById('template-hunt');
     const card = template.content.cloneNode(true).querySelector('.hunt-card');
@@ -287,6 +287,7 @@ export class Hunt {
 
     //if (this.dexid == 0) setTimeout(() => card.classList.remove('new'), 400);
 
+    if (start) return;
     deferCards('chasses-en-cours');
   }
 
@@ -561,6 +562,6 @@ async function initHunts() {
   if (keys.length == 0)
     document.querySelector('#chasses-en-cours').classList.add('vide');
   else
-    keys.forEach(async k => Hunt.build(await huntStorage.getItem(k)));
+    keys.forEach(async k => Hunt.build(await huntStorage.getItem(k), true));
 }
 initHunts();

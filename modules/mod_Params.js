@@ -25,7 +25,7 @@ export const Params = {
       const iconsPerCol = Math.floor(availHeight / iconHeight);
       const iconsPerScreen = iconsPerRow * iconsPerCol;
       const generationEnds = [151, 251, 386, 493, 649, 721, 809, 890];
-      let visibleGens = 0;
+      let visibleGens = 1;
       for (let gen of generationEnds) {
         if (gen < iconsPerScreen) visibleGens++;
       }

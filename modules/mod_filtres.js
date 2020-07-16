@@ -188,10 +188,13 @@ export function deferCards(section = false)
       break;
   }
 
+  if (cardList.length <= Params.nombreADefer[sectionActuelle]())
+    return document.getElementById(sectionActuelle).classList.add('defered');
+
   cardList.forEach((card, i) => {
     card.classList.remove('defered');
-    card.classList.add('defer');
-    if (i <= Params.nombreADefer[sectionActuelle]()) card.classList.remove('defer');
+    if (i < Params.nombreADefer[sectionActuelle]()) card.classList.remove('defer');
+    else                                            card.classList.add('defer');
   });
 }
 
@@ -202,23 +205,34 @@ export function deferMonitor(entries)
   if (defering) return;
   defering = true;
   const sectionActuelle = document.body.dataset.sectionActuelle;
-  const scrollPosition = -1 * document.querySelector(`#${sectionActuelle}`).getBoundingClientRect().y;
+  const stopAfter = 2 * Params.nombreADefer[sectionActuelle]();
 
   entries.forEach(async entry => {
     if (entry.target.parentElement.parentElement.id != sectionActuelle) return;
     if (!entry.isIntersecting) return;
 
-    const cardsToDefer = Array.from(document.querySelectorAll(`#${sectionActuelle} .defer:not(.filtered)`))
-                              .sort((a, b) => parseInt(a.style.getPropertyValue('--order')) - parseInt(b.style.getPropertyValue('--order')));
-    if (cardsToDefer.length <= Params.nombreADefer[sectionActuelle]())
+    let cardsToDefer = [];
+    switch (sectionActuelle) {
+      case 'mes-chromatiques':
+        cardsToDefer = Array.from(document.querySelectorAll(`#${sectionActuelle} .defer:not(.filtered)`))
+                            .sort((a, b) => parseInt(a.style.getPropertyValue('--order')) - parseInt(b.style.getPropertyValue('--order')));
+        break;
+      case 'chasses-en-cours':
+        cardsToDefer = Array.from(document.querySelectorAll(`#${sectionActuelle} .defer`)).reverse();
+        break;
+      default:
+        cardsToDefer = Array.from(document.querySelectorAll(`#${sectionActuelle} .defer`));
+    }
+    
+    if (cardsToDefer.length <= stopAfter)
       return document.getElementById(sectionActuelle).classList.add('defered');
+
     for (const [i, card] of cardsToDefer.entries()) {
-      if (i > Params.nombreADefer[sectionActuelle]()) break;
+      if (i >= stopAfter) break;
       card.classList.replace('defer', 'defered');
     }
   });
 
-  document.querySelector('main').scroll(0, scrollPosition);
   setTimeout(() => { defering = false; }, 50);
 }
 

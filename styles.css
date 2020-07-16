@@ -227,6 +227,7 @@ main {
 main>section {
   display: none;
   grid-template-rows: 56px auto;
+  overflow-anchor: none;
 }
 
 main>section.on,
