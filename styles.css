@@ -802,8 +802,7 @@ section:not(.defered) .defer,
 }
 
 .defer-loader>load-spinner {
-  transform: scale(.5);
-  margin: -1.2em 0;
+  --size: 2em;
 }
 
 #chasses-en-cours .defer-loader {
@@ -1065,10 +1064,8 @@ body:not([data-section-actuelle=pokedex]) .only-pokedex {
 .loading-bar {
   grid-row: 2 / 3;
   grid-column: 1 / 2;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
+  display: grid;
+  place-items: center;
   z-index: var(--z-loading-bar);
   --bg-color: var(--loading-bar-color);
   background-color: var(--bg-color);
@@ -1076,9 +1073,14 @@ body:not([data-section-actuelle=pokedex]) .only-pokedex {
   animation-fill-mode: backwards;
 }
 
+.loading-bar>load-spinner {
+  --size: 3em;
+}
+
 .loading-bar>load-spinner,
 .loading-bar>.bouton-retour {
-  position: absolute;
+  grid-area: 1 / 1;
+  z-index: 1;
 }
 
 body:not([data-viewer-loading]):not([data-hunt-uploading]) .loading-bar {
@@ -1664,11 +1666,13 @@ textarea {
 .hunt-loader>load-spinner {
   --bg-color: var(--card-bg-color);
   margin: auto;
+  --size: 3em;
 }
 
 .hunt-loader>.material-icons {
   position: absolute;
   opacity: .5;
+  z-index: 2;
 }
 
 .hunt-card[data-loading='cloud_upload']>.hunt-loader>.material-icons::before {
@@ -2096,27 +2100,20 @@ input:checked + label.checkbox::after {
   transform: scaleX(var(--progression));
 }
 
-.maj-loading {
-  display: none;
+.notification>load-spinner {
+  --size: 3em;
   --bg-color: var(--notif-bg-color);
-  transform: scale(.8);
-  transform-origin: top right;
   position: absolute;
-  top: 0;
   right: 3px;
+  place-self: center;
 }
 
-.maj-loading load-spinner {
-  margin: 0;
+:not(.installing):not(.loading).notification>load-spinner {
+  display: none;
 }
 
 .installing .notif-bouton {
   display: none;
-}
-
-.installing .maj-loading,
-.notification.loading .maj-loading {
-  display: block;
 }
 
 .notification.loading .material-icons {
@@ -2360,11 +2357,6 @@ input:checked + label.checkbox::after {
 
   .loading-bar {
     grid-row: 1 / 2;
-  }
-
-  .loading-bar>load-spinner,
-  .loading-bar>.bouton-retour {
-    margin: auto;
   }
 
   .notification {

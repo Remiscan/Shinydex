@@ -111,8 +111,8 @@
 
   <body data-section-actuelle="mes-chromatiques">
     <!-- Écran de chargement -->
-    <div id="load-screen" style="grid-row: 1 / 3; grid-column: 1 / 2; position: absolute; z-index: 1000; top: 0; left: 0; width: 100vw; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: var(--bg-color, rgb(34, 34, 34));">
-      <load-spinner id="spinner"></load-spinner>
+    <div id="load-screen" style="grid-row: 1 / 3; grid-column: 1 / 2; position: absolute; z-index: 1000;width: 100vw; height: 100vh; display: grid; place-items: center; background-color: var(--bg-color, rgb(34, 34, 34));">
+      <load-spinner id="spinner" style="--size: 3em;"></load-spinner>
     </div>
 
     <!-- Barre de navigation -->
@@ -198,9 +198,7 @@
 
       <div class="progression-maj"></div>
 
-      <div class="maj-loading">
-        <load-spinner></load-spinner>
-      </div>
+      <load-spinner></load-spinner>
     </div>
 
     <!-- Menu des filtres -->
