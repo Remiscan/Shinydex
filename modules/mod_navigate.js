@@ -67,7 +67,8 @@ export async function navigate(sectionCible, position = 0, historique = true)
   if (sectionCible == 'chasses-en-cours')
     getNames();
 
-  ancienneSection.classList.remove('defered');
+  const toUndefer = Array.from(ancienneSection.querySelectorAll('.defered'));
+  if (toUndefer.length != 0) ancienneSection.classList.remove('defered');
   Array.from(ancienneSection.querySelectorAll('.defered')).forEach(defered => defered.classList.replace('defered', 'defer'));
 }
 

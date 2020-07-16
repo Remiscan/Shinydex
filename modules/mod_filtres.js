@@ -231,7 +231,7 @@ export function deferMonitor(entries)
     }
     
     if (cardsToDefer.length <= stopAfter)
-      return document.getElementById(sectionActuelle).classList.add('defered');
+      document.getElementById(sectionActuelle).classList.add('defered');
 
     for (const [i, card] of cardsToDefer.entries()) {
       if (i >= stopAfter) break;
