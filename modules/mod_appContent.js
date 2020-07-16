@@ -189,7 +189,7 @@ async function makeEdit(event, card) {
   ], {
     easing: Params.easingStandard,
     duration: 150,
-    fill: 'backwards'
+    fill: 'forwards'
   });
   appear.pause();
   const circle = editIcon.querySelector('.edit-icon circle');
@@ -203,7 +203,7 @@ async function makeEdit(event, card) {
   anim.pause();
 
   const clear = () => {
-    act = false; card.classList.remove('editing');
+    act = false;
     appear.cancel(); anim.cancel();
     setTimeout(() => { longClic = false; }, 50)
   };
@@ -220,7 +220,6 @@ async function makeEdit(event, card) {
 
   if (!act) return;
   longClic = true;
-  card.classList.add('editing');
 
   appear.play();
   await new Promise(resolve => appear.addEventListener('finish', resolve));
@@ -230,5 +229,6 @@ async function makeEdit(event, card) {
   if (!act) return;
   card.classList.remove('editing');
   const ready = await editHunt(parseInt(card.id.replace('pokemon-card-', '')));
+  appear.cancel(); anim.cancel();
   if (ready) longClic = false;
 }

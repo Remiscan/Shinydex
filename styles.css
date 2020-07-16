@@ -474,13 +474,10 @@ body:not([data-section-actuelle=mes-chromatiques]):not([data-section-actuelle=po
 }
 
 .edit-icon {
-  display: none;
+  display: grid;
   background-color: var(--card-edit-bg-color);
   position: relative;
-}
-
-.editing .edit-icon {
-  display: grid;
+  opacity: 0;
 }
 
 .edit-icon>.material-icons {
