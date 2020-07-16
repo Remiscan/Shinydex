@@ -144,7 +144,6 @@ export async function appStart()
 // Met à jour l'application
 function appUpdate(update = false)
 {
-  const version = Date.now();
   const progressBar = document.querySelector('.progression-maj');
   progressBar.style.setProperty('--progression', 0);
 
