@@ -29,6 +29,7 @@ export function notify(texteDesc, texteBouton = '', iconeBouton = 'close', actio
     else notif.classList.remove('loading');
   });
   notifTimeLimit = setTimeout(() => {
+    if (notif.classList.contains('installing')) return;
     unNotify();
   }, duree);
 }
