@@ -2020,7 +2020,7 @@ input:checked + label.checkbox::after {
   justify-content: flex-start;
   align-items: center;
 	text-decoration: none;
-  color: #FF5252;
+  color: var(--button-ghost-color);
   height: 2em;
   font-size: 14px;
 }
