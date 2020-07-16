@@ -133,11 +133,11 @@ export async function reverseOrder()
   if (currentReversed) {
     document.body.removeAttribute('data-reversed');
     currentReversed = false;
-    await dataStorage.setItem('remidex/ordre-reverse', JSON.stringify(false));
+    await dataStorage.setItem('ordre-reverse', false);
   } else {
     document.body.dataset.reversed = true;
     currentReversed = true;
-    await dataStorage.setItem('remidex/ordre-reverse', JSON.stringify(true));
+    await dataStorage.setItem('ordre-reverse', true);
   }
   return orderCards(currentOrdre, currentReversed);
 }
@@ -171,7 +171,10 @@ function filterDex()
 export function deferCards(section = false)
 {
   const sectionActuelle = section || document.body.dataset.sectionActuelle;
-  if (sectionActuelle == 'mes-chromatiques') document.querySelector('main').scroll(0, 0);
+  if (sectionActuelle == 'mes-chromatiques') {
+    document.getElementById('mes-chromatiques').classList.remove('defered');
+    document.querySelector('main').scroll(0, 0);
+  }
   let cardList = [];
 
   switch (sectionActuelle) {
@@ -300,7 +303,7 @@ export function cardsInOrder() { return cardsOrdered; }
 // Surveille les options d'ordre
 Array.from(document.querySelectorAll('label.ordre')).forEach(label => {
   label.addEventListener('click', async () => {
-    await orderCards(label.getAttribute('for').replace('ordre-', ''));
+    await orderCards(label.getAttribute('for').replace('ordre-', ''), document.body.dataset.reversed);
     deferCards();
   });
 });

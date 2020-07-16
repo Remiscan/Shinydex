@@ -121,7 +121,7 @@ export async function appDisplay(start = true)
     else
       await orderCards();
 
-    const savedOrdreReverse = JSON.parse(await dataStorage.getItem('ordre-reverse'));
+    const savedOrdreReverse = await dataStorage.getItem('ordre-reverse');
     if (savedOrdreReverse == true)
       await reverseOrder();
 
