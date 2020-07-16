@@ -178,7 +178,6 @@ export function deferCards(section = false)
     case 'mes-chromatiques':
       cardsOrdered = Array.from(document.querySelectorAll('#mes-chromatiques .pokemon-card:not(.filtered)'))
                           .sort((a, b) => parseInt(a.style.getPropertyValue('--order')) - parseInt(b.style.getPropertyValue('--order')));
-      if (document.body.classList.contains('reverse')) cardsOrdered.reverse();
       cardList = cardsOrdered;
       break;
     case 'pokedex':
@@ -196,18 +195,31 @@ export function deferCards(section = false)
   });
 }
 
+let defering = false;
+
 export function deferMonitor(entries)
 {
+  if (defering) return;
+  defering = true;
   const sectionActuelle = document.body.dataset.sectionActuelle;
-  /*const deferSections = ['mes-chromatiques', 'pokedex', 'chasses-en-cours'];
-  if (!deferSections.includes(document.body.dataset.sectionActuelle))
-    return;*/
+  const scrollPosition = -1 * document.querySelector(`#${sectionActuelle}`).getBoundingClientRect().y;
 
   entries.forEach(async entry => {
     if (entry.target.parentElement.parentElement.id != sectionActuelle) return;
     if (!entry.isIntersecting) return;
-    document.getElementById(sectionActuelle).classList.add('defered');
+
+    const cardsToDefer = Array.from(document.querySelectorAll(`#${sectionActuelle} .defer:not(.filtered)`))
+                              .sort((a, b) => parseInt(a.style.getPropertyValue('--order')) - parseInt(b.style.getPropertyValue('--order')));
+    if (cardsToDefer.length <= Params.nombreADefer[sectionActuelle]())
+      return document.getElementById(sectionActuelle).classList.add('defered');
+    for (const [i, card] of cardsToDefer.entries()) {
+      if (i > Params.nombreADefer[sectionActuelle]()) break;
+      card.classList.replace('defer', 'defered');
+    }
   });
+
+  document.querySelector('main').scroll(0, scrollPosition);
+  setTimeout(() => { defering = false; }, 50);
 }
 
 
