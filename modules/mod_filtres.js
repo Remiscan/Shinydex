@@ -327,7 +327,7 @@ Array.from(document.querySelectorAll('input.filtre')).forEach(radio => {
 ///////////////////////////////
 // Crée les checkboxes des jeux
 Pokemon.jeux.forEach(jeu => {
-  const nomJeu = jeu.nom.replace(/ /g, '');
+  const nomJeu = jeu.nom.replace(/[ \']/g, '');
   const template = document.getElementById('template-checkbox-jeu');
   const checkbox = template.content.cloneNode(true);
   const input = checkbox.querySelector('input');
