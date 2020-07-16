@@ -2104,7 +2104,7 @@ input:checked + label.checkbox::after {
   --size: 3em;
   --bg-color: var(--notif-bg-color);
   position: absolute;
-  right: 3px;
+  right: 6px;
   place-self: center;
 }
 
