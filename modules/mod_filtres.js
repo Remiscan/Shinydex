@@ -166,8 +166,8 @@ function filterDex()
 }
 
 
-///////////////////////////////
-// Choisit quelles cartes defer
+////////////////////////////////////////////////////////////////////////////
+// Affiche seulement un certain nombre de cartes à l'ouverture d'une section
 export function deferCards(section = false)
 {
   const sectionActuelle = section || document.body.dataset.sectionActuelle;
@@ -198,8 +198,10 @@ export function deferCards(section = false)
   });
 }
 
-let defering = false;
 
+/////////////////////////////////////////////////////////////////
+// Charge un certain nombre de cartes au défilement d'une section
+let defering = false;
 export function deferMonitor(entries)
 {
   if (defering) return;
