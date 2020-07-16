@@ -1,5 +1,5 @@
 import { appPopulate, appDisplay } from './mod_appContent.js';
-import { recalcOnResize, version2date } from './mod_Params.js';
+import { recalcOnResize, version2date, wait } from './mod_Params.js';
 import { notify } from './mod_notification.js';
 
 /////////////////////////////////////////////////////
@@ -110,6 +110,7 @@ export async function appStart()
     const willCheckUpdate = await dataStorage.getItem('check-updates');
     if (willCheckUpdate == 1) {
       await navigator.serviceWorker.ready;
+      await wait(1000);
       return checkUpdate();
     } else {
       return;
