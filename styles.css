@@ -25,6 +25,8 @@ html.light {
   --checkbox-checked-bg-color: var(--fab-color);
   --checkbox-check-color: white;
   --input-bg-color: white;
+  --button-color: var(--fab-color);
+  --button-ghost-color: var(--button-color);
   --loading-bar-color: hsl(0, 0%, 37%);
   --card-edit-bg-color: hsla(0, 0%, 37%, .7);
 }
@@ -51,6 +53,8 @@ html.dark {
   --checkbox-checked-bg-color: var(--nav-text-color-on);
   --checkbox-check-color: var(--nav-bg-color);
   --input-bg-color: hsl(0, 0%, 90%);
+  --button-color: var(--fab-color);
+  --button-ghost-color: var(--nav-text-color-on);
   --loading-bar-color: hsl(0, 0%, 7%);
   --card-edit-bg-color: hsla(0, 0%, 7%, .7);
 }
@@ -368,7 +372,7 @@ button {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: var(--fab-color);
+  background-color: var(--button-color);
   height: 32px;
   width: fit-content;
   padding: 0 16px;
@@ -386,7 +390,7 @@ button {
 button.ghost {
   background-color: transparent;
   color: var(--text-color);
-  border: 2px solid var(--fab-color);
+  border: 2px solid var(--button-ghost-color);
   box-sizing: border-box;
   box-shadow: none;
 }
@@ -1393,7 +1397,7 @@ picture.no-shiny>span {
 
 .caught .bouton-hunt-caught {
   background-color: transparent;
-  border: 2px solid var(--fab-color);
+  border: 2px solid var(--button-ghost-color);
   box-sizing: border-box;
   box-shadow: none;
 }
