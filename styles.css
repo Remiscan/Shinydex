@@ -800,6 +800,11 @@ section:not(.defered) .defer,
   color: var(--text-color-soft);
 }
 
+.defer-loader>load-spinner {
+  transform: scale(.5);
+  margin: -1.2em 0;
+}
+
 #chasses-en-cours .defer-loader {
   order: -1;
 }
