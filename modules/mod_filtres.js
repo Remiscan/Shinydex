@@ -173,7 +173,8 @@ export function deferCards(section = false)
   const sectionActuelle = section || document.body.dataset.sectionActuelle;
   if (sectionActuelle == 'mes-chromatiques') {
     document.getElementById('mes-chromatiques').classList.remove('defered');
-    document.querySelector('main').scroll(0, 0);
+    const scroll = (document.body.dataset.sectionActuelle == sectionActuelle);
+    if (scroll) document.querySelector('main').scroll(0, 0);
   }
   let cardList = [];
 
@@ -308,19 +309,19 @@ Array.from(document.querySelectorAll('label.ordre')).forEach(label => {
   });
 });
 
+// Active le bouton d'inversion de l'ordre
+document.querySelector('.reverse-order').addEventListener('click', async () => {
+  await reverseOrder();
+  deferCards();
+});
+
 ///////////////////////////////////
 // Surveille les options de filtres
 Array.from(document.querySelectorAll('input.filtre')).forEach(radio => {
   radio.addEventListener('change', async () => {
     await filterCards(buildFiltres());
-    deferCards();
+    deferCards('mes-chromatiques');
   });
-});
-
-// Active le bouton d'inversion de l'ordre
-document.querySelector('.reverse-order').addEventListener('click', async () => {
-  await reverseOrder();
-  deferCards();
 });
 
 ///////////////////////////////
