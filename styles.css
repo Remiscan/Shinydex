@@ -1795,7 +1795,7 @@ label.switch {
   position: relative;
   cursor: pointer;
   border-radius: var(--height);
-  background-color: rgba(0, 0, 0, .2);
+  background-color: transparent;
   overflow: hidden;
 }
 
@@ -1821,7 +1821,7 @@ label.switch::after {
 	position: absolute;
 	top: var(--padding);
 	left: var(--padding);
-	background-color: rgba(255, 255, 255, .5);
+  background-color: var(--bg-color);
 	border-radius: var(--height);
   transition: transform .2s var(--easing-decelerate);
 }
@@ -1832,7 +1832,6 @@ input:checked + label.switch::before {
 }
 
 input:checked + label.switch::after {
-  background-color: var(--checkbox-check-color);
 	transform: translateX(calc(2.875rem - 100%));
 }
 
