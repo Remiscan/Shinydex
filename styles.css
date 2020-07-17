@@ -939,11 +939,15 @@ body:not([data-section-actuelle=pokedex]) .sous-titre:not(:nth-child(2)) {
 }
 
 .sous-titre>span {
-  --bg: var(--nav-bg-color);
+  --bg: var(--bg-color);
   background-color: var(--bg);
   z-index: 1;
   padding: 0 8px;
   margin: 0 32px;
+}
+
+.menu-filtres .sous-titre>span {
+  --bg: var(--nav-bg-color);
 }
 
 .reverse-order__container {
@@ -1732,9 +1736,14 @@ textarea {
   color: var(--text-color-soft);
 }
 
-#parametres .separateur {
-  background: none;
-  flex-grow: 1;
+#parametres .sous-titre,
+#a-propos .sous-titre {
+  font-size: 1em;
+}
+
+#parametres p + .sous-titre,
+#a-propos p + .sous-titre {
+  margin-top: 48px;
 }
 
 .un-parametre {
@@ -2018,14 +2027,6 @@ input:checked + label.checkbox::after {
 
 #instinct {
   margin-top: -8px;
-}
-
-.separateur {
-  width: 20%;
-  max-width: 100px;
-  height: 1px;
-  background-color: var(--radio-disabled-color);
-  margin: 40px auto;
 }
 
 .sources-titre {
