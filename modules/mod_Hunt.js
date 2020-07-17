@@ -1,10 +1,8 @@
 import { Pokemon, Shiny } from './mod_Pokemon.js';
-import { checkUpdate } from './mod_appLifeCycle.js';
 import { notify } from './mod_notification.js';
 import { wait, Params } from './mod_Params.js';
 import { navigate } from './mod_navigate.js';
 import { DexDatalist } from './mod_DexDatalist.js';
-import { appPopulate, appDisplay } from './mod_appContent.js';
 import { deferCards } from './mod_filtres.js';
 
 const huntStorage = localforage.createInstance({
@@ -456,24 +454,41 @@ export class Hunt {
   async submitHunt(edit = false)
   {
     const card = document.getElementById('hunt-' + this.id);
+    this.lastupdate = Date.now();
+    this.huntid = this.id;
 
-    // On demande au service worker d'upload la chasse dans la BDD en ligne
-    if (!'serviceWorker' in navigator || !'syncManager' in window)
-      throw 'Upload de la chasse impossible.';
+    const onlineBackup = await dataStorage.getItem('online-backup');
+    if (onlineBackup) {
+      // On demande au service worker d'upload la chasse dans la BDD en ligne
+      if (!'serviceWorker' in navigator || !'syncManager' in window)
+        throw 'Upload de la chasse impossible.';
 
-    const reg = await navigator.serviceWorker.ready;
-    console.log('[sync] Envoi de la chasse au sw');
-    try {
-      this.uploaded = 'cloud_upload';
-      await huntStorage.setItem(String(this.id), this);
-      card.dataset.loading = this.uploaded;
-      // On demande au service worker d'envoyer la chasse vers la DB
-      if (edit) await reg.sync.register('HUNT-EDIT-' + this.id);
-      else await reg.sync.register('HUNT-ADD-' + this.id);
-      // Voir scripts.js pour la réponse du service worker
+      const reg = await navigator.serviceWorker.ready;
+      console.log('[sync] Envoi de la chasse au sw');
+      try {
+        this.uploaded = 'cloud_upload';
+        await huntStorage.setItem(String(this.id), this);
+        card.dataset.loading = this.uploaded;
+        // On demande au service worker d'envoyer la chasse vers la DB
+        if (edit) await reg.sync.register('HUNT-EDIT-' + this.id);
+        else await reg.sync.register('HUNT-ADD-' + this.id);
+        // Voir scripts.js pour la réponse du service worker
+      }
+      catch(error) {
+        console.log('[sync] Erreur lors de la requête de synchronisation');
+      }
     }
-    catch(error) {
-      console.log('[sync] Erreur lors de la requête de synchronisation');
+
+    else {
+      try {
+        const shiny = await Shiny.build(this);
+        await shinyStorage.setItem(String(this.id), shiny);
+        await huntStorage.removeItem(String(this.id));
+        card.remove();
+      }
+      catch(error) {
+        console.error(error);
+      }
     }
   }
 
@@ -483,22 +498,30 @@ export class Hunt {
   {
     const card = document.getElementById('hunt-' + this.id);
 
-    // On demande au service worker de supprimer la chasse de la BDD en ligne
-    if (!'serviceWorker' in navigator || !'syncManager' in window)
-      throw 'Suppression de la chasse impossible.';
+    const onlineBackup = await dataStorage.getItem('online-backup');
+    if (onlineBackup) {
+      // On demande au service worker de supprimer la chasse de la BDD en ligne
+      if (!'serviceWorker' in navigator || !'syncManager' in window)
+        throw 'Suppression de la chasse impossible.';
 
-    const reg = await navigator.serviceWorker.ready;
-    console.log('[sync] Suppression de la chasse demandée au sw');
-    try {
-      this.uploaded = 'delete_forever';
-      await huntStorage.setItem(String(this.id), this);
-      card.dataset.loading = this.uploaded;
-      // On demande au service worker de supprimer la chasse de la DB
-      await reg.sync.register('HUNT-REMOVE-' + this.id);
-      // Voir scripts.js pour la réponse du service worker
+      const reg = await navigator.serviceWorker.ready;
+      console.log('[sync] Suppression de la chasse demandée au sw');
+      try {
+        this.uploaded = 'delete_forever';
+        await huntStorage.setItem(String(this.id), this);
+        card.dataset.loading = this.uploaded;
+        // On demande au service worker de supprimer la chasse de la DB
+        await reg.sync.register('HUNT-REMOVE-' + this.id);
+        // Voir scripts.js pour la réponse du service worker
+      }
+      catch(error) {
+        console.log('[sync] Erreur lors de la requête de synchronisation');
+      }
     }
-    catch(error) {
-      console.log('[sync] Erreur lors de la requête de synchronisation');
+
+    else {
+      await shinyStorage.removeItem(String(this.id));
+      card.remove();
     }
   }
 }
@@ -507,7 +530,7 @@ export class Hunt {
 
 ////////////////////////////////////////////////////////////
 // Créer une chasse pour mettre à jour une carte dans la BDD
-export async function editHunt(id) {
+export async function editHunt(id, nav = true) {
   let k = await huntStorage.getItem(String(id));
   if (k != null) {
     const message = 'Cette chasse est déjà en cours d\'édition.';
@@ -520,8 +543,8 @@ export async function editHunt(id) {
   parseTheseInts.forEach(int => pkmn[int] = parseInt(pkmn[int]));
   pkmn.dexid = parseInt(pkmn['numero_national']);
   const hunt = await Hunt.build(pkmn);
-  navigate('chasses-en-cours');
-  return true;
+  if (nav) navigate('chasses-en-cours');
+  return hunt;
 }
 
 
@@ -543,7 +566,7 @@ Pokemon.jeux.forEach(jeu => {
 
 //////////////////////////////////////
 // Initialise les chasses sauvegardées
-async function initHunts() {
+export async function initHunts() {
   await Promise.all([huntStorage.ready(), dataStorage.ready()]);
 
   // On vérifie quelles chasses ont été uploadées par le service worker depuis la dernière visite
@@ -565,4 +588,3 @@ async function initHunts() {
   else
     keys.forEach(async k => Hunt.build(await huntStorage.getItem(k), true));
 }
-initHunts();

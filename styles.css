@@ -368,6 +368,7 @@ h1 {
  * FAB des filtres
  */
 
+input[type=file] + label,
 button {
   all: unset;
   cursor: pointer;
@@ -389,6 +390,7 @@ button {
   font-weight: 500;
 }
 
+input[type=file] + label.ghost,
 button.ghost {
   background-color: transparent;
   color: var(--text-color);
@@ -1807,12 +1809,30 @@ textarea {
   grid-column: 2 / 3;
 }
 
-.param>button {
+.param button,
+.param label.ghost {
   margin: 0;
 }
 
 .bouton-recherche-maj {
   margin-top: 0;
+}
+
+#parametres:not([data-online-backup]) .if-backup {
+  display: none;
+}
+
+#parametres[data-online-backup] .no-backup {
+  display: none;
+}
+
+#pick-import-file {
+  width: .1px;
+	height: .1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
 }
 
 

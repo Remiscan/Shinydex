@@ -66,7 +66,7 @@ if (isset($_POST['hunt']) && $_POST['hunt'] != '')
       // Si c'est une édition
       if ($type == 'EDIT') {
         $insert = $link->prepare('UPDATE mes_shinies SET 
-          numero_national = :dexid, forme =:forme, surnom = :surnom, methode = :methode, compteur = :compteur, date = :date, jeu = :jeu, ball = :ball, description = :description, origin = :origin, monjeu = :monjeu, charm = :charm, hacked = :hacked, aupif = :aupif
+          numero_national = :dexid, forme =:forme, surnom = :surnom, methode = :methode, compteur = :compteur, date = :date, jeu = :jeu, ball = :ball, description = :description, origin = :origin, monjeu = :monjeu, charm = :charm, hacked = :hacked, aupif = :aupif, last_update = :lastupdate
         WHERE id = :id');
         $insert->bindValue(':id', $data->{'id'}, PDO::PARAM_INT);
       }
@@ -79,9 +79,9 @@ if (isset($_POST['hunt']) && $_POST['hunt'] != '')
 
         // Si ce n'est pas le cas, on prépare l'ajout
         $insert = $link->prepare('INSERT INTO mes_shinies (
-          numero_national, forme, surnom, methode, compteur, date, jeu, ball, description, origin, monjeu, charm, hacked, aupif, huntid
+          numero_national, forme, surnom, methode, compteur, date, jeu, ball, description, origin, monjeu, charm, hacked, aupif, huntid, last_update
         ) VALUES (
-          :dexid, :forme, :surnom, :methode, :compteur, :date, :jeu, :ball, :description, :origin, :monjeu, :charm, :hacked, :aupif, :huntid
+          :dexid, :forme, :surnom, :methode, :compteur, :date, :jeu, :ball, :description, :origin, :monjeu, :charm, :hacked, :aupif, :huntid, :lastupdate
         )');
         $insert->bindParam(':huntid', $data->{'id'}, PDO::PARAM_INT);
       }
@@ -100,6 +100,7 @@ if (isset($_POST['hunt']) && $_POST['hunt'] != '')
       $insert->bindParam(':charm', $data->{'charm'}, PDO::PARAM_INT, 1);
       $insert->bindParam(':hacked', $data->{'hacked'}, PDO::PARAM_INT, 1);
       $insert->bindParam(':aupif', $data->{'aupif'}, PDO::PARAM_INT, 1);
+      $insert->bindParam(':lastupdate', $data->{'lastupdate'}, PDO::PARAM_INT);
 
     }
 

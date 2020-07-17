@@ -121,56 +121,112 @@ self.addEventListener('message', function(event) {
       })
     );
   }
+
+  // COMPARE-BACKUP
+  else if (event.data.action == 'compare-backup')
+  {
+    console.log('[compare-backup] Demande reçue...');
+
+    event.waitUntil(
+      Promise.resolve()
+      .then(async () => {
+        // On récupère les données locales
+        await shinyStorage.ready();
+        const keys = await shinyStorage.keys();
+        const localData = await Promise.all(keys.map(async key => await shinyStorage.getItem(key)));
+
+        // On envoie les données locales au serveur
+        const formData = new FormData();
+        formData.append('local-data', JSON.stringify(localData));
+        formData.append('mdp', await dataStorage.getItem('mdp-bdd'));
+
+        const response = await fetch('/remidex/mod_backupLocalToDb.php?date=' + Date.now(), {
+          method: 'POST',
+          body: formData
+        });
+        if (response.status != 200)
+          throw '[:(] Erreur ' + response.status + ' lors de la requête';
+        const data = await response.json();
+    
+        if (data['mdp'] == false)
+          throw '[:(] Mauvais mot de passe...';
+        
+        // Vérifier si le serveur a réussi sa mission
+        console.log('Réponse reçue du serveur :', data);
+
+        if (data['error'] == true) throw data['response'];
+
+        // Mettons à jour les données locales obsolètes
+        const toSet = [...data['inserts-local'], ...data['updates-local']];
+        await Promise.all(
+          toSet.map(shiny => shinyStorage.setItem(String(shiny.id), shiny))
+        );
+        return true;
+      })
+      .catch(error => {
+        console.error(error);
+        return false;
+      })
+      .then(result => {
+        return self.clients.matchAll()
+        .then(all => all.map(client => client.postMessage({ successfulBackupComparison: (result != false) })));
+      })
+    );
+  }
 });
 
 
 // SYNC
 self.addEventListener('sync', async function(event) {
   console.log('[sw] Requête de SYNC reçue');
-  const PRE_HUNT_ADD = 'HUNT-ADD-';
-  const PRE_HUNT_EDIT = 'HUNT-EDIT-';
-  const PRE_HUNT_DELETE = 'HUNT-REMOVE-';
-  let huntid;
 
-  const whatDo = event => {
-    // Upload d'une chasse dans la BDD en ligne
-    if (event.tag.startsWith(PRE_HUNT_ADD)) {
-      huntid = event.tag.replace(PRE_HUNT_ADD, '');
-      return sendHunt(huntid);
-    }
+  // HUNT-ADD-id, HUNT-EDIT-id, HUNT-REMOVE-id
+  if (event.tag.startsWith('HUNT-')) {
+    const PRE_HUNT_ADD = 'HUNT-ADD-';
+    const PRE_HUNT_EDIT = 'HUNT-EDIT-';
+    const PRE_HUNT_DELETE = 'HUNT-REMOVE-';
+    let huntid;
 
-    // Édition d'une chasse dans la BDD en ligne
-    else if (event.tag.startsWith(PRE_HUNT_EDIT)) {
-      huntid = event.tag.replace(PRE_HUNT_EDIT, '');
-      return sendHunt(huntid, true);
-    }
-
-    // Suppression d'une chasse dans la BDD en ligne
-    else if (event.tag.startsWith(PRE_HUNT_DELETE)) {
-      huntid = event.tag.replace(PRE_HUNT_DELETE, '');
-      return deleteHunt(huntid);
-    }
-  };
-
-  event.waitUntil(
-    whatDo(event)
-    .then(updateShinyData)
-    .then(successfulDBUpdate => {
-      return dataStorage.getItem('uploaded-hunts')
-      .then(uploadedHunts => dataStorage.setItem('uploaded-hunts', [...uploadedHunts, huntid]))
-      .then(() => self.clients.matchAll())
-      .then(all => all.map(client => client.postMessage({ successfulDBUpdate, huntid })));
-    })
-    .catch(error => {
-      if (event.lastChance) {
-        return huntStorage.getItem(String(huntid))
-        .then(hunt => { const _hunt = hunt; _hunt.uploaded = false; return huntStorage.setItem(String(huntid), _hunt); })
-        .then(() => { throw error; });
-      } else {
-        throw error;
+    const whatDo = event => {
+      // Upload d'une chasse dans la BDD en ligne
+      if (event.tag.startsWith(PRE_HUNT_ADD)) {
+        huntid = event.tag.replace(PRE_HUNT_ADD, '');
+        return sendHunt(huntid);
       }
-    })
-  );
+
+      // Édition d'une chasse dans la BDD en ligne
+      else if (event.tag.startsWith(PRE_HUNT_EDIT)) {
+        huntid = event.tag.replace(PRE_HUNT_EDIT, '');
+        return sendHunt(huntid, true);
+      }
+
+      // Suppression d'une chasse dans la BDD en ligne
+      else if (event.tag.startsWith(PRE_HUNT_DELETE)) {
+        huntid = event.tag.replace(PRE_HUNT_DELETE, '');
+        return deleteHunt(huntid);
+      }
+    };
+
+    event.waitUntil(
+      whatDo(event)
+      .then(updateShinyData)
+      .then(successfulDBUpdate => {
+        return dataStorage.getItem('uploaded-hunts')
+        .then(uploadedHunts => dataStorage.setItem('uploaded-hunts', [...uploadedHunts, huntid]))
+        .then(() => self.clients.matchAll())
+        .then(all => all.map(client => client.postMessage({ successfulDBUpdate, huntid })));
+      })
+      .catch(error => {
+        if (event.lastChance) {
+          return huntStorage.getItem(String(huntid))
+          .then(hunt => { const _hunt = hunt; _hunt.uploaded = false; return huntStorage.setItem(String(huntid), _hunt); })
+          .then(() => { throw error; });
+        } else {
+          throw error;
+        }
+      })
+    );
+  }
 });
 
 
@@ -237,6 +293,7 @@ async function installData([data, files], action = 'install', event = null) {
     console.log(`[${action}] Mise en cache des fichiers terminée !`);
 
     // Mise à jour des données
+    const onlineBackup = await dataStorage.getItem('online-backup');
     console.log(`[${action}] Installation des données...`);
     await Promise.all([dataStorage.ready(), shinyStorage.ready(), pokemonData.ready()]);
     await dataStorage.setItem('version-fichiers', data['version-fichiers']);
@@ -244,9 +301,11 @@ async function installData([data, files], action = 'install', event = null) {
     await dataStorage.setItem('version', versionMax);
     await dataStorage.setItem('pokemon-names', data['pokemon-names']);
     await dataStorage.setItem('pokemon-names-fr', data['pokemon-names-fr']);
-    await Promise.all(
-      data['data-shinies'].map(shiny => shinyStorage.setItem(String(shiny.id), shiny))
-    );
+    if (onlineBackup) {
+      await Promise.all(
+        data['data-shinies'].map(shiny => shinyStorage.setItem(String(shiny.id), shiny))
+      );
+    }
     await Promise.all(
       data['pokemon-data'].map(pkmn => pokemonData.setItem(String(pkmn.dexid), pkmn))
     );
@@ -282,6 +341,9 @@ async function updateShinyData()
   // Récupération des données
 
   try {
+    const onlineBackup = await dataStorage.getItem('online-backup');
+    if (!onlineBackup) return;
+    
     console.log('[update-db] Récupération des données...')
     data = await fetch('/remidex/mod_update.php?type=updateDB&date=' + Date.now());
     if (data.status != 200)

@@ -1,9 +1,9 @@
 import './modules/comp_loadSpinner.js';
-import { Params, changeAutoMaj, callResize, saveDBpassword, export2json } from './modules/mod_Params.js';
+import { Params, changeAutoMaj, callResize, saveDBpassword, export2json, changeOnlineBackup, wait } from './modules/mod_Params.js';
 import { navigate, sectionActuelle } from './modules/mod_navigate.js';
 import { playEasterEgg } from './modules/mod_easterEgg.js';
 import { appStart, checkUpdate, manualUpdate } from './modules/mod_appLifeCycle.js';
-import { appPopulate, appDisplay } from './modules/mod_appContent.js';
+import { appPopulate, appDisplay, json2import } from './modules/mod_appContent.js';
 import { openFiltres } from './modules/mod_filtres.js';
 import { Hunt } from './modules/mod_Hunt.js';
 import { notify, unNotify } from './modules/mod_notification.js';
@@ -64,10 +64,19 @@ dataStorage.getItem('check-updates').then(value => {
   else            document.getElementById('switch-auto-maj').checked = false;
 });
 
+dataStorage.getItem('online-backup').then(value => {
+  if (value == 1) {
+    document.getElementById('switch-online-backup').checked = true;
+    document.getElementById('parametres').dataset.onlineBackup = '1';
+  }
+  else document.getElementById('switch-online-backup').checked = false;
+});
+
 Array.from(document.querySelectorAll('input[name=theme]')).forEach(input => {
   input.onclick = async event => { return await setTheme(input.value); };
 });
 document.querySelector('[for=switch-auto-maj]').onclick = async event => { event.preventDefault(); return await changeAutoMaj(); };
+document.querySelector('[for=switch-online-backup]').onclick = async event => { event.preventDefault(); return await changeOnlineBackup(); };
 
 document.getElementById('mdp-bdd').addEventListener('input', async () => {
   return await saveDBpassword();
@@ -103,12 +112,43 @@ majButton.addEventListener('touchstart', () => {
 // Prépare le bouton d'export des données
 document.querySelector('.bouton-export').addEventListener('click', export2json);
 
+// Prépare le bouton d'import des données
+const importInput = document.getElementById('pick-import-file');
+importInput.addEventListener('change', async event => {
+  await json2import(importInput.files[0]);
+});
+
+// Prépare le bouton de suppression des données locales
+const boutonSupprimer = document.querySelector('.bouton-supprimer-local');
+boutonSupprimer.addEventListener('click', async event => {
+  event.preventDefault();
+
+  if (boutonSupprimer.innerHTML == 'Supprimer' || boutonSupprimer.innerHTML == 'Annuler')
+  {
+    boutonSupprimer.innerHTML = 'Vraiment ?';
+    setTimeout(() => boutonSupprimer.innerHTML = 'Supprimer', 3000);
+  }
+  else if (boutonSupprimer.innerHTML == 'Vraiment ?')
+  {
+    boutonSupprimer.disabled = true;
+    boutonSupprimer.innerHTML = 'Supprimer';
+    notify('Suppression des données...', '', 'loading', () => {}, 999999999);
+    await Promise.all([shinyStorage.clear(), huntStorage.clear()]);
+    await appPopulate(false);
+    await appDisplay(false);
+    await wait(1000);
+    unNotify();
+    boutonSupprimer.disabled = false;
+  }
+});
+
 
 
 ///////////////////////////////////////
 // COMMUNICATION AVEC LE SERVICE WORKER
 navigator.serviceWorker.addEventListener('message', async event => {
-  // Réception d'une réponse à l'envoi d'une chasse au service worker
+
+  // --- Réponse à HUNT-ADD-id, HUNT-EDIT-id ou HUNT-REMOVE-id ---
   if ('successfulDBUpdate' in event.data) {
     const huntid = event.data.huntid;
     const card = document.getElementById('hunt-' + huntid);
@@ -145,6 +185,7 @@ navigator.serviceWorker.addEventListener('message', async event => {
       await appDisplay(false);
       // ✅ forcer l'affichage du nouveau sprite--versionBDD.php (appDisplay s'en charge)
       // ✅ fin de l'animation de chargement
+      await wait(1000);
       unNotify();
     }
     else {
@@ -159,6 +200,25 @@ navigator.serviceWorker.addEventListener('message', async event => {
       const hunt = await huntStorage.getItem(String(huntid));
       hunt.uploaded = false;
       await huntStorage.setItem(String(huntid), hunt);
+    }
+  }
+
+  // --- Réponse à COMPARE-BACKUP ---
+  else if ('successfulBackupComparison' in event.data) {
+    const checkbox = document.getElementById('switch-online-backup');
+    if (event.data.successfulBackupComparison === true) {
+      // Toutes les chasses locales plus récentes que celles de la BDD ont été ajoutées / éditées
+      await wait(1000);
+      unNotify();
+      checkbox.disabled = false;
+      await dataStorage.setItem('online-backup', 1);
+    }
+    else {
+      // Au moins une chasse n'a pas pu être ajoutée / éditée
+      unNotify();
+      notify('Erreur. Réessayez plus tard.');
+      checkbox.checked = false;
+      checkbox.disabled = false;
     }
   }
 });

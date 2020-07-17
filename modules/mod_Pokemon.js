@@ -139,6 +139,8 @@ class Shiny {
     this.charm = shiny.charm;
     this.hacked = shiny.hacked;
     this.random = shiny.aupif;
+    this.huntid = shiny.huntid;
+    this.lastupdate = shiny.lastupdate;
   }
 
   static async build(shiny) {

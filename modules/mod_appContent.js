@@ -3,7 +3,8 @@ import { createCard, toggleNotes } from './mod_pokemonCard.js';
 import { filterCards, orderCards, reverseOrder, deferCards, deferMonitor } from './mod_filtres.js';
 import { Params, loadAllImages, wait, version2date } from './mod_Params.js';
 import { openSpriteViewer } from './mod_spriteViewer.js';
-import { editHunt } from './mod_Hunt.js';
+import { editHunt, initHunts } from './mod_Hunt.js';
+import { notify, unNotify } from './mod_notification.js';
 
 let longClic = false;
 
@@ -20,7 +21,7 @@ export async function appPopulate(start = true)
     }
 
     let data = await shinyStorage.keys();
-    data = await Promise.all(data.map(async key => { return await shinyStorage.getItem(key) }));
+    data = await Promise.all(data.map(key => shinyStorage.getItem(key)));
 
     if (data.length == 0) {
       document.querySelector('#mes-chromatiques').classList.add('vide');
@@ -39,6 +40,13 @@ export async function appPopulate(start = true)
 
       cardsToPopulate.push(card);
     };
+
+    // Peuple les éléments après la préparation (pour optimiser le temps d'exécution)
+    //// Liste principale
+    let conteneur = document.querySelector('#mes-chromatiques>.section-contenu');
+    for (let card of cardsToPopulate) { conteneur.appendChild(card); }
+    //// Chasses en cours
+    await initHunts();
 
     if (!start) return;
 
@@ -64,11 +72,7 @@ export async function appPopulate(start = true)
       gensToPopulate.push(genConteneur);
     }
 
-    // Peuple les éléments après la préparation (pour optimiser le temps d'exécution)
-    //// Liste principale
-    let conteneur = document.querySelector('#mes-chromatiques>.section-contenu');
-    for (let card of cardsToPopulate) { conteneur.appendChild(card); }
-    //// Pokédex
+    // Peuple le Pokédex (seulement au lancement)
     conteneur = document.querySelector('#pokedex>.section-contenu');
     for (let genConteneur of gensToPopulate) { conteneur.appendChild(genConteneur); }
 
@@ -226,7 +230,36 @@ async function makeEdit(event, card) {
 
   if (!act) return;
   card.classList.remove('editing');
-  const ready = await editHunt(parseInt(card.id.replace('pokemon-card-', '')));
+  let ready = await editHunt(parseInt(card.id.replace('pokemon-card-', '')));
+  ready = (ready != false);
   appear.cancel(); anim.cancel();
   if (ready) longClic = false;
+}
+
+
+//////////////////////////////////////////////////////////
+// Peuple l'application avec les données d'un fichier JSON
+export async function json2import(file) {
+  const reader = new FileReader();
+  reader.addEventListener('load', async event => {
+    const importedData = JSON.parse(event.target.result);
+    if (!'shiny' in importedData || !'hunts' in importedData)
+      throw 'Le fichier importé est incorrect.';
+
+    await shinyStorage.ready();
+    await Promise.all(
+      importedData.shiny.map(shiny => shinyStorage.setItem(String(shiny.id), shiny))
+    );
+    await huntStorage.ready();
+    await Promise.all(
+      importedData.hunts.map(hunt => huntStorage.setItem(String(hunt.id), hunt))
+    );
+
+    notify('Mise à jour des données...', '', 'loading', () => {}, 999999999);
+    await appPopulate(false);
+    await appDisplay(false);
+    await wait(1000);
+    unNotify();
+  });
+  reader.readAsText(file);
 }

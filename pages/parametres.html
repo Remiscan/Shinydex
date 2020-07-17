@@ -46,11 +46,12 @@
 
   <p class="un-parametre">
     <span class="param-nom">Sauvegarde en ligne</span>
-    <span class="param-description">Si désactivé, vos données seront perdues si vous désinstallez l'application ou nettoyez son stockage.</span>
-    <input type="checkbox" id="switch-db-backup" checked disabled><label for="switch-db-backup" class="switch"></label>
+    <span class="param-description no-backup">Si désactivé, vos données seront perdues si vous désinstallez l'application ou nettoyez son stockage.</span>
+    <span class="param-description if-backup">Vos données sont sauvegardées sur internet.</span>
+    <input type="checkbox" id="switch-online-backup"><label for="switch-online-backup" class="switch"></label>
   </p>
 
-  <p class="un-parametre">
+  <p class="un-parametre if-backup">
     <span class="param-nom"><label for="mdp-bdd">Mot de passe BDD</label></span>
     <span class="param-description">pour sauvegarder mes chromatiques en ligne.</span>
     <input type="password" id="mdp-bdd" size="10">
@@ -68,7 +69,16 @@
     <span class="param-nom"><label for="mdp-bdd">Importer mes données</label></span>
     <span class="param-description">depuis un fichier JSON.</span>
     <span class="param">
-      <button class="bouton-import ghost" disabled>Importer</button>
+      <input type="file" id="pick-import-file" accept=".json">
+      <label for="pick-import-file" class="ghost">Importer</label>
+    </span>
+  </p>
+
+  <p class="un-parametre no-backup">
+    <span class="param-nom"><label for="mdp-bdd">Supprimer mes données</label></span>
+    <span class="param-description">Ceci est irréversible.</span>
+    <span class="param">
+      <button class="bouton-supprimer-local ghost danger">Supprimer</button>
     </span>
   </p>
 

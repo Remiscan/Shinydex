@@ -1,3 +1,5 @@
+import { notify, unNotify } from './mod_notification.js';
+
 //////////////////////
 // Constantes globales
 export const Params = {
@@ -57,6 +59,67 @@ export async function changeAutoMaj()
       setTimeout(function() { settingClicked = false }, 100);
       checkUpdate();
     }*/
+  }
+  return;
+}
+
+
+/////////////////////////////////////////////////////////
+// Change le paramètre de sauvegarde des données en ligne
+export async function changeOnlineBackup()
+{
+  const checkbox = document.getElementById('switch-online-backup');
+  if (checkbox.checked)
+  {
+    checkbox.checked = false;
+    document.getElementById('parametres').removeAttribute('data-online-backup');
+    await dataStorage.setItem('online-backup', 0);
+  }
+  else
+  {
+    checkbox.checked = true;
+    document.getElementById('parametres').dataset.onlineBackup = '1';
+
+    // Changement de paramètre détecté ! L'application passe du mode offline au mode online.
+    // Il est possible que certaines données locales n'aient pas été envoyées dans la base de données.
+    // Plan de remédiation à ce problème (par une requête SYNC au service worker) :
+    // --- Dans l'appli ---
+    // ✅ Désactiver le switch-online-backup
+    checkbox.disabled = true;
+    // ✅ Afficher une notification de chargement
+    notify('Sauvegarde des données...', '', 'loading', () => {}, 999999999);
+    // ✅ Envoyer une requête sync avec tag COMPARE-BACKUP
+    const reg = await navigator.serviceWorker.ready;
+    console.log('[compare-backup] Activation du backup en ligne demandée au sw');
+    try {
+      // On demande au service worker de mettre à jour l'appli' et on attend sa réponse
+      const chan = new MessageChannel();
+
+      // On contacte le SW
+      navigator.serviceWorker.controller.postMessage({ 'action': 'compare-backup' }, [chan.port2]);
+
+      // On se prépare à recevoir la réponse
+      await new Promise((resolve, reject) => {
+        chan.port1.onmessage = function(event) {
+          if (event.data.error) {
+            console.error(event.data.error);
+            reject('[:(] Erreur de contact du service worker');
+          }
+          else {
+            progressBar.style.setProperty('--progression', 1);
+            resolve('[:)] Backup terminé !');
+          }
+        }
+      });
+    }
+    catch(error) {
+      unNotify();
+      console.error(error);
+      notify('Erreur. Réessayez plus tard.');
+      checkbox.disabled = false;
+      checkbox.checked = false;
+    }
+    // ✅ Attendre la réponse du sw
   }
   return;
 }
@@ -123,7 +186,7 @@ export function wait(time) { return new Promise(resolve => setTimeout(resolve, t
 // Convertit un timestamp en date
 export function version2date(timestamp) {
   const d = new Date(timestamp * 1000);
-  return d.toISOString().replace('T', ' ').replace('.000Z', '');
+  return d.toISOString().replace('T', ' ').replace(/\.[0-9]{3}Z/, '');
 }
 
 
@@ -133,9 +196,9 @@ export async function export2json() {
   const getItems = async store => {
     await store.ready();
     const keys = await store.keys();
-    const items = {};
+    const items = [];
     for (const key of keys) {
-      items[key] = await store.getItem(key);
+      items.push(await store.getItem(key));
     }
     return items;
   }
@@ -144,7 +207,7 @@ export async function export2json() {
   const a = document.createElement('A');
   a.href = dataString;
   await dataStorage.ready();
-  a.download = `remidex-${version2date(await dataStorage.getItem('version-bdd'))}.json`;
+  a.download = `remidex-${version2date(Date.now() / 1000).replace(' ', '_')}.json`;
   a.style = 'position: absolute; width: 0; height: 0;';
   document.body.appendChild(a);
   a.click();
