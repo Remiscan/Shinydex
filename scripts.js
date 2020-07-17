@@ -1,5 +1,5 @@
 import './modules/comp_loadSpinner.js';
-import { Params, changeAutoMaj, callResize, saveDBpassword } from './modules/mod_Params.js';
+import { Params, changeAutoMaj, callResize, saveDBpassword, export2json } from './modules/mod_Params.js';
 import { navigate, sectionActuelle } from './modules/mod_navigate.js';
 import { playEasterEgg } from './modules/mod_easterEgg.js';
 import { appStart, checkUpdate, manualUpdate } from './modules/mod_appLifeCycle.js';
@@ -99,6 +99,9 @@ majButton.addEventListener('touchstart', () => {
   majButton.addEventListener('touchend', () => { clearTimeout(longClic); if (needCheck) checkUpdate(true); });
   majButton.addEventListener('touchcancel', () => clearTimeout(longClic));
 });
+
+// Prépare le bouton d'export des données
+document.querySelector('.bouton-export').addEventListener('click', export2json);
 
 
 

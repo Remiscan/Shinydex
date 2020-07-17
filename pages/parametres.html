@@ -45,9 +45,31 @@
   </span>
 
   <p class="un-parametre">
+    <span class="param-nom">Sauvegarde en ligne</span>
+    <span class="param-description">Si désactivé, vos données seront perdues si vous désinstallez l'application ou nettoyez son stockage.</span>
+    <input type="checkbox" id="switch-db-backup" checked disabled><label for="switch-db-backup" class="switch"></label>
+  </p>
+
+  <p class="un-parametre">
     <span class="param-nom"><label for="mdp-bdd">Mot de passe BDD</label></span>
     <span class="param-description">pour sauvegarder mes chromatiques en ligne.</span>
     <input type="password" id="mdp-bdd" size="10">
+  </p>
+
+  <p class="un-parametre">
+    <span class="param-nom"><label for="mdp-bdd">Exporter mes données</label></span>
+    <span class="param-description">dans un fichier remidex.json.</span>
+    <span class="param">
+      <button class="bouton-export ghost">Exporter</button>
+    </span>
+  </p>
+
+  <p class="un-parametre">
+    <span class="param-nom"><label for="mdp-bdd">Importer mes données</label></span>
+    <span class="param-description">depuis un fichier .json.</span>
+    <span class="param">
+      <button class="bouton-import ghost" disabled>Importer</button>
+    </span>
   </p>
 
   <div class="spacer"></div>

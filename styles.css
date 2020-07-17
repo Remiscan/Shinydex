@@ -395,6 +395,12 @@ button.ghost {
   box-shadow: none;
 }
 
+button:disabled {
+  opacity: .5;
+  filter: grayscale(1);
+  cursor: not-allowed;
+}
+
 button.danger.ghost {
   border-color: var(--danger-color);
 }
@@ -1799,6 +1805,10 @@ textarea {
   grid-column: 2 / 3;
 }
 
+.param>button {
+  margin: 0;
+}
+
 .bouton-recherche-maj {
   margin-top: 0;
 }
@@ -2007,6 +2017,14 @@ input:checked + label.checkbox::after {
 
 .un-parametre.theme label.radio {
   margin: 0;
+}
+
+input:disabled + label.radio,
+input:disabled + label.checkbox,
+input:disabled + label.switch {
+  opacity: .5;
+  filter: grayscale(1);
+  cursor: not-allowed;
 }
 
 

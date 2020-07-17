@@ -125,3 +125,28 @@ export function version2date(timestamp) {
   const d = new Date(timestamp * 1000);
   return d.toISOString().replace('T', ' ').replace('.000Z', '');
 }
+
+
+//////////////////////////////
+// Exporte les données en JSON
+export async function export2json() {
+  const getItems = async store => {
+    await store.ready();
+    const keys = await store.keys();
+    const items = {};
+    for (const key of keys) {
+      items[key] = await store.getItem(key);
+    }
+    return items;
+  }
+  const data = { shiny: await getItems(shinyStorage), hunts: await getItems(huntStorage) };
+  const dataString = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(data))}`;
+  const a = document.createElement('A');
+  a.href = dataString;
+  await dataStorage.ready();
+  a.download = `remidex-${version2date(await dataStorage.getItem('version-bdd'))}.json`;
+  a.style = 'position: absolute; width: 0; height: 0;';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
