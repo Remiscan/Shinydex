@@ -1763,6 +1763,11 @@ textarea {
   grid-column: 1 / 2;
 }
 
+.param-nom,
+.param-nom>label {
+  color: var(--text-color-soft);
+}
+
 .bouton-recherche-maj {
   margin-top: 0;
 }
