@@ -10,8 +10,8 @@ html.light {
   --nav-bubble-color: rgb(179, 186, 224);
   --text-color: rgb(33, 33, 33);
   --text-color-soft: rgb(0, 0, 0);
-  --card-bg-color: rgb(255, 255, 255);
-  --card-sprite-bg-color: rgba(0, 0, 0, .06);
+  --card-bg-color: rgb(245, 245, 245);
+  --card-sprite-bg-color: white;
   --card-infos-text-color: rgba(0, 0, 0, 0.54);
   --notif-bg-color: rgb(245, 245, 245);
   --sprite-viewer-bg-color: rgb(255, 255, 255);
@@ -25,10 +25,11 @@ html.light {
   --checkbox-checked-bg-color: var(--fab-color);
   --checkbox-check-color: white;
   --input-bg-color: white;
+  --progress-bar-color: var(--fab-color);
   --button-color: var(--fab-color);
   --button-ghost-color: var(--button-color);
   --loading-bar-color: hsl(0, 0%, 37%);
-  --card-edit-bg-color: hsla(0, 0%, 37%, .7);
+  --card-edit-bg-color: rgba(240, 240, 240, .7);
 }
 html.dark {
   --bg-color: rgb(34, 34, 34);
@@ -53,6 +54,7 @@ html.dark {
   --checkbox-checked-bg-color: var(--nav-text-color-on);
   --checkbox-check-color: var(--nav-bg-color);
   --input-bg-color: hsl(0, 0%, 90%);
+  --progress-bar-color: white;
   --button-color: var(--fab-color);
   --button-ghost-color: var(--nav-text-color-on);
   --loading-bar-color: hsl(0, 0%, 7%);
@@ -522,7 +524,7 @@ body:not([data-section-actuelle=mes-chromatiques]):not([data-section-actuelle=po
 .edit-icon circle {
   --diametre: 50;
   fill: transparent;
-  stroke: white;
+  stroke: var(--progress-bar-color);
   stroke-width: 2;
   --perimetre: calc(3.14 * var(--diametre));
   stroke-dasharray: var(--perimetre);
@@ -2165,7 +2167,7 @@ input:disabled + label.switch {
   left: 0;
   width: 100%;
   height: 3px;
-  background-color: var(--text-color);
+  background-color: var(--progress-bar-color);
   transform-origin: center left;
   --progression: 0;
   transform: scaleX(0);
