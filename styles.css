@@ -1185,7 +1185,7 @@ body[data-viewer-open=true] #sprite-viewer {
   top: 50%;
   left: calc(50% - 10px);
   transform: translate(-50%, -50%);
-  fill: white;
+  fill: var(--sprite-viewer-bg-color);
 }
 
 #sprite-viewer.shiny [for=switch-shy-reg]>.shinystars {
