@@ -2009,7 +2009,6 @@ input:checked + label.checkbox::after {
 
 .sources-titre {
   font-weight: 500;
-  opacity: .7;
   position: relative;
   left: -15px;
   display: block;
