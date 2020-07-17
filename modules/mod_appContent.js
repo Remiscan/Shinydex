@@ -91,7 +91,6 @@ export async function appDisplay(start = true)
   const listeImages = [`./ext/pokesprite.png`, `./sprites--${version}.php`];
   document.documentElement.style.setProperty('--link-sprites', `url('./sprites--${version}.php')`);
 
-  const promiseImages = loadAllImages(listeImages);
   async function promiseInit() {
     const savedFiltres = JSON.parse(await dataStorage.getItem('filtres'));
     if (savedFiltres != null && savedFiltres.length > 0)
@@ -138,7 +137,7 @@ export async function appDisplay(start = true)
   };
 
   try {
-    if (start) await Promise.all([promiseImages, promiseInit()]);
+    if (start) await Promise.all([loadAllImages(listeImages), promiseInit()]);
     else await promiseInit();
 
     // Surveille le defer-loader pour charger le reste des shiny quand il apparaît à l'écran
@@ -151,9 +150,6 @@ export async function appDisplay(start = true)
     });
 
     if (!start) return;
-
-    // Try to reduce TTFB for Pokédex sprites
-    loadAllImages(['./sprites-home/small/poke_capture_0670_005_fo_n_00000000_f_n.png']).catch(() => {});
     
     // Efface l'écran de chargement
     const byeLoad = loadScreen.animate([
@@ -166,6 +162,8 @@ export async function appDisplay(start = true)
     });
     byeLoad.onfinish = () => {
       loadScreen.remove();
+      // Try to reduce TTFB for Pokédex sprites
+      loadAllImages(['./sprites-home/small/poke_capture_0670_005_fo_n_00000000_f_n.png']).catch(() => {});
     }
 
     return '[:)] Bienvenue sur le Rémidex !';
