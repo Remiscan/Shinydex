@@ -22,6 +22,7 @@ export async function appPopulate(start = true)
 
     let data = await shinyStorage.keys();
     data = await Promise.all(data.map(key => shinyStorage.getItem(key)));
+    data = data.filter(shiny => !shiny.deleted);
     data = data.sort((a, b) => b.id - a.id);
 
     if (data.length == 0) {

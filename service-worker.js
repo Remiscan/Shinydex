@@ -74,6 +74,7 @@ self.addEventListener('fetch', function(event)
         let keys = await shinyStorage.keys();
         keys = keys.sort((a, b) => b - a);
         let data = await Promise.all(keys.map(key => shinyStorage.getItem(key)));
+        data = data.filter(shiny => !shiny.deleted);
         data = data.map(s => [s['numero_national'], s['forme'], s['id']]);
 
         const formData = new FormData();
@@ -173,7 +174,8 @@ self.addEventListener('message', function(event) {
 
         // On envoie les données locales au serveur
         const formData = new FormData();
-        formData.append('local-data', JSON.stringify(localData));
+        formData.append('local-data', JSON.stringify(localData.filter(shiny => !shiny.deleted)));
+        formData.append('deleted-local-data', JSON.stringify(localData.filter(shiny => shiny.deleted)));
         formData.append('mdp', await dataStorage.getItem('mdp-bdd'));
 
         const response = await fetch('/remidex/mod_backupLocalToDb.php?date=' + Date.now(), {
@@ -196,6 +198,10 @@ self.addEventListener('message', function(event) {
         const toSet = [...data['inserts-local'], ...data['updates-local']];
         await Promise.all(
           toSet.map(shiny => shinyStorage.setItem(String(shiny.id), shiny))
+        );
+        const toDelete = [...data['deletions-local']];
+        await Promise.all(
+          toDelete.map(id => shinyStorage.removeItem(String(id)))
         );
         return true;
       })

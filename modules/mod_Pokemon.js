@@ -141,6 +141,7 @@ class Shiny {
     this.random = shiny.aupif;
     this.huntid = shiny.huntid;
     this.lastupdate = shiny.lastupdate;
+    this.deleted = Boolean(shiny.deleted);
   }
 
   static async build(shiny) {
@@ -346,6 +347,7 @@ class Shiny {
     shiny['aupif'] = String(this.random);
     shiny['huntid'] = String(this.huntid);
     shiny['last_update'] = String(this.lastupdate);
+    if (this.deleted) shiny['deleted'] = String(true);
     return shiny;
   }
 }

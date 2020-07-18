@@ -224,7 +224,7 @@ window.addEventListener('populate', async event => {
   notify('Mise à jour des données...', '', 'loading', () => {}, 999999999);
   await appPopulate(false);
   await appDisplay(false);
-  if (event.detail.version) await loadAllImages([`./sprites--data-${event.detail.version}.php`]);
+  if ('version' in event.detail) await loadAllImages([`./sprites--data-${event.detail.version}.php`]);
   await wait(1000);
   unNotify();
 })

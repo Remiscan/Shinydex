@@ -456,7 +456,7 @@ export class Hunt {
   async submitHunt(edit = false)
   {
     const card = document.getElementById('hunt-' + this.id);
-    this.lastupdate = Math.floor(Date.now() / 1000);
+    this.lastupdate = Date.now();
     this.huntid = this.id;
 
     const onlineBackup = await dataStorage.getItem('online-backup');
@@ -500,7 +500,7 @@ export class Hunt {
   async deleteHuntFromDB()
   {
     const card = document.getElementById('hunt-' + this.id);
-    this.lastupdate = Math.floor(Date.now() / 1000);
+    this.lastupdate = Date.now() / 1000;
 
     const onlineBackup = await dataStorage.getItem('online-backup');
     if (onlineBackup) {
@@ -524,10 +524,18 @@ export class Hunt {
     }
 
     else {
-      await shinyStorage.removeItem(String(this.id));
-      await this.destroyHunt();
-      await dataStorage.setItem('version-bdd', this.lastupdate);
-      window.dispatchEvent(new CustomEvent('populate', { detail: { version: this.lastupdate } }));
+      try {
+        //await shinyStorage.removeItem(String(this.id));
+        const shiny = await Shiny.build(await shinyStorage.getItem(String(this.id)));
+        shiny.deleted = true;
+        await shinyStorage.setItem(String(this.id), shiny.format());
+        await this.destroyHunt();
+        await dataStorage.setItem('version-bdd', this.lastupdate);
+        window.dispatchEvent(new CustomEvent('populate', { detail: { version: this.lastupdate } }));
+      }
+      catch(error) {
+        console.error(error);
+      }
     }
   }
 }
