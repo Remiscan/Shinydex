@@ -62,8 +62,44 @@ self.addEventListener('activate', function(event)
 self.addEventListener('fetch', function(event)
 {
   //console.log('[fetch] Le service worker récupère l\'élément ' + event.request.url);
+  // Si l'élément est sprites.php et que online-backup = 0
+  if (event.request.url.match(/(.+)sprites--data-(.+)/))
+  {
+    event.respondWith(
+      shinyStorage.ready()
+      .then(async () => {
+        const matching = await caches.match(event.request);
+        if (matching) return matching;
+
+        let keys = await shinyStorage.keys();
+        keys = keys.sort((a, b) => b - a);
+        let data = await Promise.all(keys.map(key => shinyStorage.getItem(key)));
+        data = data.map(s => [s['numero_national'], s['forme'], s['id']]);
+
+        const formData = new FormData();
+        formData.append('data', JSON.stringify(data));
+        const dataSprite = new Request(`./sprites--data.php`, { method: 'POST', cache: 'reload', body: formData });
+        
+        const sprite = await fetch(dataSprite);
+        if (!sprite.ok)
+          throw Error(`[${action}] Le fichier n\'a pas pu être récupéré... (${sprite.url})`);
+
+        const version = await dataStorage.getItem('version');
+        const newCACHE = PRE_CACHE + '-' + version;
+        const cache = await caches.open(newCACHE);
+        const fichiersEnCache = await cache.keys();
+        await Promise.all(fichiersEnCache.map(fichier => {
+          if (fichier.url.match(/(.+)sprites--data-(.+).php$/)) return cache.delete(fichier);
+          else return;
+        }));
+        await cache.put(event.request, sprite.clone());
+        return sprite;
+      })
+      .catch(error => console.error(error))
+    )
+  }
   // Si l'élément est un sprite (non mis en cache par le sw), on le récupère sur le réseau
-  if (event.request.url.match(/(.+)\/poke_(capture|icon)_(.+)/))
+  else if (event.request.url.match(/(.+)\/poke_(capture|icon)_(.+)/))
   {
     event.respondWith(
       fetch(event.request)
@@ -165,11 +201,11 @@ self.addEventListener('message', function(event) {
       })
       .catch(error => {
         console.error(error);
-        return false;
+        return error;
       })
       .then(result => {
         return self.clients.matchAll()
-        .then(all => all.map(client => client.postMessage({ successfulBackupComparison: (result != false) })));
+        .then(all => all.map(client => client.postMessage({ successfulBackupComparison: (result === true), error: result })));
       })
     );
   }

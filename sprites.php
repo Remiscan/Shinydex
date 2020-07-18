@@ -1,33 +1,28 @@
 <?php
-require_once('parametres.php');
+require_once 'parametres.php';
+require_once './class_BDD.php';
+require_once './class_Pokemon.php';
 
-
-//////////////////////////////////////////////////////////////////////////////////////////
-// Chargement automatique de classes PHP, chaque classe est dans son fichier class_nom.php
-// et sera appelée automatiquement quand on utilisera la classe pour la première fois.
-function charge_classe($className)
-{
-  $classPath = 'class_'.$className.'.php';
-  if (file_exists($classPath))
-  {
-    require_once $classPath;
-    return true;
-  }
-  return false;
-}
-// Indique que la fonction précédente est une fonction d'autoload
-spl_autoload_register('charge_classe');
-
-
-/////////////////////////////////////////////////////////////////////
-// Je récupère les infos sur mes chromatiques dans la base de données
-$link = new BDD();
+if (isset($_POST['data']) && $_POST['data'] != '') $data = $_POST['data'];
+else $data = false;
 
 $allsprites = array();
 
-$recup_shinies = $link->prepare('SELECT * FROM mes_shinies ORDER BY id DESC');
-  $recup_shinies->execute();
-  $data_shinies = $recup_shinies->fetchAll(PDO::FETCH_ASSOC);
+if ($data === false) {
+  // Je récupère les infos sur mes chromatiques dans la base de données
+  $link = new BDD();
+  $recup_shinies = $link->prepare('SELECT * FROM mes_shinies ORDER BY id DESC');
+    $recup_shinies->execute();
+    $data_shinies = $recup_shinies->fetchAll(PDO::FETCH_ASSOC);
+}
+
+else {
+  $data_shinies = [];
+  $data = json_decode($data);
+  foreach($data as $d) {
+    $data_shinies[] = ['numero_national' => $d[0], 'forme' => $d[1]];
+  }
+}
 
 /////////////////////////////////////////////////////////////
 // Je récupère les infos sur tous les Pokémon et leurs formes

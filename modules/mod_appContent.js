@@ -22,6 +22,7 @@ export async function appPopulate(start = true)
 
     let data = await shinyStorage.keys();
     data = await Promise.all(data.map(key => shinyStorage.getItem(key)));
+    data = data.sort((a, b) => b.id - a.id);
 
     if (data.length == 0) {
       document.querySelector('#mes-chromatiques').classList.add('vide');
@@ -29,8 +30,8 @@ export async function appPopulate(start = true)
       document.querySelector('#mes-chromatiques .message-vide>span').innerHTML = 'Aucun Pokémon chromatique dans la base de données. Pour en ajouter, complétez une Chasse !';
     }
 
-    for (const pokemon of data) {
-      const card = await createCard(pokemon);
+    for (const [ordre, pokemon] of data.entries()) {
+      const card = await createCard(pokemon, ordre);
       card.classList.add('defer');
 
       // Active le long clic pour éditer
@@ -91,9 +92,11 @@ export async function appPopulate(start = true)
 export async function appDisplay(start = true)
 {
   const loadScreen = (start == true) ? document.getElementById('load-screen') : null;
-  const version = await dataStorage.getItem('version');
-  const listeImages = [`./ext/pokesprite.png`, `./sprites--${version}.php`];
-  document.documentElement.style.setProperty('--link-sprites', `url('./sprites--${version}.php')`);
+  const version = await dataStorage.getItem('version-bdd');
+  const onlineBackup = await dataStorage.getItem('online-backup');
+  const spritePrefix = onlineBackup ? '' : 'data-';
+  const listeImages = [`./ext/pokesprite.png`, `./sprites--${spritePrefix}${version}.php`];
+  document.documentElement.style.setProperty('--link-sprites', `url('./sprites--${spritePrefix}${version}.php')`);
 
   async function promiseInit() {
     const savedFiltres = JSON.parse(await dataStorage.getItem('filtres'));

@@ -1,6 +1,6 @@
 import { Pokemon, Shiny } from './mod_Pokemon.js';
 import { notify } from './mod_notification.js';
-import { wait, Params } from './mod_Params.js';
+import { wait, Params, loadAllImages } from './mod_Params.js';
 import { navigate } from './mod_navigate.js';
 import { DexDatalist } from './mod_DexDatalist.js';
 import { deferCards } from './mod_filtres.js';
@@ -88,7 +88,9 @@ export class Hunt {
     Array.from(card.querySelectorAll('[name^="hunt-{id}"]')).forEach(el => el.name = el.name.replace('{id}', this.id));
 
     // 825379200 = timestamp du jour de la sortie de Pokémon au Japon
-    const edit = (this.id < 825379200) ? true : false;
+    const k = await shinyStorage.getItem(String(this.id));
+    const edit = (k != null);
+    //const edit = (this.id < 825379200) ? true : false;
     if (edit) card.classList.add('edit');
 
     // Active le bouton "compteur++";
@@ -454,7 +456,7 @@ export class Hunt {
   async submitHunt(edit = false)
   {
     const card = document.getElementById('hunt-' + this.id);
-    this.lastupdate = Date.now();
+    this.lastupdate = Math.floor(Date.now() / 1000);
     this.huntid = this.id;
 
     const onlineBackup = await dataStorage.getItem('online-backup');
@@ -482,9 +484,10 @@ export class Hunt {
     else {
       try {
         const shiny = await Shiny.build(this);
-        await shinyStorage.setItem(String(this.id), shiny);
-        await huntStorage.removeItem(String(this.id));
-        card.remove();
+        await shinyStorage.setItem(String(this.id), shiny.format());
+        await this.destroyHunt();
+        await dataStorage.setItem('version-bdd', this.lastupdate);
+        window.dispatchEvent(new CustomEvent('populate', { detail: { version: this.lastupdate } }));
       }
       catch(error) {
         console.error(error);
@@ -497,6 +500,7 @@ export class Hunt {
   async deleteHuntFromDB()
   {
     const card = document.getElementById('hunt-' + this.id);
+    this.lastupdate = Math.floor(Date.now() / 1000);
 
     const onlineBackup = await dataStorage.getItem('online-backup');
     if (onlineBackup) {
@@ -521,7 +525,9 @@ export class Hunt {
 
     else {
       await shinyStorage.removeItem(String(this.id));
-      card.remove();
+      await this.destroyHunt();
+      await dataStorage.setItem('version-bdd', this.lastupdate);
+      window.dispatchEvent(new CustomEvent('populate', { detail: { version: this.lastupdate } }));
     }
   }
 }

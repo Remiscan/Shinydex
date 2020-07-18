@@ -144,10 +144,10 @@ class Shiny {
   }
 
   static async build(shiny) {
-    const dexid = shiny['numero_national'];
+    const dexid = shiny['numero_national'] || shiny.dexid;
     let pokemon;
     try {
-      pokemon = await pokemonData.getItem(dexid);
+      pokemon = await pokemonData.getItem(String(dexid));
       if (pokemon == null) throw 'Aucun Pokémon ne correspond à ce Shiny';
       return new Shiny(shiny, pokemon);
     } catch(error) {
@@ -324,6 +324,29 @@ class Shiny {
     rate = useRolls ? Math.round(baseRate / rolls) : rate;
 
     return rate;
+  }
+
+  // Renvoie l'objet shiny au bon format pour le stocker dans la BDD
+  format() {
+    const shiny = {};
+    shiny['id'] = String(this.huntid);
+    shiny['numero_national'] = String(this.dexid);
+    shiny['forme'] = String(this.forme.dbid);
+    shiny['surnom'] = String(this.surnom);
+    shiny['methode'] = String(this.methode);
+    shiny['compteur'] = String(this.compteur);
+    shiny['date'] = String(this.date);
+    shiny['jeu'] = String(this.jeu);
+    shiny['ball'] = String(this.ball);
+    shiny['description'] = String(this.description);
+    shiny['origin'] = String(this.checkmark);
+    shiny['monjeu'] = String(this.monjeu);
+    shiny['charm'] = String(this.charm);
+    shiny['hacked'] = String(this.hacked);
+    shiny['aupif'] = String(this.random);
+    shiny['huntid'] = String(this.huntid);
+    shiny['last_update'] = String(this.lastupdate);
+    return shiny;
   }
 }
 

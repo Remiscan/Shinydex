@@ -1,8 +1,8 @@
 import './modules/comp_loadSpinner.js';
-import { Params, changeAutoMaj, callResize, saveDBpassword, export2json, changeOnlineBackup, wait } from './modules/mod_Params.js';
+import { Params, changeAutoMaj, callResize, saveDBpassword, export2json, wait, loadAllImages } from './modules/mod_Params.js';
 import { navigate, sectionActuelle } from './modules/mod_navigate.js';
 import { playEasterEgg } from './modules/mod_easterEgg.js';
-import { appStart, checkUpdate, manualUpdate } from './modules/mod_appLifeCycle.js';
+import { appStart, checkUpdate, manualUpdate, setOnlineBackup } from './modules/mod_appLifeCycle.js';
 import { appPopulate, appDisplay, json2import } from './modules/mod_appContent.js';
 import { openFiltres } from './modules/mod_filtres.js';
 import { Hunt } from './modules/mod_Hunt.js';
@@ -76,7 +76,7 @@ Array.from(document.querySelectorAll('input[name=theme]')).forEach(input => {
   input.onclick = async event => { return await setTheme(input.value); };
 });
 document.querySelector('[for=switch-auto-maj]').onclick = async event => { event.preventDefault(); return await changeAutoMaj(); };
-document.querySelector('[for=switch-online-backup]').onclick = async event => { event.preventDefault(); return await changeOnlineBackup(); };
+document.querySelector('[for=switch-online-backup]').onclick = async event => { event.preventDefault(); return await setOnlineBackup(); };
 
 document.getElementById('mdp-bdd').addEventListener('input', async () => {
   return await saveDBpassword();
@@ -147,7 +147,6 @@ boutonSupprimer.addEventListener('click', async event => {
 ///////////////////////////////////////
 // COMMUNICATION AVEC LE SERVICE WORKER
 navigator.serviceWorker.addEventListener('message', async event => {
-
   // --- Réponse à HUNT-ADD-id, HUNT-EDIT-id ou HUNT-REMOVE-id ---
   if ('successfulDBUpdate' in event.data) {
     const huntid = event.data.huntid;
@@ -178,15 +177,7 @@ navigator.serviceWorker.addEventListener('message', async event => {
       const keys = await huntStorage.keys();
       if (keys.length == 0) document.querySelector('#chasses-en-cours').classList.add('vide');
       // ✅ animation de chargement
-      notify('Mise à jour des données...', '', 'loading', () => {}, 999999999);
-      // ✅ re-lancer appPopulate(start = false)
-      await appPopulate(false);
-      // ✅ re-lancer appDisplay(start = false)
-      await appDisplay(false);
-      // ✅ forcer l'affichage du nouveau sprite--versionBDD.php (appDisplay s'en charge)
-      // ✅ fin de l'animation de chargement
-      await wait(1000);
-      unNotify();
+      window.dispatchEvent(new Event('populate'));
     }
     else {
       // On reçoit la confirmation de l'échec de l'ajout à la DB
@@ -216,12 +207,27 @@ navigator.serviceWorker.addEventListener('message', async event => {
     else {
       // Au moins une chasse n'a pas pu être ajoutée / éditée
       unNotify();
-      notify('Erreur. Réessayez plus tard.');
+      if (event.data.error !== true) notify(event.data.error);
+      else notify('Erreur. Réessayez plus tard.');
+      document.getElementById('parametres').removeAttribute('data-online-backup');
       checkbox.checked = false;
       checkbox.disabled = false;
     }
   }
 });
+
+
+
+//////////////////////////////////////
+// ÉCOUTE DE L'EVENT CUSTOM 'POPULATE'
+window.addEventListener('populate', async event => {
+  notify('Mise à jour des données...', '', 'loading', () => {}, 999999999);
+  await appPopulate(false);
+  await appDisplay(false);
+  if (event.detail.version) await loadAllImages([`./sprites--data-${event.detail.version}.php`]);
+  await wait(1000);
+  unNotify();
+})
 
 
 

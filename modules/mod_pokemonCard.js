@@ -25,7 +25,7 @@ export function toggleNotes(idCard)
 
 //////////////////////////////
 // Créer la carte d'un Pokémon
-export async function createCard(pokemon)
+export async function createCard(pokemon, ordre)
 {
   let shiny;
   try {
@@ -36,8 +36,6 @@ export async function createCard(pokemon)
   }
 
   const template = document.getElementById('template-pokemon-card');
-
-  const ordre = pokemon['sprite-position'];
 
   const imagePosition = ordre * Params.spriteSize;
   const conditionMien = shiny.mine;

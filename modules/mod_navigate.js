@@ -16,8 +16,10 @@ export async function navigate(sectionCible, position = 0, historique = true)
 
   const listeImages = ['./ext/pokesprite.png'];
   if (sectionCible == 'mes-chromatiques') {
-    const versionDB = await dataStorage.getItem('version');
-    listeImages.push(`./sprites--${versionDB}.php`, './images/iconsheet.png');
+    const versionDB = await dataStorage.getItem('version-bdd');
+    const onlineBackup = await dataStorage.getItem('online-backup');
+    const spritePrefix = onlineBackup ? '' : 'data-';
+    listeImages.push(`./sprites--${spritePrefix}${versionDB}.php`, './images/iconsheet.png');
   }
 
   await Promise.all([loadAllImages(listeImages), loadVideo(sectionCible)]);
