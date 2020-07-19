@@ -63,38 +63,13 @@ self.addEventListener('fetch', function(event)
 {
   //console.log('[fetch] Le service worker récupère l\'élément ' + event.request.url);
   // Si l'élément est sprites.php et que online-backup = 0
-  if (event.request.url.match(/(.+)sprites--data-(.+)/))
+  if (event.request.url.match(/(.+)sprites--(.+).php$/))
   {
+    const version = event.request.url.match(/(?:.+)sprites--(.+).php$/)[1];
     event.respondWith(
-      shinyStorage.ready()
-      .then(async () => {
-        const matching = await caches.match(event.request);
-        if (matching) return matching;
-
-        let keys = await shinyStorage.keys();
-        keys = keys.sort((a, b) => b - a);
-        let data = await Promise.all(keys.map(key => shinyStorage.getItem(key)));
-        data = data.filter(shiny => !shiny.deleted);
-        data = data.map(s => [s['numero_national'], s['forme'], s['id']]);
-
-        const formData = new FormData();
-        formData.append('data', JSON.stringify(data));
-        const dataSprite = new Request(`./sprites--data.php`, { method: 'POST', cache: 'reload', body: formData });
-        
-        const sprite = await fetch(dataSprite);
-        if (!sprite.ok)
-          throw Error(`[${action}] Le fichier n\'a pas pu être récupéré... (${sprite.url})`);
-
-        const version = await dataStorage.getItem('version');
-        const newCACHE = PRE_CACHE + '-' + version;
-        const cache = await caches.open(newCACHE);
-        const fichiersEnCache = await cache.keys();
-        await Promise.all(fichiersEnCache.map(fichier => {
-          if (fichier.url.match(/(.+)sprites--data-(.+).php$/)) return cache.delete(fichier);
-          else return;
-        }));
-        await cache.put(event.request, sprite.clone());
-        return sprite;
+      caches.match(event.request)
+      .then(matching => {
+        return matching || updateSprite(version).then(() => fetch(event.request));
       })
       .catch(error => console.error(error))
     )
@@ -123,10 +98,11 @@ self.addEventListener('fetch', function(event)
 
 // MESSAGE
 self.addEventListener('message', function(event) {
+  if ('action' in event.data) console.log(`[${event.data.action}] Demande reçue...`);
+
   // FULL UPDATE
   if (event.data.action == 'update')
   {
-    console.log('[update] Mise à jour de l\'application demandée...');
     const source = event.source;
 
     event.waitUntil(
@@ -142,7 +118,6 @@ self.addEventListener('message', function(event) {
   // UPDATE DB
   else if (event.data.action == 'update-db')
   {
-    console.log('[update-db] Mise à jour de la base de données demandée...');
     const source = event.source;
 
     event.waitUntil(
@@ -162,57 +137,20 @@ self.addEventListener('message', function(event) {
   // COMPARE-BACKUP
   else if (event.data.action == 'compare-backup')
   {
-    console.log('[compare-backup] Demande reçue...');
+    event.waitUntil(
+      compareBackup()
+    );
+  }
+
+  // UPDATE-SPRITE
+  else if (event.data.action == 'update-sprite') {
+    const version = ('version' in event.data) ? event.data.version : null;
+    const source = event.source;
 
     event.waitUntil(
-      Promise.resolve()
-      .then(async () => {
-        // On récupère les données locales
-        await shinyStorage.ready();
-        const keys = await shinyStorage.keys();
-        const localData = await Promise.all(keys.map(async key => await shinyStorage.getItem(key)));
-
-        // On envoie les données locales au serveur
-        const formData = new FormData();
-        formData.append('local-data', JSON.stringify(localData.filter(shiny => !shiny.deleted)));
-        formData.append('deleted-local-data', JSON.stringify(localData.filter(shiny => shiny.deleted)));
-        formData.append('mdp', await dataStorage.getItem('mdp-bdd'));
-
-        const response = await fetch('/remidex/mod_backupLocalToDb.php?date=' + Date.now(), {
-          method: 'POST',
-          body: formData
-        });
-        if (response.status != 200)
-          throw '[:(] Erreur ' + response.status + ' lors de la requête';
-        const data = await response.json();
-    
-        if (data['mdp'] == false)
-          throw '[:(] Mauvais mot de passe...';
-        
-        // Vérifier si le serveur a réussi sa mission
-        console.log('Réponse reçue du serveur :', data);
-
-        if (data['error'] == true) throw data['response'];
-
-        // Mettons à jour les données locales obsolètes
-        const toSet = [...data['inserts-local'], ...data['updates-local']];
-        await Promise.all(
-          toSet.map(shiny => shinyStorage.setItem(String(shiny.id), shiny))
-        );
-        const toDelete = [...data['deletions-local']];
-        await Promise.all(
-          toDelete.map(id => shinyStorage.removeItem(String(id)))
-        );
-        return true;
-      })
-      .catch(error => {
-        console.error(error);
-        return error;
-      })
-      .then(result => {
-        return self.clients.matchAll()
-        .then(all => all.map(client => client.postMessage({ successfulBackupComparison: (result === true), error: result })));
-      })
+      updateSprite(version)
+      .then(() => source.postMessage({ successfulSpriteUpdate: true, version }))
+      .catch(error => source.postMessage({ successfulSpriteUpdate: false, error }))
     );
   }
 });
@@ -313,27 +251,6 @@ async function installData([data, files], action = 'install', event = null) {
   const totalFichiers = files.fichiers.length;
 
   try {
-    // Mise à jour des fichiers
-    console.log(`[${action}] Mise en cache des fichiers :`, files.fichiers);
-    const cache = await caches.open(newCACHE);
-    await Promise.all(
-      files.fichiers.map(async url => {
-        let _url = url;
-        if (url == './sprites.php')
-          _url = `./sprites--${versionMax}.php`;
-        const request = new Request(_url, {cache: 'reload'});
-        const response = await fetch(request);
-        if (!response.ok)
-          throw Error(`[${action}] Le fichier n\'a pas pu être récupéré... (${request.url})`);
-        if (event != null) {
-          const source = event.source;
-          source.postMessage({ loaded: true, total: totalFichiers, url: request.url });
-        }
-        return cache.put(request, response);
-      })
-    );
-    console.log(`[${action}] Mise en cache des fichiers terminée !`);
-
     // Mise à jour des données
     const onlineBackup = await dataStorage.getItem('online-backup');
     console.log(`[${action}] Installation des données...`);
@@ -344,14 +261,41 @@ async function installData([data, files], action = 'install', event = null) {
     await dataStorage.setItem('pokemon-names', data['pokemon-names']);
     await dataStorage.setItem('pokemon-names-fr', data['pokemon-names-fr']);
     if (onlineBackup) {
+      await shinyStorage.clear();
       await Promise.all(
-        data['data-shinies'].map(shiny => shinyStorage.setItem(String(shiny.id), shiny))
+        data['data-shinies'].map(shiny => shinyStorage.setItem(String(shiny.huntid), shiny))
       );
     }
     await Promise.all(
       data['pokemon-data'].map(pkmn => pokemonData.setItem(String(pkmn.dexid), pkmn))
     );
     console.log(`[${action}] Installation des données terminée !`);
+
+    // Mise à jour des fichiers
+    console.log(`[${action}] Mise en cache des fichiers :`, files.fichiers);
+    const cache = await caches.open(newCACHE);
+    await Promise.all(
+      files.fichiers.map(async url => {
+        if (url == './sprites.php') {
+          if (onlineBackup) await updateSprite(data['version-bdd']);
+          else await updateSprite();
+        }
+        else {
+          const request = new Request(url, {cache: 'reload'});
+          const response = await fetch(request);
+          if (!response.ok)
+            throw Error(`[${action}] Le fichier n\'a pas pu être récupéré... (${request.url})`);
+          await cache.put(request, response);
+        }
+        
+        if (event != null) {
+          const source = event.source;
+          source.postMessage({ loaded: true, total: totalFichiers, url: url });
+        }
+        return;
+      })
+    );
+    console.log(`[${action}] Mise en cache des fichiers terminée !`);
   }
 
   // Si le nouveau cache n'a pas été complété, ou que les données n'ont pas pu être récupérées,
@@ -412,7 +356,7 @@ async function updateShinyData()
     await dataStorage.setItem('version', versionMax);
     await shinyStorage.clear();
     await Promise.all(
-      data['data-shinies'].map(shiny => shinyStorage.setItem(String(shiny.id), shiny))
+      data['data-shinies'].map(shiny => shinyStorage.setItem(String(shiny.huntid), shiny))
     );
 
     console.log('[update-db] Données installées !');
@@ -469,6 +413,134 @@ async function deleteOldCaches(newCache, action)
   }
   catch (error) {
     return console.log(error);
+  }
+}
+
+
+// Compare et synchronise les bases de données locale et en ligne
+async function compareBackup() {
+  try {
+    // On récupère les données locales
+    await shinyStorage.ready();
+    const keys = await shinyStorage.keys();
+    const localData = await Promise.all(keys.map(async key => await shinyStorage.getItem(key)));
+
+    // On envoie les données locales au serveur
+    const formData = new FormData();
+    formData.append('local-data', JSON.stringify(localData.filter(shiny => !shiny.deleted)));
+    formData.append('deleted-local-data', JSON.stringify(localData.filter(shiny => shiny.deleted)));
+    formData.append('mdp', await dataStorage.getItem('mdp-bdd'));
+
+    const response = await fetch('/remidex/mod_backupLocalToDb.php?date=' + Date.now(), {
+      method: 'POST',
+      body: formData
+    });
+    if (response.status != 200)
+      throw '[:(] Erreur ' + response.status + ' lors de la requête';
+    const data = await response.json();
+
+    if (data['mdp'] == false)
+      throw '[:(] Mauvais mot de passe...';
+    
+    // Vérifier si le serveur a réussi sa mission
+    console.log('Réponse reçue du serveur :', data);
+
+    if (data['error'] == true) throw data['response'];
+
+    // Vérifions si le sprite doit être mis à jour
+    let obsoleteLocal = false;
+    if (data['inserts-local'].length > 0) obsoleteLocal = true;
+    else {
+      for (const pkmn of data['updates-local']) {
+        const shiny = await shinyStorage.getItem(String(pkmn.huntid));
+        const onlineDexix = pkmn['numero_national'];
+        const localDexid = shiny['numero_national'];
+        const onlineFormid = pkmn.forme;
+        const localFormid = shiny.forme;
+        if (onlineDexix != localDexid || onlineFormid != localFormid) {
+          obsoleteLocal = true;
+          break;
+        }
+      }
+    }
+
+    // Mettons à jour les données locales obsolètes
+    const toSet = [...data['inserts-local'], ...data['updates-local']];
+    await Promise.all(
+      toSet.map(shiny => shinyStorage.setItem(String(shiny.huntid), shiny))
+    );
+    const toDelete = [...data['deletions-local']];
+    await Promise.all(
+      toDelete.map(huntid => shinyStorage.removeItem(String(huntid)))
+    );
+
+    // Vérifions si la BDD en ligne est plus récente que la locale
+    const versionBDD = await dataStorage.getItem('version-bdd');
+    const newVersionBDD = data['version-bdd'];
+    if (newVersionBDD > versionBDD) {
+      await dataStorage.setItem('version-bdd', newVersionBDD);
+    }
+
+    // Transmettons les informations à l'application
+    const clients = await self.clients.matchAll();
+    clients.map(client => client.postMessage({ successfulBackupComparison: true, obsolete: obsoleteLocal }));
+    return true;
+  }
+
+  catch(error) {
+    console.error(error);
+    const clients = await self.clients.matchAll();
+    clients.map(client => client.postMessage({ successfulBackupComparison: false, error }));
+    return false;
+  }
+}
+
+
+// Met à jour sprites.php dans le cache à partir des données locales.
+// Pour mettre à jour sprites.php à partir des données en ligne, utiliser updateShinyData()
+async function updateSprite(_version = null) {
+  try {
+    await Promise.all([shinyStorage.ready(), dataStorage.ready()]);
+
+    let version = _version;
+    if (_version == null) version = await dataStorage.getItem('version-bdd');
+    
+    // On récupère et ordonne la liste des sprites à partir des données locales
+    let keys = await shinyStorage.keys();
+    keys = keys.sort((a, b) => b - a);
+    let data = await Promise.all(keys.map(key => shinyStorage.getItem(key)));
+    data = data.filter(shiny => !shiny.deleted);
+    data = data.map(s => [s['numero_national'], s['forme'], s['id']]);
+
+    // On envoie les données des sprites à sprites.php
+    const formData = new FormData();
+    formData.append('data', JSON.stringify(data));
+    let spriteRequest = new Request(`./sprites--${version}.php`, { method: 'POST', cache: 'reload', body: formData });
+    
+    const sprite = await fetch(spriteRequest);
+    if (!sprite.ok)
+      throw Error(`[update-sprite] Le fichier n\'a pas pu être récupéré... (${sprite.url})`);
+
+    // On ouvre le cache
+    const versionCache = await dataStorage.getItem('version');
+    const currentCACHE = PRE_CACHE + '-' + versionCache;
+    const cache = await caches.open(currentCACHE);
+
+    // On supprime les anciennes versions de sprites.php du cache
+    const fichiersEnCache = await cache.keys();
+    await Promise.all(fichiersEnCache.map(fichier => {
+      if (fichier.url.match(/(.+)sprites--(.+).php$/)) return cache.delete(fichier);
+      else return;
+    }));
+
+    // On place le nouveau sprites.php dans le cache
+    spriteRequest = new Request(`./sprites--${version}.php`);
+    return cache.put(spriteRequest, sprite);
+  }
+
+  catch(error) {
+    console.error(error);
+    throw error;
   }
 }
 

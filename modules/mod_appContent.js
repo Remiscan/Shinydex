@@ -10,17 +10,73 @@ let longClic = false;
 
 /////////////////////////////////////////////////////////
 // Peuple l'application à partir des données de indexedDB
-export async function appPopulate(start = true)
+export async function appPopulate(start = true, obsolete = false)
 {
   try {
     // Prépare la liste principale
     let cardsToPopulate = [];
-    if (!start) {
-      // Vide la liste principale
-      Array.from(document.querySelectorAll('#mes-chromatiques .pokemon-card')).forEach(c => c.remove());
+
+    // Récupère la liste des huntid des shiny ayant déjà une carte
+    const currentShiny = Array.from(document.querySelectorAll('#mes-chromatiques .pokemon-card'))
+                              .map(shiny => Number(shiny.id.replace('pokemon-card-', '')));
+
+    // Récupère la liste des huntid des shiny de la base de données
+    let keys = await shinyStorage.keys();
+    keys = await Promise.all(keys.map(key => shinyStorage.getItem(key)));
+    const dbShiny = keys.filter(shiny => !shiny.deleted)
+                        .map(shiny => shiny.huntid);
+
+    // Comparons les deux listes
+    //// Shiny ayant une carte qui ont disparu de la base de données (donc à supprimer)
+    const toDelete = currentShiny.filter(huntid => !dbShiny.includes(huntid));
+    //// Shiny présents dans la base de données n'ayant pas de carte (donc à créer)
+    const toCreate = dbShiny.filter(huntid => !currentShiny.includes(huntid));
+
+    // Liste des huntid de tous les shiny à créer, éditer ou supprimer, ordonnée par huntid
+    const allShiny = Array.from(new Set([...dbShiny, ...currentShiny]))
+                          .sort((a, b) => b - a);
+
+    // Nombre de cartes qui seront affichées à la fin
+    const numberOfCards = allShiny.length - toDelete.length;
+    if (numberOfCards <= 0) {
+      document.querySelector('#mes-chromatiques').classList.add('vide');
+      document.querySelector('#mes-chromatiques .message-vide>.material-icons').innerHTML = 'cloud_off';
+      document.querySelector('#mes-chromatiques .message-vide>span').innerHTML = 'Aucun Pokémon chromatique dans la base de données. Pour en ajouter, complétez une Chasse !';
     }
 
-    let data = await shinyStorage.keys();
+    let ordre = 0;
+    for (const huntid of allShiny) {
+      // Si on doit supprimer cette carte
+      if (toDelete.includes(huntid)) {
+        const card = document.getElementById(`pokemon-card-${huntid}`);
+        card.remove();
+      }
+
+      // Si on doit créer cette carte
+      else if (toCreate.includes(huntid)) {
+        const pokemon = await shinyStorage.getItem(String(huntid));
+        const card = await createCard(pokemon, ordre);
+
+        // Active le long clic pour éditer
+        card.addEventListener('click', () => { if (!longClic) toggleNotes(card.id); longClic = false; });
+        card.addEventListener('mousedown', async event => { if (event.button != 0) return; makeEdit(event, card); }); // souris
+        card.addEventListener('touchstart', async event => { makeEdit(event, card); }, { passive: true }); // toucher
+
+        cardsToPopulate.push(card);
+      }
+
+      // Si on doit éditer cette carte
+      else {
+        const card = document.getElementById(`pokemon-card-${huntid}`);
+        const oldOrdre = card.style.getPropertyValue('--sprite-ordre');
+        const newCard = await createCard(pokemon, (obsolete ? ordre : oldOrdre));
+        card.outerHTML = newCard.outerHTML;
+      }
+
+      ordre++;
+    }
+
+    /*let data = await shinyStorage.keys();
     data = await Promise.all(data.map(key => shinyStorage.getItem(key)));
     data = data.filter(shiny => !shiny.deleted);
     data = data.sort((a, b) => b.id - a.id);
@@ -41,16 +97,17 @@ export async function appPopulate(start = true)
       card.addEventListener('touchstart', async event => { makeEdit(event, card); }, { passive: true }); // toucher
 
       cardsToPopulate.push(card);
-    };
+    };*/
 
     // Peuple les éléments après la préparation (pour optimiser le temps d'exécution)
     //// Liste principale
     let conteneur = document.querySelector('#mes-chromatiques>.section-contenu');
     for (let card of cardsToPopulate) { conteneur.appendChild(card); }
-    //// Chasses en cours
-    await initHunts();
 
     if (!start) return;
+
+    // Peuple les chasses en cours
+    await initHunts();
 
     // Prépare le Pokédex
     let gensToPopulate = [];
@@ -94,10 +151,11 @@ export async function appDisplay(start = true)
 {
   const loadScreen = (start == true) ? document.getElementById('load-screen') : null;
   const version = await dataStorage.getItem('version-bdd');
-  const onlineBackup = await dataStorage.getItem('online-backup');
-  const spritePrefix = onlineBackup ? '' : 'data-';
-  const listeImages = [`./ext/pokesprite.png`, `./sprites--${spritePrefix}${version}.php`];
-  document.documentElement.style.setProperty('--link-sprites', `url('./sprites--${spritePrefix}${version}.php')`);
+  let listeImages = [`./ext/pokesprite.png`];
+  if (start) {
+    listeImages.push(`./sprites--${version}.php`);
+    document.documentElement.style.setProperty('--link-sprites', `url('./sprites--${version}.php')`);
+  }
 
   async function promiseInit() {
     const savedFiltres = JSON.parse(await dataStorage.getItem('filtres'));

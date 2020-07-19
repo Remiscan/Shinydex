@@ -484,10 +484,25 @@ export class Hunt {
     else {
       try {
         const shiny = await Shiny.build(this);
+
+        // Vérifions si sprites.php est obsolète
+        let obsolete = false;
+        test: {
+          if (!edit) {
+            obsolete = true;
+            break test;
+          }
+          const oldData = await shinyStorage.getItem(String(this.id));
+          if (oldData['numero_national'] != shiny.dexid || oldData['forme'] != shiny.forme) {
+            obsolete = true;
+            break test;
+          }
+        }
+
         await shinyStorage.setItem(String(this.id), shiny.format());
         await this.destroyHunt();
         await dataStorage.setItem('version-bdd', this.lastupdate);
-        window.dispatchEvent(new CustomEvent('populate', { detail: { version: this.lastupdate } }));
+        window.dispatchEvent(new CustomEvent('populate', { detail: { version: this.lastupdate, obsolete } }));
       }
       catch(error) {
         console.error(error);
@@ -531,7 +546,7 @@ export class Hunt {
         await shinyStorage.setItem(String(this.id), shiny.format());
         await this.destroyHunt();
         await dataStorage.setItem('version-bdd', this.lastupdate);
-        window.dispatchEvent(new CustomEvent('populate', { detail: { version: this.lastupdate } }));
+        window.dispatchEvent(new CustomEvent('populate', { detail: { version: this.lastupdate, obsolete: false } }));
       }
       catch(error) {
         console.error(error);
@@ -556,6 +571,7 @@ export async function editHunt(id, nav = true) {
   const parseTheseInts = ['id', 'origin', 'monjeu', 'charm', 'hacked', 'aupif'];
   parseTheseInts.forEach(int => pkmn[int] = parseInt(pkmn[int]));
   pkmn.dexid = parseInt(pkmn['numero_national']);
+  pkmn.id = id;
   const hunt = await Hunt.build(pkmn);
   if (nav) navigate('chasses-en-cours');
   return hunt;

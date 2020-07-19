@@ -543,7 +543,8 @@ body:not([data-section-actuelle=mes-chromatiques]):not([data-section-actuelle=po
   height: var(--size);
   margin: auto;
   background-image: var(--link-sprites);
-  background-position: 0 var(--image-position, 0);
+  --image-position: calc(-1 * var(--ordre-sprite) * 112px);
+  background-position: 0 var(--image-position, 112px);
   background-repeat: no-repeat;
   background-size: 112px;
 }
@@ -1872,7 +1873,8 @@ label.switch::before {
 	background-color: var(--checkbox-checked-bg-color);
 	opacity: .5;
   filter: grayscale(1);
-	transition: opacity .2s var(--easing-decelerate);
+  transition: opacity .2s var(--easing-decelerate),
+              filter .2s var(--easing-decelerate);
 }
 
 label.switch::after {

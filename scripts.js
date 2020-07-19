@@ -2,7 +2,7 @@ import './modules/comp_loadSpinner.js';
 import { Params, changeAutoMaj, callResize, saveDBpassword, export2json, wait, loadAllImages } from './modules/mod_Params.js';
 import { navigate, sectionActuelle } from './modules/mod_navigate.js';
 import { playEasterEgg } from './modules/mod_easterEgg.js';
-import { appStart, checkUpdate, manualUpdate, setOnlineBackup } from './modules/mod_appLifeCycle.js';
+import { appStart, checkUpdate, manualUpdate, setOnlineBackup, updateSprite } from './modules/mod_appLifeCycle.js';
 import { appPopulate, appDisplay, json2import } from './modules/mod_appContent.js';
 import { openFiltres } from './modules/mod_filtres.js';
 import { Hunt } from './modules/mod_Hunt.js';
@@ -203,6 +203,10 @@ navigator.serviceWorker.addEventListener('message', async event => {
       unNotify();
       checkbox.disabled = false;
       await dataStorage.setItem('online-backup', 1);
+      if ('obsolete' in event.data) {
+        const versionBDD = await dataStorage.getItem('version-bdd');
+        window.dispatchEvent(new CustomEvent('populate', { detail: { version: versionBDD, obsolete: event.data.obsolete } }));
+      }
     }
     else {
       // Au moins une chasse n'a pas pu être ajoutée / éditée
@@ -221,12 +225,18 @@ navigator.serviceWorker.addEventListener('message', async event => {
 //////////////////////////////////////
 // ÉCOUTE DE L'EVENT CUSTOM 'POPULATE'
 window.addEventListener('populate', async event => {
+  console.log('[populate]', event.detail);
   notify('Mise à jour des données...', '', 'loading', () => {}, 999999999);
   await appPopulate(false);
   await appDisplay(false);
-  if ('version' in event.detail) await loadAllImages([`./sprites--data-${event.detail.version}.php`]);
-  await wait(1000);
+  const isObsolete = ('obsolete' in event.detail && event.detail.obsolete === true);
+  //if (!isObsolete) await wait(1000);
   unNotify();
+  if (isObsolete) {
+    const version = await updateSprite(event.detail.version);
+    await loadAllImages([`./sprites--${version}.php`]);
+    document.documentElement.style.setProperty('--link-sprites', `url('./sprites--${version}.php')`);
+  }
 })
 
 

@@ -47,11 +47,12 @@ export async function createCard(pokemon, ordre)
     filtres.push('do:autre');
   
   const card = template.content.cloneNode(true).querySelector('.pokemon-card');
-  card.id = 'pokemon-card-' + shiny.dbid;
+  card.id = 'pokemon-card-' + shiny.huntid;
   card.classList.add('pkmn-card-' + shiny.dexid);
   card.dataset.dexid = shiny.dexid;
 
-  card.style.setProperty('--image-position', '-' + imagePosition + 'px');
+  card.style.setProperty('--ordre-sprite', ordre);
+  //card.style.setProperty('--image-position', '-' + imagePosition + 'px');
   card.querySelector('.pokemon-notes__texte').innerHTML = shiny.description;
 
   if (!shiny.ball)

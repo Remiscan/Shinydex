@@ -37,6 +37,7 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
 
     // On récupère les données de la BDD
     $link = new BDD();
+
     $recup_shinies = $link->prepare('SELECT * FROM mes_shinies ORDER BY id DESC');
     $recup_shinies->execute();
     $onlineData = $recup_shinies->fetchAll(PDO::FETCH_ASSOC);
@@ -62,12 +63,12 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
       else {
         $pkmn = $onlineData[$r];
         // Données locales plus récentes que celles de la BDD en ligne
-        if ($pkmn->{'last_update'} < $shiny->lastupdate) {
+        if ($pkmn['last_update'] < $shiny->{'last_update'}) {
           $toUpdate[] = $key;
           $dataToCompare[] = $pkmn;
         }
         // Données en ligne plus récentes que celles de la BDD locale
-        elseif ($pkmn->{'last_update'} > $shiny->lastupdate) {
+        elseif ($pkmn['last_update'] > $shiny->{'last_update'}) {
           $dataToUpdateLocal[] = $pkmn;
           $dataToCompare[] = $pkmn;
         }
@@ -88,18 +89,16 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
       // Données locales supprimées absentes de la BDD en ligne
       if ($r === false) {
         $toDelete[] = $shiny->huntid;
-        $toDeleteLocal[] = $shiny->id;
       }
       // Données locales supprimées plus récemment que leur état dans la BDD
       else {
         $pkmn = $onlineData[$r];
         // Données locales supprimées plus récemment que leur état dans la BDD
-        if ($pkmn->{'last_update'} < $shiny->lastupdate) {
+        if ($pkmn['last_update'] < $shiny->{'last_update'}) {
           $toDelete[] = $shiny->huntid;
-          $toDeleteLocal[] = $shiny->id;
         }
         // Données locales supprimées avant leur état actuel dans la BDD
-        elseif ($pkmn->{'last_update'} > $shiny->lastupdate) {
+        elseif ($pkmn['last_update'] > $shiny->{'last_update'}) {
           $dataToUpdateLocal[] = $pkmn;
         }
       }
@@ -141,8 +140,8 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
 
       $insert = $link->prepare('UPDATE mes_shinies SET 
         numero_national = :dexid, forme =:forme, surnom = :surnom, methode = :methode, compteur = :compteur, date = :date, jeu = :jeu, ball = :ball, description = :description, origin = :origin, monjeu = :monjeu, charm = :charm, hacked = :hacked, aupif = :aupif, last_update = :lastupdate
-      WHERE id = :id');
-      $insert->bindValue(':id', $data->{'id'}, PDO::PARAM_INT);
+      WHERE huntid = :huntid');
+      $insert->bindValue(':huntid', $data->{'huntid'}, PDO::PARAM_INT);
       $insert->bindParam(':dexid', $data->{'numero_national'}, PDO::PARAM_INT, 4);
       $insert->bindParam(':forme', $data->{'forme'}, PDO::PARAM_STR, 50);
       $insert->bindParam(':surnom', $data->{'surnom'}, PDO::PARAM_STR, 50);
@@ -164,10 +163,16 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
 
     // On supprime de la BDD ce qui doit l'être
     foreach($toDelete as $huntid) {
-      $insert = $link->prepare('DELETE FROM mes_shinies WHERE id = :huntid');
+      $insert = $link->prepare('DELETE FROM mes_shinies WHERE huntid = :huntid');
       $insert->bindParam(':huntid', $huntid, PDO::PARAM_INT);
       $results[] = $insert->execute();
     }
+
+    // On récupère la version de la BDD
+    $versionBDD = $link->prepare('SELECT MAX(last_update) AS max FROM mes_shinies');
+    $versionBDD->execute();
+    $versionBDD = $versionBDD->fetch(PDO::FETCH_ASSOC);
+    $versionBDD = $versionBDD['max'];
 
     if (array_sum($results) != count($results)) {
       $error = true;
@@ -193,7 +198,8 @@ echo json_encode(array(
   'updates' => $dataToUpdate,
   'inserts-local' => $dataToInsertLocal,
   'updates-local' => $dataToUpdateLocal,
-  'deletions-local' => $toDeleteLocal,
+  'deletions-local' => $toDelete,
   'compare' => $dataToCompare,
-  'results' => $results
+  'results' => $results,
+  'version-bdd' => $versionBDD,
 ), JSON_PRETTY_PRINT);

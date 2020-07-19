@@ -357,3 +357,34 @@ export async function setOnlineBackup()
   }
   return;
 }
+
+
+
+// Demande au service worker de mettre à jour le sprite
+export async function updateSprite(version = null) {
+  return new Promise((resolve, reject) => {
+    const chan = new MessageChannel();
+
+    chan.port1.onmessage = event => {
+      if (event.data.error) {
+        console.error(event.data.error);
+        reject('[:(] Erreur de contact du service worker');
+      }
+
+      if ('successfulSpriteUpdate' in event.data) {
+        if (event.data.successfulSpriteUpdate === true) resolve(event.data.version);
+        else reject('[:(] Échec de la mise à jour du sprite');
+      }
+      else {
+        reject('[:(] Message invalide reçu du service worker');
+      }
+    }
+
+    chan.port1.onmessageerror = event => {
+      reject('[:(] Erreur de communication avec le service worker');
+    }
+  
+    currentWorker.postMessage({ 'action': 'update-sprite', version }, [chan.port2]);
+  })
+  
+}
