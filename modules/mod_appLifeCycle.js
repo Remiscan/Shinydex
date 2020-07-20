@@ -107,12 +107,15 @@ export async function appStart()
     appChargee = true;
 
     checkInstall();
+    const onlineBackup = await dataStorage.getItem('online-backup');
+    if (onlineBackup) await startBackup();
     const willCheckUpdate = await dataStorage.getItem('check-updates');
     if (willCheckUpdate == 1) {
       await navigator.serviceWorker.ready;
       await wait(1000);
       return checkUpdate();
-    } else {
+    }
+    else {
       return;
     }
   }
