@@ -22,7 +22,8 @@ template.innerHTML = `
 
   svg.loading,
   svg.success,
-  svg.failure {
+  svg.failure,
+  svg.lazy {
     opacity: 1;
   }
 
@@ -39,15 +40,26 @@ template.innerHTML = `
   }
 
   .failure>.progress-dots {
-    stroke: indianred;
-    transition: strole 0 linear;
+    stroke: var(--failure-color);
+    transition: stroke 0 linear;
+    transition-delay: .5s;
+  }
+
+  .lazy>.progress-dots {
+    stroke: var(--success-color);
+    transition: stroke .1s linear;
     transition-delay: .5s;
   }
 
   .loading>.progress-dots,
-  .success>.progress-dots {
+  .success>.progress-dots,
+  .lazy>.progress-dots {
     stroke-dasharray: 2px 3px;
     animation: rotate 10s infinite linear;
+  }
+
+  .finished>.progress-dots {
+    animation-play-state: paused;
   }
 
   .progress-line {
@@ -81,12 +93,13 @@ class syncProgress extends HTMLElement {
   get state() { return this.getAttribute('state'); }
 
   static get observedAttributes() {
-    return ['state'];
+    return ['state', 'finished'];
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
+    const svg = this.shadow.querySelector('svg');
+
     if (name == 'state') {
-      const svg = this.shadow.querySelector('svg');
       svg.classList.remove(oldValue);
       svg.classList.add(newValue);
       const progressLine = this.shadow.querySelector('.progress-line');
@@ -151,11 +164,49 @@ class syncProgress extends HTMLElement {
         this.failureAnim.onfinish = () => this.setAttribute('finished', true);
       }
 
+      // Si le chargement est complété sans avoir effectué d'action
+      else if (newValue == 'lazy') {
+        this.loadingAnim.pause();
+
+        const offset = (this.loadingAnim.currentTime % loadingDuration < .5 * loadingDuration) ? '-101px' : '-101px';
+        this.lazyAnim = progressLine.animate([
+          { strokeDashoffset: offset }
+        ], {
+          duration: successDuration,
+          iterations: 1,
+          easing: 'linear',
+          fill: 'forwards'
+        });
+
+        this.lazyAnim.onfinish = () => this.setAttribute('finished', 'true');
+      }
+
       // Sinon
       else {
         this.loadingAnim.cancel();
         if (this.successAnim) this.successAnim.cancel();
         if (this.failureAnim) this.failureAnim.cancel();
+        if (this.lazyAnim) this.lazyAnim.cancel();
+      }
+    }
+
+    else if (name == 'finished') {
+      if (newValue == 'true') {
+        svg.classList.add('finished');
+        this.bye = svg.animate([
+          { opacity: '0' }
+        ], {
+          duration: 200,
+          easing: 'linear',
+          fill: 'forwards'
+        });
+        this.bye.pause();
+        setTimeout(() => this.bye.play(), 3000);
+        this.bye.onfinish = () => { this.removeAttribute('state'); this.bye.cancel(); };
+      }
+
+      else {
+        svg.classList.remove('finished');
       }
     }
   }

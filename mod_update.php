@@ -26,7 +26,8 @@ function getFilesVersion()
     if ($dateFichier > $versionFichiers)
       $versionFichiers = $dateFichier;
   }
-  return $versionFichiers;
+  // timestamp à 10 digits, généré par PHP
+  return $versionFichiers * 1000;
 }
 
 
@@ -35,23 +36,12 @@ function getFilesVersion()
 function getDBVersion()
 {
   $link = new BDD();
-  $dates_derniereUpdate = $link->prepare('SELECT UPDATE_TIME FROM information_schema.tables WHERE TABLE_SCHEMA = ?');
-  $dates_derniereUpdate->execute(['remiscanmk17']);
-  $dates_derniereUpdate = array_column($dates_derniereUpdate->fetchAll(PDO::FETCH_ASSOC), 'UPDATE_TIME');
-  $versionBDD = max(array_map('strtotime', $dates_derniereUpdate));
-  return $versionBDD;
-}
-
-
-//////////////////////////////////////////////////////////////////
-// Récupère les infos sur mes chromatiques dans la base de données
-function getShinyData()
-{
-  $link = new BDD();
-  $recup_shinies = $link->prepare('SELECT * FROM mes_shinies ORDER BY id DESC');
-  $recup_shinies->execute();
-  $data_shinies = $recup_shinies->fetchAll(PDO::FETCH_ASSOC);
-  return $data_shinies;
+  $versionBDD = $link->prepare('SELECT MAX(last_update) AS max FROM mes_shinies');
+  $versionBDD->execute();
+  $versionBDD = $versionBDD->fetch(PDO::FETCH_ASSOC);
+  $versionBDD = $versionBDD['max'];
+  // timestamp à 13 digits, généré par JS
+  return $versionBDD * 1;
 }
 
 
@@ -84,20 +74,11 @@ if (isset($_GET['type']) && $_GET['type'] == 'check')
   $results['version-fichiers'] = getFilesVersion();
 }
 
-// Si on veut juste mettre à jour la base de données des shiny
-elseif (isset($_GET['type']) && $_GET['type'] == 'updateDB')
-{
-  $results['version-bdd'] = getDBVersion();
-  $results['version-fichiers'] = getFilesVersion();
-  $results['data-shinies'] = getShinyData();
-}
-
 // Si on veut installer tous les fichiers et données
 else
 {
   $results['version-bdd'] = getDBVersion();
   $results['version-fichiers'] = getFilesVersion();
-  $results['data-shinies'] = getShinyData();
   $results['pokemon-data'] = getPokemonData();
   $results['pokemon-names'] = Pokemon::ALL_POKEMON;
   $results['pokemon-names-fr'] = Pokemon::ALL_POKEMON_FR;

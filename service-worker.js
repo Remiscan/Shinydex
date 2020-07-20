@@ -63,7 +63,7 @@ self.addEventListener('fetch', function(event)
 {
   //console.log('[fetch] Le service worker récupère l\'élément ' + event.request.url);
   // Si l'élément est sprites.php et que online-backup = 0
-  if (event.request.url.match(/(.+)sprites--(.+).php$/))
+  /*if (event.request.url.match(/(.+)sprites--(.+).php$/))
   {
     const version = event.request.url.match(/(?:.+)sprites--(.+).php$/)[1];
     event.respondWith(
@@ -73,9 +73,10 @@ self.addEventListener('fetch', function(event)
       })
       .catch(error => console.error(error))
     )
-  }
+  }*/
   // Si l'élément est un sprite (non mis en cache par le sw), on le récupère sur le réseau
-  else if (event.request.url.match(/(.+)\/poke_(capture|icon)_(.+)/))
+  /*else */
+  if (event.request.url.match(/(.+)\/poke_(capture|icon)_(.+)/))
   {
     event.respondWith(
       fetch(event.request)
@@ -101,8 +102,7 @@ self.addEventListener('message', function(event) {
   if ('action' in event.data) console.log(`[${event.data.action}] Demande reçue...`);
 
   // FULL UPDATE
-  if (event.data.action == 'update')
-  {
+  if (event.data.action == 'update') {
     const source = event.source;
 
     event.waitUntil(
@@ -115,28 +115,8 @@ self.addEventListener('message', function(event) {
     );
   }
 
-  // UPDATE DB
-  else if (event.data.action == 'update-db')
-  {
-    const source = event.source;
-
-    event.waitUntil(
-      updateShinyData()
-      .then(result => {
-        if (result === true) {
-          source.postMessage(true);
-        }
-      })
-      .catch(error => {
-        source.postMessage(false);
-        console.error(error);
-      })
-    );
-  }
-
   // COMPARE-BACKUP
-  else if (event.data.action == 'compare-backup')
-  {
+  else if (event.data.action == 'compare-backup') {
     event.waitUntil(
       compareBackup()
     );
@@ -160,55 +140,7 @@ self.addEventListener('message', function(event) {
 self.addEventListener('sync', async function(event) {
   console.log('[sw] Requête de SYNC reçue');
 
-  // HUNT-ADD-id, HUNT-EDIT-id, HUNT-REMOVE-id
-  if (event.tag.startsWith('HUNT-')) {
-    const PRE_HUNT_ADD = 'HUNT-ADD-';
-    const PRE_HUNT_EDIT = 'HUNT-EDIT-';
-    const PRE_HUNT_DELETE = 'HUNT-REMOVE-';
-    let huntid;
-
-    const whatDo = event => {
-      // Upload d'une chasse dans la BDD en ligne
-      if (event.tag.startsWith(PRE_HUNT_ADD)) {
-        huntid = event.tag.replace(PRE_HUNT_ADD, '');
-        return sendHunt(huntid);
-      }
-
-      // Édition d'une chasse dans la BDD en ligne
-      else if (event.tag.startsWith(PRE_HUNT_EDIT)) {
-        huntid = event.tag.replace(PRE_HUNT_EDIT, '');
-        return sendHunt(huntid, true);
-      }
-
-      // Suppression d'une chasse dans la BDD en ligne
-      else if (event.tag.startsWith(PRE_HUNT_DELETE)) {
-        huntid = event.tag.replace(PRE_HUNT_DELETE, '');
-        return deleteHunt(huntid);
-      }
-    };
-
-    event.waitUntil(
-      whatDo(event)
-      .then(updateShinyData)
-      .then(successfulDBUpdate => {
-        return dataStorage.getItem('uploaded-hunts')
-        .then(uploadedHunts => dataStorage.setItem('uploaded-hunts', [...uploadedHunts, huntid]))
-        .then(() => self.clients.matchAll())
-        .then(all => all.map(client => client.postMessage({ successfulDBUpdate, huntid })));
-      })
-      .catch(error => {
-        if (event.lastChance) {
-          return huntStorage.getItem(String(huntid))
-          .then(hunt => { const _hunt = hunt; _hunt.uploaded = false; return huntStorage.setItem(String(huntid), _hunt); })
-          .then(() => { throw error; });
-        } else {
-          throw error;
-        }
-      })
-    );
-  }
-
-  else if (event.tag == 'SYNC-BACKUP') {
+  if (event.tag == 'SYNC-BACKUP') {
     event.waitUntil(
       compareBackup()
     );
@@ -249,29 +181,16 @@ function getData() {
 
 // Installer les données du Rémidex
 async function installData([data, files], action = 'install', event = null) {
-  // On commence par mettre à jour les fichiers :
-  // - en cas de succès, on mettra à jour les données
-  // - sinon, on supprimera le nouveau cache, ce qui laissera l'ancien cache et les anciennes données
-  const versionMax = Math.max(data['version-fichiers'], data['version-bdd']);
-  const newCACHE = PRE_CACHE + '-' + versionMax;
+  const newCACHE = PRE_CACHE + '-' + data['version-fichiers'];
   const totalFichiers = files.fichiers.length;
 
   try {
     // Mise à jour des données
-    const onlineBackup = await dataStorage.getItem('online-backup');
     console.log(`[${action}] Installation des données...`);
     await Promise.all([dataStorage.ready(), shinyStorage.ready(), pokemonData.ready()]);
     await dataStorage.setItem('version-fichiers', data['version-fichiers']);
-    await dataStorage.setItem('version-bdd', data['version-bdd']);
-    await dataStorage.setItem('version', versionMax);
     await dataStorage.setItem('pokemon-names', data['pokemon-names']);
     await dataStorage.setItem('pokemon-names-fr', data['pokemon-names-fr']);
-    if (onlineBackup) {
-      await shinyStorage.clear();
-      await Promise.all(
-        data['data-shinies'].map(shiny => shinyStorage.setItem(String(shiny.huntid), shiny))
-      );
-    }
     await Promise.all(
       data['pokemon-data'].map(pkmn => pokemonData.setItem(String(pkmn.dexid), pkmn))
     );
@@ -283,8 +202,7 @@ async function installData([data, files], action = 'install', event = null) {
     await Promise.all(
       files.fichiers.map(async url => {
         if (url == './sprites.php') {
-          if (onlineBackup) await updateSprite(data['version-bdd']);
-          else await updateSprite();
+          await updateSprite();
         }
         else {
           const request = new Request(url, {cache: 'reload'});
@@ -321,79 +239,6 @@ async function installData([data, files], action = 'install', event = null) {
     }
   } catch(error) {
     throw error;
-  }
-}
-
-
-// Met à jour les données des Pokémon chromatiques possédés
-async function updateShinyData()
-{
-  let data;
-
-  // Récupération des données
-
-  try {
-    const onlineBackup = await dataStorage.getItem('online-backup');
-    if (!onlineBackup) return;
-    
-    console.log('[update-db] Récupération des données...')
-    data = await fetch('/remidex/mod_update.php?type=updateDB&date=' + Date.now());
-    if (data.status != 200)
-      throw '[:(] Erreur ' + response.status + ' lors de la requête (mod_update.php)';
-    data = await data.json();
-  }
-  catch(error) {
-    console.error('Erreur de récupération des données', error);
-    throw false;
-  }
-
-  const versionBDD = data['version-bdd'];
-  const versionMax = Math.max(data['version-fichiers'], data['version-bdd']);
-  let oldVersion;
-
-  // Installation des données
-
-  try {
-    console.log('[update-db] Installation des données...');
-
-    await Promise.all([dataStorage.ready(), shinyStorage.ready()]);
-    oldVersion = dataStorage.getItem('version-bdd');
-    await dataStorage.setItem('version-bdd', data['version-bdd']);
-    await dataStorage.setItem('version', versionMax);
-    await shinyStorage.clear();
-    await Promise.all(
-      data['data-shinies'].map(shiny => shinyStorage.setItem(String(shiny.huntid), shiny))
-    );
-
-    console.log('[update-db] Données installées !');
-  }
-  catch(error) {
-    console.error('Erreur d\'installation des données', error);
-    throw false;
-  }
-
-  // Mise à jour du spritesheet
-
-  const currentCACHE = PRE_CACHE + '-' + versionMax;
-
-  try {
-    const cache = await caches.open(currentCACHE);
-    const request = new Request(`./sprites--${versionBDD}.php`, {cache: 'reload'});
-    const response = await fetch(request);
-    if (!response.ok)
-      throw Error(`[update-db] Le fichier n\'a pas pu être récupéré...`, request.url);
-    const oldRequest = new Request(`./sprites--${oldVersion}.php`);
-    await cache.delete(oldRequest);
-    await cache.put(request, response);
-    console.log('[update-db] Cache mis à jour !');
-    return true;
-  }
-  catch(error) {
-    console.error('Erreur de mise à jour du spritesheet', error);
-    await dataStorage.ready();
-    await dataStorage.setItem('version-bdd', oldVersion);
-    await dataStorage.setItem('version', Math.max(data['version-fichiers'], oldVersion));
-    throw false;
   }
 }
 
@@ -480,6 +325,16 @@ async function compareBackup() {
       toDelete.map(huntid => shinyStorage.removeItem(String(huntid)))
     );
 
+    // Supprimons les chasses locales correctement uploadées
+    let toCheck = [...data['inserts'], ...data['updates']].map(shiny => shiny.huntid);
+    const huntsToCheck = await Promise.all(
+      toCheck.map(huntid => huntStorage.getItem(String(huntid)))
+    );
+    await Promise.all(
+      huntsToCheck.filter(hunt => hunt.uploaded == 'cloud_upload')
+                  .map(hunt => huntStorage.removeItem(String(hunt.huntid)))
+    );
+
     // Vérifions si la BDD en ligne est plus récente que la locale
     const versionBDD = await dataStorage.getItem('version-bdd');
     const newVersionBDD = data['version-bdd'];
@@ -490,7 +345,7 @@ async function compareBackup() {
     // Transmettons les informations à l'application
     await dataStorage.setItem('last-sync', 'success');
     const clients = await self.clients.matchAll();
-    clients.map(client => client.postMessage({ successfulBackupComparison: true, obsolete: obsoleteLocal }));
+    clients.map(client => client.postMessage({ successfulBackupComparison: true, obsolete: obsoleteLocal, quantity: data['results'].length }));
     return true;
   }
 
@@ -510,8 +365,7 @@ async function updateSprite(_version = null) {
   try {
     await Promise.all([shinyStorage.ready(), dataStorage.ready()]);
 
-    let version = _version;
-    if (_version == null) version = await dataStorage.getItem('version-bdd');
+    let version = _version ||  await dataStorage.getItem('version-bdd');
     
     // On récupère et ordonne la liste des sprites à partir des données locales
     let keys = await shinyStorage.keys();
@@ -530,7 +384,7 @@ async function updateSprite(_version = null) {
       throw Error(`[update-sprite] Le fichier n\'a pas pu être récupéré... (${sprite.url})`);
 
     // On ouvre le cache
-    const versionCache = await dataStorage.getItem('version');
+    const versionCache = await dataStorage.getItem('version-fichiers');
     const currentCACHE = PRE_CACHE + '-' + versionCache;
     const cache = await caches.open(currentCACHE);
 
@@ -549,118 +403,5 @@ async function updateSprite(_version = null) {
   catch(error) {
     console.error(error);
     throw error;
-  }
-}
-
-
-// Envoie une chasse de la BDD locale vers la BDD en ligne
-async function sendHunt(huntid, edit = false) {
-  try {
-    const hunt = await huntStorage.getItem(huntid);
-
-    const formData = new FormData();
-    formData.append('hunt', JSON.stringify(hunt));
-    formData.append('mdp', await dataStorage.getItem('mdp-bdd'));
-    formData.append('type', edit ? 'EDIT' : 'ADD');
-
-    console.log('Envoi de la chasse :', JSON.stringify(hunt));
-
-    const response = await fetch('/remidex/mod_sendHuntToDb.php?date=' + Date.now(), {
-      method: 'POST',
-      body: formData
-    });
-    if (response.status != 200)
-      throw '[:(] Erreur ' + response.status + ' lors de la requête';
-    const data = await response.json();
-
-    if (data['mdp'] == false)
-      throw '[:(] Mauvais mot de passe...';
-    
-    // Traiter la réponse et vérifier le bon ajout à la BDD
-    console.log('Réponse reçue du serveur :', data);
-    if (data['stored-data'] == false)
-      throw '[:(] Chasse non stockée dans la BDD...';
-    
-    if (
-      parseInt(data['stored-data']['numero_national']) == hunt.dexid
-      && data['stored-data']['forme'] == hunt.forme
-      && data['stored-data']['surnom'] == hunt.surnom
-      && data['stored-data']['methode'] == hunt.methode
-      && data['stored-data']['compteur'] == hunt.compteur
-      && data['stored-data']['date'] == hunt.date
-      && data['stored-data']['jeu'] == hunt.jeu
-      && data['stored-data']['ball'] == hunt.ball
-      && data['stored-data']['description'] == hunt.description
-      && parseInt(data['stored-data']['origin']) == hunt.origin
-      && parseInt(data['stored-data']['monjeu']) == hunt.monjeu
-      && parseInt(data['stored-data']['charm']) == hunt.charm
-      && parseInt(data['stored-data']['hacked']) == hunt.hacked
-      && parseInt(data['stored-data']['aupif']) == hunt.aupif
-    ) {
-      // La chasse est bien dans la BDD,
-      // on peut la supprimer de indexedDB.
-      return await huntStorage.removeItem(huntid);
-    } else {
-      console.log(
-        parseInt(data['stored-data']['numero_national']) == hunt.dexid,
-        data['stored-data']['forme'] == hunt.forme,
-        data['stored-data']['surnom'] == hunt.surnom,
-        data['stored-data']['methode'] == hunt.methode,
-        data['stored-data']['compteur'] == hunt.compteur,
-        data['stored-data']['date'] == hunt.date,
-        data['stored-data']['jeu'] == hunt.jeu,
-        data['stored-data']['ball'] == hunt.ball,
-        data['stored-data']['description'] == hunt.description,
-        parseInt(data['stored-data']['origin']) == hunt.origin,
-        parseInt(data['stored-data']['monjeu']) == hunt.monjeu,
-        parseInt(data['stored-data']['charm']) == hunt.charm,
-        parseInt(data['stored-data']['hacked']) == hunt.hacked,
-        parseInt(data['stored-data']['aupif']) == hunt.aupif
-      );
-      throw '[:(] Erreur de copie pendant la sauvegarde de la chasse...';
-    }
-  }
-  catch(error) {
-    console.error(error);
-    throw error;
-  }
-}
-
-
-// Supprime un shiny de la BDD à partir de l'édition de sa chasse en local
-async function deleteHunt(huntid) {
-  try {
-    const hunt = await huntStorage.getItem(huntid);
-
-    const formData = new FormData();
-    formData.append('hunt', JSON.stringify(hunt));
-    formData.append('mdp', await dataStorage.getItem('mdp-bdd'));
-    formData.append('type', 'REMOVE');
-
-    console.log(JSON.stringify(hunt));
-
-    const response = await fetch('mod_sendHuntToDb.php', {
-      method: 'POST',
-      body: formData
-    });
-    if (response.status != 200)
-      throw '[:(] Erreur ' + response.status + ' lors de la requête';
-    const data = await response.json();
-
-    if (data['mdp'] == false)
-      throw '[:(] Mauvais mot de passe...';
-    
-    // Traiter la réponse et vérifier le bon ajout à la BDD
-    console.log('Réponse reçue du serveur :', data);
-    if (data['error'] != false)
-      throw '[:(] Chasse non supprimée de la BDD...';
-    
-    // La chasse n'est plus dans la BDD,
-    // on peut la supprimer de indexedDB.
-    return await huntStorage.removeItem(huntid);
-  }
-  catch(error) {
-    console.error(error);
-    return;
   }
 }

@@ -199,7 +199,7 @@ echo json_encode(array(
   'inserts-local' => $dataToInsertLocal,
   'updates-local' => $dataToUpdateLocal,
   'deletions-local' => $toDelete,
-  'compare' => $dataToCompare,
+  //'compare' => $dataToCompare,
   'results' => $results,
   'version-bdd' => $versionBDD,
 ), JSON_PRETTY_PRINT);

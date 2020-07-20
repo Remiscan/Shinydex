@@ -55,7 +55,7 @@ export async function appStart()
 
     // On vérifie si les données sont installées
     await Promise.all([dataStorage.ready(), shinyStorage.ready(), pokemonData.ready()]);
-    const installedVersion = await dataStorage.getItem('version');
+    const installedVersion = await dataStorage.getItem('version-fichiers');
     if (installedVersion !== null)
       dataInstalled = true;
 
@@ -359,7 +359,7 @@ export async function updateSprite(version = null) {
 // Démarre la procédure de backup
 export async function startBackup() {
   const reg = await navigator.serviceWorker.ready;
-  reg.sync.register('SYNC-BACKUP');
+  await reg.sync.register('SYNC-BACKUP');
 
   const loaders = Array.from(document.querySelectorAll('sync-progress'));
   loaders.forEach(loader => loader.setAttribute('state', 'loading'));

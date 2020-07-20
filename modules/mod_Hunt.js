@@ -4,6 +4,7 @@ import { wait, Params, loadAllImages } from './mod_Params.js';
 import { navigate } from './mod_navigate.js';
 import { DexDatalist } from './mod_DexDatalist.js';
 import { deferCards } from './mod_filtres.js';
+import { startBackup } from './mod_appLifeCycle.js';
 
 const huntStorage = localforage.createInstance({
   name: 'remidex',
@@ -455,58 +456,39 @@ export class Hunt {
   // Envoie la chasse dans la BDD
   async submitHunt(edit = false)
   {
-    const card = document.getElementById('hunt-' + this.id);
     this.lastupdate = Date.now();
     this.huntid = this.id;
 
-    const onlineBackup = await dataStorage.getItem('online-backup');
-    if (onlineBackup) {
-      // On demande au service worker d'upload la chasse dans la BDD en ligne
-      if (!'serviceWorker' in navigator || !'syncManager' in window)
-        throw 'Upload de la chasse impossible.';
+    try {
+      const onlineBackup = await dataStorage.getItem('online-backup');
+      const shiny = await Shiny.build(this);
 
-      const reg = await navigator.serviceWorker.ready;
-      console.log('[sync] Envoi de la chasse au sw');
-      try {
-        this.uploaded = 'cloud_upload';
-        await huntStorage.setItem(String(this.id), this);
-        card.dataset.loading = this.uploaded;
-        // On demande au service worker d'envoyer la chasse vers la DB
-        if (edit) await reg.sync.register('HUNT-EDIT-' + this.id);
-        else await reg.sync.register('HUNT-ADD-' + this.id);
-        // Voir scripts.js pour la réponse du service worker
-      }
-      catch(error) {
-        console.log('[sync] Erreur lors de la requête de synchronisation');
-      }
-    }
-
-    else {
-      try {
-        const shiny = await Shiny.build(this);
-
-        // Vérifions si sprites.php est obsolète
-        let obsolete = false;
-        test: {
-          if (!edit) {
-            obsolete = true;
-            break test;
-          }
-          const oldData = await shinyStorage.getItem(String(this.id));
-          if (oldData['numero_national'] != shiny.dexid || oldData['forme'] != shiny.forme) {
-            obsolete = true;
-            break test;
-          }
+      // Vérifions si sprites.php est obsolète
+      let obsolete = false;
+      test: {
+        if (!edit) {
+          obsolete = true;
+          break test;
         }
+        const oldData = await shinyStorage.getItem(String(this.id));
+        if (oldData['numero_national'] != shiny.dexid || oldData['forme'] != shiny.forme) {
+          obsolete = true;
+          break test;
+        }
+      }
 
-        await shinyStorage.setItem(String(this.id), shiny.format());
-        await this.destroyHunt();
-        await dataStorage.setItem('version-bdd', this.lastupdate);
-        window.dispatchEvent(new CustomEvent('populate', { detail: { version: this.lastupdate, obsolete } }));
-      }
-      catch(error) {
-        console.error(error);
-      }
+      // On marque la chasse comme uploadée
+      this.uploaded = 'cloud_upload';
+      await huntStorage.setItem(String(this.id), this);
+      await shinyStorage.setItem(String(this.id), shiny.format());
+
+      await this.destroyHunt();
+      await dataStorage.setItem('version-bdd', this.lastupdate);
+      window.dispatchEvent(new CustomEvent('populate', { detail: { version: this.lastupdate, obsolete } }));
+      if (onlineBackup) await startBackup();
+    }
+    catch(error) {
+      console.error(error);
     }
   }
 
@@ -514,43 +496,23 @@ export class Hunt {
   // Supprime la chasse de la BDD
   async deleteHuntFromDB()
   {
-    const card = document.getElementById('hunt-' + this.id);
-    this.lastupdate = Date.now() / 1000;
+    this.lastupdate = Date.now();
 
-    const onlineBackup = await dataStorage.getItem('online-backup');
-    if (onlineBackup) {
-      // On demande au service worker de supprimer la chasse de la BDD en ligne
-      if (!'serviceWorker' in navigator || !'syncManager' in window)
-        throw 'Suppression de la chasse impossible.';
+    try {
+      const onlineBackup = await dataStorage.getItem('online-backup');
 
-      const reg = await navigator.serviceWorker.ready;
-      console.log('[sync] Suppression de la chasse demandée au sw');
-      try {
-        this.uploaded = 'delete_forever';
-        await huntStorage.setItem(String(this.id), this);
-        card.dataset.loading = this.uploaded;
-        // On demande au service worker de supprimer la chasse de la DB
-        await reg.sync.register('HUNT-REMOVE-' + this.id);
-        // Voir scripts.js pour la réponse du service worker
-      }
-      catch(error) {
-        console.log('[sync] Erreur lors de la requête de synchronisation');
-      }
+      // On marque le shiny comme supprimé
+      const shiny = await Shiny.build(await shinyStorage.getItem(String(this.id)));
+      shiny.deleted = true;
+      await shinyStorage.setItem(String(this.id), shiny.format());
+
+      await this.destroyHunt();
+      await dataStorage.setItem('version-bdd', this.lastupdate);
+      window.dispatchEvent(new CustomEvent('populate', { detail: { version: this.lastupdate, obsolete: false } }));
+      if (onlineBackup) await startBackup();
     }
-
-    else {
-      try {
-        //await shinyStorage.removeItem(String(this.id));
-        const shiny = await Shiny.build(await shinyStorage.getItem(String(this.id)));
-        shiny.deleted = true;
-        await shinyStorage.setItem(String(this.id), shiny.format());
-        await this.destroyHunt();
-        await dataStorage.setItem('version-bdd', this.lastupdate);
-        window.dispatchEvent(new CustomEvent('populate', { detail: { version: this.lastupdate, obsolete: false } }));
-      }
-      catch(error) {
-        console.error(error);
-      }
+    catch(error) {
+      console.error(error);
     }
   }
 }
