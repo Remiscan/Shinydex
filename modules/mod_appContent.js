@@ -1,6 +1,6 @@
 import { Pokemon } from './mod_Pokemon.js';
 import { createCard, toggleNotes } from './mod_pokemonCard.js';
-import { filterCards, orderCards, reverseOrder, deferCards, deferMonitor } from './mod_filtres.js';
+import { filterCards, orderCards, filterDex, deferCards, deferMonitor } from './mod_filtres.js';
 import { Params, loadAllImages, wait, version2date } from './mod_Params.js';
 import { openSpriteViewer } from './mod_spriteViewer.js';
 import { editHunt, initHunts } from './mod_Hunt.js';
@@ -81,28 +81,23 @@ export async function appPopulate(start = true, obsolete = false)
       ordre++;
     }
 
-    /*let data = await shinyStorage.keys();
-    data = await Promise.all(data.map(key => shinyStorage.getItem(key)));
-    data = data.filter(shiny => !shiny.deleted);
-    data = data.sort((a, b) => b.id - a.id);
+    if (start) {
+      const savedFiltres = JSON.parse(await dataStorage.getItem('filtres'));
+      let unfilteredCards;
+      if (savedFiltres != null && savedFiltres.length > 0)
+        unfilteredCards = await filterCards(savedFiltres, cardsToPopulate);
+      else
+        unfilteredCards = await filterCards(undefined, cardsToPopulate);
 
-    if (data.length == 0) {
-      document.querySelector('#mes-chromatiques').classList.add('vide');
-      document.querySelector('#mes-chromatiques .message-vide>.material-icons').innerHTML = 'cloud_off';
-      document.querySelector('#mes-chromatiques .message-vide>span').innerHTML = 'Aucun Pokémon chromatique dans la base de données. Pour en ajouter, complétez une Chasse !';
+      filterDex(unfilteredCards);
+
+      const savedOrdreReverse = await dataStorage.getItem('ordre-reverse');
+      const savedOrdre = JSON.parse(await dataStorage.getItem('ordre'));
+      if (savedOrdre != null)
+        cardsToPopulate = await orderCards(savedOrdre, savedOrdreReverse, cardsToPopulate);
+      else
+        cardsToPopulate = await orderCards(undefined, savedOrdreReverse, cardsToPopulate);
     }
-
-    for (const [ordre, pokemon] of data.entries()) {
-      const card = await createCard(pokemon, ordre);
-      card.classList.add('defer');
-
-      // Active le long clic pour éditer
-      card.addEventListener('click', () => { if (!longClic) toggleNotes(card.id); longClic = false; });
-      card.addEventListener('mousedown', async event => { if (event.button != 0) return; makeEdit(event, card); }); // souris
-      card.addEventListener('touchstart', async event => { makeEdit(event, card); }, { passive: true }); // toucher
-
-      cardsToPopulate.push(card);
-    };*/
 
     // Peuple les éléments après la préparation (pour optimiser le temps d'exécution)
     //// Liste principale
@@ -166,7 +161,7 @@ export async function appDisplay(start = true)
     const savedFiltres = JSON.parse(await dataStorage.getItem('filtres'));
     if (savedFiltres != null && savedFiltres.length > 0)
     {
-      await filterCards(savedFiltres);
+      if (!start) await filterCards(savedFiltres);
       Array.from(document.querySelectorAll('input.filtre')).forEach(input => {
         let correspondances = 0;
         for (const filtre of savedFiltres) {
@@ -178,22 +173,19 @@ export async function appDisplay(start = true)
       });
     }
     else
-      await filterCards();
+      if (!start) await filterCards();
 
+    const savedOrdreReverse = await dataStorage.getItem('ordre-reverse');
     const savedOrdre = JSON.parse(await dataStorage.getItem('ordre'));
     if (savedOrdre != null)
     {
-      await orderCards(savedOrdre);
+      if (!start) await orderCards(savedOrdre, savedOrdreReverse);
       Array.from(document.querySelectorAll('input[name=ordre]')).forEach(input => {
         if (input.id == 'ordre-' + savedOrdre) input.checked = true;
       });
     }
     else
-      await orderCards();
-
-    const savedOrdreReverse = await dataStorage.getItem('ordre-reverse');
-    if (savedOrdreReverse == true)
-      await reverseOrder();
+      if (!start) await orderCards(undefined, savedOrdreReverse);
 
     ['mes-chromatiques', 'pokedex', 'chasses-en-cours'].forEach(section => deferCards(section));
     

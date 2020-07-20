@@ -10,10 +10,11 @@ let cardsOrdered = [];
 const defautFiltres = ['do:moi', 'legit:oui'];
 let currentFiltres = defautFiltres;
 
-export async function filterCards(filtres = defautFiltres)
+export async function filterCards(filtres = defautFiltres, cards = null)
 {
-  const allCards = Array.from(document.querySelectorAll('#mes-chromatiques .pokemon-card'));
+  const allCards = cards || Array.from(document.querySelectorAll('#mes-chromatiques .pokemon-card'));
   const filteredCards = [];
+  const unfilteredCards = [];
 
   allCards.forEach(card => {
     card.classList.remove('filtered');
@@ -32,6 +33,9 @@ export async function filterCards(filtres = defautFiltres)
         filteredCards.push(card);
         break;
       }
+      else {
+        unfilteredCards.push(card);
+      }
     }
   });
   //console.log('Cartes filtrées :', filtres);
@@ -43,11 +47,11 @@ export async function filterCards(filtres = defautFiltres)
   else document.querySelector('#mes-chromatiques').classList.remove('vide');
 
   filteredCards.forEach(card => card.classList.add('filtered'));
-  filterDex();
+  if (cards != null) filterDex();
   await dataStorage.setItem('filtres', JSON.stringify(filtres));
   currentFiltres = filtres;
   
-  return compteur;
+  return unfilteredCards;
 }
 
 
@@ -57,9 +61,9 @@ export async function filterCards(filtres = defautFiltres)
 const defautOrdre = 'date';
 let currentOrdre = defautOrdre;
 
-export async function orderCards(ordre = defautOrdre, reversed = false)
+export async function orderCards(ordre = defautOrdre, reversed = false, cards = null)
 {
-  const allCards = Array.from(document.querySelectorAll('#mes-chromatiques .pokemon-card'));
+  const allCards = cards || Array.from(document.querySelectorAll('#mes-chromatiques .pokemon-card'));
   let ordrement;
 
   if (ordre == 'jeu')
@@ -114,12 +118,20 @@ export async function orderCards(ordre = defautOrdre, reversed = false)
   }
 
   let sortedCards = allCards.sort(ordrement);
-  if (reversed)
+  if (reversed) {
     sortedCards = sortedCards.reverse();
+    document.body.dataset.reversed = true;
+    await dataStorage.setItem('ordre-reverse', true);
+  }
+  else {
+    document.body.removeAttribute('data-reversed');
+    await dataStorage.setItem('ordre-reverse', false);
+  }
   
   sortedCards.forEach((card, ordre) => card.style.setProperty('--order', ordre));
   await dataStorage.setItem('ordre', JSON.stringify(ordre));
   currentOrdre = ordre;
+  return sortedCards;
   //console.log('Cartes ordonnées :', ordre, reverse);
 }
 
@@ -127,28 +139,19 @@ export async function orderCards(ordre = defautOrdre, reversed = false)
 
 //////////////////
 // Inverse l'ordre
-let currentReversed = false;
 export async function reverseOrder()
 {
-  if (currentReversed) {
-    document.body.removeAttribute('data-reversed');
-    currentReversed = false;
-    await dataStorage.setItem('ordre-reverse', false);
-  } else {
-    document.body.dataset.reversed = true;
-    currentReversed = true;
-    await dataStorage.setItem('ordre-reverse', true);
-  }
-  return orderCards(currentOrdre, currentReversed);
+  let currentReversed = Boolean(await dataStorage.getItem('ordre-reverse'));
+  return orderCards(currentOrdre, !currentReversed);
 }
 
 
 
 ///////////////////////////////
 // Filtre les icônes du Pokédex
-function filterDex()
+export function filterDex(cards = null)
 {
-  const displayedCards = Array.from(document.querySelectorAll('#mes-chromatiques :not(.filtered).pokemon-card'));
+  const displayedCards = cards || Array.from(document.querySelectorAll('#mes-chromatiques :not(.filtered).pokemon-card'));
   const dexids = new Set();
 
   displayedCards.forEach(card => {
