@@ -123,7 +123,7 @@ class syncProgress extends HTMLElement {
 
         const offset = (this.loadingAnim.currentTime % loadingDuration < .5 * loadingDuration) ? '0' : '-202px';
         this.successAnim = progressLine.animate([
-          { strokeDashoffset: offset, stroke: 'lightgreen' }
+          { strokeDashoffset: offset, stroke: 'var(--success-color)' }
         ], {
           duration: successDuration,
           iterations: 1,
@@ -140,7 +140,7 @@ class syncProgress extends HTMLElement {
 
         const offset = (this.loadingAnim.currentTime % loadingDuration < .5 * loadingDuration) ? '0' : '-202px';
         this.failureAnim = progressLine.animate([
-          { strokeDashoffset: offset, stroke: 'indianred' }
+          { strokeDashoffset: offset, stroke: 'var(--failure-color)' }
         ], {
           duration: successDuration,
           iterations: 1,
