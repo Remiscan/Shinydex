@@ -1,4 +1,5 @@
 import './modules/comp_loadSpinner.js';
+import './modules/comp_syncProgress.js';
 import { Params, changeAutoMaj, callResize, saveDBpassword, export2json, wait, loadAllImages } from './modules/mod_Params.js';
 import { navigate, sectionActuelle } from './modules/mod_navigate.js';
 import { playEasterEgg } from './modules/mod_easterEgg.js';

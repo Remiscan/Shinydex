@@ -91,6 +91,7 @@
     </script>
 
     <link rel="modulepreload" href="./modules/comp_loadSpinner.js">
+    <link rel="modulepreload" href="./modules/comp_syncProgress.js">
     <link rel="modulepreload" href="./modules/mod_appContent.js">
     <link rel="modulepreload" href="./modules/mod_appLifeCycle.js">
     <link rel="modulepreload" href="./modules/mod_DexDatalist.js">
