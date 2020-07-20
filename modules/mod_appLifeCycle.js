@@ -302,8 +302,6 @@ function checkInstall()
 
 
 
-
-
 /////////////////////////////////////////////////////////
 // Change le paramètre de sauvegarde des données en ligne
 export async function setOnlineBackup()
@@ -319,41 +317,8 @@ export async function setOnlineBackup()
   {
     checkbox.checked = true;
     document.getElementById('parametres').dataset.onlineBackup = '1';
-
-    // Changement de paramètre détecté ! L'application passe du mode offline au mode online.
-    checkbox.disabled = true;
-    notify('Sauvegarde des données...', '', 'loading', () => {}, 999999999);
-
-    console.log('[compare-backup] Activation du backup en ligne demandée au sw');
-    try {
-      // On demande au service worker de mettre à jour l'appli' et on attend sa réponse
-      const chan = new MessageChannel();
-
-      // On contacte le SW
-      currentWorker.postMessage({ 'action': 'compare-backup' }, [chan.port2]);
-
-      // On se prépare à recevoir la réponse
-      await new Promise((resolve, reject) => {
-        chan.port1.onmessage = function(event) {
-          if (event.data.error) {
-            console.error(event.data.error);
-            reject('[:(] Erreur de contact du service worker');
-          }
-          else {
-            progressBar.style.setProperty('--progression', 1);
-            resolve('[:)] Backup terminé !');
-          }
-        }
-      });
-    }
-    catch(error) {
-      unNotify();
-      console.error(error);
-      notify('Erreur. Réessayez plus tard.');
-      document.getElementById('parametres').removeAttribute('data-online-backup');
-      checkbox.disabled = false;
-      checkbox.checked = false;
-    }
+    await dataStorage.setItem('online-backup', 1);
+    await startBackup();
   }
   return;
 }
@@ -387,4 +352,15 @@ export async function updateSprite(version = null) {
     currentWorker.postMessage({ 'action': 'update-sprite', version }, [chan.port2]);
   })
   
+}
+
+
+
+// Démarre la procédure de backup
+export async function startBackup() {
+  const reg = await navigator.serviceWorker.ready;
+  reg.sync.register('SYNC-BACKUP');
+
+  const loaders = Array.from(document.querySelectorAll('sync-progress'));
+  loaders.forEach(loader => loader.setAttribute('state', 'loading'));
 }

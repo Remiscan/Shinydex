@@ -37,7 +37,6 @@ export async function createCard(pokemon, ordre)
 
   const template = document.getElementById('template-pokemon-card');
 
-  const imagePosition = ordre * Params.spriteSize;
   const conditionMien = shiny.mine;
 
   let filtres = [];

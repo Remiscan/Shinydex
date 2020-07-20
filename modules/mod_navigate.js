@@ -14,6 +14,7 @@ export async function navigate(sectionCible, position = 0, historique = true)
   const ancienneSection = document.getElementById(sectionActuelle);
   const nouvelleSection = document.getElementById(sectionCible);
 
+  // Pré-chargement des images de la nouvelle section
   const listeImages = ['./ext/pokesprite.png'];
   if (sectionCible == 'mes-chromatiques') {
     const versionSprite = document.documentElement.style.getPropertyValue('--link-sprites').match(/[0-9]+/)[0];
@@ -24,18 +25,20 @@ export async function navigate(sectionCible, position = 0, historique = true)
   await new Promise((resolve, reject) => {
     closeFiltres();
 
+    // Préparation de l'easter-egg de la section 'à propos'
     if (sectionCible == 'a-propos' || (sectionCible == 'parametres' && Params.owidth >= Params.layoutPClarge))
       playEasterEgg();
     else
       setTimeout(prepareEasterEgg, 200);
 
-    // Try to reduce TTFB for Pokédex sprites
+    // Essaie de réduire le TTFB pour les sprites du Pokédex
     if (sectionCible == 'pokedex' || (sectionCible == 'mes-chromatiques' && Params.owidth >= Params.layoutPClarge))
       loadAllImages(['./sprites-home/small/poke_capture_0670_005_fo_n_00000000_f_n.png']).catch(() => {});
 
     if (historique)
       history.pushState({section: sectionCible}, '');
 
+    // Animation du FAB
     const sectionsFabFilter = ['mes-chromatiques', 'pokedex'];
     const sectionsFabAdd = ['chasses-en-cours'];
     let animateFab = false;
@@ -50,8 +53,14 @@ export async function navigate(sectionCible, position = 0, historique = true)
     document.querySelector('main').scroll(0, 0);
     document.body.dataset.sectionActuelle = sectionActuelle;
 
+    // Disparition de l'indicateur de l'état du backup autour du bouton paramètres
+    Array.from(document.querySelectorAll('sync-progress[finished]'))
+    .forEach(sp => { sp.removeAttribute('state'); sp.removeAttribute('finished'); });
+
     if (Params.owidth >= Params.layoutPClarge) return resolve();
 
+    // Animation d'apparition de la nouvelle section
+    // (sur PC, géré par CSS, d'où le return précédent)
     const apparitionSection = nouvelleSection.animate([
       { transform: 'translate3D(0, 20px, 0)', opacity: '0' },
       { transform: 'translate3D(0, 0, 0)', opacity: '1' }

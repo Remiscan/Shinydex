@@ -18,13 +18,13 @@ export async function appPopulate(start = true, obsolete = false)
 
     // Récupère la liste des huntid des shiny ayant déjà une carte
     const currentShiny = Array.from(document.querySelectorAll('#mes-chromatiques .pokemon-card'))
-                              .map(shiny => Number(shiny.id.replace('pokemon-card-', '')));
+                              .map(shiny => String(shiny.id.replace('pokemon-card-', '')));
 
     // Récupère la liste des huntid des shiny de la base de données
     let keys = await shinyStorage.keys();
     keys = await Promise.all(keys.map(key => shinyStorage.getItem(key)));
     const dbShiny = keys.filter(shiny => !shiny.deleted)
-                        .map(shiny => shiny.huntid);
+                        .map(shiny => String(shiny.huntid));
 
     // Comparons les deux listes
     //// Shiny ayant une carte qui ont disparu de la base de données (donc à supprimer)
@@ -52,25 +52,30 @@ export async function appPopulate(start = true, obsolete = false)
         card.remove();
       }
 
-      // Si on doit créer cette carte
-      else if (toCreate.includes(huntid)) {
+      else {
         const pokemon = await shinyStorage.getItem(String(huntid));
-        const card = await createCard(pokemon, ordre);
+        let card;
+
+        // Si on doit créer cette carte
+        if (toCreate.includes(huntid)) {
+          card = await createCard(pokemon, ordre);
+          cardsToPopulate.push(card);
+        }
+
+        // Si on doit éditer cette carte
+        else {
+          const oldCard = document.getElementById(`pokemon-card-${huntid}`);
+          const oldOrdre = oldCard.style.getPropertyValue('--ordre-sprite');
+          const newCard = await createCard(pokemon, (obsolete ? ordre : oldOrdre));
+          if (oldCard.classList.contains('on')) newCard.classList.add('on');
+          oldCard.outerHTML = newCard.outerHTML;
+          card = document.getElementById(`pokemon-card-${huntid}`);
+        }
 
         // Active le long clic pour éditer
         card.addEventListener('click', () => { if (!longClic) toggleNotes(card.id); longClic = false; });
         card.addEventListener('mousedown', async event => { if (event.button != 0) return; makeEdit(event, card); }); // souris
         card.addEventListener('touchstart', async event => { makeEdit(event, card); }, { passive: true }); // toucher
-
-        cardsToPopulate.push(card);
-      }
-
-      // Si on doit éditer cette carte
-      else {
-        const card = document.getElementById(`pokemon-card-${huntid}`);
-        const oldOrdre = card.style.getPropertyValue('--sprite-ordre');
-        const newCard = await createCard(pokemon, (obsolete ? ordre : oldOrdre));
-        card.outerHTML = newCard.outerHTML;
       }
 
       ordre++;

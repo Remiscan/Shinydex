@@ -207,6 +207,12 @@ self.addEventListener('sync', async function(event) {
       })
     );
   }
+
+  else if (event.tag == 'SYNC-BACKUP') {
+    event.waitUntil(
+      compareBackup()
+    );
+  }
 });
 
 
@@ -482,6 +488,7 @@ async function compareBackup() {
     }
 
     // Transmettons les informations à l'application
+    await dataStorage.setItem('last-sync', 'success');
     const clients = await self.clients.matchAll();
     clients.map(client => client.postMessage({ successfulBackupComparison: true, obsolete: obsoleteLocal }));
     return true;
@@ -489,6 +496,7 @@ async function compareBackup() {
 
   catch(error) {
     console.error(error);
+    await dataStorage.setItem('last-sync', 'failure');
     const clients = await self.clients.matchAll();
     clients.map(client => client.postMessage({ successfulBackupComparison: false, error }));
     return false;

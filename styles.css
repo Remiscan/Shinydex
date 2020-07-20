@@ -17,6 +17,8 @@ html.light {
   --sprite-viewer-bg-color: rgb(255, 255, 255);
   --fab-color: hsl(231, 40%, 50%);
   --danger-color: hsl(0, 40%, 50%);
+  --success-color: hsl(120, 73%, 40%);
+  --failure-color: hsl(0, 53%, 40%);
   --radio-disabled-color: rgba(100, 100, 100, .2);
   --radio-off-color: rgba(100, 100, 100, .3);
   --radio-on-color: var(--fab-color);
@@ -46,6 +48,8 @@ html.dark {
   --sprite-viewer-bg-color: rgb(0, 0, 0);
   --fab-color: hsl(231, 40%, 50%);
   --danger-color: hsl(0, 40%, 50%);
+  --success-color: hsl(120, 73%, 75%);
+  --failure-color: hsl(0, 53%, 75%);
   --radio-disabled-color: rgba(193, 193, 193, .3);
   --radio-off-color: rgba(193, 193, 193, .2);
   --radio-on-color: var(--fab-color);
@@ -1829,6 +1833,29 @@ textarea {
 
 #parametres[data-online-backup] .no-backup {
   display: none;
+}
+
+.info-backup {
+  display: none;
+  font-size: .8em;
+  color: var(--bg-color);
+  background-color: var(--color);
+  padding: .2em .5em;
+  margin-left: .2em;
+  border-radius: 20px;
+}
+
+.info-backup.success {
+  --color: var(--success-color);
+}
+
+.info-backup.failure {
+  --color: var(--failure-color);
+}
+
+#parametres[data-online-backup][data-last-sync=success] .success,
+#parametres[data-online-backup][data-last-sync=failure] .failure {
+  display: inline;
 }
 
 #pick-import-file {

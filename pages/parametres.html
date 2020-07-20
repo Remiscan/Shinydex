@@ -8,6 +8,7 @@
     <!-- Bouton "à propos" -->
     <a class="icone lien-section" data-section="a-propos">
       <i class="material-icons">info</i>
+      <sync-progress></sync-progress>
     </a>
   </div>
 </header>
@@ -45,9 +46,13 @@
   </span>
 
   <p class="un-parametre">
-    <span class="param-nom">Sauvegarde en ligne</span>
+    <span class="param-nom">
+      Sauvegarde en ligne
+      <span class="param-description info-backup success if-backup">à jour</span>
+      <span class="param-description info-backup failure if-backup">obsolète</span>
+    </span>
     <span class="param-description no-backup">Si désactivé, vos données seront perdues si vous désinstallez l'application ou nettoyez son stockage.</span>
-    <span class="param-description if-backup">Vos données sont sauvegardées sur internet.</span>
+    <span class="param-description if-backup">Vos données sont sauvegardées en ligne.</span>
     <input type="checkbox" id="switch-online-backup"><label for="switch-online-backup" class="switch"></label>
   </p>
 

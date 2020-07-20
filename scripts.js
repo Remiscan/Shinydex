@@ -3,7 +3,7 @@ import './modules/comp_syncProgress.js';
 import { Params, changeAutoMaj, callResize, saveDBpassword, export2json, wait, loadAllImages } from './modules/mod_Params.js';
 import { navigate, sectionActuelle } from './modules/mod_navigate.js';
 import { playEasterEgg } from './modules/mod_easterEgg.js';
-import { appStart, checkUpdate, manualUpdate, setOnlineBackup, updateSprite } from './modules/mod_appLifeCycle.js';
+import { appStart, checkUpdate, manualUpdate, setOnlineBackup, updateSprite, startBackup } from './modules/mod_appLifeCycle.js';
 import { appPopulate, appDisplay, json2import } from './modules/mod_appContent.js';
 import { openFiltres } from './modules/mod_filtres.js';
 import { Hunt } from './modules/mod_Hunt.js';
@@ -50,21 +50,29 @@ document.querySelector('.obfuscator').addEventListener('click', () => history.ba
 
 
 
-////////////////////////
-// PARAMÈTRES & À PROPOS
+/////////////
+// PARAMÈTRES
 
-// Active les switch des paramètres
+// Active le switch du thème
 dataStorage.getItem('theme').then(theme => {
   const storedTheme = (theme != null) ? theme : 'system';
   const input = document.getElementById(`theme-${storedTheme}`);
   input.checked = true;
 });
 
+Array.from(document.querySelectorAll('input[name=theme]')).forEach(input => {
+  input.onclick = async event => { return await setTheme(input.value); };
+});
+
+// Active le switch des mises à jour auto
 dataStorage.getItem('check-updates').then(value => {
   if (value == 1) document.getElementById('switch-auto-maj').checked = true;
   else            document.getElementById('switch-auto-maj').checked = false;
 });
 
+document.querySelector('[for=switch-auto-maj]').onclick = async event => { event.preventDefault(); return await changeAutoMaj(); };
+
+// Active le switch de la sauvegarde en ligne
 dataStorage.getItem('online-backup').then(value => {
   if (value == 1) {
     document.getElementById('switch-online-backup').checked = true;
@@ -73,18 +81,21 @@ dataStorage.getItem('online-backup').then(value => {
   else document.getElementById('switch-online-backup').checked = false;
 });
 
-Array.from(document.querySelectorAll('input[name=theme]')).forEach(input => {
-  input.onclick = async event => { return await setTheme(input.value); };
-});
-document.querySelector('[for=switch-auto-maj]').onclick = async event => { event.preventDefault(); return await changeAutoMaj(); };
 document.querySelector('[for=switch-online-backup]').onclick = async event => { event.preventDefault(); return await setOnlineBackup(); };
 
+// Surveille l'input du mot de passe de la BDD
 document.getElementById('mdp-bdd').addEventListener('input', async () => {
   return await saveDBpassword();
 });
 
-// Active l'easter egg de la section a-propos
-document.querySelector('.easter-egg').onclick = playEasterEgg;
+// Active le badge indiquant le succès / échec de la dernière synchronisation des BDD
+dataStorage.getItem('last-sync').then(value => {
+  if (value === 'success') document.querySelector('#parametres').dataset.lastSync = 'success';
+  else document.querySelector('#parametres').dataset.lastSync = 'failure';
+})
+
+document.querySelector('.info-backup.failure').onclick = startBackup;
+document.querySelector('.info-backup.success').onclick = startBackup;
 
 // Prépare le bouton de recherche de mise à jour
 let longClic;
@@ -143,6 +154,9 @@ boutonSupprimer.addEventListener('click', async event => {
   }
 });
 
+// Active l'easter egg de la section a-propos
+document.querySelector('.easter-egg').onclick = playEasterEgg;
+
 
 
 ///////////////////////////////////////
@@ -197,13 +211,13 @@ navigator.serviceWorker.addEventListener('message', async event => {
 
   // --- Réponse à COMPARE-BACKUP ---
   else if ('successfulBackupComparison' in event.data) {
-    const checkbox = document.getElementById('switch-online-backup');
+    const loaders = Array.from(document.querySelectorAll('sync-progress'));
+
     if (event.data.successfulBackupComparison === true) {
       // Toutes les chasses locales plus récentes que celles de la BDD ont été ajoutées / éditées
-      await wait(1000);
-      unNotify();
-      checkbox.disabled = false;
-      await dataStorage.setItem('online-backup', 1);
+      loaders.forEach(loader => loader.setAttribute('state', 'success'));
+      document.querySelector('#parametres').dataset.lastSync = 'success';
+
       if ('obsolete' in event.data) {
         const versionBDD = await dataStorage.getItem('version-bdd');
         window.dispatchEvent(new CustomEvent('populate', { detail: { version: versionBDD, obsolete: event.data.obsolete } }));
@@ -211,12 +225,10 @@ navigator.serviceWorker.addEventListener('message', async event => {
     }
     else {
       // Au moins une chasse n'a pas pu être ajoutée / éditée
-      unNotify();
       if (event.data.error !== true) notify(event.data.error);
       else notify('Erreur. Réessayez plus tard.');
-      document.getElementById('parametres').removeAttribute('data-online-backup');
-      checkbox.checked = false;
-      checkbox.disabled = false;
+      loaders.forEach(loader => loader.setAttribute('state', 'failure'));
+      document.querySelector('#parametres').dataset.lastSync = 'failure';
     }
   }
 });
@@ -227,10 +239,10 @@ navigator.serviceWorker.addEventListener('message', async event => {
 // ÉCOUTE DE L'EVENT CUSTOM 'POPULATE'
 window.addEventListener('populate', async event => {
   console.log('[populate]', event.detail);
-  notify('Mise à jour des données...', '', 'loading', () => {}, 999999999);
-  await appPopulate(false);
-  await appDisplay(false);
   const isObsolete = ('obsolete' in event.detail && event.detail.obsolete === true);
+  notify('Mise à jour des données...', '', 'loading', () => {}, 999999999);
+  await appPopulate(false, isObsolete);
+  await appDisplay(false);
   //if (!isObsolete) await wait(1000);
   unNotify();
   if (isObsolete) {

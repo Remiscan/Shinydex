@@ -76,19 +76,6 @@ class syncProgress extends HTMLElement {
     super();
     this.shadow = this.attachShadow({ mode: 'open' });
     this.shadow.appendChild(template.content.cloneNode(true));
-
-    /*this.onclick = () => {
-      switch (this.getAttribute('state')) {
-        case null:
-          this.setAttribute('state', 'loading');
-          break;
-        case 'loading':
-          this.setAttribute('state', 'failure');
-          break;
-        default:
-          this.removeAttribute('state');
-      }
-    }*/
   }
 
   get state() { return this.getAttribute('state'); }
@@ -109,6 +96,13 @@ class syncProgress extends HTMLElement {
 
       // Si on lance le chargement
       if (newValue == 'loading') {
+        if (this.getAttribute('finished') != null) {
+          setTimeout(() => this.setAttribute('state', 'loading'), 50);
+          this.removeAttribute('state');
+          this.removeAttribute('finished');
+          return;
+        }
+
         this.perimetre = Math.ceil(Math.PI * this.getBoundingClientRect().width);
         svg.style.setProperty('--perimetre', this.perimetre);
 
@@ -136,14 +130,8 @@ class syncProgress extends HTMLElement {
           easing: 'linear',
           fill: 'forwards'
         });
-        this.successAnim.finished
-        .then(async () => {
-          this.loadingAnim.cancel();
-          await new Promise(r => setTimeout(r, 3000));
-          this.removeAttribute('state');
-          await new Promise(r => setTimeout(r, 200));
-          this.successAnim.cancel();
-        });
+
+        this.successAnim.onfinish = () => this.setAttribute('finished', true);
       }
 
       // Si le chargement est complété avec erreur
@@ -159,28 +147,15 @@ class syncProgress extends HTMLElement {
           easing: 'linear',
           fill: 'forwards'
         });
-        this.failureAnim.finished
-        .then(async () => {
-          this.loadingAnim.cancel();
-          await new Promise(r => setTimeout(r, 3000));
-          const bye = svg.animate([
-            { opacity: '0' }
-          ], {
-            easing: 'linear',
-            duration: 200,
-            fill: 'forwards'
-          });
-          await bye.finished;
-          this.removeAttribute('state');
-          await new Promise(r => setTimeout(r, 10));
-          bye.cancel();
-          this.failureAnim.cancel();
-        });
+
+        this.failureAnim.onfinish = () => this.setAttribute('finished', true);
       }
 
       // Sinon
       else {
-
+        this.loadingAnim.cancel();
+        if (this.successAnim) this.successAnim.cancel();
+        if (this.failureAnim) this.failureAnim.cancel();
       }
     }
   }
