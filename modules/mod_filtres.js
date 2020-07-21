@@ -220,7 +220,7 @@ export function deferMonitor(entries)
     if (!entry.isIntersecting) return;
 
     let cardsToDefer = [];
-    let stopAfter = 2 * Params.nombreADefer[sectionActuelle]();
+    let stopAfter = Params.nombreADefer[sectionActuelle]();
     switch (sectionActuelle) {
       case 'mes-chromatiques':
         cardsToDefer = Array.from(document.querySelectorAll(`#${sectionActuelle} .defer:not(.filtered)`))
@@ -228,7 +228,7 @@ export function deferMonitor(entries)
         break;
       case 'pokedex':
         cardsToDefer = Array.from(document.querySelectorAll(`#${sectionActuelle} .defer`));
-        stopAfter = 4 * Params.nombreADefer[sectionActuelle]();
+        //stopAfter = 4 * Params.nombreADefer[sectionActuelle]();
         break;
       case 'chasses-en-cours':
         cardsToDefer = Array.from(document.querySelectorAll(`#${sectionActuelle} .defer`)).reverse();
