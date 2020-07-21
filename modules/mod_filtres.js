@@ -7,51 +7,68 @@ let cardsOrdered = [];
 
 //////////////////////////////////////////////////////////
 // Filter les cartes de Pokémon selon une liste de filtres
+//
+// - si filtres = undefined, la fonction filtre cards selon defautFiltres
+// - si filtres = null, la fonction ne filtre pas les cartes mais calcule
+//   le nombre de cartes affichées à partir des cartes déjà filtrées
+//
+// - si cards = null, la fonction récupère toutes les cartes présentes dans l'appli
+// - si cards = [...](length == 1), la fonction filtre cette carte mais ne calcule
+//   pas le nombre de cartes affichées (puisqu'elle ne connaît pas la liste complète)
+// - si cards = [...](length > 1), la fonction filtre ces cartes et calcule le nombre
+//   d'entre elles qui seront affichées
+//
 const defautFiltres = ['do:moi', 'legit:oui'];
 let currentFiltres = defautFiltres;
 
 export async function filterCards(filtres = defautFiltres, cards = null)
 {
   const allCards = cards || Array.from(document.querySelectorAll('#mes-chromatiques .pokemon-card'));
-  const filteredCards = [];
-  const unfilteredCards = [];
+  const filteredCards = (filtres != null) ? [] : Array.from(document.querySelectorAll('#mes-chromatiques .pokemon-card.filtered'));
+  const unfilteredCards = (filtres != null) ? [] : allCards.filter(card => !card.classList.contains('filtered'));
 
-  allCards.forEach(card => {
-    card.classList.remove('filtered');
-    // On récupère les filtres de chaque carte
-    const cardFiltres = card.dataset.filtres.split(',');
-    for (const filtre of filtres) {
-      // Un filtre peut proposer plusieurs choix (a ou b : a|b), on récupère ces choix
-      const alterFiltres = filtre.split('|');
-      let alterCorrespondances = 0; // on compte combien de choix sont vérifiés
-      alterFiltres.forEach(af => {
-        if (cardFiltres.includes(af))
-          alterCorrespondances++;
-      });
-      // Si aucun choix n'est vérifié, on élimine la carte
-      if (alterCorrespondances == 0) {
-        filteredCards.push(card);
-        break;
+  filtrage: {
+    if (filtres == null) break filtrage;
+    allCards.forEach(card => {
+      card.classList.remove('filtered');
+      // On récupère les filtres de chaque carte
+      const cardFiltres = card.dataset.filtres.split(',');
+      for (const filtre of filtres) {
+        // Un filtre peut proposer plusieurs choix (a ou b : a|b), on récupère ces choix
+        const alterFiltres = filtre.split('|');
+        let alterCorrespondances = 0; // on compte combien de choix sont vérifiés
+        alterFiltres.forEach(af => {
+          if (cardFiltres.includes(af))
+            alterCorrespondances++;
+        });
+        // Si aucun choix n'est vérifié, on élimine la carte
+        if (alterCorrespondances == 0) {
+          filteredCards.push(card);
+          break;
+        }
+        else {
+          unfilteredCards.push(card);
+        }
       }
-      else {
-        unfilteredCards.push(card);
-      }
-    }
-  });
-  //console.log('Cartes filtrées :', filtres);
+    });
+    //console.log('Cartes filtrées :', filtres);
+  }
 
-  const compteur = allCards.length - filteredCards.length;
-  document.querySelector('.compteur').innerHTML = compteur;
-  document.querySelector('#mes-chromatiques .section-contenu').style.setProperty('--compteur', compteur);
-  if (compteur == 0) document.querySelector('#mes-chromatiques').classList.add('vide');
-  else document.querySelector('#mes-chromatiques').classList.remove('vide');
+  if (allCards.length > 1) {
+    const compteur = allCards.length - filteredCards.length;
+    document.querySelector('.compteur').innerHTML = compteur;
+    document.querySelector('#mes-chromatiques .section-contenu').style.setProperty('--compteur', compteur);
+    if (compteur == 0) document.querySelector('#mes-chromatiques').classList.add('vide');
+    else document.querySelector('#mes-chromatiques').classList.remove('vide');
+  }
 
-  filteredCards.forEach(card => card.classList.add('filtered'));
+  if (filtres != null) filteredCards.forEach(card => card.classList.add('filtered'));
   if (cards == null) filterDex();
-  await dataStorage.setItem('filtres', JSON.stringify(filtres));
+  if (allCards.length > 1) await dataStorage.setItem('filtres', JSON.stringify(filtres));
   currentFiltres = filtres;
   
-  return unfilteredCards;
+  if (allCards.length > 1) return unfilteredCards;
+  else return allCards[0];
 }
 
 

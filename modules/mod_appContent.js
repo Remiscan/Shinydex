@@ -44,6 +44,9 @@ export async function appPopulate(start = true, obsolete = false)
       document.querySelector('#mes-chromatiques .message-vide>span').innerHTML = 'Aucun Pokémon chromatique dans la base de données. Pour en ajouter, complétez une Chasse !';
     }
 
+    let savedFiltres = JSON.parse(await dataStorage.getItem('filtres'));
+    savedFiltres = (savedFiltres != null && savedFiltres.length > 0) ? savedFiltres : undefined;
+
     let ordre = 0;
     for (const huntid of allShiny) {
       // Si on doit supprimer cette carte
@@ -59,15 +62,16 @@ export async function appPopulate(start = true, obsolete = false)
         // Si on doit créer cette carte
         if (toCreate.includes(huntid)) {
           card = await createCard(pokemon, ordre);
-          cardsToPopulate.push(card);
+          cardsToPopulate.push(await filterCards(savedFiltres, [card]));
         }
 
         // Si on doit éditer cette carte
         else {
           const oldCard = document.getElementById(`pokemon-card-${huntid}`);
           const oldOrdre = oldCard.style.getPropertyValue('--ordre-sprite');
-          const newCard = await createCard(pokemon, (obsolete ? ordre : oldOrdre));
+          let newCard = await createCard(pokemon, (obsolete ? ordre : oldOrdre));
           if (oldCard.classList.contains('on')) newCard.classList.add('on');
+          newCard = await filterCards(savedFiltres, [newCard]);
           oldCard.outerHTML = newCard.outerHTML;
           card = document.getElementById(`pokemon-card-${huntid}`);
         }
@@ -83,18 +87,12 @@ export async function appPopulate(start = true, obsolete = false)
 
     let unfilteredCards;
     if (start) {
-      const savedFiltres = JSON.parse(await dataStorage.getItem('filtres'));
-      if (savedFiltres != null && savedFiltres.length > 0)
-        unfilteredCards = await filterCards(savedFiltres, cardsToPopulate);
-      else
-        unfilteredCards = await filterCards(undefined, cardsToPopulate);
+      unfilteredCards = await filterCards(null, cardsToPopulate);
 
       const savedOrdreReverse = await dataStorage.getItem('ordre-reverse');
-      const savedOrdre = JSON.parse(await dataStorage.getItem('ordre'));
-      if (savedOrdre != null)
-        cardsToPopulate = await orderCards(savedOrdre, savedOrdreReverse, cardsToPopulate);
-      else
-        cardsToPopulate = await orderCards(undefined, savedOrdreReverse, cardsToPopulate);
+      let savedOrdre = JSON.parse(await dataStorage.getItem('ordre'));
+      savedOrdre = (savedOrdre != null) ? savedOrdre : undefined;
+      cardsToPopulate = await orderCards(savedOrdre, savedOrdreReverse, cardsToPopulate);
     }
 
     // Peuple les éléments après la préparation (pour optimiser le temps d'exécution)

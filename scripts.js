@@ -211,7 +211,9 @@ navigator.serviceWorker.addEventListener('message', async event => {
 
   // --- Réponse à COMPARE-BACKUP ---
   else if ('successfulBackupComparison' in event.data) {
-    const loaders = Array.from(document.querySelectorAll('sync-progress'));
+    if ('noresponse' in event.data) return;
+
+    const loaders = Array.from(document.querySelectorAll('sync-progress, sync-line'));
 
     if (event.data.successfulBackupComparison === true) {
       // Toutes les chasses locales plus récentes que celles de la BDD ont été ajoutées / éditées

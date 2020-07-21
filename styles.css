@@ -232,7 +232,8 @@ body[data-section-actuelle=chasses-en-cours] .nav-link[data-section=chasses-en-c
   cursor: pointer;
 }
 
-.lien-section>sync-progress {
+.lien-section>sync-progress,
+.sous-titre>sync-line {
   position: absolute;
 }
 

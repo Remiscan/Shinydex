@@ -45,8 +45,7 @@ export async function appStart()
   if (!'serviceWorker' in navigator)
     throw 'Application non supportée.';
 
-  // Étape 1 : on vérifie si l'application est installée localement
-
+  // ÉTAPE 1 : on vérifie si l'application est installée localement
   let log;
   try {
     let filesInstalled = false;
@@ -78,9 +77,7 @@ export async function appStart()
     }
   }
 
-  // Étape 2 : si la réponse est non, on installe l'application
-  //   si l'installation est impossible, on arrête et on retentera une fois le service worker disponible
-
+  // ÉTAPE 2 : si la réponse est non, on installe l'application
   catch(error) {
     console.log(error);
     console.log('[:|] Préparation de l\'installation...');
@@ -94,11 +91,15 @@ export async function appStart()
     console.log('[:)] Chargement de l\'application...');
     recalcOnResize();
 
-    // Étape 3 : on peuple l'application à partir des données locales
+    // ÉTAPE 3 : si la  sauvegarde en ligne est activée, on met à jour les données locales
+    const onlineBackup = await dataStorage.getItem('online-backup');
+    if (onlineBackup) await waitBackup();
+
+    // ÉTAPE 4 : on peuple l'application à partir des données locales
     log = await appPopulate();
     console.log(log);
 
-    // Étape 4 : on affiche l'application
+    // ÉTAPE 5 : on affiche l'application
     log = await appDisplay();
     console.log(log);
     appChargee = 'loaded';
@@ -106,9 +107,9 @@ export async function appStart()
     // Fini !! :)
     appChargee = true;
 
+    // ÉTAPE bonus : si nécessaire, on vérifie si l'application
+    // peut être installée ou si une mise à jour est disponible
     checkInstall();
-    const onlineBackup = await dataStorage.getItem('online-backup');
-    if (onlineBackup) await startBackup();
     const willCheckUpdate = await dataStorage.getItem('check-updates');
     if (willCheckUpdate == 1) {
       await navigator.serviceWorker.ready;
@@ -127,17 +128,15 @@ export async function appStart()
     if (error == '[:(] Erreur critique de chargement')
     {
       async function forceUpdateNow() {
-        [dataStorage, shinyStorage, pokemonData].forEach(async store => {
-          await store.clear();
-        });
+        await Promise.all([ dataStorage.clear(), shinyStorage.clear(), pokemonData.clear() ]);
         manualUpdate();
       };
       document.getElementById('load-screen').remove();
-      return notify('Échec critique du chargement...', 'Réinstaller', 'refresh', forceUpdateNow, 2147483647);
+      return notify('Échec critique du chargement...', 'Réinstaller', 'refresh', forceUpdateNow, 999999999);
     }
     else if (error != '[:(] Service worker indisponible')
     {
-      return notify('Échec du chargement...', 'Réessayer', 'refresh', () => { location.reload() }, 2147483647);
+      return notify('Échec du chargement...', 'Réessayer', 'refresh', () => { location.reload() }, 999999999);
     }
   }
 }
@@ -330,6 +329,7 @@ export async function setOnlineBackup()
 
 // Demande au service worker de mettre à jour le sprite
 export async function updateSprite(version = null) {
+  await navigator.serviceWorker.ready;
   return new Promise((resolve, reject) => {
     const chan = new MessageChannel();
 
@@ -353,8 +353,7 @@ export async function updateSprite(version = null) {
     }
   
     currentWorker.postMessage({ 'action': 'update-sprite', version }, [chan.port2]);
-  })
-  
+  });
 }
 
 
@@ -364,6 +363,35 @@ export async function startBackup() {
   const reg = await navigator.serviceWorker.ready;
   await reg.sync.register('SYNC-BACKUP');
 
-  const loaders = Array.from(document.querySelectorAll('sync-progress'));
+  const loaders = Array.from(document.querySelectorAll('sync-progress, sync-line'));
   loaders.forEach(loader => loader.setAttribute('state', 'loading'));
+}
+
+// Démarre la procédure de backup et attend la réponse
+async function waitBackup() {
+  await navigator.serviceWorker.ready;
+  return new Promise((resolve, reject) => {
+    const chan = new MessageChannel();
+
+    chan.port1.onmessage = event => {
+      if (event.data.error) {
+        console.error(event.data.error);
+        reject('[:(] Erreur de contact du service worker');
+      }
+
+      if ('successfulBackupComparison' in event.data) {
+        if (event.data.successfulBackupComparison === true) resolve();
+        else reject('[:(] Échec de la synchronisation des BDD');
+      }
+      else {
+        reject('[:(] Message invalide reçu du service worker');
+      }
+    }
+
+    chan.port1.onmessageerror = event => {
+      reject('[:(] Erreur de communication avec le service worker');
+    }
+  
+    currentWorker.postMessage({ 'action': 'compare-backup' }, [chan.port2]);
+  });
 }

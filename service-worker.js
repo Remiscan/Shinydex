@@ -62,20 +62,7 @@ self.addEventListener('activate', function(event)
 self.addEventListener('fetch', function(event)
 {
   //console.log('[fetch] Le service worker récupère l\'élément ' + event.request.url);
-  // Si l'élément est sprites.php et que online-backup = 0
-  /*if (event.request.url.match(/(.+)sprites--(.+).php$/))
-  {
-    const version = event.request.url.match(/(?:.+)sprites--(.+).php$/)[1];
-    event.respondWith(
-      caches.match(event.request)
-      .then(matching => {
-        return matching || updateSprite(version).then(() => fetch(event.request));
-      })
-      .catch(error => console.error(error))
-    )
-  }*/
   // Si l'élément est un sprite (non mis en cache par le sw), on le récupère sur le réseau
-  /*else */
   if (event.request.url.match(/(.+)\/poke_(capture|icon)_(.+)/))
   {
     event.respondWith(
@@ -117,8 +104,12 @@ self.addEventListener('message', function(event) {
 
   // COMPARE-BACKUP
   else if (event.data.action == 'compare-backup') {
+    const source = event.ports[0];
+
     event.waitUntil(
-      compareBackup()
+      compareBackup(false)
+      .then(() => source.postMessage({ successfulBackupComparison: true, noresponse: true }))
+      .catch(() => source.postMessage({ successfulBackupComparison: false, noresponse: true }))
     );
   }
 
@@ -269,7 +260,7 @@ async function deleteOldCaches(newCache, action)
 
 
 // Compare et synchronise les bases de données locale et en ligne
-async function compareBackup() {
+async function compareBackup(message = true) {
   try {
     // On récupère les données locales
     await shinyStorage.ready();
@@ -294,7 +285,7 @@ async function compareBackup() {
       throw '[:(] Mauvais mot de passe...';
     
     // Vérifier si le serveur a réussi sa mission
-    console.log('Réponse reçue du serveur :', data);
+    console.log('[compare-backup] Réponse reçue du serveur :', data);
 
     if (data['error'] == true) throw data['response'];
 
@@ -344,6 +335,7 @@ async function compareBackup() {
 
     // Transmettons les informations à l'application
     await dataStorage.setItem('last-sync', 'success');
+    if (!message) return true;
     const clients = await self.clients.matchAll();
     clients.map(client => client.postMessage({ successfulBackupComparison: true, obsolete: obsoleteLocal, quantity: data['results'].length }));
     return true;
@@ -352,6 +344,7 @@ async function compareBackup() {
   catch(error) {
     console.error(error);
     await dataStorage.setItem('last-sync', 'failure');
+    if (!message) throw false;
     const clients = await self.clients.matchAll();
     clients.map(client => client.postMessage({ successfulBackupComparison: false, error }));
     return false;
