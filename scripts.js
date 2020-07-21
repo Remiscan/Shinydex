@@ -242,15 +242,17 @@ navigator.serviceWorker.addEventListener('message', async event => {
 window.addEventListener('populate', async event => {
   console.log('[populate]', event.detail);
   const isObsolete = ('obsolete' in event.detail && event.detail.obsolete === true);
-  //notify('Mise à jour des données...', '', 'loading', () => {}, 999999999);
+  if (isObsolete) notify('Mise à jour des données...', '', 'loading', () => {}, 999999999);
   await appPopulate(false, isObsolete);
   await appDisplay(false);
   //if (!isObsolete) await wait(1000);
   //unNotify();
   if (isObsolete) {
     const version = await updateSprite(event.detail.version);
+    if (isNaN(version)) { console.log('Problème de version du sprite ?'); return unNotify(); }
     await loadAllImages([`./sprites--${version}.php`]);
     document.documentElement.style.setProperty('--link-sprites', `url('./sprites--${version}.php')`);
+    unNotify();
   }
 })
 

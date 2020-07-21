@@ -116,7 +116,7 @@ self.addEventListener('message', function(event) {
   // UPDATE-SPRITE
   else if (event.data.action == 'update-sprite') {
     const version = ('version' in event.data) ? event.data.version : null;
-    const source = event.source;
+    const source = event.ports[0];
 
     event.waitUntil(
       updateSprite(version)
@@ -312,18 +312,15 @@ async function compareBackup(message = true) {
       toSet.map(shiny => shinyStorage.setItem(String(shiny.huntid), shiny))
     );
     const toDelete = [...data['deletions-local']];
-    await Promise.all(
-      toDelete.map(huntid => shinyStorage.removeItem(String(huntid)))
-    );
-
-    // Supprimons les chasses locales correctement uploadées
-    let toCheck = [...data['inserts'], ...data['updates']].map(shiny => shiny.huntid);
-    const huntsToCheck = await Promise.all(
-      toCheck.map(huntid => huntStorage.getItem(String(huntid)))
-    );
-    await Promise.all(
-      huntsToCheck.filter(hunt => hunt.uploaded == 'cloud_upload')
-                  .map(hunt => huntStorage.removeItem(String(hunt.huntid)))
+    const prepareForDeletion = async huntid => {
+      const shiny = await shinyStorage.getItem(String(huntid));
+      shiny.destroy = true;
+      await shinyStorage.setItem(String(huntid), shiny);
+      return;
+    };
+     await Promise.all(
+      //toDelete.map(huntid => shinyStorage.removeItem(String(huntid)))
+      toDelete.map(huntid => prepareForDeletion(huntid))
     );
 
     // Vérifions si la BDD en ligne est plus récente que la locale

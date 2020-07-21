@@ -24,7 +24,7 @@ let currentFiltres = defautFiltres;
 export async function filterCards(filtres = defautFiltres, cards = null)
 {
   const allCards = cards || Array.from(document.querySelectorAll('#mes-chromatiques .pokemon-card'));
-  const filteredCards = (filtres != null) ? [] : Array.from(document.querySelectorAll('#mes-chromatiques .pokemon-card.filtered'));
+  const filteredCards = (filtres != null) ? [] : allCards.filter(card => card.classList.contains('filtered'));
   const unfilteredCards = (filtres != null) ? [] : allCards.filter(card => !card.classList.contains('filtered'));
 
   filtrage: {
@@ -64,7 +64,7 @@ export async function filterCards(filtres = defautFiltres, cards = null)
 
   if (filtres != null) filteredCards.forEach(card => card.classList.add('filtered'));
   if (cards == null) filterDex();
-  if (allCards.length > 1) await dataStorage.setItem('filtres', JSON.stringify(filtres));
+  if (allCards.length > 1) await dataStorage.setItem('filtres', filtres);
   currentFiltres = filtres;
   
   if (allCards.length > 1) return unfilteredCards;
@@ -146,7 +146,7 @@ export async function orderCards(ordre = defautOrdre, reversed = false, cards = 
   }
   
   sortedCards.forEach((card, ordre) => card.style.setProperty('--order', ordre));
-  await dataStorage.setItem('ordre', JSON.stringify(ordre));
+  await dataStorage.setItem('ordre', ordre);
   currentOrdre = ordre;
   return sortedCards;
   //console.log('Cartes ordonnées :', ordre, reverse);

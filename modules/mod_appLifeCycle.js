@@ -1,5 +1,5 @@
 import { appPopulate, appDisplay } from './mod_appContent.js';
-import { recalcOnResize, version2date, wait } from './mod_Params.js';
+import { Params, recalcOnResize, version2date, wait } from './mod_Params.js';
 import { notify } from './mod_notification.js';
 
 /////////////////////////////////////////////////////
@@ -53,7 +53,7 @@ export async function appStart()
     let serviceWorkerReady = navigator.serviceWorker.controller != null;
 
     // On vérifie si les données sont installées
-    await Promise.all([dataStorage.ready(), shinyStorage.ready(), pokemonData.ready()]);
+    await Promise.all([dataStorage.ready(), shinyStorage.ready(), pokemonData.ready(), huntStorage.ready()]);
     const installedVersion = await dataStorage.getItem('version-fichiers');
     if (installedVersion !== null)
       dataInstalled = true;
@@ -91,9 +91,31 @@ export async function appStart()
     console.log('[:)] Chargement de l\'application...');
     recalcOnResize();
 
-    // ÉTAPE 3 : si la  sauvegarde en ligne est activée, on met à jour les données locales
+    // ÉTAPE 3 : si la sauvegarde en ligne est activée, on met à jour les données locales
     const onlineBackup = await dataStorage.getItem('online-backup');
     if (onlineBackup) await waitBackup();
+
+    // ÉTAPE 3.98 : si des shiny marqués à 'destroy' sont stockés, on les supprime
+    let toDestroy = await shinyStorage.keys();
+    toDestroy = await Promise.all(
+      toDestroy.map(key => shinyStorage.getItem(key))
+    );
+    await Promise.all(
+      toDestroy.filter(shiny => shiny.destroy == true)
+               .map(shiny => shiny.huntid)
+               .map(huntid => shinyStorage.removeItem(String(huntid)))
+    );
+
+    // ÉTAPE 3.99 : si la version de base de données ne correspond pas à la version du sprite en cache, on le met à jour
+    const versionBDD = await dataStorage.getItem('version-bdd');
+    const versionFichiers = await dataStorage.getItem('version-fichiers');
+    const cacheActuel = await caches.open(`remidex-sw-${versionFichiers}`);
+    let versionSprite = await cacheActuel.keys();
+    versionSprite = versionSprite.map(req => req.url)
+                                 .filter(url => url.match(Params.spriteRegex))
+                                 .map(url => Number(url.match(Params.spriteRegex)[1]));
+    versionSprite = Math.max(...versionSprite);
+    if (versionSprite < versionBDD) await updateSprite();
 
     // ÉTAPE 4 : on peuple l'application à partir des données locales
     log = await appPopulate();

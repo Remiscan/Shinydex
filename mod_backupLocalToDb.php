@@ -77,8 +77,9 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
 
     foreach($onlineData as $key => $pkmn) {
       $r = array_search($pkmn['huntid'], array_column($localData, 'huntid'));
+      $d = array_search($pkmn['huntid'], array_column($deletedData, 'huntid'));
       // Données en ligne non présentes dans la BDD locale
-      if ($r === false) {
+      if ($r === false && $d === false) {
         $dataToInsertLocal[] = $pkmn;
       }
     }

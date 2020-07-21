@@ -478,8 +478,8 @@ export class Hunt {
       }
 
       // On marque la chasse comme uploadée
-      this.uploaded = 'cloud_upload';
-      await huntStorage.setItem(String(this.id), this);
+      /*this.uploaded = 'cloud_upload';
+      await huntStorage.setItem(String(this.id), this);*/
       await shinyStorage.setItem(String(this.id), shiny.format());
 
       await this.destroyHunt();
