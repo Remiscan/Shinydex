@@ -124,7 +124,7 @@ export function wait(time) { return new Promise(resolve => setTimeout(resolve, t
 /////////////////////////////////
 // Convertit un timestamp en date
 export function version2date(timestamp) {
-  const d = new Date(timestamp * 1000);
+  const d = new Date(timestamp);
   return d.toISOString().replace('T', ' ').replace(/\.[0-9]{3}Z/, '');
 }
 
