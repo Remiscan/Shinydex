@@ -47,7 +47,7 @@ export async function filterCards(filtres = defautFiltres, cards = null)
   else document.querySelector('#mes-chromatiques').classList.remove('vide');
 
   filteredCards.forEach(card => card.classList.add('filtered'));
-  if (cards != null) filterDex();
+  if (cards == null) filterDex();
   await dataStorage.setItem('filtres', JSON.stringify(filtres));
   currentFiltres = filtres;
   

@@ -81,15 +81,13 @@ export async function appPopulate(start = true, obsolete = false)
       ordre++;
     }
 
+    let unfilteredCards;
     if (start) {
       const savedFiltres = JSON.parse(await dataStorage.getItem('filtres'));
-      let unfilteredCards;
       if (savedFiltres != null && savedFiltres.length > 0)
         unfilteredCards = await filterCards(savedFiltres, cardsToPopulate);
       else
         unfilteredCards = await filterCards(undefined, cardsToPopulate);
-
-      filterDex(unfilteredCards);
 
       const savedOrdreReverse = await dataStorage.getItem('ordre-reverse');
       const savedOrdre = JSON.parse(await dataStorage.getItem('ordre'));
@@ -134,6 +132,7 @@ export async function appPopulate(start = true, obsolete = false)
     // Peuple le Pokédex (seulement au lancement)
     conteneur = document.querySelector('#pokedex>.section-contenu');
     for (let genConteneur of gensToPopulate) { conteneur.appendChild(genConteneur); }
+    if (start) filterDex(unfilteredCards);
 
     return '[:)] L\'application est prête !';
   }
