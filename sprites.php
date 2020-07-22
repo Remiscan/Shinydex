@@ -22,6 +22,9 @@ else {
   foreach($data as $d) {
     $data_shinies[] = ['numero_national' => $d[0], 'forme' => $d[1]];
   }
+
+  if (count($data_shinies) == 0)
+    $data_shinies[] = ['numero_national' => 0, 'forme' => 0];
 }
 
 /////////////////////////////////////////////////////////////
