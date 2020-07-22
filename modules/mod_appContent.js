@@ -241,6 +241,7 @@ export async function appDisplay(start = true)
       document.querySelector('#mes-chromatiques').classList.add('vide');
       document.querySelector('#mes-chromatiques .message-vide>.material-icons').innerHTML = 'cloud_off';
       document.querySelector('#mes-chromatiques .message-vide>span').innerHTML = 'Aucun Pokémon chromatique dans la base de données. Pour en ajouter, complétez une Chasse !';
+      document.querySelector('.compteur').innerHTML = 0;
     }
     
     document.getElementById('version-fichiers').innerHTML = version2date(await dataStorage.getItem('version-fichiers'));
