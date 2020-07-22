@@ -86,10 +86,10 @@ self.addEventListener('fetch', function(event)
 
 // MESSAGE
 self.addEventListener('message', function(event) {
-  if ('action' in event.data) console.log(`[${event.data.action}] Demande reçue...`);
+  console.log('[sw] Message reçu :', event.data);
 
   // FULL UPDATE
-  if (event.data.action == 'update') {
+  if (event.data && event.data.action == 'update') {
     const source = event.source;
 
     event.waitUntil(
@@ -103,7 +103,7 @@ self.addEventListener('message', function(event) {
   }
 
   // COMPARE-BACKUP
-  else if (event.data.action == 'compare-backup') {
+  else if (event.data && event.data.action == 'compare-backup') {
     const source = event.ports[0];
 
     event.waitUntil(
@@ -114,7 +114,7 @@ self.addEventListener('message', function(event) {
   }
 
   // UPDATE-SPRITE
-  else if (event.data.action == 'update-sprite') {
+  else if (event.data && event.data.action == 'update-sprite') {
     const version = ('version' in event.data) ? event.data.version : null;
     const source = event.ports[0];
 
@@ -128,8 +128,8 @@ self.addEventListener('message', function(event) {
 
 
 // SYNC
-self.addEventListener('sync', async function(event) {
-  console.log('[sw] Requête de SYNC reçue');
+self.addEventListener('sync', function(event) {
+  console.log('[sw] Requête SYNC reçue :', event.tag);
 
   if (event.tag == 'SYNC-BACKUP') {
     event.waitUntil(

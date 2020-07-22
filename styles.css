@@ -544,8 +544,7 @@ body:not([data-section-actuelle=mes-chromatiques]):not([data-section-actuelle=po
   transform-origin: center;
 }
 
-.pokemon-sprite::before {
-  content: '';
+.pokemon-sprite>.actual-sprite {
   display: block;
   --size: 112px;
   width: var(--size);
@@ -1382,7 +1381,7 @@ picture.no-shiny>span {
   left: -8px;
 }
 
-.hunt-card>.pokemon-sprite::before {
+.hunt-card>.pokemon-sprite>.actual-sprite {
   background-image: var(--sprite, none);
   background-position: center center;
 }

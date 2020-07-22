@@ -140,22 +140,16 @@ export async function appStart()
   catch(error) {
     console.error(error);
     appChargee = false;
-    if (error != '[:(] Service worker indisponible')
-    {
-      return notify('Échec du chargement...', 'Réessayer', 'refresh', () => { location.reload() }, 999999999);
-    }
-    else
-    {
-      async function forceUpdateNow() {
-        await Promise.all([ dataStorage.clear(), shinyStorage.clear(), pokemonData.clear() ]);
-        await caches.keys()
-              .then(keys => keys.filter(k => k.startsWith('remidex-sw')))
-              .then(keys => Promise.all(keys.map(key => caches.delete(key))))
-        manualUpdate();
-      };
-      document.getElementById('load-screen').remove();
-      return notify('Échec critique du chargement...', 'Réinitialiser', 'refresh', forceUpdateNow, 999999999);
-    }
+
+    async function forceUpdateNow() {
+      await Promise.all([ dataStorage.clear(), shinyStorage.clear(), pokemonData.clear() ]);
+      await caches.keys()
+            .then(keys => keys.filter(k => k.startsWith('remidex-sw')))
+            .then(keys => Promise.all(keys.map(key => caches.delete(key))))
+      manualUpdate();
+    };
+    document.getElementById('load-screen').remove();
+    return notify('Échec critique du chargement...', 'Réinitialiser', 'refresh', forceUpdateNow, 999999999);
   }
 }
 
@@ -347,7 +341,7 @@ export async function setOnlineBackup()
 
 // Demande au service worker de mettre à jour le sprite
 export async function updateSprite(version = null) {
-  await navigator.serviceWorker.ready;
+  const reg = await navigator.serviceWorker.ready;
   return new Promise((resolve, reject) => {
     const chan = new MessageChannel();
 
@@ -370,7 +364,8 @@ export async function updateSprite(version = null) {
       reject('[:(] Erreur de communication avec le service worker');
     }
   
-    currentWorker.postMessage({ 'action': 'update-sprite', version }, [chan.port2]);
+    const worker = currentWorker || reg.active;
+    worker.postMessage({ 'action': 'update-sprite', version }, [chan.port2]);
   });
 }
 
@@ -387,7 +382,7 @@ export async function startBackup() {
 
 // Démarre la procédure de backup et attend la réponse
 async function waitBackup() {
-  await navigator.serviceWorker.ready;
+  const reg = await navigator.serviceWorker.ready;
   return new Promise((resolve, reject) => {
     const chan = new MessageChannel();
 
@@ -410,6 +405,7 @@ async function waitBackup() {
       reject('[:(] Erreur de communication avec le service worker');
     }
   
-    currentWorker.postMessage({ 'action': 'compare-backup' }, [chan.port2]);
+    const worker = currentWorker || reg.active;
+    worker.postMessage({ 'action': 'compare-backup' }, [chan.port2]);
   });
 }

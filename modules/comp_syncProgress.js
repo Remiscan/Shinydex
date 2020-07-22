@@ -71,8 +71,8 @@ template.innerHTML = `
   .progress-line {
     stroke: var(--progress-bar-color);
     stroke-width: 2px;
-    stroke-dasharray: var(--perimetre, 0);
-    stroke-dashoffset: var(--perimetre, 0);
+    stroke-dasharray: 101px;
+    stroke-dashoffset: 101px;
     transform-origin: center center;
   }
 </style>

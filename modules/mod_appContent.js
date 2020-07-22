@@ -53,10 +53,12 @@ export async function appPopulate(start = true, obsolete = [], versionSprite = 0
 
     let ordre = 0; // ordre du sprite dans le spritesheet
     for (const huntid of allShiny) {
-      // Si on doit supprimer cette carte
+      // Si on doit supprimer cette carte, on incrément l'ordre et continue
       if (toDelete.includes(huntid)) {
         const card = document.getElementById(`pokemon-card-${huntid}`);
         card.remove();
+        ordre++;
+        continue;
       }
 
       // Si cette carte est déjà marquée comme supprimée,
