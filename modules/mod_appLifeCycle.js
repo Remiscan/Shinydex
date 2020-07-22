@@ -1,5 +1,5 @@
 import { appPopulate, appDisplay } from './mod_appContent.js';
-import { Params, recalcOnResize, version2date, wait } from './mod_Params.js';
+import { Params, recalcOnResize, version2date, wait, getVersionSprite } from './mod_Params.js';
 import { notify } from './mod_notification.js';
 
 /////////////////////////////////////////////////////
@@ -108,13 +108,7 @@ export async function appStart()
 
     // ÉTAPE 3.99 : si la version de base de données ne correspond pas à la version du sprite en cache, on le met à jour
     const versionBDD = await dataStorage.getItem('version-bdd');
-    const versionFichiers = await dataStorage.getItem('version-fichiers');
-    const cacheActuel = await caches.open(`remidex-sw-${versionFichiers}`);
-    let versionSprite = await cacheActuel.keys();
-    versionSprite = versionSprite.map(req => req.url)
-                                 .filter(url => url.match(Params.spriteRegex))
-                                 .map(url => Number(url.match(Params.spriteRegex)[1]));
-    versionSprite = Math.max(...versionSprite);
+    const versionSprite = await getVersionSprite();
     if (versionSprite < versionBDD) await updateSprite();
 
     // ÉTAPE 4 : on peuple l'application à partir des données locales

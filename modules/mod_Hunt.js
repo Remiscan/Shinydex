@@ -484,7 +484,7 @@ export class Hunt {
 
       await this.destroyHunt();
       await dataStorage.setItem('version-bdd', this.lastupdate);
-      window.dispatchEvent(new CustomEvent('populate', { detail: { version: this.lastupdate, obsolete } }));
+      window.dispatchEvent(new CustomEvent('populate', { detail: { version: this.lastupdate, obsolete: (obsolete ? [String(this.huntid)] : []) } }));
       if (onlineBackup) await startBackup();
     }
     catch(error) {
@@ -503,12 +503,13 @@ export class Hunt {
 
       // On marque le shiny comme supprimé
       const shiny = await Shiny.build(await shinyStorage.getItem(String(this.id)));
+      shiny.lastupdate = this.lastupdate;
       shiny.deleted = true;
       await shinyStorage.setItem(String(this.id), shiny.format());
 
       await this.destroyHunt();
       await dataStorage.setItem('version-bdd', this.lastupdate);
-      window.dispatchEvent(new CustomEvent('populate', { detail: { version: this.lastupdate, obsolete: false } }));
+      window.dispatchEvent(new CustomEvent('populate', { detail: { version: this.lastupdate, obsolete: [] } }));
       if (onlineBackup) await startBackup();
     }
     catch(error) {

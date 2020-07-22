@@ -179,7 +179,7 @@ async function installData([data, files], action = 'install', event = null) {
     // Mise à jour des données
     console.log(`[${action}] Installation des données...`);
     await Promise.all([dataStorage.ready(), shinyStorage.ready(), pokemonData.ready()]);
-    await dataStorage.setItem('version-fichiers', data['version-fichiers']);
+    await dataStorage.setItem('version-fichiers', Number(data['version-fichiers']));
     await dataStorage.setItem('pokemon-names', data['pokemon-names']);
     await dataStorage.setItem('pokemon-names-fr', data['pokemon-names-fr']);
     await Promise.all(
@@ -290,8 +290,9 @@ async function compareBackup(message = true) {
     if (data['error'] == true) throw data['response'];
 
     // Vérifions si le sprite doit être mis à jour
-    let obsoleteLocal = false;
-    if (data['inserts-local'].length > 0) obsoleteLocal = true;
+    let localObsoletes = [];
+    if (data['inserts-local'].length > 0)
+      localObsoletes = [...localObsoletes, ...data['inserts-local'].map(shiny => String(shiny.huntid))];
     else {
       for (const pkmn of data['updates-local']) {
         const shiny = await shinyStorage.getItem(String(pkmn.huntid));
@@ -300,7 +301,7 @@ async function compareBackup(message = true) {
         const onlineFormid = pkmn.forme;
         const localFormid = shiny.forme;
         if (onlineDexix != localDexid || onlineFormid != localFormid) {
-          obsoleteLocal = true;
+          localObsoletes.push(String(pkmn.huntid));
           break;
         }
       }
@@ -327,14 +328,14 @@ async function compareBackup(message = true) {
     const versionBDD = await dataStorage.getItem('version-bdd');
     const newVersionBDD = data['version-bdd'];
     if (newVersionBDD > versionBDD) {
-      await dataStorage.setItem('version-bdd', newVersionBDD);
+      await dataStorage.setItem('version-bdd', Number(newVersionBDD));
     }
 
     // Transmettons les informations à l'application
     await dataStorage.setItem('last-sync', 'success');
     if (!message) return true;
     const clients = await self.clients.matchAll();
-    clients.map(client => client.postMessage({ successfulBackupComparison: true, obsolete: obsoleteLocal, quantity: data['results'].length }));
+    clients.map(client => client.postMessage({ successfulBackupComparison: true, obsolete: localObsoletes, quantity: data['results'].length }));
     return true;
   }
 
@@ -359,7 +360,7 @@ async function updateSprite(_version = null) {
     
     // On récupère et ordonne la liste des sprites à partir des données locales
     let keys = await shinyStorage.keys();
-    keys = keys.sort((a, b) => b - a);
+    keys = keys.sort((a, b) => a - b);
     let data = await Promise.all(keys.map(key => shinyStorage.getItem(key)));
     data = data.filter(shiny => !shiny.deleted);
     data = data.map(s => [s['numero_national'], s['forme'], s['id']]);

@@ -11,7 +11,7 @@ $allsprites = array();
 if ($data === false) {
   // Je récupère les infos sur mes chromatiques dans la base de données
   $link = new BDD();
-  $recup_shinies = $link->prepare('SELECT * FROM mes_shinies ORDER BY id DESC');
+  $recup_shinies = $link->prepare('SELECT * FROM mes_shinies ORDER BY huntid ASC');
     $recup_shinies->execute();
     $data_shinies = $recup_shinies->fetchAll(PDO::FETCH_ASSOC);
 }

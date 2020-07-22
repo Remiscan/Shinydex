@@ -1,7 +1,7 @@
 import { Pokemon } from './mod_Pokemon.js';
 import { createCard, toggleNotes } from './mod_pokemonCard.js';
 import { filterCards, orderCards, filterDex, deferCards, deferMonitor } from './mod_filtres.js';
-import { Params, loadAllImages, wait, version2date } from './mod_Params.js';
+import { Params, loadAllImages, wait, version2date, getVersionSprite } from './mod_Params.js';
 import { openSpriteViewer } from './mod_spriteViewer.js';
 import { editHunt, initHunts } from './mod_Hunt.js';
 import { notify, unNotify } from './mod_notification.js';
@@ -12,7 +12,7 @@ let displaying = false;
 
 /////////////////////////////////////////////////////////
 // Peuple l'application à partir des données de indexedDB
-export async function appPopulate(start = true, obsolete = false)
+export async function appPopulate(start = true, obsolete = [], versionSprite = 0)
 {
   if (populating) return;
   populating = true;
@@ -31,19 +31,21 @@ export async function appPopulate(start = true, obsolete = false)
     const dbShiny = keys.map(shiny => String(shiny.huntid));
 
     // Comparons les deux listes
-    //// Shiny ayant une carte qui ont disparu de la base de données (donc à supprimer)
-    const toDelete = currentShiny.filter(huntid => !dbShiny.includes(huntid));
-    //// Shiny présents dans la base de données n'ayant pas de carte (donc à créer)
-    const toCreate = dbShiny.filter(huntid => !currentShiny.includes(huntid));
     //// Shiny marqués supprimés dans la base de données (donc à ignorer)
     const toIgnore = keys.filter(shiny => shiny.deleted).map(shiny => String(shiny.huntid));
+    //// Shiny ayant une carte qui ont disparu de la base de données (donc à supprimer)
+    const toDelete = currentShiny.filter(huntid => !dbShiny.includes(huntid) || (currentShiny.includes(huntid) && toIgnore.includes(huntid)));
+    //// Shiny présents dans la base de données n'ayant pas de carte (donc à créer)
+    const toCreate = dbShiny.filter(huntid => !currentShiny.includes(huntid));
 
     // Liste des huntid de tous les shiny à créer, éditer ou supprimer, ordonnée par huntid
     const allShiny = Array.from(new Set([...dbShiny, ...currentShiny]))
-                          .sort((a, b) => b - a);
+                          .sort((a, b) => a - b);
 
     let savedFiltres = await dataStorage.getItem('filtres');
     savedFiltres = (savedFiltres != null && savedFiltres.length > 0) ? savedFiltres : undefined;
+
+    const futureVersionSprite = versionSprite || getVersionSprite();
 
     let ordre = 0;
     for (const huntid of allShiny) {
@@ -53,7 +55,10 @@ export async function appPopulate(start = true, obsolete = false)
         card.remove();
       }
 
-      else if (toIgnore.includes(huntid)) {}
+      if (toIgnore.includes(huntid)) {
+        const pokemon = await shinyStorage.getItem(String(huntid));
+        if (pokemon['last_update'] <= futureVersionSprite) continue;
+      }
 
       else {
         const pokemon = await shinyStorage.getItem(String(huntid));
@@ -62,6 +67,10 @@ export async function appPopulate(start = true, obsolete = false)
         // Si on doit créer cette carte
         if (toCreate.includes(huntid)) {
           card = await createCard(pokemon, ordre);
+          if (!start && obsolete.includes(huntid)) {
+            card.style.removeProperty('--ordre-sprite');
+            card.dataset.ordreSprite = ordre;
+          }
           cardsToPopulate.push(await filterCards(savedFiltres, [card]));
         }
 
@@ -69,9 +78,15 @@ export async function appPopulate(start = true, obsolete = false)
         else {
           const oldCard = document.getElementById(`pokemon-card-${huntid}`);
           const oldOrdre = oldCard.style.getPropertyValue('--ordre-sprite');
-          let newCard = await createCard(pokemon, ordre);
+          const wasObsolete = (oldCard.dataset.obsolete != null);
+          let newCard = await createCard(pokemon, oldOrdre);
+          if (obsolete.includes(huntid) || wasObsolete) newCard.dataset.obsolete = true;
           if (oldCard.classList.contains('on')) newCard.classList.add('on');
           newCard = await filterCards(savedFiltres, [newCard]);
+          if (newCard.dataset.obsolete != null) {
+            newCard.style.removeProperty('--ordre-sprite');
+            newCard.dataset.ordreSprite = ordre;
+          }
           oldCard.outerHTML = newCard.outerHTML;
           card = document.getElementById(`pokemon-card-${huntid}`);
         }

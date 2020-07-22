@@ -153,3 +153,18 @@ export async function export2json() {
   a.click();
   a.remove();
 }
+
+
+////////////////////////////////////////////
+// Récupère la version du spritesheet actuel
+export async function getVersionSprite() {
+  await dataStorage.ready();
+  const versionFichiers = await dataStorage.getItem('version-fichiers');
+  const cacheActuel = await caches.open(`remidex-sw-${versionFichiers}`);
+  let versionSprite = await cacheActuel.keys();
+  versionSprite = versionSprite.map(req => req.url)
+                               .filter(url => url.match(Params.spriteRegex))
+                               .map(url => Number(url.match(Params.spriteRegex)[1]));
+  versionSprite = Math.max(...versionSprite);
+  return versionSprite;
+}

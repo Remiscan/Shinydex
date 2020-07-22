@@ -241,18 +241,24 @@ navigator.serviceWorker.addEventListener('message', async event => {
 // ÉCOUTE DE L'EVENT CUSTOM 'POPULATE'
 window.addEventListener('populate', async event => {
   console.log('[populate]', event.detail);
-  const isObsolete = ('obsolete' in event.detail && event.detail.obsolete === true);
-  if (isObsolete) notify('Mise à jour des données...', '', 'loading', () => {}, 999999999);
-  await appPopulate(false, isObsolete);
+  const isObsolete = ('obsolete' in event.detail && event.detail.obsolete.length > 0);
+  //if (isObsolete) notify('Mise à jour des données...', '', 'loading', () => {}, 999999999);
+  await appPopulate(false, event.detail.obsolete, event.detail.version);
   await appDisplay(false);
   //if (!isObsolete) await wait(1000);
   //unNotify();
   if (isObsolete) {
     const version = await updateSprite(event.detail.version);
-    if (isNaN(version)) { console.log('Problème de version du sprite ?'); return unNotify(); }
+    if (isNaN(version)) { console.log('Problème de version du sprite ?'); return; /*unNotify();*/ }
     await loadAllImages([`./sprites--${version}.php`]);
     document.documentElement.style.setProperty('--link-sprites', `url('./sprites--${version}.php')`);
-    unNotify();
+    // On met à jour l'ordre des sprites
+    Array.from(document.querySelectorAll('[data-ordre-sprite]')).forEach(card => {
+      const ordre = card.dataset.ordreSprite;
+      card.style.setProperty('--ordre-sprite', ordre);
+      card.removeAttribute('data-ordre-sprite');
+    });
+    //unNotify();
   }
 })
 
