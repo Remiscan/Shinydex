@@ -290,6 +290,7 @@ export async function appDisplay(start = true)
   catch(error) {
     displaying = false;
     console.error(error);
+    throw error;
   }
 }
 

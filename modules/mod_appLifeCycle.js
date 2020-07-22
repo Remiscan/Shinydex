@@ -118,7 +118,6 @@ export async function appStart()
     // ÉTAPE 5 : on affiche l'application
     log = await appDisplay();
     console.log(log);
-    appChargee = 'loaded';
 
     // Fini !! :)
     appChargee = true;
@@ -141,18 +140,21 @@ export async function appStart()
   catch(error) {
     console.error(error);
     appChargee = false;
-    if (error == '[:(] Erreur critique de chargement')
+    if (error != '[:(] Service worker indisponible')
+    {
+      return notify('Échec du chargement...', 'Réessayer', 'refresh', () => { location.reload() }, 999999999);
+    }
+    else
     {
       async function forceUpdateNow() {
         await Promise.all([ dataStorage.clear(), shinyStorage.clear(), pokemonData.clear() ]);
+        await caches.keys()
+              .then(keys => keys.filter(k => k.startsWith('remidex-sw')))
+              .then(keys => Promise.all(keys.map(key => caches.delete(key))))
         manualUpdate();
       };
       document.getElementById('load-screen').remove();
-      return notify('Échec critique du chargement...', 'Réinstaller', 'refresh', forceUpdateNow, 999999999);
-    }
-    else if (error != '[:(] Service worker indisponible')
-    {
-      return notify('Échec du chargement...', 'Réessayer', 'refresh', () => { location.reload() }, 999999999);
+      return notify('Échec critique du chargement...', 'Réinitialiser', 'refresh', forceUpdateNow, 999999999);
     }
   }
 }
