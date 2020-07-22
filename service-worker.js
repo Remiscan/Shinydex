@@ -289,9 +289,9 @@ async function compareBackup(message = true) {
 
     if (data['error'] == true) throw data['response'];
 
-    // Vérifions si le sprite doit être mis à jour
-    let localObsoletes = [];
-    if (data['inserts-local'].length > 0)
+    // Vérifions si le spritesheet doit être mis à jour
+    let localObsoletes = []; // liste des shiny qui rendent le spritesheet obsolète
+    if (data['inserts-local'].length > 0) // ➡ tous les nouveaux shiny qui n'étaient pas sur le spritesheet
       localObsoletes = [...localObsoletes, ...data['inserts-local'].map(shiny => String(shiny.huntid))];
     else {
       for (const pkmn of data['updates-local']) {
@@ -300,6 +300,7 @@ async function compareBackup(message = true) {
         const localDexid = shiny['numero_national'];
         const onlineFormid = pkmn.forme;
         const localFormid = shiny.forme;
+        // ➡ tous les shiny qui étaient sur le spritesheet mais ont changé d'espèce ou de forme
         if (onlineDexix != localDexid || onlineFormid != localFormid) {
           localObsoletes.push(String(pkmn.huntid));
           break;
@@ -314,13 +315,15 @@ async function compareBackup(message = true) {
     );
     const toDelete = [...data['deletions-local']];
     const prepareForDeletion = async huntid => {
+      // Au lieu d'effacer directement les shiny de la base de données locale,
+      // on les marque "à détruire" au prochain démarrage de l'appli,
+      // pour ne pas rendre obsolète le spritesheet en pleine utilisation de l'appli
       const shiny = await shinyStorage.getItem(String(huntid));
       shiny.destroy = true;
       await shinyStorage.setItem(String(huntid), shiny);
       return;
     };
      await Promise.all(
-      //toDelete.map(huntid => shinyStorage.removeItem(String(huntid)))
       toDelete.map(huntid => prepareForDeletion(huntid))
     );
 
