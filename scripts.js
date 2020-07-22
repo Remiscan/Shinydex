@@ -4,7 +4,7 @@ import { Params, changeAutoMaj, callResize, saveDBpassword, export2json, wait, l
 import { navigate, sectionActuelle } from './modules/mod_navigate.js';
 import { playEasterEgg } from './modules/mod_easterEgg.js';
 import { appStart, checkUpdate, manualUpdate, setOnlineBackup, updateSprite, startBackup } from './modules/mod_appLifeCycle.js';
-import { appPopulate, appDisplay, json2import } from './modules/mod_appContent.js';
+import { appPopulate, appDisplay, json2import, populateAttemptsVersions, populateAttemptsObsolete } from './modules/mod_appContent.js';
 import { openFiltres } from './modules/mod_filtres.js';
 import { Hunt } from './modules/mod_Hunt.js';
 import { notify, unNotify } from './modules/mod_notification.js';
@@ -240,25 +240,41 @@ navigator.serviceWorker.addEventListener('message', async event => {
 //////////////////////////////////////
 // ÉCOUTE DE L'EVENT CUSTOM 'POPULATE'
 window.addEventListener('populate', async event => {
-  console.log('[populate]', event.detail);
   const isObsolete = ('obsolete' in event.detail && event.detail.obsolete.length > 0);
-  //if (isObsolete) notify('Mise à jour des données...', '', 'loading', () => {}, 999999999);
+  // Si le spritesheet devra être régénéré, on place cette tentative en file d'attente
+  if (isObsolete) {
+    populateAttemptsVersions.push(event.detail.version);
+    populateAttemptsObsolete.push(...event.detail.obsolete);
+  }
+
+  // On peuple l'application avec les nouvelles données
   await appPopulate(false, event.detail.obsolete, event.detail.version);
   await appDisplay(false);
-  //if (!isObsolete) await wait(1000);
-  //unNotify();
+
+  // Si le spritesheet doit être régénéré
   if (isObsolete) {
+    // Si une tentative plus récente est déjà en file d'attente, on ne fait rien
+    if (Math.max(...populateAttemptsVersions) > event.detail.version) return;
+
+    // Si une version plus récente du spritesheet est déjà utilisée, on ne fait rien
+    const previousSpriteVersion = document.documentElement.style.getPropertyValue('--link-sprites')
+                                  .match(Params.spriteRegex)[1];
+    if (previousSpriteVersion >= event.detail.version) return;
+
+    // On génère le nouveau spritesheet et on le place dans le cache
     const version = await updateSprite(event.detail.version);
     if (isNaN(version)) { console.log('Problème de version du sprite ?'); return; /*unNotify();*/ }
+  
+    // On pré-charge le nouveau spritesheet et ensuite on l'utilise dans la section 'mes chromatiques'
     await loadAllImages([`./sprites--${version}.php`]);
     document.documentElement.style.setProperty('--link-sprites', `url('./sprites--${version}.php')`);
+    
     // On met à jour l'ordre des sprites
     Array.from(document.querySelectorAll('[data-ordre-sprite]')).forEach(card => {
       const ordre = card.dataset.ordreSprite;
       card.style.setProperty('--ordre-sprite', ordre);
       card.removeAttribute('data-ordre-sprite');
     });
-    //unNotify();
   }
 })
 

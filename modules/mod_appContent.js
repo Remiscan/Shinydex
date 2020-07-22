@@ -10,6 +10,9 @@ let longClic = false;
 let populating = false;
 let displaying = false;
 
+export let populateAttemptsVersions = [];
+export let populateAttemptsObsolete = [];
+
 /////////////////////////////////////////////////////////
 // Peuple l'application à partir des données de indexedDB
 export async function appPopulate(start = true, obsolete = [], versionSprite = 0)
@@ -42,12 +45,13 @@ export async function appPopulate(start = true, obsolete = [], versionSprite = 0
     const allShiny = Array.from(new Set([...dbShiny, ...currentShiny]))
                           .sort((a, b) => a - b);
 
+    // On récupère la liste des filtres à appliquer aux cartes (undefined = filtres par défaut)
     let savedFiltres = await dataStorage.getItem('filtres');
     savedFiltres = (savedFiltres != null && savedFiltres.length > 0) ? savedFiltres : undefined;
 
     const futureVersionSprite = versionSprite || getVersionSprite();
 
-    let ordre = 0;
+    let ordre = 0; // ordre du sprite dans le spritesheet
     for (const huntid of allShiny) {
       // Si on doit supprimer cette carte
       if (toDelete.includes(huntid)) {
@@ -55,11 +59,14 @@ export async function appPopulate(start = true, obsolete = [], versionSprite = 0
         card.remove();
       }
 
+      // Si cette carte est déjà marquée comme supprimée,
+      // si cette suppression précède la génération du spritesheet, on n'incrémente pas ordre
       if (toIgnore.includes(huntid)) {
         const pokemon = await shinyStorage.getItem(String(huntid));
         if (pokemon['last_update'] <= futureVersionSprite) continue;
       }
 
+      // Si cette carte doit être affichée
       else {
         const pokemon = await shinyStorage.getItem(String(huntid));
         let card;
@@ -67,6 +74,9 @@ export async function appPopulate(start = true, obsolete = [], versionSprite = 0
         // Si on doit créer cette carte
         if (toCreate.includes(huntid)) {
           card = await createCard(pokemon, ordre);
+          // Si le spritesheet est obsolète à cause de cette carte, on affichera
+          // le sprite seulement après la génération du spritesheet (supprimer --ordre-sprite = sprite masqué)
+          // (après génération du spritesheet, card.dataset.ordreSprite deviendra --ordre-sprite)
           if (!start && obsolete.includes(huntid)) {
             card.style.removeProperty('--ordre-sprite');
             card.dataset.ordreSprite = ordre;
@@ -77,18 +87,21 @@ export async function appPopulate(start = true, obsolete = [], versionSprite = 0
         // Si on doit éditer cette carte
         else {
           const oldCard = document.getElementById(`pokemon-card-${huntid}`);
-          const oldOrdre = oldCard.style.getPropertyValue('--ordre-sprite');
-          const wasObsolete = (oldCard.dataset.obsolete != null);
-          let newCard = await createCard(pokemon, oldOrdre);
+          const oldOrdre = oldCard.style.getPropertyValue('--ordre-sprite'); // ancien ordre du sprite
+          const wasObsolete = (oldCard.dataset.obsolete != null); // spritesheet obsolète à cause de cette carte
+
+          let newCard = await createCard(pokemon, oldOrdre || ordre); // nouvel ordre = oldOrdre || ordre pour le cas où oldOrdre non défini
           if (obsolete.includes(huntid) || wasObsolete) newCard.dataset.obsolete = true;
           if (oldCard.classList.contains('on')) newCard.classList.add('on');
           newCard = await filterCards(savedFiltres, [newCard]);
+
+          // Si le spritesheet est obsolète à cause de cette carte... (cf cas précédent)
           if (newCard.dataset.obsolete != null) {
             newCard.style.removeProperty('--ordre-sprite');
             newCard.dataset.ordreSprite = ordre;
           }
           oldCard.outerHTML = newCard.outerHTML;
-          card = document.getElementById(`pokemon-card-${huntid}`);
+          card = document.getElementById(`pokemon-card-${huntid}`); // on récupère la carte mise à jour pour détecter le clic
         }
 
         // Active le long clic pour éditer
@@ -102,8 +115,10 @@ export async function appPopulate(start = true, obsolete = [], versionSprite = 0
 
     let unfilteredCards;
     if (start) {
+      // On récupère les cartes non filtrées pour filtrer le Pokédex
       unfilteredCards = await filterCards(null, cardsToPopulate);
 
+      // On ordonne les cartes
       const savedOrdreReverse = await dataStorage.getItem('ordre-reverse');
       let savedOrdre = await dataStorage.getItem('ordre');
       savedOrdre = (savedOrdre != null) ? savedOrdre : undefined;
@@ -115,7 +130,21 @@ export async function appPopulate(start = true, obsolete = [], versionSprite = 0
     let conteneur = document.querySelector('#mes-chromatiques>.section-contenu');
     for (let card of cardsToPopulate) { conteneur.appendChild(card); }
 
-    if (!start) { populating = false; return; }
+    if (!start) {
+      populating = false;
+
+      // On vérifie si des requêtes plus récentes de populate ont été faites
+      const lastPopulateAttempt = Math.max(...populateAttemptsVersions);
+      if (lastPopulateAttempt > futureVersionSprite)
+        return appPopulate(false, populateAttemptsObsolete, lastPopulateAttempt);
+      else {
+        populateAttemptsVersions.length = 0;
+        populateAttemptsObsolete.length = 0;
+      }
+      return;
+    }
+
+    // 🔽🔽🔽 Seulement au lancement de l'appli 🔽🔽🔽
 
     // Peuple les chasses en cours
     await initHunts();
@@ -142,10 +171,10 @@ export async function appPopulate(start = true, obsolete = [], versionSprite = 0
       gensToPopulate.push(genConteneur);
     }
 
-    // Peuple le Pokédex (seulement au lancement)
+    // Peuple le Pokédex
     conteneur = document.querySelector('#pokedex>.section-contenu');
     for (let genConteneur of gensToPopulate) { conteneur.appendChild(genConteneur); }
-    if (start) filterDex(unfilteredCards);
+    filterDex(unfilteredCards);
 
     populating = false;
     return '[:)] L\'application est prête !';

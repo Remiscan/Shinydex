@@ -12,7 +12,7 @@ export const Params = {
   easingAccelerate: 'cubic-bezier(0.4, 0.0, 1, 1)',
 
   spriteSize: 112,
-  spriteRegex: /sprites--(.+).php$/,
+  spriteRegex: /sprites--(.+).php/,
 
   owidth: false,
   oheight: false,
