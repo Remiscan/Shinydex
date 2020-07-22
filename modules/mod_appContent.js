@@ -196,11 +196,11 @@ export async function appDisplay(start = true)
   displaying = true;
 
   const loadScreen = (start == true) ? document.getElementById('load-screen') : null;
-  const version = await dataStorage.getItem('version-bdd');
+  const versionSprite = await getVersionSprite();
   let listeImages = [`./ext/pokesprite.png`];
   if (start) {
-    listeImages.push(`./sprites--${version}.php`);
-    document.documentElement.style.setProperty('--link-sprites', `url('./sprites--${version}.php')`);
+    listeImages.push(`./sprites--${versionSprite}.php`);
+    document.documentElement.style.setProperty('--link-sprites', `url('./sprites--${versionSprite}.php')`);
   }
 
   async function promiseInit() {

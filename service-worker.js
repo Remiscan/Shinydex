@@ -359,7 +359,7 @@ async function updateSprite(_version = null) {
   try {
     await Promise.all([shinyStorage.ready(), dataStorage.ready()]);
 
-    let version = _version ||  await dataStorage.getItem('version-bdd');
+    let version = _version ||  await dataStorage.getItem('version-bdd') || 0;
     
     // On récupère et ordonne la liste des sprites à partir des données locales
     let keys = await shinyStorage.keys();
