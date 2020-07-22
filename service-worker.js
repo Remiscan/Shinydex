@@ -273,7 +273,7 @@ async function compareBackup(message = true) {
     formData.append('deleted-local-data', JSON.stringify(localData.filter(shiny => shiny.deleted)));
     formData.append('mdp', await dataStorage.getItem('mdp-bdd'));
 
-    const response = await fetch('/remidex/mod_backupLocalToDb.php?date=' + Date.now(), {
+    const response = await fetch('/remidex/mod_compareBackup.php?date=' + Date.now(), {
       method: 'POST',
       body: formData
     });
