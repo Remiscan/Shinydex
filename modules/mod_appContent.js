@@ -1,12 +1,11 @@
 import { Pokemon } from './mod_Pokemon.js';
-import { createCard, toggleNotes } from './mod_pokemonCard.js';
+import { createCard } from './mod_pokemonCard.js';
 import { filterCards, orderCards, filterDex, deferCards, deferMonitor } from './mod_filtres.js';
 import { Params, loadAllImages, wait, version2date, getVersionSprite } from './mod_Params.js';
 import { openSpriteViewer } from './mod_spriteViewer.js';
-import { editHunt, initHunts } from './mod_Hunt.js';
+import { initHunts } from './mod_Hunt.js';
 import { notify, unNotify } from './mod_notification.js';
 
-let longClic = false;
 let populating = false;
 let displaying = false;
 
@@ -75,13 +74,16 @@ export async function appPopulate(start = true, obsolete = [], versionSprite = 0
 
         // Si on doit créer cette carte
         if (toCreate.includes(huntid)) {
-          card = await createCard(pokemon, ordre);
+          card = await createCard(pokemon);
           // Si le spritesheet est obsolète à cause de cette carte, on affichera
           // le sprite seulement après la génération du spritesheet (supprimer --ordre-sprite = sprite masqué)
           // (après génération du spritesheet, card.dataset.ordreSprite deviendra --ordre-sprite)
           if (!start && obsolete.includes(huntid)) {
-            card.style.removeProperty('--ordre-sprite');
-            card.dataset.ordreSprite = ordre;
+            card.removeAttribute('ordre-sprite');
+            card.dataset.futurOrdreSprite = ordre;
+          }
+          else {
+            card.setAttribute('ordre-sprite', ordre);
           }
           cardsToPopulate.push(await filterCards(savedFiltres, [card]));
         }
@@ -92,24 +94,24 @@ export async function appPopulate(start = true, obsolete = [], versionSprite = 0
           const oldOrdre = oldCard.style.getPropertyValue('--ordre-sprite'); // ancien ordre du sprite
           const wasObsolete = (oldCard.dataset.obsolete != null); // spritesheet obsolète à cause de cette carte
 
-          let newCard = await createCard(pokemon, oldOrdre || ordre); // nouvel ordre = oldOrdre || ordre pour le cas où oldOrdre non défini
+          let newCard = await createCard(pokemon); // nouvel ordre = oldOrdre || ordre pour le cas où oldOrdre non défini
           if (obsolete.includes(huntid) || wasObsolete) newCard.dataset.obsolete = true;
           if (oldCard.classList.contains('on')) newCard.classList.add('on');
           newCard = await filterCards(savedFiltres, [newCard]);
 
           // Si le spritesheet est obsolète à cause de cette carte... (cf cas précédent)
           if (newCard.dataset.obsolete != null) {
-            newCard.style.removeProperty('--ordre-sprite');
-            newCard.dataset.ordreSprite = ordre;
+            newCard.style.removeAttribute('ordre-sprite');
+            newCard.dataset.futurOrdreSprite = oldOrdre || ordre;
           }
-          oldCard.outerHTML = newCard.outerHTML;
-          card = document.getElementById(`pokemon-card-${huntid}`); // on récupère la carte mise à jour pour détecter le clic
+          else {
+            newCard.setAttribute('ordre-sprite', oldOrdre || ordre);
+          }
+          //oldCard.outerHTML = newCard.outerHTML;
+          //card = document.getElementById(`pokemon-card-${huntid}`); // on récupère la carte mise à jour pour détecter le clic
+          card = newCard;
+          cardsToPopulate.push(card);
         }
-
-        // Active le long clic pour éditer
-        card.addEventListener('click', () => { if (!longClic) toggleNotes(card.id); longClic = false; });
-        card.addEventListener('mousedown', async event => { if (event.button != 0) return; makeEdit(event, card); }); // souris
-        card.addEventListener('touchstart', async event => { makeEdit(event, card); }, { passive: true }); // toucher
       }
 
       ordre++;
@@ -130,7 +132,8 @@ export async function appPopulate(start = true, obsolete = [], versionSprite = 0
     // Peuple les éléments après la préparation (pour optimiser le temps d'exécution)
     //// Liste principale
     let conteneur = document.querySelector('#mes-chromatiques>.section-contenu');
-    for (let card of cardsToPopulate) { conteneur.appendChild(card); }
+    for (const card of Array.from(document.querySelectorAll('#mes-chromatiques .pokemon-card'))) { card.remove(); }
+    for (const card of cardsToPopulate) { conteneur.appendChild(card); }
 
     if (!start) {
       populating = false;
@@ -294,65 +297,6 @@ export async function appDisplay(start = true)
     console.error(error);
     throw error;
   }
-}
-
-
-
-///////////////////////////////////////////////////////////////////
-// Créer une chasse pour éditer un shiny au long clic sur une carte
-async function makeEdit(event, card) {
-  let act = true;
-
-  const editIcon = card.querySelector('.edit-icon');
-  let appear = editIcon.animate([
-    { opacity: '0' },
-    { opacity: '1' }
-  ], {
-    easing: Params.easingStandard,
-    duration: 150,
-    fill: 'forwards'
-  });
-  appear.pause();
-  const circle = editIcon.querySelector('.edit-icon circle');
-  let anim = circle.animate([
-    { strokeDashoffset: '157' },
-    { strokeDashoffset: '0' }
-  ], {
-    easing: 'linear',
-    duration: 1000
-  });
-  anim.pause();
-
-  const clear = () => {
-    act = false;
-    appear.cancel(); anim.cancel();
-    setTimeout(() => { longClic = false; }, 50)
-  };
-
-  if (event.type == 'touchstart') {
-    card.addEventListener('touchmove', clear, { passive: true });
-    card.addEventListener('touchend', clear);
-    card.addEventListener('touchcancel', clear);
-  } else {
-    card.addEventListener('mouseup', clear);
-    card.addEventListener('mouseout', clear);
-  }
-  await wait(500);
-
-  if (!act) return;
-  longClic = true;
-
-  appear.play();
-  await new Promise(resolve => appear.addEventListener('finish', resolve));
-  anim.play();
-  await new Promise(resolve => anim.addEventListener('finish', resolve));
-
-  if (!act) return;
-  card.classList.remove('editing');
-  let ready = await editHunt(parseInt(card.id.replace('pokemon-card-', '')));
-  ready = (ready != false);
-  appear.cancel(); anim.cancel();
-  if (ready) longClic = false;
 }
 
 

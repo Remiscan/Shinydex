@@ -542,24 +542,12 @@ export async function editHunt(id, nav = true) {
 
 
 
-/*///////////////////////////
-// Crée la datalist Pokédex
-const datalistPokedex = document.getElementById('datalist-pokedex');
-Pokemon.pokemonData.slice(1).forEach(pkmn => {
-  datalistPokedex.innerHTML += `<option value="${pkmn.namefr}">`;
-});*/
-
-// Crée la datalist Jeux
-const datalistJeux = document.getElementById('datalist-jeux');
-Pokemon.jeux.forEach(jeu => {
-  datalistJeux.innerHTML += `<option value="${jeu.nom}">`;
-});
-
-
-
 //////////////////////////////////////
 // Initialise les chasses sauvegardées
 export async function initHunts() {
+  // On initialise la datalist des jeux
+  initGamesDatalist();
+
   await Promise.all([huntStorage.ready(), dataStorage.ready()]);
 
   // On vérifie quelles chasses ont été uploadées par le service worker depuis la dernière visite
@@ -580,4 +568,13 @@ export async function initHunts() {
     document.querySelector('#chasses-en-cours').classList.add('vide');
   else
     keys.forEach(async k => Hunt.build(await huntStorage.getItem(k), true));
+}
+
+
+// Crée la datalist Jeux
+function initGamesDatalist() {
+  const datalistJeux = document.getElementById('datalist-jeux');
+  Pokemon.jeux.forEach(jeu => {
+    datalistJeux.innerHTML += `<option value="${jeu.nom}">`;
+  });
 }

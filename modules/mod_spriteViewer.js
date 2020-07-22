@@ -6,8 +6,10 @@ const spriteViewer = document.getElementById('sprite-viewer');
 const spriteScroller = document.querySelector('.sprite-scroller');
 const switchSR = document.getElementById('switch-shy-reg');
 
-spriteScroller.addEventListener('click', switchShinyRegular);
-switchSR.addEventListener('click', switchShinyRegular);
+export function initSpriteViewer() {
+  spriteScroller.addEventListener('click', switchShinyRegular);
+  switchSR.addEventListener('click', switchShinyRegular);
+}
 
 export async function openSpriteViewer(dexid, event)
 {

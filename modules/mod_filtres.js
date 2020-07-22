@@ -320,43 +320,44 @@ function buildFiltres()
 export function cardsInOrder() { return cardsOrdered; }
 
 
-////////////////////////////////
-// Surveille les options d'ordre
-Array.from(document.querySelectorAll('label.ordre')).forEach(label => {
-  label.addEventListener('click', async () => {
-    await orderCards(label.getAttribute('for').replace('ordre-', ''), document.body.dataset.reversed);
+/////////////////////////
+// Initialise les filtres
+export function initFiltres() {
+  // Surveille les options d'ordre
+  Array.from(document.querySelectorAll('label.ordre')).forEach(label => {
+    label.addEventListener('click', async () => {
+      await orderCards(label.getAttribute('for').replace('ordre-', ''), document.body.dataset.reversed);
+      deferCards();
+    });
+  });
+
+  // Active le bouton d'inversion de l'ordre
+  document.querySelector('.reverse-order').addEventListener('click', async () => {
+    await reverseOrder();
     deferCards();
   });
-});
 
-// Active le bouton d'inversion de l'ordre
-document.querySelector('.reverse-order').addEventListener('click', async () => {
-  await reverseOrder();
-  deferCards();
-});
-
-///////////////////////////////////
-// Surveille les options de filtres
-Array.from(document.querySelectorAll('input.filtre')).forEach(radio => {
-  radio.addEventListener('change', async () => {
-    await filterCards(buildFiltres());
-    deferCards('mes-chromatiques');
+  // Surveille les options de filtres
+  Array.from(document.querySelectorAll('input.filtre')).forEach(radio => {
+    radio.addEventListener('change', async () => {
+      await filterCards(buildFiltres());
+      deferCards('mes-chromatiques');
+    });
   });
-});
 
-///////////////////////////////
-// Crée les checkboxes des jeux
-Pokemon.jeux.forEach(jeu => {
-  const nomJeu = jeu.nom.replace(/[ \']/g, '');
-  const template = document.getElementById('template-checkbox-jeu');
-  const checkbox = template.content.cloneNode(true);
-  const input = checkbox.querySelector('input');
-  const label = checkbox.querySelector('label');
+  // Crée les checkboxes des jeux
+  Pokemon.jeux.forEach(jeu => {
+    const nomJeu = jeu.nom.replace(/[ \']/g, '');
+    const template = document.getElementById('template-checkbox-jeu');
+    const checkbox = template.content.cloneNode(true);
+    const input = checkbox.querySelector('input');
+    const label = checkbox.querySelector('label');
 
-  input.id = 'filtre-jeu-' + nomJeu;
-  input.value = "jeu:" + nomJeu;
-  label.setAttribute('for', 'filtre-jeu-' + nomJeu);
-  label.querySelector('span').classList.add(nomJeu);
+    input.id = 'filtre-jeu-' + nomJeu;
+    input.value = "jeu:" + nomJeu;
+    label.setAttribute('for', 'filtre-jeu-' + nomJeu);
+    label.querySelector('span').classList.add(nomJeu);
 
-  document.getElementById('liste-options-jeux').appendChild(checkbox);
-});
+    document.getElementById('liste-options-jeux').appendChild(checkbox);
+  });
+}

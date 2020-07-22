@@ -1,31 +1,96 @@
 import { Shiny } from './mod_Pokemon.js';
-import { Params } from './mod_Params.js';
-
-let currentCard;
-let charmlessMethods;
-
-/////////////////////////////////////////////////////////
-// Afficher la description d'une carte en cliquant dessus
-export function toggleNotes(idCard)
-{
-  // On ferme la carte déjà ouverte
-  if (currentCard != null)
-    document.getElementById(currentCard).classList.remove('on');
-
-  // Si la carte demandée n'est pas celle qu'on vient de fermer, on l'ouvre
-  if (idCard != currentCard)
-  {
-    document.getElementById(idCard).classList.add('on');
-    currentCard = idCard;
-  }
-  else
-    currentCard = null;
-}
 
 
 //////////////////////////////
 // Créer la carte d'un Pokémon
-export async function createCard(pokemon, ordre)
+export async function createCard(pokemon)
+{
+  let shiny;
+  try {
+    shiny = await Shiny.build(pokemon);
+  } catch (e) {
+    console.error('Failed creating Shiny object', e);
+    return;
+  }
+
+  const conditionMien = shiny.mine;
+
+  let filtres = [];
+  if (conditionMien)
+    filtres.push('do:moi');
+  else
+    filtres.push('do:autre');
+  
+  const card = document.createElement('pokemon-card');
+  card.id = `pokemon-card-${shiny.huntid}`;
+  card.setAttribute('huntid', shiny.huntid);
+
+  card.setAttribute('dexid', shiny.dexid);
+  card.setAttribute('espece', shiny.espece);
+
+  card.setAttribute('notes', shiny.description);
+
+  if (shiny.ball) card.setAttribute('ball', shiny.ball);
+  else card.removeAttribute('ball');
+
+  card.setAttribute('surnom', shiny.surnom);
+
+  card.setAttribute('methode', shiny.methode);
+  filtres.push('methode:' + shiny.methode);
+  card.setAttribute('compteur', shiny.compteur);
+
+  if (shiny.charm) card.setAttribute('charm', shiny.charm);
+  else card.removeAttribute('charm');
+
+  card.setAttribute('shiny-rate', shiny.shinyRate);
+  card.setAttribute('checkmark', shiny.checkmark);
+
+  switch(parseInt(shiny.hacked))
+  {
+    case 3:
+      filtres.push('legit:clone');
+      break;
+    case 2:
+      filtres.push('legit:hack');
+      break;
+    case 1:
+      filtres.push('legit:maybe');
+      break;
+    default:
+      filtres.push('legit:oui');
+  }
+  if (shiny.hacked > 0) card.setAttribute('hacked', shiny.hacked);
+
+  if (conditionMien)
+  {
+    card.setAttribute('shiny-rate', shiny.shinyRate);
+
+    if (shiny.charm == false && [8192, 4096].includes(shiny.shinyRate))
+      filtres.push('taux:full');
+    else if (shiny.charm == true && [2731, 1365].includes(shiny.shinyRate))
+      filtres.push('taux:charm');
+    else if (shiny.shinyRate == 1 || shiny.shinyRate == '???')
+      filtres.push('taux:boosted');
+    else
+      filtres.push('taux:boosted');
+  }
+  else
+  {
+    card.removeAttribute('shiny-rate');
+    filtres.push('taux:inconnu');
+  }
+
+  const jeu = shiny.jeu.replace(/[ \']/g, '');
+  card.setAttribute('jeu', jeu);
+  filtres.push('jeu:' + jeu);
+
+  card.setAttribute('date', shiny.date);
+  card.setAttribute('filtres', JSON.stringify(filtres));
+
+  return card;
+}
+
+/*export async function createCard(pokemon, ordre)
 {
   let shiny;
   try {
@@ -170,4 +235,4 @@ export async function createCard(pokemon, ordre)
   card.dataset.filtres = filtres;
 
   return card;
-}
+}*/

@@ -5,9 +5,10 @@ import { navigate, sectionActuelle } from './modules/mod_navigate.js';
 import { playEasterEgg } from './modules/mod_easterEgg.js';
 import { appStart, checkUpdate, manualUpdate, setOnlineBackup, updateSprite, startBackup } from './modules/mod_appLifeCycle.js';
 import { appPopulate, appDisplay, json2import, populateAttemptsVersions, populateAttemptsObsolete } from './modules/mod_appContent.js';
-import { openFiltres } from './modules/mod_filtres.js';
+import { openFiltres, initFiltres } from './modules/mod_filtres.js';
 import { Hunt } from './modules/mod_Hunt.js';
 import { notify, unNotify } from './modules/mod_notification.js';
+import { initSpriteViewer } from './modules/mod_spriteViewer.js';
 
 
 
@@ -157,6 +158,12 @@ boutonSupprimer.addEventListener('click', async event => {
 // Active l'easter egg de la section a-propos
 document.querySelector('.easter-egg').onclick = playEasterEgg;
 
+// Initialise les filtres
+initFiltres();
+
+// Initialise le sprite-viewer
+initSpriteViewer();
+
 
 
 ///////////////////////////////////////
@@ -248,8 +255,10 @@ window.addEventListener('populate', async event => {
   }
 
   // On peuple l'application avec les nouvelles données
+  notify('Mise à jour des données...', '', 'loading', () => {}, 999999999);
   await appPopulate(false, event.detail.obsolete, event.detail.version);
   await appDisplay(false);
+  unNotify();
 
   // Si le spritesheet doit être régénéré
   if (isObsolete) {
@@ -263,7 +272,7 @@ window.addEventListener('populate', async event => {
 
     // On génère le nouveau spritesheet et on le place dans le cache
     const version = await updateSprite(event.detail.version);
-    if (isNaN(version)) { console.log('Problème de version du sprite ?'); return; /*unNotify();*/ }
+    if (isNaN(version)) { console.log('Problème de version du sprite ?'); return; }
   
     // On pré-charge le nouveau spritesheet et ensuite on l'utilise dans la section 'mes chromatiques'
     await loadAllImages([`./sprites--${version}.php`]);
@@ -271,9 +280,9 @@ window.addEventListener('populate', async event => {
     
     // On met à jour l'ordre des sprites
     Array.from(document.querySelectorAll('[data-ordre-sprite]')).forEach(card => {
-      const ordre = card.dataset.ordreSprite;
-      card.style.setProperty('--ordre-sprite', ordre);
-      card.removeAttribute('data-ordre-sprite');
+      const ordre = card.dataset.futurOrdreSprite;
+      card.setAttribute('ordre-sprite', ordre);
+      card.removeAttribute('data-futur-ordre-sprite');
     });
   }
 })
