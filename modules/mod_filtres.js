@@ -172,7 +172,7 @@ export function filterDex(cards = null)
   const dexids = new Set();
 
   displayedCards.forEach(card => {
-    dexids.add(parseInt(card.dataset.dexid));
+    dexids.add(parseInt(card.getAttribute('dexid')));
   });
 
   const dexIcons = Array.from(document.querySelectorAll('#pokedex .pkspr'));
