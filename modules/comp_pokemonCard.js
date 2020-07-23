@@ -1,6 +1,6 @@
 import { Shiny } from './mod_Pokemon.js';
 import { editHunt } from './mod_Hunt.js';
-import { Params, wait, getStyleSheet } from './mod_Params.js';
+import { Params, wait, getStyleSheet, styleSheets } from './mod_Params.js';
 
 let currentCard;
 let charmlessMethods;
@@ -60,7 +60,17 @@ class pokemonCard extends HTMLElement {
     super();
     this.shadow = this.attachShadow({ mode: 'open' });
     this.shadow.appendChild(template.content.cloneNode(true));
-    this.shadow.adoptedStyleSheets = [getStyleSheet('pokemonCard'), getStyleSheet('iconsheet'), getStyleSheet('pokesprite')];
+
+    if ('adoptedStyleSheets' in this.shadow)
+      this.shadow.adoptedStyleSheets = [getStyleSheet('materialIcons'), getStyleSheet('pokemonCard'),
+                                        getStyleSheet('iconsheet'), getStyleSheet('pokesprite')];
+    else {
+      const style = document.createElement('style');
+      for (const sheet of Object.keys(styleSheets)) {
+        style.appendChild(document.createTextNode(`@import url('${styleSheets[sheet].url}');`));
+      }
+      this.shadow.appendChild(style);
+    }
     const card = this.shadowRoot;
 
     // Active le long clic pour éditer
@@ -308,7 +318,6 @@ class pokemonCard extends HTMLElement {
     await new Promise(resolve => anim.addEventListener('finish', resolve));
 
     if (!act) return;
-    card.classList.remove('editing');
     let ready = await editHunt(parseInt(this.getAttribute('huntid')));
     ready = (ready != false);
     appear.cancel(); anim.cancel();
@@ -324,6 +333,7 @@ class pokemonCard extends HTMLElement {
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
+    if (oldValue == newValue) return;
     this.updateCard([name]);
   }
 }

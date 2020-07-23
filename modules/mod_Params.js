@@ -42,6 +42,10 @@ export const Params = {
 /////////////////////////////////////////////////////////////////////
 // Charge les CSS stylesheets à faire adopter par des éléments custom
 export const styleSheets = {
+  materialIcons: {
+    url: './ext/material_icons.css',
+    content: null
+  },
   pokesprite: {
     url: './ext/pokesprite.css',
     content: null
@@ -81,9 +85,16 @@ export function getStyleSheet(sheet) {
 
 // Initialise les stylesheets
 export async function initStyleSheets() {
-  return Promise.all(
-    Object.keys(styleSheets).map(sheet => setStyleSheet(sheet))
-  );
+  if ('adoptedStyleSheets' in document)
+    return Promise.all( Object.keys(styleSheets).map(sheet => setStyleSheet(sheet)) );
+  else {
+    for (const sheet of Object.keys(styleSheets)) {
+      const link = document.createElement('link');
+      link.type = 'text/css'; link.rel = 'stylesheet', link.href = styleSheets[sheet].url;
+      document.head.appendChild(link);
+    };
+    return;
+  }
 }
 
 

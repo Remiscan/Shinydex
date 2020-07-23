@@ -97,7 +97,9 @@ export async function appStart()
 
     // ÉTAPE 3.97 : on applique les stylesheets
     await initStyleSheets();
-    document.adoptedStyleSheets = [getStyleSheet('pokesprite'), getStyleSheet('iconsheet')];
+    if ('adoptedStyleSheets' in document) {
+      document.adoptedStyleSheets = [getStyleSheet('materialIcons'), getStyleSheet('pokesprite'), getStyleSheet('iconsheet')];
+    }
 
     // ÉTAPE 3.98 : si des shiny marqués à 'destroy' sont stockés, on les supprime
     let toDestroy = await shinyStorage.keys();
