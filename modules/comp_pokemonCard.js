@@ -244,6 +244,7 @@ template.innerHTML = `
 
   .icones.explain.oeuf {
     margin: 0;
+    margin-right: 3px;
   }
 
   .spacer {
@@ -340,9 +341,8 @@ template.innerHTML = `
     font-size: 16px;
   }
 
-  .off,
-  .offborn {
-    display: none;
+  .off {
+    display: none !important;
   }
 </style>
 
@@ -455,6 +455,14 @@ class pokemonCard extends HTMLElement {
       element.classList.add('item', 'ball-' + this.getAttribute('ball'));
     }
 
+    monjeu: {
+      if (!toUpdate.includes('monjeu')) break monjeu;
+      if (this.getAttribute('monjeu') == null)
+        card.querySelector('.icones.mine').classList.add('off');
+      else
+        card.querySelector('.icones.mine').classList.remove('off');
+    }
+
     methode: {
       if (!toUpdate.includes('methode')) break methode;
       card.querySelector('.capture-methode').innerHTML = this.getAttribute('methode');
@@ -462,10 +470,11 @@ class pokemonCard extends HTMLElement {
 
     compteur: {
       if (!toUpdate.includes('methode') && !toUpdate.includes('compteur')) break compteur;
+      const compteur = this.getAttribute('compteur');
       const element = card.querySelector('.methode-compteur');
       element.innerHTML = '<span class="icones explain oeuf"></span>';
-      if (this.getAttribute('methode') == 'Masuda' && shiny.compteur > 0) {
-        element.innerHTML += shiny.compteur;
+      if (this.getAttribute('methode') == 'Masuda' && compteur > 0) {
+        element.innerHTML += compteur;
         element.classList.remove('off');
       }
       else
@@ -473,11 +482,10 @@ class pokemonCard extends HTMLElement {
     }
 
     shinyRate: {
-      if (!toUpdate.includes('shiny-rate') && !toUpdate.includes('charm')
-          && !toUpdate.includes('methode') && !toUpdate.includes('compteur')) break shinyRate;
+      if (!toUpdate.includes('shiny-rate')) break shinyRate;
       const shinyRateBox = card.querySelector('.shiny-rate');
-      const shinyRate = this.getAttribute('shiny-rate');
-      const charm = this.getAttribute('charm');
+      const shinyRate = Number(this.getAttribute('shiny-rate'));
+      const charm = Number(this.getAttribute('charm')) || null;
 
       if (charmlessMethods == null) charmlessMethods = Shiny.methodes('charmless');
       if (charm == true && !charmlessMethods.includes(this.getAttribute('methode')))
@@ -488,18 +496,21 @@ class pokemonCard extends HTMLElement {
       else
         shinyRateBox.classList.remove('off');
 
-      card.querySelector('.shiny-rate-text.denominator').innerHTML = shinyRate;
+      card.querySelector('.shiny-rate-text.denominator').innerHTML = shinyRate || '???';
 
       shinyRateBox.classList.remove('full-odds', 'charm-ods', 'one-odds');
       if (charm == null && [8192, 4096].includes(shinyRate))
         shinyRateBox.classList.add('full-odds');
       else if (charm == true && [2731, 1365].includes(shinyRate))
         shinyRateBox.classList.add('charm-odds');
-      else if (shinyRate == 1 || shinyRate == '???')
+      else if (shinyRate == 1 || shinyRate == 0)
         shinyRateBox.classList.add('one-odds');
 
       const shinyRateCoeff = 1 - Math.min(1, Math.max(0, shinyRate / 1360));
       shinyRateBox.style.setProperty('--coeff', shinyRateCoeff);
+
+      if (!this.getAttribute('monjeu')) shinyRateBox.classList.add('off');
+      else shinyRateBox.classList.remove('off');
     }
 
     random: {
@@ -508,19 +519,13 @@ class pokemonCard extends HTMLElement {
         card.querySelector('.icones.lucky').remove();
     }
 
-    monjeu: {
-      if (!toUpdate.includes('monjeu')) break monjeu;
-      if (this.getAttribute('monjeu') == null)
-        card.querySelector('.icones.mine').remove();
-    }
-
     checkmark: {
       if (!toUpdate.includes('checkmark')) break checkmark;
       const checkmark = this.getAttribute('checkmark');
       const element = card.querySelector('.icones.checkmark');
       element.className = 'icones explain checkmark';
       let origin;
-      switch (checkmark) {
+      switch (Number(checkmark)) {
         case 1:
           origin = 'kalos'; break;
         case 2:
@@ -552,6 +557,8 @@ class pokemonCard extends HTMLElement {
           origin = 'hack'; break;
         case 3:
           origin = 'clone'; break;
+        default:
+          origin = 'off';
       }
       element.classList.add(origin);
     }
@@ -562,7 +569,7 @@ class pokemonCard extends HTMLElement {
       if (date != '1000-01-01') {
         card.querySelector('.pokemon-infos__capture').classList.remove('no-date');
         card.querySelector('.capture-date').innerHTML = new Intl.DateTimeFormat('fr-FR', {day: 'numeric', month: 'short', year: 'numeric'})
-                                                                .format(new Date(shiny.date));
+                                                                .format(new Date(this.getAttribute('date')));
       }
       else
         card.querySelector('.pokemon-infos__capture').classList.add('no-date');

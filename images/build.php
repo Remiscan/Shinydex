@@ -161,7 +161,7 @@ function buildIconSheet($logs = false)
       imagecopy($outputImage, $icon, $currentPosition->x, $currentPosition->y, 0, 0, $file->taille[0], $file->taille[1]);
 
       // Insert position into CSS file
-      $css = 'html.dark .icones.explain.' . $file->nom . '{background-position:-' . $currentPosition->x . 'px -' . $currentPosition->y . 'px}';
+      $css = 'html.dark .icones.explain.' . $file->nom . ',:host-context(html.dark) .icones.explain.' . $file->nom . '{background-position:-' . $currentPosition->x . 'px -' . $currentPosition->y . 'px}';
       if ($file->taille[0] != 12 || $file->taille[1] != 12)
         $css .= '.icones.explain.' . $file->nom . '{width:' . $file->taille[0] . 'px;height:' . $file->taille[1] .'px}';
       file_put_contents($cssPath, $css, FILE_APPEND);

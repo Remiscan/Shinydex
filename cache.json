@@ -12,6 +12,7 @@
         "./images/instinct.mp4",
         "./images/shinystars.svg",
         "./modules/comp_loadSpinner.js",
+        "./modules/comp_pokemonCard.js",
         "./modules/comp_syncProgress.js",
         "./modules/mod_appContent.js",
         "./modules/mod_appLifeCycle.js",

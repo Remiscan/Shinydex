@@ -23,7 +23,7 @@ let currentFiltres = defautFiltres;
 
 export async function filterCards(filtres = defautFiltres, cards = null)
 {
-  const allCards = cards || Array.from(document.querySelectorAll('#mes-chromatiques .pokemon-card'));
+  const allCards = cards || Array.from(document.querySelectorAll('#mes-chromatiques pokemon-card'));
   const filteredCards = (filtres != null) ? [] : allCards.filter(card => card.classList.contains('filtered'));
   const unfilteredCards = (filtres != null) ? [] : allCards.filter(card => !card.classList.contains('filtered'));
 
@@ -32,7 +32,7 @@ export async function filterCards(filtres = defautFiltres, cards = null)
     allCards.forEach(card => {
       card.classList.remove('filtered');
       // On récupère les filtres de chaque carte
-      const cardFiltres = card.dataset.filtres.split(',');
+      const cardFiltres = JSON.parse(card.getAttribute('filtres').split(','));
       for (const filtre of filtres) {
         // Un filtre peut proposer plusieurs choix (a ou b : a|b), on récupère ces choix
         const alterFiltres = filtre.split('|');
@@ -80,18 +80,18 @@ let currentOrdre = defautOrdre;
 
 export async function orderCards(ordre = defautOrdre, reversed = false, cards = null)
 {
-  const allCards = cards || Array.from(document.querySelectorAll('#mes-chromatiques .pokemon-card'));
+  const allCards = cards || Array.from(document.querySelectorAll('#mes-chromatiques pokemon-card'));
   let ordrement;
 
   if (ordre == 'jeu')
   {
     ordrement = (carte1, carte2) => {
-      const jeu1 = Pokemon.jeux.findIndex(jeu => jeu.nom == carte1.dataset.jeu);
-      const jeu2 = Pokemon.jeux.findIndex(jeu => jeu.nom == carte2.dataset.jeu);
-      const date1 = new Date(carte1.dataset.date || '1000-01-01');
-      const date2 = new Date(carte2.dataset.date || '1000-01-01');
-      const id1 = parseInt(carte1.id.replace('pokemon-card-', ''));
-      const id2 = parseInt(carte2.id.replace('pokemon-card-', ''));
+      const jeu1 = Pokemon.jeux.findIndex(jeu => jeu.nom == carte1.getAttribute('jeu'));
+      const jeu2 = Pokemon.jeux.findIndex(jeu => jeu.nom == carte2.getAttribute('jeu'));
+      const date1 = new Date(carte1.getAttribute('date') || '1000-01-01');
+      const date2 = new Date(carte2.getAttribute('date') || '1000-01-01');
+      const id1 = parseInt(carte1.getAttribute('huntid'));
+      const id2 = parseInt(carte2.getAttribute('huntid'));
 
       return jeu2 - jeu1 || date2 - date1 || id2 - id1;
     }
@@ -99,12 +99,12 @@ export async function orderCards(ordre = defautOrdre, reversed = false, cards = 
   else if (ordre == 'taux')
   {
     ordrement = (carte1, carte2) => {
-      const taux1 = parseInt(carte1.dataset.taux);
-      const taux2 = parseInt(carte2.dataset.taux);
-      const date1 = new Date(carte1.dataset.date || '1000-01-01');
-      const date2 = new Date(carte2.dataset.date || '1000-01-01');
-      const id1 = parseInt(carte1.id.replace('pokemon-card-', ''));
-      const id2 = parseInt(carte2.id.replace('pokemon-card-', ''));
+      const taux1 = parseInt(carte1.getAttribute('shiny-rate'));
+      const taux2 = parseInt(carte2.getAttribute('shiny-rate'));
+      const date1 = new Date(carte1.getAttribute('date') || '1000-01-01');
+      const date2 = new Date(carte2.getAttribute('date') || '1000-01-01');
+      const id1 = parseInt(carte1.getAttribute('huntid'));
+      const id2 = parseInt(carte2.getAttribute('huntid'));
 
       return taux2 - taux1 || date2 - date1 || id2 - id1;
     }
@@ -112,12 +112,12 @@ export async function orderCards(ordre = defautOrdre, reversed = false, cards = 
   else if (ordre == 'dex')
   {
     ordrement = (carte1, carte2) => {
-      const dexid1 = parseInt(carte1.dataset.dexid);
-      const dexid2 = parseInt(carte2.dataset.dexid);
-      const date1 = new Date(carte1.dataset.date || '1000-01-01');
-      const date2 = new Date(carte2.dataset.date || '1000-01-01');
-      const id1 = parseInt(carte1.id.replace('pokemon-card-', ''));
-      const id2 = parseInt(carte2.id.replace('pokemon-card-', ''));
+      const dexid1 = parseInt(carte1.getAttribute('dexid'));
+      const dexid2 = parseInt(carte2.getAttribute('dexid'));
+      const date1 = new Date(carte1.getAttribute('date') || '1000-01-01');
+      const date2 = new Date(carte2.getAttribute('date') || '1000-01-01');
+      const id1 = parseInt(carte1.getAttribute('huntid'));
+      const id2 = parseInt(carte2.getAttribute('huntid'));
 
       return dexid1 - dexid2 || date2 - date1 || id2 - id1;
     }
@@ -125,10 +125,10 @@ export async function orderCards(ordre = defautOrdre, reversed = false, cards = 
   else if (ordre == 'date')
   {
     ordrement = (carte1, carte2) => {
-      const date1 = new Date(carte1.dataset.date || '1000-01-01');
-      const date2 = new Date(carte2.dataset.date || '1000-01-01');
-      const id1 = parseInt(carte1.id.replace('pokemon-card-', ''));
-      const id2 = parseInt(carte2.id.replace('pokemon-card-', ''));
+      const date1 = new Date(carte1.getAttribute('date') || '1000-01-01');
+      const date2 = new Date(carte2.getAttribute('date') || '1000-01-01');
+      const id1 = parseInt(carte1.getAttribute('huntid'));
+      const id2 = parseInt(carte2.getAttribute('huntid'));
 
       return date2 - date1 || id2 - id1;
     }
@@ -168,7 +168,7 @@ export async function reverseOrder()
 // Filtre les icônes du Pokédex
 export function filterDex(cards = null)
 {
-  const displayedCards = cards || Array.from(document.querySelectorAll('#mes-chromatiques :not(.filtered).pokemon-card'));
+  const displayedCards = cards || Array.from(document.querySelectorAll('#mes-chromatiques pokemon-card:not(.filtered)'));
   const dexids = new Set();
 
   displayedCards.forEach(card => {
