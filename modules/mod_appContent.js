@@ -1,5 +1,5 @@
 import { Pokemon } from './mod_Pokemon.js';
-import { createCard, updateCard } from './mod_pokemonCard.js';
+import { updateCard } from './mod_pokemonCard.js';
 import { filterCards, orderCards, filterDex, deferCards, deferMonitor } from './mod_filtres.js';
 import { Params, loadAllImages, wait, version2date, getVersionSprite } from './mod_Params.js';
 import { openSpriteViewer } from './mod_spriteViewer.js';
