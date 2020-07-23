@@ -39,6 +39,54 @@ export const Params = {
 };
 
 
+/////////////////////////////////////////////////////////////////////
+// Charge les CSS stylesheets à faire adopter par des éléments custom
+export const styleSheets = {
+  pokesprite: {
+    url: './ext/pokesprite.css',
+    content: null
+  },
+  iconsheet: {
+    url: './images/iconsheet.css',
+    content: null
+  },
+  pokemonCard: {
+    url: './modules/comp_pokemonCard.css',
+    content: null
+  }
+};
+
+async function setStyleSheet(sheet) {
+  if (styleSheets[sheet].content == null) {
+    try {
+      const tempSheet = new CSSStyleSheet();
+      let css = await fetch(styleSheets[sheet].url);
+      css = await css.text();
+      tempSheet.replaceSync(css);
+      styleSheets[sheet].content = tempSheet;
+    }
+    catch(error) {
+      console.error(error);
+      throw `Erreur de récupération du stylesheet (${sheet})`;
+    }
+  }
+  return styleSheets[sheet].content;
+}
+
+// Utiliser uniquement si initStyleSheets() a déjà fini
+export function getStyleSheet(sheet) {
+  if (styleSheets[sheet].content != null) return styleSheets[sheet].content;
+  else throw `Impossible d'utiliser getStyleSheet() avant complétion de setStyleSheet()`;
+}
+
+// Initialise les stylesheets
+export async function initStyleSheets() {
+  return Promise.all(
+    Object.keys(styleSheets).map(sheet => setStyleSheet(sheet))
+  );
+}
+
+
 ///////////////////////////////////////////////////////
 // Change le paramètre de vérification des mises à jour
 let settingClicked = false;

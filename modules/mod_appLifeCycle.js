@@ -1,5 +1,5 @@
 import { appPopulate, appDisplay } from './mod_appContent.js';
-import { Params, recalcOnResize, version2date, wait, getVersionSprite } from './mod_Params.js';
+import { Params, recalcOnResize, version2date, wait, getVersionSprite, getStyleSheet, initStyleSheets } from './mod_Params.js';
 import { notify } from './mod_notification.js';
 
 /////////////////////////////////////////////////////
@@ -94,6 +94,10 @@ export async function appStart()
     // ÉTAPE 3 : si la sauvegarde en ligne est activée, on met à jour les données locales
     const onlineBackup = await dataStorage.getItem('online-backup');
     if (onlineBackup) await waitBackup();
+
+    // ÉTAPE 3.97 : on applique les stylesheets
+    await initStyleSheets();
+    document.adoptedStyleSheets = [getStyleSheet('pokesprite'), getStyleSheet('iconsheet')];
 
     // ÉTAPE 3.98 : si des shiny marqués à 'destroy' sont stockés, on les supprime
     let toDestroy = await shinyStorage.keys();
@@ -368,7 +372,6 @@ export async function updateSprite(version = null) {
     worker.postMessage({ 'action': 'update-sprite', version }, [chan.port2]);
   });
 }
-
 
 
 // Démarre la procédure de backup
