@@ -5,7 +5,7 @@ import { Params, changeAutoMaj, callResize, saveDBpassword, export2json, wait, l
 import { navigate, sectionActuelle } from './modules/mod_navigate.js';
 import { playEasterEgg } from './modules/mod_easterEgg.js';
 import { appStart, checkUpdate, manualUpdate, setOnlineBackup, updateSprite, startBackup } from './modules/mod_appLifeCycle.js';
-import { appPopulate, appDisplay, json2import, populateAttemptsVersions, populateAttemptsObsolete } from './modules/mod_appContent.js';
+import { appPopulate, appDisplay, json2import, populateAttemptsVersions, populateAttemptsObsolete, populateAttemptsModified } from './modules/mod_appContent.js';
 import { openFiltres, initFiltres } from './modules/mod_filtres.js';
 import { Hunt } from './modules/mod_Hunt.js';
 import { notify, unNotify } from './modules/mod_notification.js';
@@ -230,7 +230,11 @@ navigator.serviceWorker.addEventListener('message', async event => {
 
       if ('obsolete' in event.data) {
         const versionBDD = await dataStorage.getItem('version-bdd');
-        window.dispatchEvent(new CustomEvent('populate', { detail: { version: versionBDD, obsolete: event.data.obsolete } }));
+        window.dispatchEvent(new CustomEvent('populate', { detail: {
+          version: versionBDD,
+          obsolete: event.data.obsolete,
+          modified: event.data.modified
+        } }));
       }
     }
     else {
@@ -255,9 +259,12 @@ window.addEventListener('populate', async event => {
     populateAttemptsObsolete.push(...event.detail.obsolete);
   }
 
+  // On liste les Pokémon modifiés
+  populateAttemptsModified.push(...event.detail.modified);
+
   // On peuple l'application avec les nouvelles données
   notify('Mise à jour des données...', '', 'loading', () => {}, 999999999);
-  await appPopulate(false, event.detail.obsolete, event.detail.version);
+  await appPopulate(false, event.detail.obsolete, event.detail.modified, event.detail.version);
   await appDisplay(false);
   unNotify();
 

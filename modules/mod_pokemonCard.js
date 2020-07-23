@@ -28,54 +28,33 @@ export async function updateCard(pokemon, _card = null)
     card.setAttribute('huntid', shiny.huntid);
   }
 
-  if (card.getAttribute('dexid') != shiny.dexid) {
-    card.setAttribute('dexid', shiny.dexid);
-    card.setAttribute('espece', shiny.espece);
-  }
+  card.setAttribute('dexid', shiny.dexid);
+  card.setAttribute('espece', shiny.espece);
+  card.setAttribute('notes', shiny.description);
 
-  if (card.getAttribute('notes') != shiny.description)
-    card.setAttribute('notes', shiny.description);
+  if (shiny.ball) card.setAttribute('ball', shiny.ball);
+  else card.removeAttribute('ball');
 
-  const ball = shiny.ball || null;
-  if (card.getAttribute('ball') != ball) {
-    if (shiny.ball) card.setAttribute('ball', shiny.ball);
-    else card.removeAttribute('ball');
-  }
+  card.setAttribute('surnom', shiny.surnom);
 
-  if (card.getAttribute('surnom') != shiny.surnom)
-    card.setAttribute('surnom', shiny.surnom);
-
-  if (card.getAttribute('methode') != shiny.methode) {
-    card.setAttribute('methode', shiny.methode);
-  }
+  card.setAttribute('methode', shiny.methode);
   filtres.push('methode:' + shiny.methode);
 
-  if (card.getAttribute('compteur') != shiny.compteur)
-    card.setAttribute('compteur', shiny.compteur);
+  card.setAttribute('compteur', shiny.compteur);
 
-  const charm = shiny.charm || null;
-  if (card.getAttribute('charm') != charm) {
-    if (shiny.charm) card.setAttribute('charm', shiny.charm);
-    else card.removeAttribute('charm');
-  }
+  if (shiny.charm) card.setAttribute('charm', shiny.charm);
+  else card.removeAttribute('charm');
 
   const jeu = shiny.jeu.replace(/[ \']/g, '');
-  if (card.getAttribute('jeu') != jeu) {
-    card.setAttribute('jeu', jeu);
-  }
+  card.setAttribute('jeu', jeu);
   filtres.push('jeu:' + jeu);
 
-  const checkmark = shiny.checkmark || null;
-  if (card.getAttribute('checkmark') != checkmark) {
-    if (shiny.checkmark) card.setAttribute('checkmark', shiny.checkmark);
-    else card.removeAttribute('checkmark');
-  }
+  if (shiny.checkmark) card.setAttribute('checkmark', shiny.checkmark);
+  else card.removeAttribute('checkmark');
 
-  const monjeu = shiny.mine || null;
-  if (card.getAttribute('monjeu') != monjeu) {
-    if (shiny.mine) card.setAttribute('monjeu', true);
-    else card.removeAttribute('monjeu');
-  }
+  const monjeu = Number(shiny.monjeu) || null;
+  if (monjeu) card.setAttribute('monjeu', 1);
+  else card.removeAttribute('monjeu');
 
   switch(parseInt(shiny.hacked))
   {
@@ -97,9 +76,7 @@ export async function updateCard(pokemon, _card = null)
   if (conditionMien)
   {
     const shinyRate = (shiny.shinyRate != '???' ? shiny.shinyRate : 0);
-    if (card.getAttribute('shiny-rate') != shinyRate/* || card.getAttribute('charm') != charm || card.getAttribute('compteur') != shiny.compteur || card.getAttribute('methode') != shiny.methode || card.getAttribute('jeu') != jeu*/) {
-      card.setAttribute('shiny-rate', shinyRate);
-    }
+    card.setAttribute('shiny-rate', shinyRate);
 
     if (shiny.charm == false && [8192, 4096].includes(shinyRate))
       filtres.push('taux:full');
@@ -117,10 +94,9 @@ export async function updateCard(pokemon, _card = null)
     filtres.push('taux:inconnu');
   }
 
-  if (card.getAttribute('date') != shiny.date)
-    card.setAttribute('date', shiny.date);
-
+  card.setAttribute('date', shiny.date);
   card.setAttribute('filtres', JSON.stringify(filtres));
+  card.setAttribute('last-update', shiny.lastupdate);
 
   return card;
 }

@@ -11,10 +11,11 @@ let displaying = false;
 
 export let populateAttemptsVersions = [];
 export let populateAttemptsObsolete = [];
+export let populateAttemptsModified = [];
 
 /////////////////////////////////////////////////////////
 // Peuple l'application à partir des données de indexedDB
-export async function appPopulate(start = true, obsolete = [], versionSprite = 0)
+export async function appPopulate(start = true, obsolete = [], modified = [], versionSprite = 0)
 {
   if (populating) return;
   populating = true;
@@ -69,11 +70,11 @@ export async function appPopulate(start = true, obsolete = [], versionSprite = 0
 
       // Si cette carte doit être affichée
       else {
-        const pokemon = await shinyStorage.getItem(String(huntid));
         let card;
 
         // Si on doit créer cette carte
         if (toCreate.includes(huntid)) {
+          const pokemon = await shinyStorage.getItem(String(huntid));
           card = await updateCard(pokemon);
           // Si le spritesheet est obsolète à cause de cette carte, on affichera
           // le sprite seulement après la génération du spritesheet (supprimer --ordre-sprite = sprite masqué)
@@ -91,20 +92,24 @@ export async function appPopulate(start = true, obsolete = [], versionSprite = 0
         // Si on doit éditer cette carte
         else {
           card = document.getElementById(`pokemon-card-${huntid}`);
-          const oldOrdre = card.style.getPropertyValue('--ordre-sprite'); // ancien ordre du sprite
+          const oldOrdre = card.getAttribute('ordre-sprite'); // ancien ordre du sprite
           const wasObsolete = (card.dataset.obsolete != null); // spritesheet obsolète à cause de cette carte
 
-          await updateCard(pokemon, oldCard); // nouvel ordre = oldOrdre || ordre pour le cas où oldOrdre non défini
+          if (modified.includes(huntid)) {
+            const pokemon = await shinyStorage.getItem(String(huntid));
+            await updateCard(pokemon, card);
+            await filterCards(savedFiltres, [card]);
+          }
           if (obsolete.includes(huntid) || wasObsolete) card.dataset.obsolete = true;
-          await filterCards(savedFiltres, [card]);
 
           // Si le spritesheet est obsolète à cause de cette carte... (cf cas précédent)
+          // nouvel ordre = oldOrdre || ordre pour le cas où oldOrdre non défini
           if (card.dataset.obsolete != null) {
-            card.style.removeAttribute('ordre-sprite');
+            card.removeAttribute('ordre-sprite');
             card.dataset.futurOrdreSprite = oldOrdre || ordre;
           }
           else {
-            card.setAttribute('ordre-sprite', oldOrdre || ordre);
+            if (!oldOrdre) card.setAttribute('ordre-sprite', ordre);
           }
           //oldCard.outerHTML = newCard.outerHTML;
           //card = document.getElementById(`pokemon-card-${huntid}`); // on récupère la carte mise à jour pour détecter le clic
@@ -140,10 +145,11 @@ export async function appPopulate(start = true, obsolete = [], versionSprite = 0
       // On vérifie si des requêtes plus récentes de populate ont été faites
       const lastPopulateAttempt = Math.max(...populateAttemptsVersions);
       if (lastPopulateAttempt > futureVersionSprite)
-        return appPopulate(false, populateAttemptsObsolete, lastPopulateAttempt);
+        return appPopulate(false, populateAttemptsObsolete, populateAttemptsModified, lastPopulateAttempt);
       else {
         populateAttemptsVersions.length = 0;
         populateAttemptsObsolete.length = 0;
+        populateAttemptsModified.length = 0;
       }
       return;
     }

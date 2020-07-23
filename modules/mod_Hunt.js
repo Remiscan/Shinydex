@@ -471,7 +471,7 @@ export class Hunt {
           break test;
         }
         const oldData = await shinyStorage.getItem(String(this.id));
-        if (oldData['numero_national'] != shiny.dexid || oldData['forme'] != shiny.forme) {
+        if (oldData['numero_national'] != shiny.dexid || oldData['forme'] != shiny.forme.dbid) {
           obsolete = true;
           break test;
         }
@@ -484,7 +484,11 @@ export class Hunt {
 
       await this.destroyHunt();
       await dataStorage.setItem('version-bdd', this.lastupdate);
-      window.dispatchEvent(new CustomEvent('populate', { detail: { version: this.lastupdate, obsolete: (obsolete ? [String(this.huntid)] : []) } }));
+      window.dispatchEvent(new CustomEvent('populate', { detail: {
+        version: this.lastupdate,
+        obsolete: (obsolete ? [String(this.huntid)] : []),
+        modified: [String(this.huntid)]
+      } }));
       if (onlineBackup) await startBackup();
     }
     catch(error) {
@@ -509,7 +513,11 @@ export class Hunt {
 
       await this.destroyHunt();
       await dataStorage.setItem('version-bdd', this.lastupdate);
-      window.dispatchEvent(new CustomEvent('populate', { detail: { version: this.lastupdate, obsolete: [] } }));
+      window.dispatchEvent(new CustomEvent('populate', { detail: {
+        version: this.lastupdate,
+        obsolete: [],
+        modified: [String(this.id)]
+      } }));
       if (onlineBackup) await startBackup();
     }
     catch(error) {

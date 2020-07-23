@@ -327,6 +327,15 @@ async function compareBackup(message = true) {
       toDelete.map(huntid => prepareForDeletion(huntid))
     );
 
+    // Récupérons la liste des huntid créés / modifiés / supprimés
+    const modified = [
+      ...data['inserts-local'].map(shiny => String(shiny.huntid)),
+      ...data['updates-local'].map(shiny => String(shiny.huntid)),
+      ...data['deletions-local'].map(huntid => String(huntid)),
+      ...data['inserts'].map(shiny => String(shiny.huntid)),
+      ...data['updates'].map(shiny => String(shiny.huntid))
+    ];
+
     // Vérifions si la BDD en ligne est plus récente que la locale
     const versionBDD = await dataStorage.getItem('version-bdd');
     const newVersionBDD = data['version-bdd'];
@@ -338,7 +347,12 @@ async function compareBackup(message = true) {
     await dataStorage.setItem('last-sync', 'success');
     if (!message) return true;
     const clients = await self.clients.matchAll();
-    clients.map(client => client.postMessage({ successfulBackupComparison: true, obsolete: localObsoletes, quantity: data['results'].length }));
+    clients.map(client => client.postMessage({
+      successfulBackupComparison: true,
+      obsolete: localObsoletes,
+      quantity: data['results'].length,
+      modified
+    }));
     return true;
   }
 
