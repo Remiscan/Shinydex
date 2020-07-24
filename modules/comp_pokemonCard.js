@@ -1,6 +1,6 @@
 import { Shiny } from './mod_Pokemon.js';
 import { editHunt } from './mod_Hunt.js';
-import { Params, wait, getStyleSheet, styleSheets } from './mod_Params.js';
+import { Params, wait, adoptStyleSheets } from './mod_Params.js';
 
 let currentCard;
 let charmlessMethods;
@@ -61,22 +61,17 @@ class pokemonCard extends HTMLElement {
     this.shadow = this.attachShadow({ mode: 'open' });
     this.shadow.appendChild(template.content.cloneNode(true));
 
-    if ('adoptedStyleSheets' in this.shadow)
-      this.shadow.adoptedStyleSheets = [getStyleSheet('materialIcons'), getStyleSheet('pokemonCard'),
-                                        getStyleSheet('iconsheet'), getStyleSheet('pokesprite')];
-    else {
-      const style = document.createElement('style');
-      for (const sheet of Object.keys(styleSheets)) {
-        style.appendChild(document.createTextNode(`@import url('${styleSheets[sheet].url}');`));
-      }
-      this.shadow.appendChild(style);
-    }
+    adoptStyleSheets(this.shadow, ['materialIcons', 'pokemonCard', 'iconsheet', 'pokesprite'], this.shadow);
     const card = this.shadowRoot;
 
     // Active le long clic pour éditer
     card.addEventListener('click', () => { if (!longClic) this.toggleNotes(); longClic = false; });
     card.addEventListener('mousedown', async event => { if (event.button != 0) return; this.makeEdit(event); }); // souris
     card.addEventListener('touchstart', async event => { this.makeEdit(event); }, { passive: true }); // toucher
+
+    // Applique le bon thème aux icônes
+    window.addEventListener('themechange', event => this.changeTheme(event.detail.theme));
+    this.changeTheme();
   }
 
   updateCard(toUpdate = pokemonCard.observedAttributes) {
@@ -322,6 +317,16 @@ class pokemonCard extends HTMLElement {
     ready = (ready != false);
     appear.cancel(); anim.cancel();
     if (ready) longClic = false;
+  }
+
+  // Applique le bon thème aux éléments
+  async changeTheme(_theme = null) {
+    const elementsToTheme = [this.shadowRoot.querySelector('.pokemon-icones')];
+    const theme = _theme || document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+    elementsToTheme.forEach(element => {
+      element.classList.remove('light', 'dark');
+      element.classList.add(theme);
+    });
   }
 
   static get observedAttributes() {

@@ -80,6 +80,8 @@
         let themeColor = (theme == 'dark') ? 'rgb(34, 34, 34)' : 'rgb(224, 224, 224)';
         document.querySelector("meta[name=theme-color]").setAttribute('content', themeColor);
 
+        window.dispatchEvent(new CustomEvent('themechange', { detail: { theme } }));
+
         return await dataStorage.setItem('theme', storedTheme);
       }
 

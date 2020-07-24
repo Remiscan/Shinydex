@@ -158,7 +158,7 @@ function buildIconSheet($logs = false)
   $css = '';
   $iconsToDarken = array_filter($explain, function($e) { return ($e->dark == 'true'); });
   foreach($iconsToDarken as $i => $file) {
-    $css .= 'html.dark .icones.explain.' . $file->nom;
+    $css .= 'html.dark .icones.explain.' . $file->nom . ',.dark>.icones.explain.' . $file->nom;
     if ($i < count($iconsToDarken) - 1) $css .= ',';
   }
   $css .= '{filter:invert(100%) hue-rotate(180deg) saturate(1.2)}';
