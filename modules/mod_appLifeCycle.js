@@ -1,5 +1,5 @@
 import { appPopulate, appDisplay } from './mod_appContent.js';
-import { Params, recalcOnResize, version2date, wait, getVersionSprite, getStyleSheet, initStyleSheets } from './mod_Params.js';
+import { recalcOnResize, version2date, wait, getVersionSprite, initStyleSheets, adoptStyleSheets } from './mod_Params.js';
 import { notify } from './mod_notification.js';
 
 /////////////////////////////////////////////////////
@@ -97,9 +97,7 @@ export async function appStart()
 
     // ÉTAPE 3.97 : on applique les stylesheets
     await initStyleSheets();
-    if ('adoptedStyleSheets' in document) {
-      document.adoptedStyleSheets = [getStyleSheet('materialIcons'), getStyleSheet('pokesprite'), getStyleSheet('iconsheet')];
-    }
+    adoptStyleSheets(undefined, ['materialIcons', 'iconsheet', 'pokesprite']);
 
     // ÉTAPE 3.98 : si des shiny marqués à 'destroy' sont stockés, on les supprime
     let toDestroy = await shinyStorage.keys();

@@ -128,9 +128,8 @@ export async function appPopulate(start = true, obsolete = [], modified = [], ve
 
       // On ordonne les cartes
       const savedOrdreReverse = await dataStorage.getItem('ordre-reverse');
-      let savedOrdre = await dataStorage.getItem('ordre');
-      savedOrdre = (savedOrdre != null) ? savedOrdre : undefined;
-      cardsToPopulate = await orderCards(savedOrdre, savedOrdreReverse, cardsToPopulate);
+      const savedOrdre = await dataStorage.getItem('ordre');
+      cardsToPopulate = await orderCards(savedOrdre || undefined, savedOrdreReverse || undefined, cardsToPopulate);
     }
 
     // Peuple les éléments après la préparation (pour optimiser le temps d'exécution)
@@ -210,7 +209,7 @@ export async function appDisplay(start = true)
   let listeImages = [`./ext/pokesprite.png`];
   if (start) {
     listeImages.push(`./sprites--${versionSprite}.php`);
-    document.documentElement.style.setProperty('--link-sprites', `url('./sprites--${versionSprite}.php')`);
+    document.documentElement.style.setProperty('--link-sprites', `url('/remidex/sprites--${versionSprite}.php')`);
   }
 
   async function promiseInit() {
@@ -233,10 +232,9 @@ export async function appDisplay(start = true)
     if (!start) filterDex();
 
     const savedOrdreReverse = await dataStorage.getItem('ordre-reverse');
-    let savedOrdre = await dataStorage.getItem('ordre');
-    savedOrdre = (savedOrdre != null) ? savedOrdre : undefined;
-    if (!start) await orderCards(savedOrdre, savedOrdreReverse);
-    if (savedOrdre != null)
+    const savedOrdre = await dataStorage.getItem('ordre');
+    if (!start) await orderCards(savedOrdre || undefined, savedOrdreReverse || undefined);
+    if (savedOrdre !== null)
     {
       Array.from(document.querySelectorAll('input[name=ordre]')).forEach(input => {
         if (input.id == 'ordre-' + savedOrdre) input.checked = true;

@@ -284,7 +284,7 @@ window.addEventListener('populate', async event => {
   
     // On pré-charge le nouveau spritesheet et ensuite on l'utilise dans la section 'mes chromatiques'
     await loadAllImages([`./sprites--${version}.php`]);
-    document.documentElement.style.setProperty('--link-sprites', `url('./sprites--${version}.php')`);
+    document.documentElement.style.setProperty('--link-sprites', `url('/remidex/sprites--${version}.php')`);
     
     // On met à jour l'ordre des sprites
     Array.from(document.querySelectorAll('[data-ordre-sprite]')).forEach(card => {

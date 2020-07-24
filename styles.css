@@ -65,8 +65,8 @@ html.dark {
   --card-edit-bg-color: hsla(0, 0%, 7%, .7);
 }
 html {
-  --link-iconsheet: url(./images/iconsheet.png);
-  --link-pokesprite: url(./ext/pokesprite.png);
+  --link-iconsheet: url(/remidex/images/iconsheet.png);
+  --link-pokesprite: url(/remidex/ext/pokesprite.png);
   --easing-standard: cubic-bezier(0.4, 0.0, 0.2, 1);
   --easing-decelerate: cubic-bezier(0.0, 0.0, 0.2, 1);
   --easing-accelerate: cubic-bezier(0.4, 0.0, 1, 1);

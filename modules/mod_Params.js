@@ -87,13 +87,21 @@ export function getStyleSheet(sheet) {
 export async function initStyleSheets() {
   if ('adoptedStyleSheets' in document)
     return Promise.all( Object.keys(styleSheets).map(sheet => setStyleSheet(sheet)) );
-  else {
-    for (const sheet of Object.keys(styleSheets)) {
-      const link = document.createElement('link');
-      link.type = 'text/css'; link.rel = 'stylesheet', link.href = styleSheets[sheet].url;
-      document.head.appendChild(link);
-    };
+  else
     return;
+}
+
+// Insère les stylesheets dans le contexte demandé
+export function adoptStyleSheets(context = document, sheets = Object.keys(styleSheets), destination = document.head) {
+  if ('adoptedStyleSheets' in context)
+    context.adoptedStyleSheets = [...context.adoptedStyleSheets, ...sheets.map(sheet => getStyleSheet(sheet))];
+  else {
+    const style = document.createElement('style');
+    style.id = `adopted-stylesheets`;
+    for (const sheet of sheets) {
+      style.appendChild(document.createTextNode(`@import url('${styleSheets[sheet].url}');`));
+    }
+    destination.appendChild(style);
   }
 }
 
