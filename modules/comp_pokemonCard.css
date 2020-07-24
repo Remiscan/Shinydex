@@ -330,3 +330,40 @@
 .off {
   display: none !important;
 }
+
+@media (min-width: 1140px) {
+  :host {
+    overflow: visible;
+    margin: 0 0 6px 0;
+  }
+
+  .pokemon-sprite {
+    border-radius: 10px;
+  }
+
+  .pokemon-notes {
+    opacity: 1;
+    position: absolute;
+    top: 0;
+    left: calc(100% + 16px);
+    transform: none;
+    border-radius: 10px;
+    overflow: visible;
+  }
+
+  .pokemon-notes::before {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 0;
+    height: 0;
+    border: 7px solid transparent;
+    border-right: 7px solid var(--card-bg-color);
+    top: calc(50% - 7px);
+    left: -14px;
+  }
+
+  :host([open]) .pokemon-ball {
+    transform: translate(0) rotate(0);
+  }
+}
