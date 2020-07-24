@@ -152,30 +152,17 @@ function buildIconSheet($logs = false)
       $currentPosition->y += $lines[$currentLine];
       $currentLine++;
     }
-
-    if ($file->dark == 'true') {
-      // Create image from the icon file
-      $icon = imagecreatefrompng('explain-icons/' . $file->nom . '-dark.png');
-
-      // Copy that icon to the output image
-      imagecopy($outputImage, $icon, $currentPosition->x, $currentPosition->y, 0, 0, $file->taille[0], $file->taille[1]);
-
-      // Insert position into CSS file
-      $css = 'html.dark .icones.explain.' . $file->nom . ',:host-context(html.dark) .icones.explain.' . $file->nom . '{background-position:-' . $currentPosition->x . 'px -' . $currentPosition->y . 'px}';
-      if ($file->taille[0] != 12 || $file->taille[1] != 12)
-        $css .= '.icones.explain.' . $file->nom . '{width:' . $file->taille[0] . 'px;height:' . $file->taille[1] .'px}';
-      file_put_contents($cssPath, $css, FILE_APPEND);
-
-      // Increment current position
-      $currentPosition->x += $file->taille[0];
-      if ($currentPosition->x + $file->taille[0] > $width)
-      {
-        $currentPosition->x = $currentPosition->x % $width;
-        $currentPosition->y += $lines[$currentLine];
-        $currentLine++;
-      }
-    }
   }
+
+  // Enable dark theme on icons which should adapt
+  $css = '';
+  $iconsToDarken = array_filter($explain, function($e) { return ($e->dark == 'true'); });
+  foreach($iconsToDarken as $i => $file) {
+    $css .= 'html.dark .icones.explain.' . $file->nom;
+    if ($i < count($iconsToDarken) - 1) $css .= ',';
+  }
+  $css .= '{filter:invert(100%) hue-rotate(180deg) saturate(1.2)}';
+  file_put_contents($cssPath, $css, FILE_APPEND);
 
   imagepng($outputImage, $imagePath, 9, PNG_NO_FILTER);
 
