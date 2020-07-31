@@ -19,6 +19,8 @@ class Forme extends Sprite
       || ($dexid == 664 && $sprite->form > 0) // Lépidonille (formes de Prismillon)
       || ($dexid == 665 && $sprite->form > 0) // Pérégrain (formes de Prismillon)
       || ($dexid == 670 && $sprite->form == 5) // Floette de AZ
+      || ($dexid == 718 && $sprite->form == 2) // Zygarde (doublon)
+      || ($dexid == 718 && $sprite->form == 3) // Zygarde (doublon)
       || ($dexid == 735 && $sprite->form == 1) // Argouste totem
       || ($dexid == 738 && $sprite->form == 1) // Lucanon totem
       || ($dexid == 743 && $sprite->form == 1) // Rubombelle totem
