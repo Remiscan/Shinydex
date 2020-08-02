@@ -132,6 +132,15 @@ body {
   font-family: Roboto, system-ui;
 }
 
+::-webkit-scrollbar {
+  width: 0;
+}
+@supports (scrollbar-width: 0) {
+  * {
+    scrollbar-width: 0;
+  }
+}
+
 
 
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
