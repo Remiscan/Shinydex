@@ -53,10 +53,6 @@ export const styleSheets = {
   iconsheet: {
     url: './images/iconsheet.css',
     content: null
-  },
-  pokemonCard: {
-    url: './modules/comp_pokemonCard.css',
-    content: null
   }
 };
 

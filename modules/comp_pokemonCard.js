@@ -58,24 +58,19 @@ template.innerHTML = `
 class pokemonCard extends HTMLElement {
   constructor() {
     super();
-    this.shadow = this.attachShadow({ mode: 'open' });
-    this.shadow.appendChild(template.content.cloneNode(true));
 
-    adoptStyleSheets(this.shadow, ['materialIcons', 'pokemonCard', 'iconsheet', 'pokesprite'], this.shadow);
-    const card = this.shadowRoot;
+    const card = this;
+    this.ready = false;
 
     // Active le long clic pour éditer
     card.addEventListener('click', () => { if (!longClic) this.toggleNotes(); longClic = false; });
     card.addEventListener('mousedown', async event => { if (event.button != 0) return; this.makeEdit(event); }); // souris
     card.addEventListener('touchstart', async event => { this.makeEdit(event); }, { passive: true }); // toucher
-
-    // Applique le bon thème aux icônes
-    window.addEventListener('themechange', event => this.changeTheme(event.detail.theme));
-    this.changeTheme();
   }
 
   updateCard(toUpdate = pokemonCard.observedAttributes) {
-    const card = this.shadowRoot;
+    const card = this;
+    if (!this.ready) return;
 
     ordreSprite: {
       if (!toUpdate.includes('ordre-sprite')) break ordreSprite;
@@ -246,7 +241,7 @@ class pokemonCard extends HTMLElement {
 
   // Affiche les notes d'une carte au clic
   toggleNotes() {
-    const card = this.shadowRoot;
+    const card = this;
     const huntid = this.getAttribute('huntid');
 
     // On ferme la carte déjà ouverte
@@ -266,7 +261,7 @@ class pokemonCard extends HTMLElement {
   // Créer une chasse pour éditer un shiny au long clic sur une carte
   async makeEdit(event) {
     let act = true;
-    const card = this.shadowRoot;
+    const card = this;
 
     const editIcon = card.querySelector('.edit-icon');
     let appear = editIcon.animate([
@@ -319,21 +314,13 @@ class pokemonCard extends HTMLElement {
     if (ready) longClic = false;
   }
 
-  // Applique le bon thème aux éléments
-  async changeTheme(_theme = null) {
-    const elementsToTheme = [this.shadowRoot.querySelector('.pokemon-icones')];
-    const theme = _theme || document.documentElement.classList.contains('dark') ? 'dark' : 'light';
-    elementsToTheme.forEach(element => {
-      element.classList.remove('light', 'dark');
-      element.classList.add(theme);
-    });
-  }
-
   static get observedAttributes() {
     return ['ordre-sprite', 'notes', 'surnom', 'espece', 'jeu', 'ball', 'methode', 'compteur', 'charm', 'shiny-rate', 'random', 'monjeu', 'checkmark', 'hacked', 'date'];
   }
 
   connectedCallback() {
+    this.appendChild(template.content.cloneNode(true));
+    this.ready = true;
     this.updateCard();
   }
 

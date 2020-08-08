@@ -158,21 +158,21 @@ function buildIconSheet($logs = false)
   $css = '';
   $iconsToDarken = array_filter($explain, function($e) { return ($e->dark == 'true'); });
   foreach($iconsToDarken as $i => $file) {
-    $css .= 'html.dark .icones.explain.' . $file->nom . ',.dark>.icones.explain.' . $file->nom;
+    $css .= 'html.dark .icones.explain.' . $file->nom;
     if ($i < count($iconsToDarken) - 1) $css .= ',';
   }
   $css .= '{filter:invert(1) hue-rotate(183deg) saturate(0.89) brightness(0.97)}';
   file_put_contents($cssPath, $css, FILE_APPEND);
 
   // Enable light theme on icons which should adapt
-  $css = '';
+  /*$css = '';
   $iconsToDarken = array_filter($explain, function($e) { return ($e->dark == 'true'); });
   foreach($iconsToDarken as $i => $file) {
-    $css .= 'html.light .icones.explain.' . $file->nom . ',.light>.icones.explain.' . $file->nom;
+    $css .= 'html.light .icones.explain.' . $file->nom;
     if ($i < count($iconsToDarken) - 1) $css .= ',';
   }
   $css .= '{filter:hue-rotate(17deg) saturate(0.4) brightness(2.17)';
-  file_put_contents($cssPath, $css, FILE_APPEND);
+  file_put_contents($cssPath, $css, FILE_APPEND);*/
 
   imagepng($outputImage, $imagePath, 9, PNG_NO_FILTER);
 

@@ -467,7 +467,7 @@ body:not([data-section-actuelle=mes-chromatiques]):not([data-section-actuelle=po
 !!!!! CARTE D'UN POKÉMON !!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
-.pokemon-card {
+pokemon-card {
   width: 100%;
   max-width: 500px;
   height: 120px;
@@ -567,7 +567,7 @@ body:not([data-section-actuelle=mes-chromatiques]):not([data-section-actuelle=po
   transform: translate(0) rotate(0);
 }
 
-.on.pokemon-card .pokemon-ball {
+pokemon-card[open] .pokemon-ball {
   transition: all .11s var(--easing-accelerate);
   transform: translate(15px) rotate(120deg);
 }
@@ -683,7 +683,7 @@ body:not([data-section-actuelle=mes-chromatiques]):not([data-section-actuelle=po
   transition: all .1s var(--easing-accelerate);
   overflow: hidden;
 }
-.on>.pokemon-notes {
+pokemon-card[open]>.pokemon-notes {
   opacity: 1;
   transform: translate3d(0, 0, 0);
   transition: all .1s var(--easing-decelerate);
@@ -735,7 +735,6 @@ section:not(.defered) .defer,
   background: hsl(calc(var(--hue-min) + var(--coeff) * (var(--hue-max) - var(--hue-min))), 50%, 50%);
 }
 .full-odds {
-  /*background: repeating-linear-gradient(-45deg, red 0, orange 5px, yellow 10px, lightgreen 15px, cyan 20px, blue 25px, magenta 30px, red 35px);*/
   background: repeating-linear-gradient(-45deg, 
     hsl(2,80%,50%) 0, 
     hsl(24,100%,50%) 5px, 
@@ -2420,7 +2419,7 @@ input:disabled + label.switch {
     --z-fab: 30;
   }
 
-  .pokemon-card {
+  pokemon-card {
     overflow: visible;
     margin: 0 0 6px 0;
   }
@@ -2456,7 +2455,7 @@ input:disabled + label.switch {
     left: -14px;
   }
 
-  .on.pokemon-card .pokemon-ball {
+  pokemon-card[open] .pokemon-ball {
     transform: translate(0) rotate(0);
   }
 
