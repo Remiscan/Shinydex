@@ -695,7 +695,8 @@ pokemon-card[open]>.pokemon-notes {
 
 .filtered,
 section:not(.defered) .defer,
-.off {
+.off,
+.icones.explain.off {
   display: none;
 }
 
