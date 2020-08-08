@@ -1314,6 +1314,10 @@ body[data-viewer-open=true] #sprite-viewer {
 
 .dex-sprite>picture.loading {
   animation: sprite-loading 2s ease-out infinite;
+  -webkit-mask-image: var(--mask);
+  mask-image: var(--mask);
+  -webkit-mask-size: cover;
+  mask-size: cover;
 }
 
 picture.loading>img {

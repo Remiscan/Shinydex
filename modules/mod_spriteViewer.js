@@ -163,7 +163,7 @@ async function fillSpriteViewer(dexid)
 
     const html = `
       <div class="dex-sprite">
-        <picture class="loading">
+        <picture class="loading" style="--mask: url('${imagesShiny[k]}')">
           <img data-src="${sprite}" width="${Params.spriteSize}" height="${Params.spriteSize}">
         </picture>
         <span ${afficherNomForme ? 'class="on"' : ''}>
