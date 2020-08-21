@@ -705,7 +705,7 @@ section:not(.defered) .defer,
   100% { opacity: 1; transform: translate3D(0, 0, 0); }
 }
 
-#mes-chromatiques.start .pokemon-card:not(.defer) {
+#mes-chromatiques.start pokemon-card:not(.defer) {
   animation: start-card .8s var(--easing-decelerate);
   animation-fill-mode: backwards;
   animation-delay: calc(var(--order) * .08s + .2s);
