@@ -717,6 +717,7 @@ section:not(.defered) .defer,
 
 .icones.explain.oeuf {
   margin: 0;
+  margin-right: 3px;
 }
 
 
