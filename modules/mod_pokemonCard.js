@@ -52,6 +52,9 @@ export async function updateCard(pokemon, _card = null)
   if (shiny.checkmark) card.setAttribute('checkmark', shiny.checkmark);
   else card.removeAttribute('checkmark');
 
+  if (shiny.random == 1) card.setAttribute('random', shiny.random);
+  else card.removeAttribute('random');
+
   const monjeu = Number(shiny.monjeu) || null;
   if (monjeu) card.setAttribute('monjeu', 1);
   else card.removeAttribute('monjeu');
