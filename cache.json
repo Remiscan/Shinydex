@@ -6,6 +6,7 @@
         "./ext/pokesprite.css",
         "./ext/pokesprite.png",
         "./ext/localforage.min.js",
+        "./ext/material_icons.css",
         "./ext/material_icons.woff2",
         "./images/iconsheet.css",
         "./images/iconsheet.png",
