@@ -200,7 +200,7 @@ export function deferCards(section = false)
 
   switch (sectionActuelle) {
     case 'mes-chromatiques':
-      cardsOrdered = Array.from(document.querySelectorAll('#mes-chromatiques .pokemon-card:not(.filtered)'))
+      cardsOrdered = Array.from(document.querySelectorAll('#mes-chromatiques pokemon-card:not(.filtered)'))
                           .sort((a, b) => parseInt(a.style.getPropertyValue('--order')) - parseInt(b.style.getPropertyValue('--order')));
       cardList = cardsOrdered;
       break;
