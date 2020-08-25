@@ -287,7 +287,7 @@ window.addEventListener('populate', async event => {
     document.documentElement.style.setProperty('--link-sprites', `url('/remidex/sprites--${version}.php')`);
     
     // On met à jour l'ordre des sprites
-    Array.from(document.querySelectorAll('[data-ordre-sprite]')).forEach(card => {
+    Array.from(document.querySelectorAll('[data-futur-ordre-sprite]')).forEach(card => {
       const ordre = card.dataset.futurOrdreSprite;
       card.setAttribute('ordre-sprite', ordre);
       card.removeAttribute('data-futur-ordre-sprite');
