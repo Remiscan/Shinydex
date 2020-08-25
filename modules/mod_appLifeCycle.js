@@ -81,6 +81,11 @@ export async function appStart()
   catch(error) {
     console.log(error);
     console.log('[:|] Préparation de l\'installation...');
+    const loadMessage = document.getElementById('load-screen-message');
+    if (loadMessage !== null) {
+      loadMessage.innerText = 'Mise à jour...';
+      loadMessage.style.display = 'block';
+    }
     await initServiceWorker();
     log = await appUpdate();
   }
