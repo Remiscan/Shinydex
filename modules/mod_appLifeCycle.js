@@ -1,6 +1,6 @@
 import { appPopulate, appDisplay } from './mod_appContent.js';
 import { recalcOnResize, version2date, wait, getVersionSprite, initStyleSheets, adoptStyleSheets } from './mod_Params.js';
-import { notify } from './mod_notification.js';
+import { notify, unNotify } from './mod_notification.js';
 
 /////////////////////////////////////////////////////
 // On enregistre le service worker
@@ -110,11 +110,6 @@ export async function appStart()
                .map(huntid => shinyStorage.removeItem(String(huntid)))
     );
 
-    // ÉTAPE 3.99 : si la version de base de données ne correspond pas à la version du sprite en cache, on le met à jour
-    const versionBDD = await dataStorage.getItem('version-bdd');
-    const versionSprite = await getVersionSprite();
-    if (versionSprite < versionBDD) await updateSprite();
-
     // ÉTAPE 4 : on peuple l'application à partir des données locales
     log = await appPopulate();
     console.log(log);
@@ -122,6 +117,15 @@ export async function appStart()
     // ÉTAPE 5 : on affiche l'application
     log = await appDisplay();
     console.log(log);
+
+    // ÉTAPE 5.1 : si la version de base de données ne correspond pas à la version du sprite en cache, on le met à jour
+    const versionBDD = await dataStorage.getItem('version-bdd');
+    const versionSprite = await getVersionSprite();
+    if (versionSprite < versionBDD) {
+      notify('Mise à jour des images...', '', 'loading', () => {}, 999999999);
+      await updateSprite();
+      unNotify();
+    }
 
     // Fini !! :)
     appChargee = true;
