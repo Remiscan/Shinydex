@@ -10,6 +10,7 @@ import { openFiltres, initFiltres } from './modules/mod_filtres.js';
 import { Hunt } from './modules/mod_Hunt.js';
 import { notify, unNotify } from './modules/mod_notification.js';
 import { initSpriteViewer } from './modules/mod_spriteViewer.js';
+import { DexDatalist } from './modules/mod_DexDatalist.js';
 
 
 
@@ -41,6 +42,14 @@ document.querySelector('.fab').addEventListener('click', () => {
 
 // L'obfuscator ramène en arrière quand on clique dessus
 document.querySelector('.obfuscator').addEventListener('click', () => history.back());
+
+// Surveille le champ de filtrage par espèce de Pokémon
+{
+  const input = document.querySelector('.menu-filtres').querySelector('[list="datalist-pokedex"]');
+  input.addEventListener('input', async () => {
+    DexDatalist.build(input.value);
+  });
+}
 
 
 

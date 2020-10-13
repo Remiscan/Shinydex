@@ -1001,9 +1001,18 @@ body[data-reversed=true] .reverse-order {
   margin-top: 8px;
 }
 
+.options-search-espece {
+  align-items: center;
+  padding-bottom: 16px;
+}
+
 .titre-options {
   flex-basis: 100%;
   margin: 0 8px 8px;
+}
+
+.options-search-espece>.titre-options {
+  flex-basis: auto;
 }
 
 label.checkbox.filtre-jeu {
@@ -1127,7 +1136,8 @@ body[data-hunt-uploading] .bouton-hunt-submit {
 }
 
 .fab>.material-icons::after {
-  content: 'filter_list';
+  /*content: 'filter_list';*/
+  content: 'search';
 }
 
 .fab.add>.material-icons::after {
@@ -1648,6 +1658,12 @@ select {
 
 input[type=text] + select {
   margin-left: 8px;
+  padding: .5rem;
+}
+
+.liste-options>input[type=text] {
+  margin: 0 0 0 8px;
+  padding: .5rem;
 }
 
 select[id$="-forme"] {
