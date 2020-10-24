@@ -212,12 +212,15 @@ export function deferCards(section = false)
       break;
   }
 
-  if (cardList.length <= Params.nombreADefer[sectionActuelle]())
+  let nombreADefer = Params.nombreADefer[sectionActuelle]();
+  //if (CSS.supports("(content-visibility: auto)")) nombreADefer = 1000;
+
+  if (cardList.length <= nombreADefer)
     return document.getElementById(sectionActuelle).classList.add('defered');
 
   cardList.forEach((card, i) => {
     card.classList.remove('defered');
-    if (i < Params.nombreADefer[sectionActuelle]()) card.classList.remove('defer');
+    if (i < nombreADefer) card.classList.remove('defer');
     else                                            card.classList.add('defer');
   });
 }

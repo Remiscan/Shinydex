@@ -695,11 +695,38 @@ pokemon-card[open]>.pokemon-notes {
 }
 
 .filtered,
-section:not(.defered) .defer,
 .off,
 .icones.explain.offborn,
 .icones.explain.off {
   display: none;
+}
+
+@supports (content-visibility: auto) {
+  @media (max-width: 1140px) {
+    .defer {
+      content-visibility: auto;
+    }
+
+    .pokedex-gen {
+      contain-intrinsic-size: auto 1000px;
+    }
+
+    .defer-loader {
+      display: none !important;
+    }
+  }
+
+  @media (min-width: 1140px) {
+    section:not(.defered) .defer {
+      display: none;
+    }
+  }
+}
+
+@supports not (content-visibility: auto) {
+  section:not(.defered) .defer {
+    display: none;
+  }
 }
 
 @keyframes start-card {
