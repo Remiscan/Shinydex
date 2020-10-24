@@ -179,6 +179,7 @@ class Shiny {
       { nom: 'Chaîne de captures', jeux: allGames.filter(g => g.gen == 7.1), mine: true, charm: true },
       { nom: 'Bonus de combats', jeux: allGames.filter(g => g.gen == 8), mine: true, charm: true },
       { nom: 'Raid Dynamax', jeux: allGames.filter(g => g.gen == 8), mine: true, charm: false },
+      { nom: 'Expédition Dynamax', jeux: allGames.filter(g => g.gen == 8), mine: true, charm: true },
       { nom: 'Sauvage (évènement)', jeux: allGames.filter(g => g.gen == 0), mine: true, charm: false },
       { nom: 'Sauvage (garanti)', jeux: allGames.filter(g => ['gs', 'hgss', 'bw2'].includes(g.id)), mine: true, charm: false },
       { nom: 'Glitch', jeux: allGames.filter(g => [1, 2].includes(g.gen)), mine: true, charm: false },
