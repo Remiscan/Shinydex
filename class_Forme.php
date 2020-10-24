@@ -11,7 +11,6 @@ class Forme extends Sprite
     // Formes à ne pas compter
     if (
       ($dexid == 25 && $sprite->form == 8) // Pikachu starter
-      || ($dexid == 25 && $sprite->form == 9) // Pikachu casquette World
       || ($dexid == 20 && $sprite->form == 2) // Rattatac totem
       || ($dexid == 105 && $sprite->form == 2) // Ossatueur totem
       || ($dexid == 133 && $sprite->form == 1) // Évoli starter
@@ -262,6 +261,10 @@ class Forme extends Sprite
           $ids = ['', 'dada'];
           $noms = ['', 'Dada'];
         break;
+        case 898: // Sylveroy
+          $ids = ['', 'ice', 'ghost'];
+          $noms = ['', 'Cavalier du Froid', 'Cavalier d\'Effroi'];
+        break;
         default:
           $done = false;
       }
@@ -291,7 +294,7 @@ class Forme extends Sprite
         $hasMegaX = [6, 150];
         $hasPrimal = [382, 383];
         $hasAlolan = [19, 20, 26, 27, 28, 37, 38, 50, 51, 52, 53, 74, 75, 76, 88, 89, 103, 105];
-        $hasGalarian = [52, 77, 78, 79, 80, 83, 110, 122, 222, 263, 264, 554, 555, 562, 618];
+        $hasGalarian = [52, 77, 78, 79, 80, 83, 110, 122, 144, 145, 146, 199, 222, 263, 264, 554, 555, 562, 618];
 
         if (in_array($spriteid, ['mf', 'uk', 'mo', 'fo']))
         {
@@ -375,6 +378,9 @@ class Forme extends Sprite
             break;
             case 7:
               $this->nom = 'Casquette Partenaire';
+            break;
+            case 9:
+              $this->nom = 'Casquette Monde';
             break;
           }
         }
