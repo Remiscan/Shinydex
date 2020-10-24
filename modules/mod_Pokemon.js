@@ -317,6 +317,9 @@ class Shiny {
         useRolls = false;
         rate = '???';
         break;
+      case 'Expédition Dynamax':
+        rate = (charmRolls > 0) ? 100 : 300;
+        break;
       default:
         bonusRolls = 0;
     }
