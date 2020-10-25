@@ -319,6 +319,7 @@ class Shiny {
         rate = '???';
         break;
       case 'Expédition Dynamax':
+        useRolls = false;
         rate = (charmRolls > 0) ? 100 : 300;
         break;
       default:
