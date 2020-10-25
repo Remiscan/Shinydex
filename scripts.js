@@ -123,7 +123,7 @@ majButton.addEventListener('mousedown', event => {
   majButton.addEventListener('mouseout', () => clearTimeout(longClic));
 });
 
-majButton.addEventListener('touchstart', () => {
+majButton.addEventListener('touchstart', event => {
   event.preventDefault();
   clearTimeout(longClic);
   longClic = setTimeout(() => { needCheck = 0; manualUpdate(); }, 3000);
