@@ -824,10 +824,13 @@ section:not(.defered) .defer,
   margin: 0 0 6px;
   padding: 6px;
   color: var(--text-color-soft);
+  /*--root-margin: 126px;
+  transform: translateY(calc(-1 * var(--root-margin)));*/
 }
 
 .defer-loader>load-spinner {
   --size: 2em;
+  /*transform: translateY(var(--root-margin));*/
 }
 
 #chasses-en-cours .defer-loader {
