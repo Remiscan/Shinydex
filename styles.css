@@ -1663,7 +1663,6 @@ input[type=text] + select {
 }
 
 .liste-options>input[type=text] {
-  margin: 0 0 0 8px;
   padding: .5rem;
 }
 
