@@ -140,7 +140,7 @@ class Shiny {
     this.hacked = shiny.hacked;
     this.random = shiny.aupif;
     this.huntid = shiny.huntid;
-    this.lastupdate = shiny['last_update'];
+    this.lastupdate = shiny.lastupdate || shiny['last_update'];
     this.deleted = Boolean(shiny.deleted);
   }
 
