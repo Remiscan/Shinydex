@@ -130,8 +130,8 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
       $insert->bindParam(':charm', $data->{'charm'}, PDO::PARAM_INT, 1);
       $insert->bindParam(':hacked', $data->{'hacked'}, PDO::PARAM_INT, 1);
       $insert->bindParam(':aupif', $data->{'aupif'}, PDO::PARAM_INT, 1);
-      $insert->bindParam(':huntid', $data->{'huntid'}, PDO::PARAM_INT);
-      $insert->bindParam(':lastupdate', $data->{'last_update'}, PDO::PARAM_INT);
+      $insert->bindParam(':huntid', $data->{'huntid'}, PDO::PARAM_STR, 13);
+      $insert->bindParam(':lastupdate', $data->{'last_update'}, PDO::PARAM_STR, 13);
       $results[] = $insert->execute();
     }
 
@@ -142,7 +142,7 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
       $insert = $link->prepare('UPDATE mes_shinies SET 
         numero_national = :dexid, forme =:forme, surnom = :surnom, methode = :methode, compteur = :compteur, date = :date, jeu = :jeu, ball = :ball, description = :description, origin = :origin, monjeu = :monjeu, charm = :charm, hacked = :hacked, aupif = :aupif, last_update = :lastupdate
       WHERE huntid = :huntid');
-      $insert->bindValue(':huntid', $data->{'huntid'}, PDO::PARAM_INT);
+      $insert->bindValue(':huntid', $data->{'huntid'}, PDO::PARAM_STR, 13);
       $insert->bindParam(':dexid', $data->{'numero_national'}, PDO::PARAM_INT, 4);
       $insert->bindParam(':forme', $data->{'forme'}, PDO::PARAM_STR, 50);
       $insert->bindParam(':surnom', $data->{'surnom'}, PDO::PARAM_STR, 50);
@@ -158,14 +158,14 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
       $insert->bindParam(':hacked', $data->{'hacked'}, PDO::PARAM_INT, 1);
       $insert->bindParam(':aupif', $data->{'aupif'}, PDO::PARAM_INT, 1);
       // On n'édite pas huntid
-      $insert->bindParam(':lastupdate', $data->{'last_update'}, PDO::PARAM_INT);
+      $insert->bindParam(':lastupdate', $data->{'last_update'}, PDO::PARAM_STR, 13);
       $results[] = $insert->execute();
     }
 
     // On supprime de la BDD ce qui doit l'être
     foreach($toDelete as $huntid) {
       $insert = $link->prepare('DELETE FROM mes_shinies WHERE huntid = :huntid');
-      $insert->bindParam(':huntid', $huntid, PDO::PARAM_INT);
+      $insert->bindParam(':huntid', $huntid, PDO::PARAM_STR, 13);
       $results[] = $insert->execute();
     }
 
