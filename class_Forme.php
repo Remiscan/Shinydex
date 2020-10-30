@@ -30,6 +30,7 @@ class Forme extends Sprite
       || ($dexid == 777 && $sprite->form == 1) // Togedemaru totem
       || ($dexid == 784 && $sprite->form == 1) // Ékaïser totem
       || ($dexid == 849 && $sprite->form == 1 && $sprite->gigamax == 1) // Salarsen Gigamax Grave (identique au Aigu)
+      || ($dexid == 869 && $sprite->gigamax == 1 && ($sprite->form > 0 || $sprite->candy > 0)) // Charmilly Gigamax (autres friandises)
     )
       throw new Exception('Forme ignorée');
     
