@@ -128,14 +128,6 @@ export async function changeAutoMaj()
 }
 
 
-//////////////////////////////
-// Sauvegarde le mdp de la BDD
-export async function saveDBpassword()
-{
-  return await dataStorage.setItem('mdp-bdd', document.getElementById('mdp-bdd').value);
-}
-
-
 //////////////////////////////////////////
 // Gère le redimensionnement de la fenêtre
 let resizing = false;

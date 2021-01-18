@@ -1,7 +1,7 @@
 import './modules/comp_loadSpinner.js';
 import './modules/comp_pokemonCard.js';
 import './modules/comp_syncProgress.js';
-import { Params, changeAutoMaj, callResize, saveDBpassword, export2json, wait, loadAllImages } from './modules/mod_Params.js';
+import { Params, changeAutoMaj, callResize, export2json, wait, loadAllImages } from './modules/mod_Params.js';
 import { navigate, sectionActuelle } from './modules/mod_navigate.js';
 import { playEasterEgg } from './modules/mod_easterEgg.js';
 import { appStart, checkUpdate, manualUpdate, setOnlineBackup, updateSprite, startBackup } from './modules/mod_appLifeCycle.js';
@@ -93,11 +93,6 @@ dataStorage.getItem('online-backup').then(value => {
 });
 
 document.querySelector('[for=switch-online-backup]').onclick = async event => { event.preventDefault(); return await setOnlineBackup(); };
-
-// Surveille l'input du mot de passe de la BDD
-document.getElementById('mdp-bdd').addEventListener('input', async () => {
-  return await saveDBpassword();
-});
 
 // Active le badge indiquant le succès / échec de la dernière synchronisation des BDD
 dataStorage.getItem('last-sync').then(value => {
