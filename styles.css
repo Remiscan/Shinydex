@@ -292,6 +292,10 @@ h1 {
   flex-grow: 1;
 }
 
+#parametres .spacer {
+  min-height: 48px;
+}
+
 .section-titre.with-button {
   padding-left: 0;
 }
@@ -1839,11 +1843,13 @@ textarea {
   margin-top: 0;
 }
 
-#parametres:not([data-online-backup]) .if-backup {
+#parametres:not([data-online-backup]) .if-backup,
+#parametres:not([data-online-sharing]) .if-sharing {
   display: none;
 }
 
-#parametres[data-online-backup] .no-backup {
+#parametres[data-online-backup] .no-backup,
+#parametres[data-online-sharing] .no-sharing {
   display: none;
 }
 
@@ -1877,6 +1883,14 @@ textarea {
 	overflow: hidden;
 	position: absolute;
 	z-index: -1;
+}
+
+.account-warning {
+  border: 1px solid var(--success-color);
+  border-radius: 10px;
+  padding: 8px;
+  grid-template-columns: auto;
+  box-sizing: border-box;
 }
 
 
