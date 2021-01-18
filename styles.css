@@ -1902,7 +1902,8 @@ input[type=checkbox] {
 	height: 0;
   width: 0;
   margin: 0;
-  visibility: hidden;
+  opacity: 0;
+  pointer-events: 0;
   position: absolute;
 }
 
