@@ -153,7 +153,7 @@
       </section>
 
       <!-- FAB des filtres -->
-      <button class="fab">
+      <button type="button" class="fab">
         <i class="material-icons"></i>
       </button>
 
