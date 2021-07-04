@@ -3,6 +3,9 @@
 <IfModule mod_headers.c>
     <filesMatch "\.(jpg|jpeg|png|webp|gif|ico|svg|css|json|js|php|html)$">
         Header unset Cache-Control
+        Header unset Last-Modified
+        Header unset ETag
+        FileETag None
     </filesMatch>
 
     # Still cache sprites for 2 628 000 s = 1 month
