@@ -1,21 +1,7 @@
 <?php
-//////////////////////////////////////////////////////////////////////////////////////////
-// Chargement automatique de classes PHP, chaque classe est dans son fichier class_nom.php
-// et sera appelée automatiquement quand on utilisera la classe pour la première fois.
-function charge_classe($className)
-{
-  $classPath = 'class_'.$className.'.php';
-  if (file_exists($classPath))
-  {
-    require_once $classPath;
-    return true;
-  }
-  return false;
-}
-// Indique que la fonction précédente est une fonction d'autoload
-spl_autoload_register('charge_classe');
+require_once 'class_Pokemon.php';
 
-$dir = "./sprites-home/big";
+$dir = "../images/pokemon-sprites/home";
 $files = scandir($dir);
 
 $pokemons = [];
@@ -43,8 +29,8 @@ forEach($pokemons as $pokemon)
     <div style="display: grid; border: 1px solid rgba(0, 0, 0, 1); box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .15); margin: 5px; padding: 5px; border-radius: 5px;">
       <div style="grid-row: 1 / 2;">
       <?php echo '<pre>'; print_r($forme); echo '</pre>'; ?>
-        <img src="<?=$pokemon->getSprite($forme, (object) ['shiny' => false, 'big' => false])?>" width="112" height="112">
-        <img src="<?=$pokemon->getSprite($forme, (object) ['shiny' => true, 'big' => false])?>" width="112" height="112">
+        <img src="<?=$pokemon->getSprite($forme, (object) [ 'shiny' => false, 'format' => 'webp' ])?>" width="112" height="112">
+        <img src="<?=$pokemon->getSprite($forme, (object) [ 'shiny' => true, 'format' => 'webp' ])?>" width="112" height="112">
       </div>
       <div style="grid-row: 2 / 3;">
         <?=($forme->nom != '') ? $forme->nom : '(Normal)'?>

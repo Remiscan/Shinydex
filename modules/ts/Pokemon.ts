@@ -166,18 +166,14 @@ class Pokemon {
     this.formes = pkmn.formes;
   }
 
-  getSprite(forme: Forme, { shiny = false, big = false, backside = undefined }: { shiny: boolean, big: boolean, backside?: boolean}): string {
+  getSprite(forme: Forme, { shiny = false, backside = undefined, size = 512, format = 'png' }: { shiny: boolean, backside?: boolean, size: number, format: string }): string {
     const shinySuffix = shiny ? 'r' : 'n';
-    const size = big ? 'big' : 'small';
-    const sizePrefix = 'capture';
 
     const side = (typeof forme.hasBackside !== 'undefined' && typeof backside !== 'undefined' && backside === true) ? 'b' : 'f';
 
     const formToConsider = (shiny && this.dexid === 869) ? 0 : forme.form;
 
     const spriteCaracs = [
-      `./sprites-home/${size}/poke`,
-      sizePrefix,
       pad(this.dexid.toString(), 4),
       pad(formToConsider.toString(), 3),
       forme.gender,
@@ -187,10 +183,10 @@ class Pokemon {
       shinySuffix
     ];
 
-    let spriteUrl = `${spriteCaracs.join('_')}.png`;
+    let spriteUrl = `/remidex/pokemon-sprite-${spriteCaracs.join('_')}-${size}.${format}`;
 
     if (typeof forme.noShiny !== 'undefined' && forme.noShiny === true && shiny === true)
-      spriteUrl = this.getSprite(forme, { shiny: false, big, backside });
+      spriteUrl = this.getSprite(forme, { shiny: false, size, format });
 
     return spriteUrl;
   }

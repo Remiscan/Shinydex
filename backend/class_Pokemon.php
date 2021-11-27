@@ -24,11 +24,11 @@ class Pokemon
       try {
         $forme = new Forme(new Sprite($s), $id);
 
-        if (!file_exists('./sprites-home/big/' . str_replace('_n.png', '_r.png', $s)) && $this->dexid != 869)
-        $forme->noShiny = true;
+        if (!file_exists('../images/pokemon-sprites/home/' . str_replace('_n.png', '_r.png', $s)) && $this->dexid != 869)
+          $forme->noShiny = true;
 
-        if (file_exists('./sprites-home/big/' . str_replace('_f_n.png', '_b_n.png', $s)))
-          $forme->hasBackside == true;
+        if (file_exists('../images/pokemon-sprites/home/' . str_replace('_f_n.png', '_b_n.png', $s)))
+          $forme->hasBackside = true;
 
         $formeCaracs = [
           $forme->form,
@@ -55,8 +55,9 @@ class Pokemon
     {
       $options = (object) [
         'shiny' => false,
-        'big' => true,
-        'backside' => false
+        'backside' => false,
+        'size' => 512,
+        'format' => 'png'
       ];
     }
 
@@ -64,17 +65,15 @@ class Pokemon
 
     $shiny = property_exists($options, 'shiny') ? $options->shiny : false;
     $shinySuffix = $shiny ? 'r' : 'n';
-    $big = property_exists($options, 'big') ? $options->big : true;
-    $size = $big ? 'big' : 'small';
-    $sizePrefix = 'capture';
+
+    $size = (property_exists($options, 'size') && is_numeric($options->size)) ? $options->size : 512;
+    $format = property_exists($options, 'format') ? match(strtolower($options->format)) { 'webp' => 'webp', default => 'png' } : 'png';
 
     $side = (property_exists($forme, 'hasBackside') && property_exists($options, 'backside') && $options->backside) ? 'b' : 'f';
 
     $formToConsider = ($shiny && $this->dexid == 869) ? 0 : $forme->form;
 
     $spriteCaracs = [
-      './sprites-home/' . $size . '/poke',
-      $sizePrefix,
       str_pad($this->dexid, 4, "0", STR_PAD_LEFT),
       str_pad($formToConsider, 3, "0", STR_PAD_LEFT),
       $forme->gender,
@@ -84,10 +83,10 @@ class Pokemon
       $shinySuffix
     ];
 
-    $spriteUrl = implode('_', $spriteCaracs) . '.png';
+    $spriteUrl = '/remidex/pokemon-sprite-' . implode('_', $spriteCaracs) . '-' . $size . '.' . $format;
 
     if (property_exists($forme, 'noShiny') && $forme->noShiny == true && $shiny)
-      $spriteUrl = './sprites-home/' . $size . '/poke_' . $sizePrefix . '_0000_000_uk_n_00000000_f_n.png';
+      $spriteUrl = '/remidex/pokemon-sprite-0000_000_uk_n_00000000_f_n-' . $size . '.' . $format;
 
     return $spriteUrl;
   }

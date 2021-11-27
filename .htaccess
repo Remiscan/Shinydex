@@ -13,3 +13,12 @@
         Header set Cache-Control "max-age=2628000, public"
     </filesMatch>
 </IfModule>
+
+### Rewrite URLs
+
+RewriteEngine On
+
+# Rewrite /remidex/sprite-{params}.webp to /remidex/backend/sprite.php?format=webp&params={params}
+# and /remidex/sprite-{params}.png to /remidex/backend/sprite.php?format=png&params={params}
+RewriteRule ^pokemon-sprite-(.*)-([0-9]+)\.webp$ backend/pokemon-sprite.php?format=webp&params=$1&size=$2 [l,QSA]
+RewriteRule ^pokemon-sprite-(.*)-([0-9]+)\.png$ backend/pokemon-sprite.php?format=png&params=$1&size=$2 [l,QSA]

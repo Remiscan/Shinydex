@@ -10,14 +10,18 @@ if (isset($_GET['params'])) {
   $params = $_GET['params'];
 } else $params = '0000_000_uk_n_00000000_f_n';
 
+if (isset($_GET['size']) && is_numeric($_GET['size'])) {
+  $size = max(1, min($_GET['size'], 512));
+} else $size = 512;
+
 
 
 ///////////////////
 // Génère le sprite
-function generateSprite(string $sprite, string $type): void {
+function generateSprite(string $sprite, string $type, int $size): void {
   // Taille de sprite désirée
-  $width = 112;
-  $height = 112;
+  $width = $size;
+  $height = $size;
 
   // Taille du sprite d'origine
   $bigWidth = 512;
@@ -53,5 +57,5 @@ function generateSprite(string $sprite, string $type): void {
 
 //////////////////////////////
 // On génère le sprite demandé
-$originalSprite = "../sprites-home/big/poke_capture_$params.png";
-generateSprite($originalSprite, $format);
+$originalSprite = "../images/pokemon-sprites/home/poke_capture_$params.png";
+generateSprite($originalSprite, $format, $size);

@@ -8,15 +8,15 @@
     <meta property="og:description" content="Pokédex recensant les Pokémon chromatiques possédés par Rémi.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://remiscan.fr/remidex/">
-    <meta property="og:image" content="https://remiscan.fr/remidex/preview.png">
+    <meta property="og:image" content="https://remiscan.fr/remidex/images/preview.png">
 
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, user-scalable=no">
     <meta name="theme-color" content="#222222">
     
-    <link rel="icon" type="image/png" href="./icons/icon-192.png">
-    <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="./images/app-icons/icon-192.png">
+    <link rel="apple-touch-icon" href="./images/app-icons/apple-touch-icon.png">
     <link rel="manifest" href="./manifest.json">
 
     <link rel="preconnect" href="https://remiscan.fr">

@@ -7,13 +7,13 @@ import { pokemonCard } from './pokemonCard.component.js';
 //////////////////////////////////////////////////////
 // Crée la carte d'un Pokémon, ou si elle existe déjà,
 // met à jour uniquement les données qui ont changé.
-export async function updateCard(pokemon: frontendShiny, _card = null) {
+export async function updateCard(pokemon: frontendShiny, _card?: pokemonCard): Promise<pokemonCard> {
   let shiny: Shiny;
   try {
     shiny = new Shiny(pokemon);
   } catch (e) {
     console.error('Failed creating Shiny object', e);
-    return;
+    throw e;
   }
 
   const conditionMien = shiny.mine;
