@@ -54,8 +54,4 @@ function generateSprite(string $sprite, string $type): void {
 //////////////////////////////
 // On génère le sprite demandé
 $originalSprite = "../sprites-home/big/poke_capture_$params.png";
-try {
-  generateSprite($originalSprite, $format);
-} catch (Error $e) {
-  generateSprite($originalSprite, 'png');
-}
+generateSprite($originalSprite, $format);
