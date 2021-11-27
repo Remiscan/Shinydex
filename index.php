@@ -22,7 +22,9 @@
     <link rel="preconnect" href="https://remiscan.fr">
 
     <script src="./ext/localforage.min.js"></script>
-    <script>
+    <script type="module">
+      import { pokemonData, shinyStorage, dataStorage, huntStorage } from './modules/localforage.js';
+      
       window.tempsDebut = Date.now();
 
       // Stockage de données

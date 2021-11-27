@@ -2,9 +2,9 @@
 // Affiche une notification en bas de l'écran pendant duree ms, avec un texte de description,
 // un bouton (texte + icône), et une action au clic sur le bouton
 let notifTimeLimit;
+let actionFunction;
 
-export function notify(texteDesc, texteBouton = '', iconeBouton = 'close', action = unNotify, duree = 5000)
-{
+export function notify(texteDesc: string, texteBouton = '', iconeBouton = 'close', action = unNotify, duree = 5000) {
   const notif = document.getElementById('notification');
   const fab = document.querySelector('.fab');
 
@@ -20,7 +20,8 @@ export function notify(texteDesc, texteBouton = '', iconeBouton = 'close', actio
   notifTexte.innerHTML = texteDesc;
   notifTexteBouton.innerHTML = texteBouton;
   notifIcone.innerHTML = iconeBouton;
-  notifBouton.addEventListener('click', window.notifAction = action);
+  actionFunction = action;
+  notifBouton.addEventListener('click', actionFunction);
 
   requestAnimationFrame(() => {
     notif.classList.add('on');
@@ -45,5 +46,5 @@ export function unNotify()
   notif.classList.remove('on');
   fab.classList.remove('notif');
   const notifBouton = notif.querySelector('.notif-bouton');
-  notifBouton.removeEventListener('click', window.notifAction);
+  notifBouton.removeEventListener('click', actionFunction);
 }

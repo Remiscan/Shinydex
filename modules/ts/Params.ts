@@ -1,4 +1,6 @@
-import { notify, unNotify } from './mod_notification.js';
+import { dataStorage, shinyStorage, huntStorage } from './localforage.js';
+
+
 
 //////////////////////
 // Constantes globales
@@ -14,8 +16,8 @@ export const Params = {
   spriteSize: 112,
   spriteRegex: /sprites--(.+).php/,
 
-  owidth: false,
-  oheight: false,
+  owidth: 0,
+  oheight: 0,
 
   nombreADefer: {
     'mes-chromatiques': () => { return Math.ceil((Params.oheight ? Params.oheight : 0) / 126); },
@@ -41,41 +43,48 @@ export const Params = {
 
 /////////////////////////////////////////////////////////////////////
 // Charge les CSS stylesheets à faire adopter par des éléments custom
-export const styleSheets = {
-  materialIcons: {
-    url: './ext/material_icons.css',
-    content: null
-  },
-  pokesprite: {
-    url: './ext/pokesprite.css',
-    content: null
-  },
-  iconsheet: {
-    url: './images/iconsheet.css',
-    content: null
-  }
+type styleSheet = {
+  url: string,
+  content: string | null,
 };
 
-async function setStyleSheet(sheet) {
-  if (styleSheets[sheet].content == null) {
+export const styleSheets: Map<string, { url: string, content: CSSStyleSheet | null }> = new Map([
+  ['materialIcons', {
+    url: './ext/material_icons.css',
+    content: null
+  }],
+  ['pokesprite', {
+    url: './ext/pokesprite.css',
+    content: null
+  }],
+  ['iconsheet', {
+    url: './images/iconsheet.css',
+    content: null
+  }]
+]);
+
+async function setStyleSheet(sheetId: string): Promise<CSSStyleSheet | null> {
+  const sheet = styleSheets.get(sheetId);
+  if (sheet.content == null) {
     try {
       const tempSheet = new CSSStyleSheet();
-      let css = await fetch(styleSheets[sheet].url);
-      css = await css.text();
+      
+      let css = await (await fetch(sheet.url)).text();
       tempSheet.replaceSync(css);
-      styleSheets[sheet].content = tempSheet;
+      sheet.content = tempSheet;
     }
     catch(error) {
       console.error(error);
       throw `Erreur de récupération du stylesheet (${sheet})`;
     }
   }
-  return styleSheets[sheet].content;
+  return sheet.content;
 }
 
 // Utiliser uniquement si initStyleSheets() a déjà fini
-export function getStyleSheet(sheet) {
-  if (styleSheets[sheet].content != null) return styleSheets[sheet].content;
+export function getStyleSheet(sheetId: string): CSSStyleSheet {
+  const sheet = styleSheets.get(sheetId);
+  if (sheet.content != null) return sheet.content;
   else throw `Impossible d'utiliser getStyleSheet() avant complétion de setStyleSheet()`;
 }
 
@@ -104,25 +113,14 @@ export function adoptStyleSheets(context = document, sheets = Object.keys(styleS
 
 ///////////////////////////////////////////////////////
 // Change le paramètre de vérification des mises à jour
-let settingClicked = false;
-export async function changeAutoMaj()
-{
-  const checkbox = document.getElementById('switch-auto-maj');
-  if (checkbox.checked)
-  {
+export async function changeAutoMaj() {
+  const checkbox = document.getElementById('switch-auto-maj') as HTMLInputElement;
+  if (checkbox.checked) {
     checkbox.checked = false;
     await dataStorage.setItem('check-updates', 0);
-  }
-  else
-  {
+  } else {
     checkbox.checked = true;
     await dataStorage.setItem('check-updates', 1);
-    /*if (!settingClicked)
-    {
-      settingClicked = true;
-      setTimeout(function() { settingClicked = false }, 100);
-      checkUpdate();
-    }*/
   }
   return;
 }
@@ -130,7 +128,7 @@ export async function changeAutoMaj()
 
 //////////////////////////////////////////
 // Gère le redimensionnement de la fenêtre
-let resizing = false;
+let resizing = 0;
 
 export function recalcOnResize() {
   const largeurPage = document.getElementById('largeur-fenetre');
@@ -157,9 +155,8 @@ export function callResize() {
 
 ///////////////////////////////////////
 // Charge toutes les images d'une liste
-export function loadAllImages(liste)
-{
-  let promises = [];
+export function loadAllImages(liste: string[]): Promise<number[]> {
+  let promises: Promise<number>[] = [];
   liste.forEach((e, k) => {
     promises[k] = new Promise((resolve, reject) => {
       const img = new Image();
@@ -174,12 +171,12 @@ export function loadAllImages(liste)
 
 ////////////
 // Sync wait
-export function wait(time) { return new Promise(resolve => setTimeout(resolve, time)); }
+export function wait(time: number) { return new Promise(resolve => setTimeout(resolve, time)); }
 
 
 /////////////////////////////////
 // Convertit un timestamp en date
-export function version2date(timestamp) {
+export function version2date(timestamp: number): string {
   const d = new Date(timestamp);
   return d.toISOString().replace('T', ' ').replace(/\.[0-9]{3}Z/, '');
 }
@@ -199,11 +196,11 @@ export async function export2json() {
   }
   const data = { shiny: await getItems(shinyStorage), hunts: await getItems(huntStorage) };
   const dataString = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(data))}`;
-  const a = document.createElement('A');
+  const a = document.createElement('A') as HTMLAnchorElement;
   a.href = dataString;
   await dataStorage.ready();
   a.download = `remidex-${version2date(Date.now() / 1000).replace(' ', '_')}.json`;
-  a.style = 'position: absolute; width: 0; height: 0;';
+  a.setAttribute('style', 'position: absolute; width: 0; height: 0;');
   document.body.appendChild(a);
   a.click();
   a.remove();
@@ -216,10 +213,45 @@ export async function getVersionSprite() {
   await dataStorage.ready();
   const versionFichiers = await dataStorage.getItem('version-fichiers');
   const cacheActuel = await caches.open(`remidex-sw-${versionFichiers}`);
-  let versionSprite = await cacheActuel.keys();
-  versionSprite = versionSprite.map(req => req.url)
-                               .filter(url => url.match(Params.spriteRegex))
-                               .map(url => Number(url.match(Params.spriteRegex)[1]));
-  versionSprite = Math.max(...versionSprite);
-  return versionSprite;
+  const versionsSprites = (await cacheActuel.keys()).map(req => req.url)
+                                                    .filter(url => url.match(Params.spriteRegex))
+                                                    .map(url => Number(url.match(Params.spriteRegex)[1]));
+  return Math.max(...versionsSprites);
+}
+
+
+////////////////////////////////
+// Pads a string with leading 0s
+export function pad(s: string, long: number): string {
+  let chaine = this;
+  while (chaine.length < long)
+    chaine = `0${chaine}`;
+  return chaine;
+}
+
+
+/////////////////////////////////////////////////////////////////////////
+// Vérifie si les images au format webp sont supportées par le navigateur
+export async function webpSupport(): Promise<boolean> {
+  const features = [
+    'UklGRiIAAABXRUJQVlA4IBYAAAAwAQCdASoBAAEADsD+JaQAA3AAAAAA', // lossy
+    'UklGRkoAAABXRUJQVlA4WAoAAAAQAAAAAAAAAAAAQUxQSAwAAAARBxAR/Q9ERP8DAABWUDggGAAAABQBAJ0BKgEAAQAAAP4AAA3AAP7mtQAAAA==' // alpha
+  ];
+  
+  const results = await Promise.all(features.map(feature => {
+    return new Promise(resolve => {
+      const img = new Image();
+      
+      img.onload = function() {
+        const result = (img.width > 0) && (img.height > 0);
+        resolve(result);
+      }
+      
+      img.onerror = function() { resolve(false); }
+      
+      img.src = 'data:image/webp;base64,' + feature;
+    });
+  }));
+  
+  return results.every(r => r === true);
 }

@@ -1,37 +1,34 @@
-import { Params, loadAllImages, wait } from './mod_Params.js';
-import { Pokemon } from './mod_Pokemon.js';
-import { notify } from './mod_notification.js';
+import { Params, loadAllImages, pad } from './Params.js';
+import { Pokemon } from './Pokemon.js';
+import { notify } from './notification.js';
+import { pokemonData } from './localforage.js';
+
 
 const spriteViewer = document.getElementById('sprite-viewer');
 const spriteScroller = document.querySelector('.sprite-scroller');
-const switchSR = document.getElementById('switch-shy-reg');
+const switchSR = document.getElementById('switch-shy-reg') as HTMLInputElement;
 
 export function initSpriteViewer() {
   spriteScroller.addEventListener('click', switchShinyRegular);
   switchSR.addEventListener('click', switchShinyRegular);
 }
 
-export async function openSpriteViewer(dexid, event)
-{
-  if (typeof document.body.dataset.viewerLoading != 'undefined')
-    return;
+export async function openSpriteViewer(dexid: number, event: { clientX: number, clientY: number }) {
+  if (typeof document.body.dataset.viewerLoading != 'undefined') return;
   
   // Coordonnées du clic qui ouvre la visionneuse
-  let originX, originY;
-  if (event.clientX == 0 && event.clientY == 0)
-  {
-    const rect = document.querySelector('.pkspr.pokemon[data-dexid="' + dexid + '"]');
+  let originX: number, originY: number;
+  if (event.clientX === 0 && event.clientY === 0) {
+    const rect = document.querySelector('.pkspr.pokemon[data-dexid="' + dexid + '"]').getBoundingClientRect();
     originX = rect.x;
     originY = rect.y;
-  }
-  else
-  {
+  } else {
     originX = event.clientX;
     originY = event.clientY;
   }
   spriteViewer.style.transformOrigin = originX + 'px ' + originY + 'px';
 
-  document.body.dataset.viewerLoading = dexid;
+  document.body.dataset.viewerLoading = String(dexid);
   history.pushState({ section: 'sprite-viewer', dexid: dexid }, '');
 
   try {
@@ -47,7 +44,7 @@ export async function openSpriteViewer(dexid, event)
           img.src = e;
         })
         .then(() => {
-          const img = spriteViewer.querySelector(`img[data-src="${e}"]`);
+          const img = spriteViewer.querySelector(`img[data-src="${e}"]`) as HTMLImageElement;
           img.src = img.dataset.src;
           img.removeAttribute('data-src');
           img.parentElement.classList.remove('loading');
@@ -55,9 +52,8 @@ export async function openSpriteViewer(dexid, event)
       });
     } catch(error) {}
 
-    if (document.body.dataset.viewerLoading != dexid)
-      return;
-    document.body.dataset.viewerOpen = true;
+    if (document.body.dataset.viewerLoading !== String(dexid)) return;
+    document.body.dataset.viewerOpen = 'true';
     spriteViewer.classList.add('shiny');
     spriteViewer.animate([
       { opacity: 0, transform: 'scale(.7) translateZ(0)' },
@@ -80,12 +76,8 @@ export async function openSpriteViewer(dexid, event)
   }
 }
 
-export function closeSpriteViewer()
-{
-  return new Promise(resolve => {
-    if (typeof document.body.dataset.viewerLoading != 'undefined')
-      resolve();
-    
+export async function closeSpriteViewer() {
+  if (typeof document.body.dataset.viewerLoading === 'undefined') {
     const closure = spriteViewer.animate([
       { opacity: 1, transform: 'scale(1) translateZ(0)' },
       { opacity: 0, transform: 'scale(.7) translateZ(0)' }
@@ -93,24 +85,22 @@ export function closeSpriteViewer()
       easing: Params.easingAccelerate,
       duration: 150
     });
-    closure.onfinish = resolve;
-  })
-  .then(() => {
-    document.body.removeAttribute('data-viewer-loading');
-    document.body.removeAttribute('data-viewer-open');
-    spriteViewer.classList.remove('shiny', 'regular');
-  });
+    await new Promise(resolve => closure.onfinish = resolve);
+  }
+
+  document.body.removeAttribute('data-viewer-loading');
+  document.body.removeAttribute('data-viewer-open');
+  spriteViewer.classList.remove('shiny', 'regular');
 }
 
-async function fillSpriteViewer(dexid)
-{
+async function fillSpriteViewer(dexid: number) {
   const pokemon = new Pokemon(await pokemonData.getItem(String(dexid)));
   const imagesShiny = [];
   const imagesRegular = [];
   const nomFormeNormale = 'Normale';
 
   // On réordonne les formes (normale d'abord, les autres ensuite)
-  const formes = pokemon.formes.slice().sort((a, b) => { if (a.nom == '') return -1; else return 0;});
+  const formes = pokemon.formes.slice().sort((a, b) => { if (a.nom == '') return -1; else return 0; });
 
   // Si moins de 2 sprites, on les affiche en plus gros
   if (formes.length == 1) {
@@ -176,7 +166,7 @@ async function fillSpriteViewer(dexid)
   });
 
   // On place le numéro et nom
-  document.querySelector('.info-dexid').innerHTML = String(pokemon.dexid).pad(3);
+  document.querySelector('.info-dexid').innerHTML = pad(String(pokemon.dexid), 3);
   document.querySelector('.info-nom').innerHTML = pokemon.namefr;
 
   //return Promise.resolve([...imagesShiny, ...imagesRegular]);
@@ -185,15 +175,11 @@ async function fillSpriteViewer(dexid)
 
 ///////////////////////////////////////////////////////////
 // Inverse les sprites shiny / normaux dans le spriteViewer
-function switchShinyRegular()
-{
-  if (spriteViewer.classList.contains('shiny'))
-  {
+function switchShinyRegular() {
+  if (spriteViewer.classList.contains('shiny')) {
     spriteViewer.classList.replace('shiny', 'regular');
     switchSR.checked = false;
-  }
-  else
-  {
+  } else {
     spriteViewer.classList.replace('regular', 'shiny');
     switchSR.checked = true;
   }

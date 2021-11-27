@@ -1,6 +1,8 @@
-import { Shiny } from './mod_Pokemon.js';
-import { editHunt } from './mod_Hunt.js';
-import { Params, wait, adoptStyleSheets } from './mod_Params.js';
+import { Shiny } from './Pokemon.js';
+import { editHunt } from './Hunt.js';
+import { Params, wait } from './Params.js';
+
+
 
 let currentCard;
 let charmlessMethods;
@@ -55,17 +57,16 @@ template.innerHTML = `
 </div>
 `;
 
-class pokemonCard extends HTMLElement {
+export class pokemonCard extends HTMLElement {
+  ready: boolean = false;
+
   constructor() {
     super();
 
-    const card = this;
-    this.ready = false;
-
     // Active le long clic pour éditer
-    card.addEventListener('click', () => { if (!longClic) this.toggleNotes(); longClic = false; });
-    card.addEventListener('mousedown', async event => { if (event.button != 0) return; this.makeEdit(event); }); // souris
-    card.addEventListener('touchstart', async event => { this.makeEdit(event); }, { passive: true }); // toucher
+    this.addEventListener('click', () => { if (!longClic) this.toggleNotes(); longClic = false; });
+    this.addEventListener('mousedown', async event => { if (event.button != 0) return; this.makeEdit(event); }); // souris
+    this.addEventListener('touchstart', async event => { this.makeEdit(event); }, { passive: true }); // toucher
   }
 
   updateCard(toUpdate = pokemonCard.observedAttributes) {
@@ -74,7 +75,7 @@ class pokemonCard extends HTMLElement {
 
     ordreSprite: {
       if (!toUpdate.includes('ordre-sprite')) break ordreSprite;
-      card.querySelector('.pokemon-sprite').style.setProperty('--ordre-sprite', this.getAttribute('ordre-sprite'));
+      (card.querySelector('.pokemon-sprite') as HTMLElement).style.setProperty('--ordre-sprite', this.getAttribute('ordre-sprite'));
     }
 
     notes: {
@@ -133,7 +134,7 @@ class pokemonCard extends HTMLElement {
 
     compteur: {
       if (!toUpdate.includes('methode') && !toUpdate.includes('compteur')) break compteur;
-      const compteur = this.getAttribute('compteur');
+      const compteur = Number(this.getAttribute('compteur'));
       const element = card.querySelector('.methode-compteur');
       element.innerHTML = '<span class="icones explain oeuf"></span>';
       if (this.getAttribute('methode') == 'Masuda' && compteur > 0) {
@@ -146,12 +147,12 @@ class pokemonCard extends HTMLElement {
 
     shinyRate: {
       if (!toUpdate.includes('shiny-rate')) break shinyRate;
-      const shinyRateBox = card.querySelector('.shiny-rate');
+      const shinyRateBox = card.querySelector('.shiny-rate') as HTMLElement;
       const shinyRate = Number(this.getAttribute('shiny-rate'));
-      const charm = Number(this.getAttribute('charm')) || null;
+      const charm = Boolean(this.getAttribute('charm')) || null;
 
       if (charmlessMethods == null) charmlessMethods = Shiny.methodes('charmless');
-      if (charm == true && !charmlessMethods.includes(this.getAttribute('methode')))
+      if (charm === true && !charmlessMethods.includes(this.getAttribute('methode')))
         shinyRateBox.classList.add('with-charm');
 
       if (shinyRate == null)
@@ -159,7 +160,7 @@ class pokemonCard extends HTMLElement {
       else
         shinyRateBox.classList.remove('off');
 
-      card.querySelector('.shiny-rate-text.denominator').innerHTML = shinyRate || '???';
+      card.querySelector('.shiny-rate-text.denominator').innerHTML = String(shinyRate) || '???';
 
       shinyRateBox.classList.remove('full-odds', 'charm-ods', 'one-odds');
       if (charm == null && [8192, 4096].includes(shinyRate))
@@ -170,7 +171,7 @@ class pokemonCard extends HTMLElement {
         shinyRateBox.classList.add('one-odds');
 
       const shinyRateCoeff = 1 - Math.min(1, Math.max(0, shinyRate / 1360));
-      shinyRateBox.style.setProperty('--coeff', shinyRateCoeff);
+      shinyRateBox.style.setProperty('--coeff', String(shinyRateCoeff));
 
       if (!this.getAttribute('monjeu')) shinyRateBox.classList.add('off');
       else shinyRateBox.classList.remove('off');
@@ -187,7 +188,7 @@ class pokemonCard extends HTMLElement {
       const checkmark = this.getAttribute('checkmark');
       const element = card.querySelector('.icones.checkmark');
       element.className = 'icones explain checkmark';
-      let origin;
+      let origin: string;
       switch (Number(checkmark)) {
         case 1:
           origin = 'kalos'; break;
@@ -209,10 +210,10 @@ class pokemonCard extends HTMLElement {
 
     hacked: {
       if (!toUpdate.includes('hacked')) break hacked;
-      const hacked = this.getAttribute('hacked');
+      const hacked = Number(this.getAttribute('hacked'));
       const element = card.querySelector('.icones.hacked');
       element.className = 'icones explain hacked';
-      let origin;
+      let origin: string;
       switch (hacked) {
         case 1:
           origin = 'ptethack'; break;
@@ -241,7 +242,6 @@ class pokemonCard extends HTMLElement {
 
   // Affiche les notes d'une carte au clic
   toggleNotes() {
-    const card = this;
     const huntid = this.getAttribute('huntid');
 
     // On ferme la carte déjà ouverte
@@ -251,7 +251,7 @@ class pokemonCard extends HTMLElement {
     // Si la carte demandée n'est pas celle qu'on vient de fermer, on l'ouvre
     if (huntid != currentCard)
     {
-      this.setAttribute('open', true);
+      this.setAttribute('open', 'true');
       currentCard = huntid;
     }
     else

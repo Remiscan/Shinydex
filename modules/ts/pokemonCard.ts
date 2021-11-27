@@ -1,14 +1,16 @@
-import { Shiny } from './mod_Pokemon.js';
+import { Shiny } from './Pokemon.js';
+import { frontendShiny } from './Pokemon.js';
+import { pokemonCard } from './pokemonCard.component.js';
+
 
 
 //////////////////////////////////////////////////////
 // Crée la carte d'un Pokémon, ou si elle existe déjà,
 // met à jour uniquement les données qui ont changé.
-export async function updateCard(pokemon, _card = null)
-{
-  let shiny;
+export async function updateCard(pokemon: frontendShiny, _card = null) {
+  let shiny: Shiny;
   try {
-    shiny = await Shiny.build(pokemon);
+    shiny = new Shiny(pokemon);
   } catch (e) {
     console.error('Failed creating Shiny object', e);
     return;
@@ -29,7 +31,7 @@ export async function updateCard(pokemon, _card = null)
   }
 
   card.setAttribute('dexid', shiny.dexid);
-  card.setAttribute('espece', shiny.espece);
+  card.setAttribute('espece', shiny.getNamefr());
   card.setAttribute('notes', shiny.description);
 
   if (shiny.ball) card.setAttribute('ball', shiny.ball);
@@ -52,15 +54,14 @@ export async function updateCard(pokemon, _card = null)
   if (shiny.checkmark) card.setAttribute('checkmark', shiny.checkmark);
   else card.removeAttribute('checkmark');
 
-  if (shiny.random == 1) card.setAttribute('random', shiny.random);
+  if (shiny.horsChasse === true) card.setAttribute('random', shiny.horsChasse);
   else card.removeAttribute('random');
 
-  const monjeu = Number(shiny.monjeu) || null;
+  const monjeu = Number(shiny.DO) || null;
   if (monjeu) card.setAttribute('monjeu', 1);
   else card.removeAttribute('monjeu');
 
-  switch(parseInt(shiny.hacked))
-  {
+  switch (shiny.hacked) {
     case 3:
       filtres.push('legit:clone');
       break;
@@ -76,30 +77,27 @@ export async function updateCard(pokemon, _card = null)
   if (shiny.hacked > 0) card.setAttribute('hacked', shiny.hacked);
   else card.removeAttribute('hacked');
 
-  if (conditionMien)
-  {
-    const shinyRate = (shiny.shinyRate != '???' ? shiny.shinyRate : 0);
+  if (conditionMien) {
+    const shinyRate = shiny.shinyRate != null ? shiny.shinyRate : 0;
     card.setAttribute('shiny-rate', shinyRate);
 
-    if (shiny.charm == false && [8192, 4096].includes(shinyRate))
+    if (shiny.charm === false && [8192, 4096].includes(shinyRate))
       filtres.push('taux:full');
-    else if (shiny.charm == true && [2731, 1365].includes(shinyRate))
+    else if (shiny.charm === true && [2731, 1365].includes(shinyRate))
       filtres.push('taux:charm');
-    else if (shiny.shinyRate == 1 || shinyRate == 0)
+    else if (shiny.shinyRate === 1 || shinyRate === 0)
       filtres.push('taux:boosted');
     else
       filtres.push('taux:boosted');
-  }
-  else
-  {
+  } else {
     card.removeAttribute('shiny-rate');
     card.setAttribute('shiny-rate', 0);
     filtres.push('taux:inconnu');
   }
 
-  card.setAttribute('date', shiny.date);
+  card.setAttribute('date', (new Date(shiny.timeCapture)).toLocaleDateString());
   card.setAttribute('filtres', JSON.stringify(filtres));
-  card.setAttribute('last-update', shiny.lastupdate);
+  card.setAttribute('last-update', shiny.lastUpdate);
 
   return card;
 }

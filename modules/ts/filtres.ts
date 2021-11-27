@@ -1,9 +1,12 @@
-import { Pokemon } from './mod_Pokemon.js';
-import { Params } from './mod_Params.js';
+import { Pokemon } from './Pokemon.js';
+import { dataStorage } from './localforage.js';
+import { pokemonCard } from './pokemonCard.component.js';
+
+
 
 const menuFiltres = document.querySelector('.menu-filtres');
 const obfuscator = document.querySelector('.obfuscator');
-let cardsOrdered = [];
+let cardsOrdered: pokemonCard[] = [];
 
 //////////////////////////////////////////////////////////
 // Filter les cartes de Pokémon selon une liste de filtres
@@ -21,54 +24,52 @@ let cardsOrdered = [];
 const defautFiltres = ['do:moi', 'legit:oui'];
 let currentFiltres = defautFiltres;
 
-export async function filterCards(filtres = defautFiltres, cards = null)
-{
-  const allCards = cards || Array.from(document.querySelectorAll('#mes-chromatiques pokemon-card'));
-  const filteredCards = (filtres != null) ? [] : allCards.filter(card => card.classList.contains('filtered'));
-  const unfilteredCards = (filtres != null) ? [] : allCards.filter(card => !card.classList.contains('filtered'));
+export async function filterCards(filtres: string[] = defautFiltres, cards: pokemonCard[] = []): Promise<pokemonCard[]> {
+  const allCards: pokemonCard[] = cards.length > 0 ? cards : Array.from(document.querySelectorAll('#mes-chromatiques pokemon-card'));
+  const filteredCards: pokemonCard[] = (filtres.length > 0) ? [] : allCards.filter(card => card.classList.contains('filtered'));
+  const unfilteredCards: pokemonCard[] = (filtres.length > 0) ? [] : allCards.filter(card => !card.classList.contains('filtered'));
 
   filtrage: {
-    if (filtres == null) break filtrage;
-    allCards.forEach(card => {
+    if (filtres.length === 0) break filtrage;
+    for (const card of allCards) {
       card.classList.remove('filtered');
+
       // On récupère les filtres de chaque carte
-      const cardFiltres = JSON.parse(card.getAttribute('filtres').split(','));
+      const cardFiltres = JSON.parse(card.getAttribute('filtres'));
+      
       for (const filtre of filtres) {
         // Un filtre peut proposer plusieurs choix (a ou b : a|b), on récupère ces choix
         const alterFiltres = filtre.split('|');
         let alterCorrespondances = 0; // on compte combien de choix sont vérifiés
-        alterFiltres.forEach(af => {
-          if (cardFiltres.includes(af))
-            alterCorrespondances++;
-        });
+
+        for (const af of alterFiltres) {
+          if (cardFiltres.includes(af)) alterCorrespondances++;
+        }
+
         // Si aucun choix n'est vérifié, on élimine la carte
-        if (alterCorrespondances == 0) {
+        if (alterCorrespondances === 0) {
           filteredCards.push(card);
           break;
-        }
-        else {
+        } else {
           unfilteredCards.push(card);
         }
       }
-    });
+    }
     //console.log('Cartes filtrées :', filtres);
   }
 
-  if (allCards.length > 1) {
-    const compteur = allCards.length - filteredCards.length;
-    document.querySelector('.compteur').innerHTML = compteur;
-    document.querySelector('#mes-chromatiques .section-contenu').style.setProperty('--compteur', compteur);
-    if (compteur == 0) document.querySelector('#mes-chromatiques').classList.add('vide');
-    else document.querySelector('#mes-chromatiques').classList.remove('vide');
-  }
+  const compteur = allCards.length - filteredCards.length;
+  document.querySelector('.compteur').innerHTML = String(compteur);
+  (document.querySelector('#mes-chromatiques .section-contenu') as HTMLElement).style.setProperty('--compteur', String(compteur));
+  if (compteur == 0) document.querySelector('#mes-chromatiques').classList.add('vide');
+  else               document.querySelector('#mes-chromatiques').classList.remove('vide');
 
   if (filtres != null) filteredCards.forEach(card => card.classList.add('filtered'));
   if (cards == null) filterDex();
   if (allCards.length > 1) await dataStorage.setItem('filtres', filtres);
   currentFiltres = filtres;
   
-  if (allCards.length > 1) return unfilteredCards;
-  else return allCards[0];
+  return unfilteredCards;
 }
 
 
@@ -78,77 +79,57 @@ export async function filterCards(filtres = defautFiltres, cards = null)
 const defautOrdre = 'date';
 let currentOrdre = defautOrdre;
 
-export async function orderCards(ordre = defautOrdre, reversed = false, cards = null)
-{
-  const allCards = cards || Array.from(document.querySelectorAll('#mes-chromatiques pokemon-card'));
-  let ordrement;
+export async function orderCards(ordre: string = defautOrdre, reversed: boolean = false, cards: pokemonCard[] = []): Promise<pokemonCard[]> {
+  const allCards = cards.length > 0 ? cards : Array.from(document.querySelectorAll('#mes-chromatiques pokemon-card'));
 
-  if (ordre == 'jeu')
-  {
-    ordrement = (carte1, carte2) => {
-      const jeu1 = Pokemon.jeux.findIndex(jeu => jeu.nom == carte1.getAttribute('jeu'));
-      const jeu2 = Pokemon.jeux.findIndex(jeu => jeu.nom == carte2.getAttribute('jeu'));
-      const date1 = new Date(carte1.getAttribute('date') || '1000-01-01');
-      const date2 = new Date(carte2.getAttribute('date') || '1000-01-01');
-      const id1 = parseInt(carte1.getAttribute('huntid'));
-      const id2 = parseInt(carte2.getAttribute('huntid'));
+  let sortedCards = allCards.sort((carte1, carte2) => {
+    const date1 = Number(new Date(carte1.getAttribute('date') || '1000-01-01'));
+    const date2 = Number(new Date(carte2.getAttribute('date') || '1000-01-01'));
 
-      return jeu2 - jeu1 || date2 - date1 || id2 - id1;
+    const id1 = parseInt(carte1.getAttribute('huntid'));
+    const id2 = parseInt(carte2.getAttribute('huntid'));
+
+    switch (ordre) {
+      case 'jeu': {
+        const jeu1 = Pokemon.jeux.findIndex(jeu => jeu.nom == carte1.getAttribute('jeu'));
+        const jeu2 = Pokemon.jeux.findIndex(jeu => jeu.nom == carte2.getAttribute('jeu'));
+
+        return jeu2 - jeu1 || date2 - date1 || id2 - id1;
+      }
+
+      case 'taux': {
+        const taux1 = parseInt(carte1.getAttribute('shiny-rate'));
+        const taux2 = parseInt(carte2.getAttribute('shiny-rate'));
+
+        return taux2 - taux1 || date2 - date1 || id2 - id1;
+      }
+
+      case 'dex': {
+        const dexid1 = parseInt(carte1.getAttribute('dexid'));
+        const dexid2 = parseInt(carte2.getAttribute('dexid'));
+
+        return dexid1 - dexid2 || date2 - date1 || id2 - id1;
+      }
+
+      case 'date': {
+        return date2 - date1 || id2 - id1;
+      }
     }
-  }
-  else if (ordre == 'taux')
-  {
-    ordrement = (carte1, carte2) => {
-      const taux1 = parseInt(carte1.getAttribute('shiny-rate'));
-      const taux2 = parseInt(carte2.getAttribute('shiny-rate'));
-      const date1 = new Date(carte1.getAttribute('date') || '1000-01-01');
-      const date2 = new Date(carte2.getAttribute('date') || '1000-01-01');
-      const id1 = parseInt(carte1.getAttribute('huntid'));
-      const id2 = parseInt(carte2.getAttribute('huntid'));
+  });
 
-      return taux2 - taux1 || date2 - date1 || id2 - id1;
-    }
-  }
-  else if (ordre == 'dex')
-  {
-    ordrement = (carte1, carte2) => {
-      const dexid1 = parseInt(carte1.getAttribute('dexid'));
-      const dexid2 = parseInt(carte2.getAttribute('dexid'));
-      const date1 = new Date(carte1.getAttribute('date') || '1000-01-01');
-      const date2 = new Date(carte2.getAttribute('date') || '1000-01-01');
-      const id1 = parseInt(carte1.getAttribute('huntid'));
-      const id2 = parseInt(carte2.getAttribute('huntid'));
-
-      return dexid1 - dexid2 || date2 - date1 || id2 - id1;
-    }
-  }
-  else if (ordre == 'date')
-  {
-    ordrement = (carte1, carte2) => {
-      const date1 = new Date(carte1.getAttribute('date') || '1000-01-01');
-      const date2 = new Date(carte2.getAttribute('date') || '1000-01-01');
-      const id1 = parseInt(carte1.getAttribute('huntid'));
-      const id2 = parseInt(carte2.getAttribute('huntid'));
-
-      return date2 - date1 || id2 - id1;
-    }
-  }
-
-  let sortedCards = allCards.sort(ordrement);
   if (reversed) {
     sortedCards = sortedCards.reverse();
-    document.body.dataset.reversed = true;
+    document.body.dataset.reversed = 'true';
     await dataStorage.setItem('ordre-reverse', true);
-  }
-  else {
+  } else {
     document.body.removeAttribute('data-reversed');
     await dataStorage.setItem('ordre-reverse', false);
   }
   
-  sortedCards.forEach((card, ordre) => card.style.setProperty('--order', ordre));
+  sortedCards.forEach((card, ordre) => (card as HTMLElement).style.setProperty('--order', String(ordre)));
   await dataStorage.setItem('ordre', ordre);
   currentOrdre = ordre;
-  return sortedCards;
+  return sortedCards as pokemonCard[];
   //console.log('Cartes ordonnées :', ordre, reverse);
 }
 
@@ -156,8 +137,7 @@ export async function orderCards(ordre = defautOrdre, reversed = false, cards = 
 
 //////////////////
 // Inverse l'ordre
-export async function reverseOrder()
-{
+export async function reverseOrder() {
   let currentReversed = Boolean(await dataStorage.getItem('ordre-reverse'));
   return orderCards(currentOrdre, !currentReversed);
 }
@@ -166,8 +146,7 @@ export async function reverseOrder()
 
 ///////////////////////////////
 // Filtre les icônes du Pokédex
-export function filterDex(cards = null)
-{
+export function filterDex(cards: pokemonCard[] = []) {
   const displayedCards = cards || Array.from(document.querySelectorAll('#mes-chromatiques pokemon-card:not(.filtered)'));
   const dexids = new Set();
 
@@ -175,7 +154,7 @@ export function filterDex(cards = null)
     dexids.add(parseInt(card.getAttribute('dexid')));
   });
 
-  const dexIcons = Array.from(document.querySelectorAll('#pokedex .pkspr'));
+  const dexIcons = Array.from(document.querySelectorAll('#pokedex .pkspr')) as HTMLElement[];
 
   dexIcons.forEach(icon => {
     if (dexids.has(parseInt(icon.dataset.dexid)))
@@ -188,8 +167,7 @@ export function filterDex(cards = null)
 
 ////////////////////////////////////////////////////////////////////////////
 // Affiche seulement un certain nombre de cartes à l'ouverture d'une section
-export function deferCards(section = false)
-{
+/*export function deferCards(section?: string) {
   const sectionActuelle = section || document.body.dataset.sectionActuelle;
   if (sectionActuelle == 'mes-chromatiques') {
     document.getElementById('mes-chromatiques').classList.remove('defered');
@@ -201,7 +179,7 @@ export function deferCards(section = false)
   switch (sectionActuelle) {
     case 'mes-chromatiques':
       cardsOrdered = Array.from(document.querySelectorAll('#mes-chromatiques pokemon-card:not(.filtered)'))
-                          .sort((a, b) => parseInt(a.style.getPropertyValue('--order')) - parseInt(b.style.getPropertyValue('--order')));
+                          .sort((a, b) => parseInt((a as HTMLElement).style.getPropertyValue('--order')) - parseInt((b as HTMLElement).style.getPropertyValue('--order')));
       cardList = cardsOrdered;
       break;
     case 'pokedex':
@@ -223,12 +201,12 @@ export function deferCards(section = false)
     if (i < nombreADefer) card.classList.remove('defer');
     else                                            card.classList.add('defer');
   });
-}
+}*/
 
 
 /////////////////////////////////////////////////////////////////
 // Charge un certain nombre de cartes au défilement d'une section
-let defering = false;
+/*let defering = false;
 export function deferMonitor(entries)
 {
   if (defering) return;
@@ -267,15 +245,13 @@ export function deferMonitor(entries)
   });
 
   setTimeout(() => { defering = false; }, 50);
-}
+}*/
 
 
 ////////////////////////////
 // Ouvre le menu des filtres
-export function openFiltres(historique = true)
-{
-  if (historique)
-    history.pushState({section: 'menu-filtres'}, '');
+export function openFiltres(historique = true) {
+  if (historique) history.pushState({section: 'menu-filtres'}, '');
 
   obfuscator.classList.remove('off');
   menuFiltres.classList.add('on');
@@ -284,8 +260,7 @@ export function openFiltres(historique = true)
 
 ////////////////////////////
 // Ferme le menu des filtres
-export function closeFiltres()
-{
+export function closeFiltres() {
   menuFiltres.classList.remove('on');
   obfuscator.classList.add('off');
 }
@@ -293,26 +268,21 @@ export function closeFiltres()
 
 //////////////////////////////////////////////////////
 // Récupère les filtres entrés dans le menu de filtres
-function buildFiltres()
-{
+function buildFiltres(): string[] {
   const filtres = [];
-
-  let checkboxes;
-  let tempAlterFiltres;
 
   // do = Dresseur d'origine
   // legit = hacké ou non
   // taux = shiny rate
   const categories = ['do', 'legit'];
-  categories.forEach(cat => {
-    checkboxes = Array.from(document.querySelectorAll('input.filtre-' + cat));
-    tempAlterFiltres = [];
-    checkboxes.forEach(check => {
-      if (check.checked)
-        tempAlterFiltres.push(check.value);
-    });
+  for (const cat of categories) {
+    const checkboxes = Array.from(document.querySelectorAll('input.filtre-' + cat)) as HTMLInputElement[];
+    const tempAlterFiltres =  [];
+    for (const box of checkboxes) {
+      if (box.checked) tempAlterFiltres.push(box.value);
+    }
     filtres.push(tempAlterFiltres.join('|'));
-  });
+  }
 
   return filtres;
 }
@@ -327,29 +297,30 @@ export function cardsInOrder() { return cardsOrdered; }
 // Initialise les filtres
 export function initFiltres() {
   // Surveille les options d'ordre
-  Array.from(document.querySelectorAll('label.ordre')).forEach(label => {
+  const reversed = document.body.dataset.reversed === 'true';
+  for (const label of Array.from(document.querySelectorAll('label.ordre'))) {
     label.addEventListener('click', async () => {
-      await orderCards(label.getAttribute('for').replace('ordre-', ''), document.body.dataset.reversed);
-      deferCards();
+      await orderCards(label.getAttribute('for').replace('ordre-', ''), reversed);
+      //deferCards();
     });
-  });
+  }
 
   // Active le bouton d'inversion de l'ordre
   document.querySelector('.reverse-order').addEventListener('click', async () => {
     await reverseOrder();
-    deferCards();
+    //deferCards();
   });
 
   // Surveille les options de filtres
-  Array.from(document.querySelectorAll('input.filtre')).forEach(radio => {
+  for (const radio of Array.from(document.querySelectorAll('input.filtre'))) {
     radio.addEventListener('change', async () => {
       await filterCards(buildFiltres());
-      deferCards('mes-chromatiques');
+      //deferCards('mes-chromatiques');
     });
-  });
+  }
 
   // Crée les checkboxes des jeux
-  Pokemon.jeux.forEach(jeu => {
+  /*Pokemon.jeux.forEach(jeu => {
     const nomJeu = jeu.nom.replace(/[ \']/g, '');
     const template = document.getElementById('template-checkbox-jeu');
     const checkbox = template.content.cloneNode(true);
@@ -362,5 +333,5 @@ export function initFiltres() {
     label.querySelector('span').classList.add(nomJeu);
 
     document.getElementById('liste-options-jeux').appendChild(checkbox);
-  });
+  });*/
 }

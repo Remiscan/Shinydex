@@ -1,16 +1,16 @@
-import './modules/comp_loadSpinner.js';
-import './modules/comp_pokemonCard.js';
-import './modules/comp_syncProgress.js';
-import { Params, changeAutoMaj, callResize, export2json, wait, loadAllImages } from './modules/mod_Params.js';
-import { navigate, sectionActuelle } from './modules/mod_navigate.js';
-import { playEasterEgg } from './modules/mod_easterEgg.js';
-import { appStart, checkUpdate, manualUpdate, setOnlineBackup, updateSprite, startBackup } from './modules/mod_appLifeCycle.js';
-import { appPopulate, appDisplay, json2import, populateAttemptsVersions, populateAttemptsObsolete, populateAttemptsModified } from './modules/mod_appContent.js';
-import { openFiltres, initFiltres } from './modules/mod_filtres.js';
-import { Hunt } from './modules/mod_Hunt.js';
-import { notify, unNotify } from './modules/mod_notification.js';
-import { initSpriteViewer } from './modules/mod_spriteViewer.js';
-import { DexDatalist } from './modules/mod_DexDatalist.js';
+import './loadSpinner.component.js';
+import './pokemonCard.component.js';
+import './syncProgress.component.js';
+import { Params, changeAutoMaj, callResize, export2json, wait, loadAllImages } from './Params.js';
+import { navigate, sectionActuelle } from './navigate.js';
+import { playEasterEgg } from './easterEgg.js';
+import { appStart, checkUpdate, manualUpdate, setOnlineBackup, updateSprite, startBackup } from './appLifeCycle.js';
+import { appPopulate, appDisplay, json2import, populateAttemptsVersions, populateAttemptsObsolete, populateAttemptsModified } from './appContent.js';
+import { openFiltres, initFiltres } from './filtres.js';
+import { Hunt } from './Hunt.js';
+import { notify, unNotify } from './notification.js';
+import { initSpriteViewer } from './spriteViewer.js';
+import { DexDatalist } from './DexDatalist.js';
 
 
 
@@ -19,7 +19,7 @@ import { DexDatalist } from './modules/mod_DexDatalist.js';
 
 // Active les liens de navigation
 Array.from(document.querySelectorAll('[data-section]')).forEach(link => {
-  link.addEventListener('click', () => navigate(link.dataset.section));
+  link.addEventListener('click', () => navigate((link as HTMLElement).dataset.section));
 });
 
 // Active le bouton retour / fermer
@@ -45,7 +45,7 @@ document.querySelector('.obfuscator').addEventListener('click', () => history.ba
 
 // Surveille le champ de filtrage par espèce de Pokémon
 {
-  const input = document.querySelector('.menu-filtres').querySelector('[list="datalist-pokedex"]');
+  const input = document.querySelector('.menu-filtres').querySelector('[list="datalist-pokedex"]') as HTMLInputElement;
   input.addEventListener('input', async () => {
     DexDatalist.build(input.value);
   });
@@ -67,11 +67,12 @@ document.querySelector('.obfuscator').addEventListener('click', () => history.ba
 // Active le switch du thème
 dataStorage.getItem('theme').then(theme => {
   const storedTheme = (theme != null) ? theme : 'system';
-  const input = document.getElementById(`theme-${storedTheme}`);
+  const input = document.getElementById(`theme-${storedTheme}`) as HTMLInputElement;
   input.checked = true;
 });
 
-Array.from(document.querySelectorAll('input[name=theme]')).forEach(input => {
+Array.from(document.querySelectorAll('input[name=theme]')).forEach(_input => {
+  const input = _input as HTMLInputElement;
   input.onclick = async event => { return await setTheme(input.value); };
 });
 

@@ -1,15 +1,15 @@
-import { Pokemon } from './mod_Pokemon.js';
+import { Pokemon } from './Pokemon.js';
+
+
 
 let previousLength = 0;
 let allNames = [];
 
 export class DexDatalist {
-  constructor() {
-    this.correspondances = [];
-    this.datalist = '';
-  }
+  correspondances: string[] = [];
+  datalist: string = '';
 
-  static async build(string) {
+  static async build(string: string) {
     const dexDataList = new DexDatalist();
 
     await getNames();

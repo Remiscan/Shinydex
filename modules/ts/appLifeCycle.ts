@@ -1,6 +1,9 @@
-import { appPopulate, appDisplay } from './mod_appContent.js';
-import { recalcOnResize, version2date, wait, getVersionSprite, initStyleSheets, adoptStyleSheets } from './mod_Params.js';
-import { notify, unNotify } from './mod_notification.js';
+import { appPopulate, appDisplay } from './appContent.js';
+import { recalcOnResize, version2date, wait, getVersionSprite, initStyleSheets, adoptStyleSheets } from './Params.js';
+import { notify, unNotify } from './notification.js';
+import { dataStorage, shinyStorage, huntStorage, pokemonData } from './localforage.js';
+
+
 
 /////////////////////////////////////////////////////
 // On enregistre le service worker
@@ -10,8 +13,7 @@ let appCached;
 let appChargee;
 let updateAvailable = 0;
 
-async function initServiceWorker()
-{
+async function initServiceWorker() {
   try {
     const registration = await navigator.serviceWorker.register('/remidex/service-worker.js');
     console.log('Le service worker a été enregistré', registration);
@@ -20,8 +22,7 @@ async function initServiceWorker()
     registration.addEventListener('updatefound', () => {
       const newWorker = registration.installing;
       newWorker.addEventListener('statechange', () => {
-        if (newWorker.state == 'activated')
-        {
+        if (newWorker.state == 'activated') {
           console.log('[sw] Service worker mis à jour');
           currentWorker = newWorker;
         }
@@ -40,9 +41,8 @@ async function initServiceWorker()
 
 /////////////////////////////////////////////////////////
 // Démarre l'application (update? => populate => display)
-export async function appStart()
-{
-  if (!'serviceWorker' in navigator)
+export async function appStart() {
+  if (!('serviceWorker' in navigator))
     throw 'Application non supportée.';
 
   // ÉTAPE 1 : on vérifie si l'application est installée localement
@@ -172,8 +172,8 @@ export async function appStart()
 // Met à jour l'application
 function appUpdate(update = false)
 {
-  const progressBar = document.querySelector('.progression-maj');
-  progressBar.style.setProperty('--progression', 0);
+  const progressBar = document.querySelector('.progression-maj') as HTMLElement;
+  progressBar.style.setProperty('--progression', '0');
 
   return new Promise((resolve, reject) => {
     if (typeof currentWorker === 'undefined' || currentWorker == null)
@@ -190,8 +190,8 @@ function appUpdate(update = false)
       }
       else {
         if (update) {
-          progressBar.style.setProperty('--progression', 1);
-          setTimeout(function() { location.reload(true); }, 100);
+          progressBar.style.setProperty('--progression', '1');
+          setTimeout(function() { location.reload(); }, 100);
         }
         resolve('[:)] Installation terminée !');
       }
@@ -206,7 +206,7 @@ function appUpdate(update = false)
       if (event.data.loaded)
       {
         totalLoaded++;
-        progressBar.style.setProperty('--progression', totalLoaded / (event.data.total + 1));
+        progressBar.style.setProperty('--progression', String(totalLoaded / (event.data.total + 1)));
       }
       else if (!event.data.loaded && event.data.erreur)
         reject('[:(] Certains fichiers n\'ont pas pu être récupérés');
@@ -223,7 +223,7 @@ export async function manualUpdate()
   try {
     if (!navigator.onLine)
       throw 'Connexion internet indisponible';
-    if (!'serviceWorker' in navigator)
+    if (!('serviceWorker' in navigator))
       throw 'Service worker indisponible';
 
     document.querySelector('.notif-texte').innerHTML = 'Installation en cours...';
@@ -333,7 +333,7 @@ function checkInstall()
 // Change le paramètre de sauvegarde des données en ligne
 export async function setOnlineBackup()
 {
-  const checkbox = document.getElementById('switch-online-backup');
+  const checkbox = document.getElementById('switch-online-backup') as HTMLInputElement;
   if (checkbox.checked)
   {
     checkbox.checked = false;
@@ -384,6 +384,27 @@ export async function updateSprite(version = null) {
 
 
 // Démarre la procédure de backup
+
+interface SyncManager {
+  getTags(): Promise<string[]>;
+  register(tag: string): Promise<void>;
+}
+
+declare global {
+  interface ServiceWorkerRegistration {
+    readonly sync: SyncManager;
+  }
+
+  interface SyncEvent extends Event {
+    readonly lastChance: boolean;
+    readonly tag: string;
+  }
+
+  interface ServiceWorkerGlobalScopeEventMap {
+    sync: SyncEvent;
+  }
+}
+
 export async function startBackup() {
   const reg = await navigator.serviceWorker.ready;
   await reg.sync.register('SYNC-BACKUP');
@@ -405,7 +426,7 @@ async function waitBackup() {
       }
 
       if ('successfulBackupComparison' in event.data) {
-        if (event.data.successfulBackupComparison === true) resolve();
+        if (event.data.successfulBackupComparison === true) resolve(null);
         else reject('[:(] Échec de la synchronisation des BDD');
       }
       else {

@@ -1,14 +1,15 @@
-import { Params, loadAllImages, wait } from './mod_Params.js';
-import { playEasterEgg, prepareEasterEgg } from './mod_easterEgg.js';
-import { closeFiltres, openFiltres } from './mod_filtres.js';
-import { closeSpriteViewer, openSpriteViewer } from './mod_spriteViewer.js';
-import { getNames } from './mod_DexDatalist.js';
+import { Params, loadAllImages, wait } from './Params.js';
+import { playEasterEgg, prepareEasterEgg } from './easterEgg.js';
+import { closeFiltres, openFiltres } from './filtres.js';
+import { closeSpriteViewer, openSpriteViewer } from './spriteViewer.js';
+import { getNames } from './DexDatalist.js';
+
+
 
 export let sectionActuelle = 'mes-chromatiques';
 export const sections = ['mes-chromatiques', 'pokedex', 'chasses-en-cours', 'parametres', 'a-propos'];
 
-export async function navigate(sectionCible, position = 0, historique = true)
-{
+export async function navigate(sectionCible: string, position = 0, historique = true) {
   if (sectionActuelle == sectionCible) return Promise.resolve();
 
   const ancienneSection = document.getElementById(sectionActuelle);
@@ -57,7 +58,7 @@ export async function navigate(sectionCible, position = 0, historique = true)
     Array.from(document.querySelectorAll('sync-progress[finished]'))
     .forEach(sp => { sp.removeAttribute('state'); sp.removeAttribute('finished'); });
 
-    if (Params.owidth >= Params.layoutPClarge) return resolve();
+    if (Params.owidth >= Params.layoutPClarge) return resolve(null);
 
     // Animation d'apparition de la nouvelle section
     // (sur PC, géré par CSS, d'où le return précédent)
@@ -84,7 +85,7 @@ export async function navigate(sectionCible, position = 0, historique = true)
 
 
 // Anime l'icône du FAB selon la section en cours
-function animateFabIcon(sectionCible, animations = false) {
+function animateFabIcon(sectionCible: string, animations = false) {
   const fab = document.querySelector('.fab');
   const fabIcon = fab.querySelector('.material-icons');
   const animFabIcon = { start: null, end: null };

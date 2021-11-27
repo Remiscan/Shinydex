@@ -1,10 +1,13 @@
-import { Pokemon } from './mod_Pokemon.js';
-import { updateCard } from './mod_pokemonCard.js';
-import { filterCards, orderCards, filterDex, deferCards, deferMonitor } from './mod_filtres.js';
-import { Params, loadAllImages, wait, version2date, getVersionSprite } from './mod_Params.js';
-import { openSpriteViewer } from './mod_spriteViewer.js';
-import { initHunts } from './mod_Hunt.js';
-import { notify, unNotify } from './mod_notification.js';
+import { Pokemon } from './Pokemon.js';
+import { updateCard } from './pokemonCard.js';
+import { filterCards, orderCards, filterDex } from './filtres.js';
+import { Params, loadAllImages, wait, version2date, getVersionSprite } from './Params.js';
+import { openSpriteViewer } from './spriteViewer.js';
+import { initHunts } from './Hunt.js';
+import { notify, unNotify } from './notification.js';
+import { dataStorage, shinyStorage, huntStorage, pokemonData } from './localforage.js';
+
+
 
 let populating = false;
 let displaying = false;
@@ -15,7 +18,7 @@ export let populateAttemptsModified = [];
 
 /////////////////////////////////////////////////////////
 // Peuple l'application à partir des données de indexedDB
-export async function appPopulate(start = true, obsolete = [], modified = [], versionSprite = 0)
+export async function appPopulate(start: boolean = true, obsolete: number[] = [], modified = [], versionSprite = 0)
 {
   if (populating) return;
   populating = true;
@@ -170,7 +173,7 @@ export async function appPopulate(start = true, obsolete = [], modified = [], ve
         const pkmn = document.createElement('span');
         const name = names[i];
         pkmn.classList.add('pkspr', 'pokemon', name + '-shiny');
-        pkmn.dataset.dexid = i;
+        pkmn.dataset.dexid = String(i);
         pkmn.addEventListener('click', event => openSpriteViewer(i, event));
         monsToPopulate.push(pkmn);
       }

@@ -1,4 +1,4 @@
-import { Params } from './mod_Params.js';
+import { Params } from './Params.js';
 
 const template = document.createElement('template');
 template.innerHTML = `
@@ -84,6 +84,17 @@ template.innerHTML = `
 `;
 
 class syncProgress extends HTMLElement {
+  shadow: ShadowRoot;
+  perimetre: number;
+  loadingAnim: Animation;
+  successAnim: Animation;
+  failureAnim: Animation;
+  lazyAnim: Animation;
+  bye: Animation;
+  disappear: Animation;
+  
+
+
   constructor() {
     super();
     this.shadow = this.attachShadow({ mode: 'open' });
@@ -96,7 +107,7 @@ class syncProgress extends HTMLElement {
     return ['state', 'finished'];
   }
 
-  attributeChangedCallback(name, oldValue, newValue) {
+  attributeChangedCallback(name: string, oldValue: string, newValue: string) {
     const svg = this.shadow.querySelector('svg');
 
     if (name == 'state') {
@@ -117,7 +128,7 @@ class syncProgress extends HTMLElement {
         }
 
         this.perimetre = Math.ceil(Math.PI * this.getBoundingClientRect().width);
-        svg.style.setProperty('--perimetre', this.perimetre);
+        svg.style.setProperty('--perimetre', String(this.perimetre));
 
         this.loadingAnim = progressLine.animate([
           { transform: 'rotate(0)', strokeDashoffset: '101px' },
@@ -144,7 +155,7 @@ class syncProgress extends HTMLElement {
           fill: 'forwards'
         });
 
-        this.successAnim.onfinish = () => this.setAttribute('finished', true);
+        this.successAnim.onfinish = () => this.setAttribute('finished', 'true');
       }
 
       // Si le chargement est complété avec erreur
@@ -161,7 +172,7 @@ class syncProgress extends HTMLElement {
           fill: 'forwards'
         });
 
-        this.failureAnim.onfinish = () => this.setAttribute('finished', true);
+        this.failureAnim.onfinish = () => this.setAttribute('finished', 'true');
       }
 
       // Si le chargement est complété sans avoir effectué d'action
@@ -286,6 +297,15 @@ template2.innerHTML = `
 `;
 
 class syncLine extends HTMLElement {
+  shadow: ShadowRoot;
+  longueur: number;
+  loadingAnim: Animation;
+  successAnim: Animation;
+  failureAnim: Animation;
+  lazyAnim: Animation;
+  bye: Animation;
+  disappear: Animation;
+
   constructor() {
     super();
     this.shadow = this.attachShadow({ mode: 'open' });
@@ -298,7 +318,7 @@ class syncLine extends HTMLElement {
     return ['state', 'finished'];
   }
 
-  attributeChangedCallback(name, oldValue, newValue) {
+  attributeChangedCallback(name: string, oldValue: string, newValue: string) {
     const svg = this.shadow.querySelector('svg');
 
     if (name == 'state') {
@@ -319,7 +339,7 @@ class syncLine extends HTMLElement {
         }
 
         this.longueur = this.getBoundingClientRect().width;
-        svg.style.setProperty('--longueur', this.longueur);
+        svg.style.setProperty('--longueur', String(this.longueur));
 
         this.loadingAnim = progressLine.animate([
           { strokeDashoffset: `${this.longueur}px` },
@@ -346,7 +366,7 @@ class syncLine extends HTMLElement {
           fill: 'forwards'
         });
 
-        this.successAnim.onfinish = () => this.setAttribute('finished', true);
+        this.successAnim.onfinish = () => this.setAttribute('finished', 'true');
       }
 
       // Si le chargement est complété avec erreur
@@ -363,7 +383,7 @@ class syncLine extends HTMLElement {
           fill: 'forwards'
         });
 
-        this.failureAnim.onfinish = () => this.setAttribute('finished', true);
+        this.failureAnim.onfinish = () => this.setAttribute('finished', 'true');
       }
 
       // Si le chargement est complété sans avoir effectué d'action

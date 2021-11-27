@@ -89,6 +89,8 @@ template.innerHTML = `
 `;
 
 class loadSpinner extends HTMLElement {
+  shadow: ShadowRoot;
+  
   constructor() {
     super();
     this.shadow = this.attachShadow({ mode: 'open' });
