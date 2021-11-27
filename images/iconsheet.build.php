@@ -20,7 +20,7 @@ function buildIconSheet($logs = false)
 
     // Step 1.2: explain
 
-  $explain = json_decode(file_get_contents('icons.json', true));
+  $explain = json_decode(file_get_contents('iconsheet.data.json', true));
   $explain = $explain->icones->explain->liste;
   $sheetWidth = $columns * $gameSize->width;
   $maxHeight = 0;
