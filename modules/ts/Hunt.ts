@@ -8,12 +8,13 @@ import { huntStorage, shinyStorage, pokemonData, dataStorage } from './localfora
 
 
 
-interface HuntedPokemon extends Omit<frontendShiny, 'id'> {
+// Structure d'un Pokémon en cours de chasse tel que stocké dans la BDD locale
+export interface huntedPokemon extends Omit<frontendShiny, 'id'> {
   caught: boolean,
   uploaded: boolean,
 }
 
-export class Hunt implements HuntedPokemon {
+export class Hunt implements huntedPokemon {
   huntid: number = new Date().getTime();
   lastUpdate: number = 0;
   dexid: number = 0;
@@ -33,13 +34,13 @@ export class Hunt implements HuntedPokemon {
   caught: boolean = false;
   uploaded: boolean = false;
   
-  constructor(pokemon: HuntedPokemon) {
+  constructor(pokemon?: huntedPokemon) {
     for (const key of Object.keys(pokemon)) {
       this[key] = pokemon[key];
     }
   }
 
-  static async build(pokemon: HuntedPokemon, start: boolean = false) {
+  static async build(pokemon?: huntedPokemon, start: boolean = false) {
     const hunt = new Hunt(pokemon);
     await huntStorage.setItem(String(pokemon.huntid), hunt);
     await hunt.buildHunt(start);

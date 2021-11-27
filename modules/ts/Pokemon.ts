@@ -124,6 +124,7 @@ interface backendPokemon {
 
 
 
+// Structure d'un Pokémon shiny tel que stocké dans la BDD en ligne
 interface backendShiny {
   id: number,
   huntid: number,
@@ -144,8 +145,10 @@ interface backendShiny {
   horsChasse: boolean,
 };
 
+// Structure d'un Pokémon shiny tel que stocké dans la BDD locale
 export interface frontendShiny extends Omit<backendShiny, 'id'> {
   deleted?: boolean,
+  destroy?: boolean,
 }
 
 
@@ -192,7 +195,7 @@ class Pokemon {
     return spriteUrl;
   }
 
-  get gen(): number {
+  get gen(): number | undefined {
     const gens = Pokemon.generations;
     for (let gen of gens) {
       if (this.dexid >= gen.start && this.dexid <= gen.end) return gen.num;

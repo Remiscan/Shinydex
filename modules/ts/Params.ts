@@ -1,4 +1,19 @@
-import { dataStorage, shinyStorage, huntStorage } from './localforage.js';
+import { dataStorage, shinyStorage, huntStorage, localForageAPI } from './localforage.js';
+
+
+declare global {
+  interface CSSStyleSheet {
+    replaceSync: (text: string) => void
+  }
+
+  interface Document {
+    adoptedStyleSheets: CSSStyleSheet[]
+  }
+
+  interface ShadowRoot {
+    adoptedStyleSheets: CSSStyleSheet[]
+  }
+}
 
 
 
@@ -65,6 +80,7 @@ export const styleSheets: Map<string, { url: string, content: CSSStyleSheet | nu
 
 async function setStyleSheet(sheetId: string): Promise<CSSStyleSheet | null> {
   const sheet = styleSheets.get(sheetId);
+  if (typeof sheet === 'undefined') throw 'Undefined stylesheet';
   if (sheet.content == null) {
     try {
       const tempSheet = new CSSStyleSheet();
@@ -84,7 +100,7 @@ async function setStyleSheet(sheetId: string): Promise<CSSStyleSheet | null> {
 // Utiliser uniquement si initStyleSheets() a déjà fini
 export function getStyleSheet(sheetId: string): CSSStyleSheet {
   const sheet = styleSheets.get(sheetId);
-  if (sheet.content != null) return sheet.content;
+  if (typeof sheet !== 'undefined' && sheet.content != null) return sheet.content;
   else throw `Impossible d'utiliser getStyleSheet() avant complétion de setStyleSheet()`;
 }
 
@@ -97,14 +113,15 @@ export async function initStyleSheets() {
 }
 
 // Insère les stylesheets dans le contexte demandé
-export function adoptStyleSheets(context = document, sheets = Object.keys(styleSheets), destination = document.head) {
+export function adoptStyleSheets(context = document, sheetids = Object.keys(styleSheets), destination = document.head) {
   if ('adoptedStyleSheets' in context)
-    context.adoptedStyleSheets = [...context.adoptedStyleSheets, ...sheets.map(sheet => getStyleSheet(sheet))];
+    context.adoptedStyleSheets = [...context.adoptedStyleSheets, ...sheetids.map(sheet => getStyleSheet(sheet))];
   else {
     const style = document.createElement('style');
     style.id = `adopted-stylesheets`;
-    for (const sheet of sheets) {
-      style.appendChild(document.createTextNode(`@import url('${styleSheets[sheet].url}');`));
+    for (const sheetid of sheetids) {
+      const sheet = styleSheets.get(sheetid);
+      if (sheet != null) style.appendChild(document.createTextNode(`@import url('${sheet.url}');`));
     }
     destination.appendChild(style);
   }
@@ -131,8 +148,8 @@ export async function changeAutoMaj() {
 let resizing = 0;
 
 export function recalcOnResize() {
-  const largeurPage = document.getElementById('largeur-fenetre');
-  const hauteurPage = document.getElementById('hauteur-fenetre');
+  const largeurPage = document.getElementById('largeur-fenetre') as HTMLElement;
+  const hauteurPage = document.getElementById('hauteur-fenetre') as HTMLElement;
 
   // owidth = 100vw = largeur totale de la fenêtre, indépendamment de l'affichage ou non des barres de défilement
   const candidWidth = Number(window.getComputedStyle(largeurPage).width.replace('px', ''));
@@ -185,7 +202,7 @@ export function version2date(timestamp: number): string {
 //////////////////////////////
 // Exporte les données en JSON
 export async function export2json() {
-  const getItems = async store => {
+  const getItems = async (store: localForageAPI) => {
     await store.ready();
     const keys = await store.keys();
     const items = [];
@@ -215,7 +232,7 @@ export async function getVersionSprite() {
   const cacheActuel = await caches.open(`remidex-sw-${versionFichiers}`);
   const versionsSprites = (await cacheActuel.keys()).map(req => req.url)
                                                     .filter(url => url.match(Params.spriteRegex))
-                                                    .map(url => Number(url.match(Params.spriteRegex)[1]));
+                                                    .map(url => Number(url.match(Params.spriteRegex)?.[1]));
   return Math.max(...versionsSprites);
 }
 
@@ -223,7 +240,7 @@ export async function getVersionSprite() {
 ////////////////////////////////
 // Pads a string with leading 0s
 export function pad(s: string, long: number): string {
-  let chaine = this;
+  let chaine = s;
   while (chaine.length < long)
     chaine = `0${chaine}`;
   return chaine;

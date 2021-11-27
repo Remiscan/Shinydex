@@ -1,4 +1,30 @@
-declare const localforage;
+export interface localForageAPI {
+  INDEXEDDB: string;
+  WEBSQL: string;
+  LOCALSTORAGE: string;
+
+  getItem(key: string, callback?: () => any): Promise<any>;
+  setItem(key: string, value: any, callback?: () => any): Promise<any>;
+  removeItem(key: string, callback?: () => any): Promise<any>;
+  clear(callback?: () => any): Promise<any>;
+  length(callback?: () => any): Promise<number>;
+  key(index: number, callback?: () => any): Promise<any>;
+  keys(callback?: () => any): Promise<string[]>;
+  iterate(iteratorCallback: () => any, callback?: () => any): Promise<any[]>;
+
+  setDriver(names: string | string[]): void;
+  config(options: object): void;
+
+  ready(): Promise<any>;
+  supports(name: string): boolean;
+
+  createInstance(options: object): localForageAPI;
+  dropInstance(options: object): Promise<any>;
+}
+
+declare const localforage: localForageAPI;
+
+
 
 // Pokédex
 const pokemonData = localforage.createInstance({

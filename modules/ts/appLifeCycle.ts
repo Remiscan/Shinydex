@@ -9,7 +9,7 @@ import { upgradeStorage } from './upgradeStorage.js';
 /////////////////////////////////////////////////////
 // On enregistre le service worker
 // et on le met à jour si la version du site a changé
-let currentWorker;
+let currentWorker: ServiceWorker | null;
 let appCached;
 let appChargee;
 let updateAvailable = 0;
@@ -22,8 +22,8 @@ async function initServiceWorker() {
     // On détecte les mises à jour du service worker lui-même
     registration.addEventListener('updatefound', () => {
       const newWorker = registration.installing;
-      newWorker.addEventListener('statechange', () => {
-        if (newWorker.state == 'activated') {
+      newWorker!.addEventListener('statechange', () => {
+        if (newWorker!.state == 'activated') {
           console.log('[sw] Service worker mis à jour');
           currentWorker = newWorker;
         }
@@ -101,13 +101,13 @@ export async function appStart() {
     adoptStyleSheets(undefined, ['materialIcons', 'iconsheet', 'pokesprite']);
 
     // ÉTAPE 3.98 : si des shiny marqués à 'destroy' sont stockés, on les supprime
-    let toDestroy = await shinyStorage.keys();
-    toDestroy = await Promise.all(
-      toDestroy.map(key => shinyStorage.getItem(key))
+    const shinyKeys = await shinyStorage.keys();
+    const shinyMons = await Promise.all(
+      shinyKeys.map(key => shinyStorage.getItem(key))
     );
+    const toDestroy = shinyMons.filter(shiny => shiny.destroy === true);
     await Promise.all(
-      toDestroy.filter(shiny => shiny.destroy == true)
-               .map(shiny => shiny.huntid)
+      toDestroy.map(shiny => shiny.huntid)
                .map(huntid => shinyStorage.removeItem(String(huntid)))
     );
 
@@ -160,7 +160,7 @@ export async function appStart() {
             .then(keys => Promise.all(keys.map(key => caches.delete(key))))
       manualUpdate();
     };
-    document.getElementById('load-screen').remove();
+    document.getElementById('load-screen')!.remove();
     return notify('Échec critique du chargement...', 'Réinitialiser', 'refresh', forceUpdateNow, 999999999);
   }
 }
@@ -225,14 +225,14 @@ export async function manualUpdate()
     if (!('serviceWorker' in navigator))
       throw 'Service worker indisponible';
 
-    document.querySelector('.notif-texte').innerHTML = 'Installation en cours...';
-    document.getElementById('notification').classList.add('installing');
+    document.querySelector('.notif-texte')!.innerHTML = 'Installation en cours...';
+    document.getElementById('notification')!.classList.add('installing');
     const result = await appUpdate(true);
     return console.log(result);
   }
   catch (raison) {
     console.error(raison);
-    document.getElementById('notification').classList.remove('installing');
+    document.getElementById('notification')!.classList.remove('installing');
     notify('Échec de mise à jour', 'Réessayer', 'update', manualUpdate, 10000);
   }
 }
@@ -245,7 +245,7 @@ let checkingUpdate = 0;
 export async function checkUpdate(checkNotification = false)
 {
   const notif = document.getElementById('notification');
-  if (notif.classList.contains('on') || checkingUpdate)
+  if (notif!.classList.contains('on') || checkingUpdate)
     return;
   checkingUpdate = 1;
   const texteSucces = 'Mise à jour disponible...';
@@ -287,7 +287,7 @@ export async function checkUpdate(checkNotification = false)
       throw 'Pas de mise à jour';
     }
   } catch(error) {
-    if (checkNotification)
+    if (checkNotification && typeof error === 'string')
       notify(error);
     checkingUpdate = 0;
   }
@@ -299,10 +299,10 @@ export async function checkUpdate(checkNotification = false)
 // Vérifie si l'appli peut être installée
 function checkInstall()
 {
-  let installPrompt;
-  const installBouton = document.getElementById('install-bouton');
+  let installPrompt: BeforeInstallPromptEvent;
+  const installBouton = document.getElementById('install-bouton')!;
 
-  window.addEventListener('beforeinstallprompt', e => {
+  window.addEventListener('beforeinstallprompt', (e: BeforeInstallPromptEvent) => {
     e.preventDefault();
     installPrompt = e;
     installBouton.classList.add('on');
@@ -336,13 +336,13 @@ export async function setOnlineBackup()
   if (checkbox.checked)
   {
     checkbox.checked = false;
-    document.getElementById('parametres').removeAttribute('data-online-backup');
+    document.getElementById('parametres')!.removeAttribute('data-online-backup');
     await dataStorage.setItem('online-backup', 0);
   }
   else
   {
     checkbox.checked = true;
-    document.getElementById('parametres').dataset.onlineBackup = '1';
+    document.getElementById('parametres')!.dataset.onlineBackup = '1';
     await dataStorage.setItem('online-backup', 1);
     await startBackup();
   }
@@ -377,7 +377,7 @@ export async function updateSprite(version = null) {
     }
   
     const worker = currentWorker || reg.active;
-    worker.postMessage({ 'action': 'update-sprite', version }, [chan.port2]);
+    worker?.postMessage({ 'action': 'update-sprite', version }, [chan.port2]);
   });
 }
 
@@ -438,6 +438,6 @@ async function waitBackup() {
     }
   
     const worker = currentWorker || reg.active;
-    worker.postMessage({ 'action': 'compare-backup' }, [chan.port2]);
+    worker?.postMessage({ 'action': 'compare-backup' }, [chan.port2]);
   });
 }

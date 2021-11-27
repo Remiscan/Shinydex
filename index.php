@@ -54,8 +54,7 @@
       });
 
       // Définition du thème
-      async function setTheme(askedTheme = false)
-      {
+      async function setTheme(askedTheme = false) {
         // Thème sélectionné par l'utilisateur
         await dataStorage.ready();
         const userTheme = await dataStorage.getItem('theme');

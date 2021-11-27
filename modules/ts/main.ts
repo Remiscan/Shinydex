@@ -11,6 +11,15 @@ import { Hunt } from './Hunt.js';
 import { notify, unNotify } from './notification.js';
 import { initSpriteViewer } from './spriteViewer.js';
 import { DexDatalist } from './DexDatalist.js';
+import { dataStorage, shinyStorage, huntStorage } from './localforage.js';
+
+
+
+declare global {
+  interface Window {
+    setTheme: (askedTheme: string | false) => Promise<void>
+  }
+}
 
 
 
@@ -18,12 +27,12 @@ import { DexDatalist } from './DexDatalist.js';
 // NAVIGATION
 
 // Active les liens de navigation
-Array.from(document.querySelectorAll('[data-section]')).forEach(link => {
-  link.addEventListener('click', () => navigate((link as HTMLElement).dataset.section));
+Array.from(document.querySelectorAll('[data-section]')).forEach((link: HTMLElement) => {
+  link.addEventListener('click', () => navigate(link.dataset.section));
 });
 
 // Active le bouton retour / fermer
-Array.from(document.querySelectorAll('.bouton-retour')).forEach(bouton => {
+Array.from(document.querySelectorAll('.bouton-retour')).forEach((bouton: HTMLButtonElement) => {
   bouton.addEventListener('click', () => history.back());
 });
 
@@ -65,51 +74,53 @@ document.querySelector('.obfuscator').addEventListener('click', () => history.ba
 // PARAMÈTRES
 
 // Active le switch du thème
-dataStorage.getItem('theme').then(theme => {
+dataStorage.getItem('theme').then((theme?: string) => {
   const storedTheme = (theme != null) ? theme : 'system';
   const input = document.getElementById(`theme-${storedTheme}`) as HTMLInputElement;
   input.checked = true;
 });
 
-Array.from(document.querySelectorAll('input[name=theme]')).forEach(_input => {
-  const input = _input as HTMLInputElement;
-  input.onclick = async event => { return await setTheme(input.value); };
+Array.from(document.querySelectorAll('input[name=theme]')).forEach((input: HTMLInputElement) => {
+  input.onclick = async event => { return await window.setTheme(input.value); };
 });
 
 // Active le switch des mises à jour auto
-dataStorage.getItem('check-updates').then(value => {
-  if (value == 1) document.getElementById('switch-auto-maj').checked = true;
-  else            document.getElementById('switch-auto-maj').checked = false;
+dataStorage.getItem('check-updates').then((value: boolean) => {
+  const box = document.getElementById('switch-auto-maj') as HTMLInputElement;
+  if (value === true) box.checked = true;
+  else                box.checked = false;
 });
 
-document.querySelector('[for=switch-auto-maj]').onclick = async event => { event.preventDefault(); return await changeAutoMaj(); };
+(document.querySelector('[for=switch-auto-maj]') as HTMLLabelElement).onclick = async event => { event.preventDefault(); return await changeAutoMaj(); };
 
 // Active le switch de la sauvegarde en ligne
-dataStorage.getItem('online-backup').then(value => {
-  if (value == 1) {
-    document.getElementById('switch-online-backup').checked = true;
+dataStorage.getItem('online-backup').then((value: boolean) => {
+  const box = document.getElementById('switch-online-backup') as HTMLInputElement;
+  if (value === true) {
+    box.checked = true;
     document.getElementById('parametres').dataset.onlineBackup = '1';
   }
-  else document.getElementById('switch-online-backup').checked = false;
+  else box.checked = false;
 });
 
-document.querySelector('[for=switch-online-backup]').onclick = async event => { event.preventDefault(); return await setOnlineBackup(); };
+(document.querySelector('[for=switch-online-backup]') as HTMLLabelElement).onclick = async event => { event.preventDefault(); return await setOnlineBackup(); };
 
 // Active le badge indiquant le succès / échec de la dernière synchronisation des BDD
-dataStorage.getItem('last-sync').then(value => {
-  if (value === 'success') document.querySelector('#parametres').dataset.lastSync = 'success';
-  else document.querySelector('#parametres').dataset.lastSync = 'failure';
-})
+dataStorage.getItem('last-sync').then((value?: string) => {
+  const params = document.querySelector('#parametres') as HTMLElement;
+  if (value === 'success') params.dataset.lastSync = 'success';
+  else params.dataset.lastSync = 'failure';
+});
 
-document.querySelector('.info-backup.failure').onclick = startBackup;
-document.querySelector('.info-backup.success').onclick = startBackup;
+(document.querySelector('.info-backup.failure') as HTMLButtonElement).onclick = startBackup;
+(document.querySelector('.info-backup.success') as HTMLButtonElement).onclick = startBackup;
 
 // Prépare le bouton de recherche de mise à jour
 let longClic;
 let needCheck = 1;
 const majButton = document.querySelector('.bouton-recherche-maj');
 
-majButton.addEventListener('mousedown', event => {
+majButton.addEventListener('mousedown', (event: MouseEvent) => {
   if (event.button != 0) return;
   event.preventDefault();
   clearTimeout(longClic);
@@ -119,7 +130,7 @@ majButton.addEventListener('mousedown', event => {
   majButton.addEventListener('mouseout', () => clearTimeout(longClic));
 });
 
-majButton.addEventListener('touchstart', event => {
+majButton.addEventListener('touchstart', (event: TouchEvent) => {
   event.preventDefault();
   clearTimeout(longClic);
   longClic = setTimeout(() => { needCheck = 0; manualUpdate(); }, 3000);
@@ -132,13 +143,13 @@ majButton.addEventListener('touchstart', event => {
 document.querySelector('.bouton-export').addEventListener('click', export2json);
 
 // Prépare le bouton d'import des données
-const importInput = document.getElementById('pick-import-file');
+const importInput = document.getElementById('pick-import-file') as HTMLInputElement;
 importInput.addEventListener('change', async event => {
   await json2import(importInput.files[0]);
 });
 
 // Prépare le bouton de suppression des données locales
-const boutonSupprimer = document.querySelector('.bouton-supprimer-local');
+const boutonSupprimer = document.querySelector('.bouton-supprimer-local') as HTMLButtonElement;
 boutonSupprimer.addEventListener('click', async event => {
   event.preventDefault();
 
@@ -162,7 +173,7 @@ boutonSupprimer.addEventListener('click', async event => {
 });
 
 // Active l'easter egg de la section a-propos
-document.querySelector('.easter-egg').onclick = playEasterEgg;
+(document.querySelector('.easter-egg') as HTMLElement).onclick = playEasterEgg;
 
 // Initialise les filtres
 initFiltres();
@@ -227,11 +238,12 @@ navigator.serviceWorker.addEventListener('message', async event => {
     if ('noresponse' in event.data) return;
 
     const loaders = Array.from(document.querySelectorAll('sync-progress, sync-line'));
+    const params = document.querySelector('#parametres') as HTMLElement;
 
     if (event.data.successfulBackupComparison === true) {
       // Toutes les chasses locales plus récentes que celles de la BDD ont été ajoutées / éditées
       loaders.forEach(loader => loader.setAttribute('state', 'success'));
-      document.querySelector('#parametres').dataset.lastSync = 'success';
+      params.dataset.lastSync = 'success';
 
       if ('obsolete' in event.data) {
         const versionBDD = await dataStorage.getItem('version-bdd');
@@ -247,7 +259,7 @@ navigator.serviceWorker.addEventListener('message', async event => {
       if (event.data.error !== true) notify(event.data.error);
       else notify('Erreur. Réessayez plus tard.');
       loaders.forEach(loader => loader.setAttribute('state', 'failure'));
-      document.querySelector('#parametres').dataset.lastSync = 'failure';
+      params.dataset.lastSync = 'failure';
     }
   }
 });
@@ -256,7 +268,7 @@ navigator.serviceWorker.addEventListener('message', async event => {
 
 //////////////////////////////////////
 // ÉCOUTE DE L'EVENT CUSTOM 'POPULATE'
-window.addEventListener('populate', async event => {
+window.addEventListener('populate', async (event: CustomEvent) => {
   const isObsolete = ('obsolete' in event.detail && event.detail.obsolete.length > 0);
   // Si le spritesheet devra être régénéré, on place cette tentative en file d'attente
   if (isObsolete) {
@@ -284,7 +296,7 @@ window.addEventListener('populate', async event => {
     if (previousSpriteVersion >= event.detail.version) return;
 
     // On génère le nouveau spritesheet et on le place dans le cache
-    const version = await updateSprite(event.detail.version);
+    /*const version = await updateSprite(event.detail.version);
     if (isNaN(version)) { console.log('Problème de version du sprite ?'); return; }
   
     // On pré-charge le nouveau spritesheet et ensuite on l'utilise dans la section 'mes chromatiques'
@@ -296,7 +308,7 @@ window.addEventListener('populate', async event => {
       const ordre = card.dataset.futurOrdreSprite;
       card.setAttribute('ordre-sprite', ordre);
       card.removeAttribute('data-futur-ordre-sprite');
-    });
+    });*/
   }
 })
 

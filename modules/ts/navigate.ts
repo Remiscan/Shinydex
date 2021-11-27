@@ -12,8 +12,8 @@ export const sections = ['mes-chromatiques', 'pokedex', 'chasses-en-cours', 'par
 export async function navigate(sectionCible: string, position = 0, historique = true) {
   if (sectionActuelle == sectionCible) return Promise.resolve();
 
-  const ancienneSection = document.getElementById(sectionActuelle);
-  const nouvelleSection = document.getElementById(sectionCible);
+  const ancienneSection = document.getElementById(sectionActuelle)!;
+  const nouvelleSection = document.getElementById(sectionCible)!;
 
   // Pré-chargement des images de la nouvelle section
   const listeImages = ['./ext/pokesprite.png'];
@@ -51,7 +51,7 @@ export async function navigate(sectionCible: string, position = 0, historique = 
 
     sectionActuelle = sectionCible;
 
-    document.querySelector('main').scroll(0, 0);
+    document.querySelector('main')!.scroll(0, 0);
     document.body.dataset.sectionActuelle = sectionActuelle;
 
     // Disparition de l'indicateur de l'état du backup autour du bouton paramètres
@@ -79,16 +79,17 @@ export async function navigate(sectionCible: string, position = 0, historique = 
 
   const toUndefer = Array.from(ancienneSection.querySelectorAll('.defered'));
   if (toUndefer.length != 0) ancienneSection.classList.remove('defered');
-  Array.from(ancienneSection.querySelectorAll('.defered')).forEach(defered => defered.classList.replace('defered', 'defer'));
+  Array.from(ancienneSection!.querySelectorAll('.defered')).forEach(defered => defered.classList.replace('defered', 'defer'));
 }
 
 
 
 // Anime l'icône du FAB selon la section en cours
 function animateFabIcon(sectionCible: string, animations = false) {
-  const fab = document.querySelector('.fab');
-  const fabIcon = fab.querySelector('.material-icons');
-  const animFabIcon = { start: null, end: null };
+  const fab = document.querySelector('.fab')!;
+  const fabIcon = fab.querySelector('.material-icons')!;
+  type startendAnimations = { start: Animation | null, end: Animation | null };
+  const animFabIcon: startendAnimations = { start: null, end: null };
 
   if (!animations) {
     if (sectionCible == 'chasses-en-cours') fab.classList.add('add');
@@ -122,8 +123,8 @@ function animateFabIcon(sectionCible: string, animations = false) {
     });
 
     animFabIcon.end.addEventListener('finish', () => {
-      animFabIcon.start.cancel();
-      animFabIcon.end.cancel();
+      animFabIcon.start?.cancel();
+      animFabIcon.end?.cancel();
     });
   });
 }
@@ -131,7 +132,7 @@ function animateFabIcon(sectionCible: string, animations = false) {
 
 
 // Précharge la vidéo de l'easter egg
-async function loadVideo(sectionCible) {
+async function loadVideo(sectionCible: string) {
   if (sectionCible == 'a-propos' || (sectionCible == 'parametres' && Params.owidth >= Params.layoutPClarge))
     await fetch('./images/instinct.mp4');
   return;
@@ -148,7 +149,7 @@ window.addEventListener('popstate', event => {
   else if (event.state)
   {
     const section = event.state.section;
-    if (document.querySelector('.menu-filtres').classList.contains('on'))
+    if (document.querySelector('.menu-filtres')!.classList.contains('on'))
       closeFiltres();
     if (section != sectionActuelle)
     {

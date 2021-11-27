@@ -3,7 +3,7 @@ import { Pokemon } from './Pokemon.js';
 
 
 let previousLength = 0;
-let allNames = [];
+let allNames: string[] = [];
 
 export class DexDatalist {
   correspondances: string[] = [];
@@ -36,7 +36,7 @@ export class DexDatalist {
 
   tohtml() {
     const conteneur = document.getElementById('datalist-pokedex');
-    conteneur.innerHTML = this.datalist;
+    conteneur!.innerHTML = this.datalist;
   }
 }
 

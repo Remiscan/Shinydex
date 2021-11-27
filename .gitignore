@@ -3,3 +3,6 @@ test.php
 
 # Ignore generated icon sheet
 images/out/
+
+# Ignore compiled js for now
+modules/*.js

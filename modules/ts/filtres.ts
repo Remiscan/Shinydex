@@ -35,7 +35,7 @@ export async function filterCards(filtres: string[] = defautFiltres, cards: poke
       card.classList.remove('filtered');
 
       // On récupère les filtres de chaque carte
-      const cardFiltres = JSON.parse(card.getAttribute('filtres'));
+      const cardFiltres = JSON.parse(card.getAttribute('filtres') || '');
       
       for (const filtre of filtres) {
         // Un filtre peut proposer plusieurs choix (a ou b : a|b), on récupère ces choix
@@ -59,10 +59,10 @@ export async function filterCards(filtres: string[] = defautFiltres, cards: poke
   }
 
   const compteur = allCards.length - filteredCards.length;
-  document.querySelector('.compteur').innerHTML = String(compteur);
+  document.querySelector('.compteur')!.innerHTML = String(compteur);
   (document.querySelector('#mes-chromatiques .section-contenu') as HTMLElement).style.setProperty('--compteur', String(compteur));
-  if (compteur == 0) document.querySelector('#mes-chromatiques').classList.add('vide');
-  else               document.querySelector('#mes-chromatiques').classList.remove('vide');
+  if (compteur == 0) document.querySelector('#mes-chromatiques')!.classList.add('vide');
+  else               document.querySelector('#mes-chromatiques')!.classList.remove('vide');
 
   if (filtres != null) filteredCards.forEach(card => card.classList.add('filtered'));
   if (cards == null) filterDex();
@@ -86,8 +86,8 @@ export async function orderCards(ordre: string = defautOrdre, reversed: boolean 
     const date1 = Number(new Date(carte1.getAttribute('date') || '1000-01-01'));
     const date2 = Number(new Date(carte2.getAttribute('date') || '1000-01-01'));
 
-    const id1 = parseInt(carte1.getAttribute('huntid'));
-    const id2 = parseInt(carte2.getAttribute('huntid'));
+    const id1 = parseInt(carte1.getAttribute('huntid') || '');
+    const id2 = parseInt(carte2.getAttribute('huntid') || '');
 
     switch (ordre) {
       case 'jeu': {
@@ -98,15 +98,15 @@ export async function orderCards(ordre: string = defautOrdre, reversed: boolean 
       }
 
       case 'taux': {
-        const taux1 = parseInt(carte1.getAttribute('shiny-rate'));
-        const taux2 = parseInt(carte2.getAttribute('shiny-rate'));
+        const taux1 = parseInt(carte1.getAttribute('shiny-rate') || '');
+        const taux2 = parseInt(carte2.getAttribute('shiny-rate') || '');
 
         return taux2 - taux1 || date2 - date1 || id2 - id1;
       }
 
       case 'dex': {
-        const dexid1 = parseInt(carte1.getAttribute('dexid'));
-        const dexid2 = parseInt(carte2.getAttribute('dexid'));
+        const dexid1 = parseInt(carte1.getAttribute('dexid') || '');
+        const dexid2 = parseInt(carte2.getAttribute('dexid') || '');
 
         return dexid1 - dexid2 || date2 - date1 || id2 - id1;
       }
@@ -114,6 +114,8 @@ export async function orderCards(ordre: string = defautOrdre, reversed: boolean 
       case 'date': {
         return date2 - date1 || id2 - id1;
       }
+
+      default: return id2 - id1;
     }
   });
 
@@ -151,13 +153,13 @@ export function filterDex(cards: pokemonCard[] = []) {
   const dexids = new Set();
 
   displayedCards.forEach(card => {
-    dexids.add(parseInt(card.getAttribute('dexid')));
+    dexids.add(parseInt(card.getAttribute('dexid') || ''));
   });
 
   const dexIcons = Array.from(document.querySelectorAll('#pokedex .pkspr')) as HTMLElement[];
 
   dexIcons.forEach(icon => {
-    if (dexids.has(parseInt(icon.dataset.dexid)))
+    if (dexids.has(parseInt(icon.dataset.dexid || '')))
       icon.classList.add('got');
     else
       icon.classList.remove('got');
@@ -253,16 +255,16 @@ export function deferMonitor(entries)
 export function openFiltres(historique = true) {
   if (historique) history.pushState({section: 'menu-filtres'}, '');
 
-  obfuscator.classList.remove('off');
-  menuFiltres.classList.add('on');
+  obfuscator!.classList.remove('off');
+  menuFiltres!.classList.add('on');
 }
 
 
 ////////////////////////////
 // Ferme le menu des filtres
 export function closeFiltres() {
-  menuFiltres.classList.remove('on');
-  obfuscator.classList.add('off');
+  menuFiltres!.classList.remove('on');
+  obfuscator!.classList.add('off');
 }
 
 
@@ -300,13 +302,13 @@ export function initFiltres() {
   const reversed = document.body.dataset.reversed === 'true';
   for (const label of Array.from(document.querySelectorAll('label.ordre'))) {
     label.addEventListener('click', async () => {
-      await orderCards(label.getAttribute('for').replace('ordre-', ''), reversed);
+      await orderCards(label.getAttribute('for')!.replace('ordre-', ''), reversed);
       //deferCards();
     });
   }
 
   // Active le bouton d'inversion de l'ordre
-  document.querySelector('.reverse-order').addEventListener('click', async () => {
+  document.querySelector('.reverse-order')!.addEventListener('click', async () => {
     await reverseOrder();
     //deferCards();
   });
