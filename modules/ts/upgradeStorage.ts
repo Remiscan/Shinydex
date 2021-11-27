@@ -8,6 +8,7 @@ export async function upgradeStorage() {
 
   if (lastStorageUpgrade > versionFichiers) return;
 
+  // Update the structure of stored shiny Pokémon
   const keys = await shinyStorage.keys();
   for (const key of keys) {
     const shiny = await shinyStorage.getItem(key);
@@ -40,6 +41,9 @@ export async function upgradeStorage() {
     // Store the updated data
     await shinyStorage.setItem(key, shiny);
   }
+
+  // Delete old, now obsolete stored items
+  // (none for now)
 
   await dataStorage.setItem('last-storage-upgrade', Date.now());
   return;

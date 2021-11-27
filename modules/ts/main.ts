@@ -27,14 +27,14 @@ declare global {
 // NAVIGATION
 
 // Active les liens de navigation
-Array.from(document.querySelectorAll('[data-section]')).forEach((link: HTMLElement) => {
-  link.addEventListener('click', () => navigate(link.dataset.section));
-});
+for (const link of Array.from(document.querySelectorAll('[data-section]')) as HTMLElement[]) {
+  link.addEventListener('click', () => navigate(link.dataset.section || ''));
+}
 
 // Active le bouton retour / fermer
-Array.from(document.querySelectorAll('.bouton-retour')).forEach((bouton: HTMLButtonElement) => {
+for (const bouton of Array.from(document.querySelectorAll('.bouton-retour')) as HTMLButtonElement[]) {
   bouton.addEventListener('click', () => history.back());
-});
+}
 
 
 
@@ -42,7 +42,7 @@ Array.from(document.querySelectorAll('.bouton-retour')).forEach((bouton: HTMLBut
 // FAB (filtres et nouvelle chasse)
 
 // Active le FAB
-document.querySelector('.fab').addEventListener('click', () => {
+document.querySelector('.fab')!.addEventListener('click', () => {
   // Filtres
   if (['mes-chromatiques', 'pokedex'].includes(sectionActuelle)) openFiltres();
   // Nouvelle chasse
@@ -50,11 +50,11 @@ document.querySelector('.fab').addEventListener('click', () => {
 });
 
 // L'obfuscator ramène en arrière quand on clique dessus
-document.querySelector('.obfuscator').addEventListener('click', () => history.back());
+document.querySelector('.obfuscator')!.addEventListener('click', () => history.back());
 
 // Surveille le champ de filtrage par espèce de Pokémon
 {
-  const input = document.querySelector('.menu-filtres').querySelector('[list="datalist-pokedex"]') as HTMLInputElement;
+  const input = document.querySelector('.menu-filtres')!.querySelector('[list="datalist-pokedex"]') as HTMLInputElement;
   input.addEventListener('input', async () => {
     DexDatalist.build(input.value);
   });
@@ -80,9 +80,9 @@ dataStorage.getItem('theme').then((theme?: string) => {
   input.checked = true;
 });
 
-Array.from(document.querySelectorAll('input[name=theme]')).forEach((input: HTMLInputElement) => {
+for (const input of Array.from(document.querySelectorAll('input[name=theme]')) as HTMLInputElement[]) {
   input.onclick = async event => { return await window.setTheme(input.value); };
-});
+}
 
 // Active le switch des mises à jour auto
 dataStorage.getItem('check-updates').then((value: boolean) => {
@@ -98,7 +98,7 @@ dataStorage.getItem('online-backup').then((value: boolean) => {
   const box = document.getElementById('switch-online-backup') as HTMLInputElement;
   if (value === true) {
     box.checked = true;
-    document.getElementById('parametres').dataset.onlineBackup = '1';
+    document.getElementById('parametres')!.dataset.onlineBackup = '1';
   }
   else box.checked = false;
 });
@@ -116,12 +116,12 @@ dataStorage.getItem('last-sync').then((value?: string) => {
 (document.querySelector('.info-backup.success') as HTMLButtonElement).onclick = startBackup;
 
 // Prépare le bouton de recherche de mise à jour
-let longClic;
+let longClic: number | undefined;
 let needCheck = 1;
-const majButton = document.querySelector('.bouton-recherche-maj');
+const majButton = document.querySelector('.bouton-recherche-maj')!;
 
-majButton.addEventListener('mousedown', (event: MouseEvent) => {
-  if (event.button != 0) return;
+majButton.addEventListener('mousedown', (event: Event) => {
+  if ((event as MouseEvent).button != 0) return;
   event.preventDefault();
   clearTimeout(longClic);
   longClic = setTimeout(() => { needCheck = 0; manualUpdate(); }, 3000);
@@ -130,7 +130,7 @@ majButton.addEventListener('mousedown', (event: MouseEvent) => {
   majButton.addEventListener('mouseout', () => clearTimeout(longClic));
 });
 
-majButton.addEventListener('touchstart', (event: TouchEvent) => {
+majButton.addEventListener('touchstart', (event: Event) => {
   event.preventDefault();
   clearTimeout(longClic);
   longClic = setTimeout(() => { needCheck = 0; manualUpdate(); }, 3000);
@@ -140,12 +140,12 @@ majButton.addEventListener('touchstart', (event: TouchEvent) => {
 });
 
 // Prépare le bouton d'export des données
-document.querySelector('.bouton-export').addEventListener('click', export2json);
+document.querySelector('.bouton-export')!.addEventListener('click', export2json);
 
 // Prépare le bouton d'import des données
 const importInput = document.getElementById('pick-import-file') as HTMLInputElement;
 importInput.addEventListener('change', async event => {
-  await json2import(importInput.files[0]);
+  await json2import(importInput.files?.[0]);
 });
 
 // Prépare le bouton de suppression des données locales
@@ -189,7 +189,7 @@ navigator.serviceWorker.addEventListener('message', async event => {
   // --- Réponse à HUNT-ADD-id, HUNT-EDIT-id ou HUNT-REMOVE-id ---
   if ('successfulDBUpdate' in event.data) {
     const huntid = event.data.huntid;
-    const card = document.getElementById('hunt-' + huntid);
+    const card = document.getElementById('hunt-' + huntid)!;
 
     if (event.data.successfulDBUpdate === true) {
       // On reçoit la confirmation du succès de l'ajout à la DB
@@ -211,10 +211,10 @@ navigator.serviceWorker.addEventListener('message', async event => {
       // ✅ faire disparaître la carte de la chasse
       let uploadConfirmed = await dataStorage.getItem('uploaded-hunts');
       if (uploadConfirmed == null) uploadConfirmed = [];
-      await dataStorage.setItem('uploaded-hunts', uploadConfirmed.filter(v => v != huntid));
+      await dataStorage.setItem('uploaded-hunts', uploadConfirmed.filter((v: number) => v != huntid));
       card.remove();
       const keys = await huntStorage.keys();
-      if (keys.length == 0) document.querySelector('#chasses-en-cours').classList.add('vide');
+      if (keys.length == 0) document.querySelector('#chasses-en-cours')!.classList.add('vide');
       // ✅ animation de chargement
       window.dispatchEvent(new Event('populate'));
     }
@@ -226,7 +226,7 @@ navigator.serviceWorker.addEventListener('message', async event => {
       card.removeAttribute('data-loading');
       let uploadConfirmed = await dataStorage.getItem('uploaded-hunts');
       if (uploadConfirmed == null) uploadConfirmed = [];
-      await dataStorage.setItem('uploaded-hunts', uploadConfirmed.filter(v => v != huntid));
+      await dataStorage.setItem('uploaded-hunts', uploadConfirmed.filter((v: number) => v != huntid));
       const hunt = await huntStorage.getItem(String(huntid));
       hunt.uploaded = false;
       await huntStorage.setItem(String(huntid), hunt);
@@ -268,7 +268,8 @@ navigator.serviceWorker.addEventListener('message', async event => {
 
 //////////////////////////////////////
 // ÉCOUTE DE L'EVENT CUSTOM 'POPULATE'
-window.addEventListener('populate', async (event: CustomEvent) => {
+window.addEventListener('populate', async (_event: Event) => {
+  const event = _event as CustomEvent;
   const isObsolete = ('obsolete' in event.detail && event.detail.obsolete.length > 0);
   // Si le spritesheet devra être régénéré, on place cette tentative en file d'attente
   if (isObsolete) {
@@ -291,9 +292,9 @@ window.addEventListener('populate', async (event: CustomEvent) => {
     if (Math.max(...populateAttemptsVersions) > event.detail.version) return;
 
     // Si une version plus récente du spritesheet est déjà utilisée, on ne fait rien
-    const previousSpriteVersion = document.documentElement.style.getPropertyValue('--link-sprites')
-                                  .match(Params.spriteRegex)[1];
-    if (previousSpriteVersion >= event.detail.version) return;
+    /*const previousSpriteVersion = document.documentElement.style.getPropertyValue('--link-sprites')
+                                  .match(Params.spriteRegex)?.[1];
+    if (previousSpriteVersion >= event.detail.version) return;*/
 
     // On génère le nouveau spritesheet et on le place dans le cache
     /*const version = await updateSprite(event.detail.version);

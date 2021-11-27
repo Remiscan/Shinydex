@@ -85,13 +85,13 @@ template.innerHTML = `
 
 class syncProgress extends HTMLElement {
   shadow: ShadowRoot;
-  perimetre: number;
-  loadingAnim: Animation;
-  successAnim: Animation;
-  failureAnim: Animation;
-  lazyAnim: Animation;
-  bye: Animation;
-  disappear: Animation;
+  perimetre: number = 0;
+  loadingAnim: Animation = new Animation();
+  successAnim: Animation = new Animation();
+  failureAnim: Animation = new Animation();
+  lazyAnim: Animation = new Animation();
+  bye: Animation = new Animation();
+  disappear: Animation = new Animation();
   
 
 
@@ -108,12 +108,12 @@ class syncProgress extends HTMLElement {
   }
 
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {
-    const svg = this.shadow.querySelector('svg');
+    const svg = this.shadow.querySelector('svg')!;
 
     if (name == 'state') {
       svg.classList.remove(oldValue);
       svg.classList.add(newValue);
-      const progressLine = this.shadow.querySelector('.progress-line');
+      const progressLine = this.shadow.querySelector('.progress-line')!;
 
       const loadingDuration = 3000;
       const successDuration = 500;
@@ -145,7 +145,7 @@ class syncProgress extends HTMLElement {
       else if (newValue == 'success') {
         this.loadingAnim.pause();
 
-        const offset = (this.loadingAnim.currentTime % loadingDuration < .5 * loadingDuration) ? '0' : '-202px';
+        const offset = ((this.loadingAnim.currentTime || 0) % loadingDuration < .5 * loadingDuration) ? '0' : '-202px';
         this.successAnim = progressLine.animate([
           { strokeDashoffset: offset, stroke: 'var(--success-color)' }
         ], {
@@ -162,7 +162,7 @@ class syncProgress extends HTMLElement {
       else if (newValue == 'failure') {
         this.loadingAnim.pause();
 
-        const offset = (this.loadingAnim.currentTime % loadingDuration < .5 * loadingDuration) ? '0' : '-202px';
+        const offset = ((this.loadingAnim.currentTime || 0) % loadingDuration < .5 * loadingDuration) ? '0' : '-202px';
         this.failureAnim = progressLine.animate([
           { strokeDashoffset: offset, stroke: 'var(--failure-color)' }
         ], {
@@ -179,7 +179,7 @@ class syncProgress extends HTMLElement {
       else if (newValue == 'lazy') {
         this.loadingAnim.pause();
 
-        const offset = (this.loadingAnim.currentTime % loadingDuration < .5 * loadingDuration) ? '-101px' : '-101px';
+        const offset = ((this.loadingAnim.currentTime || 0) % loadingDuration < .5 * loadingDuration) ? '-101px' : '-101px';
         this.lazyAnim = progressLine.animate([
           { strokeDashoffset: offset }
         ], {
@@ -204,7 +204,7 @@ class syncProgress extends HTMLElement {
     else if (name == 'finished') {
       if (newValue == 'true') {
         svg.classList.add('finished');
-        const progressLine = this.shadow.querySelector('.progress-line');
+        const progressLine = this.shadow.querySelector('.progress-line')!;
 
         this.bye = svg.animate([
           { opacity: '0' }
@@ -298,13 +298,13 @@ template2.innerHTML = `
 
 class syncLine extends HTMLElement {
   shadow: ShadowRoot;
-  longueur: number;
-  loadingAnim: Animation;
-  successAnim: Animation;
-  failureAnim: Animation;
-  lazyAnim: Animation;
-  bye: Animation;
-  disappear: Animation;
+  longueur: number = 0;
+  loadingAnim: Animation = new Animation();
+  successAnim: Animation = new Animation();
+  failureAnim: Animation = new Animation();
+  lazyAnim: Animation = new Animation();
+  bye: Animation = new Animation();
+  disappear: Animation = new Animation();
 
   constructor() {
     super();
@@ -319,12 +319,12 @@ class syncLine extends HTMLElement {
   }
 
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {
-    const svg = this.shadow.querySelector('svg');
+    const svg = this.shadow.querySelector('svg')!;
 
     if (name == 'state') {
       svg.classList.remove(oldValue);
       svg.classList.add(newValue);
-      const progressLine = this.shadow.querySelector('.progress-line');
+      const progressLine = this.shadow.querySelector('.progress-line')!;
 
       const loadingDuration = 3000;
       const successDuration = 500;
@@ -356,7 +356,7 @@ class syncLine extends HTMLElement {
       else if (newValue == 'success') {
         this.loadingAnim.pause();
 
-        const offset = (this.loadingAnim.currentTime % loadingDuration < .5 * loadingDuration) ? '0' : `-${2 * this.longueur}px`;
+        const offset = ((this.loadingAnim.currentTime || 0) % loadingDuration < .5 * loadingDuration) ? '0' : `-${2 * this.longueur}px`;
         this.successAnim = progressLine.animate([
           { strokeDashoffset: offset, stroke: 'var(--success-color)' }
         ], {
@@ -373,7 +373,7 @@ class syncLine extends HTMLElement {
       else if (newValue == 'failure') {
         this.loadingAnim.pause();
 
-        const offset = (this.loadingAnim.currentTime % loadingDuration < .5 * loadingDuration) ? '0' : `-${2 * this.longueur}px`;
+        const offset = ((this.loadingAnim.currentTime || 0) % loadingDuration < .5 * loadingDuration) ? '0' : `-${2 * this.longueur}px`;
         this.failureAnim = progressLine.animate([
           { strokeDashoffset: offset, stroke: 'var(--failure-color)' }
         ], {
@@ -390,7 +390,7 @@ class syncLine extends HTMLElement {
       else if (newValue == 'lazy') {
         this.loadingAnim.pause();
 
-        const offset = (this.loadingAnim.currentTime % loadingDuration < .5 * loadingDuration) ? `-${this.longueur}px` : `-${this.longueur}px`;
+        const offset = ((this.loadingAnim.currentTime || 0) % loadingDuration < .5 * loadingDuration) ? `-${this.longueur}px` : `-${this.longueur}px`;
         this.lazyAnim = progressLine.animate([
           { strokeDashoffset: offset }
         ], {
@@ -415,7 +415,7 @@ class syncLine extends HTMLElement {
     else if (name == 'finished') {
       if (newValue == 'true') {
         svg.classList.add('finished');
-        const progressLine = this.shadow.querySelector('.progress-line');
+        const progressLine = this.shadow.querySelector('.progress-line')!;
 
         this.bye = svg.animate([
           { opacity: '0' }

@@ -21,72 +21,16 @@
 
     <link rel="preconnect" href="https://remiscan.fr">
 
-    <script src="./ext/localforage.min.js"></script>
+    <script>window.tempsChargementDebut = Date.now();</script>
+    <script defer src="../_common/polyfills/adoptedStyleSheets.min.js"></script>
+    <script defer src="../_common/polyfills/es-module-shims.js"></script>
+    <script defer src="./ext/localforage.min.js"></script>
     <script type="module">
       import { pokemonData, shinyStorage, dataStorage, huntStorage } from './modules/localforage.js';
+
       
-      window.tempsDebut = Date.now();
 
-      // Stockage de données
-      //// Pokédex
-      const pokemonData = localforage.createInstance({
-        name: 'remidex',
-        storeName: 'pokemon-data',
-        driver: localforage.INDEXEDDB
-      });
-      //// Liste de shiny
-      const shinyStorage = localforage.createInstance({
-        name: 'remidex',
-        storeName: 'shiny-list',
-        driver: localforage.INDEXEDDB
-      });
-      //// Données diverses
-      const dataStorage = localforage.createInstance({
-        name: 'remidex',
-        storeName: 'misc',
-        driver: localforage.INDEXEDDB
-      });
-      // Chasses en cours
-      const huntStorage = localforage.createInstance({
-        name: 'remidex',
-        storeName: 'hunts',
-        driver: localforage.INDEXEDDB
-      });
-
-      // Définition du thème
-      async function setTheme(askedTheme = false) {
-        // Thème sélectionné par l'utilisateur
-        await dataStorage.ready();
-        const userTheme = await dataStorage.getItem('theme');
-
-        // Thème préféré selon l'OS
-        let osTheme;
-        if (window.matchMedia('(prefers-color-scheme: dark)').matches) osTheme = 'dark';
-        else if (window.matchMedia('(prefers-color-scheme: light)').matches) osTheme = 'light';
-
-        // Thème exigé par la fonction
-        const forcedTheme = (askedTheme == 'system') ? osTheme : askedTheme;
-
-        // Thème par défaut
-        const defaultTheme = 'dark';
-
-        // On applique le thème (forcedTheme > userTheme > osTheme > defaultTheme)
-        const theme = forcedTheme || userTheme || osTheme || defaultTheme;
-        const storedTheme = (askedTheme == 'system') ? null : (forcedTheme || userTheme);
-
-        let html = document.documentElement;
-        html.classList.remove('light', 'dark');
-        html.classList.add(theme);
-        
-        let themeColor = (theme == 'dark') ? 'rgb(34, 34, 34)' : 'rgb(224, 224, 224)';
-        document.querySelector("meta[name=theme-color]").setAttribute('content', themeColor);
-
-        window.dispatchEvent(new CustomEvent('themechange', { detail: { theme } }));
-
-        return await dataStorage.setItem('theme', storedTheme);
-      }
-
-      Promise.all([dataStorage.ready(), shinyStorage.ready(), pokemonData.ready()])
+      Promise.all([dataStorage.ready(), shinyStorage.ready(), pokemonData.ready(), huntStorage.ready()])
       .then(() => setTheme());
 
       window.matchMedia('(prefers-color-scheme: dark)').addListener(event => setTheme());
@@ -99,6 +43,9 @@
     <?php } ?>
 
     <link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="./ext/material-icons.css">
+    <link rel="stylesheet" href="./ext/pokesprite.css">
+    <link rel="stylesheet" href="./images/iconsheet.css">
   </head>
 
   <body data-section-actuelle="mes-chromatiques">

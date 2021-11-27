@@ -12,17 +12,17 @@ import { pokemonCard } from './pokemonCard.component.js';
 
 declare global {
   interface Window {
-    tempsDebut: number,
-    tempsFin: number
+    tempsChargementDebut: number,
+    tempsChargementFin: number
   }
 }
 
 let populating = false;
 let displaying = false;
 
-export let populateAttemptsVersions = [];
-export let populateAttemptsObsolete = [];
-export let populateAttemptsModified = [];
+export let populateAttemptsVersions: any[] = [];
+export let populateAttemptsObsolete: any[] = [];
+export let populateAttemptsModified: any[] = [];
 
 /////////////////////////////////////////////////////////
 // Peuple l'application à partir des données de indexedDB
@@ -268,8 +268,8 @@ export async function appDisplay(start = true)
     document.getElementById('version-fichiers')!.innerHTML = version2date(await dataStorage.getItem('version-fichiers'));
     document.getElementById('version-bdd')!.innerHTML = version2date(await dataStorage.getItem('version-bdd'));
     if (start) {
-      window.tempsFin = Date.now();
-      document.getElementById('version-tempschargement')!.innerHTML = String(window.tempsFin - window.tempsDebut);
+      window.tempsChargementFin = Date.now();
+      document.getElementById('version-tempschargement')!.innerHTML = String(window.tempsChargementFin - window.tempsChargementDebut);
     }
     
     return;
@@ -318,10 +318,12 @@ export async function appDisplay(start = true)
 
 //////////////////////////////////////////////////////////
 // Peuple l'application avec les données d'un fichier JSON
-export async function json2import(file: File | Blob) {
+export async function json2import(file: File | Blob | undefined) {
+  if (file == null) return;
+
   const reader = new FileReader();
   reader.addEventListener('load', async (event: ProgressEvent)  => {
-    const importedData = typeof event.target.result === 'string' ? JSON.parse(event.target.result) : event.target.result;
+    const importedData = typeof reader.result === 'string' ? JSON.parse(reader.result) : reader.result;
     if (!('shiny' in importedData) || !('hunts' in importedData))
       throw 'Le fichier importé est incorrect.';
 

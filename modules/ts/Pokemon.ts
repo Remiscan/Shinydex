@@ -67,7 +67,7 @@ const generations: Generation[] = [
 
 
 
-type Methode = {
+export type Methode = {
   nom: string, // nom de la méthode en FR
   jeux: Jeu[], // liste de jeux dans lesquels la méthode s'applique
   mine: boolean, // si le Pokémon obtenu porte mon DO ou non
@@ -102,7 +102,7 @@ const allMethodes: Methode[] = [
 
 
 
-type Forme = {
+export type Forme = {
   dbid: string,
   nom: string,
   form: number,
@@ -153,6 +153,15 @@ export interface frontendShiny extends Omit<backendShiny, 'id'> {
 
 
 
+type SpriteOptions = {
+  shiny: boolean,
+  backside?: boolean,
+  size: number,
+  format: 'webp' | 'png'
+};
+
+
+
 class Pokemon {
   public dexid: number;
   public name: string;
@@ -166,7 +175,7 @@ class Pokemon {
     this.formes = pkmn.formes;
   }
 
-  getSprite(forme: Forme, { shiny = false, backside = undefined, size = 512, format = 'png' }: { shiny: boolean, backside?: boolean, size: number, format: string }): string {
+  getSprite(forme: Forme, { shiny = false, backside = undefined, size = 512, format = 'png' }: SpriteOptions): string {
     const shinySuffix = shiny ? 'r' : 'n';
 
     const side = (typeof forme.hasBackside !== 'undefined' && typeof backside !== 'undefined' && backside === true) ? 'b' : 'f';
@@ -220,52 +229,45 @@ class Pokemon {
 
 
 class Shiny implements frontendShiny {
-  // backendShiny fields
-  id: number;
-  huntid: number;
-  lastUpdate: number;
-  dexid: number;
-  formid: string;
-  surnom: string;
-  methode: string;
-  compteur: string;
-  timeCapture: number;
-  jeu: string;
-  ball: string;
-  description: string;
-  checkmark: number;
-  DO: boolean;
-  charm: boolean;
-  hacked: number;
-  horsChasse: boolean;
+  // frontendShiny fields
+  huntid: number = NaN;
+  lastUpdate: number = NaN;
+  dexid: number = NaN;
+  formid: string = '';
+  surnom: string = '';
+  methode: string = '';
+  compteur: string = '';
+  timeCapture: number = NaN;
+  jeu: string = '';
+  ball: string = '';
+  description: string = '';
+  checkmark: number = NaN;
+  DO: boolean = false;
+  charm: boolean = false;
+  hacked: number = NaN;
+  horsChasse: boolean = false;
 
   // additional fields
   deleted: boolean = false;
+  destroy: boolean = false;
 
   constructor(shiny: frontendShiny) {
-    for (const key of Object.keys(shiny)) {
-      this[key] = shiny[key];
-    }
-
+    Object.assign(this, shiny);
     this.deleted = Boolean(shiny.deleted);
   }
 
   async getEspece(): Promise<backendPokemon> {
-    try {
-      const pokemon = await pokemonData.getItem(String(this.dexid));
-      if (pokemon == null) throw `Aucun Pokémon ne correspond à ce Shiny (${this.surnom} / ${this.formid})`;
-      return pokemon;
-    } catch(error) { throw error; }
+    const pokemon = await pokemonData.getItem(String(this.dexid));
+    if (pokemon == null) throw `Aucun Pokémon ne correspond à ce Shiny (${this.surnom} / ${this.formid})`;
+    return pokemon;
   }
 
   async getForme(): Promise<Forme> {
-    try {
-      const pokemon = await this.getEspece();
+    const pokemon = await this.getEspece();
 
-      const k = pokemon.formes.findIndex(p => p.dbid == this.formid);
-      if (k == -1) throw `La forme de ce Shiny est invalide (${this.surnom} / ${pokemon.namefr} / ${this.formid})`;
-      return pokemon.formes[k];
-    } catch(error) { throw error; }
+    const k = pokemon.formes.findIndex(p => p.dbid == this.formid);
+    if (k == -1) throw `La forme de ce Shiny est invalide (${this.surnom} / ${pokemon.namefr} / ${this.formid})`;
+    return pokemon.formes[k];
   }
 
   async getName(): Promise<string> {
@@ -283,6 +285,17 @@ class Shiny implements frontendShiny {
       const pokemon = await this.getEspece();
       return pokemon.namefr;
     } catch (error) { 
+      console.error(error);
+      return 'error';
+    }
+  }
+
+  async getSprite(options: SpriteOptions): Promise<string> {
+    try {
+      const pokemon = await this.getEspece();
+      const forme = await this.getForme();
+      return (new Pokemon(pokemon)).getSprite(forme, options);
+    } catch (error) {
       console.error(error);
       return 'error';
     }

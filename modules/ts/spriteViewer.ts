@@ -4,8 +4,8 @@ import { notify } from './notification.js';
 import { pokemonData } from './localforage.js';
 
 
-const spriteViewer = document.getElementById('sprite-viewer');
-const spriteScroller = document.querySelector('.sprite-scroller');
+const spriteViewer = document.getElementById('sprite-viewer')!;
+const spriteScroller = document.querySelector('.sprite-scroller')!;
 const switchSR = document.getElementById('switch-shy-reg') as HTMLInputElement;
 
 export function initSpriteViewer() {
@@ -19,7 +19,7 @@ export async function openSpriteViewer(dexid: number, event: { clientX: number, 
   // Coordonnées du clic qui ouvre la visionneuse
   let originX: number, originY: number;
   if (event.clientX === 0 && event.clientY === 0) {
-    const rect = document.querySelector('.pkspr.pokemon[data-dexid="' + dexid + '"]').getBoundingClientRect();
+    const rect = document.querySelector('.pkspr.pokemon[data-dexid="' + dexid + '"]')!.getBoundingClientRect();
     originX = rect.x;
     originY = rect.y;
   } else {
@@ -45,9 +45,9 @@ export async function openSpriteViewer(dexid: number, event: { clientX: number, 
         })
         .then(() => {
           const img = spriteViewer.querySelector(`img[data-src="${e}"]`) as HTMLImageElement;
-          img.src = img.dataset.src;
+          img.src = img.dataset.src || '';
           img.removeAttribute('data-src');
-          img.parentElement.classList.remove('loading');
+          img.parentElement!.classList.remove('loading');
         });
       });
     } catch(error) {}
@@ -95,8 +95,8 @@ export async function closeSpriteViewer() {
 
 async function fillSpriteViewer(dexid: number) {
   const pokemon = new Pokemon(await pokemonData.getItem(String(dexid)));
-  const imagesShiny = [];
-  const imagesRegular = [];
+  const imagesShiny: string[] = [];
+  const imagesRegular: string[] = [];
   const nomFormeNormale = 'Normale';
 
   // On réordonne les formes (normale d'abord, les autres ensuite)
@@ -114,11 +114,11 @@ async function fillSpriteViewer(dexid: number) {
 
   // On place les sprites shiny
   formes.forEach(forme => {
-    const sprite = pokemon.getSprite(forme, { shiny: true, big: true });
+    const sprite = pokemon.getSprite(forme, { shiny: true, size: 512, format: Params.preferredImageFormat });
     imagesShiny.push(sprite);
   });
 
-  const listeShiny = document.querySelector('.sprite-list.shiny');
+  const listeShiny = document.querySelector('.sprite-list.shiny')!;
   listeShiny.innerHTML = '';
   imagesShiny.forEach((sprite, k) => {
     const forme = formes[k];
@@ -141,11 +141,11 @@ async function fillSpriteViewer(dexid: number) {
 
   // On place les sprites normaux
   formes.forEach(forme => {
-    const sprite = pokemon.getSprite(forme, { shiny: false, big: true });
+    const sprite = pokemon.getSprite(forme, { shiny: false, size: 512, format: Params.preferredImageFormat });
     imagesRegular.push(sprite);
   });
 
-  const listeRegular = document.querySelector('.sprite-list.regular');
+  const listeRegular = document.querySelector('.sprite-list.regular')!;
   listeRegular.innerHTML = '';
   imagesRegular.forEach((sprite, k) => {
     const forme = formes[k];
@@ -166,8 +166,8 @@ async function fillSpriteViewer(dexid: number) {
   });
 
   // On place le numéro et nom
-  document.querySelector('.info-dexid').innerHTML = pad(String(pokemon.dexid), 3);
-  document.querySelector('.info-nom').innerHTML = pokemon.namefr;
+  document.querySelector('.info-dexid')!.innerHTML = pad(String(pokemon.dexid), 3);
+  document.querySelector('.info-nom')!.innerHTML = pokemon.namefr;
 
   //return Promise.resolve([...imagesShiny, ...imagesRegular]);
   return Promise.resolve({ shiny: imagesShiny, regular: imagesRegular });

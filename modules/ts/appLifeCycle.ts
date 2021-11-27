@@ -1,5 +1,5 @@
 import { appPopulate, appDisplay } from './appContent.js';
-import { recalcOnResize, version2date, wait, getVersionSprite, initStyleSheets, adoptStyleSheets } from './Params.js';
+import { recalcOnResize, version2date, wait, getVersionSprite, initStyleSheets, adoptStyleSheets, webpSupport, setTheme, Params } from './Params.js';
 import { notify, unNotify } from './notification.js';
 import { dataStorage, shinyStorage, huntStorage, pokemonData } from './localforage.js';
 import { upgradeStorage } from './upgradeStorage.js';
@@ -53,6 +53,9 @@ export async function appStart() {
     let dataInstalled = false;
     let serviceWorkerReady = navigator.serviceWorker.controller != null;
 
+    // On initialise supportsWebp
+    if (await webpSupport()) Params.preferredImageFormat = 'webp';
+
     // On vérifie si les données sont installées
     await Promise.all([dataStorage.ready(), shinyStorage.ready(), pokemonData.ready(), huntStorage.ready()]);
     const installedVersion = await dataStorage.getItem('version-fichiers');
@@ -96,9 +99,17 @@ export async function appStart() {
     const onlineBackup = await dataStorage.getItem('online-backup');
     if (onlineBackup) await waitBackup();
 
-    // ÉTAPE 3.97 : on applique les stylesheets
+    // ÉTAPE 3.97 : on applique les stylesheets et le thème
     await initStyleSheets();
     adoptStyleSheets(undefined, ['materialIcons', 'iconsheet', 'pokesprite']);
+    await setTheme();
+    try {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => setTheme(undefined));
+      window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', event => setTheme(undefined));
+    } catch (e) {
+      window.matchMedia('(prefers-color-scheme: dark)').addListener(event => setTheme(undefined));
+      window.matchMedia('(prefers-color-scheme: light)').addListener(event => setTheme(undefined));
+    }
 
     // ÉTAPE 3.98 : si des shiny marqués à 'destroy' sont stockés, on les supprime
     const shinyKeys = await shinyStorage.keys();
@@ -297,9 +308,23 @@ export async function checkUpdate(checkNotification = false)
 
 /////////////////////////////////////////
 // Vérifie si l'appli peut être installée
-function checkInstall()
-{
-  let installPrompt: BeforeInstallPromptEvent;
+interface BeforeInstallPromptEvent extends Event {
+  readonly platforms: Array<string>;
+  readonly userChoice: Promise<{
+    outcome: 'accepted' | 'dismissed',
+    platform: string
+  }>;
+  prompt(): Promise<void>;
+}
+
+declare global {
+  interface WindowEventMap {
+    beforeinstallprompt: BeforeInstallPromptEvent;
+  }
+}
+
+function checkInstall() {
+  let installPrompt: BeforeInstallPromptEvent | null;
   const installBouton = document.getElementById('install-bouton')!;
 
   window.addEventListener('beforeinstallprompt', (e: BeforeInstallPromptEvent) => {
@@ -309,6 +334,7 @@ function checkInstall()
 
     installBouton.addEventListener('click', e => {
       installBouton.classList.remove('on');
+      if (installPrompt == null) return;
       installPrompt.prompt();
       installPrompt.userChoice
       .then(choix => {

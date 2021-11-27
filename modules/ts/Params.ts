@@ -30,6 +30,7 @@ export const Params = {
 
   spriteSize: 112,
   spriteRegex: /sprites--(.+).php/,
+  preferredImageFormat: <'webp' | 'png'> 'png',
 
   owidth: 0,
   oheight: 0,
@@ -271,4 +272,39 @@ export async function webpSupport(): Promise<boolean> {
   }));
   
   return results.every(r => r === true);
+}
+
+
+//////////////////////
+// Définition du thème
+export async function setTheme(askedTheme?: string) {
+  // Thème sélectionné par l'utilisateur
+  await dataStorage.ready();
+  const userTheme = await dataStorage.getItem('theme');
+
+  // Thème préféré selon l'OS
+  let osTheme;
+  if (window.matchMedia('(prefers-color-scheme: dark)').matches) osTheme = 'dark';
+  else if (window.matchMedia('(prefers-color-scheme: light)').matches) osTheme = 'light';
+
+  // Thème exigé par la fonction
+  const forcedTheme = (askedTheme === 'system') ? osTheme : askedTheme;
+
+  // Thème par défaut
+  const defaultTheme = 'dark';
+
+  // On applique le thème (forcedTheme > userTheme > osTheme > defaultTheme)
+  const theme = forcedTheme || userTheme || osTheme || defaultTheme;
+  const storedTheme = (askedTheme === 'system') ? null : (forcedTheme || userTheme);
+
+  let html = document.documentElement;
+  html.classList.remove('light', 'dark');
+  html.classList.add(theme);
+  
+  let themeColor = (theme == 'dark') ? 'rgb(34, 34, 34)' : 'rgb(224, 224, 224)';
+  document.querySelector("meta[name=theme-color]")!.setAttribute('content', themeColor);
+
+  window.dispatchEvent(new CustomEvent('themechange', { detail: { theme } }));
+
+  return await dataStorage.setItem('theme', storedTheme);
 }

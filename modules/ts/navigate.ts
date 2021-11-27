@@ -18,7 +18,7 @@ export async function navigate(sectionCible: string, position = 0, historique = 
   // Pré-chargement des images de la nouvelle section
   const listeImages = ['./ext/pokesprite.png'];
   if (sectionCible == 'mes-chromatiques') {
-    const versionSprite = document.documentElement.style.getPropertyValue('--link-sprites').match(/[0-9]+/)[0];
+    const versionSprite = document.documentElement.style.getPropertyValue('--link-sprites').match(/[0-9]+/)?.[0] || '0';
     listeImages.push(`./sprites--${versionSprite}.php`, './images/iconsheet.png');
   }
 

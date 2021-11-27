@@ -1,4 +1,4 @@
-import { Pokemon, Shiny, frontendShiny } from './Pokemon.js';
+import { Pokemon, Shiny, frontendShiny, Forme, Methode } from './Pokemon.js';
 import { notify } from './notification.js';
 import { Params } from './Params.js';
 import { navigate } from './navigate.js';
@@ -9,7 +9,7 @@ import { huntStorage, shinyStorage, pokemonData, dataStorage } from './localfora
 
 
 // Structure d'un Pokémon en cours de chasse tel que stocké dans la BDD locale
-export interface huntedPokemon extends Omit<frontendShiny, 'id'> {
+export interface huntedPokemon extends Omit<frontendShiny, 'id' | 'destroy'> {
   caught: boolean,
   uploaded: boolean,
 }
@@ -31,18 +31,18 @@ export class Hunt implements huntedPokemon {
   charm: boolean = false;
   hacked: number = 0;
   horsChasse: boolean = false;
+  deleted: boolean = false;
   caught: boolean = false;
   uploaded: boolean = false;
   
-  constructor(pokemon?: huntedPokemon) {
-    for (const key of Object.keys(pokemon)) {
-      this[key] = pokemon[key];
-    }
+  constructor(pokemon?: frontendShiny) {
+    if (pokemon == null) return;
+    Object.assign(this, pokemon);
   }
 
   static async build(pokemon?: huntedPokemon, start: boolean = false) {
     const hunt = new Hunt(pokemon);
-    await huntStorage.setItem(String(pokemon.huntid), hunt);
+    await huntStorage.setItem(String(pokemon?.huntid || hunt.huntid), hunt);
     await hunt.buildHunt(start);
     return hunt;
   }
@@ -59,11 +59,11 @@ export class Hunt implements huntedPokemon {
     }
 
     for (const el of Array.from(card.querySelectorAll('[for^="hunt-{id}"]'))) {
-      el.setAttribute('for', el.getAttribute('for').replace('{id}', String(this.huntid)));
+      el.setAttribute('for', (el.getAttribute('for') || '').replace('{id}', String(this.huntid)));
     }
 
     for (const el of Array.from(card.querySelectorAll('[name^="hunt-{id}"]'))) {
-      el.setAttribute('name', el.getAttribute('name').replace('{id}', String(this.huntid)));
+      el.setAttribute('name', (el.getAttribute('name') || '').replace('{id}', String(this.huntid)));
     }
 
     const k = await shinyStorage.getItem(String(this.huntid));
@@ -71,8 +71,8 @@ export class Hunt implements huntedPokemon {
     if (edit) card.classList.add('edit');
 
     // Active le bouton "compteur++";
-    const boutonAdd = card.querySelector('.bouton-compteur.add');
-    const boutonSub = card.querySelector('.bouton-compteur.sub');
+    const boutonAdd = card.querySelector('.bouton-compteur.add')!;
+    const boutonSub = card.querySelector('.bouton-compteur.sub')!;
     const inputCompteur = card.querySelector('input[id$="-compteur"]') as HTMLInputElement;
 
     boutonAdd.addEventListener('click', async event => {
@@ -92,15 +92,15 @@ export class Hunt implements huntedPokemon {
     });
 
     // Active le bouton "shiny capturé"
-    const boutonCaught = card.querySelector('.bouton-hunt-caught');
+    const boutonCaught = card.querySelector('.bouton-hunt-caught')!;
     boutonCaught.addEventListener('click', async event => {
       event.preventDefault();
-      boutonCaught.parentElement.parentElement.classList.toggle('caught');
+      boutonCaught.parentElement!.parentElement!.classList.toggle('caught');
       const inputDate = card.querySelector('input[type="date"]') as HTMLInputElement;
 
       if (inputDate.value == '') inputDate.value = new Date().toISOString().split('T')[0];
-      if (boutonCaught.parentElement.parentElement.classList.contains('caught')) this.caught = true;
-      else                                                                       this.caught = false;
+      if (boutonCaught.parentElement!.parentElement!.classList.contains('caught')) this.caught = true;
+      else                                                                         this.caught = false;
 
       await this.updateHunt();
     });
@@ -109,11 +109,11 @@ export class Hunt implements huntedPokemon {
     const boutonEffacer = card.querySelector('.bouton-hunt-remove');
     const boutonAnnuler = card.querySelector('.bouton-hunt-edit');
 
-    for (const bouton of [boutonEffacer, boutonAnnuler]) {
+    for (const bouton of [boutonEffacer, boutonAnnuler] as HTMLButtonElement[]) {
       bouton.addEventListener('click', async event => {
         event.preventDefault();
   
-        const span = bouton.querySelector('span');
+        const span = bouton.querySelector('span')!;
         if (span.innerHTML == 'Supprimer' || span.innerHTML == 'Annuler') {
           span.innerHTML = 'Vraiment ?';
           setTimeout(() => span.innerHTML = 'Supprimer', 3000);
@@ -124,13 +124,13 @@ export class Hunt implements huntedPokemon {
     }
 
     // Active le bouton "enregistrer"
-    const boutonSubmit = card.querySelector('.bouton-hunt-submit');
+    const boutonSubmit = card.querySelector('.bouton-hunt-submit')!;
     boutonSubmit.addEventListener('click', async event => {
       event.preventDefault();
 
       if (!navigator.onLine) return notify('Pas de connexion internet');
 
-      const span = boutonSubmit.querySelector('span');
+      const span = boutonSubmit.querySelector('span')!;
       if (span.innerHTML == 'Enregistrer') {
         // Gestion des erreurs de formulaire
         const erreurs = [];
@@ -157,14 +157,14 @@ export class Hunt implements huntedPokemon {
     });
 
     // Active le bouton "supprimer"
-    const boutonSupprimer = card.querySelector('.bouton-hunt-eraseDB');
+    const boutonSupprimer = card.querySelector('.bouton-hunt-eraseDB')!;
     boutonSupprimer.addEventListener('click', async event => {
       event.preventDefault();
 
       if (!edit) return notify('Cette chasse n\'est pas dans la base de données');
       if (!navigator.onLine) return notify('Pas de connexion internet');
 
-      const span = boutonSupprimer.querySelector('span');
+      const span = boutonSupprimer.querySelector('span')!;
       if (span.innerHTML == 'Supprimer') {
         span.innerHTML = 'Vraiment ?';
         setTimeout(() => span.innerHTML = 'Supprimer', 3000);
@@ -176,8 +176,8 @@ export class Hunt implements huntedPokemon {
     // Détecte les modifications du formulaire
     card.addEventListener('input', async () => await this.updateHunt());
 
-    document.querySelector('#chasses-en-cours>.section-contenu').appendChild(card);
-    document.querySelector('#chasses-en-cours').classList.remove('vide');
+    document.querySelector('#chasses-en-cours>.section-contenu')!.appendChild(card);
+    document.querySelector('#chasses-en-cours')!.classList.remove('vide');
 
     // Animation de la carte
     if (this.dexid == 0) {
@@ -191,7 +191,7 @@ export class Hunt implements huntedPokemon {
       });
 
       const height = card.getBoundingClientRect().height;
-      document.querySelector('#chasses-en-cours>.section-contenu').animate([
+      document.querySelector('#chasses-en-cours>.section-contenu')!.animate([
         { transform: 'translate3D(0, -' + height + 'px, 0)' },
         { transform: 'translate3D(0, 0, 0)' }
       ], {
@@ -253,7 +253,7 @@ export class Hunt implements huntedPokemon {
     });
 
     // Génère la liste des méthodes au choix du jeu
-    const inputJeu = card.querySelector('[list=datalist-jeux]');
+    const inputJeu = card.querySelector('[list=datalist-jeux]')!;
     inputJeu.addEventListener('input', () => this.genereMethodes());
 
     if (this.caught) card.classList.add('caught');
@@ -268,10 +268,10 @@ export class Hunt implements huntedPokemon {
   // Génère la liste des formes à partir du Pokémon entré
   async genereFormes()
   {
-    const card = document.getElementById('hunt-' + this.huntid);
+    const card = document.getElementById('hunt-' + this.huntid)!;
     const inputEspece = card.querySelector('[list="datalist-pokedex"]') as HTMLInputElement;
     const idFormes = inputEspece.id.replace('espece', 'forme');
-    const select = document.getElementById(idFormes);
+    const select = document.getElementById(idFormes)!;
     select.innerHTML = '';
 
     const allNames = await Pokemon.namesfr();
@@ -280,7 +280,7 @@ export class Hunt implements huntedPokemon {
       return 'Pokémon inexistant';
     else {
       const pkmn = await pokemonData.getItem(String(k));
-      const formes = pkmn.formes.slice().sort((a, b) => { if (a.nom == '') return -1; else return 0;});
+      const formes: Forme[] = pkmn.formes.slice().sort((a: Forme, b: Forme) => { if (a.nom == '') return -1; else return 0;});
       formes.forEach(forme => {
         if (forme.noShiny == true)
           return;
@@ -296,17 +296,17 @@ export class Hunt implements huntedPokemon {
   // Génère la liste des méthodes à partir du jeu entré
   genereMethodes()
   {
-    const card = document.getElementById('hunt-' + this.huntid);
+    const card = document.getElementById('hunt-' + this.huntid)!;
     const inputJeu = card.querySelector('[list=datalist-jeux]') as HTMLInputElement;
     const idMethodes = inputJeu.id.replace('jeu', 'methode');
-    const select = document.getElementById(idMethodes);
+    const select = document.getElementById(idMethodes)!;
     select.innerHTML = '';
 
     const k = Pokemon.jeux.findIndex(jeu => jeu.nom == inputJeu.value);
     if (k == -1)
       return 'Jeu inexistant';
     else {
-      const methodes = [];
+      const methodes: Methode[] = [];
       Shiny.allMethodes.forEach(methode => {
         const k = methode.jeux.findIndex(jeu => jeu.nom == inputJeu.value);
         if (k != -1)
@@ -321,7 +321,7 @@ export class Hunt implements huntedPokemon {
 
   // Met à jour l'objet Hunt à partir des modifications faites au formulaire
   async updateHunt() {
-    const card = document.getElementById('hunt-' + this.huntid);
+    const card = document.getElementById('hunt-' + this.huntid)!;
 
     const allNames = await Pokemon.namesfr();
     let k = allNames.findIndex(p => p == (document.getElementById(`hunt-${this.huntid}-espece`) as HTMLInputElement).value);
@@ -374,7 +374,7 @@ export class Hunt implements huntedPokemon {
 
   // Met à jour le sprite
   async updateSprite() {
-    const card = document.getElementById('hunt-' + this.huntid);
+    const card = document.getElementById('hunt-' + this.huntid)!;
     const sprite = card.querySelector('.pokemon-sprite') as HTMLElement;
     const displayShiny = card.classList.contains('edit') || this.caught;
 
@@ -382,15 +382,15 @@ export class Hunt implements huntedPokemon {
     const formes = pkmn.formes;
     const k = formes.findIndex(forme => forme.dbid == this.formid);
     const forme = formes[k];
-    if (k != -1) sprite.style.setProperty('--sprite', `url('${pkmn.getSprite(forme, { shiny: displayShiny, big: false })}')`);
-    else         sprite.style.setProperty('--sprite', `url('${pkmn.getSprite(formes[0], { shiny: displayShiny, big: false })}')`);
+    if (k != -1) sprite.style.setProperty('--sprite', `url('${pkmn.getSprite(forme, { shiny: displayShiny, size: 112, format: Params.preferredImageFormat })}')`);
+    else         sprite.style.setProperty('--sprite', `url('${pkmn.getSprite(formes[0], { shiny: displayShiny, size: 112, format: Params.preferredImageFormat })}')`);
   }
 
 
   // Met à jour l'icône de jeu
   updateJeu() {
-    const card = document.getElementById('hunt-' + this.huntid);
-    const icone = card.querySelector('.icones.jeu');
+    const card = document.getElementById('hunt-' + this.huntid)!;
+    const icone = card.querySelector('.icones.jeu')!;
 
     const k = Pokemon.jeux.findIndex(jeu => jeu.nom == this.jeu);
     if (k != -1) icone.classList.add(this.jeu.replace(/[ \']/g, ''));
@@ -400,8 +400,8 @@ export class Hunt implements huntedPokemon {
 
   // Met à jour l'icône de la Ball
   updateBall() {
-    const card = document.getElementById('hunt-' + this.huntid);
-    const icone = card.querySelector('.ball>.pkspr');
+    const card = document.getElementById('hunt-' + this.huntid)!;
+    const icone = card.querySelector('.ball>.pkspr')!;
 
     icone.className = `pkspr item ball-${this.ball}`;
   }
@@ -412,13 +412,13 @@ export class Hunt implements huntedPokemon {
     const k = await huntStorage.getItem(String(this.huntid));
     if (k == null) throw 'Chasse inexistante';
 
-    const card = document.getElementById('hunt-' + this.huntid);
+    const card = document.getElementById('hunt-' + this.huntid)!;
     card.remove();
 
     await huntStorage.removeItem(String(this.huntid));
 
     const keys = await huntStorage.keys();
-    if (keys.length == 0) document.querySelector('#chasses-en-cours').classList.add('vide');
+    if (keys.length == 0) document.querySelector('#chasses-en-cours')!.classList.add('vide');
   }
 
 
@@ -498,7 +498,7 @@ export class Hunt implements huntedPokemon {
 
 ////////////////////////////////////////////////////////////
 // Créer une chasse pour mettre à jour une carte dans la BDD
-export async function editHunt(id, nav = true) {
+export async function editHunt(id: number, nav = true) {
   let k = await huntStorage.getItem(String(id));
   if (k != null) {
     const message = 'Cette chasse est déjà en cours d\'édition.';
@@ -541,7 +541,7 @@ export async function initHunts() {
   // On génère les chasses restantes
   const keys = await huntStorage.keys();
   if (keys.length == 0)
-    document.querySelector('#chasses-en-cours').classList.add('vide');
+    document.querySelector('#chasses-en-cours')!.classList.add('vide');
   else
     keys.forEach(async k => Hunt.build(await huntStorage.getItem(k), true));
 }
@@ -549,7 +549,7 @@ export async function initHunts() {
 
 // Crée la datalist Jeux
 function initGamesDatalist() {
-  const datalistJeux = document.getElementById('datalist-jeux');
+  const datalistJeux = document.getElementById('datalist-jeux')!;
   Pokemon.jeux.forEach(jeu => {
     datalistJeux.innerHTML += `<option value="${jeu.nom}">`;
   });

@@ -1,11 +1,11 @@
-import { Shiny } from './Pokemon.js';
+import { Methode, Shiny } from './Pokemon.js';
 import { editHunt } from './Hunt.js';
 import { Params, wait } from './Params.js';
 
 
 
-let currentCard;
-let charmlessMethods;
+let currentCardId: string | null;
+let charmlessMethods: string[];
 let longClic = false;
 
 const template = document.createElement('template');
@@ -80,41 +80,41 @@ export class pokemonCard extends HTMLElement {
 
     notes: {
       if (!toUpdate.includes('notes')) break notes;
-      card.querySelector('.pokemon-notes__texte').innerHTML = this.getAttribute('notes');
+      card.querySelector('.pokemon-notes__texte')!.innerHTML = this.getAttribute('notes') || '';
 
-      if (!this.getAttribute('notes').includes('Gigamax'))
-        card.querySelector('.gigamax').classList.add('off');
+      if (!this.getAttribute('notes')!.includes('Gigamax'))
+        card.querySelector('.gigamax')!.classList.add('off');
       else
-        card.querySelector('.gigamax').classList.remove('off');
+        card.querySelector('.gigamax')!.classList.remove('off');
     }
 
     surnom: {
       if (!toUpdate.includes('surnom')) break surnom;
-      card.querySelector('.pokemon-surnom').innerHTML = this.getAttribute('surnom');
+      card.querySelector('.pokemon-surnom')!.innerHTML = this.getAttribute('surnom') || '';
     }
 
     espece: {
       if (!toUpdate.includes('espece') && !toUpdate.includes('surnom')) break espece;
-      card.querySelector('.pokemon-espece').innerHTML = this.getAttribute('espece');
+      card.querySelector('.pokemon-espece')!.innerHTML = this.getAttribute('espece') || '';
       const surnom = this.getAttribute('surnom') || '';
       if (surnom == '' || surnom.toLowerCase() == this.getAttribute('espece'))
-        card.querySelector('.pokemon-infos__nom').classList.add('no-surnom');
+        card.querySelector('.pokemon-infos__nom')!.classList.add('no-surnom');
       else
-        card.querySelector('.pokemon-infos__nom').classList.remove('no-surnom');
+        card.querySelector('.pokemon-infos__nom')!.classList.remove('no-surnom');
     }
 
     jeu: {
       if (!toUpdate.includes('jeu')) break jeu;
-      card.querySelector('.icones.jeu').className = 'icones jeu';
-      card.querySelector('.icones.jeu').classList.add(this.getAttribute('jeu'));
+      card.querySelector('.icones.jeu')!.className = 'icones jeu';
+      card.querySelector('.icones.jeu')!.classList.add(this.getAttribute('jeu') || '');
     }
 
     ball: {
       if (!toUpdate.includes('ball')) break ball;
-      const element = card.querySelector('.pokemon-ball');
+      const element = card.querySelector('.pokemon-ball')!;
       const baseClassList = 'pkspr pokemon-ball';
       element.className = baseClassList;
-      if (this.getAttribute('ball') != null) element.classList.add(this.getAttribute('ball'));
+      if (this.getAttribute('ball') != null) element.classList.add(this.getAttribute('ball') || '');
       else element.classList.add('off');
       element.classList.add('item', 'ball-' + this.getAttribute('ball'));
     }
@@ -122,20 +122,20 @@ export class pokemonCard extends HTMLElement {
     monjeu: {
       if (!toUpdate.includes('monjeu')) break monjeu;
       if (this.getAttribute('monjeu') == null)
-        card.querySelector('.icones.mine').classList.add('off');
+        card.querySelector('.icones.mine')!.classList.add('off');
       else
-        card.querySelector('.icones.mine').classList.remove('off');
+        card.querySelector('.icones.mine')!.classList.remove('off');
     }
 
     methode: {
       if (!toUpdate.includes('methode')) break methode;
-      card.querySelector('.capture-methode').innerHTML = this.getAttribute('methode');
+      card.querySelector('.capture-methode')!.innerHTML = this.getAttribute('methode') || '';
     }
 
     compteur: {
       if (!toUpdate.includes('methode') && !toUpdate.includes('compteur')) break compteur;
       const compteur = Number(this.getAttribute('compteur'));
-      const element = card.querySelector('.methode-compteur');
+      const element = card.querySelector('.methode-compteur')!;
       element.innerHTML = '<span class="icones explain oeuf"></span>';
       if (this.getAttribute('methode') == 'Masuda' && compteur > 0) {
         element.innerHTML += compteur;
@@ -151,8 +151,8 @@ export class pokemonCard extends HTMLElement {
       const shinyRate = Number(this.getAttribute('shiny-rate'));
       const charm = Boolean(this.getAttribute('charm')) || null;
 
-      if (charmlessMethods == null) charmlessMethods = Shiny.methodes('charmless');
-      if (charm === true && !charmlessMethods.includes(this.getAttribute('methode')))
+      if (charmlessMethods == null) charmlessMethods = Shiny.methodes('charmless').map(m => m.nom);
+      if (charm === true && !charmlessMethods.includes(this.getAttribute('methode') || ''))
         shinyRateBox.classList.add('with-charm');
 
       if (shinyRate == null)
@@ -160,7 +160,7 @@ export class pokemonCard extends HTMLElement {
       else
         shinyRateBox.classList.remove('off');
 
-      card.querySelector('.shiny-rate-text.denominator').innerHTML = String(shinyRate) || '???';
+      card.querySelector('.shiny-rate-text.denominator')!.innerHTML = String(shinyRate) || '???';
 
       shinyRateBox.classList.remove('full-odds', 'charm-ods', 'one-odds');
       if (charm == null && [8192, 4096].includes(shinyRate))
@@ -180,13 +180,13 @@ export class pokemonCard extends HTMLElement {
     random: {
       if (!toUpdate.includes('random')) break random;
       if (this.getAttribute('random') == null)
-        card.querySelector('.icones.lucky').remove();
+        card.querySelector('.icones.lucky')!.remove();
     }
 
     checkmark: {
       if (!toUpdate.includes('checkmark')) break checkmark;
       const checkmark = this.getAttribute('checkmark');
-      const element = card.querySelector('.icones.checkmark');
+      const element = card.querySelector('.icones.checkmark')!;
       element.className = 'icones explain checkmark';
       let origin: string;
       switch (Number(checkmark)) {
@@ -211,7 +211,7 @@ export class pokemonCard extends HTMLElement {
     hacked: {
       if (!toUpdate.includes('hacked')) break hacked;
       const hacked = Number(this.getAttribute('hacked'));
-      const element = card.querySelector('.icones.hacked');
+      const element = card.querySelector('.icones.hacked')!;
       element.className = 'icones explain hacked';
       let origin: string;
       switch (hacked) {
@@ -231,12 +231,12 @@ export class pokemonCard extends HTMLElement {
       if (!toUpdate.includes('date')) break date;
       const date = this.getAttribute('date');
       if (date != '1000-01-01') {
-        card.querySelector('.pokemon-infos__capture').classList.remove('no-date');
-        card.querySelector('.capture-date').innerHTML = new Intl.DateTimeFormat('fr-FR', {day: 'numeric', month: 'short', year: 'numeric'})
-                                                                .format(new Date(this.getAttribute('date')));
+        card.querySelector('.pokemon-infos__capture')!.classList.remove('no-date');
+        card.querySelector('.capture-date')!.innerHTML = new Intl.DateTimeFormat('fr-FR', {day: 'numeric', month: 'short', year: 'numeric'})
+                                                                 .format(new Date(this.getAttribute('time-capture') || ''));
       }
       else
-        card.querySelector('.pokemon-infos__capture').classList.add('no-date');
+        card.querySelector('.pokemon-infos__capture')!.classList.add('no-date');
     }
   }
 
@@ -245,25 +245,25 @@ export class pokemonCard extends HTMLElement {
     const huntid = this.getAttribute('huntid');
 
     // On ferme la carte déjà ouverte
-    if (currentCard != null)
-      document.getElementById(`pokemon-card-${currentCard}`).removeAttribute('open');
+    if (currentCardId != null)
+      document.getElementById(`pokemon-card-${currentCardId}`)!.removeAttribute('open');
 
     // Si la carte demandée n'est pas celle qu'on vient de fermer, on l'ouvre
-    if (huntid != currentCard)
+    if (huntid != currentCardId)
     {
       this.setAttribute('open', 'true');
-      currentCard = huntid;
+      currentCardId = huntid;
     }
     else
-      currentCard = null;
+      currentCardId = null;
   }
 
   // Créer une chasse pour éditer un shiny au long clic sur une carte
-  async makeEdit(event) {
+  async makeEdit(event: Event) {
     let act = true;
     const card = this;
 
-    const editIcon = card.querySelector('.edit-icon');
+    const editIcon = card.querySelector('.edit-icon')!;
     let appear = editIcon.animate([
       { opacity: '0' },
       { opacity: '1' }
@@ -273,7 +273,7 @@ export class pokemonCard extends HTMLElement {
       fill: 'forwards'
     });
     appear.pause();
-    const circle = editIcon.querySelector('.edit-icon circle');
+    const circle = editIcon.querySelector('.edit-icon circle')!;
     let anim = circle.animate([
       { strokeDashoffset: '157' },
       { strokeDashoffset: '0' }
@@ -308,7 +308,7 @@ export class pokemonCard extends HTMLElement {
     await new Promise(resolve => anim.addEventListener('finish', resolve));
 
     if (!act) return;
-    let ready = await editHunt(parseInt(this.getAttribute('huntid')));
+    let ready = await editHunt(parseInt(this.getAttribute('huntid') || ''));
     ready = (ready != false);
     appear.cancel(); anim.cancel();
     if (ready) longClic = false;
@@ -324,7 +324,7 @@ export class pokemonCard extends HTMLElement {
     this.updateCard();
   }
 
-  attributeChangedCallback(name, oldValue, newValue) {
+  attributeChangedCallback(name: string, oldValue: string, newValue: string) {
     if (oldValue == newValue) return;
     this.updateCard([name]);
   }
