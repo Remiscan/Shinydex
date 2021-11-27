@@ -2,6 +2,7 @@ import { appPopulate, appDisplay } from './appContent.js';
 import { recalcOnResize, version2date, wait, getVersionSprite, initStyleSheets, adoptStyleSheets } from './Params.js';
 import { notify, unNotify } from './notification.js';
 import { dataStorage, shinyStorage, huntStorage, pokemonData } from './localforage.js';
+import { upgradeStorage } from './upgradeStorage.js';
 
 
 
@@ -55,23 +56,18 @@ export async function appStart() {
     // On vérifie si les données sont installées
     await Promise.all([dataStorage.ready(), shinyStorage.ready(), pokemonData.ready(), huntStorage.ready()]);
     const installedVersion = await dataStorage.getItem('version-fichiers');
-    if (installedVersion !== null)
-      dataInstalled = true;
+    if (installedVersion !== null) dataInstalled = true;
 
     // On vérifie si les fichiers sont installés
     const keys = await caches.keys();
     const trueKeys = keys.filter(e => e.includes('remidex-sw-' + installedVersion));
-    if (trueKeys.length >= 1)
-      filesInstalled = true;
+    if (trueKeys.length >= 1) filesInstalled = true;
 
-    if (filesInstalled && dataInstalled && serviceWorkerReady)
-    {
+    if (filesInstalled && dataInstalled && serviceWorkerReady) {
       appCached = true;
       log = '[:)] L\'application est déjà installée localement.';
       initServiceWorker();
-    }
-    else
-    {
+    } else {
       appCached = false;
       throw '[:(] L\'application n\'est pas installée localement';
     }
@@ -114,6 +110,9 @@ export async function appStart() {
                .map(shiny => shiny.huntid)
                .map(huntid => shinyStorage.removeItem(String(huntid)))
     );
+
+    // ÉTAPE 3.99 : on met à jour la structure de la BDD locale si nécessaire
+    await upgradeStorage();
 
     // ÉTAPE 4 : on peuple l'application à partir des données locales
     log = await appPopulate();
