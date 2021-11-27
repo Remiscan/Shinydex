@@ -1,5 +1,4 @@
-import { Shiny } from './Pokemon.js';
-import { frontendShiny } from './Pokemon.js';
+import { frontendShiny, Shiny } from './Pokemon.js';
 import { pokemonCard } from './pokemonCard.component.js';
 
 

@@ -1,4 +1,4 @@
-import { dataStorage, shinyStorage, huntStorage, localForageAPI } from './localforage.js';
+import { dataStorage, huntStorage, localForageAPI, shinyStorage } from './localforage.js';
 
 
 declare global {

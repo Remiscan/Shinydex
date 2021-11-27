@@ -1,5 +1,5 @@
-import { Pokemon } from './Pokemon.js';
 import { dataStorage } from './localforage.js';
+import { Pokemon } from './Pokemon.js';
 import { pokemonCard } from './pokemonCard.component.js';
 
 

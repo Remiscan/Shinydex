@@ -1,7 +1,7 @@
-import { appPopulate, appDisplay } from './appContent.js';
-import { recalcOnResize, version2date, wait, getVersionSprite, initStyleSheets, adoptStyleSheets, webpSupport, setTheme, Params } from './Params.js';
+import { appDisplay, appPopulate } from './appContent.js';
+import { dataStorage, huntStorage, pokemonData, shinyStorage } from './localforage.js';
 import { notify, unNotify } from './notification.js';
-import { dataStorage, shinyStorage, huntStorage, pokemonData } from './localforage.js';
+import { adoptStyleSheets, getVersionSprite, initStyleSheets, Params, recalcOnResize, setTheme, version2date, wait, webpSupport } from './Params.js';
 import { upgradeStorage } from './upgradeStorage.js';
 
 

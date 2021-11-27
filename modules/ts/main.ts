@@ -1,17 +1,17 @@
-import './loadSpinner.component.js';
-import './pokemonCard.component.js';
-import './syncProgress.component.js';
-import { Params, changeAutoMaj, callResize, export2json, wait, loadAllImages } from './Params.js';
-import { navigate, sectionActuelle } from './navigate.js';
-import { playEasterEgg } from './easterEgg.js';
-import { appStart, checkUpdate, manualUpdate, setOnlineBackup, updateSprite, startBackup } from './appLifeCycle.js';
-import { appPopulate, appDisplay, json2import, populateAttemptsVersions, populateAttemptsObsolete, populateAttemptsModified } from './appContent.js';
-import { openFiltres, initFiltres } from './filtres.js';
-import { Hunt } from './Hunt.js';
-import { notify, unNotify } from './notification.js';
-import { initSpriteViewer } from './spriteViewer.js';
+import { appDisplay, appPopulate, json2import, populateAttemptsModified, populateAttemptsObsolete, populateAttemptsVersions } from './appContent.js';
+import { appStart, checkUpdate, manualUpdate, setOnlineBackup, startBackup } from './appLifeCycle.js';
 import { DexDatalist } from './DexDatalist.js';
-import { dataStorage, shinyStorage, huntStorage } from './localforage.js';
+import { playEasterEgg } from './easterEgg.js';
+import { initFiltres, openFiltres } from './filtres.js';
+import { Hunt } from './Hunt.js';
+import './loadSpinner.component.js';
+import { dataStorage, huntStorage, shinyStorage } from './localforage.js';
+import { navigate, sectionActuelle } from './navigate.js';
+import { notify, unNotify } from './notification.js';
+import { callResize, changeAutoMaj, export2json, wait } from './Params.js';
+import './pokemonCard.component.js';
+import { initSpriteViewer } from './spriteViewer.js';
+import './syncProgress.component.js';
 
 
 

@@ -1,7 +1,7 @@
-import { Params, loadAllImages, pad } from './Params.js';
-import { Pokemon } from './Pokemon.js';
-import { notify } from './notification.js';
 import { pokemonData } from './localforage.js';
+import { notify } from './notification.js';
+import { loadAllImages, pad, Params } from './Params.js';
+import { Pokemon } from './Pokemon.js';
 
 
 const spriteViewer = document.getElementById('sprite-viewer')!;

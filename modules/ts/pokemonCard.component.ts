@@ -1,6 +1,6 @@
-import { Methode, Shiny } from './Pokemon.js';
 import { editHunt } from './Hunt.js';
 import { Params, wait } from './Params.js';
+import { Shiny } from './Pokemon.js';
 
 
 

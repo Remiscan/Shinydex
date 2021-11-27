@@ -1,10 +1,10 @@
-import { Pokemon, Shiny, frontendShiny, Forme, Methode } from './Pokemon.js';
+import { startBackup } from './appLifeCycle.js';
+import { DexDatalist } from './DexDatalist.js';
+import { dataStorage, huntStorage, pokemonData, shinyStorage } from './localforage.js';
+import { navigate } from './navigate.js';
 import { notify } from './notification.js';
 import { Params } from './Params.js';
-import { navigate } from './navigate.js';
-import { DexDatalist } from './DexDatalist.js';
-import { startBackup } from './appLifeCycle.js';
-import { huntStorage, shinyStorage, pokemonData, dataStorage } from './localforage.js';
+import { Forme, frontendShiny, Methode, Pokemon, Shiny } from './Pokemon.js';
 
 
 

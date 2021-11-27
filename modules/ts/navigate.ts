@@ -1,8 +1,8 @@
-import { Params, loadAllImages, wait } from './Params.js';
+import { getNames } from './DexDatalist.js';
 import { playEasterEgg, prepareEasterEgg } from './easterEgg.js';
 import { closeFiltres, openFiltres } from './filtres.js';
+import { loadAllImages, Params } from './Params.js';
 import { closeSpriteViewer, openSpriteViewer } from './spriteViewer.js';
-import { getNames } from './DexDatalist.js';
 
 
 
