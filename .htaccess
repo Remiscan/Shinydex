@@ -16,11 +16,11 @@
 
     # Cache sprites (server from pokemon-sprite.php)
     # - of size 112 (used in shiny list) for 31 536 000 s = 1 year
-    <If "%{QUERY_STRING} =~ /format=(webp|png)&params=(.+?)&size=112/">
+    <If "%{QUERY_STRING} =~ /params=(.+?)&size=112&format=(webp|png)/">
         Header set Cache-Control "max-age=31536000, public"
     </If>
     # - of other sizes (e.g. used in Pokédex) for 2 630 000 s = 1 month
-    <ElseIf "%{QUERY_STRING} =~ /format=(webp|png)&params=(.+?)&size/">
+    <ElseIf "%{QUERY_STRING} =~ /params=(.+?)&size=([0-9]+?)&format=(webp|png)/">
         Header set Cache-Control "max-age=2630000, public"
     </ElseIf>
 
@@ -32,5 +32,4 @@ RewriteEngine On
 
 # Rewrite /remidex/sprite-{params}.webp to /remidex/backend/sprite.php?format=webp&params={params}
 # and /remidex/sprite-{params}.png to /remidex/backend/sprite.php?format=png&params={params}
-RewriteRule ^pokemon-sprite-(.*)-([0-9]+)\.webp$ backend/pokemon-sprite.php?format=webp&params=$1&size=$2 [l,QSA]
-RewriteRule ^pokemon-sprite-(.*)-([0-9]+)\.png$ backend/pokemon-sprite.php?format=png&params=$1&size=$2 [l,QSA]
+RewriteRule ^pokemon-sprite-(.*)-([0-9]+)\.(webp|png)$ backend/pokemon-sprite.php?params=$1&size=$2&format=$3 [l,QSA]
