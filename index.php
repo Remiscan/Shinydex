@@ -42,7 +42,7 @@
     <link rel="modulepreload" href="./modules/<?=$mod?>.js">
     <?php } ?>
 
-    <link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="./styles.css.php">
     <link rel="stylesheet" href="./ext/material-icons.css">
     <link rel="stylesheet" href="./ext/pokesprite.css">
     <link rel="stylesheet" href="./images/iconsheet.css">

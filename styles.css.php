@@ -2,7 +2,8 @@
 !!!!! ÉLÉMENTS GLOBAUX !!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
-html.light {
+/*<?php ob_start();?>*/
+:root[data-theme="light"] {
   --bg-color: rgb(224, 224, 224);
   --nav-bg-color: rgb(235, 235, 235);
   --nav-text-color: rgb(100, 100, 100);
@@ -34,7 +35,8 @@ html.light {
   --loading-bar-color: hsl(0, 0%, 37%);
   --card-edit-bg-color: rgba(240, 240, 240, .7);
 }
-html.dark {
+
+:root[data-theme="dark"] {
   --bg-color: rgb(34, 34, 34);
   --nav-bg-color: rgb(48, 48, 48);
   --nav-text-color: rgb(162, 166, 173);
@@ -66,6 +68,10 @@ html.dark {
   --loading-bar-color: hsl(0, 0%, 7%);
   --card-edit-bg-color: hsla(0, 0%, 7%, .7);
 }
+/*<?php $body = ob_get_clean();
+require_once $_SERVER['DOCUMENT_ROOT'] . '/_common/components/theme-selector/build-css.php';
+echo buildThemesStylesheet($body); ?>*/
+
 html {
   --link-iconsheet: url(/remidex/images/iconsheet.png);
   --link-pokesprite: url(/remidex/ext/pokesprite.png);

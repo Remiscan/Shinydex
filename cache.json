@@ -29,6 +29,6 @@
         "./modules/mod_spriteViewer.js",
         "./scripts.js",
         "./sprites.php",
-        "./styles.css"
+        "./styles.css.php"
     ]
 }
