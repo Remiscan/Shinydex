@@ -1,6 +1,7 @@
 ### No caching, leave it to service workers
 
 <IfModule mod_headers.c>
+
     <filesMatch "\.(jpg|jpeg|png|webp|gif|ico|svg|css|json|js|php|html)$">
         Header unset Cache-Control
         Header unset Last-Modified
@@ -8,10 +9,21 @@
         FileETag None
     </filesMatch>
 
-    # Still cache sprites for 2 628 000 s = 1 month
+    # Still cache sprites for 31 536 000 s = 1 year
     <filesMatch "^poke_(capture|icon)(.+)\.png$">
-        Header set Cache-Control "max-age=2628000, public"
+        Header set Cache-Control "max-age=31536000, public"
     </filesMatch>
+
+    # Cache sprites (server from pokemon-sprite.php)
+    # - of size 112 (used in shiny list) for 31 536 000 s = 1 year
+    <If "%{QUERY_STRING} =~ /format=(webp|png)&params=(.+?)&size=112/">
+        Header set Cache-Control "max-age=31536000, public"
+    </If>
+    # - of other sizes (e.g. used in Pokédex) for 2 630 000 s = 1 month
+    <ElseIf "%{QUERY_STRING} =~ /format=(webp|png)&params=(.+?)&size/">
+        Header set Cache-Control "max-age=2630000, public"
+    </ElseIf>
+
 </IfModule>
 
 ### Rewrite URLs
