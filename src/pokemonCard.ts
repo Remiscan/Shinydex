@@ -17,11 +17,11 @@ export async function updateCard(pokemon: frontendShiny, _card?: pokemonCard): P
 
   const conditionMien = shiny.mine;
 
-  let filtres = [];
-  if (conditionMien)
-    filtres.push('do:moi');
-  else
-    filtres.push('do:autre');
+  const filtres = new Map(emptyFiltres);
+
+  if (conditionMien) filtres.set('do', 'moi');
+  else               filtres.set('do', 'autre');
+  card.setAttribute('do')
   
   const card = _card as pokemonCard || document.createElement('pokemon-card');
   if (_card == null) {

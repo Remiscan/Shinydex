@@ -8,18 +8,10 @@ import './loadSpinner.component.js';
 import { dataStorage, huntStorage, shinyStorage } from './localforage.js';
 import { navigate, sectionActuelle } from './navigate.js';
 import { notify, unNotify } from './notification.js';
-import { callResize, changeAutoMaj, export2json, wait } from './Params.js';
+import { callResize, changeAutoMaj, export2json, wait, setTheme } from './Params.js';
 import './pokemonCard.component.js';
 import { initSpriteViewer } from './spriteViewer.js';
 import './syncProgress.component.js';
-
-
-
-declare global {
-  interface Window {
-    setTheme: (askedTheme: string | false) => Promise<void>
-  }
-}
 
 
 
@@ -62,14 +54,6 @@ document.querySelector('.obfuscator')!.addEventListener('click', () => history.b
 
 
 
-///////////////////
-// CHASSES EN COURS
-
-// Active le bouton de création de chasse
-//document.querySelector('.bouton-new-hunt').addEventListener('click', () => Hunt.build());
-
-
-
 /////////////
 // PARAMÈTRES
 
@@ -81,7 +65,7 @@ dataStorage.getItem('theme').then((theme?: string) => {
 });
 
 for (const input of Array.from(document.querySelectorAll('input[name=theme]')) as HTMLInputElement[]) {
-  input.onclick = async event => { return await window.setTheme(input.value); };
+  input.onclick = async event => { return await setTheme(input.value); };
 }
 
 // Active le switch des mises à jour auto

@@ -258,6 +258,11 @@ export class pokemonCard extends HTMLElement {
       currentCardId = null;
   }
 
+  // Vérifie si la carte correspond à un filtre
+  fitsFilter(filterid: string): boolean {
+    return JSON.parse(this.getAttribute('filtres') || '[]').includes(filterid);
+  }
+
   // Créer une chasse pour éditer un shiny au long clic sur une carte
   async makeEdit(event: Event) {
     let act = true;
