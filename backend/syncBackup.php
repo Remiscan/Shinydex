@@ -6,10 +6,10 @@ require_once './class_BDD.php';
 // ÉTAPES DU BACKUP DES DONNÉES LOCALES VERS LA BDD
 // ✅ JavaScript envoie les données locales au serveur
 // ✅ Le serveur récupère les données de la BDD
-// - Le serveur compare les données de la BDD et les données locales
-// - Le serveur détermine quelles données doivent être insérées / éditées dans la BDD
-// - Le serveur ajoute / éditer ce qui doit l'être
-// - Le serveur envoie une notification de succès ou d'échec à l'application
+// ✅ Le serveur compare les données de la BDD et les données locales
+//    et détermine quelles données doivent être insérées / éditées dans la BDD
+// ✅ Le serveur ajoute / éditer ce qui doit l'être
+// ✅ Le serveur envoie une notification de succès ou d'échec à l'application
 // FINI
 
 $error = false;
@@ -63,12 +63,12 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
       else {
         $pkmn = $onlineData[$r];
         // Données locales plus récentes que celles de la BDD en ligne
-        if ($pkmn['last_update'] < $shiny->{'last_update'}) {
+        if ($pkmn['lastUpdate'] < $shiny->{'lastUpdate'}) {
           $toUpdate[] = $key;
           $dataToCompare[] = $pkmn;
         }
         // Données en ligne plus récentes que celles de la BDD locale
-        elseif ($pkmn['last_update'] > $shiny->{'last_update'}) {
+        elseif ($pkmn['lastUpdate'] > $shiny->{'lastUpdate'}) {
           $dataToUpdateLocal[] = $pkmn;
           $dataToCompare[] = $pkmn;
         }
@@ -95,11 +95,11 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
       else {
         $pkmn = $onlineData[$r];
         // Données locales supprimées plus récemment que leur état dans la BDD
-        if ($pkmn['last_update'] < $shiny->{'last_update'}) {
+        if ($pkmn['lastUpdate'] < $shiny->{'lastUpdate'}) {
           $toDelete[] = $shiny->huntid;
         }
         // Données locales supprimées avant leur état actuel dans la BDD
-        elseif ($pkmn['last_update'] > $shiny->{'last_update'}) {
+        elseif ($pkmn['lastUpdate'] > $shiny->{'lastUpdate'}) {
           $dataToUpdateLocal[] = $pkmn;
         }
       }
@@ -112,26 +112,57 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
       $dataToInsert[] = $data;
 
       $insert = $link->prepare('INSERT INTO mes_shinies (
-        numero_national, forme, surnom, methode, compteur, date, jeu, ball, description, origin, monjeu, charm, hacked, aupif, huntid, last_update
+        huntid,
+        lastUpdate,
+        dexid,
+        formid,
+        surnom,
+        methode,
+        compteur,
+        timeCapture,
+        jeu,
+        ball,
+        notes,
+        checkmark,
+        DO,
+        charm,
+        hacked,
+        horsChasse
       ) VALUES (
-        :dexid, :forme, :surnom, :methode, :compteur, :date, :jeu, :ball, :description, :origin, :monjeu, :charm, :hacked, :aupif, :huntid, :lastupdate
+        :huntid,
+        :lastUpdate,
+        :dexid,
+        :formid,
+        :surnom,
+        :methode,
+        :compteur,
+        :timeCapture,
+        :jeu,
+        :ball,
+        :notes,
+        :checkmark,
+        :DO,
+        :charm,
+        :hacked,
+        :horsChasse
       )');
-      $insert->bindParam(':dexid', $data->{'numero_national'}, PDO::PARAM_INT, 4);
-      $insert->bindParam(':forme', $data->{'forme'}, PDO::PARAM_STR, 50);
+      $insert->bindParam(':huntid', $data->{'huntid'}, PDO::PARAM_STR, 13);
+      $insert->bindParam(':lastUpdate', $data->{'lastUpdate'}, PDO::PARAM_STR, 13);
+      $insert->bindParam(':dexid', $data->{'dexid'}, PDO::PARAM_INT, 4);
+      $insert->bindParam(':formid', $data->{'formid'}, PDO::PARAM_STR, 50);
       $insert->bindParam(':surnom', $data->{'surnom'}, PDO::PARAM_STR, 50);
       $insert->bindParam(':methode', $data->{'methode'});
       $insert->bindParam(':compteur', $data->{'compteur'}, PDO::PARAM_STR, 50);
-      $insert->bindParam(':date', $data->{'date'});
+      $insert->bindParam(':timeCapture', $data->{'timeCapture'}, PDO::PARAM_INT, 13);
       $insert->bindParam(':jeu', $data->{'jeu'}, PDO::PARAM_STR, 50);
       $insert->bindParam(':ball', $data->{'ball'});
-      $insert->bindParam(':description', $data->{'description'});
-      $insert->bindParam(':origin', $data->{'origin'}, PDO::PARAM_INT, 1);
-      $insert->bindParam(':monjeu', $data->{'monjeu'}, PDO::PARAM_INT, 1);
+      $insert->bindParam(':notes', $data->{'notes'});
+      $insert->bindParam(':checkmark', $data->{'origin'}, PDO::PARAM_INT, 1);
+      $insert->bindParam(':DO', $data->{'monjeu'}, PDO::PARAM_INT, 1);
       $insert->bindParam(':charm', $data->{'charm'}, PDO::PARAM_INT, 1);
       $insert->bindParam(':hacked', $data->{'hacked'}, PDO::PARAM_INT, 1);
-      $insert->bindParam(':aupif', $data->{'aupif'}, PDO::PARAM_INT, 1);
-      $insert->bindParam(':huntid', $data->{'huntid'}, PDO::PARAM_STR, 13);
-      $insert->bindParam(':lastupdate', $data->{'last_update'}, PDO::PARAM_STR, 13);
+      $insert->bindParam(':horsChasse', $data->{'aupif'}, PDO::PARAM_INT, 1);
+      
       $results[] = $insert->execute();
     }
 
@@ -140,25 +171,38 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
       $dataToUpdate[] = $data;
 
       $insert = $link->prepare('UPDATE mes_shinies SET 
-        numero_national = :dexid, forme =:forme, surnom = :surnom, methode = :methode, compteur = :compteur, date = :date, jeu = :jeu, ball = :ball, description = :description, origin = :origin, monjeu = :monjeu, charm = :charm, hacked = :hacked, aupif = :aupif, last_update = :lastupdate
+        lastUpdate = :lastUpdate,
+        dexid = :dexid,
+        formid =:formid,
+        surnom = :surnom,
+        methode = :methode,
+        compteur = :compteur,
+        timeCapture = :timeCapture,
+        jeu = :jeu,
+        ball = :ball,
+        notes = :notes,
+        checkmark = :checkmark,
+        DO = :DO,
+        charm = :charm,
+        hacked = :hacked,
+        horsChasse = :horsChasse 
       WHERE huntid = :huntid');
-      $insert->bindValue(':huntid', $data->{'huntid'}, PDO::PARAM_STR, 13);
-      $insert->bindParam(':dexid', $data->{'numero_national'}, PDO::PARAM_INT, 4);
-      $insert->bindParam(':forme', $data->{'forme'}, PDO::PARAM_STR, 50);
+      $insert->bindParam(':huntid', $data->{'huntid'}, PDO::PARAM_STR, 13);
+      $insert->bindParam(':lastUpdate', $data->{'lastUpdate'}, PDO::PARAM_STR, 13);
+      $insert->bindParam(':dexid', $data->{'dexid'}, PDO::PARAM_INT, 4);
+      $insert->bindParam(':formid', $data->{'formid'}, PDO::PARAM_STR, 50);
       $insert->bindParam(':surnom', $data->{'surnom'}, PDO::PARAM_STR, 50);
       $insert->bindParam(':methode', $data->{'methode'});
       $insert->bindParam(':compteur', $data->{'compteur'}, PDO::PARAM_STR, 50);
-      $insert->bindParam(':date', $data->{'date'});
+      $insert->bindParam(':timeCapture', $data->{'timeCapture'}, PDO::PARAM_INT, 13);
       $insert->bindParam(':jeu', $data->{'jeu'}, PDO::PARAM_STR, 50);
       $insert->bindParam(':ball', $data->{'ball'});
-      $insert->bindParam(':description', $data->{'description'});
-      $insert->bindParam(':origin', $data->{'origin'}, PDO::PARAM_INT, 1);
-      $insert->bindParam(':monjeu', $data->{'monjeu'}, PDO::PARAM_INT, 1);
+      $insert->bindParam(':notes', $data->{'notes'});
+      $insert->bindParam(':checkmark', $data->{'origin'}, PDO::PARAM_INT, 1);
+      $insert->bindParam(':DO', $data->{'monjeu'}, PDO::PARAM_INT, 1);
       $insert->bindParam(':charm', $data->{'charm'}, PDO::PARAM_INT, 1);
       $insert->bindParam(':hacked', $data->{'hacked'}, PDO::PARAM_INT, 1);
-      $insert->bindParam(':aupif', $data->{'aupif'}, PDO::PARAM_INT, 1);
-      // On n'édite pas huntid
-      $insert->bindParam(':lastupdate', $data->{'last_update'}, PDO::PARAM_STR, 13);
+      $insert->bindParam(':horsChasse', $data->{'aupif'}, PDO::PARAM_INT, 1);
       $results[] = $insert->execute();
     }
 
@@ -168,12 +212,6 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
       $insert->bindParam(':huntid', $huntid, PDO::PARAM_STR, 13);
       $results[] = $insert->execute();
     }
-
-    // On récupère la version de la BDD
-    $versionBDD = $link->prepare('SELECT MAX(last_update) AS max FROM mes_shinies');
-    $versionBDD->execute();
-    $versionBDD = $versionBDD->fetch(PDO::FETCH_ASSOC);
-    $versionBDD = $versionBDD['max'];
 
     if (array_sum($results) != count($results)) {
       $error = true;
@@ -200,7 +238,5 @@ echo json_encode(array(
   'inserts-local' => $dataToInsertLocal,
   'updates-local' => $dataToUpdateLocal,
   'deletions-local' => $toDelete,
-  //'compare' => $dataToCompare,
   'results' => $results,
-  'version-bdd' => $versionBDD,
 ), JSON_PRETTY_PRINT);

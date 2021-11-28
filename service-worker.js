@@ -61,26 +61,13 @@ self.addEventListener('activate', function(event)
 // FETCH
 self.addEventListener('fetch', function(event)
 {
-  //console.log('[fetch] Le service worker récupère l\'élément ' + event.request.url);
-  // Si l'élément est un sprite (non mis en cache par le sw), on le récupère sur le réseau
-  if (event.request.url.match(/(.+)\/poke_(capture|icon)_(.+)/))
-  {
-    event.respondWith(
-      fetch(event.request)
-      .catch(error => console.error(error))
-    )
-  }
-  // On récupère le contenu dans le cache, et s'il n'y est pas, sur le réseau
-  else
-  {
-    event.respondWith(
-      caches.match(event.request)
-      .then(matching => {
-        return matching || fetch(event.request);
-      })
-      .catch(error => console.error(error))
-    )
-  }
+  event.respondWith(
+    caches.match(event.request)
+    .then(matching => {
+      return matching || fetch(event.request);
+    })
+    .catch(error => console.error(error))
+  )
 });
 
 
@@ -103,25 +90,13 @@ self.addEventListener('message', function(event) {
   }
 
   // COMPARE-BACKUP
-  else if (event.data && event.data.action == 'compare-backup') {
+  else if (event.data && event.data.action == 'sync-backup') {
     const source = event.ports[0];
 
     event.waitUntil(
-      compareBackup(false)
+      syncBackup(false)
       .then(() => source.postMessage({ successfulBackupComparison: true, noresponse: true }))
       .catch(() => source.postMessage({ successfulBackupComparison: false, noresponse: true }))
-    );
-  }
-
-  // UPDATE-SPRITE
-  else if (event.data && event.data.action == 'update-sprite') {
-    const version = ('version' in event.data) ? event.data.version : null;
-    const source = event.ports[0];
-
-    event.waitUntil(
-      updateSprite(version)
-      .then(() => source.postMessage({ successfulSpriteUpdate: true, version }))
-      .catch(error => source.postMessage({ successfulSpriteUpdate: false, error }))
     );
   }
 });
@@ -133,7 +108,7 @@ self.addEventListener('sync', function(event) {
 
   if (event.tag == 'SYNC-BACKUP') {
     event.waitUntil(
-      compareBackup()
+      syncBackup()
     );
   }
 });
@@ -146,7 +121,7 @@ self.addEventListener('sync', function(event) {
 // Récupérer les données du Rémidex
 function getData() {
   // On récupère les données les plus récentes
-  const promiseData = fetch('/remidex/mod_update.php?type=full&date=' + Date.now())
+  const promiseData = fetch('/remidex/backend/update.php?type=full&date=' + Date.now())
   .then(response => {
     if (response.status == 200)
       return response;
@@ -156,7 +131,7 @@ function getData() {
   .then(response => response.json());
 
   // On récupère la liste des fichiers à mettre en cache
-  const promiseFiles = fetch('cache.json?' + Date.now())
+  const promiseFiles = fetch('cache.json?date=' + Date.now())
   .then(response => {
     if (response.status == 200)
       return response;
@@ -260,12 +235,12 @@ async function deleteOldCaches(newCache, action)
 
 
 // Compare et synchronise les bases de données locale et en ligne
-async function compareBackup(message = true) {
+async function syncBackup(message = true) {
   try {
     // On récupère les données locales
     await shinyStorage.ready();
     const keys = await shinyStorage.keys();
-    const localData = await Promise.all(keys.map(async key => await shinyStorage.getItem(key)));
+    const localData = await Promise.all(keys.map(key => shinyStorage.getItem(key)));
 
     // On envoie les données locales au serveur
     const formData = new FormData();
@@ -273,7 +248,7 @@ async function compareBackup(message = true) {
     formData.append('deleted-local-data', JSON.stringify(localData.filter(shiny => shiny.deleted)));
     formData.append('mdp', await dataStorage.getItem('mdp-bdd'));
 
-    const response = await fetch('/remidex/mod_compareBackup.php?date=' + Date.now(), {
+    const response = await fetch('/remidex/backend/syncBackup.php?date=' + Date.now(), {
       method: 'POST',
       body: formData
     });
@@ -285,28 +260,9 @@ async function compareBackup(message = true) {
       throw '[:(] Mauvais mot de passe...';
     
     // Vérifier si le serveur a réussi sa mission
-    console.log('[compare-backup] Réponse reçue du serveur :', data);
+    console.log('[sync-backup] Réponse reçue du serveur :', data);
 
     if (data['error'] == true) throw data['response'];
-
-    // Vérifions si le spritesheet doit être mis à jour
-    let localObsoletes = []; // liste des shiny qui rendent le spritesheet obsolète
-    if (data['inserts-local'].length > 0) // ➡ tous les nouveaux shiny qui n'étaient pas sur le spritesheet
-      localObsoletes = [...localObsoletes, ...data['inserts-local'].map(shiny => String(shiny.huntid))];
-    else {
-      for (const pkmn of data['updates-local']) {
-        const shiny = await shinyStorage.getItem(String(pkmn.huntid));
-        const onlineDexix = pkmn['numero_national'];
-        const localDexid = shiny['numero_national'];
-        const onlineFormid = pkmn.forme;
-        const localFormid = shiny.forme;
-        // ➡ tous les shiny qui étaient sur le spritesheet mais ont changé d'espèce ou de forme
-        if (onlineDexix != localDexid || onlineFormid != localFormid) {
-          localObsoletes.push(String(pkmn.huntid));
-          break;
-        }
-      }
-    }
 
     // Mettons à jour les données locales obsolètes
     const toSet = [...data['inserts-local'], ...data['updates-local']];
@@ -336,20 +292,12 @@ async function compareBackup(message = true) {
       ...data['updates'].map(shiny => String(shiny.huntid))
     ];
 
-    // Vérifions si la BDD en ligne est plus récente que la locale
-    const versionBDD = await dataStorage.getItem('version-bdd');
-    const newVersionBDD = data['version-bdd'];
-    if (newVersionBDD > versionBDD) {
-      await dataStorage.setItem('version-bdd', Number(newVersionBDD));
-    }
-
     // Transmettons les informations à l'application
     await dataStorage.setItem('last-sync', 'success');
     if (!message) return true;
     const clients = await self.clients.matchAll();
     clients.map(client => client.postMessage({
       successfulBackupComparison: true,
-      obsolete: localObsoletes,
       quantity: data['results'].length,
       modified
     }));

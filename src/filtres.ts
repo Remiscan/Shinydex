@@ -1,5 +1,6 @@
 import { dataStorage, shinyStorage } from './localforage.js';
 import { Shiny } from './Pokemon.js';
+import { pokemonCard } from './pokemonCard.component.js';
 
 
 
@@ -12,7 +13,6 @@ type ListeFiltres = Map<string, string[]>;
 const allFiltres: ListeFiltres = new Map([
   ['do', [ 'moi', 'autre' ]],
   ['legit', [ 'oui', 'maybe', 'hack', 'clone' ]],
-  ['taux', [ 'full', 'charm', 'boosted', 'inconnu' ]],
   ['jeu', [ '*' ]],
   ['espece', [ '*' ]],
   ['surnom', [ '*' ]]
@@ -20,7 +20,6 @@ const allFiltres: ListeFiltres = new Map([
 const defautFiltres: ListeFiltres = new Map([
   ['do', [ 'moi' ]],
   ['legit', [ 'oui' ]],
-  ['taux', [ 'full', 'charm', 'boosted', 'inconnu' ]],
   ['jeu', [ '*' ]],
   ['espece', [ '*' ]],
   ['surnom', [ '*' ]]
@@ -28,11 +27,12 @@ const defautFiltres: ListeFiltres = new Map([
 const emptyFiltres: ListeFiltres = new Map([
   ['do', []],
   ['legit', []],
-  ['taux', []],
   ['jeu', []],
   ['espece', []],
   ['surnom', []]
 ]);
+
+export { allFiltres };
 
 /*export function stringifyFiltres(filtres: ListeFiltres): string {
   return JSON.stringify(Array.from(filtres.entries()));
@@ -46,7 +46,6 @@ type FiltresPokemon = Map<string, string>;
 const emptyFiltresCarte: FiltresPokemon = new Map([
   ['do', ''],
   ['legit', ''],
-  ['taux', ''],
   ['jeu', ''],
   ['espece', ''],
   ['surnom', '']
@@ -131,25 +130,34 @@ async function filterAllPokemon(filtres: ListeFiltres): Promise<Shiny[]> {
 
 /////////////////////////////////////////////////////////
 // Filtre les cartes des Pokémon et les icônes du Pokédex
-export async function filterCards(filtres: ListeFiltres = defautFiltres, ids: number[] = []): Promise<void> {
-  const correspondingids = (await filterAllPokemon(filtres)).map(shiny => shiny.huntid);
+export async function filterCards(_filtres?: ListeFiltres, ids: string[] = []): Promise<number> {
+  const filtres = _filtres ?? await dataStorage.getItem('filtres') ?? defautFiltres;
+
+  const correspondingids = (await filterAllPokemon(filtres)).map(shiny => String(shiny.huntid));
+  const keptCards: pokemonCard[] = [];
+  const hiddenCards: pokemonCard[] = [];
   
   // Filtre les cartes des Pokémon
-  const allids = ids.length > 0 ? ids : (await shinyStorage.keys()).map(n => Number(n));
+  const allids = ids.length > 0 ? ids : (await shinyStorage.keys());
   for (const id of allids) {
-    const card = document.querySelector(`pokemon-card[huntid="${id}"]`);
+    const card = document.querySelector(`pokemon-card[huntid="${id}"]`) as pokemonCard;
     if (card == null) {
       console.error(`Aucune carte trouvée pour le shiny #${id}`);
       continue;
     }
-    if (correspondingids.includes(id)) card.classList.remove('filtered');
-    else                               card.classList.add('filtered');
+    if (correspondingids.includes(id)) {
+      card.classList.remove('filtered');
+      keptCards.push(card);
+    } else {
+      card.classList.add('filtered');
+      hiddenCards.push(card);
+    }
   }
 
   // Filtre les icônes du Pokédex
   const dexIcons = Array.from(document.querySelectorAll('#pokedex .pkspr')) as HTMLElement[];
   for (const icon of dexIcons) {
-    const id = parseInt(icon.dataset.dexid || '');
+    const id = icon.dataset.dexid || '';
     if (correspondingids.includes(id)) icon.classList.add('got');
     else                               icon.classList.remove('got');
   }
@@ -162,7 +170,7 @@ export async function filterCards(filtres: ListeFiltres = defautFiltres, ids: nu
   else               document.querySelector('#mes-chromatiques')!.classList.remove('vide');
 
   await dataStorage.setItem('filtres', filtres);
-  return;
+  return compteur;
 }
 
 
@@ -174,7 +182,10 @@ let currentOrdre = defautOrdre;
 
 ////////////////////////////////////////////////////////////////////
 // Ordonner les cartes de Pokémon selon une certaine caractéristique
-export async function orderCards(ordre: string = defautOrdre, reversed: boolean = false, ids: number[] = []): Promise<void> {
+export async function orderCards(_ordre?: string, _reversed?: boolean, ids: number[] = []): Promise<void> {
+  const ordre = _ordre ?? await dataStorage.getItem('ordre') ?? defautOrdre;
+  const reversed = _reversed ?? await dataStorage.getItem('ordre-reverse') ?? false;
+  
   const allids = ids.length > 0 ? ids : (await shinyStorage.keys()).map(n => Number(n));
   const allShiny = await Promise.all(allids.map(id => shinyStorage.getItem(String(id))));
 

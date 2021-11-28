@@ -15,7 +15,7 @@ export interface huntedPokemon extends Omit<frontendShiny, 'id' | 'destroy'> {
 }
 
 export class Hunt implements huntedPokemon {
-  huntid: number = new Date().getTime();
+  huntid: string = String(new Date().getTime());
   lastUpdate: number = 0;
   dexid: number = 0;
   formid: string = '';
@@ -25,7 +25,7 @@ export class Hunt implements huntedPokemon {
   timeCapture: number = 0;
   jeu: string = '';
   ball: string = 'poke';
-  description: string = '';
+  notes: string = '';
   checkmark: number = 0;
   DO: boolean = false;
   charm: boolean = false;
@@ -233,7 +233,7 @@ export class Hunt implements huntedPokemon {
     this.genereMethodes();
     (document.getElementById(`hunt-${this.huntid}-methode`) as HTMLInputElement).value = this.methode;
     (document.getElementById(`hunt-${this.huntid}-ball`) as HTMLInputElement).value = this.ball;
-    (document.getElementById(`hunt-${this.huntid}-description`) as HTMLInputElement).value = this.description;
+    (document.getElementById(`hunt-${this.huntid}-notes`) as HTMLInputElement).value = this.notes;
     (document.querySelector(`input[name="hunt-${this.huntid}-origin-icon"][value="${this.checkmark}"]`) as HTMLInputElement).checked = true;
     (document.querySelector(`input[name="hunt-${this.huntid}-monjeu"][value="${this.DO}"]`) as HTMLInputElement).checked = true;
     (document.querySelector(`input[name="hunt-${this.huntid}-charm"][value="${this.charm}"]`) as HTMLInputElement).checked = true;
@@ -352,7 +352,7 @@ export class Hunt implements huntedPokemon {
 
     this.jeu = (document.getElementById(`hunt-${this.huntid}-jeu`) as HTMLInputElement).value;
     this.ball = (document.getElementById(`hunt-${this.huntid}-ball`) as HTMLInputElement).value;
-    this.description = (document.getElementById(`hunt-${this.huntid}-description`) as HTMLInputElement).value;
+    this.notes = (document.getElementById(`hunt-${this.huntid}-notes`) as HTMLInputElement).value;
     this.checkmark = parseInt((document.querySelector(`input[name="hunt-${this.huntid}-origin-icon"]:checked`) as HTMLInputElement).value);
     this.DO = Boolean(parseInt((document.querySelector(`input[name="hunt-${this.huntid}-monjeu"]:checked`) as HTMLInputElement).value));
     this.charm = Boolean(parseInt((document.querySelector(`input[name="hunt-${this.huntid}-charm"]:checked`) as HTMLInputElement).value));

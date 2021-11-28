@@ -1,7 +1,7 @@
 import { appDisplay, appPopulate } from './appContent.js';
 import { dataStorage, huntStorage, pokemonData, shinyStorage } from './localforage.js';
-import { notify, unNotify } from './notification.js';
-import { adoptStyleSheets, getVersionSprite, initStyleSheets, Params, recalcOnResize, setTheme, version2date, wait, webpSupport } from './Params.js';
+import { notify } from './notification.js';
+import { adoptStyleSheets, initStyleSheets, Params, recalcOnResize, setTheme, timestamp2date, wait, webpSupport } from './Params.js';
 import { upgradeStorage } from './upgradeStorage.js';
 
 
@@ -132,15 +132,6 @@ export async function appStart() {
     // ÉTAPE 5 : on affiche l'application
     log = await appDisplay();
     console.log(log);
-
-    // ÉTAPE 5.1 : si la version de base de données ne correspond pas à la version du sprite en cache, on le met à jour
-    const versionBDD = await dataStorage.getItem('version-bdd');
-    const versionSprite = await getVersionSprite();
-    if (versionSprite < versionBDD) {
-      notify('Mise à jour des images...', '', 'loading', () => {}, 999999999);
-      await updateSprite();
-      unNotify();
-    }
 
     // Fini !! :)
     appChargee = true;
@@ -279,14 +270,13 @@ export async function checkUpdate(checkNotification = false)
     const data = await response.json();
 
     const versionFichiers = await dataStorage.getItem('version-fichiers');
-    const versionBDD = await dataStorage.getItem('version-bdd');
 
-    if ((versionFichiers != data['version-fichiers'])/* || (versionBDD != data['version-bdd'])*/)
+    if ((versionFichiers != data['version-fichiers']))
     {
       updateAvailable = 1;
       console.log('[:|] Mise à jour détectée');
-      console.log('     Installé : fichiers v. ' + version2date(versionFichiers) + ', bdd v. ' + version2date(versionBDD));
-      console.log('   Disponible : fichiers v. ' + version2date(data['version-fichiers']) + ', bdd v. ' + version2date(data['version-bdd']));
+      console.log('     Installé : fichiers v. ' + timestamp2date(versionFichiers));
+      console.log('   Disponible : fichiers v. ' + timestamp2date(data['version-fichiers']));
 
       notifyMaj();
     }
@@ -294,7 +284,7 @@ export async function checkUpdate(checkNotification = false)
     {
       updateAvailable = 0;
       console.log('[:)] Aucune mise à jour disponible');
-      console.log('     Installé : fichiers v. ' + version2date(versionFichiers) + ', bdd v. ' + version2date(versionBDD));
+      console.log('     Installé : fichiers v. ' + timestamp2date(versionFichiers));
       throw 'Pas de mise à jour';
     }
   } catch(error) {

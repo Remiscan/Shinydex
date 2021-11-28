@@ -31,20 +31,6 @@ function getFilesVersion()
 }
 
 
-/////////////////////////////////////////////////////////////////
-// Récupère la date de dernière mise à jour de la base de données
-function getDBVersion()
-{
-  $link = new BDD();
-  $versionBDD = $link->prepare('SELECT MAX(last_update) AS max FROM mes_shinies');
-  $versionBDD->execute();
-  $versionBDD = $versionBDD->fetch(PDO::FETCH_ASSOC);
-  $versionBDD = $versionBDD['max'];
-  // timestamp à 13 digits, généré par JS
-  return $versionBDD * 1;
-}
-
-
 //////////////////////////////////////////////////////////
 // Récupère les infos sur tous les Pokémon et leurs formes
 function getPokemonData()
@@ -70,14 +56,12 @@ $results = array();
 // Si on vérifie juste la disponibilité d'une mise à jour de l'application
 if (isset($_GET['type']) && $_GET['type'] == 'check')
 {
-  $results['version-bdd'] = getDBVersion();
   $results['version-fichiers'] = getFilesVersion();
 }
 
 // Si on veut installer tous les fichiers et données
 else
 {
-  $results['version-bdd'] = getDBVersion();
   $results['version-fichiers'] = getFilesVersion();
   $results['pokemon-data'] = getPokemonData();
   $results['pokemon-names'] = Pokemon::ALL_POKEMON;

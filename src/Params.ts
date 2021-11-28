@@ -194,7 +194,7 @@ export function wait(time: number) { return new Promise(resolve => setTimeout(re
 
 /////////////////////////////////
 // Convertit un timestamp en date
-export function version2date(timestamp: number): string {
+export function timestamp2date(timestamp: number): string {
   const d = new Date(timestamp);
   return d.toISOString().replace('T', ' ').replace(/\.[0-9]{3}Z/, '');
 }
@@ -217,7 +217,7 @@ export async function export2json() {
   const a = document.createElement('A') as HTMLAnchorElement;
   a.href = dataString;
   await dataStorage.ready();
-  a.download = `remidex-${version2date(Date.now() / 1000).replace(' ', '_')}.json`;
+  a.download = `remidex-${timestamp2date(Date.now() / 1000).replace(' ', '_')}.json`;
   a.setAttribute('style', 'position: absolute; width: 0; height: 0;');
   document.body.appendChild(a);
   a.click();
@@ -278,33 +278,25 @@ export async function webpSupport(): Promise<boolean> {
 //////////////////////
 // Définition du thème
 export async function setTheme(askedTheme?: string) {
-  // Thème sélectionné par l'utilisateur
-  await dataStorage.ready();
-  const userTheme = await dataStorage.getItem('theme');
+  // Thème par défaut
+  const defaultTheme = 'dark';
 
   // Thème préféré selon l'OS
   let osTheme;
   if (window.matchMedia('(prefers-color-scheme: dark)').matches) osTheme = 'dark';
   else if (window.matchMedia('(prefers-color-scheme: light)').matches) osTheme = 'light';
 
-  // Thème exigé par la fonction
-  const forcedTheme = (askedTheme === 'system') ? osTheme : askedTheme;
-
-  // Thème par défaut
-  const defaultTheme = 'dark';
-
-  // On applique le thème (forcedTheme > userTheme > osTheme > defaultTheme)
-  const theme = forcedTheme || userTheme || osTheme || defaultTheme;
-  const storedTheme = (askedTheme === 'system') ? null : (forcedTheme || userTheme);
+  // Thème appliqué (askedTheme > osTheme > defaultTheme)
+  const theme = ['light', 'dark'].includes(askedTheme || '') ? askedTheme : (osTheme || defaultTheme);
 
   let html = document.documentElement;
-  html.classList.remove('light', 'dark');
-  html.classList.add(theme);
+  html.dataset.theme = askedTheme;
   
   let themeColor = (theme == 'dark') ? 'rgb(34, 34, 34)' : 'rgb(224, 224, 224)';
   document.querySelector("meta[name=theme-color]")!.setAttribute('content', themeColor);
 
   window.dispatchEvent(new CustomEvent('themechange', { detail: { theme } }));
 
-  return await dataStorage.setItem('theme', storedTheme);
+  await dataStorage.ready();
+  return await dataStorage.setItem('theme', askedTheme);
 }

@@ -1,12 +1,27 @@
 import { editHunt } from './Hunt.js';
+import { pokemonData } from './localforage.js';
 import { Params, wait } from './Params.js';
-import { Shiny } from './Pokemon.js';
+import { frontendShiny, Shiny } from './Pokemon.js';
 
 
 
 let currentCardId: string | null;
 let charmlessMethods: string[];
 let longClic = false;
+
+interface CardUpdateEvent extends CustomEvent {
+  detail: {
+    shiny: frontendShiny;
+  }
+}
+
+declare global {
+  interface HTMLElementEventMap {
+    cardupdate: CardUpdateEvent;
+  }
+}
+
+
 
 const template = document.createElement('template');
 template.innerHTML = `
@@ -67,176 +82,243 @@ export class pokemonCard extends HTMLElement {
     this.addEventListener('click', () => { if (!longClic) this.toggleNotes(); longClic = false; });
     this.addEventListener('mousedown', async event => { if (event.button != 0) return; this.makeEdit(event); }); // souris
     this.addEventListener('touchstart', async event => { this.makeEdit(event); }, { passive: true }); // toucher
+    this.addEventListener('cardupdate', this.updateCard);
   }
 
-  updateCard(toUpdate = pokemonCard.observedAttributes) {
+  // Met à jour les attributs de la carte à partir d'un objet Shiny
+  async updateCard(event: CardUpdateEvent) {
+    let shiny: Shiny;
+    try {
+      shiny = new Shiny(event.detail.shiny);
+    } catch (e) {
+      console.error('Échec de création du Shiny', e);
+      throw e;
+    }
+
     const card = this;
+    const mine = shiny.mine;
+
+    card.setAttribute('id', `pokemon-card-${shiny.huntid}`);
+    card.setAttribute('huntid', shiny.huntid);
+    card.setAttribute('last-update', String(shiny.lastUpdate));
+    card.setAttribute('dexid', String(shiny.dexid));
+    card.setAttribute('surnom', shiny.surnom);
+    card.setAttribute('methode', shiny.methode);
+    card.setAttribute('compteur', shiny.compteur);
+    card.setAttribute('time-capture', String(shiny.timeCapture));
+    card.setAttribute('jeu', shiny.jeu.replace(/[ \']/g, ''));
+
+    if (shiny.ball) card.setAttribute('ball', shiny.ball);
+    else            card.removeAttribute('ball');
+
+    card.setAttribute('notes', shiny.notes);
+
+    if (shiny.checkmark) card.setAttribute('checkmark', String(shiny.checkmark));
+    else                 card.removeAttribute('checkmark');
+
+    if (mine) card.setAttribute('DO', '1');
+    else      card.removeAttribute('DO');
+
+    if (shiny.charm) card.setAttribute('charm', '1');
+    else             card.removeAttribute('charm');
+
+    if (mine) {
+      const shinyRate = shiny.shinyRate != null ? shiny.shinyRate : 0;
+      card.setAttribute('shiny-rate', String(shinyRate));
+    } else {
+      card.setAttribute('shiny-rate', '0');
+    }
+
+    if (shiny.hacked > 0) card.setAttribute('hacked', String(shiny.hacked));
+    else                  card.removeAttribute('hacked');
+
+    if (shiny.horsChasse) card.setAttribute('horsChasse', '1');
+    else                  card.removeAttribute('horsChasse');
+  }
+
+  // Met à jour le contenu de la carte à partir de ses attributs
+  async updateContents(toUpdate = pokemonCard.observedAttributes) {
     if (!this.ready) return;
 
-    ordreSprite: {
-      if (!toUpdate.includes('ordre-sprite')) break ordreSprite;
-      (card.querySelector('.pokemon-sprite') as HTMLElement).style.setProperty('--ordre-sprite', this.getAttribute('ordre-sprite'));
-    }
+    for (const attr of toUpdate) {
+      switch (attr) {
 
-    notes: {
-      if (!toUpdate.includes('notes')) break notes;
-      card.querySelector('.pokemon-notes__texte')!.innerHTML = this.getAttribute('notes') || '';
+        // Espèce
+        case 'dexid': {
+          const dexid = this.getAttribute('dexid') || '';
+          const pokemon = await pokemonData.getItem(dexid);
+          const element = this.querySelector('.pokemon-espece')!;
+          element.innerHTML = pokemon.namefr;
 
-      if (!this.getAttribute('notes')!.includes('Gigamax'))
-        card.querySelector('.gigamax')!.classList.add('off');
-      else
-        card.querySelector('.gigamax')!.classList.remove('off');
-    }
+          const surnom = this.getAttribute('surnom') || '';
+          if (surnom === '' || surnom === pokemon.namefr) {
+            this.querySelector('.pokemon-infos__nom')!.classList.add('no-surnom');
+          } else {
+            this.querySelector('.pokemon-infos__nom')!.classList.remove('no-surnom');
+          }
+        } break;
 
-    surnom: {
-      if (!toUpdate.includes('surnom')) break surnom;
-      card.querySelector('.pokemon-surnom')!.innerHTML = this.getAttribute('surnom') || '';
-    }
+        // Surnom
+        case 'surnom': {
+          const element = this.querySelector('.pokemon-surnom')!;
+          element.innerHTML = this.getAttribute('surnom') || '';
+        } break;
 
-    espece: {
-      if (!toUpdate.includes('espece') && !toUpdate.includes('surnom')) break espece;
-      card.querySelector('.pokemon-espece')!.innerHTML = this.getAttribute('espece') || '';
-      const surnom = this.getAttribute('surnom') || '';
-      if (surnom == '' || surnom.toLowerCase() == this.getAttribute('espece'))
-        card.querySelector('.pokemon-infos__nom')!.classList.add('no-surnom');
-      else
-        card.querySelector('.pokemon-infos__nom')!.classList.remove('no-surnom');
-    }
+        // Compteur
+        case 'compteur': {
+          const compteur = JSON.parse(this.getAttribute('compteur') || '0');
+          const element = this.querySelector('.methode-compteur')!;
+          element.innerHTML = '<span class="icones explain oeuf"></span>';
+          if (this.getAttribute('methode') === 'Masuda' && typeof compteur === 'number' && compteur > 0) {
+            element.innerHTML += compteur;
+            element.classList.remove('off');
+          }
+          else element.classList.add('off');
+        } break;
 
-    jeu: {
-      if (!toUpdate.includes('jeu')) break jeu;
-      card.querySelector('.icones.jeu')!.className = 'icones jeu';
-      card.querySelector('.icones.jeu')!.classList.add(this.getAttribute('jeu') || '');
-    }
+        // Temps de capture / date
+        case 'time-capture': {
+          const time = Number(this.getAttribute('time-capture'));
+          if (time > 0) {
+            const date = new Intl.DateTimeFormat('fr-FR', {day: 'numeric', month: 'short', year: 'numeric'})
+                                .format(new Date(time));
+            const element = this.querySelector('.capture-date')!;
+            element.innerHTML = date;
+            this.querySelector('.pokemon-infos__capture')!.classList.remove('no-date');
+          } else {
+            this.querySelector('.pokemon-infos__capture')!.classList.add('no-date');
+          }
+        } break;
 
-    ball: {
-      if (!toUpdate.includes('ball')) break ball;
-      const element = card.querySelector('.pokemon-ball')!;
-      const baseClassList = 'pkspr pokemon-ball';
-      element.className = baseClassList;
-      if (this.getAttribute('ball') != null) element.classList.add(this.getAttribute('ball') || '');
-      else element.classList.add('off');
-      element.classList.add('item', 'ball-' + this.getAttribute('ball'));
-    }
+        // Jeu
+        case 'jeu': {
+          const element = this.querySelector('.icones.jeu')!
+          element.className = `icones jeu ${this.getAttribute('jeu') || ''}`;
+        } break;
 
-    monjeu: {
-      if (!toUpdate.includes('monjeu')) break monjeu;
-      if (this.getAttribute('monjeu') == null)
-        card.querySelector('.icones.mine')!.classList.add('off');
-      else
-        card.querySelector('.icones.mine')!.classList.remove('off');
-    }
+        // Ball
+        case 'ball': {
+          const element = this.querySelector('.pokemon-ball')!;
+          const baseClassList = 'pkspr pokemon-ball';
+          element.className = baseClassList;
+          if (this.getAttribute('ball') != null) {
+            element.classList.add(this.getAttribute('ball') || '');
+            element.classList.add('item', 'ball-' + this.getAttribute('ball'));
+          } else {
+            element.classList.add('off');
+          }
+        } break;
 
-    methode: {
-      if (!toUpdate.includes('methode')) break methode;
-      card.querySelector('.capture-methode')!.innerHTML = this.getAttribute('methode') || '';
-    }
+        // Notes
+        case 'notes': {
+          const element = this.querySelector('.pokemon-notes__texte')!;
+          const notes = this.getAttribute('notes') || '';
+          element.innerHTML = notes;
 
-    compteur: {
-      if (!toUpdate.includes('methode') && !toUpdate.includes('compteur')) break compteur;
-      const compteur = Number(this.getAttribute('compteur'));
-      const element = card.querySelector('.methode-compteur')!;
-      element.innerHTML = '<span class="icones explain oeuf"></span>';
-      if (this.getAttribute('methode') == 'Masuda' && compteur > 0) {
-        element.innerHTML += compteur;
-        element.classList.remove('off');
+          const gigamaxElement = this.querySelector('.gigamax')!;
+          if (notes.includes('Gigamax')) {
+            gigamaxElement.classList.remove('off');
+          } else {
+            gigamaxElement.classList.add('off');
+          }
+        } break;
+
+        // Checkmark
+        case 'checkmark': {
+          const checkmark = this.getAttribute('checkmark');
+          const element = this.querySelector('.icones.checkmark')!;
+          element.className = 'icones explain checkmark';
+          let origin: string;
+          switch (Number(checkmark)) {
+            case 1: origin = 'kalos'; break;
+            case 2: origin = 'alola'; break;
+            case 3: origin = 'vc'; break;
+            case 4: origin = 'letsgo'; break;
+            case 5: origin = 'go'; break;
+            case 6: origin = 'galar'; break;
+            default: origin = 'off';
+          }
+          element.classList.add(`${origin}born`);
+        } break;
+
+        // DO
+        case 'DO': {
+          const element = this.querySelector('.icones.mine')!;
+          if (this.getAttribute('DO') === '1') {
+            element.classList.remove('off');
+          } else {
+            element.classList.add('off');
+          }
+        } // NO BREAK
+
+        // Méthode
+        case 'methode': {
+          const element = this.querySelector('.capture-methode')!;
+          element.innerHTML = this.getAttribute('methode') || '';
+        } // NO BREAK
+
+        // Charme chroma et shiny rate
+        case 'charm':
+        case 'shiny-rate': {
+          const srContainer = this.querySelector('.shiny-rate')!;
+          const charm = Boolean(this.getAttribute('charm'));
+          const shinyRate = Number(this.getAttribute('shiny-rate'));
+          const methode = this.getAttribute('methode') || '';
+
+          // Icône du charme chroma
+          if (charmlessMethods == null) charmlessMethods = Shiny.methodes('charmless').map(m => m.nom);
+          if (charm && !(charmlessMethods.includes(methode))) {
+            srContainer.classList.add('with-charm');
+          } else {
+            srContainer.classList.remove('with-charm');
+          }
+
+          // Affichage du shiny rate
+          if (shinyRate > 0 && this.getAttribute('DO') === '1') {
+            srContainer.classList.remove('off');
+          } else {
+            srContainer.classList.add('off');
+          }
+          
+          const element = this.querySelector('.shiny-rate-text.denominator')!;
+          element.innerHTML = String(shinyRate || '???');
+
+          // Couleur du shiny rate
+          srContainer.classList.remove('full-odds', 'charm-ods', 'one-odds');
+          if (!charm && [8192, 4096].includes(shinyRate)) {
+            srContainer.classList.add('full-odds');
+          } else if (charm && [2731, 1365].includes(shinyRate)) {
+            srContainer.classList.add('charm-odds');
+          } else if (shinyRate <= 1) {
+            srContainer.classList.add('one-odds');
+          }
+        } break;
+
+        // Legit ou hacké ?
+        case 'hacked': {
+          const hacked = Number(this.getAttribute('hacked'));
+          const element = this.querySelector('.icones.hacked')!;
+          element.className = 'icones explain hacked';
+          let origin: string;
+          switch (hacked) {
+            case 1: origin = 'ptethack'; break;
+            case 2: origin = 'hack'; break;
+            case 3: origin = 'clone'; break;
+            default: origin = 'off';
+          }
+          element.classList.add(origin);
+        } break;
+
+        // Hors chasse ?
+        case 'hors-chasse': {
+          const element = this.querySelector('.icones.lucky')!;
+          if (this.getAttribute('hors-chasse') === '1') {
+            element.classList.remove('off');
+          } else {
+            element.classList.add('off');
+          }
+        }
       }
-      else
-        element.classList.add('off');
-    }
-
-    shinyRate: {
-      if (!toUpdate.includes('shiny-rate')) break shinyRate;
-      const shinyRateBox = card.querySelector('.shiny-rate') as HTMLElement;
-      const shinyRate = Number(this.getAttribute('shiny-rate'));
-      const charm = Boolean(this.getAttribute('charm')) || null;
-
-      if (charmlessMethods == null) charmlessMethods = Shiny.methodes('charmless').map(m => m.nom);
-      if (charm === true && !charmlessMethods.includes(this.getAttribute('methode') || ''))
-        shinyRateBox.classList.add('with-charm');
-
-      if (shinyRate == null)
-        shinyRateBox.classList.add('off');
-      else
-        shinyRateBox.classList.remove('off');
-
-      card.querySelector('.shiny-rate-text.denominator')!.innerHTML = String(shinyRate) || '???';
-
-      shinyRateBox.classList.remove('full-odds', 'charm-ods', 'one-odds');
-      if (charm == null && [8192, 4096].includes(shinyRate))
-        shinyRateBox.classList.add('full-odds');
-      else if (charm == true && [2731, 1365].includes(shinyRate))
-        shinyRateBox.classList.add('charm-odds');
-      else if (shinyRate == 1 || shinyRate == 0)
-        shinyRateBox.classList.add('one-odds');
-
-      const shinyRateCoeff = 1 - Math.min(1, Math.max(0, shinyRate / 1360));
-      shinyRateBox.style.setProperty('--coeff', String(shinyRateCoeff));
-
-      if (!this.getAttribute('monjeu')) shinyRateBox.classList.add('off');
-      else shinyRateBox.classList.remove('off');
-    }
-
-    random: {
-      if (!toUpdate.includes('random')) break random;
-      if (this.getAttribute('random') == null)
-        card.querySelector('.icones.lucky')!.remove();
-    }
-
-    checkmark: {
-      if (!toUpdate.includes('checkmark')) break checkmark;
-      const checkmark = this.getAttribute('checkmark');
-      const element = card.querySelector('.icones.checkmark')!;
-      element.className = 'icones explain checkmark';
-      let origin: string;
-      switch (Number(checkmark)) {
-        case 1:
-          origin = 'kalos'; break;
-        case 2:
-          origin = 'alola'; break;
-        case 3:
-          origin = 'vc'; break;
-        case 4:
-          origin = 'letsgo'; break;
-        case 5:
-          origin = 'go'; break;
-        case 6:
-          origin = 'galar'; break;
-        default:
-          origin = 'off';
-      }
-      element.classList.add(`${origin}born`);
-    }
-
-    hacked: {
-      if (!toUpdate.includes('hacked')) break hacked;
-      const hacked = Number(this.getAttribute('hacked'));
-      const element = card.querySelector('.icones.hacked')!;
-      element.className = 'icones explain hacked';
-      let origin: string;
-      switch (hacked) {
-        case 1:
-          origin = 'ptethack'; break;
-        case 2:
-          origin = 'hack'; break;
-        case 3:
-          origin = 'clone'; break;
-        default:
-          origin = 'off';
-      }
-      element.classList.add(origin);
-    }
-
-    date: {
-      if (!toUpdate.includes('date')) break date;
-      const date = this.getAttribute('date');
-      if (date != '1000-01-01') {
-        card.querySelector('.pokemon-infos__capture')!.classList.remove('no-date');
-        card.querySelector('.capture-date')!.innerHTML = new Intl.DateTimeFormat('fr-FR', {day: 'numeric', month: 'short', year: 'numeric'})
-                                                                 .format(new Date(this.getAttribute('time-capture') || ''));
-      }
-      else
-        card.querySelector('.pokemon-infos__capture')!.classList.add('no-date');
     }
   }
 
@@ -320,18 +402,18 @@ export class pokemonCard extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ['ordre-sprite', 'notes', 'surnom', 'espece', 'jeu', 'ball', 'methode', 'compteur', 'charm', 'shiny-rate', 'random', 'monjeu', 'checkmark', 'hacked', 'date'];
+    return ['dexid', 'surnom', 'methode', 'compteur', 'time-capture', 'jeu', 'ball', 'notes', 'checkmark', 'DO', 'charm', 'shiny-rate', 'hacked', 'hors-chasse'];
   }
 
   connectedCallback() {
     this.appendChild(template.content.cloneNode(true));
     this.ready = true;
-    this.updateCard();
+    this.updateContents();
   }
 
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {
     if (oldValue == newValue) return;
-    this.updateCard([name]);
+    this.updateContents([name]);
   }
 }
 customElements.define("pokemon-card", pokemonCard);

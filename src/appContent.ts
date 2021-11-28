@@ -1,12 +1,12 @@
-import { filterCards, filterDex, orderCards } from './filtres.js';
+import { filterCards, orderCards } from './filtres.js';
 import { huntedPokemon, initHunts } from './Hunt.js';
 import { dataStorage, huntStorage, shinyStorage } from './localforage.js';
 import { notify, unNotify } from './notification.js';
-import { getVersionSprite, loadAllImages, Params, version2date, wait } from './Params.js';
+import { loadAllImages, Params, timestamp2date, wait } from './Params.js';
 import { frontendShiny, Pokemon } from './Pokemon.js';
 import { pokemonCard } from './pokemonCard.component.js';
-import { updateCard } from './pokemonCard.js';
 import { openSpriteViewer } from './spriteViewer.js';
+import { upgradeStorage } from './upgradeStorage.js';
 
 
 
@@ -20,27 +20,29 @@ declare global {
 let populating = false;
 let displaying = false;
 
-export let populateAttemptsVersions: any[] = [];
-export let populateAttemptsObsolete: any[] = [];
-export let populateAttemptsModified: any[] = [];
+export let lastPopulateAttempt: number = 0;
+let lastModified: string[] = [];
 
 /////////////////////////////////////////////////////////
 // Peuple l'application à partir des données de indexedDB
-export async function appPopulate(start: boolean = true, obsolete: string[] = [], modified: string[] = [], versionSprite: number = 0): Promise<string | undefined> {
+export async function appPopulate(start: boolean = true, modified: string[] = []): Promise<string | undefined> {
+  lastModified = modified;
+
   if (populating) return;
   populating = true;
+  const thisAttempt = Date.now();
 
   try {
     // Prépare la liste principale
-    let cardsToPopulate = [];
+    let cardsToPopulate: pokemonCard[] = [];
 
     // Récupère la liste des huntid des shiny ayant déjà une carte
     const currentShinyIds = Array.from(document.querySelectorAll('#mes-chromatiques pokemon-card'))
-                              .map(shiny => String(shiny.getAttribute('huntid')));
+                                 .map(shiny => String(shiny.getAttribute('huntid')));
 
     // Récupère la liste des huntid des shiny de la base de données
-    let keys = await shinyStorage.keys();
-    const dbShiny = await Promise.all(keys.map(key => shinyStorage.getItem(key)))
+    const keys = await shinyStorage.keys();
+    const dbShiny = await Promise.all(keys.map(key => shinyStorage.getItem(key)));
     const dbShinyIds = dbShiny.map(shiny => String(shiny.huntid));
 
     // Comparons les deux listes
@@ -59,145 +61,99 @@ export async function appPopulate(start: boolean = true, obsolete: string[] = []
     let savedFiltres = await dataStorage.getItem('filtres');
     savedFiltres = (savedFiltres != null && savedFiltres.length > 0) ? savedFiltres : undefined;
 
-    const futureVersionSprite = versionSprite || getVersionSprite();
-
-    let ordre = 0; // ordre du sprite dans le spritesheet
     for (const huntid of allShinyIds) {
-      // Si on doit supprimer cette carte, on incrément l'ordre et continue
+      // Si on doit supprimer cette carte, on la supprime puis on passe à la suivante
       if (toDelete.includes(huntid)) {
         const card = document.getElementById(`pokemon-card-${huntid}`);
         card?.remove();
-        ordre++;
         continue;
       }
 
-      // Si cette carte est déjà marquée comme supprimée,
-      // si cette suppression précède la génération du spritesheet, on n'incrémente pas ordre
+      // Si cette carte est déjà marquée comme supprimée, on passe à la suivante
       if (toIgnore.includes(huntid)) {
-        const pokemon = await shinyStorage.getItem(String(huntid));
-        if (pokemon['last_update'] <= futureVersionSprite) continue;
+        continue;
       }
 
       // Si cette carte doit être affichée
       else {
         let card;
+        const shiny = await shinyStorage.getItem(huntid);
+        const cardUpdateEvent = new CustomEvent('cardupdate', { detail: { shiny }});
 
         // Si on doit créer cette carte
         if (toCreate.includes(huntid)) {
-          const pokemon = await shinyStorage.getItem(String(huntid));
-          card = await updateCard(pokemon);
-          // Si le spritesheet est obsolète à cause de cette carte, on affichera
-          // le sprite seulement après la génération du spritesheet (supprimer --ordre-sprite = sprite masqué)
-          // (après génération du spritesheet, card.dataset.ordreSprite deviendra --ordre-sprite)
-          if (!start && obsolete.includes(huntid)) {
-            card.removeAttribute('ordre-sprite');
-            card.dataset.futurOrdreSprite = String(ordre);
-          }
-          else {
-            card.setAttribute('ordre-sprite', String(ordre));
-          }
-          cardsToPopulate.push(...(await filterCards(savedFiltres, [card])));
+          card = document.createElement('pokemon-card') as pokemonCard;
+          card.dispatchEvent(cardUpdateEvent);
+          cardsToPopulate.push(card);
         }
 
         // Si on doit éditer cette carte
-        else {
+        else if (modified.includes(huntid)) {
           card = document.getElementById(`pokemon-card-${huntid}`) as pokemonCard;
-          if (card == null) throw 'Card not found';
-          const oldOrdre = card.getAttribute('ordre-sprite'); // ancien ordre du sprite
-          const wasObsolete = (card.dataset.obsolete != null); // spritesheet obsolète à cause de cette carte
-
-          if (modified.includes(huntid)) {
-            const pokemon = await shinyStorage.getItem(String(huntid));
-            await updateCard(pokemon, card);
-            await filterCards(savedFiltres, [card]);
-          }
-          if (obsolete.includes(huntid) || wasObsolete) card.dataset.obsolete = 'true';
-
-          // Si le spritesheet est obsolète à cause de cette carte... (cf cas précédent)
-          // nouvel ordre = oldOrdre || ordre pour le cas où oldOrdre non défini
-          if (card.dataset.obsolete != null) {
-            card.removeAttribute('ordre-sprite');
-            card.dataset.futurOrdreSprite = String(oldOrdre || ordre);
-          }
-          else {
-            if (!oldOrdre) card.setAttribute('ordre-sprite', String(ordre));
-          }
-          //oldCard.outerHTML = newCard.outerHTML;
-          //card = document.getElementById(`pokemon-card-${huntid}`); // on récupère la carte mise à jour pour détecter le clic
-          /*card = newCard;
-          cardsToPopulate.push(card);*/
+          if (card == null) throw `Card #${huntid} not found`;
+          card.dispatchEvent(cardUpdateEvent);
         }
       }
-
-      ordre++;
     }
 
-    let unfilteredCards;
-    if (start) {
-      // On récupère les cartes non filtrées pour filtrer le Pokédex
-      unfilteredCards = await filterCards([], cardsToPopulate);
-
-      // On ordonne les cartes
-      const savedOrdreReverse = await dataStorage.getItem('ordre-reverse');
-      const savedOrdre = await dataStorage.getItem('ordre');
-      cardsToPopulate = await orderCards(savedOrdre || undefined, savedOrdreReverse || undefined, cardsToPopulate);
-    }
+    await filterCards();
+    await orderCards();
 
     // Peuple les éléments après la préparation (pour optimiser le temps d'exécution)
     //// Liste principale
-    let conteneur = document.querySelector('#mes-chromatiques>.section-contenu');
-    //for (const card of Array.from(document.querySelectorAll('#mes-chromatiques pokemon-card'))) { card.remove(); }
-    for (const card of cardsToPopulate) { conteneur?.appendChild(card); }
-
-    if (!start) {
-      populating = false;
-
-      // On vérifie si des requêtes plus récentes de populate ont été faites
-      const lastPopulateAttempt = Math.max(...populateAttemptsVersions);
-      if (lastPopulateAttempt > futureVersionSprite)
-        return appPopulate(false, populateAttemptsObsolete, populateAttemptsModified, lastPopulateAttempt);
-      else {
-        populateAttemptsVersions.length = 0;
-        populateAttemptsObsolete.length = 0;
-        populateAttemptsModified.length = 0;
-      }
-      return;
+    {
+      const conteneur = document.querySelector('#mes-chromatiques>.section-contenu')!;
+      for (const card of cardsToPopulate) { conteneur.appendChild(card); }
     }
 
     // 🔽🔽🔽 Seulement au lancement de l'appli 🔽🔽🔽
+    if (start) {
+      // Peuple les chasses en cours
+      await initHunts();
 
-    // Peuple les chasses en cours
-    await initHunts();
+      // Prépare le Pokédex
+      let gensToPopulate = [];
+      const generations = Pokemon.generations;
+      const names = await Pokemon.names();
 
-    // Prépare le Pokédex
-    let gensToPopulate = [];
-    const generations = Pokemon.generations;
-    const names = await Pokemon.names();
-    for (const gen of generations) {
-      let monsToPopulate = [];
-      const genConteneur = document.createElement('div');
-      genConteneur.classList.add('pokedex-gen');
-      for (let i = gen.start; i <= gen.end; i++) {
-        const pkmn = document.createElement('span');
-        const name = names[i];
-        pkmn.classList.add('pkspr', 'pokemon', name + '-shiny');
-        pkmn.dataset.dexid = String(i);
-        pkmn.addEventListener('click', event => openSpriteViewer(i, event));
-        monsToPopulate.push(pkmn);
+      for (const gen of generations) {
+        let monsToPopulate = [];
+        const genConteneur = document.createElement('div');
+        genConteneur.classList.add('pokedex-gen');
+
+        for (let i = gen.start; i <= gen.end; i++) {
+          const pkmn = document.createElement('span');
+          const name = names[i];
+          pkmn.classList.add('pkspr', 'pokemon', name + '-shiny');
+          pkmn.dataset.dexid = String(i);
+          pkmn.addEventListener('click', event => openSpriteViewer(i, event));
+          monsToPopulate.push(pkmn);
+        }
+
+        for (let pkmn of monsToPopulate) { genConteneur.appendChild(pkmn); }
+        gensToPopulate.push(genConteneur);
       }
-      genConteneur.classList.add('defer');
 
-      for (let pkmn of monsToPopulate) { genConteneur.appendChild(pkmn); }
-      gensToPopulate.push(genConteneur);
+      // Peuple le Pokédex
+      const conteneur = document.querySelector('#pokedex>.section-contenu')!;
+      for (let genConteneur of gensToPopulate) { conteneur.appendChild(genConteneur); }
     }
 
-    // Peuple le Pokédex
-    conteneur = document.querySelector('#pokedex>.section-contenu');
-    for (let genConteneur of gensToPopulate) { conteneur?.appendChild(genConteneur); }
-    filterDex(unfilteredCards);
+    else {
+      // On vérifie si des requêtes plus récentes de populate ont été faites
+      if (lastPopulateAttempt > thisAttempt) {
+        populating = false;
+        return appPopulate(false, lastModified);
+      } else {
+        lastModified.length = 0;
+      }
+    }
+
+    await filterCards();
+    await orderCards();
 
     populating = false;
-    return '[:)] L\'application est prête !';
+    return '[:)] Liste de Pokémon chromatiques prête !';
   }
   catch(error) {
     populating = false;
@@ -215,49 +171,13 @@ export async function appDisplay(start = true)
   if (displaying) return;
   displaying = true;
 
-  const loadScreen = (start == true) ? document.getElementById('load-screen') : null;
-  const versionSprite = await getVersionSprite();
   let listeImages = [`./ext/pokesprite.png`];
-  if (start) {
-    listeImages.push(`./sprites--${versionSprite}.php`);
-    document.documentElement.style.setProperty('--link-sprites', `url('/remidex/sprites--${versionSprite}.php')`);
-  }
 
   async function promiseInit() {
-    const savedFiltres = await dataStorage.getItem('filtres');
-    if (savedFiltres != null && savedFiltres.length > 0)
-    {
-      if (!start) await filterCards(savedFiltres);
-      Array.from(document.querySelectorAll('input.filtre')).forEach(_input => {
-        const input = _input as HTMLInputElement;
-        let correspondances = 0;
-        for (const filtre of savedFiltres) {
-          const alterFiltres = filtre.split('|');
-          if (alterFiltres.includes(input.value)) correspondances++;
-        }
-        if (correspondances > 0) input.checked = true;
-        else input.checked = false;
-      });
-    }
-    else
-      if (!start) await filterCards();
-    if (!start) filterDex();
-
-    const savedOrdreReverse = await dataStorage.getItem('ordre-reverse');
-    const savedOrdre = await dataStorage.getItem('ordre');
-    if (!start) await orderCards(savedOrdre || undefined, savedOrdreReverse || undefined);
-    if (savedOrdre !== null)
-    {
-      Array.from(document.querySelectorAll('input[name=ordre]')).forEach(_input => {
-        const input = _input as HTMLInputElement;
-        if (input.id == 'ordre-' + savedOrdre) input.checked = true;
-      });
-    }
-
-    //['mes-chromatiques', 'pokedex', 'chasses-en-cours'].forEach(section => deferCards(section));
-
-    // Nombre de cartes affichées
-    const numberOfCards = Array.from(document.querySelectorAll('#mes-chromatiques pokemon-card')).length;
+    // Nombre de cartes en tout (filtrées ou non)
+    const keys = await shinyStorage.keys();
+    const dbShiny = await Promise.all(keys.map(key => shinyStorage.getItem(key)));
+    const numberOfCards = dbShiny.filter(shiny => !shiny.deleted).length;
     if (numberOfCards <= 0) {
       document.querySelector('#mes-chromatiques')!.classList.add('vide');
       document.querySelector('#mes-chromatiques .message-vide>.material-icons')!.innerHTML = 'cloud_off';
@@ -265,8 +185,7 @@ export async function appDisplay(start = true)
       document.querySelector('.compteur')!.innerHTML = '0';
     }
     
-    document.getElementById('version-fichiers')!.innerHTML = version2date(await dataStorage.getItem('version-fichiers'));
-    document.getElementById('version-bdd')!.innerHTML = version2date(await dataStorage.getItem('version-bdd'));
+    document.getElementById('version-fichiers')!.innerHTML = timestamp2date(await dataStorage.getItem('version-fichiers'));
     if (start) {
       window.tempsChargementFin = Date.now();
       document.getElementById('version-tempschargement')!.innerHTML = String(window.tempsChargementFin - window.tempsChargementDebut);
@@ -279,36 +198,23 @@ export async function appDisplay(start = true)
     if (start) await Promise.all([loadAllImages(listeImages), promiseInit()]);
     else await promiseInit();
 
-    // Surveille le defer-loader pour charger le reste des shiny quand il apparaît à l'écran
-    /*const deferLoaders = Array.from(document.querySelectorAll('.defer-loader'));
-    deferLoaders.forEach(deferLoader => {
-      const observer = new IntersectionObserver(deferMonitor, {
-        threshold: 1
+    if (start) {
+      // Efface l'écran de chargement
+      const loadScreen = document.getElementById('load-screen')!;
+      const byeLoad = loadScreen.animate([
+        { opacity: 1 },
+        { opacity: 0 }
+      ], {
+        duration: 100,
+        easing: Params.easingStandard,
+        fill: 'forwards'
       });
-      observer.observe(deferLoader);
-    });*/
-
-    if (!start) { displaying = false; return; }
-    
-    // Efface l'écran de chargement
-    const byeLoad = loadScreen!.animate([
-      { opacity: 1 },
-      { opacity: 0 }
-    ], {
-      duration: 100,
-      easing: Params.easingStandard,
-      fill: 'forwards'
-    });
-    byeLoad.onfinish = () => {
-      loadScreen!.remove();
-      // Try to reduce TTFB for Pokédex sprites
-      loadAllImages(['./sprites-home/small/poke_capture_0670_005_fo_n_00000000_f_n.png']).catch(() => {});
+      byeLoad.onfinish = loadScreen.remove;
     }
 
     displaying = false;
-    return '[:)] Bienvenue sur le Rémidex !';
-  }
-  catch(error) {
+    return '[:)] Affichage du Rémidex réussi !';
+  } catch (error) {
     displaying = false;
     console.error(error);
     throw error;
@@ -327,6 +233,9 @@ export async function json2import(file: File | Blob | undefined) {
     if (!('shiny' in importedData) || !('hunts' in importedData))
       throw 'Le fichier importé est incorrect.';
 
+    notify('Mise à jour des données...', '', 'loading', () => {}, 999999999);
+    const startTime = performance.now();
+
     await shinyStorage.ready();
     await Promise.all(
       importedData.shiny.map((shiny: frontendShiny) => shinyStorage.setItem(String(shiny.huntid), shiny))
@@ -336,10 +245,13 @@ export async function json2import(file: File | Blob | undefined) {
       importedData.hunts.map((hunt: huntedPokemon) => huntStorage.setItem(String(hunt.huntid), hunt))
     );
 
-    notify('Mise à jour des données...', '', 'loading', () => {}, 999999999);
+    await upgradeStorage(true);
+
     await appPopulate(false);
     await appDisplay(false);
-    await wait(1000);
+
+    const duration = performance.now() - startTime;
+    await wait(Math.max(0, 1000 - duration));
     unNotify();
   });
   reader.readAsText(file);

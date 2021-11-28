@@ -127,8 +127,8 @@ interface backendPokemon {
 // Structure d'un Pokémon shiny tel que stocké dans la BDD en ligne
 interface backendShiny {
   id: number,
-  huntid: number,
-  lastUpdate: number,
+  huntid: string,
+  lastUpdate: string,
   dexid: number,
   formid: string,
   surnom: string,
@@ -137,7 +137,7 @@ interface backendShiny {
   timeCapture: number,
   jeu: string,
   ball: string,
-  description: string,
+  notes: string,
   checkmark: number,
   DO: boolean,
   charm: boolean,
@@ -146,7 +146,8 @@ interface backendShiny {
 };
 
 // Structure d'un Pokémon shiny tel que stocké dans la BDD locale
-export interface frontendShiny extends Omit<backendShiny, 'id'> {
+export interface frontendShiny extends Omit<backendShiny, 'id' | 'lastUpdate'> {
+  lastUpdate: number,
   deleted?: boolean,
   destroy?: boolean,
 }
@@ -230,7 +231,7 @@ class Pokemon {
 
 class Shiny implements frontendShiny {
   // frontendShiny fields
-  huntid: number = NaN;
+  huntid: string = '';
   lastUpdate: number = NaN;
   dexid: number = NaN;
   formid: string = '';
@@ -240,7 +241,7 @@ class Shiny implements frontendShiny {
   timeCapture: number = NaN;
   jeu: string = '';
   ball: string = '';
-  description: string = '';
+  notes: string = '';
   checkmark: number = NaN;
   DO: boolean = false;
   charm: boolean = false;
@@ -477,3 +478,4 @@ class Shiny implements frontendShiny {
 }
 
 export { Pokemon, Shiny };
+

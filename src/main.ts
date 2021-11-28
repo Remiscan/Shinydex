@@ -1,4 +1,4 @@
-import { appDisplay, appPopulate, json2import, populateAttemptsModified, populateAttemptsObsolete, populateAttemptsVersions } from './appContent.js';
+import { appDisplay, appPopulate, json2import } from './appContent.js';
 import { appStart, checkUpdate, manualUpdate, setOnlineBackup, startBackup } from './appLifeCycle.js';
 import { DexDatalist } from './DexDatalist.js';
 import { playEasterEgg } from './easterEgg.js';
@@ -8,7 +8,7 @@ import './loadSpinner.component.js';
 import { dataStorage, huntStorage, shinyStorage } from './localforage.js';
 import { navigate, sectionActuelle } from './navigate.js';
 import { notify, unNotify } from './notification.js';
-import { callResize, changeAutoMaj, export2json, wait, setTheme } from './Params.js';
+import { callResize, changeAutoMaj, export2json, setTheme, wait } from './Params.js';
 import './pokemonCard.component.js';
 import { initSpriteViewer } from './spriteViewer.js';
 import './syncProgress.component.js';
@@ -229,14 +229,9 @@ navigator.serviceWorker.addEventListener('message', async event => {
       loaders.forEach(loader => loader.setAttribute('state', 'success'));
       params.dataset.lastSync = 'success';
 
-      if ('obsolete' in event.data) {
-        const versionBDD = await dataStorage.getItem('version-bdd');
-        window.dispatchEvent(new CustomEvent('populate', { detail: {
-          version: versionBDD,
-          obsolete: event.data.obsolete,
-          modified: event.data.modified
-        } }));
-      }
+      window.dispatchEvent(new CustomEvent('populate', { detail: {
+        modified: event.data.modified
+      } }));
     }
     else {
       // Au moins une chasse n'a pas pu être ajoutée / éditée
@@ -254,47 +249,12 @@ navigator.serviceWorker.addEventListener('message', async event => {
 // ÉCOUTE DE L'EVENT CUSTOM 'POPULATE'
 window.addEventListener('populate', async (_event: Event) => {
   const event = _event as CustomEvent;
-  const isObsolete = ('obsolete' in event.detail && event.detail.obsolete.length > 0);
-  // Si le spritesheet devra être régénéré, on place cette tentative en file d'attente
-  if (isObsolete) {
-    populateAttemptsVersions.push(event.detail.version);
-    populateAttemptsObsolete.push(...event.detail.obsolete);
-  }
-
-  // On liste les Pokémon modifiés
-  populateAttemptsModified.push(...event.detail.modified);
 
   // On peuple l'application avec les nouvelles données
   notify('Mise à jour des données...', '', 'loading', () => {}, 999999999);
-  await appPopulate(false, event.detail.obsolete, event.detail.modified, event.detail.version);
+  await appPopulate(false, event.detail.modified);
   await appDisplay(false);
   unNotify();
-
-  // Si le spritesheet doit être régénéré
-  if (isObsolete) {
-    // Si une tentative plus récente est déjà en file d'attente, on ne fait rien
-    if (Math.max(...populateAttemptsVersions) > event.detail.version) return;
-
-    // Si une version plus récente du spritesheet est déjà utilisée, on ne fait rien
-    /*const previousSpriteVersion = document.documentElement.style.getPropertyValue('--link-sprites')
-                                  .match(Params.spriteRegex)?.[1];
-    if (previousSpriteVersion >= event.detail.version) return;*/
-
-    // On génère le nouveau spritesheet et on le place dans le cache
-    /*const version = await updateSprite(event.detail.version);
-    if (isNaN(version)) { console.log('Problème de version du sprite ?'); return; }
-  
-    // On pré-charge le nouveau spritesheet et ensuite on l'utilise dans la section 'mes chromatiques'
-    await loadAllImages([`./sprites--${version}.php`]);
-    document.documentElement.style.setProperty('--link-sprites', `url('/remidex/sprites--${version}.php')`);
-    
-    // On met à jour l'ordre des sprites
-    Array.from(document.querySelectorAll('[data-futur-ordre-sprite]')).forEach(card => {
-      const ordre = card.dataset.futurOrdreSprite;
-      card.setAttribute('ordre-sprite', ordre);
-      card.removeAttribute('data-futur-ordre-sprite');
-    });*/
-  }
 })
 
 
