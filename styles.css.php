@@ -493,6 +493,12 @@ pokemon-card,
   grid-template-rows: 1fr;
   position: relative;
   order: var(--order, 0);
+
+}
+
+pokemon-card + pokemon-card {
+  content-visibility: auto;
+  contain-intrinsic-size: 10px 126px;
 }
 
 .pokemon-sprite,
@@ -1073,6 +1079,11 @@ body:not([data-section-actuelle=pokedex]) .only-pokedex {
   align-items: flex-start;
 }
 
+.pokedex-gen + .pokedex-gen {
+  content-visibility: auto;
+  contain-intrinsic-size: 10px 1000px;
+}
+
 .pokedex-gen>.pkspr {
   position: relative;
   margin: 0 var(--side-margin);
@@ -1388,6 +1399,11 @@ picture.no-shiny>span {
   order: 0;
   padding: 8px;
   box-sizing: border-box;
+}
+
+.hunt-card + .hunt-card {
+  content-visibility: auto;
+  contain-intrinsic-size: 10px 126px;
 }
 
 .hunt-card>.pokemon-sprite {
