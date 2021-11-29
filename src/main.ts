@@ -4,17 +4,13 @@ import './components/load-spinner/loadSpinner.js';
 import './components/pokemon-card/pokemonCard.js';
 import './components/sync-progress/syncProgress.js';
 import { DexDatalist } from './DexDatalist.js';
-import { playEasterEgg } from './easterEgg.js';
 import { initFiltres, openFiltres } from './filtres.js';
 import { Hunt } from './Hunt.js';
-import './loadSpinner.component.js';
 import { dataStorage, huntStorage, shinyStorage } from './localforage.js';
 import { navigate, sectionActuelle } from './navigate.js';
 import { notify, unNotify } from './notification.js';
 import { callResize, changeAutoMaj, export2json, setTheme, wait } from './Params.js';
-import './pokemonCard.component.js';
 import { initSpriteViewer } from './spriteViewer.js';
-import './syncProgress.component.js';
 
 
 
@@ -159,9 +155,6 @@ boutonSupprimer.addEventListener('click', async event => {
   }
 });
 
-// Active l'easter egg de la section a-propos
-(document.querySelector('.easter-egg') as HTMLElement).onclick = playEasterEgg;
-
 // Initialise les filtres
 initFiltres();
 
@@ -266,11 +259,11 @@ window.addEventListener('populate', async (_event: Event) => {
 // LANCEMENT DE L'APPLICATION
 
 // Au rechargement de l'appli, indiquer qu'on est sur la section de départ
-history.replaceState({section: 'mes-chromatiques'}, '');
-
-// Lancement du service worker
-window.addEventListener('load', appStart);
+history.replaceState({ section: 'mes-chromatiques' }, '');
 
 // Gère le redimensionnement de la fenêtre
 window.addEventListener('resize', callResize);
 window.addEventListener('orientationchange', callResize);
+
+// Lancement de l'appli
+appStart();

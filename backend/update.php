@@ -11,17 +11,19 @@ clearstatcache();
 // Vérifie les dates de dernière modification des fichiers
 function getFilesVersion()
 {
-  $listeFichiers = json_decode(file_get_contents('cache.json'), true);
+  $rootDir = dirname(__DIR__, 1);
+
+  $listeFichiers = json_decode(file_get_contents("$rootDir/cache.json"), true);
   $listeFichiers = $listeFichiers['fichiers'];
   $listeFichiers[0] = './index.php';
-  foreach(glob('pages/*.html') as $f) {
+  foreach(glob('/pages/*.html') as $f) {
     $listeFichiers[] = $f;
   }
 
   $versionFichiers = 0;
   foreach($listeFichiers as $fichier)
   {
-    $dateFichier = filemtime($fichier);
+    $dateFichier = filemtime($rootDir.substr($fichier, 1));
 
     if ($dateFichier > $versionFichiers)
       $versionFichiers = $dateFichier;
@@ -35,7 +37,9 @@ function getFilesVersion()
 // Récupère les infos sur tous les Pokémon et leurs formes
 function getPokemonData()
 {
-  $dir = "./sprites-home/big";
+  $rootDir = dirname(__DIR__, 1);
+
+  $dir = "$rootDir/images/pokemon-sprites/home";
   $files = scandir($dir);
 
   $pokemons = [];

@@ -1,7 +1,7 @@
 import { appDisplay, appPopulate } from './appContent.js';
 import { dataStorage, huntStorage, pokemonData, shinyStorage } from './localforage.js';
 import { notify } from './notification.js';
-import { adoptStyleSheets, initStyleSheets, Params, recalcOnResize, setTheme, timestamp2date, wait, webpSupport } from './Params.js';
+import { Params, recalcOnResize, setTheme, timestamp2date, wait, webpSupport } from './Params.js';
 import { upgradeStorage } from './upgradeStorage.js';
 
 
@@ -10,8 +10,6 @@ import { upgradeStorage } from './upgradeStorage.js';
 // On enregistre le service worker
 // et on le met à jour si la version du site a changé
 let currentWorker: ServiceWorker | null;
-let appCached;
-let appChargee;
 let updateAvailable = 0;
 
 async function initServiceWorker() {
@@ -67,11 +65,9 @@ export async function appStart() {
     if (trueKeys.length >= 1) filesInstalled = true;
 
     if (filesInstalled && dataInstalled && serviceWorkerReady) {
-      appCached = true;
       log = '[:)] L\'application est déjà installée localement.';
       initServiceWorker();
     } else {
-      appCached = false;
       throw '[:(] L\'application n\'est pas installée localement';
     }
   }
@@ -90,7 +86,6 @@ export async function appStart() {
   }
 
   try {
-    appChargee = 'loading';
     console.log(log);
     console.log('[:)] Chargement de l\'application...');
     recalcOnResize();
@@ -99,9 +94,7 @@ export async function appStart() {
     const onlineBackup = await dataStorage.getItem('online-backup');
     if (onlineBackup) await waitBackup();
 
-    // ÉTAPE 3.97 : on applique les stylesheets et le thème
-    await initStyleSheets();
-    adoptStyleSheets(undefined, ['materialIcons', 'iconsheet', 'pokesprite']);
+    // ÉTAPE 3.97 : on applique le thème
     await setTheme();
     try {
       window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => setTheme(undefined));
@@ -134,7 +127,6 @@ export async function appStart() {
     console.log(log);
 
     // Fini !! :)
-    appChargee = true;
 
     // ÉTAPE bonus : si nécessaire, on vérifie si l'application
     // peut être installée ou si une mise à jour est disponible
@@ -153,7 +145,6 @@ export async function appStart() {
   // En cas d'erreur critique, on propose de réinstaller
   catch(error) {
     console.error(error);
-    appChargee = false;
 
     async function forceUpdateNow() {
       await Promise.all([ dataStorage.clear(), shinyStorage.clear(), pokemonData.clear() ]);

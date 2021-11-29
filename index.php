@@ -23,19 +23,14 @@
 
     <script>window.tempsChargementDebut = Date.now();</script>
     <script defer src="../_common/polyfills/adoptedStyleSheets.min.js"></script>
+    <script type="esms-options">
+    {
+      "polyfillEnable": ["css-modules", "json-modules"]
+    }
+    </script>
     <script defer src="../_common/polyfills/es-module-shims.js"></script>
     <script defer src="./ext/localforage.min.js"></script>
-    <script type="module">
-      import { pokemonData, shinyStorage, dataStorage, huntStorage } from './modules/localforage.js';
-
-      
-
-      Promise.all([dataStorage.ready(), shinyStorage.ready(), pokemonData.ready(), huntStorage.ready()])
-      .then(() => setTheme());
-
-      window.matchMedia('(prefers-color-scheme: dark)').addListener(event => setTheme());
-      window.matchMedia('(prefers-color-scheme: light)').addListener(event => setTheme());
-    </script>
+    <script type="module" src="./modules/main.js"></script>
 
     <?php $mods = preg_filter('/(.+).js/', '$1', scandir(__DIR__.'/modules'));
     foreach($mods as $mod) { ?>
@@ -43,7 +38,7 @@
     <?php } ?>
 
     <link rel="stylesheet" href="./styles.css.php">
-    <link rel="stylesheet" href="./ext/material-icons.css">
+    <link rel="stylesheet" href="./ext/material_icons.css">
     <link rel="stylesheet" href="./ext/pokesprite.css">
     <link rel="stylesheet" href="./images/iconsheet.css">
   </head>
@@ -155,9 +150,5 @@
     <!-- Mesure de la fenêtre -->
     <div id="hauteur-fenetre" style="width: 0; height: 100vh; position: absolute;"></div>
     <div id="largeur-fenetre" style="width: 100vw; height: 0; position: absolute;"></div>
-
-    <!-- Scripts -->
-    <script type="module" src="./scripts.js"></script>
-
   </body>
 </html>

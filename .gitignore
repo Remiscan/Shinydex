@@ -5,4 +5,4 @@ test.php
 images/out/
 
 # Ignore compiled js for now
-modules/*.js
+modules

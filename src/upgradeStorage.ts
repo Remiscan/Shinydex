@@ -24,7 +24,7 @@ export async function upgradeStorage(fromJSON: boolean = false): Promise<void> {
   }
 
   // Delete old, now obsolete stored items
-  // (none for now)
+  await dataStorage.removeItem('version-bdd');
 
   await dataStorage.setItem('last-storage-upgrade', Date.now());
   return;
