@@ -1,6 +1,6 @@
 import { getNames } from './DexDatalist.js';
-import { playEasterEgg, prepareEasterEgg } from './easterEgg.js';
 import { closeFiltres, openFiltres } from './filtres.js';
+import { disableLazyLoad, enableLazyLoad } from './lazyLoading.js';
 import { loadAllImages, Params } from './Params.js';
 import { closeSpriteViewer, openSpriteViewer } from './spriteViewer.js';
 
@@ -9,6 +9,18 @@ import { closeSpriteViewer, openSpriteViewer } from './spriteViewer.js';
 export let sectionActuelle = 'mes-chromatiques';
 export const sections = ['mes-chromatiques', 'pokedex', 'chasses-en-cours', 'parametres', 'a-propos'];
 
+// Récupère la première carte d'une section
+const firstCard = (section: Element): Element | null | undefined => {
+  let card;
+  switch (section.id) {
+    case 'mes-chromatiques': card = section.querySelector('pokemon-card'); break;
+    case 'pokedex':          card = section.querySelector('.pokedex-gen'); break;
+    case 'hunts':            card = section.querySelector('.hunt-card'); break;
+  }
+  return card;
+};
+
+// Navigue vers la section demandée
 export async function navigate(sectionCible: string, position = 0, historique = true) {
   if (sectionActuelle == sectionCible) return Promise.resolve();
 
@@ -26,18 +38,11 @@ export async function navigate(sectionCible: string, position = 0, historique = 
   await new Promise((resolve, reject) => {
     closeFiltres();
 
-    // Préparation de l'easter-egg de la section 'à propos'
-    if (sectionCible == 'a-propos' || (sectionCible == 'parametres' && Params.owidth >= Params.layoutPClarge))
-      playEasterEgg();
-    else
-      setTimeout(prepareEasterEgg, 200);
+    if (historique) history.pushState({section: sectionCible}, '');
 
-    // Essaie de réduire le TTFB pour les sprites du Pokédex
-    if (sectionCible == 'pokedex' || (sectionCible == 'mes-chromatiques' && Params.owidth >= Params.layoutPClarge))
-      loadAllImages(['./sprites-home/small/poke_capture_0670_005_fo_n_00000000_f_n.png']).catch(() => {});
-
-    if (historique)
-      history.pushState({section: sectionCible}, '');
+    // Désactive le lazy loading de la première carte
+    const oldFirstCard = firstCard(ancienneSection);
+    if (oldFirstCard) disableLazyLoad(oldFirstCard);
 
     // Animation du FAB
     const sectionsFabFilter = ['mes-chromatiques', 'pokedex'];
@@ -74,12 +79,11 @@ export async function navigate(sectionCible: string, position = 0, historique = 
     apparitionSection.addEventListener('finish', resolve);
   });
 
-  if (sectionCible == 'chasses-en-cours')
-    getNames();
+  if (sectionCible == 'chasses-en-cours') getNames();
 
-  const toUndefer = Array.from(ancienneSection.querySelectorAll('.defered'));
-  if (toUndefer.length != 0) ancienneSection.classList.remove('defered');
-  Array.from(ancienneSection!.querySelectorAll('.defered')).forEach(defered => defered.classList.replace('defered', 'defer'));
+  // Active le lazy loading de la première carte
+  const newFirstCard = firstCard(nouvelleSection);
+  if (newFirstCard) enableLazyLoad(newFirstCard);
 }
 
 

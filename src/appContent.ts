@@ -1,5 +1,6 @@
 import { filterCards, orderCards } from './filtres.js';
 import { huntedPokemon, initHunts } from './Hunt.js';
+import { lazyLoad } from './lazyLoading.js';
 import { dataStorage, huntStorage, shinyStorage } from './localforage.js';
 import { notify, unNotify } from './notification.js';
 import { loadAllImages, Params, timestamp2date, wait } from './Params.js';
@@ -103,7 +104,10 @@ export async function appPopulate(start: boolean = true, modified: string[] = []
     //// Liste principale
     {
       const conteneur = document.querySelector('#mes-chromatiques>.section-contenu')!;
-      for (const card of cardsToPopulate) { conteneur.appendChild(card); }
+      for (const card of cardsToPopulate) {
+        conteneur.appendChild(card);
+        lazyLoad(card);
+      }
     }
 
     // 🔽🔽🔽 Seulement au lancement de l'appli 🔽🔽🔽
@@ -136,7 +140,10 @@ export async function appPopulate(start: boolean = true, modified: string[] = []
 
       // Peuple le Pokédex
       const conteneur = document.querySelector('#pokedex>.section-contenu')!;
-      for (let genConteneur of gensToPopulate) { conteneur.appendChild(genConteneur); }
+      for (let genConteneur of gensToPopulate) {
+        conteneur.appendChild(genConteneur);
+        lazyLoad(genConteneur);
+      }
     }
 
     else {

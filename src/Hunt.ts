@@ -1,5 +1,6 @@
 import { startBackup } from './appLifeCycle.js';
 import { DexDatalist } from './DexDatalist.js';
+import { lazyLoad } from './lazyLoading.js';
 import { dataStorage, huntStorage, pokemonData, shinyStorage } from './localforage.js';
 import { navigate } from './navigate.js';
 import { notify } from './notification.js';
@@ -177,6 +178,7 @@ export class Hunt implements huntedPokemon {
     card.addEventListener('input', async () => await this.updateHunt());
 
     document.querySelector('#chasses-en-cours>.section-contenu')!.appendChild(card);
+    lazyLoad(card);
     document.querySelector('#chasses-en-cours')!.classList.remove('vide');
 
     // Animation de la carte
@@ -540,10 +542,14 @@ export async function initHunts() {
 
   // On génère les chasses restantes
   const keys = await huntStorage.keys();
-  if (keys.length == 0)
+  if (keys.length == 0) {
     document.querySelector('#chasses-en-cours')!.classList.add('vide');
-  else
+  } else {
+    for (const key of keys) {
+
+    }
     keys.forEach(async k => Hunt.build(await huntStorage.getItem(k), true));
+  }
 }
 
 
