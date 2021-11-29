@@ -1,3 +1,4 @@
+import { pokemonCard } from './components/pokemon-card/pokemonCard.js';
 import { filterCards, orderCards } from './filtres.js';
 import { huntedPokemon, initHunts } from './Hunt.js';
 import { lazyLoad } from './lazyLoading.js';
@@ -5,7 +6,6 @@ import { dataStorage, huntStorage, shinyStorage } from './localforage.js';
 import { notify, unNotify } from './notification.js';
 import { loadAllImages, Params, timestamp2date, wait } from './Params.js';
 import { frontendShiny, Pokemon } from './Pokemon.js';
-import { pokemonCard } from './pokemonCard.component.js';
 import { openSpriteViewer } from './spriteViewer.js';
 import { upgradeStorage } from './upgradeStorage.js';
 

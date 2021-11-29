@@ -1,7 +1,7 @@
-import { editHunt } from './Hunt.js';
-import { pokemonData } from './localforage.js';
-import { Params, wait } from './Params.js';
-import { frontendShiny, Shiny } from './Pokemon.js';
+import { editHunt } from '../../Hunt.js';
+import { pokemonData } from '../../localforage.js';
+import { Params, wait } from '../../Params.js';
+import { frontendShiny, Shiny } from '../../Pokemon.js';
 
 
 
@@ -25,7 +25,9 @@ declare global {
 
 const template = document.createElement('template');
 template.innerHTML = `
-<div class="pokemon-sprite"><div class="actual-sprite"></div></div>
+<div class="pokemon-sprite">
+  <img class="actual-sprite" width="112" height="112" loading="lazy"></img>
+</div>
 <div class="edit-icon">
   <i class="material-icons">edit</i>
   <svg><circle r="25" cx="25" cy="25"/></svg>
@@ -134,6 +136,8 @@ export class pokemonCard extends HTMLElement {
 
     if (shiny.horsChasse) card.setAttribute('horsChasse', '1');
     else                  card.removeAttribute('horsChasse');
+
+    card.setAttribute('sprite', await shiny.getSprite({ shiny: true, size: 112, format: Params.preferredImageFormat }));
   }
 
   // Met à jour le contenu de la carte à partir de ses attributs
@@ -317,7 +321,14 @@ export class pokemonCard extends HTMLElement {
           } else {
             element.classList.add('off');
           }
-        }
+        } break;
+
+        // Sprite
+        case 'sprite': {
+          const sprite = this.getAttribute('sprite') || '';
+          const img = this.querySelector('.actual-sprite')! as HTMLImageElement;
+          img.src = sprite;
+        } break;
       }
     }
   }
@@ -402,7 +413,7 @@ export class pokemonCard extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ['dexid', 'surnom', 'methode', 'compteur', 'time-capture', 'jeu', 'ball', 'notes', 'checkmark', 'DO', 'charm', 'shiny-rate', 'hacked', 'hors-chasse'];
+    return ['dexid', 'surnom', 'methode', 'compteur', 'time-capture', 'jeu', 'ball', 'notes', 'checkmark', 'DO', 'charm', 'shiny-rate', 'hacked', 'hors-chasse', 'sprite'];
   }
 
   connectedCallback() {

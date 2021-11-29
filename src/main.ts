@@ -1,5 +1,8 @@
 import { appDisplay, appPopulate, json2import } from './appContent.js';
 import { appStart, checkUpdate, manualUpdate, setOnlineBackup, startBackup } from './appLifeCycle.js';
+import './components/load-spinner/loadSpinner.js';
+import './components/pokemon-card/pokemonCard.js';
+import './components/sync-progress/syncProgress.js';
 import { DexDatalist } from './DexDatalist.js';
 import { playEasterEgg } from './easterEgg.js';
 import { initFiltres, openFiltres } from './filtres.js';

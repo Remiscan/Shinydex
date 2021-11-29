@@ -1,82 +1,11 @@
-import { Params } from './Params.js';
+import { Params } from '../../Params.js';
+// @ts-expect-error
+import sheet from './styles.css' assert { type: 'css' };
+
+
 
 const template = document.createElement('template');
 template.innerHTML = `
-<style>
-  @keyframes rotate {
-    0% { transform: rotate(0); }
-    100% { transform: rotate(360deg); }
-  }
-
-  :host {
-    --size: 32px;
-    width: var(--size);
-    height: var(--size);
-  }
-
-  svg {
-    width: 100%;
-    height: 100%;
-    overflow: visible;
-    opacity: 0;
-    transition: opacity .2s var(--easing-standard);
-  }
-
-  svg.loading,
-  svg.success,
-  svg.failure,
-  svg.lazy {
-    opacity: 1;
-  }
-
-  circle {
-    fill: transparent;
-  }
-
-  .progress-dots {
-    stroke: var(--text-color-soft);
-    stroke-width: 1px;
-    stroke-dasharray: 2px 3px;
-    stroke-dashoffset: 0;
-    transform-origin: center center;
-  }
-
-  .failure>.progress-dots {
-    stroke: var(--failure-color);
-    transition: stroke 0 linear;
-    transition-delay: .5s;
-  }
-
-  .lazy>.progress-dots {
-    stroke: var(--success-color);
-    transition: stroke .1s linear;
-    transition-delay: .5s;
-  }
-
-  .loading>.progress-dots,
-  .success>.progress-dots,
-  .lazy>.progress-dots {
-    stroke-dasharray: 2px 3px;
-    animation: rotate 10s infinite linear;
-  }
-
-  .finished>.progress-dots {
-    animation-play-state: paused;
-  }
-
-  .finished.success>.progress-dots {
-    opacity: 0;
-  }
-
-  .progress-line {
-    stroke: var(--progress-bar-color);
-    stroke-width: 2px;
-    stroke-dasharray: 101px;
-    stroke-dashoffset: 101px;
-    transform-origin: center center;
-  }
-</style>
-
 <svg>
   <circle class="progress-dots" cx="50%" cy="50%" r="50%"/>
   <circle class="progress-line" cx="50%" cy="50%" r="50%"/>
@@ -99,6 +28,7 @@ class syncProgress extends HTMLElement {
     super();
     this.shadow = this.attachShadow({ mode: 'open' });
     this.shadow.appendChild(template.content.cloneNode(true));
+    this.shadow.adoptedStyleSheets = [sheet];
   }
 
   get state() { return this.getAttribute('state'); }
