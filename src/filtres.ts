@@ -1,6 +1,6 @@
+import { pokemonCard } from './components/pokemon-card/pokemonCard.js';
 import { dataStorage, shinyStorage } from './localforage.js';
 import { Shiny } from './Pokemon.js';
-import { pokemonCard } from './pokemonCard.component.js';
 
 
 
@@ -66,14 +66,15 @@ function getShinyFiltres(shiny: Shiny): FiltresPokemon {
   // Legit
   switch (shiny.hacked) {
     case 3:
-      filtres.set('legit', 'clone');
-      break;
+      /*filtres.set('legit', 'clone');
+      break;*/
     case 2:
-      filtres.set('legit', 'hack');
-      break;
+      /*filtres.set('legit', 'hack');
+      break;*/
     case 1:
-      filtres.set('legit', 'maybe');
-      break;
+      /*filtres.set('legit', 'maybe');
+      break;*/
+      filtres.set('legit', 'non');
     default:
       filtres.set('legit', 'oui');
   }
@@ -297,8 +298,9 @@ export async function initFiltres() {
     const savedFiltres = (await dataStorage.getItem('filtres')) || defautFiltres;
     const allInputs = Array.from(document.querySelectorAll('input.filtre')) as HTMLInputElement[];
     for (const input of allInputs) {
-      if (savedFiltres.includes(input.value)) input.checked = true;
-      else                                    input.checked = false;
+      const [key, value] = input.value.split(':');
+      if (savedFiltres.get(key)?.includes(value)) input.checked = true;
+      else                                        input.checked = false;
     }
   }
 
