@@ -11,7 +11,8 @@ for await (const event of watcher) {
       catch (error) { console.log(error); continue; }
     } else {
       const newPath = path.replace('./src', './modules');
-      await Deno.copyFile(path, newPath);
+      try { await Deno.copyFile(path, newPath); }
+      catch (error) { console.log(error); continue; }
     }
   }
 }
