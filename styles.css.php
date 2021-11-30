@@ -113,8 +113,8 @@ p + p {
 
 html,
 body {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   overflow-x: hidden;
   overflow-y: hidden;
 }
@@ -2439,10 +2439,6 @@ input:disabled + label.switch {
 
   .titre-icones {
     display: none;
-  }
-
-  #pokedex .section-titre>h1 {
-    opacity: 0;
   }
 
   #pokedex .defer {
