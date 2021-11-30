@@ -1,5 +1,5 @@
 import { pokemonCard } from './components/pokemon-card/pokemonCard.js';
-import { dataStorage, shinyStorage } from './localforage.js';
+import { dataStorage, pokemonData, shinyStorage } from './localforage.js';
 import { Shiny } from './Pokemon.js';
 
 
@@ -157,9 +157,15 @@ export async function filterCards(_filtres?: ListeFiltres, ids: string[] = []): 
     else                               icon.classList.remove('got');
   }
 
+  // Compte le nombre d'espèces du Pokédex correspondant aux filtres
+  const dexids = (await Promise.all(correspondingids.map(huntid => shinyStorage.getItem(huntid)))).map(shiny => shiny.dexid);
+  const compteurDex = dexids.length;
+  document.querySelector('#pokedex .compteur > .caught')!.innerHTML = String(compteurDex);
+  document.querySelector('#pokedex .compteur > .total')!.innerHTML = String((await pokemonData.keys()).length - 1);
+
   // Compte le nombre de Pokémon encore affichés
   const compteur = correspondingids.length;
-  document.querySelector('.compteur')!.innerHTML = String(compteur);
+  document.querySelector('#mes-chromatiques .compteur')!.innerHTML = String(compteur);
   (document.querySelector('#mes-chromatiques .section-contenu') as HTMLElement).style.setProperty('--compteur', String(compteur));
   if (compteur == 0) document.querySelector('#mes-chromatiques')!.classList.add('vide');
   else               document.querySelector('#mes-chromatiques')!.classList.remove('vide');
