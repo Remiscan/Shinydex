@@ -131,12 +131,12 @@ function getData() {
   .then(response => response.json());
 
   // On récupère la liste des fichiers à mettre en cache
-  const promiseFiles = fetch('cache.json?date=' + Date.now())
+  const promiseFiles = fetch('cache.json.php?date=' + Date.now())
   .then(response => {
     if (response.status == 200)
       return response;
     else
-      throw '[:(] Erreur ' + response.status + ' lors de la requête (cache.json)';
+      throw '[:(] Erreur ' + response.status + ' lors de la requête (cache.json.php)';
   })
   .then(response => response.json());
 

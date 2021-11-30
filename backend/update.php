@@ -13,17 +13,21 @@ function getFilesVersion()
 {
   $rootDir = dirname(__DIR__, 1);
 
-  $listeFichiers = json_decode(file_get_contents("$rootDir/cache.json"), true);
+  $listeFichiers = json_decode(file_get_contents("$rootDir/cache.json.php"), true);
   $listeFichiers = $listeFichiers['fichiers'];
   $listeFichiers[0] = './index.php';
-  foreach(glob('/pages/*.html') as $f) {
+  foreach(glob('./pages/*.html') as $f) {
     $listeFichiers[] = $f;
   }
 
   $versionFichiers = 0;
-  foreach($listeFichiers as $fichier)
-  {
-    $dateFichier = filemtime($rootDir.substr($fichier, 1));
+  foreach($listeFichiers as $fichier) {
+    $path = $fichier;
+    if (str_starts_with($path, '../'))
+      $path = str_replace('../', dirname(__DIR__, 2).'/', $path);
+    else if (str_starts_with($path, './'))
+      $path = str_replace('./', dirname(__DIR__, 1).'/', $path);
+    $dateFichier = filemtime($path);
 
     if ($dateFichier > $versionFichiers)
       $versionFichiers = $dateFichier;
@@ -43,8 +47,7 @@ function getPokemonData()
   $files = scandir($dir);
 
   $pokemons = [];
-  forEach(Pokemon::ALL_POKEMON as $id => $name)
-  {
+  forEach(Pokemon::ALL_POKEMON as $id => $name) {
     $sprites = preg_grep('/poke_capture_([0]+)?' . intval($id) . '_.+_n\.png/', $files);
     $pokemons[] = new Pokemon($id, $name, $sprites);
   }

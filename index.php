@@ -32,10 +32,20 @@
     <script defer src="./ext/localforage.min.js"></script>
     <script type="module" src="./modules/main.js"></script>
 
-    <?php $mods = preg_filter('/(.+).js/', '$1', scandir(__DIR__.'/modules'));
-    foreach($mods as $mod) { ?>
-    <link rel="modulepreload" href="./modules/<?=$mod?>.js">
-    <?php } ?>
+    <?php
+    $modules = new RecursiveIteratorIterator(
+      new RecursiveDirectoryIterator(
+        __DIR__.'/modules',
+        RecursiveDirectoryIterator::SKIP_DOTS
+      ),
+      RecursiveIteratorIterator::SELF_FIRST
+    );
+    foreach($modules as $mod => $obj) {
+      if (is_dir($mod)) continue;
+      ?>
+    <link rel="modulepreload" href="<?=str_replace(__DIR__, '.', $mod)?>">
+      <?php
+    } ?>
 
     <link rel="stylesheet" href="./styles.css.php">
     <link rel="stylesheet" href="./ext/material_icons.css">
@@ -54,7 +64,7 @@
     <nav class="bottom-bar">
       <a class="nav-link lien-section" data-section="mes-chromatiques">
         <i class="material-icons">catching_pokemon</i>
-        <span>Mes chromatiques</span>
+        <span>Mes Pokémon<svg class="shinystars"><use xlink:href="./images/shinystars.svg#stars"></use></svg></span>
       </a>
 
       <a class="nav-link lien-section" data-section="pokedex">
@@ -135,10 +145,10 @@
 
     <!-- Notification -->
     <div class="notification bottom-bar off" id="notification">
-      <span class="notif-texte">Mise à jour disponible...</span>
+      <span class="notif-texte"></span>
       <div class="notif-bouton">
-        <span>Installer</span>
-        <i class="material-icons">update</i>
+        <span></span>
+        <i class="material-icons"></i>
       </div>
 
       <div class="progression-maj"></div>
