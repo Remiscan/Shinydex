@@ -166,7 +166,7 @@ export async function appStart() {
 
   // On affiche la version de l'appli
   const tempsChargement = performance.now() - window.tempsChargementDebut;
-  document.getElementById('version-tempschargement')!.innerHTML = String(tempsChargement);
+  document.getElementById('version-tempschargement')!.innerHTML = String(Math.round(tempsChargement));
   document.getElementById('version-fichiers')!.innerHTML = timestamp2date(await dataStorage.getItem('version-fichiers'));
 
   // On pré-charge les icônes
@@ -230,8 +230,7 @@ export async function appStart() {
 
 ///////////////////////////
 // Met à jour l'application
-function appUpdate(update = false)
-{
+function appUpdate(update = false) {
   const progressBar = document.querySelector('.progression-maj') as HTMLElement;
   progressBar.style.setProperty('--progression', '0');
 
@@ -276,8 +275,7 @@ function appUpdate(update = false)
 
 ////////////////////////////////////////
 // Met à jour l'application manuellement
-export async function manualUpdate()
-{
+export async function manualUpdate() {
   try {
     if (!navigator.onLine)
       throw 'Connexion internet indisponible';
@@ -301,8 +299,7 @@ export async function manualUpdate()
 /////////////////////////////////////////////
 // Vérifie la disponibilité d'une mise à jour
 let checkingUpdate = 0;
-export async function checkUpdate(checkNotification = false)
-{
+export async function checkUpdate(checkNotification = false) {
   const notif = document.getElementById('notification');
   if (notif!.classList.contains('on') || checkingUpdate)
     return;
@@ -325,24 +322,21 @@ export async function checkUpdate(checkNotification = false)
       notifyMaj();
 
     // On lance mod_update.php pour récupérer les données les plus récentes
-    const response = await fetch('/remidex/mod_update.php?type=check&date=' + Date.now());
+    const response = await fetch('/remidex/backend/update.php?type=check&date=' + Date.now());
     if (response.status != 200)
       throw '[:(] Erreur ' + response.status + ' lors de la requête';
     const data = await response.json();
 
     const versionFichiers = await dataStorage.getItem('version-fichiers');
 
-    if ((versionFichiers != data['version-fichiers']))
-    {
+    if ((versionFichiers != data['version-fichiers'])) {
       updateAvailable = 1;
       console.log('[:|] Mise à jour détectée');
       console.log('     Installé : fichiers v. ' + timestamp2date(versionFichiers));
       console.log('   Disponible : fichiers v. ' + timestamp2date(data['version-fichiers']));
 
       notifyMaj();
-    }
-    else
-    {
+    } else {
       updateAvailable = 0;
       console.log('[:)] Aucune mise à jour disponible');
       console.log('     Installé : fichiers v. ' + timestamp2date(versionFichiers));

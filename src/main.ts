@@ -286,7 +286,6 @@ window.addEventListener('populate', async (_event: Event) => {
   const notification = new Notif('Mise à jour des données...', '', 'loading', Notif.maxDelay, () => {}, true);
   notification.prompt();
   await appPopulate(false, event.detail.modified);
-  await appDisplay(false);
   notification.hide();
 })
 
@@ -299,4 +298,8 @@ window.addEventListener('populate', async (_event: Event) => {
 history.replaceState({ section: 'mes-chromatiques' }, '');
 
 // Lancement de l'appli
-appStart();
+try {
+  appStart();
+} catch (error) {
+  // Réagir ici à une erreur critique qui empêche le chargement de l'appli.
+}
