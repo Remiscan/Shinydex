@@ -4,6 +4,7 @@ import './components/load-spinner/loadSpinner.js';
 import './components/pokemon-card/pokemonCard.js';
 import './components/sync-progress/syncProgress.js';
 import { DexDatalist } from './DexDatalist.js';
+import { export2json, json2import } from './exportToJSON.js';
 import { initFiltres, openFiltres } from './filtres.js';
 import { Hunt } from './Hunt.js';
 import { dataStorage, huntStorage, shinyStorage } from './localforage.js';

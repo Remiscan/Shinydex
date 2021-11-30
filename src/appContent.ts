@@ -227,39 +227,3 @@ export async function appDisplay(start = true)
     throw error;
   }
 }
-
-
-//////////////////////////////////////////////////////////
-// Peuple l'application avec les données d'un fichier JSON
-export async function json2import(file: File | Blob | undefined) {
-  if (file == null) return;
-
-  const reader = new FileReader();
-  reader.addEventListener('load', async (event: ProgressEvent)  => {
-    const importedData = typeof reader.result === 'string' ? JSON.parse(reader.result) : reader.result;
-    if (!('shiny' in importedData) || !('hunts' in importedData))
-      throw 'Le fichier importé est incorrect.';
-
-    notify('Mise à jour des données...', '', 'loading', () => {}, 999999999);
-    const startTime = performance.now();
-
-    await shinyStorage.ready();
-    await Promise.all(
-      importedData.shiny.map((shiny: frontendShiny) => shinyStorage.setItem(String(shiny.huntid), shiny))
-    );
-    await huntStorage.ready();
-    await Promise.all(
-      importedData.hunts.map((hunt: huntedPokemon) => huntStorage.setItem(String(hunt.huntid), hunt))
-    );
-
-    await upgradeStorage(true);
-
-    await appPopulate(false);
-    await appDisplay(false);
-
-    const duration = performance.now() - startTime;
-    await wait(Math.max(0, 1000 - duration));
-    unNotify();
-  });
-  reader.readAsText(file);
-}

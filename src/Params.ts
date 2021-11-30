@@ -128,44 +128,6 @@ export function timestamp2date(timestamp: number): string {
 }
 
 
-//////////////////////////////
-// Exporte les données en JSON
-export async function export2json() {
-  const getItems = async (store: localForageAPI) => {
-    await store.ready();
-    const keys = await store.keys();
-    const items = [];
-    for (const key of keys) {
-      items.push(await store.getItem(key));
-    }
-    return items;
-  }
-  const data = { shiny: await getItems(shinyStorage), hunts: await getItems(huntStorage) };
-  const dataString = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(data))}`;
-  const a = document.createElement('A') as HTMLAnchorElement;
-  a.href = dataString;
-  await dataStorage.ready();
-  a.download = `remidex-${timestamp2date(Date.now() / 1000).replace(' ', '_')}.json`;
-  a.setAttribute('style', 'position: absolute; width: 0; height: 0;');
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-}
-
-
-////////////////////////////////////////////
-// Récupère la version du spritesheet actuel
-export async function getVersionSprite() {
-  await dataStorage.ready();
-  const versionFichiers = await dataStorage.getItem('version-fichiers');
-  const cacheActuel = await caches.open(`remidex-sw-${versionFichiers}`);
-  const versionsSprites = (await cacheActuel.keys()).map(req => req.url)
-                                                    .filter(url => url.match(Params.spriteRegex))
-                                                    .map(url => Number(url.match(Params.spriteRegex)?.[1]));
-  return Math.max(...versionsSprites);
-}
-
-
 ////////////////////////////////
 // Pads a string with leading 0s
 export function pad(s: string, long: number): string {
