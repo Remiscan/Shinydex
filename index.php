@@ -84,7 +84,7 @@
 
       <a class="nav-link lien-section" data-section="partage">
         <i class="material-icons">group</i>
-        <span>Partage</span>
+        <span>Amis</span>
       </a>
 
       <!-- Seulement sur PC -->
@@ -171,9 +171,5 @@
     <section id="sprite-viewer">
       <?php include './pages/sprite-viewer.html'; ?>
     </section>
-
-    <!-- Mesure de la fenêtre -->
-    <div id="hauteur-fenetre" style="width: 0; height: 100vh; position: absolute;"></div>
-    <div id="largeur-fenetre" style="width: 100vw; height: 0; position: absolute;"></div>
   </body>
 </html>
