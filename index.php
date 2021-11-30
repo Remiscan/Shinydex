@@ -64,12 +64,12 @@
     <nav class="bottom-bar">
       <a class="nav-link lien-section" data-section="mes-chromatiques">
         <i class="material-icons">catching_pokemon</i>
-        <span>Mes Pokémon<svg class="shinystars"><use xlink:href="./images/shinystars.svg#stars"></use></svg></span>
+        <span>Pokémon <shiny-stars></shiny-stars></span>
       </a>
 
       <a class="nav-link lien-section" data-section="pokedex">
         <i class="material-icons">public</i>
-        <span>Pokédex<svg class="shinystars"><use xlink:href="./images/shinystars.svg#stars"></use></svg></span>
+        <span>Pokédex <shiny-stars></shiny-stars></span>
       </a>
 
       <!-- Seulement sur mobile -->

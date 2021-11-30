@@ -1,0 +1,6 @@
+svg {
+  --size: 1em;
+  width: var(--size);
+  height: var(--size);
+  fill: var(--color);
+}

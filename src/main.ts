@@ -2,6 +2,7 @@ import { appDisplay, appPopulate } from './appContent.js';
 import { appStart, changeAutoMaj, checkUpdate, manualUpdate, setOnlineBackup } from './appLifeCycle.js';
 import './components/load-spinner/loadSpinner.js';
 import './components/pokemon-card/pokemonCard.js';
+import './components/shiny-stars/shinyStars.js';
 import './components/sync-progress/syncProgress.js';
 import { DexDatalist } from './DexDatalist.js';
 import { export2json, json2import } from './exportToJSON.js';

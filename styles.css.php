@@ -102,14 +102,6 @@ p + p {
   margin-top: 16px;
 }
 
-.shinystars {
-  height: 12px;
-  width: 12px;
-  fill: var(--text-color);
-  position: relative;
-  top: -1px;
-}
-
 /* Empêcher le contour bizarre que Chrome ajoute autour d'éléments en focus */
 * {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
@@ -216,8 +208,13 @@ body[data-section-actuelle=partage] .nav-link[data-section=partage] {
   --nav-text-color: var(--nav-text-color-on);
 }
 
-.nav-link .shinystars {
-  --text-color: var(--nav-text-color);
+shiny-stars {
+  display: inline-grid;
+  --color: currentColor;
+}
+
+.nav-link shiny-stars {
+  --size: 1.2em;
 }
 
 .search-button > i {
@@ -363,6 +360,20 @@ h1 {
   background: var(--fab-color);
   color: white;
 	letter-spacing: 0;
+}
+
+#pokedex .compteur {
+  color: rgb(255, 255, 255, .7);
+  font-size: 15px;
+}
+
+#pokedex .compteur > .caught {
+  color: white;
+  font-size: 20px;
+}
+
+#pokedex .compteur > span {
+  padding: 0 0.2em;
 }
 
 .section-contenu {
@@ -878,11 +889,6 @@ section:not(.defered) .defer,
   height: 100%;
 }
 
-#mes-chromatiques.vide>.section-contenu {
-  padding-bottom: 0;
-  height: 100%;
-}
-
 .message-vide {
   display: grid;
   grid-template-columns: 1fr;
@@ -1231,16 +1237,16 @@ body[data-viewer-open=true] #sprite-viewer {
   margin-right: 16px;
 }
 
-[for=switch-shy-reg]>.shinystars {
+[for=switch-shy-reg] > shiny-stars {
   display: none;
   position: absolute;
   top: 50%;
   left: calc(50% - 10px);
   transform: translate(-50%, -50%);
-  fill: var(--sprite-viewer-bg-color);
+  --color: var(--sprite-viewer-bg-color);
 }
 
-#sprite-viewer.shiny [for=switch-shy-reg]>.shinystars {
+#sprite-viewer.shiny [for=switch-shy-reg] > shiny-stars {
   display: block;
 }
 
