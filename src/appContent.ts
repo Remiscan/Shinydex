@@ -4,18 +4,10 @@ import { initHunts } from './Hunt.js';
 import { lazyLoad } from './lazyLoading.js';
 import { dataStorage, shinyStorage } from './localforage.js';
 import { Notif } from './notification.js';
-import { loadAllImages, Params, timestamp2date } from './Params.js';
 import { Pokemon } from './Pokemon.js';
 import { openSpriteViewer } from './spriteViewer.js';
 
 
-
-declare global {
-  interface Window {
-    tempsChargementDebut: number,
-    tempsChargementFin: number
-  }
-}
 
 let populating = false;
 let displaying = false;
@@ -182,11 +174,6 @@ export async function appPopulate(start: boolean = true, modified: string[] = []
 // Affiche l'application
 export async function appDisplay(start = true)
 {
-  if (displaying) return;
-  displaying = true;
-
-  let listeImages = [`./ext/pokesprite.png`];
-
   async function promiseInit() {
     // Nombre de cartes en tout (filtrées ou non)
     const keys = await shinyStorage.keys();
@@ -199,38 +186,6 @@ export async function appDisplay(start = true)
       document.querySelector('.compteur')!.innerHTML = '0';
     }
     
-    document.getElementById('version-fichiers')!.innerHTML = timestamp2date(await dataStorage.getItem('version-fichiers'));
-    if (start) {
-      window.tempsChargementFin = Date.now();
-      document.getElementById('version-tempschargement')!.innerHTML = String(window.tempsChargementFin - window.tempsChargementDebut);
-    }
-    
     return;
   };
-
-  try {
-    if (start) await Promise.all([loadAllImages(listeImages), promiseInit()]);
-    else await promiseInit();
-
-    if (start) {
-      // Efface l'écran de chargement
-      const loadScreen = document.getElementById('load-screen')!;
-      const byeLoad = loadScreen.animate([
-        { opacity: 1 },
-        { opacity: 0 }
-      ], {
-        duration: 100,
-        easing: Params.easingStandard,
-        fill: 'forwards'
-      });
-      byeLoad.onfinish = loadScreen.remove;
-    }
-
-    displaying = false;
-    return '[:)] Affichage du Rémidex réussi !';
-  } catch (error) {
-    displaying = false;
-    console.error(error);
-    throw error;
-  }
 }

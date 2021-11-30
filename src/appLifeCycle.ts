@@ -1,7 +1,7 @@
 import { appDisplay, appPopulate } from './appContent.js';
 import { dataStorage, huntStorage, pokemonData, shinyStorage } from './localforage.js';
 import { Notif } from './notification.js';
-import { Params, setTheme, timestamp2date, wait, webpSupport } from './Params.js';
+import { backgroundSync, immediateSync } from './syncBackup.js';
 import { upgradeStorage } from './upgradeStorage.js';
 
 
@@ -350,7 +350,7 @@ export async function setOnlineBackup(checked: boolean): Promise<void> {
   if (checked) {
     document.getElementById('parametres')!.dataset.onlineBackup = '1';
     await dataStorage.setItem('online-backup', 1);
-    await startBackup();
+    await backgroundSync();
   } else {
     document.getElementById('parametres')!.removeAttribute('data-online-backup');
     await dataStorage.setItem('online-backup', 0);

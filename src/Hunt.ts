@@ -1,4 +1,3 @@
-import { startBackup } from './appLifeCycle.js';
 import { DexDatalist } from './DexDatalist.js';
 import { lazyLoad } from './lazyLoading.js';
 import { dataStorage, huntStorage, pokemonData, shinyStorage } from './localforage.js';
@@ -6,6 +5,7 @@ import { navigate } from './navigate.js';
 import { Notif } from './notification.js';
 import { Params, warnBeforeDestruction } from './Params.js';
 import { Forme, frontendShiny, Methode, Pokemon, Shiny } from './Pokemon.js';
+import { backgroundSync } from './syncBackup.js';
 
 
 
@@ -429,7 +429,7 @@ export class Hunt implements huntedPokemon {
       window.dispatchEvent(new CustomEvent('populate', { detail: {
         modified: [this.huntid]
       } }));
-      if (onlineBackup) await startBackup();
+      if (onlineBackup) await backgroundSync();
     }
     catch(error) {
       console.error(error);

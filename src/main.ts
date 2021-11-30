@@ -12,6 +12,7 @@ import { navigate, sectionActuelle } from './navigate.js';
 import { Notif } from './notification.js';
 import { setTheme, wait, warnBeforeDestruction } from './Params.js';
 import { initSpriteViewer } from './spriteViewer.js';
+import { backgroundSync } from './syncBackup.js';
 
 
 
@@ -107,8 +108,8 @@ dataStorage.getItem('last-sync').then((value?: string) => {
 });
 
 // Détecte le clic sur l'état du dernier backup pour en lancer un nouveau
-(document.querySelector('.info-backup.failure') as HTMLButtonElement).onclick = startBackup;
-(document.querySelector('.info-backup.success') as HTMLButtonElement).onclick = startBackup;
+(document.querySelector('.info-backup.failure') as HTMLButtonElement).onclick = backgroundSync;
+(document.querySelector('.info-backup.success') as HTMLButtonElement).onclick = backgroundSync;
 
 // Détecte le clic (court ou long) sur le bouton de recherche de mise à jour
 {
