@@ -247,8 +247,7 @@ function appUpdate(update = false)
       if (event.data.error) {
         console.error(event.data.error);
         reject('[:(] Erreur de contact du service worker');
-      }
-      else {
+      } else {
         if (update) {
           progressBar.style.setProperty('--progression', '1');
           setTimeout(function() { location.reload(); }, 100);
@@ -263,13 +262,12 @@ function appUpdate(update = false)
     // On surveille l'avancée du SW grâce aux messages qu'il envoie
     let totalLoaded = 0;
     navigator.serviceWorker.addEventListener('message', event => {
-      if (event.data.loaded)
-      {
+      if (event.data.loaded) {
         totalLoaded++;
         progressBar.style.setProperty('--progression', String(totalLoaded / (event.data.total + 1)));
+      } else if (!event.data.loaded && event.data.erreur) {
+        reject('[:(] Certains fichiers n\'ont pas pu être installés');
       }
-      else if (!event.data.loaded && event.data.erreur)
-        reject('[:(] Certains fichiers n\'ont pas pu être récupérés');
     });
   });
 }
