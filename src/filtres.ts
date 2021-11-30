@@ -17,13 +17,6 @@ const allFiltres: ListeFiltres = new Map([
   ['espece', [ '*' ]],
   ['surnom', [ '*' ]]
 ]);
-const defautFiltres: ListeFiltres = new Map([
-  ['do', [ 'moi' ]],
-  ['legit', [ 'oui' ]],
-  ['jeu', [ '*' ]],
-  ['espece', [ '*' ]],
-  ['surnom', [ '*' ]]
-]);
 const emptyFiltres: ListeFiltres = new Map([
   ['do', []],
   ['legit', []],
@@ -31,6 +24,7 @@ const emptyFiltres: ListeFiltres = new Map([
   ['espece', []],
   ['surnom', []]
 ]);
+const defautFiltres = new Map(allFiltres);
 
 export { allFiltres };
 
