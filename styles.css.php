@@ -157,8 +157,9 @@ nav {
   grid-row: 2 / 3;
   grid-column: 1 / 2;
   display: grid;
-  --nombre-sections: 3;
+  --nombre-sections: 5;
   grid-template-columns: repeat(var(--nombre-sections), 1fr);
+  grid-template-columns: 1fr 1fr 0.5fr 1fr 1fr;
   background-color: var(--nav-bg-color);
   z-index: var(--z-nav);
 }
@@ -228,6 +229,13 @@ body[data-section-actuelle=chasses-en-cours] .nav-link[data-section=chasses-en-c
 .lien-section>sync-progress,
 .sous-titre>sync-line {
   position: absolute;
+}
+
+nav > a > span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 90%;
 }
 
 
@@ -1162,12 +1170,12 @@ body[data-hunt-uploading] .bouton-hunt-submit {
 
 .fab>.material-icons::after {
   /*content: 'filter_list';*/
-  content: 'search';
-}
-
-.fab.add>.material-icons::after {
   content: 'add';
 }
+
+/*.fab.add>.material-icons::after {
+  content: 'add';
+}*/
 
 body[data-hunt-uploading] .loading-bar>.bouton-retour {
   display: none;
@@ -2369,12 +2377,20 @@ input:disabled + label.switch {
     display: flex;
   }
 
+  .nav-link.only-mobile {
+    display: none;
+  }
+
   .nav-link::before {
     --size: 112px;
   }
 
   .nav-link[data-section=pokedex] {
     display: none;
+  }
+
+  nav > a > span {
+    text-align: center;
   }
 
   body[data-section-actuelle=parametres] .nav-link[data-section=parametres]::before {

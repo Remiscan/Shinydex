@@ -53,18 +53,28 @@
     <!-- Barre de navigation -->
     <nav class="bottom-bar">
       <a class="nav-link lien-section" data-section="mes-chromatiques">
-        <i class="material-icons">storage</i>
-        <span>Chromatiques</span>
+        <i class="material-icons">catching_pokemon</i>
+        <span>Mes chromatiques</span>
       </a>
 
       <a class="nav-link lien-section" data-section="pokedex">
-        <i class="material-icons">language</i>
+        <i class="material-icons">public</i>
         <span>Pokédex<svg class="shinystars"><use xlink:href="./images/shinystars.svg#stars"></use></svg></span>
+      </a>
+
+      <!-- Seulement sur mobile -->
+      <a class="nav-link lien-section only-mobile">
+        <i class="material-icons">search</i>
       </a>
 
       <a class="nav-link lien-section" data-section="chasses-en-cours">
         <i class="material-icons">add_circle</i>
         <span>Chasses</span>
+      </a>
+
+      <a class="nav-link lien-section" data-section="partage">
+        <i class="material-icons">group</i>
+        <span>Partage</span>
       </a>
 
       <!-- Seulement sur PC -->
@@ -95,7 +105,7 @@
         <?php include './pages/pokedex.html'; ?>
       </section>
 
-      <!-- FAB des filtres -->
+      <!-- FAB -->
       <button type="button" class="fab">
         <i class="material-icons"></i>
       </button>
