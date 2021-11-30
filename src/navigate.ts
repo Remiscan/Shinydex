@@ -1,7 +1,7 @@
 import { getNames } from './DexDatalist.js';
 import { closeFiltres, openFiltres } from './filtres.js';
 import { disableLazyLoad, enableLazyLoad } from './lazyLoading.js';
-import { loadAllImages, Params } from './Params.js';
+import { loadAllImages, Params, wait } from './Params.js';
 import { closeSpriteViewer, openSpriteViewer } from './spriteViewer.js';
 
 
@@ -29,12 +29,8 @@ export async function navigate(sectionCible: string, position = 0, historique = 
 
   // Pré-chargement des images de la nouvelle section
   const listeImages = ['./ext/pokesprite.png'];
-  if (sectionCible == 'mes-chromatiques') {
-    const versionSprite = document.documentElement.style.getPropertyValue('--link-sprites').match(/[0-9]+/)?.[0] || '0';
-    listeImages.push(`./sprites--${versionSprite}.php`, './images/iconsheet.png');
-  }
 
-  await Promise.all([loadAllImages(listeImages), loadVideo(sectionCible)]);
+  await Promise.all([loadAllImages(listeImages)]);
   await new Promise((resolve, reject) => {
     closeFiltres();
 
@@ -63,7 +59,7 @@ export async function navigate(sectionCible: string, position = 0, historique = 
     Array.from(document.querySelectorAll('sync-progress[finished]'))
     .forEach(sp => { sp.removeAttribute('state'); sp.removeAttribute('finished'); });
 
-    if (Params.owidth >= Params.layoutPClarge) return resolve(null);
+    if (window.innerWidth >= Params.layoutPClarge) return resolve(null);
 
     // Animation d'apparition de la nouvelle section
     // (sur PC, géré par CSS, d'où le return précédent)
@@ -89,7 +85,7 @@ export async function navigate(sectionCible: string, position = 0, historique = 
 
 
 // Anime l'icône du FAB selon la section en cours
-function animateFabIcon(sectionCible: string, animations = false) {
+async function animateFabIcon(sectionCible: string, animations = false) {
   const fab = document.querySelector('.fab')!;
   const fabIcon = fab.querySelector('.material-icons')!;
   type startendAnimations = { start: Animation | null, end: Animation | null };
@@ -112,33 +108,25 @@ function animateFabIcon(sectionCible: string, animations = false) {
     fill: 'forwards'
   });
 
-  animFabIcon.start.addEventListener('finish', () => {
-    if (sectionCible == 'chasses-en-cours') fab.classList.add('add');
-    else fab.classList.remove('add');
-    
-    deg = (sectionCible == 'chasses-en-cours') ? '-90deg' : '+90deg';
-    animFabIcon.end = fabIcon.animate([
-      { transform: 'translate3D(0, 0, 0) rotate(' + deg + ')', opacity: '0' },
-      { transform: 'translate3D(0, 0, 0) rotate(0)', opacity: '1' }
-    ], {
-      easing: Params.easingDecelerate,
-      duration: 100,
-      fill: 'backwards'
-    });
+  await wait(animFabIcon.start);
 
-    animFabIcon.end.addEventListener('finish', () => {
-      animFabIcon.start?.cancel();
-      animFabIcon.end?.cancel();
-    });
+  if (sectionCible == 'chasses-en-cours') fab.classList.add('add');
+  else fab.classList.remove('add');
+  
+  deg = (sectionCible == 'chasses-en-cours') ? '-90deg' : '+90deg';
+  animFabIcon.end = fabIcon.animate([
+    { transform: 'translate3D(0, 0, 0) rotate(' + deg + ')', opacity: '0' },
+    { transform: 'translate3D(0, 0, 0) rotate(0)', opacity: '1' }
+  ], {
+    easing: Params.easingDecelerate,
+    duration: 100,
+    fill: 'backwards'
   });
-}
 
+  await wait(animFabIcon.end);
 
-
-// Précharge la vidéo de l'easter egg
-async function loadVideo(sectionCible: string) {
-  if (sectionCible == 'a-propos' || (sectionCible == 'parametres' && Params.owidth >= Params.layoutPClarge))
-    await fetch('./images/instinct.mp4');
+  animFabIcon.start?.cancel();
+  animFabIcon.end?.cancel();
   return;
 }
 
@@ -146,30 +134,25 @@ async function loadVideo(sectionCible: string) {
 
 // Permet la navigation avec le bouton retour du navigateur
 window.addEventListener('popstate', event => {
-  if (typeof document.body.dataset.viewerOpen != 'undefined' || typeof document.body.dataset.viewerLoading != 'undefined')
-  {
+  if (typeof document.body.dataset.viewerOpen != 'undefined' || typeof document.body.dataset.viewerLoading != 'undefined') {
     closeSpriteViewer();
-  }
-  else if (event.state)
-  {
+  } else if (event.state) {
     const section = event.state.section;
     if (document.querySelector('.menu-filtres')!.classList.contains('on'))
       closeFiltres();
-    if (section != sectionActuelle)
-    {
-      switch(section)
-      {
+    if (section != sectionActuelle) {
+      switch(section) {
         case 'sprite-viewer':
           openSpriteViewer(event.state.dexid, { clientX: 0, clientY: 0 });
-          break;
+        break;
         case 'menu-filtres':
           openFiltres(false);
-          break;
+        break;
         default:
           navigate(section, 0, false);
       }
     }
-  }
-  else
+  } else {
     navigate('mes-chromatiques', 0, false);
+  }
 }, false);

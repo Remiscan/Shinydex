@@ -1,6 +1,7 @@
 import { appDisplay, appPopulate } from './appContent.js';
 import { dataStorage, huntStorage, pokemonData, shinyStorage } from './localforage.js';
 import { Notif } from './notification.js';
+import { Params, setTheme, timestamp2date, wait, webpSupport } from './Params.js';
 import { upgradeStorage } from './upgradeStorage.js';
 
 
@@ -87,7 +88,6 @@ export async function appStart() {
   try {
     console.log(log);
     console.log('[:)] Chargement de l\'application...');
-    recalcOnResize();
 
     // ÉTAPE 3 : si la sauvegarde en ligne est activée, on met à jour les données locales
     const onlineBackup = await dataStorage.getItem('online-backup');
@@ -346,23 +346,23 @@ function checkInstall() {
 
 /////////////////////////////////////////////////////////
 // Change le paramètre de sauvegarde des données en ligne
-export async function setOnlineBackup()
-{
-  const checkbox = document.getElementById('switch-online-backup') as HTMLInputElement;
-  if (checkbox.checked)
-  {
-    checkbox.checked = false;
-    document.getElementById('parametres')!.removeAttribute('data-online-backup');
-    await dataStorage.setItem('online-backup', 0);
-  }
-  else
-  {
-    checkbox.checked = true;
+export async function setOnlineBackup(checked: boolean): Promise<void> {
+  if (checked) {
     document.getElementById('parametres')!.dataset.onlineBackup = '1';
     await dataStorage.setItem('online-backup', 1);
     await startBackup();
+  } else {
+    document.getElementById('parametres')!.removeAttribute('data-online-backup');
+    await dataStorage.setItem('online-backup', 0);
   }
-  return;
+}
+
+
+///////////////////////////////////////////////////////
+// Change le paramètre de vérification des mises à jour
+export async function changeAutoMaj(checked: boolean): Promise<void> {
+  if (checked) await dataStorage.setItem('check-updates', true);
+  else         await dataStorage.setItem('check-updates', false);
 }
 
 

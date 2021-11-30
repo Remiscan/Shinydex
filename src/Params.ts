@@ -1,4 +1,6 @@
+import { dataStorage } from './localforage.js';
 import { Notif } from './notification.js';
+
 
 
 declare global {
@@ -29,74 +31,11 @@ export const Params = {
   easingAccelerate: 'cubic-bezier(0.4, 0.0, 1, 1)',
 
   spriteSize: 112,
-  spriteRegex: /sprites--(.+).php/,
   preferredImageFormat: <'webp' | 'png'> 'png',
-
-  owidth: 0,
-  oheight: 0,
-
-  nombreADefer: {
-    'mes-chromatiques': () => { return Math.ceil((Params.oheight ? Params.oheight : 0) / 126); },
-    'pokedex': () => { 
-      const iconWidth = 68 + 2 * (-2);
-      const availWidth = Params.owidth - 2 * 8;
-      const iconHeight = 56;
-      const availHeight = Params.oheight - 56 - 5;
-      const iconsPerRow = Math.floor(availWidth / iconWidth);
-      const iconsPerCol = Math.floor(availHeight / iconHeight);
-      const iconsPerScreen = iconsPerRow * iconsPerCol;
-      const generationEnds = [151, 251, 386, 493, 649, 721, 809, 890];
-      let visibleGens = 1;
-      for (let gen of generationEnds) {
-        if (gen < iconsPerScreen) visibleGens++;
-      }
-      return visibleGens;
-    },
-    'chasses-en-cours': () => { return Math.ceil((Params.oheight ? Params.oheight : 0) / 318); }
-  }
 };
 
 
-///////////////////////////////////////////////////////
-// Change le paramètre de vérification des mises à jour
-export async function changeAutoMaj() {
-  const checkbox = document.getElementById('switch-auto-maj') as HTMLInputElement;
-  if (checkbox.checked) {
-    checkbox.checked = false;
-    await dataStorage.setItem('check-updates', 0);
-  } else {
-    checkbox.checked = true;
-    await dataStorage.setItem('check-updates', 1);
-  }
-  return;
-}
 
-
-//////////////////////////////////////////
-// Gère le redimensionnement de la fenêtre
-let resizing = 0;
-
-export function recalcOnResize() {
-  const largeurPage = document.getElementById('largeur-fenetre') as HTMLElement;
-  const hauteurPage = document.getElementById('hauteur-fenetre') as HTMLElement;
-
-  // owidth = 100vw = largeur totale de la fenêtre, indépendamment de l'affichage ou non des barres de défilement
-  const candidWidth = Number(window.getComputedStyle(largeurPage).width.replace('px', ''));
-  if (Params.owidth != candidWidth)
-    Params.owidth = candidWidth;
-
-  // oheight = 100vh = hauteur totale de la fenêtre, indépendamment de l'affichage ou non de la barre d'URL (au moins pour Chrome)
-  //   diffère de window.innerHeight qui dépend de la barre d'URL (et donc change tout le temps => problématique)
-  const candidHeight = Number(window.getComputedStyle(hauteurPage).height.replace('px', ''));
-  if (Params.oheight != candidHeight)
-    Params.oheight = candidHeight;
-}
-
-// On détecte le redimensionnement
-export function callResize() {
-  clearTimeout(resizing);
-  resizing = setTimeout(recalcOnResize, 100);
-}
 
 
 ///////////////////////////////////////
@@ -117,7 +56,13 @@ export function loadAllImages(liste: string[]): Promise<number[]> {
 
 ////////////
 // Sync wait
-export function wait(time: number) { return new Promise(resolve => setTimeout(resolve, time)); }
+export function wait(time: number | Animation): Promise<any> { 
+  if (time instanceof Animation)
+    return new Promise(resolve => time.addEventListener('finish', resolve));
+  else if (typeof time === 'number')
+    return new Promise(resolve => setTimeout(resolve, time));
+  else return Promise.resolve();
+}
 
 
 /////////////////////////////////
@@ -168,6 +113,9 @@ export async function webpSupport(): Promise<boolean> {
 //////////////////////
 // Définition du thème
 export async function setTheme(askedTheme?: string) {
+  let html = document.documentElement;
+  html.dataset.theme = askedTheme || '';
+
   // Thème par défaut
   const defaultTheme = 'dark';
 
@@ -178,9 +126,6 @@ export async function setTheme(askedTheme?: string) {
 
   // Thème appliqué (askedTheme > osTheme > defaultTheme)
   const theme = ['light', 'dark'].includes(askedTheme || '') ? askedTheme : (osTheme || defaultTheme);
-
-  let html = document.documentElement;
-  html.dataset.theme = askedTheme;
   
   let themeColor = (theme == 'dark') ? 'rgb(34, 34, 34)' : 'rgb(224, 224, 224)';
   document.querySelector("meta[name=theme-color]")!.setAttribute('content', themeColor);

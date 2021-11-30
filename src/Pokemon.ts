@@ -102,6 +102,7 @@ const allMethodes: Methode[] = [
 
 
 
+/** Structure d'une Forme de Pokémon. */
 export type Forme = {
   dbid: string,
   nom: string,
@@ -115,6 +116,7 @@ export type Forme = {
 
 
 
+/** Structure d'un Pokémon. */
 interface backendPokemon {
   dexid: number,
   name: string,
@@ -124,7 +126,7 @@ interface backendPokemon {
 
 
 
-// Structure d'un Pokémon shiny tel que stocké dans la BDD en ligne
+/** Structure d'un Pokémon shiny tel que stocké dans la BDD en ligne. */
 interface backendShiny {
   id: number,
   huntid: string,
@@ -145,7 +147,7 @@ interface backendShiny {
   horsChasse: boolean,
 };
 
-// Structure d'un Pokémon shiny tel que stocké dans la BDD locale
+/** Structure d'un Pokémon shiny tel que stocké dans la BDD locale. */
 export interface frontendShiny extends Omit<backendShiny, 'id' | 'lastUpdate'> {
   lastUpdate: number,
   deleted?: boolean,
@@ -176,11 +178,21 @@ class Pokemon {
     this.formes = pkmn.formes;
   }
 
+  /**
+   * Récupère le sprite d'un Pokémon.
+   * @param forme - Forme demandée.
+   * @param options
+   * @param options.shiny - Si le Pokémon est shiny.
+   * @param options.backside - Si le Pokémon est de dos (uniquement Mustébouée, Mustéflott, Keunotor, Poussifeu et Maraiste).
+   * @param options.size - Taille du sprite en pixels (jusqu'à 512).
+   * @param options.format - Format du sprite (png ou webp);
+   * @returns URL du sprite.
+   */
   getSprite(forme: Forme, { shiny = false, backside = undefined, size = 512, format = 'png' }: SpriteOptions): string {
     const shinySuffix = shiny ? 'r' : 'n';
+    const side = (typeof forme.hasBackside !== 'undefined' && backside === true) ? 'b' : 'f';
 
-    const side = (typeof forme.hasBackside !== 'undefined' && typeof backside !== 'undefined' && backside === true) ? 'b' : 'f';
-
+    // Alcremie shiny forms are all the same
     const formToConsider = (shiny && this.dexid === 869) ? 0 : forme.form;
 
     const spriteCaracs = [
@@ -201,6 +213,9 @@ class Pokemon {
     return spriteUrl;
   }
 
+  /**
+   * Donne le numéro de la génération auquel ce Pokémon appartient.
+   */
   get gen(): number | undefined {
     const gens = Pokemon.generations;
     for (let gen of gens) {
@@ -208,20 +223,32 @@ class Pokemon {
     }
   }
 
+  /**
+   * @returns Liste des noms anglais de tous les Pokémon, dans l'ordre du Pokédex national.
+   */
   static async names(): Promise<string[]> {
     await dataStorage.ready();
     return await dataStorage.getItem('pokemon-names');
   }
 
+  /**
+   * @returns Liste des noms français de tous les Pokémon, dans l'ordre du Pokédex national.
+   */
   static async namesfr(): Promise<string[]> {
     await dataStorage.ready();
     return await dataStorage.getItem('pokemon-names-fr');
   }
 
+  /**
+   * @returns Liste des jeux vidéo Pokémon.
+   */
   static get jeux(): Jeu[] {
     return allGames;
   }
 
+  /**
+   * @returns Liste des générations de Pokémon.
+   */
   static get generations() {
     return generations;
   }
@@ -257,12 +284,18 @@ class Shiny implements frontendShiny {
     this.deleted = Boolean(shiny.deleted);
   }
 
+  /**
+   * @returns Espèce du Pokémon.
+   */
   async getEspece(): Promise<backendPokemon> {
     const pokemon = await pokemonData.getItem(String(this.dexid));
     if (pokemon == null) throw `Aucun Pokémon ne correspond à ce Shiny (${this.surnom} / ${this.formid})`;
     return pokemon;
   }
 
+  /**
+   * @returns Forme du Pokémon.
+   */
   async getForme(): Promise<Forme> {
     const pokemon = await this.getEspece();
 
@@ -271,6 +304,9 @@ class Shiny implements frontendShiny {
     return pokemon.formes[k];
   }
 
+  /**
+   * @returns Nom anglais du Pokémon.
+   */
   async getName(): Promise<string> {
     try {
       const pokemon = await this.getEspece();
@@ -281,6 +317,9 @@ class Shiny implements frontendShiny {
     }
   }
 
+  /**
+   * @returns Nom français du Pokémon
+   */
   async getNamefr(): Promise<string> {
     try {
       const pokemon = await this.getEspece();
@@ -291,6 +330,10 @@ class Shiny implements frontendShiny {
     }
   }
 
+  /**
+   * @param options - Options du sprite demandé.
+   * @returns URL du sprite.
+   */
   async getSprite(options: SpriteOptions): Promise<string> {
     try {
       const pokemon = await this.getEspece();
@@ -302,23 +345,36 @@ class Shiny implements frontendShiny {
     }
   }
 
-  get mine() {
+  /**
+   * @returns Si le Pokémon chromatique a été trouvé par moi.
+   */
+  get mine(): boolean {
     let k = Shiny.methodes('notmine').findIndex(m => m.nom == this.methode);
     if (k == -1) return true;
     else return false;
   }
 
-  static get allMethodes() {
+  /**
+   * @returns Liste des méthodes de shasse.
+   */
+  static get allMethodes(): Methode[] {
     return allMethodes;
   }
 
-  get Jeu() {
+  /**
+   * @returns Jeu dans lequel le Pokémon a été capturé.
+   */
+  get Jeu(): Jeu {
     let k = Pokemon.jeux.findIndex(p => p.nom == this.jeu);
     if (k == -1) throw `Jeu invalide (${this.jeu})`;
 
     return Pokemon.jeux[k];
   }
 
+  /**
+   * @param option - Sélecteur de méthodes à considérer.
+   * @returns Liste des méthodes concernées par le sélécteur choisi.
+   */
   static methodes(option?: string): Methode[] {
     const allMethodes = Shiny.allMethodes;
     switch (option) {
@@ -333,6 +389,9 @@ class Shiny implements frontendShiny {
     }
   }
 
+  /**
+   * @returns Les chances que le Pokémon avait d'être chromatique.
+   */
   get shinyRate(): number | null {
     // Taux de base
     const game = this.Jeu;

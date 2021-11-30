@@ -415,39 +415,19 @@ export class Hunt implements huntedPokemon {
 
 
   // Envoie la chasse dans la BDD
-  async submitHunt(edit = false) {
+  async submitHunt() {
     this.lastUpdate = Date.now();
     this.huntid = this.huntid;
 
     try {
       const onlineBackup = await dataStorage.getItem('online-backup');
       const shiny = new Shiny(this);
-
-      // Vérifions si sprites.php est obsolète
-      let obsolete = false;
-      test: {
-        if (!edit) {
-          obsolete = true;
-          break test;
-        }
-        const oldData = await shinyStorage.getItem(String(this.huntid));
-        if (oldData['numero_national'] != shiny.dexid || oldData['forme'] != (await shiny.getForme()).dbid) {
-          obsolete = true;
-          break test;
-        }
-      }
-
-      // On marque la chasse comme uploadée
-      /*this.uploaded = 'cloud_upload';
-      await huntStorage.setItem(String(this.huntid), this);*/
-      await shinyStorage.setItem(String(this.huntid), shiny);
+      await shinyStorage.setItem(this.huntid, shiny);
 
       await this.destroyHunt();
       await dataStorage.setItem('version-bdd', this.lastUpdate);
       window.dispatchEvent(new CustomEvent('populate', { detail: {
-        version: this.lastUpdate,
-        obsolete: (obsolete ? [String(this.huntid)] : []),
-        modified: [String(this.huntid)]
+        modified: [this.huntid]
       } }));
       if (onlineBackup) await startBackup();
     }
@@ -458,27 +438,22 @@ export class Hunt implements huntedPokemon {
 
 
   // Supprime la chasse de la BDD
-  async deleteHuntFromDB()
-  {
+  async deleteAssociatedShiny() {
     this.lastUpdate = Date.now();
 
     try {
-      const onlineBackup = await dataStorage.getItem('online-backup');
-
       // On marque le shiny comme supprimé
-      const shiny = new Shiny(await shinyStorage.getItem(String(this.huntid)));
+      const shiny = new Shiny(await shinyStorage.getItem(this.huntid));
       shiny.lastUpdate = this.lastUpdate;
       shiny.deleted = true;
       await shinyStorage.setItem(String(this.huntid), shiny);
 
+      // On supprime la carte du shiny
+      const card = document.querySelector(`#mes-chromatiques pokemon-card#${this.huntid}`);
+      card?.remove();
+
+      // On supprime la chasse
       await this.destroyHunt();
-      await dataStorage.setItem('version-bdd', this.lastUpdate);
-      window.dispatchEvent(new CustomEvent('populate', { detail: {
-        version: this.lastUpdate,
-        obsolete: [],
-        modified: [String(this.huntid)]
-      } }));
-      if (onlineBackup) await startBackup();
     }
     catch(error) {
       console.error(error);

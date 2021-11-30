@@ -1,5 +1,4 @@
 import { dataStorage, huntStorage, shinyStorage } from './localforage.js';
-import { frontendShiny } from './Pokemon.js';
 
 
 
@@ -23,6 +22,10 @@ export async function upgradeStorage(fromJSON: boolean = false): Promise<void> {
     await shinyStorage.setItem(key, hunt);
   }
 
+  // Remove old filters
+  const filtres = await dataStorage.getItem('filtres');
+  if (!(filtres instanceof Map)) await dataStorage.removeItem('filtres');
+
   // Delete old, now obsolete stored items
   await dataStorage.removeItem('version-bdd');
 
@@ -32,7 +35,7 @@ export async function upgradeStorage(fromJSON: boolean = false): Promise<void> {
 
 
 
-function toNewFormat(shiny: any): frontendShiny {
+function toNewFormat(shiny: { [key: string]: any }): { [key: string]: any } {
   // Rename properties whose name changed
   const renames = new Map([
     ['last_update', 'lastUpdate'],

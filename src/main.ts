@@ -1,5 +1,5 @@
-import { appDisplay, appPopulate, json2import } from './appContent.js';
-import { appStart, checkUpdate, manualUpdate, setOnlineBackup, startBackup } from './appLifeCycle.js';
+import { appDisplay, appPopulate } from './appContent.js';
+import { appStart, changeAutoMaj, checkUpdate, manualUpdate, setOnlineBackup, startBackup } from './appLifeCycle.js';
 import './components/load-spinner/loadSpinner.js';
 import './components/pokemon-card/pokemonCard.js';
 import './components/sync-progress/syncProgress.js';
@@ -57,62 +57,83 @@ document.querySelector('.obfuscator')!.addEventListener('click', () => history.b
 /////////////
 // PARAMÈTRES
 
-// Active le switch du thème
+// Applique le paramètre sauvegardé au switch du thème
 dataStorage.getItem('theme').then((theme?: string) => {
-  const storedTheme = (theme != null) ? theme : 'system';
+  const storedTheme = theme || 'system';
   const input = document.getElementById(`theme-${storedTheme}`) as HTMLInputElement;
   input.checked = true;
 });
 
+// Détecte le changement de paramètre de thème
 for (const input of Array.from(document.querySelectorAll('input[name=theme]')) as HTMLInputElement[]) {
-  input.onclick = async event => { return await setTheme(input.value); };
+  input.addEventListener('change', () => setTheme(input.value));
 }
 
-// Active le switch des mises à jour auto
+// Applique le paramètre sauvegardé au switch des mises à jour auto
 dataStorage.getItem('check-updates').then((value: boolean) => {
   const box = document.getElementById('switch-auto-maj') as HTMLInputElement;
   if (value === true) box.checked = true;
   else                box.checked = false;
 });
 
-(document.querySelector('[for=switch-auto-maj]') as HTMLLabelElement).onclick = async event => { event.preventDefault(); return await changeAutoMaj(); };
+// Détecte le changemet de paramètre de détection automatique des mises à jour
+{
+  const input = document.getElementById('switch-auto-maj')! as HTMLInputElement;
+  input.addEventListener('change', () => changeAutoMaj(input.checked));
+}
 
-// Active le switch de la sauvegarde en ligne
+// Applique le paramètre sauvegardé au switch de la sauvegarde en ligne
 dataStorage.getItem('online-backup').then((value: boolean) => {
-  const box = document.getElementById('switch-online-backup') as HTMLInputElement;
+  const box = document.getElementById('switch-online-backup')! as HTMLInputElement;
   if (value === true) {
     box.checked = true;
     document.getElementById('parametres')!.dataset.onlineBackup = '1';
+  } else {
+    box.checked = false;
   }
-  else box.checked = false;
 });
 
-(document.querySelector('[for=switch-online-backup]') as HTMLLabelElement).onclick = async event => { event.preventDefault(); return await setOnlineBackup(); };
+// Détecte le changement de paramètre de la sauvegarde en ligne
+{
+  const input = document.getElementById('switch-online-backup')! as HTMLInputElement;
+  input.addEventListener('change', () => setOnlineBackup(input.checked));
+}
 
-// Active le badge indiquant le succès / échec de la dernière synchronisation des BDD
+// Applique l'info sauvegardée au badge indiquant le succès / échec de la dernière synchronisation des BDD
 dataStorage.getItem('last-sync').then((value?: string) => {
-  const params = document.querySelector('#parametres') as HTMLElement;
+  const params = document.querySelector('#parametres')! as HTMLElement;
   if (value === 'success') params.dataset.lastSync = 'success';
-  else params.dataset.lastSync = 'failure';
+  else                     params.dataset.lastSync = 'failure';
 });
 
+// Détecte le clic sur l'état du dernier backup pour en lancer un nouveau
 (document.querySelector('.info-backup.failure') as HTMLButtonElement).onclick = startBackup;
 (document.querySelector('.info-backup.success') as HTMLButtonElement).onclick = startBackup;
 
-// Prépare le bouton de recherche de mise à jour
-let longClic: number | undefined;
-let needCheck = 1;
-const majButton = document.querySelector('.bouton-recherche-maj')!;
+// Détecte le clic (court ou long) sur le bouton de recherche de mise à jour
+{
+  let longClic: number | undefined;
+  let needCheck = 1;
+  const majButton = document.querySelector('.bouton-recherche-maj')!;
 
-majButton.addEventListener('mousedown', (event: Event) => {
-  if ((event as MouseEvent).button != 0) return;
-  event.preventDefault();
-  clearTimeout(longClic);
-  longClic = setTimeout(() => { needCheck = 0; manualUpdate(); }, 3000);
+  for (const startEvent of ['mousedown', 'touchstart']) {
+    let endEvent: string, cancelEvent: string;
+    switch (startEvent) {
+      case 'touchstart': endEvent = 'touchend'; cancelEvent = 'touchcancel';
+      default:           endEvent = 'mouseup';  cancelEvent = 'mouseout';
+    }
 
-  majButton.addEventListener('mouseup', () => { clearTimeout(longClic); if (needCheck) checkUpdate(true); });
-  majButton.addEventListener('mouseout', () => clearTimeout(longClic));
-});
+    majButton.addEventListener(startEvent, (event: Event) => {
+      if (startEvent === 'mousedown' && (event as MouseEvent).button != 0) return;
+      event.preventDefault();
+      clearTimeout(longClic);
+      longClic = setTimeout(() => { needCheck = 0; manualUpdate(); }, 3000);
+  
+      majButton.addEventListener(endEvent, () => { clearTimeout(longClic); if (needCheck) checkUpdate(true); });
+      majButton.addEventListener(cancelEvent, () => clearTimeout(longClic));
+    });
+  }
+}
 
 // Détecte le clic sur le bouton d'export des données
 document.querySelector('.bouton-export')!.addEventListener('click', () => {
@@ -158,6 +179,8 @@ boutonSupprimer.addEventListener('click', async event => {
     boutonSupprimer.disabled = false;
   }
 });
+
+
 
 // Initialise les filtres
 initFiltres();
@@ -265,10 +288,6 @@ window.addEventListener('populate', async (_event: Event) => {
 
 // Au rechargement de l'appli, indiquer qu'on est sur la section de départ
 history.replaceState({ section: 'mes-chromatiques' }, '');
-
-// Gère le redimensionnement de la fenêtre
-window.addEventListener('resize', callResize);
-window.addEventListener('orientationchange', callResize);
 
 // Lancement de l'appli
 appStart();
