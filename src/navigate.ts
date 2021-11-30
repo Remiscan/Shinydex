@@ -1,4 +1,3 @@
-import { getNames } from './DexDatalist.js';
 import { closeFiltres, openFiltres } from './filtres.js';
 import { disableLazyLoad, enableLazyLoad } from './lazyLoading.js';
 import { loadAllImages, Params, wait } from './Params.js';
@@ -8,8 +7,14 @@ import { closeSpriteViewer, openSpriteViewer } from './spriteViewer.js';
 
 export let sectionActuelle = 'mes-chromatiques';
 export const sections = ['mes-chromatiques', 'pokedex', 'chasses-en-cours', 'partage', 'parametres', 'a-propos'];
+const lastPosition: Map<string, number> = new Map(sections.map(section => [section, 0]));
 
-// Récupère la première carte d'une section
+
+/**
+ * Récupère la première carte d'une section.
+ * @param section - La section en question.
+ * @returns La première carte.
+ */
 const firstCard = (section: Element): Element | null | undefined => {
   let card;
   switch (section.id) {
@@ -20,62 +25,76 @@ const firstCard = (section: Element): Element | null | undefined => {
   return card;
 };
 
-// Navigue vers la section demandée
-export async function navigate(sectionCible: string, position = 0, historique = true) {
+
+/**
+ * Navigue vers la section demandée.
+ * @param sectionCible - ID de la section demandée.
+ * @param historique - Si la navigation doit créer une nouvelle entrée dans l'historique.
+ */
+export async function navigate(sectionCible: string, historique = true) {
   if (sectionActuelle == sectionCible) return Promise.resolve();
 
   const ancienneSection = document.getElementById(sectionActuelle)!;
   const nouvelleSection = document.getElementById(sectionCible)!;
 
+  // On enregistre la position du scroll sur l'ancienne section
+  const mainElement = document.querySelector('main')!;
+  lastPosition.set(sectionActuelle, mainElement.scrollTop);
+
   // Pré-chargement des images de la nouvelle section
   const listeImages = ['./ext/pokesprite.png'];
-
   await Promise.all([loadAllImages(listeImages)]);
-  await new Promise((resolve, reject) => {
-    closeFiltres();
 
-    if (historique) history.pushState({section: sectionCible}, '');
+  closeFiltres();
 
-    // Désactive le lazy loading de la première carte
-    const oldFirstCard = firstCard(ancienneSection);
-    if (oldFirstCard) disableLazyLoad(oldFirstCard);
+  if (historique) history.pushState({section: sectionCible}, '');
 
-    // Animation du FAB
-    const sectionsFabFilter = ['mes-chromatiques', 'pokedex'];
-    const sectionsFabAdd = ['chasses-en-cours'];
-    let animateFab = false;
-    if (
-      (sectionsFabFilter.includes(sectionActuelle) && sectionsFabAdd.includes(sectionCible))
-      || (sectionsFabFilter.includes(sectionCible) && sectionsFabAdd.includes(sectionActuelle))
-    ) animateFab = true;
-    animateFabIcon(sectionCible, animateFab);
+  // Désactive le lazy loading de la première carte de l'ancienne section
+  const oldFirstCard = firstCard(ancienneSection);
+  if (oldFirstCard) disableLazyLoad(oldFirstCard);
 
-    sectionActuelle = sectionCible;
+  // Disparition de l'indicateur de l'état du backup autour du bouton paramètres
+  Array.from(document.querySelectorAll('sync-progress[finished]')).forEach(sp => {
+    sp.removeAttribute('state');
+    sp.removeAttribute('finished');
+  });
 
-    document.querySelector('main')!.scroll(0, 0);
-    document.body.dataset.sectionActuelle = sectionActuelle;
+  // Animation du FAB
+  /*const sectionsFabFilter = ['mes-chromatiques', 'pokedex'];
+  const sectionsFabAdd = ['chasses-en-cours'];
+  let animateFab = false;
+  if (
+    (sectionsFabFilter.includes(sectionActuelle) && sectionsFabAdd.includes(sectionCible))
+    || (sectionsFabFilter.includes(sectionCible) && sectionsFabAdd.includes(sectionActuelle))
+  ) animateFab = true;
+  animateFabIcon(sectionCible, animateFab);*/
 
-    // Disparition de l'indicateur de l'état du backup autour du bouton paramètres
-    Array.from(document.querySelectorAll('sync-progress[finished]'))
-         .forEach(sp => { sp.removeAttribute('state'); sp.removeAttribute('finished'); });
+  sectionActuelle = sectionCible;
+  document.body.dataset.sectionActuelle = sectionActuelle; // affiche la nouvelle section
+  mainElement.scroll(0, lastPosition.get(sectionCible) || 0); // scrolle vers la position précédemment enregistrée
 
-    if (window.innerWidth >= Params.layoutPClarge) return resolve(null);
+  // On détermine quelles sections animer (sur PC, certaines sections apparaissent en couple)
+  const sectionsToAnimate: HTMLElement[] = [nouvelleSection];
+  if (window.innerWidth >= Params.layoutPClarge) {
+    switch (sectionCible) {
+      case 'mes-chromatiques': sectionsToAnimate.push(document.getElementById('pokedex')!); break;
+      case 'parametres':       sectionsToAnimate.push(document.getElementById('a-propos')!); break;
+    }
+  }
 
-    // Animation d'apparition de la nouvelle section
-    // (sur PC, géré par CSS, d'où le return précédent)
-    const apparitionSection = nouvelleSection.animate([
+  // On anime l'apparition de la nouvelle section
+  await Promise.all(sectionsToAnimate.map(section => {
+    const apparitionSection = section.animate([
       { transform: 'translate3D(0, 20px, 0)', opacity: '0' },
       { transform: 'translate3D(0, 0, 0)', opacity: '1' }
     ], {
-        easing: Params.easingDecelerate,
-        duration: 200,
-        fill: 'both'
+      easing: Params.easingDecelerate,
+      duration: 200,
+      fill: 'both'
     });
 
-    apparitionSection.addEventListener('finish', resolve);
-  });
-
-  if (sectionCible == 'chasses-en-cours') getNames();
+    return wait(apparitionSection);
+  }));
 
   // Active le lazy loading de la première carte
   const newFirstCard = firstCard(nouvelleSection);
@@ -137,6 +156,7 @@ async function animateFabIcon(sectionCible: string, animations = false) {
 export function navLinkBubble(event: Event, element: Element): void {
   element.classList.remove('bubbly');
   if ((element as HTMLElement).dataset.section === document.body.dataset.sectionActuelle) return;
+  if (element.classList.contains('search-button')) return;
 
   let transformOrigin = 'center center';
   const rect = element.getBoundingClientRect();
@@ -180,10 +200,10 @@ window.addEventListener('popstate', event => {
           openFiltres(false);
         break;
         default:
-          navigate(section, 0, false);
+          navigate(section, false);
       }
     }
   } else {
-    navigate('mes-chromatiques', 0, false);
+    navigate('mes-chromatiques', false);
   }
 }, false);

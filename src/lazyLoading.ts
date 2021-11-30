@@ -9,7 +9,7 @@ function isRectSame(r1: DOMRect, r2: DOMRect): boolean {
 
 function computeSize(element: Element, rect: DOMRect = element.getBoundingClientRect()): void {
   const oldRect = loaded.get(element);
-  if (!oldRect || !isRectSame(oldRect, rect)) {
+  if ((!oldRect || !isRectSame(oldRect, rect)) && (rect.width > 0 && rect.height > 0)) {
     loaded.set(element, rect);
     (element as HTMLElement).style.setProperty('contain-intrinsic-size', `${rect.width}px ${rect.height}px`);
   }
@@ -20,7 +20,7 @@ const intersector = new IntersectionObserver((entries: IntersectionObserverEntry
     computeSize(entry.target, entry.boundingClientRect);
   }
 }, {
-  rootMargin: '504px 0px 504px 0px'
+  rootMargin: '252px 0px 252px 0px'
 });
 
 const resizor = new ResizeObserver((entries: ResizeObserverEntry[]) => {

@@ -1,4 +1,5 @@
 import { appPopulate } from './appContent.js';
+import { getNames } from './DexDatalist.js';
 import { dataStorage, huntStorage, pokemonData, shinyStorage } from './localforage.js';
 import { Notif } from './notification.js';
 import { loadAllImages, Params, setTheme, timestamp2date, wait, webpSupport } from './Params.js';
@@ -173,6 +174,9 @@ export async function appStart() {
   } catch (error) {
     console.error(`Erreur de chargement d'image`, error);
   }
+
+  // On pré-charge les noms des Pokémon
+  getNames();
 
   console.log('[:)] Chargement terminé !');
 
