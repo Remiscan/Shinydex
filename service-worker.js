@@ -167,16 +167,11 @@ async function installData([data, files], action = 'install', event = null) {
     const cache = await caches.open(newCACHE);
     await Promise.all(
       files.fichiers.map(async url => {
-        if (url == './sprites.php') {
-          await updateSprite();
-        }
-        else {
-          const request = new Request(url, {cache: 'reload'});
-          const response = await fetch(request);
-          if (!response.ok)
-            throw Error(`[${action}] Le fichier n\'a pas pu être récupéré... (${request.url})`);
-          await cache.put(request, response);
-        }
+        const request = new Request(url, {cache: 'reload'});
+        const response = await fetch(request);
+        if (!response.ok)
+          throw Error(`[${action}] Un fichier n\'a pas pu être récupéré : (${request.url})`);
+        await cache.put(request, response);
         
         if (event != null) {
           const source = event.source;
@@ -219,10 +214,8 @@ async function deleteOldCaches(newCache, action)
     console.log('[' + action + '] Nettoyage des anciennes versions du cache');
     await Promise.all(
       allCaches.map(ceCache => {
-        if (ceCache.startsWith(PRE_CACHE) && newCache != ceCache)
-          return caches.delete(ceCache);
-        else
-          return;
+        if (ceCache.startsWith(PRE_CACHE) && newCache != ceCache) return caches.delete(ceCache);
+        else return;
       })
     );
     console.log('[' + action + '] Nettoyage terminé !');
@@ -311,53 +304,5 @@ async function syncBackup(message = true) {
     const clients = await self.clients.matchAll();
     clients.map(client => client.postMessage({ successfulBackupComparison: false, error }));
     return false;
-  }
-}
-
-
-// Met à jour sprites.php dans le cache à partir des données locales.
-// Pour mettre à jour sprites.php à partir des données en ligne, utiliser updateShinyData()
-async function updateSprite(_version = null) {
-  try {
-    await Promise.all([shinyStorage.ready(), dataStorage.ready()]);
-
-    let version = _version ||  await dataStorage.getItem('version-bdd') || 0;
-    
-    // On récupère et ordonne la liste des sprites à partir des données locales
-    let keys = await shinyStorage.keys();
-    keys = keys.sort((a, b) => a - b);
-    let data = await Promise.all(keys.map(key => shinyStorage.getItem(key)));
-    data = data.filter(shiny => !shiny.deleted);
-    data = data.map(s => [s['numero_national'], s['forme'], s['id']]);
-
-    // On envoie les données des sprites à sprites.php
-    const formData = new FormData();
-    formData.append('data', JSON.stringify(data));
-    let spriteRequest = new Request(`./sprites--${version}.php`, { method: 'POST', cache: 'reload', body: formData });
-    
-    const sprite = await fetch(spriteRequest);
-    if (!sprite.ok)
-      throw Error(`[update-sprite] Le fichier n\'a pas pu être récupéré... (${sprite.url})`);
-
-    // On ouvre le cache
-    const versionCache = await dataStorage.getItem('version-fichiers');
-    const currentCACHE = PRE_CACHE + '-' + versionCache;
-    const cache = await caches.open(currentCACHE);
-
-    // On supprime les anciennes versions de sprites.php du cache
-    const fichiersEnCache = await cache.keys();
-    await Promise.all(fichiersEnCache.map(fichier => {
-      if (fichier.url.match(/(.+)sprites--(.+).php$/)) return cache.delete(fichier);
-      else return;
-    }));
-
-    // On place le nouveau sprites.php dans le cache
-    spriteRequest = new Request(`./sprites--${version}.php`);
-    return cache.put(spriteRequest, sprite);
-  }
-
-  catch(error) {
-    console.error(error);
-    throw error;
   }
 }
