@@ -93,27 +93,25 @@ function buildIconSheet($logs = false)
   
   $outputImage = $background;
 
-  foreach($games as $i => $file)
-  {
+  foreach($games as $i => $file) {
     // Create image from the icon file
     $icon = imagecreatefrompng('game-icons/' . $file);
-    $name = str_replace('.png', '', $file);
+    $class = str_replace([' ', '\'', '.png'], '', utf8_decode($file));
 
     // Copy that icon to the output image
     imagecopy($outputImage, $icon, $currentPosition->x, $currentPosition->y, 0, 0, $gameSize->width, $gameSize->height);
 
     // Insert position into CSS file
-    $css = '.icones.jeu.' . $name . '{background-position:-' . $currentPosition->x . 'px -' . $currentPosition->y . 'px}';
+    $css = '.icones.jeu.' . $class . '{background-position:-' . $currentPosition->x . 'px -' . $currentPosition->y . 'px}';
     file_put_contents($cssPath, $css, FILE_APPEND);
 
     // Create preview for preview page
-    $html = '<div class="container pokemon"><div class="icones jeu ' . $name . '"></div><div>jeu ' . $name . '</div></div>';
+    $html = '<div class="container pokemon"><div class="icones jeu ' . $class . '"></div><div>jeu ' . $class . '</div></div>';
     file_put_contents($previewPath, $html, FILE_APPEND);
 
     // Increment current position
     $currentPosition->x += $gameSize->width;
-    if ($currentPosition->x + $gameSize->width > $width)
-    {
+    if ($currentPosition->x + $gameSize->width > $width) {
       $currentPosition->x = $currentPosition->x % $width;
       $currentPosition->y += $gameSize->height;
     }
@@ -126,8 +124,7 @@ function buildIconSheet($logs = false)
 
   $currentLine = 0;
 
-  foreach($explain as $i => $file)
-  {
+  foreach($explain as $i => $file) {
     // Create image from the icon file
     $icon = imagecreatefrompng('explain-icons/' . $file->nom . '.png');
 
@@ -135,6 +132,7 @@ function buildIconSheet($logs = false)
     imagecopy($outputImage, $icon, $currentPosition->x, $currentPosition->y, 0, 0, $file->taille[0], $file->taille[1]);
 
     // Insert position into CSS file
+    $class = str_replace([' ', '\'', '.png'], '', $file->nom);
     $css = '.icones.explain.' . $file->nom . '{background-position:-' . $currentPosition->x . 'px -' . $currentPosition->y . 'px}';
     if ($file->taille[0] != 12 || $file->taille[1] != 12)
       $css .= '.icones.explain.' . $file->nom . '{width:' . $file->taille[0] . 'px;height:' . $file->taille[1] .'px}';

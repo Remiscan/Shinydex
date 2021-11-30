@@ -62,5 +62,16 @@ function toNewFormat(shiny: { [key: string]: any }): { [key: string]: any } {
     delete shiny.date;
   }
 
+  // Replace game names with accented versions
+  if (shiny.hasOwnProperty('jeu')) {
+    const renames = new Map([
+      ['Emeraude', 'Émeraude'],
+      ['Let\'s Go Evoli', 'Let\'s Go Évoli'],
+      ['Epee', 'Épée']
+    ]);
+    const newName = renames.get(shiny.jeu);
+    if (newName)  shiny.jeu = newName;
+  }
+
   return shiny;
 }
