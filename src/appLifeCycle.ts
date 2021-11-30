@@ -154,7 +154,8 @@ export async function appStart() {
   // ÉTAPE 6 : on affiche l'application
 
   // Préparation du thème
-  await setTheme();
+  const theme = await dataStorage.getItem('theme');
+  await setTheme(theme);
   try {
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => setTheme(undefined));
     window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', event => setTheme(undefined));
