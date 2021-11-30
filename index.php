@@ -131,6 +131,11 @@
         <?php include './pages/chasses-en-cours.html'; ?>
       </section>
 
+      <!-- Partage -->
+      <section id="partage">
+        <?php include './pages/partage.html'; ?>
+      </section>
+
       <!-- Paramètres -->
       <section id="parametres">
         <?php include './pages/parametres.html'; ?>

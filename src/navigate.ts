@@ -7,7 +7,7 @@ import { closeSpriteViewer, openSpriteViewer } from './spriteViewer.js';
 
 
 export let sectionActuelle = 'mes-chromatiques';
-export const sections = ['mes-chromatiques', 'pokedex', 'chasses-en-cours', 'parametres', 'a-propos'];
+export const sections = ['mes-chromatiques', 'pokedex', 'chasses-en-cours', 'partage', 'parametres', 'a-propos'];
 
 // Récupère la première carte d'une section
 const firstCard = (section: Element): Element | null | undefined => {
@@ -57,7 +57,7 @@ export async function navigate(sectionCible: string, position = 0, historique = 
 
     // Disparition de l'indicateur de l'état du backup autour du bouton paramètres
     Array.from(document.querySelectorAll('sync-progress[finished]'))
-    .forEach(sp => { sp.removeAttribute('state'); sp.removeAttribute('finished'); });
+         .forEach(sp => { sp.removeAttribute('state'); sp.removeAttribute('finished'); });
 
     if (window.innerWidth >= Params.layoutPClarge) return resolve(null);
 
