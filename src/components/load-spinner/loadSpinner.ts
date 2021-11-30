@@ -22,4 +22,4 @@ class loadSpinner extends HTMLElement {
     this.shadow.adoptedStyleSheets = [sheet];
   }
 }
-customElements.define("load-spinner", loadSpinner);
+if (!customElements.get('load-spinner')) customElements.define("load-spinner", loadSpinner);

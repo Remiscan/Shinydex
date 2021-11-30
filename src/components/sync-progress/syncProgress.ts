@@ -183,7 +183,7 @@ class syncProgress extends HTMLElement {
     }
   }
 }
-customElements.define("sync-progress", syncProgress);
+if (!customElements.get('sync-progress')) customElements.define("sync-progress", syncProgress);
 
 
 
@@ -394,4 +394,4 @@ class syncLine extends HTMLElement {
     }
   }
 }
-customElements.define("sync-line", syncLine);
+if (!customElements.get('sync-line')) customElements.define("sync-line", syncLine);

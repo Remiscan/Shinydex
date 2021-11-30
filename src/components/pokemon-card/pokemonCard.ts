@@ -406,7 +406,7 @@ export class pokemonCard extends HTMLElement {
     await new Promise(resolve => anim.addEventListener('finish', resolve));
 
     if (!act) return;
-    let ready = await editHunt(parseInt(this.getAttribute('huntid') || ''));
+    let ready = await editHunt(this.getAttribute('huntid') || '');
     ready = (ready != false);
     appear.cancel(); anim.cancel();
     if (ready) longClic = false;
@@ -427,4 +427,4 @@ export class pokemonCard extends HTMLElement {
     this.updateContents([name]);
   }
 }
-customElements.define("pokemon-card", pokemonCard);
+if (!customElements.get('pokemon-card')) customElements.define("pokemon-card", pokemonCard);
