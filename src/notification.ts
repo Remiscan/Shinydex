@@ -65,6 +65,7 @@ export class Notif {
         // Détecte le clic sur le bouton d'action
         notifBouton.addEventListener('click', this.handler = () => {
           resolve(true);
+          this.hide();
           this.action();
         });
     
@@ -92,6 +93,7 @@ export class Notif {
             resolve(false);
           }
         };
+        cacheOuProlonge();
       });
     } else {
       const visibleNotif = queue[0];
