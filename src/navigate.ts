@@ -59,16 +59,6 @@ export async function navigate(sectionCible: string, historique = true) {
     sp.removeAttribute('finished');
   });
 
-  // Animation du FAB
-  /*const sectionsFabFilter = ['mes-chromatiques', 'pokedex'];
-  const sectionsFabAdd = ['chasses-en-cours'];
-  let animateFab = false;
-  if (
-    (sectionsFabFilter.includes(sectionActuelle) && sectionsFabAdd.includes(sectionCible))
-    || (sectionsFabFilter.includes(sectionCible) && sectionsFabAdd.includes(sectionActuelle))
-  ) animateFab = true;
-  animateFabIcon(sectionCible, animateFab);*/
-
   sectionActuelle = sectionCible;
   document.body.dataset.sectionActuelle = sectionActuelle; // affiche la nouvelle section
   mainElement.scroll(0, lastPosition.get(sectionCible) || 0); // scrolle vers la position précédemment enregistrée
@@ -102,8 +92,46 @@ export async function navigate(sectionCible: string, historique = true) {
 }
 
 
+/**
+ * Anime la bulle en fond d'un lien de navigation.
+ * @param event - L'event mousedown ou touchstart sur le bouton de nav.
+ * @param element - Le bouton de nav.
+ */
+export function navLinkBubble(event: Event, element: Element): void {
+  element.classList.remove('bubbly');
+  if ((element as HTMLElement).dataset.section === document.body.dataset.sectionActuelle) return;
+  if (element.classList.contains('search-button')) return;
 
-// Anime l'icône du FAB selon la section en cours
+  let transformOrigin = 'center center';
+  const rect = element.getBoundingClientRect();
+
+  switch (event.type) {
+    case 'mousedown': {
+      const evt = event as MouseEvent;
+      transformOrigin = `${evt.clientX - rect.x}px ${evt.clientY - rect.y}px`;
+    } break;
+    case 'touchstart': {
+      const evt = event as TouchEvent;
+      transformOrigin = `${evt.touches[0].clientX - rect.x}px ${evt.touches[0].clientY - rect.y}px`;
+    } break;
+  }
+
+  (element as HTMLElement).style.setProperty('--transform-origin', transformOrigin);
+  
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      element.classList.add('bubbly');
+    })
+  });
+}
+
+
+/**
+ * Anime l'icône du FAB si elle change entre deux sections.
+ * (Inutilisé pour l'instant, mais garder.)
+ * @param sectionCible 
+ * @param animations 
+ */
 async function animateFabIcon(sectionCible: string, animations = false) {
   const fab = document.querySelector('.fab')!;
   const fabIcon = fab.querySelector('.material-icons')!;
@@ -148,39 +176,6 @@ async function animateFabIcon(sectionCible: string, animations = false) {
   animFabIcon.end?.cancel();
   return;
 }
-
-
-/**
- * Anime la bulle en fond d'un lien de navigation.
- */
-export function navLinkBubble(event: Event, element: Element): void {
-  element.classList.remove('bubbly');
-  if ((element as HTMLElement).dataset.section === document.body.dataset.sectionActuelle) return;
-  if (element.classList.contains('search-button')) return;
-
-  let transformOrigin = 'center center';
-  const rect = element.getBoundingClientRect();
-
-  switch (event.type) {
-    case 'mousedown': {
-      const evt = event as MouseEvent;
-      transformOrigin = `${evt.clientX - rect.x}px ${evt.clientY - rect.y}px`;
-    } break;
-    case 'touchstart': {
-      const evt = event as TouchEvent;
-      transformOrigin = `${evt.touches[0].clientX - rect.x}px ${evt.touches[0].clientY - rect.y}px`;
-    } break;
-  }
-
-  (element as HTMLElement).style.setProperty('--transform-origin', transformOrigin);
-  
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      element.classList.add('bubbly');
-    })
-  });
-}
-
 
 
 // Permet la navigation avec le bouton retour du navigateur

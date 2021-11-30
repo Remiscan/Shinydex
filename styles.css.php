@@ -268,6 +268,7 @@ main>section.on,
 body[data-section-actuelle=mes-chromatiques] #mes-chromatiques,
 body[data-section-actuelle=pokedex] #pokedex,
 body[data-section-actuelle=chasses-en-cours] #chasses-en-cours,
+body[data-section-actuelle=partage] #partage,
 body[data-section-actuelle=parametres] #parametres,
 body[data-section-actuelle=a-propos] #a-propos {
   display: grid;
