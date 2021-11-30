@@ -43,7 +43,7 @@ export class Hunt implements huntedPokemon {
 
   static async build(pokemon?: huntedPokemon, start: boolean = false) {
     const hunt = new Hunt(pokemon);
-    await huntStorage.setItem(String(pokemon?.huntid || hunt.huntid), hunt);
+    await huntStorage.setItem(pokemon?.huntid || hunt.huntid, hunt);
     await hunt.buildHunt(start);
     return hunt;
   }
@@ -56,18 +56,18 @@ export class Hunt implements huntedPokemon {
     card.id = 'hunt-' + this.huntid;
     
     for (const el of Array.from(card.querySelectorAll('[id^="hunt-{id}"]'))) {
-      el.id = el.id.replace('{id}', String(this.huntid));
+      el.id = el.id.replace('{id}', this.huntid);
     }
 
     for (const el of Array.from(card.querySelectorAll('[for^="hunt-{id}"]'))) {
-      el.setAttribute('for', (el.getAttribute('for') || '').replace('{id}', String(this.huntid)));
+      el.setAttribute('for', (el.getAttribute('for') || '').replace('{id}', this.huntid));
     }
 
     for (const el of Array.from(card.querySelectorAll('[name^="hunt-{id}"]'))) {
-      el.setAttribute('name', (el.getAttribute('name') || '').replace('{id}', String(this.huntid)));
+      el.setAttribute('name', (el.getAttribute('name') || '').replace('{id}', this.huntid));
     }
 
-    const k = await shinyStorage.getItem(String(this.huntid));
+    const k = await shinyStorage.getItem(this.huntid);
     const edit = (k != null);
     if (edit) card.classList.add('edit');
 
@@ -358,9 +358,9 @@ export class Hunt implements huntedPokemon {
     this.updateJeu();
     this.updateBall();
 
-    k = await huntStorage.getItem(String(this.huntid));
+    k = await huntStorage.getItem(this.huntid);
     if (k == null) throw 'Chasse inexistante';
-    return await huntStorage.setItem(String(this.huntid), this);
+    return await huntStorage.setItem(this.huntid, this);
   }
 
 
@@ -401,13 +401,13 @@ export class Hunt implements huntedPokemon {
 
   // Supprime la chasse complètement
   async destroyHunt() {
-    const k = await huntStorage.getItem(String(this.huntid));
+    const k = await huntStorage.getItem(this.huntid);
     if (k == null) throw 'Chasse inexistante';
 
     const card = document.getElementById('hunt-' + this.huntid)!;
     card.remove();
 
-    await huntStorage.removeItem(String(this.huntid));
+    await huntStorage.removeItem(this.huntid);
 
     const keys = await huntStorage.keys();
     if (keys.length == 0) document.querySelector('#chasses-en-cours')!.classList.add('vide');
@@ -446,7 +446,7 @@ export class Hunt implements huntedPokemon {
       const shiny = new Shiny(await shinyStorage.getItem(this.huntid));
       shiny.lastUpdate = this.lastUpdate;
       shiny.deleted = true;
-      await shinyStorage.setItem(String(this.huntid), shiny);
+      await shinyStorage.setItem(this.huntid, shiny);
 
       // On supprime la carte du shiny
       const card = document.querySelector(`#mes-chromatiques pokemon-card#${this.huntid}`);
@@ -465,15 +465,15 @@ export class Hunt implements huntedPokemon {
 
 ////////////////////////////////////////////////////////////
 // Créer une chasse pour mettre à jour une carte dans la BDD
-export async function editHunt(id: number, nav = true) {
-  let k = await huntStorage.getItem(String(id));
+export async function editHunt(id: string, nav = true) {
+  let k = await huntStorage.getItem(id);
   if (k != null) {
     const message = 'Cette chasse est déjà en cours d\'édition.';
     new Notif(message).prompt();
     return false;
   }
 
-  const pkmn = await shinyStorage.getItem(String(id));
+  const pkmn = await shinyStorage.getItem(id);
   const parseTheseInts = ['id', 'origin', 'monjeu', 'charm', 'hacked', 'aupif'];
   parseTheseInts.forEach(int => pkmn[int] = parseInt(pkmn[int]));
   pkmn.dexid = parseInt(pkmn['numero_national']);

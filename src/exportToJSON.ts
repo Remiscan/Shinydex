@@ -26,11 +26,11 @@ export async function json2import(file: File | Blob | undefined): Promise<string
 
       await shinyStorage.ready();
       await Promise.all(
-        importedData.shiny.map((shiny: frontendShiny) => shinyStorage.setItem(String(shiny.huntid), shiny))
+        importedData.shiny.map((shiny: frontendShiny) => shinyStorage.setItem(shiny.huntid, shiny))
       );
       await huntStorage.ready();
       await Promise.all(
-        importedData.hunts.map((hunt: huntedPokemon) => huntStorage.setItem(String(hunt.huntid), hunt))
+        importedData.hunts.map((hunt: huntedPokemon) => huntStorage.setItem(hunt.huntid, hunt))
       );
 
       await upgradeStorage(true);

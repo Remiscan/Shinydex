@@ -111,7 +111,7 @@ export async function appStart() {
     const toDestroy = shinyMons.filter(shiny => shiny.destroy === true);
     await Promise.all(
       toDestroy.map(shiny => shiny.huntid)
-               .map(huntid => shinyStorage.removeItem(String(huntid)))
+               .map(huntid => shinyStorage.removeItem(huntid))
     );
 
     // ÉTAPE 3.99 : on met à jour la structure de la BDD locale si nécessaire

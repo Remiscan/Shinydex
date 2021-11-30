@@ -234,9 +234,9 @@ navigator.serviceWorker.addEventListener('message', async event => {
       let uploadConfirmed = await dataStorage.getItem('uploaded-hunts');
       if (uploadConfirmed == null) uploadConfirmed = [];
       await dataStorage.setItem('uploaded-hunts', uploadConfirmed.filter((v: number) => v != huntid));
-      const hunt = await huntStorage.getItem(String(huntid));
+      const hunt = await huntStorage.getItem(huntid);
       hunt.uploaded = false;
-      await huntStorage.setItem(String(huntid), hunt);
+      await huntStorage.setItem(huntid, hunt);
     }
   }
 

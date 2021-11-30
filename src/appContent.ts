@@ -38,16 +38,16 @@ export async function appPopulate(start: boolean = true, modified: string[] = []
 
     // Récupère la liste des huntid des shiny ayant déjà une carte
     const currentShinyIds = Array.from(document.querySelectorAll('#mes-chromatiques pokemon-card'))
-                                 .map(shiny => String(shiny.getAttribute('huntid')));
+                                 .map(shiny => shiny.getAttribute('huntid'));
 
     // Récupère la liste des huntid des shiny de la base de données
     const keys = await shinyStorage.keys();
     const dbShiny = await Promise.all(keys.map(key => shinyStorage.getItem(key)));
-    const dbShinyIds = dbShiny.map(shiny => String(shiny.huntid));
+    const dbShinyIds = dbShiny.map(shiny => shiny.huntid);
 
     // Comparons les deux listes
     //// Shiny marqués supprimés dans la base de données (donc à ignorer)
-    const toIgnore = dbShiny.filter(shiny => shiny.deleted).map(shiny => String(shiny.huntid));
+    const toIgnore = dbShiny.filter(shiny => shiny.deleted).map(shiny => shiny.huntid);
     //// Shiny ayant une carte qui ont disparu de la base de données (donc à supprimer)
     const toDelete = currentShinyIds.filter(huntid => !dbShinyIds.includes(huntid) || (currentShinyIds.includes(huntid) && toIgnore.includes(huntid)));
     //// Shiny présents dans la base de données n'ayant pas de carte (donc à créer)

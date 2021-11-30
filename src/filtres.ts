@@ -128,7 +128,7 @@ async function filterAllPokemon(filtres: ListeFiltres): Promise<Shiny[]> {
 export async function filterCards(_filtres?: ListeFiltres, ids: string[] = []): Promise<number> {
   const filtres = _filtres ?? await dataStorage.getItem('filtres') ?? defautFiltres;
 
-  const correspondingids = (await filterAllPokemon(filtres)).map(shiny => String(shiny.huntid));
+  const correspondingids = (await filterAllPokemon(filtres)).map(shiny => shiny.huntid);
   const keptCards: pokemonCard[] = [];
   const hiddenCards: pokemonCard[] = [];
   
@@ -177,12 +177,12 @@ let currentOrdre = defautOrdre;
 
 ////////////////////////////////////////////////////////////////////
 // Ordonner les cartes de Pokémon selon une certaine caractéristique
-export async function orderCards(_ordre?: string, _reversed?: boolean, ids: number[] = []): Promise<void> {
+export async function orderCards(_ordre?: string, _reversed?: boolean, ids: string[] = []): Promise<void> {
   const ordre = _ordre ?? await dataStorage.getItem('ordre') ?? defautOrdre;
   const reversed = _reversed ?? await dataStorage.getItem('ordre-reverse') ?? false;
   
-  const allids = ids.length > 0 ? ids : (await shinyStorage.keys()).map(n => Number(n));
-  const allShiny = await Promise.all(allids.map(id => shinyStorage.getItem(String(id))));
+  const allids = ids.length > 0 ? ids : (await shinyStorage.keys());
+  const allShiny = await Promise.all(allids.map(id => shinyStorage.getItem(id)));
 
   let orderedShiny = allShiny.sort((s1, s2) => {
     switch (ordre) {
