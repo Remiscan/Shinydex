@@ -159,7 +159,7 @@ nav {
   display: grid;
   --nombre-sections: 5;
   grid-template-columns: repeat(var(--nombre-sections), 1fr);
-  grid-template-columns: 1fr 1fr 0.5fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 0.6fr 1fr 1fr;
   background-color: var(--nav-bg-color);
   z-index: var(--z-nav);
 }
@@ -218,6 +218,13 @@ body[data-section-actuelle=partage] .nav-link[data-section=partage] {
 
 .nav-link .shinystars {
   --text-color: var(--nav-text-color);
+}
+
+.search-button > i {
+  padding: 0.3rem 0.8rem;
+  border-radius: 50px;
+  background-color: var(--nav-text-color);
+  color: var(--nav-bg-color);
 }
 
 .lien-section,

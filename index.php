@@ -73,7 +73,7 @@
       </a>
 
       <!-- Seulement sur mobile -->
-      <a class="nav-link lien-section only-mobile">
+      <a class="nav-link lien-section only-mobile search-button">
         <i class="material-icons">search</i>
       </a>
 
