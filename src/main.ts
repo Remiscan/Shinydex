@@ -10,6 +10,7 @@ import { Hunt } from './Hunt.js';
 import { dataStorage, huntStorage, shinyStorage } from './localforage.js';
 import { navigate, sectionActuelle } from './navigate.js';
 import { Notif } from './notification.js';
+import { setTheme, wait, warnBeforeDestruction } from './Params.js';
 import { initSpriteViewer } from './spriteViewer.js';
 
 
@@ -135,18 +136,13 @@ importInput.addEventListener('change', async event => {
   }
 });
 
-// Prépare le bouton de suppression des données locales
-const boutonSupprimer = document.querySelector('.bouton-supprimer-local') as HTMLButtonElement;
+// Détecte le clic sur le bouton de suppression des données locales
+const boutonSupprimer = document.querySelector('.bouton-supprimer-local')! as HTMLButtonElement;
 boutonSupprimer.addEventListener('click', async event => {
   event.preventDefault();
 
-  if (boutonSupprimer.innerHTML == 'Supprimer' || boutonSupprimer.innerHTML == 'Annuler')
-  {
-    boutonSupprimer.innerHTML = 'Vraiment ?';
-    setTimeout(() => boutonSupprimer.innerHTML = 'Supprimer', 3000);
-  }
-  else if (boutonSupprimer.innerHTML == 'Vraiment ?')
-  {
+  const userResponse = await warnBeforeDestruction(boutonSupprimer);
+  if (userResponse) {
     boutonSupprimer.disabled = true;
     boutonSupprimer.innerHTML = 'Supprimer';
 

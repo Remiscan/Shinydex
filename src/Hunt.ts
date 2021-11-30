@@ -4,6 +4,7 @@ import { lazyLoad } from './lazyLoading.js';
 import { dataStorage, huntStorage, pokemonData, shinyStorage } from './localforage.js';
 import { navigate } from './navigate.js';
 import { Notif } from './notification.js';
+import { Params, warnBeforeDestruction } from './Params.js';
 import { Forme, frontendShiny, Methode, Pokemon, Shiny } from './Pokemon.js';
 
 
@@ -113,11 +114,9 @@ export class Hunt implements huntedPokemon {
       bouton.addEventListener('click', async event => {
         event.preventDefault();
   
-        const span = bouton.querySelector('span')!;
-        if (span.innerHTML == 'Supprimer' || span.innerHTML == 'Annuler') {
-          span.innerHTML = 'Vraiment ?';
-          setTimeout(() => span.innerHTML = 'Supprimer', 3000);
-        } else if (span.innerHTML == 'Vraiment ?') {
+        const cancelMessage = 'Les modifications ne seront pas enregistrées.';
+        const userResponse = await warnBeforeDestruction(bouton, bouton === boutonAnnuler ? cancelMessage : undefined);
+        if (userResponse) {
           await this.destroyHunt();
         }
       });
@@ -128,31 +127,24 @@ export class Hunt implements huntedPokemon {
     boutonSubmit.addEventListener('click', async event => {
       event.preventDefault();
 
-      if (!navigator.onLine) return notify('Pas de connexion internet');
+      // Gestion des erreurs de formulaire
+      const erreurs = [];
+      if (this.dexid == 0) erreurs.push('Pokémon');
+      if (this.jeu == '') erreurs.push('jeu');
+      if (this.methode == '')  erreurs.push('méthode');
+      if (this.timeCapture == 0) erreurs.push('date');
 
-      const span = boutonSubmit.querySelector('span')!;
-      if (span.innerHTML == 'Enregistrer') {
-        // Gestion des erreurs de formulaire
-        const erreurs = [];
-        if (this.dexid == 0) erreurs.push('Pokémon');
-        if (this.jeu == '') erreurs.push('jeu');
-        if (this.methode == '')  erreurs.push('méthode');
-        if (this.timeCapture == 0) erreurs.push('date');
-
-        if (erreurs.length > 0) {
-          let message = `Les champs suivants sont mal remplis : `;
-          erreurs.forEach(e => message += `${e}, `);
-          message = message.replace(/,\ $/, '.');
-          return notify(message);
+      if (erreurs.length > 0) {
+        let message = `Les champs suivants sont mal remplis : `;
+        erreurs.forEach(e => message += `${e}, `);
+        message = message.replace(/,\ $/, '.');
+        new Notif(message).prompt();
+        return;
+      } else {
+        const userResponse = await warnBeforeDestruction(boutonSubmit, 'Ajouter ce Pokémon à vos chromatiques ?', 'done');
+        if (userResponse) {
+          await this.submitHunt();
         }
-
-        span.innerHTML = 'Confirmer ?';
-        setTimeout(() => span.innerHTML = 'Enregistrer', 3000);
-      }
-      else if (span.innerHTML == 'Confirmer ?')
-      {
-        if (edit) await this.submitHunt(true);
-        else await this.submitHunt();
       }
     });
 
@@ -166,12 +158,9 @@ export class Hunt implements huntedPokemon {
         return;
       }
 
-      const span = boutonSupprimer.querySelector('span')!;
-      if (span.innerHTML == 'Supprimer') {
-        span.innerHTML = 'Vraiment ?';
-        setTimeout(() => span.innerHTML = 'Supprimer', 3000);
-      } else if (span.innerHTML == 'Vraiment ?') {
-        await this.deleteHuntFromDB();
+      const userResponse = await warnBeforeDestruction(boutonSupprimer);
+      if (userResponse) {
+        await this.deleteAssociatedShiny();
       }
     });
 

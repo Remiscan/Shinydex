@@ -1,4 +1,4 @@
-import { dataStorage, huntStorage, localForageAPI, shinyStorage } from './localforage.js';
+import { Notif } from './notification.js';
 
 
 declare global {
@@ -189,4 +189,18 @@ export async function setTheme(askedTheme?: string) {
 
   await dataStorage.ready();
   return await dataStorage.setItem('theme', askedTheme);
+}
+
+
+export async function warnBeforeDestruction(bouton: Element, message: string = 'Ces données seront définitivement perdues.', icon: string = 'delete') {
+  bouton.setAttribute('disabled', 'true');
+  const warning = `Êtes-vous sûr ? ${message}`;
+
+  const action = () => window.dispatchEvent(new Event('destructionconfirmed'));
+  const notification = new Notif(warning, 'Confirmer', icon, 5000, action);
+
+  const userResponse = await notification.prompt();
+  bouton.removeAttribute('disabled');
+
+  return userResponse;
 }
