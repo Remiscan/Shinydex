@@ -12,7 +12,6 @@ function getCacheFiles() {
       "./ext/material_icons.woff2",
       "./images/iconsheet.css",
       "./images/iconsheet.png",
-      "./images/shinystars.svg",
       "./styles.css.php",
       "../_common/polyfills/adoptedStyleSheets.min.js",
       "../_common/polyfills/es-module-shims.js"
