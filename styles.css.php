@@ -181,8 +181,8 @@ nav {
 }
 
 @keyframes bulle-nav {
-  0% { opacity: 0; transform: scale(0); }
-  80% { opacity: 1; transform: scale(1); }
+  0% { opacity: 1; transform: scale(0); }
+  90% { opacity: .3; transform: scale(1); }
   100% { opacity: 0; transform: scale(1); }
 }
 
@@ -191,6 +191,7 @@ nav {
   display: block;
   position: absolute;
   transform: scale(0);
+  transform-origin: var(--transform-origin, center center);
   --size: calc(90vw / var(--nombre-sections));
   width: var(--size);
   height: var(--size);
@@ -203,10 +204,7 @@ nav {
   display: none;
 }
 
-.on.nav-link::before,
-body[data-section-actuelle=mes-chromatiques] .nav-link[data-section=mes-chromatiques]::before,
-body[data-section-actuelle=pokedex] .nav-link[data-section=pokedex]::before,
-body[data-section-actuelle=chasses-en-cours] .nav-link[data-section=chasses-en-cours]::before {
+.nav-link.bubbly::before {
   animation: bulle-nav .3s var(--easing-decelerate);
 }
 
@@ -2393,9 +2391,9 @@ input:disabled + label.switch {
     text-align: center;
   }
 
-  body[data-section-actuelle=parametres] .nav-link[data-section=parametres]::before {
+  /*body[data-section-actuelle=parametres] .nav-link[data-section=parametres]::before {
     animation: bulle-nav .3s var(--easing-decelerate);
-  }
+  }*/
 
   body[data-section-actuelle=parametres] .nav-link[data-section=parametres] {
     --nav-text-color: var(--nav-text-color-on);
@@ -2475,12 +2473,12 @@ input:disabled + label.switch {
   }
 
   #parametres {
-    grid-column: 2 / 3;
+    grid-column: 1;
     grid-row: 1 / 2;
   }
 
   #a-propos {
-    grid-column: 1 / 2;
+    grid-column: 2;
     grid-row: 1 / 2;
   }
 

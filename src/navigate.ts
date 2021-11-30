@@ -131,6 +131,37 @@ async function animateFabIcon(sectionCible: string, animations = false) {
 }
 
 
+/**
+ * Anime la bulle en fond d'un lien de navigation.
+ */
+export function navLinkBubble(event: Event, element: Element): void {
+  element.classList.remove('bubbly');
+  if ((element as HTMLElement).dataset.section === document.body.dataset.sectionActuelle) return;
+
+  let transformOrigin = 'center center';
+  const rect = element.getBoundingClientRect();
+
+  switch (event.type) {
+    case 'mousedown': {
+      const evt = event as MouseEvent;
+      transformOrigin = `${evt.clientX - rect.x}px ${evt.clientY - rect.y}px`;
+    } break;
+    case 'touchstart': {
+      const evt = event as TouchEvent;
+      transformOrigin = `${evt.touches[0].clientX - rect.x}px ${evt.touches[0].clientY - rect.y}px`;
+    } break;
+  }
+
+  (element as HTMLElement).style.setProperty('--transform-origin', transformOrigin);
+  
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      element.classList.add('bubbly');
+    })
+  });
+}
+
+
 
 // Permet la navigation avec le bouton retour du navigateur
 window.addEventListener('popstate', event => {
