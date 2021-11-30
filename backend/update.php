@@ -2,6 +2,7 @@
 require_once './parametres.php';
 require_once './class_BDD.php';
 require_once './class_Pokemon.php';
+require_once './cache.php';
 
 // Vide le cache des stats des fichiers
 clearstatcache();
@@ -13,8 +14,7 @@ function getFilesVersion()
 {
   $rootDir = dirname(__DIR__, 1);
 
-  $listeFichiers = json_decode(file_get_contents("$rootDir/cache.json.php"), true);
-  $listeFichiers = $listeFichiers['fichiers'];
+  $listeFichiers = getCacheFiles()['fichiers'];
   $listeFichiers[0] = './index.php';
   foreach(glob('./pages/*.html') as $f) {
     $listeFichiers[] = $f;
