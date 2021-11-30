@@ -21,7 +21,7 @@
 
     <link rel="preconnect" href="https://remiscan.fr">
 
-    <script>window.tempsChargementDebut = Date.now();</script>
+    <script>window.tempsChargementDebut = performance.now();</script>
     <script defer src="../_common/polyfills/adoptedStyleSheets.min.js"></script>
     <script type="esms-options">
     {

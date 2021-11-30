@@ -1,5 +1,5 @@
 import { appDisplay, appPopulate } from './appContent.js';
-import { appStart, changeAutoMaj, checkUpdate, manualUpdate, setOnlineBackup, startBackup } from './appLifeCycle.js';
+import { appStart, changeAutoMaj, checkUpdate, manualUpdate, setOnlineBackup } from './appLifeCycle.js';
 import './components/load-spinner/loadSpinner.js';
 import './components/pokemon-card/pokemonCard.js';
 import './components/sync-progress/syncProgress.js';
@@ -8,7 +8,7 @@ import { export2json, json2import } from './exportToJSON.js';
 import { initFiltres, openFiltres } from './filtres.js';
 import { Hunt } from './Hunt.js';
 import { dataStorage, huntStorage, shinyStorage } from './localforage.js';
-import { navigate, sectionActuelle } from './navigate.js';
+import { navigate, navLinkBubble, sectionActuelle } from './navigate.js';
 import { Notif } from './notification.js';
 import { setTheme, wait, warnBeforeDestruction } from './Params.js';
 import { initSpriteViewer } from './spriteViewer.js';
@@ -22,6 +22,13 @@ import { backgroundSync } from './syncBackup.js';
 // Active les liens de navigation
 for (const link of Array.from(document.querySelectorAll('[data-section]')) as HTMLElement[]) {
   link.addEventListener('click', () => navigate(link.dataset.section || ''));
+}
+
+// Active les bulles sur les liens de navigation
+for (const link of Array.from(document.querySelectorAll('.nav-link')) as HTMLElement[]) {
+  for (const startEvent of ['mousedown', 'touchstart']) {
+    link.addEventListener(startEvent, event => navLinkBubble(event, link));
+  }
 }
 
 // Active le bouton retour / fermer

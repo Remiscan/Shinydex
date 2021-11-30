@@ -1,8 +1,17 @@
-import { appDisplay, appPopulate } from './appContent.js';
+import { appPopulate } from './appContent.js';
 import { dataStorage, huntStorage, pokemonData, shinyStorage } from './localforage.js';
 import { Notif } from './notification.js';
+import { loadAllImages, Params, setTheme, timestamp2date, wait, webpSupport } from './Params.js';
 import { backgroundSync, immediateSync } from './syncBackup.js';
 import { upgradeStorage } from './upgradeStorage.js';
+
+
+
+declare global {
+  interface Window {
+    tempsChargementDebut: number
+  }
+}
 
 
 
@@ -41,40 +50,38 @@ async function initServiceWorker() {
 /////////////////////////////////////////////////////////
 // Démarre l'application (update? => populate => display)
 export async function appStart() {
-  if (!('serviceWorker' in navigator))
-    throw 'Application non supportée.';
+  if (!('serviceWorker' in navigator)) throw 'Application non supportée.';
+
+  // ---
 
   // ÉTAPE 1 : on vérifie si l'application est installée localement
-  let log;
-  try {
-    let filesInstalled = false;
-    let dataInstalled = false;
-    let serviceWorkerReady = navigator.serviceWorker.controller != null;
 
-    // On initialise supportsWebp
-    if (await webpSupport()) Params.preferredImageFormat = 'webp';
+  // On initialise supportsWebp
+  if (await webpSupport()) Params.preferredImageFormat = 'webp';
 
-    // On vérifie si les données sont installées
-    await Promise.all([dataStorage.ready(), shinyStorage.ready(), pokemonData.ready(), huntStorage.ready()]);
-    const installedVersion = await dataStorage.getItem('version-fichiers');
-    if (installedVersion !== null) dataInstalled = true;
+  // On vérifie si les données sont installées
+  await Promise.all([dataStorage.ready(), shinyStorage.ready(), pokemonData.ready(), huntStorage.ready()]);
+  const installedVersion = await dataStorage.getItem('version-fichiers');
+  const dataInstalled = installedVersion !== null;
 
-    // On vérifie si les fichiers sont installés
-    const keys = await caches.keys();
-    const trueKeys = keys.filter(e => e.includes('remidex-sw-' + installedVersion));
-    if (trueKeys.length >= 1) filesInstalled = true;
+  // On vérifie si les fichiers sont installés
+  const keys = await caches.keys();
+  const trueKeys = keys.filter(e => e.includes('remidex-sw-' + installedVersion));
+  const filesInstalled = trueKeys.length >= 1;
 
-    if (filesInstalled && dataInstalled && serviceWorkerReady) {
-      log = '[:)] L\'application est déjà installée localement.';
-      initServiceWorker();
-    } else {
-      throw '[:(] L\'application n\'est pas installée localement';
-    }
-  }
+  // On vérifie si le service worker est prêt
+  const serviceWorkerReady = navigator.serviceWorker.controller != null;
 
-  // ÉTAPE 2 : si la réponse est non, on installe l'application
-  catch(error) {
-    console.log(error);
+  // ---
+
+  // ÉTAPE 2 : si la réponse est oui, on passe à la suite ;
+  //           si la réponse est non, on installe l'application
+
+  if (filesInstalled && dataInstalled && serviceWorkerReady) {
+    console.log('[:)] L\'application est déjà installée localement.');
+    initServiceWorker();
+  } else {
+    console.log('[:(] L\'application n\'est pas installée localement.');
     console.log('[:|] Préparation de l\'installation...');
     const loadMessage = document.getElementById('load-screen-message');
     if (loadMessage !== null) {
@@ -82,73 +89,124 @@ export async function appStart() {
       loadMessage.style.display = 'block';
     }
     await initServiceWorker();
-    log = await appUpdate();
+    try {
+      const installation = await appUpdate();
+      console.log(installation);
+    } catch (error) {
+      console.error(error);
+      if (typeof error === 'string') new Notif(error).prompt();
+    }
   }
 
-  try {
-    console.log(log);
-    console.log('[:)] Chargement de l\'application...');
+  console.log('[:)] Chargement de l\'application...');
 
-    // ÉTAPE 3 : si la sauvegarde en ligne est activée, on met à jour les données locales
-    const onlineBackup = await dataStorage.getItem('online-backup');
-    if (onlineBackup) await waitBackup();
+  // ---
 
-    // ÉTAPE 3.97 : on applique le thème
-    await setTheme();
+  // ÉTAPE 3 : si la sauvegarde en ligne est activée, on met à jour les données locales
+
+  const onlineBackup = await dataStorage.getItem('online-backup');
+  if (onlineBackup) {
     try {
-      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => setTheme(undefined));
-      window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', event => setTheme(undefined));
-    } catch (e) {
-      window.matchMedia('(prefers-color-scheme: dark)').addListener(event => setTheme(undefined));
-      window.matchMedia('(prefers-color-scheme: light)').addListener(event => setTheme(undefined));
-    }
-
-    // ÉTAPE 3.98 : si des shiny marqués à 'destroy' sont stockés, on les supprime
-    const shinyKeys = await shinyStorage.keys();
-    const shinyMons = await Promise.all(
-      shinyKeys.map(key => shinyStorage.getItem(key))
-    );
-    const toDestroy = shinyMons.filter(shiny => shiny.destroy === true);
-    await Promise.all(
-      toDestroy.map(shiny => shiny.huntid)
-               .map(huntid => shinyStorage.removeItem(huntid))
-    );
-
-    // ÉTAPE 3.99 : on met à jour la structure de la BDD locale si nécessaire
-    try {
-      await upgradeStorage();
+      await immediateSync();
     } catch (error) {
-      const message = `Erreur pendant la mise à jour du format des données.`;
+      const message = `Erreur de synchronisation des données.`;
       console.error(message, error);
       new Notif(message).prompt();
     }
-
-    // ÉTAPE 4 : on peuple l'application à partir des données locales
-    log = await appPopulate();
-    console.log(log);
-
-    // ÉTAPE 5 : on affiche l'application
-    log = await appDisplay();
-    console.log(log);
-
-    // Fini !! :)
-
-    // ÉTAPE bonus : si nécessaire, on vérifie si l'application
-    // peut être installée ou si une mise à jour est disponible
-    checkInstall();
-    const willCheckUpdate = await dataStorage.getItem('check-updates');
-    if (willCheckUpdate == 1) {
-      await navigator.serviceWorker.ready;
-      await wait(1000);
-      return checkUpdate();
-    }
-    else {
-      return;
-    }
   }
 
+  // ---
+
+  // ÉTAPE 4 : on nettoie les données locales
+
+  // Si des shiny marqués à 'destroy' sont stockés, on les supprime
+  const shinyKeys = await shinyStorage.keys();
+  const shinyMons = await Promise.all(
+    shinyKeys.map(key => shinyStorage.getItem(key))
+  );
+  const toDestroy = shinyMons.filter(shiny => shiny.destroy === true);
+  await Promise.all(
+    toDestroy.map(shiny => shiny.huntid)
+             .map(huntid => shinyStorage.removeItem(huntid))
+  );
+
+  // On met à jour la structure de la BDD locale si nécessaire
+  try {
+    await upgradeStorage();
+  } catch (error) {
+    const message = `Erreur pendant la mise à jour du format des données.`;
+    console.error(message, error);
+    new Notif(message).prompt();
+  }
+
+  // ---
+
+  // ÉTAPE 5 : on peuple l'application à partir des données locales
+  try {
+    await appPopulate();
+  } catch (error) {
+    console.error(error);
+  }
+
+  // ---
+
+  // ÉTAPE 6 : on affiche l'application
+
+  // Préparation du thème
+  await setTheme();
+  try {
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => setTheme(undefined));
+    window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', event => setTheme(undefined));
+  } catch (e) {
+    window.matchMedia('(prefers-color-scheme: dark)').addListener(event => setTheme(undefined));
+    window.matchMedia('(prefers-color-scheme: light)').addListener(event => setTheme(undefined));
+  }
+
+  // On affiche la version de l'appli
+  const tempsChargement = performance.now() - window.tempsChargementDebut;
+  document.getElementById('version-tempschargement')!.innerHTML = String(tempsChargement);
+  document.getElementById('version-fichiers')!.innerHTML = timestamp2date(await dataStorage.getItem('version-fichiers'));
+
+  // On pré-charge les icônes
+  try {
+    await loadAllImages([`./ext/pokesprite.png`]);
+  } catch (error) {
+    console.error(`Erreur de chargement d'image`, error);
+  }
+
+  console.log('[:)] Chargement terminé !');
+
+  // On efface l'écran de chargement
+  const loadScreen = document.getElementById('load-screen')!;
+  const byeLoad = loadScreen.animate([
+    { opacity: 1 },
+    { opacity: 0 }
+  ], {
+    duration: 100,
+    easing: Params.easingStandard,
+    fill: 'forwards'
+  });
+  await wait(byeLoad);
+  loadScreen.remove();
+
+  console.log('[:)] Bienvenue sur le Rémidex !');
+
+  // ---
+
+  // ÉTAPE 7 : on vérifie si l'application peut être installée ou mise à jour
+
+  checkInstall();
+  const shouldCheckUpdate = await dataStorage.getItem('check-updates');
+  if (shouldCheckUpdate == true) {
+    await navigator.serviceWorker.ready;
+    await wait(1000);
+    await checkUpdate();
+  }
+
+  return;
+
   // En cas d'erreur critique, on propose de réinstaller
-  catch(error) {
+  /*catch(error) {
     console.error(error);
 
     async function forceUpdateNow() {
@@ -160,7 +218,7 @@ export async function appStart() {
     };
     document.getElementById('load-screen')!.remove();
     return new Notif('Échec critique du chargement...', 'Réinitialiser', 'refresh', Notif.maxDelay, forceUpdateNow, true).prompt();
-  }
+  }*/
 }
 
 
@@ -363,97 +421,4 @@ export async function setOnlineBackup(checked: boolean): Promise<void> {
 export async function changeAutoMaj(checked: boolean): Promise<void> {
   if (checked) await dataStorage.setItem('check-updates', true);
   else         await dataStorage.setItem('check-updates', false);
-}
-
-
-
-// Demande au service worker de mettre à jour le sprite
-export async function updateSprite(version = null) {
-  const reg = await navigator.serviceWorker.ready;
-  return new Promise((resolve, reject) => {
-    const chan = new MessageChannel();
-
-    chan.port1.onmessage = event => {
-      if (event.data.error) {
-        console.error(event.data.error);
-        reject('[:(] Erreur de contact du service worker');
-      }
-
-      if ('successfulSpriteUpdate' in event.data) {
-        if (event.data.successfulSpriteUpdate === true) resolve(event.data.version);
-        else reject('[:(] Échec de la mise à jour du sprite');
-      }
-      else {
-        reject('[:(] Message invalide reçu du service worker');
-      }
-    }
-
-    chan.port1.onmessageerror = event => {
-      reject('[:(] Erreur de communication avec le service worker');
-    }
-  
-    const worker = currentWorker || reg.active;
-    worker?.postMessage({ 'action': 'update-sprite', version }, [chan.port2]);
-  });
-}
-
-
-// Démarre la procédure de backup
-
-interface SyncManager {
-  getTags(): Promise<string[]>;
-  register(tag: string): Promise<void>;
-}
-
-declare global {
-  interface ServiceWorkerRegistration {
-    readonly sync: SyncManager;
-  }
-
-  interface SyncEvent extends Event {
-    readonly lastChance: boolean;
-    readonly tag: string;
-  }
-
-  interface ServiceWorkerGlobalScopeEventMap {
-    sync: SyncEvent;
-  }
-}
-
-export async function startBackup() {
-  const reg = await navigator.serviceWorker.ready;
-  await reg.sync.register('SYNC-BACKUP');
-
-  const loaders = Array.from(document.querySelectorAll('sync-progress, sync-line'));
-  loaders.forEach(loader => loader.setAttribute('state', 'loading'));
-}
-
-// Démarre la procédure de backup et attend la réponse
-async function waitBackup() {
-  const reg = await navigator.serviceWorker.ready;
-  return new Promise((resolve, reject) => {
-    const chan = new MessageChannel();
-
-    chan.port1.onmessage = event => {
-      if (event.data.error) {
-        console.error(event.data.error);
-        reject('[:(] Erreur de contact du service worker');
-      }
-
-      if ('successfulBackupComparison' in event.data) {
-        if (event.data.successfulBackupComparison === true) resolve(null);
-        else reject('[:(] Échec de la synchronisation des BDD');
-      }
-      else {
-        reject('[:(] Message invalide reçu du service worker');
-      }
-    }
-
-    chan.port1.onmessageerror = event => {
-      reject('[:(] Erreur de communication avec le service worker');
-    }
-  
-    const worker = currentWorker || reg.active;
-    worker?.postMessage({ 'action': 'compare-backup' }, [chan.port2]);
-  });
 }
