@@ -2,10 +2,7 @@ import { pokemonCard } from './components/pokemon-card/pokemonCard.js';
 import { filterCards, orderCards } from './filtres.js';
 import { huntedPokemon, initHunts } from './Hunt.js';
 import { lazyLoad } from './lazyLoading.js';
-import { dataStorage, huntStorage, shinyStorage } from './localforage.js';
-import { notify, unNotify } from './notification.js';
-import { loadAllImages, Params, timestamp2date, wait } from './Params.js';
-import { frontendShiny, Pokemon } from './Pokemon.js';
+import { Notif } from './notification.js';
 import { openSpriteViewer } from './spriteViewer.js';
 import { upgradeStorage } from './upgradeStorage.js';
 
@@ -130,7 +127,15 @@ export async function appPopulate(start: boolean = true, modified: string[] = []
           const name = names[i];
           pkmn.classList.add('pkspr', 'pokemon', name + '-shiny');
           pkmn.dataset.dexid = String(i);
-          pkmn.addEventListener('click', event => openSpriteViewer(i, event));
+          pkmn.addEventListener('click', event => {
+            try {
+              openSpriteViewer(i, event);
+            } catch (error) {
+              const message = `Erreur : impossible d'afficher ce Pokémon`;
+              console.error(message, error);
+              new Notif(message).prompt();
+            }
+          });
           monsToPopulate.push(pkmn);
         }
 

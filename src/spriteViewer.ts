@@ -1,6 +1,5 @@
 import { pokemonData } from './localforage.js';
-import { notify } from './notification.js';
-import { loadAllImages, pad, Params } from './Params.js';
+import { Notif } from './notification.js';
 import { Pokemon } from './Pokemon.js';
 
 
@@ -65,13 +64,10 @@ export async function openSpriteViewer(dexid: number, event: { clientX: number, 
     });
     switchSR.checked = true;
     document.body.removeAttribute('data-viewer-loading');
-  }
-  catch (error) {
+  } catch (error) {
     console.log(error);
-    if (!navigator.onLine)
-      notify('Chargement impossible : pas de connexion internet');
-    else
-      notify('Erreur pendant le chargement des images');
+    if (!navigator.onLine) new Notif('Chargement impossible : pas de connexion internet.').prompt();
+    else new Notif('Erreur pendant le chargement des images.').prompt();
     closeSpriteViewer();
   }
 }

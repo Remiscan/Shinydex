@@ -1,7 +1,6 @@
 import { appDisplay, appPopulate } from './appContent.js';
 import { dataStorage, huntStorage, pokemonData, shinyStorage } from './localforage.js';
-import { notify } from './notification.js';
-import { Params, recalcOnResize, setTheme, timestamp2date, wait, webpSupport } from './Params.js';
+import { Notif } from './notification.js';
 import { upgradeStorage } from './upgradeStorage.js';
 
 
@@ -116,7 +115,13 @@ export async function appStart() {
     );
 
     // ÉTAPE 3.99 : on met à jour la structure de la BDD locale si nécessaire
-    await upgradeStorage();
+    try {
+      await upgradeStorage();
+    } catch (error) {
+      const message = `Erreur pendant la mise à jour du format des données.`;
+      console.error(message, error);
+      new Notif(message).prompt();
+    }
 
     // ÉTAPE 4 : on peuple l'application à partir des données locales
     log = await appPopulate();
@@ -154,7 +159,7 @@ export async function appStart() {
       manualUpdate();
     };
     document.getElementById('load-screen')!.remove();
-    return notify('Échec critique du chargement...', 'Réinitialiser', 'refresh', forceUpdateNow, 999999999);
+    return new Notif('Échec critique du chargement...', 'Réinitialiser', 'refresh', Notif.maxDelay, forceUpdateNow, true).prompt();
   }
 }
 
@@ -226,7 +231,7 @@ export async function manualUpdate()
   catch (raison) {
     console.error(raison);
     document.getElementById('notification')!.classList.remove('installing');
-    notify('Échec de mise à jour', 'Réessayer', 'update', manualUpdate, 10000);
+    new Notif('Échec de mise à jour', 'Réessayer', 'update', 10000, manualUpdate).prompt();
   }
 }
 
@@ -242,11 +247,15 @@ export async function checkUpdate(checkNotification = false)
     return;
   checkingUpdate = 1;
   const texteSucces = 'Mise à jour disponible...';
-  const notifyMaj = () => {
-    notify(texteSucces, 'Installer', 'update', manualUpdate, 10000);
+  const notifyMaj = async () => {
     checkingUpdate = 0;
-    return texteSucces;
-  }
+    const updateNotif = new Notif(texteSucces, 'Installer', 'update', 10000, manualUpdate);
+    const userActed = await updateNotif.prompt();
+    if (userActed) {
+      updateNotif.priorite = true;
+      updateNotif.duree = Notif.maxDelay;
+    }
+  };
 
   try {
     if (!navigator.onLine)
@@ -280,7 +289,7 @@ export async function checkUpdate(checkNotification = false)
     }
   } catch(error) {
     if (checkNotification && typeof error === 'string')
-      notify(error);
+      new Notif(error).prompt();
     checkingUpdate = 0;
   }
 }

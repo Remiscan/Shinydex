@@ -9,8 +9,7 @@ import { initFiltres, openFiltres } from './filtres.js';
 import { Hunt } from './Hunt.js';
 import { dataStorage, huntStorage, shinyStorage } from './localforage.js';
 import { navigate, sectionActuelle } from './navigate.js';
-import { notify, unNotify } from './notification.js';
-import { callResize, changeAutoMaj, export2json, setTheme, wait } from './Params.js';
+import { Notif } from './notification.js';
 import { initSpriteViewer } from './spriteViewer.js';
 
 
@@ -114,22 +113,26 @@ majButton.addEventListener('mousedown', (event: Event) => {
   majButton.addEventListener('mouseout', () => clearTimeout(longClic));
 });
 
-majButton.addEventListener('touchstart', (event: Event) => {
-  event.preventDefault();
-  clearTimeout(longClic);
-  longClic = setTimeout(() => { needCheck = 0; manualUpdate(); }, 3000);
-
-  majButton.addEventListener('touchend', () => { clearTimeout(longClic); if (needCheck) checkUpdate(true); });
-  majButton.addEventListener('touchcancel', () => clearTimeout(longClic));
+// Détecte le clic sur le bouton d'export des données
+document.querySelector('.bouton-export')!.addEventListener('click', () => {
+  try {
+    export2json();
+  } catch (error) {
+    const message = `Erreur pendant l'export' des données.`;
+    console.error(message, error);
+    new Notif(message).prompt();
+  }
 });
 
-// Prépare le bouton d'export des données
-document.querySelector('.bouton-export')!.addEventListener('click', export2json);
-
-// Prépare le bouton d'import des données
+// Détecte le choix d'un fichier JSON d'import de données
 const importInput = document.getElementById('pick-import-file') as HTMLInputElement;
 importInput.addEventListener('change', async event => {
-  await json2import(importInput.files?.[0]);
+  try {
+    await json2import(importInput.files?.[0]);
+  } catch (message) {
+    console.error(message);
+    if (typeof message === 'string') new Notif(message).prompt();
+  }
 });
 
 // Prépare le bouton de suppression des données locales
@@ -146,12 +149,16 @@ boutonSupprimer.addEventListener('click', async event => {
   {
     boutonSupprimer.disabled = true;
     boutonSupprimer.innerHTML = 'Supprimer';
-    notify('Suppression des données...', '', 'loading', () => {}, 999999999);
+
+    const notification = new Notif('Suppression des données...', '', 'loading', Notif.maxDelay, () => {});
+    notification.prompt();
+
     await Promise.all([shinyStorage.clear(), huntStorage.clear()]);
     await appPopulate(false);
     await appDisplay(false);
     await wait(1000);
-    unNotify();
+
+    notification.hide();
     boutonSupprimer.disabled = false;
   }
 });
@@ -202,7 +209,7 @@ navigator.serviceWorker.addEventListener('message', async event => {
     else {
       // On reçoit la confirmation de l'échec de l'ajout à la DB
       // ✅ animer l'échec
-      notify('Échec d\'envoi des données.');
+      new Notif('Échec d\'envoi des données.').prompt();
       // ✅ laisser la carte de la chasse et désactiver son animation de chargement
       card.removeAttribute('data-loading');
       let uploadConfirmed = await dataStorage.getItem('uploaded-hunts');
@@ -232,8 +239,8 @@ navigator.serviceWorker.addEventListener('message', async event => {
     }
     else {
       // Au moins une chasse n'a pas pu être ajoutée / éditée
-      if (event.data.error !== true) notify(event.data.error);
-      else notify('Erreur. Réessayez plus tard.');
+      if (event.data.error !== true) new Notif(event.data.error).prompt();
+      else new Notif('Erreur. Réessayez plus tard.').prompt();
       loaders.forEach(loader => loader.setAttribute('state', 'failure'));
       params.dataset.lastSync = 'failure';
     }
@@ -248,10 +255,11 @@ window.addEventListener('populate', async (_event: Event) => {
   const event = _event as CustomEvent;
 
   // On peuple l'application avec les nouvelles données
-  notify('Mise à jour des données...', '', 'loading', () => {}, 999999999);
+  const notification = new Notif('Mise à jour des données...', '', 'loading', Notif.maxDelay, () => {}, true);
+  notification.prompt();
   await appPopulate(false, event.detail.modified);
   await appDisplay(false);
-  unNotify();
+  notification.hide();
 })
 
 

@@ -3,8 +3,7 @@ import { DexDatalist } from './DexDatalist.js';
 import { lazyLoad } from './lazyLoading.js';
 import { dataStorage, huntStorage, pokemonData, shinyStorage } from './localforage.js';
 import { navigate } from './navigate.js';
-import { notify } from './notification.js';
-import { Params } from './Params.js';
+import { Notif } from './notification.js';
 import { Forme, frontendShiny, Methode, Pokemon, Shiny } from './Pokemon.js';
 
 
@@ -162,8 +161,10 @@ export class Hunt implements huntedPokemon {
     boutonSupprimer.addEventListener('click', async event => {
       event.preventDefault();
 
-      if (!edit) return notify('Cette chasse n\'est pas dans la base de données');
-      if (!navigator.onLine) return notify('Pas de connexion internet');
+      if (!edit) {
+        new Notif('Cette chasse n\'est pas dans la base de données').prompt();
+        return;
+      }
 
       const span = boutonSupprimer.querySelector('span')!;
       if (span.innerHTML == 'Supprimer') {
@@ -504,7 +505,7 @@ export async function editHunt(id: number, nav = true) {
   let k = await huntStorage.getItem(String(id));
   if (k != null) {
     const message = 'Cette chasse est déjà en cours d\'édition.';
-    notify(message);
+    new Notif(message).prompt();
     return false;
   }
 
