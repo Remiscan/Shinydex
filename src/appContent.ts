@@ -138,6 +138,8 @@ export async function populateFromData(section: 'mes-chromatiques' | 'chasses-en
 
 /** Initialise le Pokédex. */
 export async function initPokedex() {
+  if (pokedexInitialized) return;
+
   let gensToPopulate = [];
   const generations = Pokemon.generations;
   const names = await Pokemon.names();
@@ -174,6 +176,9 @@ export async function initPokedex() {
     conteneur.appendChild(genConteneur);
     lazyLoad(genConteneur);
   }
+
+  pokedexInitialized = true;
+  return;
 }
 
 
