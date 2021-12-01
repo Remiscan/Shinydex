@@ -1,4 +1,4 @@
-import { appPopulate } from './appContent.js';
+import { initPokedex, populateFromData } from './appContent.js';
 import { getNames } from './DexDatalist.js';
 import { dataStorage, huntStorage, pokemonData, shinyStorage } from './localforage.js';
 import { Notif } from './notification.js';
@@ -144,7 +144,10 @@ export async function appStart() {
 
   // ÉTAPE 5 : on peuple l'application à partir des données locales
   try {
-    await appPopulate();
+    await initPokedex();
+    await populateFromData('mes-chromatiques');
+    await populateFromData('chasses-en-cours');
+    // await initAmis();
   } catch (error) {
     console.error(error);
   }

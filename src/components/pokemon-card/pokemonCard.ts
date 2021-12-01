@@ -9,7 +9,7 @@ let currentCardId: string | null;
 let charmlessMethods: string[];
 let longClic = false;
 
-interface CardUpdateEvent extends CustomEvent {
+interface ShinyUpdateEvent extends CustomEvent {
   detail: {
     shiny: frontendShiny;
   }
@@ -17,7 +17,7 @@ interface CardUpdateEvent extends CustomEvent {
 
 declare global {
   interface HTMLElementEventMap {
-    cardupdate: CardUpdateEvent;
+    shinyupdate: ShinyUpdateEvent;
   }
 }
 
@@ -76,19 +76,16 @@ template.innerHTML = `
 
 export class pokemonCard extends HTMLElement {
   ready: boolean = false;
+  clickHandler: (e: Event) => any = () => {};
+  mousedownHandler: (e: MouseEvent) => any = () => {};
+  touchstartHandler: (e: TouchEvent) => any = () => {};
 
   constructor() {
     super();
-
-    // Active le long clic pour éditer
-    this.addEventListener('click', () => { if (!longClic) this.toggleNotes(); longClic = false; });
-    this.addEventListener('mousedown', async event => { if (event.button != 0) return; this.makeEdit(event); }); // souris
-    this.addEventListener('touchstart', async event => { this.makeEdit(event); }, { passive: true }); // toucher
-    this.addEventListener('cardupdate', this.updateCard);
   }
 
   // Met à jour les attributs de la carte à partir d'un objet Shiny
-  async updateCard(event: CardUpdateEvent) {
+  async updateCard(event: ShinyUpdateEvent) {
     let shiny: Shiny;
     try {
       shiny = new Shiny(event.detail.shiny);
@@ -417,9 +414,35 @@ export class pokemonCard extends HTMLElement {
   }
 
   connectedCallback() {
+    // Crée le HTML de la carte
     this.appendChild(template.content.cloneNode(true));
     this.ready = true;
+
+    // Détecte le long clic pour éditer
+    this.addEventListener('click', this.clickHandler = () => {
+      if (!longClic) this.toggleNotes();
+      longClic = false;
+    });
+    this.addEventListener('mousedown', this.mousedownHandler = async (event) => {
+      if (event.button != 0) return;
+      this.makeEdit(event);
+    });
+    this.addEventListener('touchstart', this.touchstartHandler = async event => {
+      this.makeEdit(event);
+    }, { passive: true });
+    
+    // Prépare la carte à être mise à jour
+    this.addEventListener('shinyupdate', this.updateCard);
+
+    // Peuple le contenu de la carte
     this.updateContents();
+  }
+
+  disconnectedCallback() {
+    this.removeEventListener('click', this.clickHandler);
+    this.removeEventListener('mousedown', this.mousedownHandler);
+    this.removeEventListener('touchstart', this.touchstartHandler);
+    this.removeEventListener('shinyupdate', this.updateCard);
   }
 
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {

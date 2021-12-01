@@ -9,7 +9,7 @@ const obfuscator = document.querySelector('.obfuscator')!;
 
 
 
-type ListeFiltres = Map<string, string[]>;
+export type ListeFiltres = Map<string, string[]>;
 const allFiltres: ListeFiltres = new Map([
   ['do', [ 'moi', 'autre' ]],
   ['legit', [ 'oui', 'maybe', 'hack', 'clone' ]],
@@ -112,11 +112,21 @@ function filterPokemon(filtres: ListeFiltres, shiny: Shiny): boolean {
 
 ///////////////////////////////////////////////////////////
 // Vérifie quels Pokémon correspondent aux filtres demandés
-async function filterAllPokemon(filtres: ListeFiltres): Promise<Shiny[]> {
+async function filterAllPokemon(section: string, filtres: ListeFiltres): Promise<Shiny[]> {
   const corresponding: Shiny[] = [];
-  const keys = await shinyStorage.keys();
-  for (const key of keys) {
-    const shiny = new Shiny(await shinyStorage.getItem(key));
+
+  let pkmnList: Shiny[] = [];
+  switch (section) {
+    case 'mes-chromatiques':
+      pkmnList = await Promise.all((await shinyStorage.keys()).map(async key => await shinyStorage.getItem(key)));
+      break;
+    case 'chromatiques-ami':
+      // later
+      break;
+  }
+
+  for (const pkmn of pkmnList) {
+    const shiny = new Shiny(pkmn);
     if (filterPokemon(filtres, shiny)) corresponding.push(shiny);
   }
   return corresponding;
@@ -125,10 +135,10 @@ async function filterAllPokemon(filtres: ListeFiltres): Promise<Shiny[]> {
 
 /////////////////////////////////////////////////////////
 // Filtre les cartes des Pokémon et les icônes du Pokédex
-export async function filterCards(_filtres?: ListeFiltres, ids: string[] = []): Promise<number> {
+export async function filterCards(section: string, _filtres?: ListeFiltres, ids: string[] = []): Promise<number> {
   const filtres = _filtres ?? await dataStorage.getItem('filtres') ?? defautFiltres;
 
-  const correspondingids = (await filterAllPokemon(filtres)).map(shiny => shiny.huntid);
+  const correspondingids = (await filterAllPokemon(section, filtres)).map(shiny => shiny.huntid);
   const keptCards: pokemonCard[] = [];
   const hiddenCards: pokemonCard[] = [];
   
@@ -183,32 +193,36 @@ let currentOrdre = defautOrdre;
 
 ////////////////////////////////////////////////////////////////////
 // Ordonner les cartes de Pokémon selon une certaine caractéristique
-export async function orderCards(_ordre?: string, _reversed?: boolean, ids: string[] = []): Promise<void> {
+export async function orderCards(section: string, _ordre?: string, _reversed?: boolean, ids: string[] = []): Promise<void> {
   const ordre = _ordre ?? await dataStorage.getItem('ordre') ?? defautOrdre;
   const reversed = _reversed ?? await dataStorage.getItem('ordre-reverse') ?? false;
   
-  const allids = ids.length > 0 ? ids : (await shinyStorage.keys());
-  const allShiny = await Promise.all(allids.map(id => shinyStorage.getItem(id)));
+  let allShiny: Shiny[] = [];
+  switch (section) {
+    case 'mes-chromatiques':
+      allShiny = await Promise.all((ids.length > 0 ? ids : (await shinyStorage.keys())).map(id => shinyStorage.getItem(id)));
+      break;
+  }
 
   let orderedShiny = allShiny.sort((s1, s2) => {
     switch (ordre) {
       case 'jeu': {
-        return s2.jeu - s1.jeu || s2.timeCapture - s1.timeCapture || s2.huntid - s1.huntid;
+        return s2.jeu.localeCompare(s1.jeu, 'fr') || s2.timeCapture - s1.timeCapture || Number(s2.huntid) - Number(s1.huntid);
       }
 
       case 'taux': {
-        return (s2.shinyRate || 0) - (s1.shinyRate || 0) || s2.timeCapture - s1.timeCapture || s2.huntid - s1.huntid;
+        return (s2.shinyRate || 0) - (s1.shinyRate || 0) || s2.timeCapture - s1.timeCapture || Number(s2.huntid) - Number(s1.huntid);
       }
 
       case 'dex': {
-        return s2.dexid - s1.dexid || s2.timeCapture - s1.timeCapture || s2.huntid - s1.huntid;
+        return s2.dexid - s1.dexid || s2.timeCapture - s1.timeCapture || Number(s2.huntid) - Number(s1.huntid);
       }
 
       case 'date': {
-        return s2.timeCapture - s1.timeCapture || s2.huntid - s1.huntid;
+        return s2.timeCapture - s1.timeCapture || Number(s2.huntid) - Number(s1.huntid);
       }
 
-      default: return s2.huntid - s1.huntid;
+      default: return Number(s2.huntid) - Number(s1.huntid);
     }
   });
 
@@ -222,7 +236,8 @@ export async function orderCards(_ordre?: string, _reversed?: boolean, ids: stri
     await dataStorage.setItem('ordre-reverse', false);
   }
   
-  orderedShiny.forEach((card, ordre) => (card as HTMLElement).style.setProperty('--order', String(ordre)));
+  orderedShiny.map(shiny => document.getElementById(`#${section} pokemon-card#${shiny.huntid}`))
+              .forEach((card, ordre) => (card as HTMLElement).style.setProperty('--order', String(ordre)));
   await dataStorage.setItem('ordre', ordre);
   currentOrdre = ordre;
   return;
@@ -233,9 +248,9 @@ export async function orderCards(_ordre?: string, _reversed?: boolean, ids: stri
 
 //////////////////
 // Inverse l'ordre
-export async function reverseOrder() {
+export async function reverseOrder(section: string) {
   const currentReversed = Boolean(await dataStorage.getItem('ordre-reverse'));
-  return orderCards(currentOrdre, !currentReversed);
+  return orderCards(section, currentOrdre, !currentReversed);
 }
 
 
@@ -272,18 +287,18 @@ function filtresFromInput(): ListeFiltres {
 
 /////////////////////////
 // Initialise les filtres
-export async function initFiltres() {
+export async function initFiltres(section: string) {
   // Surveille les options d'ordre
   const reversed = document.body.dataset.reversed === 'true';
   for (const label of Array.from(document.querySelectorAll('label.ordre'))) {
     label.addEventListener('click', async () => {
-      await orderCards(label.getAttribute('for')!.replace('ordre-', ''), reversed);
+      await orderCards(section, label.getAttribute('for')!.replace('ordre-', ''), reversed);
     });
   }
 
   // Active le bouton d'inversion de l'ordre
   document.querySelector('.reverse-order')!.addEventListener('click', async () => {
-    await reverseOrder();
+    await reverseOrder(section);
   });
 
   // Coche l'option d'ordre sauvegardée
@@ -305,25 +320,9 @@ export async function initFiltres() {
   }
 
   // Surveille les options de filtres
-  for (const radio of Array.from(document.querySelectorAll('input.filtre'))) {
+  /*for (const radio of Array.from(document.querySelectorAll('input.filtre'))) {
     radio.addEventListener('change', async () => {
       await filterCards(filtresFromInput());
     });
-  }
-
-  // Crée les checkboxes des jeux
-  /*Pokemon.jeux.forEach(jeu => {
-    const nomJeu = jeu.nom.replace(/[ \']/g, '');
-    const template = document.getElementById('template-checkbox-jeu');
-    const checkbox = template.content.cloneNode(true);
-    const input = checkbox.querySelector('input');
-    const label = checkbox.querySelector('label');
-
-    input.id = 'filtre-jeu-' + nomJeu;
-    input.value = "jeu:" + nomJeu;
-    label.setAttribute('for', 'filtre-jeu-' + nomJeu);
-    label.querySelector('span').classList.add(nomJeu);
-
-    document.getElementById('liste-options-jeux').appendChild(checkbox);
-  });*/
+  }*/
 }

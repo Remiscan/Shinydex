@@ -55,3 +55,4 @@ const huntStorage = localforage.createInstance({
 });
 
 export { pokemonData, shinyStorage, dataStorage, huntStorage };
+
