@@ -6,7 +6,7 @@ import { closeSpriteViewer, openSpriteViewer } from './spriteViewer.js';
 
 
 export let sectionActuelle = 'mes-chromatiques';
-export const sections = ['mes-chromatiques', 'pokedex', 'chasses-en-cours', 'partage', 'parametres', 'a-propos'];
+export const sections = ['mes-chromatiques', 'pokedex', 'chasses-en-cours', 'corbeille', 'partage', 'chromatiques-ami', 'parametres', 'a-propos'];
 const lastPosition: Map<string, number> = new Map(sections.map(section => [section, 0]));
 
 

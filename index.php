@@ -131,9 +131,19 @@
         <?php include './pages/chasses-en-cours.html'; ?>
       </section>
 
-      <!-- Partage -->
+      <!-- Corbeille -->
+      <section id="corbeille">
+        <?php include './pages/corbeille.html'; ?>
+      </section>
+
+      <!-- Liste d'amis -->
       <section id="partage">
         <?php include './pages/partage.html'; ?>
+      </section>
+
+      <!-- Chromatiques d'un ami -->
+      <section id="chromatiques-ami">
+        <?php include './pages/chromatiques-ami.html'; ?>
       </section>
 
       <!-- Paramètres -->
