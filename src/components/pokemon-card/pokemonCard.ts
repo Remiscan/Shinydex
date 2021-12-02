@@ -2,6 +2,7 @@ import { editHunt } from '../../Hunt.js';
 import { pokemonData } from '../../localforage.js';
 import { Params, wait } from '../../Params.js';
 import { frontendShiny, Shiny } from '../../Pokemon.js';
+import template from './template.js';
 
 
 
@@ -23,57 +24,6 @@ declare global {
 
 
 
-const template = document.createElement('template');
-template.innerHTML = `
-<div class="pokemon-sprite">
-  <img class="actual-sprite" width="112" height="112" loading="lazy"></img>
-</div>
-<div class="edit-icon">
-  <i class="material-icons">edit</i>
-  <svg><circle r="25" cx="25" cy="25"/></svg>
-</div>
-
-<div class="pokemon-infos">
-  <div class="pokemon-infos__nom">
-    <span class="pkspr pokemon-ball"></span>
-    <span class="pokemon-surnom"></span>
-    <span class="pokemon-espece"></span>
-  </div>
-
-  <div class="pokemon-infos__capture">
-    <span class="icones jeu"></span>
-    <span class="capture-methode"></span>
-    <span class="capture-date"></span>
-    <span class="methode-compteur">
-      <span class="icones explain oeuf"></span>
-    </span>
-    <span class="icones explain gigamax"></span>
-  </div>
-</div>
-
-<div class="pokemon-icones">
-  <span class="icones explain checkmark"></span>
-  <span class="icones explain mine"></span>
-  <span class="icones explain lucky"></span>
-  <span class="icones explain hacked"></span>
-  <span class="spacer"></span>
-  <div class="shiny-rate">
-    <div class="shiny-charm">
-      <span class="icones explain charm"></span>
-    </div>
-    <div class="shiny-rate-data">
-      <span class="shiny-rate-text numerator">1</span>
-      <span class="shiny-rate-text separator">/</span>
-      <span class="shiny-rate-text denominator">4096</span>
-    </div>
-  </div>
-</div>
-
-<div class="pokemon-notes">
-  <span class="pokemon-notes__texte"></span>
-</div>
-`;
-
 export class pokemonCard extends HTMLElement {
   ready: boolean = false;
   clickHandler: (e: Event) => any = () => {};
@@ -85,7 +35,10 @@ export class pokemonCard extends HTMLElement {
   }
 
   // Met à jour les attributs de la carte à partir d'un objet Shiny
-  async updateCard(event: ShinyUpdateEvent) {
+  async dataToAttributes(event: ShinyUpdateEvent): Promise<void> {
+    if (!this.ready) return;
+    if (event.detail.shiny.deleted) return this.remove();
+
     let shiny: Shiny;
     try {
       shiny = new Shiny(event.detail.shiny);
@@ -138,7 +91,7 @@ export class pokemonCard extends HTMLElement {
   }
 
   // Met à jour le contenu de la carte à partir de ses attributs
-  async updateContents(toUpdate = pokemonCard.observedAttributes) {
+  async attributesToContent(toUpdate = pokemonCard.observedAttributes) {
     if (!this.ready) return;
 
     for (const attr of toUpdate) {
@@ -213,7 +166,7 @@ export class pokemonCard extends HTMLElement {
         // Notes
         case 'notes': {
           const element = this.querySelector('.pokemon-notes__texte')!;
-          const notes = this.getAttribute('notes') || '';
+          const notes = this.getAttribute('notes') || 'Pas de note.';
           element.innerHTML = notes;
 
           const gigamaxElement = this.querySelector('.gigamax')!;
@@ -432,22 +385,24 @@ export class pokemonCard extends HTMLElement {
     }, { passive: true });
     
     // Prépare la carte à être mise à jour
-    this.addEventListener('shinyupdate', this.updateCard);
+    this.addEventListener('shinyupdate', this.dataToAttributes);
 
     // Peuple le contenu de la carte
-    this.updateContents();
+    this.attributesToContent();
   }
 
   disconnectedCallback() {
+    this.ready = false;
     this.removeEventListener('click', this.clickHandler);
     this.removeEventListener('mousedown', this.mousedownHandler);
     this.removeEventListener('touchstart', this.touchstartHandler);
-    this.removeEventListener('shinyupdate', this.updateCard);
+    this.removeEventListener('shinyupdate', this.dataToAttributes);
   }
 
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {
     if (oldValue == newValue) return;
-    this.updateContents([name]);
+    this.attributesToContent([name]);
   }
 }
-if (!customElements.get('pokemon-card')) customElements.define("pokemon-card", pokemonCard);
+
+if (!customElements.get('pokemon-card')) customElements.define('pokemon-card', pokemonCard);

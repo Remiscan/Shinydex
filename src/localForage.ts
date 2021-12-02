@@ -54,5 +54,12 @@ const huntStorage = localforage.createInstance({
   driver: localforage.INDEXEDDB
 });
 
-export { pokemonData, shinyStorage, dataStorage, huntStorage };
+// Liste de shiny d'un ami
+const friendStorage = localforage.createInstance({
+  name: 'remidex',
+  storeName: 'friend-shiny-list',
+  driver: localforage.INDEXEDDB
+});
+
+export { pokemonData, shinyStorage, dataStorage, huntStorage, friendStorage };
 

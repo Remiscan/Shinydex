@@ -13,16 +13,11 @@ export type ListeFiltres = Map<string, string[]>;
 const allFiltres: ListeFiltres = new Map([
   ['do', [ 'moi', 'autre' ]],
   ['legit', [ 'oui', 'maybe', 'hack', 'clone' ]],
-  ['jeu', [ '*' ]],
-  ['espece', [ '*' ]],
-  ['surnom', [ '*' ]]
+  ['recherche', [ '*' ]]
 ]);
 const emptyFiltres: ListeFiltres = new Map([
   ['do', []],
-  ['legit', []],
-  ['jeu', []],
-  ['espece', []],
-  ['surnom', []]
+  ['legit', []]
 ]);
 const defautFiltres = new Map(allFiltres);
 
@@ -60,40 +55,12 @@ function getShinyFiltres(shiny: Shiny): FiltresPokemon {
   // Legit
   switch (shiny.hacked) {
     case 3:
-      /*filtres.set('legit', 'clone');
-      break;*/
     case 2:
-      /*filtres.set('legit', 'hack');
-      break;*/
     case 1:
-      /*filtres.set('legit', 'maybe');
-      break;*/
       filtres.set('legit', 'non');
     default:
       filtres.set('legit', 'oui');
   }
-
-  // Taux
-  if (conditionMien) {
-    const shinyRate = shiny.shinyRate != null ? shiny.shinyRate : 0;
-
-    if (shiny.charm === false && [8192, 4096].includes(shinyRate))
-      filtres.set('taux', 'full');
-    else if (shiny.charm === true && [2731, 1365].includes(shinyRate))
-      filtres.set('taux', 'charm');
-    else
-      filtres.set('taux', 'boosted');
-  } else filtres.set('taux', 'inconnu');
-
-  // Jeu
-  const jeu = shiny.jeu.replace(/[ \']/g, '');
-  filtres.set('jeu', jeu);
-
-  // Espèce
-  filtres.set('espece', String(shiny.dexid));
-
-  // Surnom
-  filtres.set('surnom', shiny.surnom);
 
   return filtres;
 }
@@ -101,11 +68,29 @@ function getShinyFiltres(shiny: Shiny): FiltresPokemon {
 
 ////////////////////////////////////////////////////////
 // Vérifie si un Pokémon correspond aux filtres demandés
-function filterPokemon(filtres: ListeFiltres, shiny: Shiny): boolean {
+async function filterPokemon(filtres: ListeFiltres, shiny: Shiny): Promise<boolean> {
   const filtresPokemon = getShinyFiltres(shiny);
   for (const [key, value] of filtresPokemon) {
     if (!(filtres.get(key)?.includes(value))) return false;
   }
+
+  const recherche = filtres.get('recherche') || [];
+  if (recherche.length > 0) {
+    let contient: boolean = false;
+    let exact: boolean = false;
+    search: for (const mot of recherche) {
+      for (const champ of [await shiny.getNamefr(), shiny.surnom, shiny.methode, shiny.jeu]) {
+        if (champ.includes(mot)) contient = true;
+        break search;
+      }
+      for (const champ of [String(shiny.dexid)]) {
+        if (champ === mot) exact = true;
+        break search;
+      }
+    }
+    return contient || exact;
+  }
+
   return true;
 }
 
@@ -127,7 +112,7 @@ async function filterAllPokemon(section: string, filtres: ListeFiltres): Promise
 
   for (const pkmn of pkmnList) {
     const shiny = new Shiny(pkmn);
-    if (filterPokemon(filtres, shiny)) corresponding.push(shiny);
+    if (await filterPokemon(filtres, shiny)) corresponding.push(shiny);
   }
   return corresponding;
 }

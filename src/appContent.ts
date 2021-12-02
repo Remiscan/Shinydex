@@ -1,9 +1,11 @@
+import { huntCard } from './components/hunt-card/huntCard.js';
 import { pokemonCard } from './components/pokemon-card/pokemonCard.js';
 import { filterCards, ListeFiltres, orderCards } from './filtres.js';
+import { huntedPokemon } from './Hunt.js';
 import { lazyLoad } from './lazyLoading.js';
-import { dataStorage, huntStorage, localForageAPI, shinyStorage } from './localforage.js';
+import { dataStorage, friendStorage, huntStorage, localForageAPI, shinyStorage } from './localforage.js';
 import { Notif } from './notification.js';
-import { Pokemon } from './Pokemon.js';
+import { frontendShiny, Pokemon } from './Pokemon.js';
 import { openSpriteViewer } from './spriteViewer.js';
 
 
@@ -11,25 +13,66 @@ import { openSpriteViewer } from './spriteViewer.js';
 const sections = ['mes-chromatiques', 'chasses-en-cours'];
 const populating: Map<string, boolean> = new Map(sections.map(s => [s, false]));
 const lastModified: Map<string, Set<string>> = new Map(sections.map(s => [s, new Set()]));
+const queue: Map<string, Set<string>> = new Map(sections.map(section => [section, new Set()]));
 let pokedexInitialized = false;
 
 
 
+export type populatableSection = 'mes-chromatiques' | 'chasses-en-cours' | 'chromatiques-ami' | 'corbeille';
 interface PopulateOptions {
-  modified?: string[];
   filtres?: ListeFiltres;
+  ordre?: string;
+  ordreReversed?: boolean;
+}
+
+export async function populateHandler(section: populatableSection, _ids?: string[], options: PopulateOptions = {}): Promise<PromiseSettledResult<string>[]> {
+  let dataStore: localForageAPI; // base de données
+  switch (section) {
+    case 'mes-chromatiques':
+      dataStore = shinyStorage;
+      break;
+    case 'chasses-en-cours':
+      dataStore = huntStorage;
+      break;
+    case 'chromatiques-ami':
+      dataStore = friendStorage;
+      break;
+    case 'corbeille':
+      dataStore = huntStorage;
+      break;
+  }
+
+  const ids = _ids ?? await dataStore.keys();
+  const currentQueue = new Set([...(queue.get(section) || []), ...ids]);
+  //queue.set(section, new Set([...(queue.get(section) || []), ...ids]));
+
+  if (populating.get(section)) return Promise.allSettled([Promise.resolve('')]);
+  populating.set(section, true);
+
+  const populated = await populateFromData(section, ids);
+  for (const result of populated) {
+    if (result.status === 'fulfilled') currentQueue.delete(result.value);
+  }
+
+  switch (section) {
+    case 'mes-chromatiques':
+    case 'chromatiques-ami':
+      await filterCards(section, options.filtres, ids);
+      await orderCards(section, options.ordre, options.ordreReversed, ids);
+  }
+
+  populating.set(section, false);
+
+  const newQueue = new Set([...(queue.get(section) || []), ...currentQueue]);
+  queue.set(section, newQueue);
+  if (newQueue.size > 0) return populateHandler(section, [...newQueue], options);
+
+  return populated;
 }
 
 
 
-export async function populateFromData(section: 'mes-chromatiques' | 'chasses-en-cours', options: PopulateOptions = {}): Promise<PromiseSettledResult<any>[]> {
-  lastModified.set(section, new Set([...(lastModified.get(section) ?? []), ...(options.modified ?? [])]));
-
-  if (populating.get(section)) return Promise.allSettled([Promise.resolve()]);
-  populating.set(section, true);
-
-  let cardsToPopulate: pokemonCard[] | huntCard[] = [];
-
+export async function populateFromData(section: populatableSection, ids: string[]): Promise<PromiseSettledResult<string>[]> {
   let elementName: string; // Nom de l'élément de carte
   let dataStore: localForageAPI; // Base de données
   let filtres: ListeFiltres | undefined; // Filtres à appliquer aux cartes
@@ -40,96 +83,73 @@ export async function populateFromData(section: 'mes-chromatiques' | 'chasses-en
       dataStore = shinyStorage;
       filtres = await dataStorage.getItem('filtres');
       eventName = 'shinyupdate';
-    break;
+      break;
     case 'chasses-en-cours':
       elementName = 'hunt-card';
       dataStore = huntStorage;
       eventName = 'huntupdate';
-    break;
+      break;
+    case 'chromatiques-ami':
+      elementName = 'pokemon-card';
+      dataStore = friendStorage;
+      eventName = '';
+      break;
+    case 'corbeille':
+      elementName = 'corbeille-card';
+      dataStore = huntStorage;
+      eventName = '';
+      break;
   }
 
-  // Liste des huntid ayant déjà une carte
-  const currentPkmnIds = Array.from(document.querySelectorAll(`#${section} ${elementName}`))
-                              .map(pkmn => pkmn.getAttribute('huntid'));
-
-  // Liste des huntid stockés dans la base de données locale
-  const keys = await dataStore.keys();
-  const dbPkmn = await Promise.all(keys.map(key => dataStore.getItem(key)));
-  const dbPkmnIds = dbPkmn.map(pkmn => pkmn.huntid);
-
-  // Comparons les deux listes
-  // - Shiny marqués supprimés dans la base de données (donc à ignorer)
-  const toIgnore = dbPkmn.filter(pkmn => pkmn.deleted).map(pkmn => pkmn.huntid);
-  // - Shiny ayant une carte qui ont disparu de la base de données (donc à supprimer)
-  const toDelete = currentPkmnIds.filter(huntid => !dbPkmnIds.includes(huntid) || (currentPkmnIds.includes(huntid) && toIgnore.includes(huntid)));
-  // - Shiny présents dans la base de données n'ayant pas de carte (donc à créer)
-  const toCreate = dbPkmnIds.filter(huntid => !currentPkmnIds.includes(huntid));
-
-  // Liste des huntid de toutes les cartes à créer, éditer ou supprimer
-  const allPkmnIds = Array.from(new Set([...dbPkmnIds, ...currentPkmnIds]));
+  /* Que faire selon l'état des données du Pokémon ?
+  |------------|-------------|--------------------------|--------------------------|
+  |            | DANS LA BDD | DANS LA BDD MAIS DELETED | ABSENT DE LA BDD         |
+  |------------|-------------|--------------------------|--------------------------|
+  | AVEC CARTE |           Éditer                       | Supprimer (manuellement) |
+  |------------|-------------|--------------------------|--------------------------|
+  | SANS CARTE |    Créer    |          Ignorer         |            N/A           |
+  |------------|-------------|--------------------------|--------------------------|
+  */
 
   // Traitons les cartes :
 
-  let results = await Promise.allSettled(allPkmnIds.map(huntid => {
-    // Si la carte existe déjà et doit être supprimée, on la supprime puis on passe à la suivante
-    if (toDelete.includes(huntid)) {
-      const card = document.getElementById(`pokemon-card-${huntid}`);
+  const cardsToCreate: Array<pokemonCard | huntCard> = [];
+  const results = await Promise.allSettled(ids.map(async huntid => {
+    const pkmn = await dataStore.getItem(huntid) as frontendShiny | huntedPokemon | null;
+    let card = document.getElementById(`pokemon-card-${huntid}`) as pokemonCard | huntCard;
+
+    // ABSENT DE LA BDD = Supprimer (manuellement)
+    if (pkmn === null) {
       card?.remove();
       return Promise.resolve(huntid);
     }
 
-    // Si la carte n'existe pas encore mais que le Pokémon est marqué comme supprimé, on ne fait rien et on passe à la suivante
-    else if (toIgnore.includes(huntid)) {
+    // DANS LA BDD
+    else {
+      if (card === null) {
+        // DANS LA BDD MAIS DELETED & SANS CARTE = Ignorer
+        const ignoreCondition = section === 'corbeille' ? !(pkmn.deleted)
+                                                        : pkmn.deleted;
+        if (ignoreCondition) return Promise.resolve(huntid);
+        // DANS LA BDD & SANS CARTE = Créer
+        else {
+          card = document.createElement(elementName) as pokemonCard | huntCard;
+          cardsToCreate.push(card);
+        }
+      }
+      // DANS LA BDD & AVEC CARTE = Éditer
+      const updateEvent = new CustomEvent(eventName, { detail: { pkmn }});
+      card.dispatchEvent(updateEvent);
       return Promise.resolve(huntid);
     }
-
-    // Si la carte (existante ou non) doit être affichée
-    else {
-      let card;
-      const pkmn = dataStore.getItem(huntid);
-      const updateEvent = new CustomEvent(eventName, { detail: { pkmn }});
-
-      // Si la carte doit être créée
-      if (toCreate.includes(huntid)) {
-        card = document.createElement('pokemon-card') as pokemonCard | huntCard;
-        card.dispatchEvent(updateEvent);
-        cardsToPopulate.push(card);
-        return Promise.resolve(huntid);
-      }
-
-      // Si la carte doit être modifiée
-      else if ('modified' in options && options.modified?.includes(huntid)) {
-        card = document.getElementById(`${elementName}-${huntid}`) as pokemonCard | huntCard;
-        if (card == null) throw `Carte #${huntid} inexistante`;
-        card.dispatchEvent(updateEvent);
-        return Promise.resolve(huntid);
-      }
-    }
   }));
-
-  // Filtrons et ordonnons les cartes :
-
-  if (section !== 'chasses-en-cours') {
-    await filterCards(section);
-    await orderCards(section);
-  }
 
   // Plaçons les cartes sur la page
   // (après la préparation pour optimiser le temps d'exécution)
   const conteneur = document.querySelector(`#${section} > .section-contenu`)!;
-  for (const card of cardsToPopulate) {
+  for (const card of cardsToCreate) {
     conteneur.appendChild(card);
     lazyLoad(card);
-  }
-
-  populating.set(section, false);
-
-  // Si certains Pokémon ont été modifiés depuis que l'exécution a commencé, on relance la fonction sur ces Pokémon uniquement
-  const newModified = [...(lastModified.get(section) || [])].filter(huntid => !((options.modified || []).includes(huntid)));
-  if (newModified.length > 0) {
-    const newOptions = Object.assign(options);
-    newOptions.modified = newModified;
-    results = [...results, ...await populateFromData(section, newOptions)];
   }
 
   return results;

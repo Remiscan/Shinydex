@@ -3,9 +3,8 @@ import { lazyLoad } from './lazyLoading.js';
 import { dataStorage, huntStorage, pokemonData, shinyStorage } from './localforage.js';
 import { navigate } from './navigate.js';
 import { Notif } from './notification.js';
-import { Params, warnBeforeDestruction } from './Params.js';
+import { Params } from './Params.js';
 import { Forme, frontendShiny, Methode, Pokemon, Shiny } from './Pokemon.js';
-import { backgroundSync } from './syncBackup.js';
 
 
 
@@ -15,164 +14,51 @@ export interface huntedPokemon extends Omit<frontendShiny, 'id' | 'destroy'> {
   uploaded: boolean,
 }
 
-export class Hunt implements huntedPokemon {
-  huntid: string = String(new Date().getTime());
-  lastUpdate: number = 0;
-  dexid: number = 0;
-  formid: string = '';
-  surnom: string = '';
-  methode: string = '';
-  compteur: string = '';
-  timeCapture: number = 0;
-  jeu: string = '';
-  ball: string = 'poke';
-  notes: string = '';
-  checkmark: number = 0;
-  DO: boolean = false;
-  charm: boolean = false;
-  hacked: number = 0;
-  horsChasse: boolean = false;
-  deleted: boolean = false;
+const defaultHunt: huntedPokemon = {
+  huntid: '',
+  lastUpdate: 0,
+  dexid: 0,
+  formid: '',
+  surnom: '',
+  methode: '',
+  compteur: '',
+  timeCapture: 0,
+  jeu: '',
+  ball: 'poke',
+  notes: '',
+  checkmark: 0,
+  DO: false,
+  charm: false,
+  hacked: 0,
+  horsChasse: false,
+  deleted: false,
+  caught: false,
+  uploaded: false,
+};
+
+export class Hunt extends Shiny implements huntedPokemon {
   caught: boolean = false;
   uploaded: boolean = false;
   
-  constructor(pokemon?: frontendShiny) {
-    if (pokemon == null) return;
-    Object.assign(this, pokemon);
+  constructor(pokemon: huntedPokemon = defaultHunt) {
+    pokemon.huntid = pokemon.huntid || String(new Date().getTime());
+    super(pokemon);
+    Object.assign(this, {
+      caught: pokemon.caught ?? false,
+      uploaded: pokemon.uploaded ?? false
+    });
   }
 
-  static async build(pokemon?: huntedPokemon, start: boolean = false) {
-    const hunt = new Hunt(pokemon);
-    await huntStorage.setItem(pokemon?.huntid || hunt.huntid, hunt);
-    await hunt.buildHunt(start);
-    return hunt;
-  }
-
-
-  // Construit la carte qui affiche la chasse en HTML
-  async buildHunt(start: boolean = false) {
-    const template = document.getElementById('template-hunt') as HTMLTemplateElement;
-    const card = (template.content.cloneNode(true) as Element).querySelector('.hunt-card') as HTMLElement;
-    card.id = 'hunt-' + this.huntid;
-    
-    for (const el of Array.from(card.querySelectorAll('[id^="hunt-{id}"]'))) {
-      el.id = el.id.replace('{id}', this.huntid);
-    }
-
-    for (const el of Array.from(card.querySelectorAll('[for^="hunt-{id}"]'))) {
-      el.setAttribute('for', (el.getAttribute('for') || '').replace('{id}', this.huntid));
-    }
-
-    for (const el of Array.from(card.querySelectorAll('[name^="hunt-{id}"]'))) {
-      el.setAttribute('name', (el.getAttribute('name') || '').replace('{id}', this.huntid));
-    }
-
-    const k = await shinyStorage.getItem(this.huntid);
-    const edit = (k != null);
-    if (edit) card.classList.add('edit');
-
-    // Active le bouton "compteur++";
-    const boutonAdd = card.querySelector('.bouton-compteur.add')!;
-    const boutonSub = card.querySelector('.bouton-compteur.sub')!;
-    const inputCompteur = card.querySelector('input[id$="-compteur"]') as HTMLInputElement;
-
-    boutonAdd.addEventListener('click', async event => {
-      event.preventDefault();
-      const value = Number(inputCompteur.value);
-      const newValue = Math.min(value + 1, 999999);
-      inputCompteur.value = String(newValue);
-      await this.updateHunt();
-    });
-
-    boutonSub.addEventListener('click', async event => {
-      event.preventDefault();
-      const value = Number(inputCompteur.value);
-      const newValue = Math.max(value - 1, 0);
-      inputCompteur.value = String(newValue);
-      await this.updateHunt();
-    });
-
-    // Active le bouton "shiny capturé"
-    const boutonCaught = card.querySelector('.bouton-hunt-caught')!;
-    boutonCaught.addEventListener('click', async event => {
-      event.preventDefault();
-      boutonCaught.parentElement!.parentElement!.classList.toggle('caught');
-      const inputDate = card.querySelector('input[type="date"]') as HTMLInputElement;
-
-      if (inputDate.value == '') inputDate.value = new Date().toISOString().split('T')[0];
-      if (boutonCaught.parentElement!.parentElement!.classList.contains('caught')) this.caught = true;
-      else                                                                         this.caught = false;
-
-      await this.updateHunt();
-    });
-
-    // Active le bouton "annuler"
-    const boutonEffacer = card.querySelector('.bouton-hunt-remove');
-    const boutonAnnuler = card.querySelector('.bouton-hunt-edit');
-
-    for (const bouton of [boutonEffacer, boutonAnnuler] as HTMLButtonElement[]) {
-      bouton.addEventListener('click', async event => {
-        event.preventDefault();
-  
-        const cancelMessage = 'Les modifications ne seront pas enregistrées.';
-        const userResponse = await warnBeforeDestruction(bouton, bouton === boutonAnnuler ? cancelMessage : undefined);
-        if (userResponse) {
-          await this.destroyHunt();
-        }
-      });
-    }
-
-    // Active le bouton "enregistrer"
-    const boutonSubmit = card.querySelector('.bouton-hunt-submit')!;
-    boutonSubmit.addEventListener('click', async event => {
-      event.preventDefault();
-
-      // Gestion des erreurs de formulaire
-      const erreurs = [];
-      if (this.dexid == 0) erreurs.push('Pokémon');
-      if (this.jeu == '') erreurs.push('jeu');
-      if (this.methode == '')  erreurs.push('méthode');
-      if (this.timeCapture == 0) erreurs.push('date');
-
-      if (erreurs.length > 0) {
-        let message = `Les champs suivants sont mal remplis : `;
-        erreurs.forEach(e => message += `${e}, `);
-        message = message.replace(/,\ $/, '.');
-        new Notif(message).prompt();
-        return;
-      } else {
-        const userResponse = await warnBeforeDestruction(boutonSubmit, 'Ajouter ce Pokémon à vos chromatiques ?', 'done');
-        if (userResponse) {
-          await this.submitHunt();
-        }
-      }
-    });
-
-    // Active le bouton "supprimer"
-    const boutonSupprimer = card.querySelector('.bouton-hunt-eraseDB')!;
-    boutonSupprimer.addEventListener('click', async event => {
-      event.preventDefault();
-
-      if (!edit) {
-        new Notif('Cette chasse n\'est pas dans la base de données').prompt();
-        return;
-      }
-
-      const userResponse = await warnBeforeDestruction(boutonSupprimer);
-      if (userResponse) {
-        await this.deleteAssociatedShiny();
-      }
-    });
-
-    // Détecte les modifications du formulaire
-    card.addEventListener('input', async () => await this.updateHunt());
+  static build(pokemon?: huntedPokemon) {
+    const card = document.createElement('hunt-card');
+    card.dispatchEvent(new CustomEvent('huntupdate', { detail: { pkmn: pokemon } }));
 
     document.querySelector('#chasses-en-cours>.section-contenu')!.appendChild(card);
     lazyLoad(card);
     document.querySelector('#chasses-en-cours')!.classList.remove('vide');
 
     // Animation de la carte
-    if (this.dexid == 0) {
+    if (!(pokemon?.dexid)) {
       card.animate([
         { opacity: '0' },
         { opacity: '1' }
@@ -192,6 +78,19 @@ export class Hunt implements huntedPokemon {
         duration: 200
       });
     }
+
+    return card;
+  }
+
+
+  // Construit la carte qui affiche la chasse en HTML
+  async buildHunt(start: boolean = false) {
+    const template = document.getElementById('template-hunt') as HTMLTemplateElement;
+    const card = (template.content.cloneNode(true) as Element).querySelector('.hunt-card') as HTMLElement;
+    card.id = 'hunt-' + this.huntid;
+
+    // Détecte les modifications du formulaire
+    card.addEventListener('input', async () => await this.updateHunt());
 
     // On met à jour la carte avec les valeurs de this
     this.updateSprite();
@@ -397,68 +296,6 @@ export class Hunt implements huntedPokemon {
 
     icone.className = `pkspr item ball-${this.ball}`;
   }
-
-
-  // Supprime la chasse complètement
-  async destroyHunt() {
-    const k = await huntStorage.getItem(this.huntid);
-    if (k == null) throw 'Chasse inexistante';
-
-    const card = document.getElementById('hunt-' + this.huntid)!;
-    card.remove();
-
-    await huntStorage.removeItem(this.huntid);
-
-    const keys = await huntStorage.keys();
-    if (keys.length == 0) document.querySelector('#chasses-en-cours')!.classList.add('vide');
-  }
-
-
-  // Envoie la chasse dans la BDD
-  async submitHunt() {
-    this.lastUpdate = Date.now();
-    this.huntid = this.huntid;
-
-    try {
-      const onlineBackup = await dataStorage.getItem('online-backup');
-      const shiny = new Shiny(this);
-      await shinyStorage.setItem(this.huntid, shiny);
-
-      await this.destroyHunt();
-      await dataStorage.setItem('version-bdd', this.lastUpdate);
-      window.dispatchEvent(new CustomEvent('populate', { detail: {
-        modified: [this.huntid]
-      } }));
-      if (onlineBackup) await backgroundSync();
-    }
-    catch(error) {
-      console.error(error);
-    }
-  }
-
-
-  // Supprime la chasse de la BDD
-  async deleteAssociatedShiny() {
-    this.lastUpdate = Date.now();
-
-    try {
-      // On marque le shiny comme supprimé
-      const shiny = new Shiny(await shinyStorage.getItem(this.huntid));
-      shiny.lastUpdate = this.lastUpdate;
-      shiny.deleted = true;
-      await shinyStorage.setItem(this.huntid, shiny);
-
-      // On supprime la carte du shiny
-      const card = document.querySelector(`#mes-chromatiques pokemon-card#${this.huntid}`);
-      card?.remove();
-
-      // On supprime la chasse
-      await this.destroyHunt();
-    }
-    catch(error) {
-      console.error(error);
-    }
-  }
 }
 
 
@@ -513,7 +350,7 @@ export async function initHunts() {
     for (const key of keys) {
 
     }
-    keys.forEach(async k => Hunt.build(await huntStorage.getItem(k), true));
+    keys.forEach(async k => Hunt.build(await huntStorage.getItem(k)));
   }
 }
 

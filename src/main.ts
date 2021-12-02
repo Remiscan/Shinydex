@@ -1,18 +1,18 @@
-import { appDisplay, appPopulate } from './appContent.js';
+import { populatableSection, populateHandler } from './appContent.js';
 import { appStart, changeAutoMaj, checkUpdate, manualUpdate, setOnlineBackup } from './appLifeCycle.js';
 import './components/load-spinner/loadSpinner.js';
 import './components/pokemon-card/pokemonCard.js';
 import './components/shiny-stars/shinyStars.js';
+import './components/sync-line/syncLine.js';
 import './components/sync-progress/syncProgress.js';
 import { DexDatalist } from './DexDatalist.js';
 import { export2json, json2import } from './exportToJSON.js';
-import { initFiltres, openFiltres } from './filtres.js';
+import { ListeFiltres, openFiltres } from './filtres.js';
 import { Hunt } from './Hunt.js';
-import { dataStorage, huntStorage, shinyStorage } from './localforage.js';
+import { dataStorage, huntStorage } from './localforage.js';
 import { navigate, navLinkBubble, sectionActuelle } from './navigate.js';
 import { Notif } from './notification.js';
-import { setTheme, wait, warnBeforeDestruction } from './Params.js';
-import { initSpriteViewer } from './spriteViewer.js';
+import { setTheme } from './Params.js';
 import { backgroundSync } from './syncBackup.js';
 
 
@@ -167,7 +167,7 @@ importInput.addEventListener('change', async event => {
 });
 
 // Détecte le clic sur le bouton de suppression des données locales
-const boutonSupprimer = document.querySelector('.bouton-supprimer-local')! as HTMLButtonElement;
+/*const boutonSupprimer = document.querySelector('.bouton-supprimer-local')! as HTMLButtonElement;
 boutonSupprimer.addEventListener('click', async event => {
   event.preventDefault();
 
@@ -187,15 +187,7 @@ boutonSupprimer.addEventListener('click', async event => {
     notification.hide();
     boutonSupprimer.disabled = false;
   }
-});
-
-
-
-// Initialise les filtres
-initFiltres();
-
-// Initialise le sprite-viewer
-initSpriteViewer();
+});*/
 
 
 
@@ -279,15 +271,35 @@ navigator.serviceWorker.addEventListener('message', async event => {
 
 //////////////////////////////////////
 // ÉCOUTE DE L'EVENT CUSTOM 'POPULATE'
-window.addEventListener('populate', async (_event: Event) => {
-  const event = _event as CustomEvent;
+interface DataUpdateEvent extends CustomEvent {
+  detail: {
+    sections: populatableSection[];
+    ids: string[];
+    filtres?: ListeFiltres;
+    ordre?: string;
+    ordreReversed?: boolean;
+  }
+}
 
+declare global {
+  interface WindowEventMap {
+    dataupdate: DataUpdateEvent;
+  }
+}
+
+window.addEventListener('dataupdate', async (event: Event) => {
   // On peuple l'application avec les nouvelles données
   const notification = new Notif('Mise à jour des données...', '', 'loading', Notif.maxDelay, () => {}, true);
   notification.prompt();
-  await appPopulate(false, event.detail.modified);
+  const { sections, ids, filtres, ordre, ordreReversed } = (event as DataUpdateEvent).detail;
+  for (const section of sections) {
+    await populateHandler(section, ids, { filtres, ordre, ordreReversed });
+  }
   notification.hide();
-})
+
+  // On demande une synchronisation des données
+  await backgroundSync();
+});
 
 
 

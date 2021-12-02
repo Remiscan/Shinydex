@@ -1,8 +1,10 @@
-import { initPokedex, populateFromData } from './appContent.js';
+import { initPokedex, populateHandler } from './appContent.js';
 import { getNames } from './DexDatalist.js';
+import { initFiltres } from './filtres.js';
 import { dataStorage, huntStorage, pokemonData, shinyStorage } from './localforage.js';
 import { Notif } from './notification.js';
 import { loadAllImages, Params, setTheme, timestamp2date, wait, webpSupport } from './Params.js';
+import { initSpriteViewer } from './spriteViewer.js';
 import { backgroundSync, immediateSync } from './syncBackup.js';
 import { upgradeStorage } from './upgradeStorage.js';
 
@@ -144,9 +146,11 @@ export async function appStart() {
 
   // ÉTAPE 5 : on peuple l'application à partir des données locales
   try {
+    await initFiltres('mes-chromatiques');
+    initSpriteViewer();
     await initPokedex();
-    await populateFromData('mes-chromatiques');
-    await populateFromData('chasses-en-cours');
+    await populateHandler('mes-chromatiques');
+    await populateHandler('chasses-en-cours');
     // await initAmis();
   } catch (error) {
     console.error(error);

@@ -5,17 +5,15 @@ import template from './template.js';
 
 
 
-class syncProgress extends HTMLElement {
+class syncLine extends HTMLElement {
   shadow: ShadowRoot;
-  perimetre: number = 0;
+  longueur: number = 0;
   loadingAnim: Animation = new Animation();
   successAnim: Animation = new Animation();
   failureAnim: Animation = new Animation();
   lazyAnim: Animation = new Animation();
   bye: Animation = new Animation();
   disappear: Animation = new Animation();
-  
-
 
   constructor() {
     super();
@@ -50,13 +48,13 @@ class syncProgress extends HTMLElement {
           return;
         }
 
-        this.perimetre = Math.ceil(Math.PI * this.getBoundingClientRect().width);
-        svg.style.setProperty('--perimetre', String(this.perimetre));
+        this.longueur = this.getBoundingClientRect().width;
+        svg.style.setProperty('--longueur', String(this.longueur));
 
         this.loadingAnim = progressLine.animate([
-          { transform: 'rotate(0)', strokeDashoffset: '101px' },
-          { transform: 'rotate(180deg)', strokeDashoffset: '0' },
-          { transform: 'rotate(360deg)', strokeDashoffset: '-101px' }
+          { strokeDashoffset: `${this.longueur}px` },
+          { strokeDashoffset: '0' },
+          { strokeDashoffset: `-${this.longueur}px` }
         ], {
           duration: loadingDuration,
           iterations: Infinity,
@@ -68,7 +66,7 @@ class syncProgress extends HTMLElement {
       else if (newValue == 'success') {
         this.loadingAnim.pause();
 
-        const offset = ((this.loadingAnim.currentTime || 0) % loadingDuration < .5 * loadingDuration) ? '0' : '-202px';
+        const offset = ((this.loadingAnim.currentTime || 0) % loadingDuration < .5 * loadingDuration) ? '0' : `-${2 * this.longueur}px`;
         this.successAnim = progressLine.animate([
           { strokeDashoffset: offset, stroke: 'var(--success-color)' }
         ], {
@@ -85,7 +83,7 @@ class syncProgress extends HTMLElement {
       else if (newValue == 'failure') {
         this.loadingAnim.pause();
 
-        const offset = ((this.loadingAnim.currentTime || 0) % loadingDuration < .5 * loadingDuration) ? '0' : '-202px';
+        const offset = ((this.loadingAnim.currentTime || 0) % loadingDuration < .5 * loadingDuration) ? '0' : `-${2 * this.longueur}px`;
         this.failureAnim = progressLine.animate([
           { strokeDashoffset: offset, stroke: 'var(--failure-color)' }
         ], {
@@ -102,7 +100,7 @@ class syncProgress extends HTMLElement {
       else if (newValue == 'lazy') {
         this.loadingAnim.pause();
 
-        const offset = ((this.loadingAnim.currentTime || 0) % loadingDuration < .5 * loadingDuration) ? '-101px' : '-101px';
+        const offset = ((this.loadingAnim.currentTime || 0) % loadingDuration < .5 * loadingDuration) ? `-${this.longueur}px` : `-${this.longueur}px`;
         this.lazyAnim = progressLine.animate([
           { strokeDashoffset: offset }
         ], {
@@ -139,8 +137,8 @@ class syncProgress extends HTMLElement {
         this.bye.pause();
 
         this.disappear = progressLine.animate([
-          { transform: 'rotate(-90deg)', strokeDashoffset: '0' },
-          { transform: 'rotate(-90deg)', strokeDashoffset: '-101px' }
+          { strokeDashoffset: '0' },
+          { strokeDashoffset: `-${this.longueur}px` }
         ], {
           duration: 500,
           easing: Params.easingAccelerate,
@@ -148,7 +146,7 @@ class syncProgress extends HTMLElement {
         });
         this.disappear.pause();
 
-        if (this.state == 'success') {
+        if (this.state == 'success' || this.state == 'failure') {
           setTimeout(() => this.disappear.play(), 3000);
           this.disappear.onfinish = () => {
             this.bye.play();
@@ -156,13 +154,13 @@ class syncProgress extends HTMLElement {
           };
         }
 
-        else if (this.state == 'failure') {
+        /*else if (this.state == 'failure') {
           setTimeout(() => this.disappear.play(), 200);
           this.disappear.onfinish = () => {
             setTimeout(() => this.bye.play(), 3000);
             this.bye.onfinish = () => { this.removeAttribute('state'); this.bye.cancel(); this.disappear.cancel(); };
           };
-        }
+        }*/
 
         else {
           setTimeout(() => this.bye.play(), 3000);
@@ -177,4 +175,4 @@ class syncProgress extends HTMLElement {
   }
 }
 
-if (!customElements.get('sync-progress')) customElements.define('sync-progress', syncProgress);
+if (!customElements.get('sync-line')) customElements.define('sync-line', syncLine);
