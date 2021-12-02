@@ -81,7 +81,7 @@ function buildIconSheet($logs = false)
   file_put_contents($cssPath, ".icones{background-image:var(--link-iconsheet)}.icones.jeu{display:block;width:32px;height:32px;background-position:32px 32px}.icones.explain{display:inline-block;width:12px;height:12px;margin:3px 0;image-rendering:pixelated;background-position:32px 32px}");
 
   // Init HTML file
-  file_put_contents($previewPath, '<html class="light"><head><style>html{width:100%;height:100%;--link-iconsheet:url("iconsheet.png");--color:black;}html.dark{--color:white}body{display:flex;flex-wrap:wrap;justify-content:space-between;margin:100px;background-color:#ccc;color:var(--color)}html.dark>body{background-color:#333}.container{border:1px solid var(--color);display:flex;justify-content:center;align-items:center;margin:5px;display:grid;grid-template-columns:68px 220px;overflow:hidden}.container{height:32px;grid-template-columns: 32px 256px}.container>div:not(.icones){padding:5px;font-size:.85em}a{color:blue}html.dark a{color:lightblue}</style><link rel="stylesheet"href="iconsheet.css"></head><body><main style="flex-basis:100%"><ul><li><a href="iconsheet.png">Link to image (iconsheet.png)</a></li><li><a href="iconsheet.css">Link to style sheet (iconsheet.css)</a></li><li><input type="checkbox" onclick="document.documentElement.classList.toggle(`dark`);document.documentElement.classList.toggle(`light`)" id="theme"> <label for="theme">Dark</label></li></ul></main>');
+  file_put_contents($previewPath, '<html class="light"><head><meta charset="utf-8"><style>html{width:100%;height:100%;--link-iconsheet:url("iconsheet.png");--color:black;}html.dark{--color:white}body{display:flex;flex-wrap:wrap;justify-content:space-between;margin:100px;background-color:#ccc;color:var(--color)}html.dark>body{background-color:#333}.container{border:1px solid var(--color);display:flex;justify-content:center;align-items:center;margin:5px;display:grid;grid-template-columns:68px 220px;overflow:hidden}.container{height:32px;grid-template-columns: 32px 256px}.container>div:not(.icones){padding:5px;font-size:.85em}a{color:blue}html.dark a{color:lightblue}</style><link rel="stylesheet"href="iconsheet.css"></head><body><main style="flex-basis:100%"><ul><li><a href="iconsheet.png">Link to image (iconsheet.png)</a></li><li><a href="iconsheet.css">Link to style sheet (iconsheet.css)</a></li><li><input type="checkbox" onclick="document.documentElement.classList.toggle(`dark`);document.documentElement.classList.toggle(`light`)" id="theme"> <label for="theme">Dark</label></li></ul></main>');
 
   // Create a blank image the right size
   $background = imagecreatetruecolor($width, $height);
@@ -96,7 +96,7 @@ function buildIconSheet($logs = false)
   foreach($games as $i => $file) {
     // Create image from the icon file
     $icon = imagecreatefrompng('game-icons/' . $file);
-    $class = str_replace([' ', '\'', '.png'], '', utf8_decode($file));
+    $class = str_replace([' ', '\'', '.png'], '', $file);
 
     // Copy that icon to the output image
     imagecopy($outputImage, $icon, $currentPosition->x, $currentPosition->y, 0, 0, $gameSize->width, $gameSize->height);
