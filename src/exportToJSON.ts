@@ -1,4 +1,3 @@
-import { appDisplay, appPopulate } from "./appContent.js";
 import { huntedPokemon } from "./Hunt.js";
 import { dataStorage, huntStorage, localForageAPI, shinyStorage } from "./localforage.js";
 import { Notif } from "./notification.js";
@@ -35,8 +34,15 @@ export async function json2import(file: File | Blob | undefined): Promise<string
 
       await upgradeStorage(true);
 
-      await appPopulate(false);
-      await appDisplay(false);
+      window.dispatchEvent(new CustomEvent('dataupdate', {
+        detail: {
+          sections: ['mes-chromatiques', 'chasses-en-cours', 'corbeille'],
+          ids: [
+            ...importedData.shiny.map((shiny: frontendShiny) => shiny.huntid),
+            ...importedData.hunts.map((hunt: huntedPokemon) => hunt.huntid)
+          ]
+        }
+      }));
 
       const duration = performance.now() - startTime;
       await wait(Math.max(0, 1000 - duration));
@@ -72,7 +78,7 @@ export async function export2json(): Promise<void> {
   const a = document.createElement('A') as HTMLAnchorElement;
   a.href = dataString;
   await dataStorage.ready();
-  a.download = `remidex-${timestamp2date(Date.now()).replace(' ', '_')}.json`;
+  a.download = `shinydex-${timestamp2date(Date.now()).replace(' ', '_')}.json`;
   a.setAttribute('style', 'position: absolute; width: 0; height: 0;');
   document.body.appendChild(a);
 
