@@ -1,0 +1,14 @@
+:host {
+  display: grid;
+  place-items: center;
+  overflow: visible;
+}
+
+:host > * {
+  grid-row: 1;
+  grid-column: 1;
+}
+
+.star-field > use {
+  opacity: 0;
+}
