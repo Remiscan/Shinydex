@@ -5,9 +5,130 @@ import { closeSpriteViewer, openSpriteViewer } from './spriteViewer.js';
 
 
 
+interface Section {
+  nom: string;
+  rememberPosition: boolean;
+  openAnimation: (el: Element, ev: Event) => (Animation | null);
+  closeAnimation: (el: Element, ev: Event) => (Animation | null);
+  historique: boolean;
+  closePrevious: boolean;
+  preload: string[];
+  fab: string | null;
+}
+
+const defaultAnimation = (section: Element, event: Event) => section.animate([
+  { transform: 'translate3D(0, 20px, 0)', opacity: '0' },
+  { transform: 'translate3D(0, 0, 0)', opacity: '1' }
+], {
+  easing: Params.easingDecelerate,
+  duration: 200,
+  fill: 'both'
+});
+
+const sections: Section[] = [
+  {
+    nom: 'mes-chromatiques',
+    rememberPosition: true,
+    openAnimation: defaultAnimation,
+    closeAnimation: () => null,
+    historique: true,
+    closePrevious: true,
+    preload: ['./ext/pokesprite.png'],
+    fab: 'add'
+  }, {
+    nom: 'pokedex',
+    rememberPosition: true,
+    openAnimation: defaultAnimation,
+    closeAnimation: () => null,
+    historique: true,
+    closePrevious: true,
+    preload: ['./ext/pokesprite.png'],
+    fab: 'add'
+  }, {
+    nom: 'chasses-en-cours',
+    rememberPosition: true,
+    openAnimation: defaultAnimation,
+    closeAnimation: () => null,
+    historique: true,
+    closePrevious: true,
+    preload: ['./ext/pokesprite.png'],
+    fab: 'add'
+  }, {
+    nom: 'corbeille',
+    rememberPosition: true,
+    openAnimation: defaultAnimation,
+    closeAnimation: () => null,
+    historique: true,
+    closePrevious: true,
+    preload: ['./ext/pokesprite.png'],
+    fab: null
+  }, {
+    nom: 'partage',
+    rememberPosition: true,
+    openAnimation: defaultAnimation,
+    closeAnimation: () => null,
+    historique: true,
+    closePrevious: true,
+    preload: ['./ext/pokesprite.png'],
+    fab: null
+  }, {
+    nom: 'chromatiques-ami',
+    rememberPosition: false,
+    openAnimation: defaultAnimation,
+    closeAnimation: () => null,
+    historique: true,
+    closePrevious: true,
+    preload: ['./ext/pokesprite.png'],
+    fab: null
+  }, {
+    nom: 'parametres',
+    rememberPosition: true,
+    openAnimation: defaultAnimation,
+    closeAnimation: () => null,
+    historique: true,
+    closePrevious: true,
+    preload: [],
+    fab: null
+  }, {
+    nom: 'a-propos',
+    rememberPosition: true,
+    openAnimation: defaultAnimation,
+    closeAnimation: () => null,
+    historique: true,
+    closePrevious: true,
+    preload: [],
+    fab: null
+  }, {
+    nom: 'sprite-viewer',
+    rememberPosition: false,
+    openAnimation: (section: Element, event: Event) => {
+      return null;
+    },
+    closeAnimation: (section: Element, event: Event) => {
+      return null;
+    },
+    historique: true,
+    closePrevious: false,
+    preload: [],
+    fab: null
+  }, {
+    nom: 'obfuscator',
+    rememberPosition: false,
+    openAnimation: (section: Element, event: Event) => {
+      return null;
+    },
+    closeAnimation: (section: Element, event: Event) => {
+      return null;
+    },
+    historique: true,
+    closePrevious: false,
+    preload: [],
+    fab: null
+  }, 
+];
 export let sectionActuelle = 'mes-chromatiques';
-export const sections = ['mes-chromatiques', 'pokedex', 'chasses-en-cours', 'corbeille', 'partage', 'chromatiques-ami', 'parametres', 'a-propos'];
-const lastPosition: Map<string, number> = new Map(sections.map(section => [section, 0]));
+//export const sections = ['mes-chromatiques', 'pokedex', 'chasses-en-cours', 'corbeille', 'partage', 'chromatiques-ami', 'parametres', 'a-propos'];
+const lastPosition: Map<string, number> = new Map(sections.filter(section => section.rememberPosition).map(section => [section.nom, 0]));
 
 
 /**
