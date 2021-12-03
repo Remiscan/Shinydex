@@ -73,8 +73,8 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/_common/components/theme-selector/bui
 echo buildThemesStylesheet($body); ?>*/
 
 html {
-  --link-iconsheet: url(/remidex/images/iconsheet.png);
-  --link-pokesprite: url(/remidex/ext/pokesprite.png);
+  --link-iconsheet: url(/shinydex/images/iconsheet.png);
+  --link-pokesprite: url(/shinydex/ext/pokesprite.png);
   --easing-standard: cubic-bezier(0.4, 0.0, 0.2, 1);
   --easing-decelerate: cubic-bezier(0.0, 0.0, 0.2, 1);
   --easing-accelerate: cubic-bezier(0.4, 0.0, 1, 1);
@@ -2152,9 +2152,9 @@ input:disabled + label.switch {
 
 
 
-/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!!!! À PROPOS DU RÉMIDEX !!!!!!!!!!!!!!!!!!!!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!! À PROPOS DU SHINYDEX !!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
 .easter-egg {
   border-radius: 50%;

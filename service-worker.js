@@ -118,7 +118,7 @@ self.addEventListener('sync', function(event) {
 ///// FONCTIONS
 
 
-// Récupérer les données du Rémidex
+// Récupérer les données du Shinydex
 function getData() {
   // On récupère les données les plus récentes
   const promiseData = fetch('/remidex/backend/update.php?type=full&date=' + Date.now())
@@ -145,7 +145,7 @@ function getData() {
 }
 
 
-// Installer les données du Rémidex
+// Installer les données du Shinydex
 async function installData([data, files], action = 'install', event = null) {
   const newCACHE = PRE_CACHE + '-' + data['version-fichiers'];
   const totalFichiers = files.fichiers.length;

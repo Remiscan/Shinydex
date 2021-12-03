@@ -2,13 +2,13 @@
 <html lang="fr">
 
   <head>
-    <title>Rémidex</title>
+    <title>Shinydex</title>
     <meta name="description" content="Pokédex recensant les Pokémon chromatiques possédés par Rémi.">
-    <meta property="og:title" content="Rémidex">
+    <meta property="og:title" content="Shinydex">
     <meta property="og:description" content="Pokédex recensant les Pokémon chromatiques possédés par Rémi.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://remiscan.fr/remidex/">
-    <meta property="og:image" content="https://remiscan.fr/remidex/images/preview.png">
+    <meta property="og:url" content="https://remiscan.fr/shinydex/">
+    <meta property="og:image" content="https://remiscan.fr/shinydex/images/preview.png">
 
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">

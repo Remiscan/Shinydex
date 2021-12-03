@@ -83,10 +83,10 @@ class Pokemon
       $shinySuffix
     ];
 
-    $spriteUrl = '/remidex/pokemon-sprite-' . implode('_', $spriteCaracs) . '-' . $size . '.' . $format;
+    $spriteUrl = '/shinydex/pokemon-sprite-' . implode('_', $spriteCaracs) . '-' . $size . '.' . $format;
 
     if (property_exists($forme, 'noShiny') && $forme->noShiny == true && $shiny)
-      $spriteUrl = '/remidex/pokemon-sprite-0000_000_uk_n_00000000_f_n-' . $size . '.' . $format;
+      $spriteUrl = '/shinydex/pokemon-sprite-0000_000_uk_n_00000000_f_n-' . $size . '.' . $format;
 
     return $spriteUrl;
   }

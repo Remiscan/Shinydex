@@ -1,6 +1,6 @@
 {
-  "name": "Rémidex",
-  "short_name": "Rémidex",
+  "name": "Shinydex",
+  "short_name": "Shinydex",
   "display": "standalone",
   "start_url": "./",
   "orientation": "portrait",
@@ -14,7 +14,7 @@
     "sizes": "192x192",
     "type": "image/png"
   }, {
-    "src": "/remidex/images/app-icons/icon-512-maskable.png",
+    "src": "./images/app-icons/icon-512-maskable.png",
     "sizes": "512x512",
     "type": "image/png",
     "purpose": "maskable"

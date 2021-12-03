@@ -26,7 +26,7 @@ let updateAvailable = 0;
 
 async function initServiceWorker() {
   try {
-    const registration = await navigator.serviceWorker.register('/remidex/service-worker.js');
+    const registration = await navigator.serviceWorker.register('/shinydex/service-worker.js');
     console.log('Le service worker a été enregistré', registration);
 
     // On détecte les mises à jour du service worker lui-même
@@ -201,7 +201,7 @@ export async function appStart() {
   await wait(byeLoad);
   loadScreen.remove();
 
-  console.log('[:)] Bienvenue sur le Rémidex !');
+  console.log('[:)] Bienvenue sur le Shinydex !');
 
   // ---
 
@@ -329,7 +329,7 @@ export async function checkUpdate(checkNotification = false) {
       notifyMaj();
 
     // On lance mod_update.php pour récupérer les données les plus récentes
-    const response = await fetch('/remidex/backend/update.php?type=check&date=' + Date.now());
+    const response = await fetch('/shinydex/backend/update.php?type=check&date=' + Date.now());
     if (response.status != 200)
       throw '[:(] Erreur ' + response.status + ' lors de la requête';
     const data = await response.json();

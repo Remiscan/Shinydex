@@ -30,6 +30,6 @@
 
 RewriteEngine On
 
-# Rewrite /remidex/sprite-{params}.webp to /remidex/backend/sprite.php?format=webp&params={params}
-# and /remidex/sprite-{params}.png to /remidex/backend/sprite.php?format=png&params={params}
+# Rewrite /shinydex/sprite-{params}.webp to /shinydex/backend/sprite.php?format=webp&params={params}
+# and /shinydex/sprite-{params}.png to /shinydex/backend/sprite.php?format=png&params={params}
 RewriteRule ^pokemon-sprite-(.*)-([0-9]+)\.(webp|png)$ backend/pokemon-sprite.php?params=$1&size=$2&format=$3 [l,QSA]

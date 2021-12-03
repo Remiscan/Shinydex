@@ -205,7 +205,7 @@ class Pokemon {
       shinySuffix
     ];
 
-    let spriteUrl = `/remidex/pokemon-sprite-${spriteCaracs.join('_')}-${size}.${format}`;
+    let spriteUrl = `/shinydex/pokemon-sprite-${spriteCaracs.join('_')}-${size}.${format}`;
 
     if (typeof forme.noShiny !== 'undefined' && forme.noShiny === true && shiny === true)
       spriteUrl = this.getSprite(forme, { shiny: false, size, format });
