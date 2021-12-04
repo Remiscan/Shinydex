@@ -137,7 +137,7 @@ export async function setTheme(askedTheme?: string) {
 }
 
 
-export async function warnBeforeDestruction(bouton: Element, message: string = 'Ces données seront définitivement perdues.', icon: string = 'delete') {
+export async function warnBeforeDestruction(bouton: Element, message: string = 'Supprimer définitivement ces données ?', icon: string = 'delete') {
   bouton.setAttribute('disabled', 'true');
   const warning = `Êtes-vous sûr ? ${message}`;
 
