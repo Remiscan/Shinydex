@@ -30,6 +30,9 @@
 
 RewriteEngine On
 
+# Rewrite --version.ext to .ext?v=version
+RewriteRule ^(.*)--(.*)\.(png|jpg|svg|css|webp|json|jsphp|js|css|html|htm|php)$ $1.$3?v=$2
+
 # Rewrite /shinydex/sprite-{params}.webp to /shinydex/backend/sprite.php?format=webp&params={params}
 # and /shinydex/sprite-{params}.png to /shinydex/backend/sprite.php?format=png&params={params}
-RewriteRule ^pokemon-sprite-(.*)-([0-9]+)\.(webp|png)$ backend/pokemon-sprite.php?params=$1&size=$2&format=$3 [l,QSA]
+RewriteRule ^pokemon-sprite-(.*)-([0-9]+)\.(webp|png)$ backend/pokemon-sprite.php?params=$1&size=$2&format=$3 [L,QSA]
