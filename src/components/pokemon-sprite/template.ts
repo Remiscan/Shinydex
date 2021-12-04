@@ -1,7 +1,7 @@
 const template = document.createElement('template');
 template.innerHTML = `
 <div class="bg" data-loading="true"></div>
-<img>
+<img loading="lazy">
 <svg>
   <style>
     #shiny-star {

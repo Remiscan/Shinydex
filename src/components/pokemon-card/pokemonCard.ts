@@ -54,6 +54,7 @@ export class pokemonCard extends HTMLElement {
     card.setAttribute('huntid', shiny.huntid);
     card.setAttribute('last-update', String(shiny.lastUpdate));
     card.setAttribute('dexid', String(shiny.dexid));
+    card.setAttribute('forme', shiny.formid);
     card.setAttribute('surnom', shiny.surnom);
     card.setAttribute('methode', shiny.methode);
     card.setAttribute('compteur', shiny.compteur);
@@ -86,8 +87,6 @@ export class pokemonCard extends HTMLElement {
 
     if (shiny.horsChasse) card.setAttribute('horsChasse', '1');
     else                  card.removeAttribute('horsChasse');
-
-    card.setAttribute('sprite', await shiny.getSprite({ shiny: true, size: 112, format: Params.preferredImageFormat }));
   }
 
   // Met à jour le contenu de la carte à partir de ses attributs
@@ -110,7 +109,17 @@ export class pokemonCard extends HTMLElement {
           } else {
             this.querySelector('.pokemon-infos__nom')!.classList.remove('no-surnom');
           }
+
+          const sprite = this.querySelector('pokemon-sprite')!;
+          sprite.setAttribute('dexid', dexid);
         } break;
+
+        // Forme
+        case 'forme': {
+          const forme = this.getAttribute('forme') || '';
+          const sprite = this.querySelector('pokemon-sprite')!;
+          sprite.setAttribute('forme', forme);
+        }
 
         // Surnom
         case 'surnom': {
@@ -272,13 +281,6 @@ export class pokemonCard extends HTMLElement {
             element.classList.add('off');
           }
         } break;
-
-        // Sprite
-        case 'sprite': {
-          const sprite = this.getAttribute('sprite') || '';
-          const img = this.querySelector('.actual-sprite')! as HTMLImageElement;
-          img.src = sprite;
-        } break;
       }
     }
   }
@@ -363,7 +365,7 @@ export class pokemonCard extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ['dexid', 'surnom', 'methode', 'compteur', 'time-capture', 'jeu', 'ball', 'notes', 'checkmark', 'DO', 'charm', 'shiny-rate', 'hacked', 'hors-chasse', 'sprite'];
+    return ['dexid', 'forme', 'surnom', 'methode', 'compteur', 'time-capture', 'jeu', 'ball', 'notes', 'checkmark', 'DO', 'charm', 'shiny-rate', 'hacked', 'hors-chasse', 'sprite'];
   }
 
   connectedCallback() {

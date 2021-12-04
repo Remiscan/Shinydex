@@ -255,6 +255,8 @@ export class huntCard extends HTMLElement {
         if (inputDate.value == '') inputDate.value = new Date().toISOString().split('T')[0];
         if (container.classList.contains('caught')) this.hunt.caught = true;
         else                                        this.hunt.caught = false;
+
+        this.querySelector('pokemon-sprite')!.dispatchEvent(new Event('sparkle'));
       }
     };
     handle(this.handlers.caught);

@@ -22,6 +22,7 @@ class pokemonSprite extends HTMLElement {
   };
   lastChange: number = 0;
   animating: boolean = false;
+
   
   constructor() {
     super();
@@ -30,22 +31,28 @@ class pokemonSprite extends HTMLElement {
     this.shadow.adoptedStyleSheets = [sheet];
   }
 
+
+  /** Animation d'étoiles, similaire à celle des jeux. */
   async sparkle() {
     if (this.animating) return;
     this.animating = true;
 
+    const animations: Animation[] = [];
+
     const starField = this.shadow.querySelector('#star-field')!;
     starField.innerHTML = '';
 
+    // On génère les étoiles sn SVG
     const starQuantity = 40;
-    const animations: Animation[] = [];
-
     for (let i = 0; i < starQuantity; i++) {
       starField.innerHTML += `<use href="#shiny-star"/>`;
     }
 
+    // Trajectoire aléatoire de chaque étoile
     for (const [i, star] of Object.entries(Array.from(starField.querySelectorAll('use')))) {
-      const late = Number(i) % 2;
+      const late = Number(i) % 2; // la moitié des étoiles font partie d'une 2e salve
+
+      // Position de l'étoile
       const angle = 2 * Math.PI * (Math.random() * (1 / starQuantity) + Number(i) / starQuantity);
       const radius = this.size / 2;
       const rotate = (A: { x: number, y: number }, angle: number) => {
@@ -63,17 +70,22 @@ class pokemonSprite extends HTMLElement {
       star.setAttribute('x', x);
       star.setAttribute('y', y);
 
+      // Taille de l'étoile
       const minWidth = this.size / 30;
       const maxWidth = this.size / 6;
       const minScale = minWidth / 30;
       const maxScale = maxWidth / 30;
       const scale = minScale + (maxScale - minScale) * Math.random();
 
+      // Rotation de l'étoile
       const startRotation = 90 * Math.random();
       const endRotation = startRotation + (Math.sign(Math.random() - 0.5) || 1) * 360 * (.5 + .5 * Math.random());
 
-      star.style.setProperty('transform-origin', 'center center');
+      // Couleur de l'étoile
       if (Math.random() - 0.5 < 0) star.style.setProperty('filter', 'hue-rotate(150deg)');
+
+      // Animation
+      star.style.setProperty('transform-origin', 'center center');
       const anim = star.animate([
         { opacity: 0, transform: `translate3D(${startPos.x}px, ${startPos.y}px, 0) scale(${scale}) rotate(${startRotation}deg)` },
         { opacity: 1 },
@@ -93,12 +105,16 @@ class pokemonSprite extends HTMLElement {
     this.animating = false;
   }
 
+
+  /** Met à jour le sprite affiché en fonction de ${this.params}. */
   async setSpriteUrl(): Promise<void> {
     const currentChange = this.lastChange;
     const img = this.shadow.querySelector('img')!;
     const svg = this.shadow.querySelector('svg')!;
     const url = await this.getSpriteUrl();
+    // On affiche le nouveau sprite uniquement si aucune nouvelle demande n'a été faite entre temps
     if (currentChange === this.lastChange) {
+      // On affiche un pixel transparent en attendant le chargement du sprite
       img.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
       img.width = img.height = this.params.size as number;
       svg.setAttribute('width', String(this.params.size));
@@ -109,6 +125,8 @@ class pokemonSprite extends HTMLElement {
     return;
   }
 
+
+  /** Récupère l'url du sprite demandé en fonction de l'objet des paramètres de sprite. */
   async getSpriteUrl(params = this.params): Promise<string> {
     const pkmn = await pokemonData.getItem(String(params.dexid));
     const forme = pkmn.formes.find((form: Forme) => form.dbid === params.forme) || pkmn.formes[0];
@@ -137,10 +155,14 @@ class pokemonSprite extends HTMLElement {
     }
   }
 
+
+  /** Taille du sprite (limitée par la taille originale de l'image). */
   get size() {
     return Math.max(1, Math.min(this.params.size as number, 512));
   }
 
+
+  /** Met à jour ${this.params} en fonction des arguments de l'élément HTML. */
   update(param: string, newValue: string) {
     let value: number | string | boolean;
     switch (param) {
@@ -173,6 +195,7 @@ class pokemonSprite extends HTMLElement {
       this.params[param] = value;
     }
   }
+  
 
   connectedCallback() {
     this.addEventListener('sparkle', this.sparkle);

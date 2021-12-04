@@ -1,8 +1,10 @@
+import '../pokemon-sprite/pokemonSprite.js';
+
+
+
 const template = document.createElement('template');
 template.innerHTML = `
-<div class="pokemon-sprite">
-  <img class="actual-sprite" width="112" height="112" loading="lazy"></img>
-</div>
+<pokemon-sprite size="112"></pokemon-sprite>
 <div class="edit-icon">
   <i class="material-icons">edit</i>
   <svg><circle r="25" cx="25" cy="25"/></svg>

@@ -6,7 +6,7 @@ template.innerHTML = `
     <i class="material-icons"></i>
   </div>
 
-  <div class="pokemon-sprite"><div class="actual-sprite"></div></div>
+  <pokemon-sprite size="112"></pokemon-sprite>
 
   <div class="hunt-edit">
     <span>Mode édit.</span>
