@@ -4,9 +4,9 @@ import { filterCards, ListeFiltres, orderCards } from './filtres.js';
 import { huntedPokemon } from './Hunt.js';
 import { lazyLoad } from './lazyLoading.js';
 import { dataStorage, friendStorage, huntStorage, localForageAPI, shinyStorage } from './localforage.js';
+import { navigate } from './navigate.js';
 import { Notif } from './notification.js';
 import { frontendShiny, Pokemon } from './Pokemon.js';
-import { openSpriteViewer } from './spriteViewer.js';
 
 
 
@@ -176,7 +176,7 @@ export async function initPokedex() {
       pkmn.dataset.dexid = String(i);
       pkmn.addEventListener('click', event => {
         try {
-          openSpriteViewer(i, event);
+          navigate('sprite-viewer', event, { dexid: String(i) });
         } catch (error) {
           const message = `Erreur : impossible d'afficher ce Pokémon`;
           console.error(message, error);

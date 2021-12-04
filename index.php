@@ -115,17 +115,6 @@
         <?php include './pages/pokedex.html'; ?>
       </section>
 
-      <!-- FAB -->
-      <button type="button" class="fab">
-        <i class="material-icons"></i>
-      </button>
-
-      <!-- Bouton installer -->
-      <div id="install-bouton">
-        <i class="material-icons">get_app</i>
-        <span>Installer</span>
-      </div>
-
       <!-- Chasses en cours -->
       <section id="chasses-en-cours">
         <?php include './pages/chasses-en-cours.html'; ?>
@@ -156,7 +145,20 @@
         <?php include './pages/a-propos.html'; ?>
       </section>
 
+      <!-- FAB -->
+      <button type="button" class="fab">
+        <i class="material-icons"></i>
+      </button>
+
     </main>
+
+    <!-- Sprite viewer -->
+    <section id="sprite-viewer">
+      <sprite-viewer></sprite-viewer>
+    </section>
+
+    <!-- Obfuscator -->
+    <section id="obfuscator"></section>
 
     <!-- Notification -->
     <div class="notification bottom-bar off" id="notification">
@@ -171,15 +173,7 @@
       <load-spinner></load-spinner>
     </div>
 
-    <!-- Menu des filtres -->
-    <?php include './pages/menu-filtres.html'; ?>
-
-    <!-- Obfuscator -->
-    <div class="obfuscator off"></div>
-
-    <!-- Sprite viewer -->
-    <section id="sprite-viewer">
-      <?php include './pages/sprite-viewer.html'; ?>
-    </section>
+    <!-- Menu des filtres (trnasférer vers élément custom) -->
+    <?php include './pages/menu-filtres.html'; ?> 
   </body>
 </html>

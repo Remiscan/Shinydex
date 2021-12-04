@@ -3,6 +3,7 @@ import { appStart, changeAutoMaj, checkUpdate, manualUpdate, setOnlineBackup } f
 import './components/load-spinner/loadSpinner.js';
 import './components/pokemon-card/pokemonCard.js';
 import './components/shiny-stars/shinyStars.js';
+import './components/sprite-viewer/spriteViewer.js';
 import './components/sync-line/syncLine.js';
 import './components/sync-progress/syncProgress.js';
 import { DexDatalist } from './DexDatalist.js';
@@ -22,7 +23,7 @@ import { backgroundSync } from './syncBackup.js';
 
 // Active les liens de navigation
 for (const link of Array.from(document.querySelectorAll('[data-section]')) as HTMLElement[]) {
-  link.addEventListener('click', () => navigate(link.dataset.section || ''));
+  link.addEventListener('click', event => navigate(link.dataset.section || '', event));
 }
 
 // Active les bulles sur les liens de navigation
@@ -37,6 +38,9 @@ for (const bouton of Array.from(document.querySelectorAll('.bouton-retour')) as 
   bouton.addEventListener('click', () => history.back());
 }
 
+// L'obfuscator ramène en arrière quand on clique dessus
+document.getElementById('obfuscator')!.addEventListener('click', () => history.back());
+
 
 
 ///////////////////////////////////
@@ -49,9 +53,6 @@ document.querySelector('.fab')!.addEventListener('click', () => {
   // Nouvelle chasse
   else if (sectionActuelle == 'chasses-en-cours') Hunt.build();
 });
-
-// L'obfuscator ramène en arrière quand on clique dessus
-document.querySelector('.obfuscator')!.addEventListener('click', () => history.back());
 
 // Surveille le champ de filtrage par espèce de Pokémon
 {
