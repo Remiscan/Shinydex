@@ -82,7 +82,7 @@ class pokemonSprite extends HTMLElement {
       const endRotation = startRotation + (Math.sign(Math.random() - 0.5) || 1) * 360 * (.5 + .5 * Math.random());
 
       // Couleur de l'étoile
-      if (Math.random() - 0.5 < 0) star.style.setProperty('filter', 'hue-rotate(150deg)');
+      if (Math.random() - (1/3) < 0) star.style.setProperty('filter', 'hue-rotate(150deg)');
 
       // Animation
       star.style.setProperty('transform-origin', 'center center');
