@@ -394,19 +394,9 @@ h1 {
   flex-direction: column;
 }
 
-#mes-chromatiques>.section-contenu,
-#pokedex>.section-contenu,
-#chasses-en-cours>.section-contenu {
-  padding-bottom: calc(56px + 2 * 15px - 6px);
-}
-
-#mes-chromatiques.defered>.section-contenu {
-  height: calc(var(--compteur, 0) * 126px);
-}
-
 
 /*
- * FAB des filtres
+ * FAB
  */
 
 input[type=file] + label,
@@ -464,6 +454,7 @@ button>.material-icons + span {
 }
 
 .fab {
+  display: none;
   grid-column: 1 / 2;
   grid-row: 1 / 2;
   width: 56px;
@@ -490,10 +481,18 @@ button>.material-icons + span {
   transition: transform .15s var(--easing-decelerate);
 }
 
-body:not([data-section-actuelle="mes-chromatiques"])
-    :not([data-section-actuelle="pokedex"])
-    :not([data-section-actuelle="chasses-en-cours"]) .fab {
-  display: none;
+body[data-section-actuelle~="mes-chromatiques"] .fab,
+body[data-section-actuelle~="pokedex"] .fab,
+body[data-section-actuelle~="chasses-en-cours"]:not([data-section-actuelle~="corbeille"]) .fab,
+body[data-section-actuelle~="partage"] .fab {
+  display: flex;
+}
+
+#mes-chromatiques > .section-contenu,
+#pokedex > .section-contenu,
+#chasses-en-cours > .section-contenu,
+#partage > .section-contenu {
+  padding-bottom: calc(56px + 2 * 15px - 6px);
 }
 
 .fab.mini {
@@ -538,7 +537,8 @@ pokemon-card + pokemon-card {
   contain-intrinsic-size: 10px 126px;
 }
 
-pokemon-sprite,
+pokemon-card pokemon-sprite,
+hunt-card pokemon-sprite,
 .edit-icon {
   grid-column: 1;
   grid-row: 1;
@@ -1175,15 +1175,6 @@ body[data-hunt-uploading] .bouton-hunt-submit {
   pointer-events: none;
   filter: brightness(0.4) grayscale(.5);
 }
-
-.fab>.material-icons::after {
-  /*content: 'filter_list';*/
-  content: 'add';
-}
-
-/*.fab.add>.material-icons::after {
-  content: 'add';
-}*/
 
 body[data-hunt-uploading] .loading-bar>.bouton-retour {
   display: none;
@@ -2360,11 +2351,5 @@ input:disabled + label.switch {
 
   .progression-maj {
     top: 0;
-  }
-
-  .dex-sprite,
-  .single-sprite .dex-sprite,
-  .two-sprites .dex-sprite {
-    --sprite-size: calc(min(400px, 80vw));
   }
 }
