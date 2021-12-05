@@ -1935,18 +1935,10 @@ input:disabled + label.switch {
 !!!!! À PROPOS DU SHINYDEX !!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
-.easter-egg {
+.app-icon {
   border-radius: 50%;
-  width: 150px;
-  height: 150px;
-  margin: 0 auto 30px;
-  background-position: center 20%;
-  background-color: #262626;
-  overflow: hidden;
-}
-
-#instinct {
-  margin-top: -8px;
+  margin: auto;
+  margin-bottom: 15px;
 }
 
 .sources-titre {
