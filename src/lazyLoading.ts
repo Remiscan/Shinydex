@@ -11,7 +11,7 @@ function computeSize(element: Element, rect: DOMRect = element.getBoundingClient
   const oldRect = loaded.get(element);
   if ((!oldRect || !isRectSame(oldRect, rect)) && (rect.width > 0 && rect.height > 0)) {
     loaded.set(element, rect);
-    (element as HTMLElement).style.setProperty('contain-intrinsic-size', `${rect.width}px ${rect.height}px`);
+    (element as HTMLElement).style.setProperty('contain-intrinsic-size', `100px ${rect.height}px`);
   }
 }
 
