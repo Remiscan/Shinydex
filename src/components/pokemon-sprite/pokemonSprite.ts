@@ -18,7 +18,8 @@ class pokemonSprite extends HTMLElement {
     backside: false,
     shiny: false,
     size: 112,
-    format: Params.preferredImageFormat
+    format: Params.preferredImageFormat,
+    lazy: true
   };
   lastChange: number = 0;
   animating: boolean = false;
@@ -54,7 +55,7 @@ class pokemonSprite extends HTMLElement {
 
       // Position de l'étoile
       const angle = 2 * Math.PI * (Math.random() * (1 / starQuantity) + Number(i) / starQuantity);
-      const radius = this.size / 2;
+      const radius = 512 / 2;
       const rotate = (A: { x: number, y: number }, angle: number) => {
         const C = { x: 0, y: 0 };
         return {
@@ -71,8 +72,8 @@ class pokemonSprite extends HTMLElement {
       star.setAttribute('y', y);
 
       // Taille de l'étoile
-      const minWidth = this.size / 30;
-      const maxWidth = this.size / 6;
+      const minWidth = radius / 15;
+      const maxWidth = radius / 3;
       const minScale = minWidth / 30;
       const maxScale = maxWidth / 30;
       const scale = minScale + (maxScale - minScale) * Math.random();
@@ -110,16 +111,11 @@ class pokemonSprite extends HTMLElement {
   async setSpriteUrl(): Promise<void> {
     const currentChange = this.lastChange;
     const img = this.shadow.querySelector('img')!;
-    const svg = this.shadow.querySelector('svg')!;
     const url = await this.getSpriteUrl();
+    this.style.setProperty('--size', `${this.params.size}px`);
     // On affiche le nouveau sprite uniquement si aucune nouvelle demande n'a été faite entre temps
     if (currentChange === this.lastChange) {
-      // On affiche un pixel transparent en attendant le chargement du sprite
-      img.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
-      img.width = img.height = this.params.size as number;
-      svg.setAttribute('width', String(this.params.size));
-      svg.setAttribute('height', String(this.params.size));
-      await fetch(url);
+      img.loading = this.params.lazy ? 'lazy' : 'eager';
       img.src = url;
     }
     return;
@@ -151,14 +147,20 @@ class pokemonSprite extends HTMLElement {
       );
       return await this.getSpriteUrl(newParams);
     } else {
-      return `/shinydex/pokemon-sprite-${spriteCaracs.join('_')}-${this.size}.${this.params.format}`;
+      return `/shinydex/pokemon-sprite-${spriteCaracs.join('_')}-${this.spriteSize}.${this.params.format}`;
     }
   }
 
 
   /** Taille du sprite (limitée par la taille originale de l'image). */
-  get size() {
+  get spriteSize() {
     return Math.max(1, Math.min(this.params.size as number, 512));
+  }
+
+
+  /** Taille de l'élément <pokemon-sprite> (limitée par la taille du sprite et du conteneur). */
+  get elementSize() {
+    return this.getBoundingClientRect().width;
   }
 
 
@@ -187,6 +189,9 @@ class pokemonSprite extends HTMLElement {
       case 'format':
         value = newValue === 'webp' ? 'webp' : 'png';
         break;
+      case 'lazy':
+        value = newValue === 'false' ? false : true;
+        break;
       default:
         value = '';
     }
@@ -210,7 +215,7 @@ class pokemonSprite extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ['dexid', 'forme', 'gender', 'gigamax', 'candy', 'backside', 'shiny', 'size', 'format'];
+    return ['dexid', 'forme', 'gender', 'gigamax', 'candy', 'backside', 'shiny', 'size', 'format', 'lazy'];
   }
 
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {
