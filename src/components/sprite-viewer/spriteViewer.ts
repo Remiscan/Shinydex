@@ -46,6 +46,22 @@ class spriteViewer extends HTMLElement {
     const listeRegular = this.querySelector('.sprite-list.regular')!;
     listeRegular.innerHTML = '';
 
+    const nomForme = (nom: string) => {
+      switch(nom) {
+        case 'Mâle':
+        case 'Femelle':
+        case 'Méga':
+        case 'Méga (X)':
+        case 'Méga (Y)':
+        case 'Gigamax':
+          return nom;
+        case '':
+          return `Forme ${nomFormeNormale}`;
+        default:
+          return `Forme ${nom}`;
+      }
+    };
+
     for (const forme of formes) {
       const afficherNomForme = (forme.nom != '' || formes.length > 1);
 
@@ -56,7 +72,7 @@ class spriteViewer extends HTMLElement {
             ${(typeof forme.noShiny != 'undefined' && forme.noShiny) ? '<span>N\'existe pas<br>en chromatique</span>' : ''}
           </picture>
           <span ${afficherNomForme ? 'class="on"' : ''}>
-            ${afficherNomForme ? (forme.nom != '' ? forme.nom : nomFormeNormale) : '&nbsp;'}
+            ${afficherNomForme ? nomForme(forme.nom) : '&nbsp;'}
           </span>
         </div>
       `;
@@ -68,7 +84,7 @@ class spriteViewer extends HTMLElement {
           <pokemon-sprite dexid="${pokemon.dexid}" shiny="false" forme="${forme.dbid}" size="512" lazy="false"></pokemon-sprite>
         </picture>
         <span ${afficherNomForme ? 'class="on"' : ''}>
-          ${afficherNomForme ? (forme.nom != '' ? forme.nom : nomFormeNormale) : '&nbsp;'}
+          ${afficherNomForme ? nomForme(forme.nom) : '&nbsp;'}
         </span>
       </div>
     `;
