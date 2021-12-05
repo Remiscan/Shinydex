@@ -1937,7 +1937,7 @@ input:disabled + label.switch {
 
 .app-icon {
   border-radius: 50%;
-  margin: auto;
+  margin: 0 auto;
   margin-bottom: 15px;
 }
 
