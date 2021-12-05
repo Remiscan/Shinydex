@@ -223,7 +223,7 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
   const sectionsString = `${nouvelleSection.closePrevious ? '' : ancienneSection.nom} ${nouvelleSection.nom}`;
   document.body.dataset.sectionActuelle = sectionsString;
 
-  if (nouvelleSection.historique && event.type !== 'popstate') history.pushState({section: sectionCible}, '');
+  if (nouvelleSection.historique && event.type !== 'popstate') history.pushState({ section: sectionCible, data: data }, '');
   if (nouvelleSection.rememberPosition) mainElement.scroll(0, lastPosition.get(sectionCible) || 0); // scrolle vers la position précédemment enregistrée
 
   // On détermine quelles sections animer (sur PC, certaines sections apparaissent en couple)
@@ -351,5 +351,5 @@ async function animateFabIcon(ancienneSection: Section, nouvelleSection: Section
 
 // Permet la navigation avec le bouton retour du navigateur
 window.addEventListener('popstate', event => {
-  navigate(event.state?.section || 'mes-chromatiques', event);
+  navigate(event.state?.section || 'mes-chromatiques', event, event.state?.data);
 }, false);
