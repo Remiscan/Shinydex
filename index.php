@@ -106,7 +106,7 @@
     <main>
 
       <!-- Mes chromatiques -->
-      <section id="mes-chromatiques">
+      <section id="mes-chromatiques" class="vide">
         <?php include './pages/mes-chromatiques.html'; ?>
       </section>
 
@@ -116,22 +116,22 @@
       </section>
 
       <!-- Chasses en cours -->
-      <section id="chasses-en-cours">
+      <section id="chasses-en-cours" class="vide">
         <?php include './pages/chasses-en-cours.html'; ?>
       </section>
 
       <!-- Corbeille -->
-      <section id="corbeille">
+      <section id="corbeille" class="vide">
         <?php include './pages/corbeille.html'; ?>
       </section>
 
       <!-- Liste d'amis -->
-      <section id="partage">
+      <section id="partage" class="vide">
         <?php include './pages/partage.html'; ?>
       </section>
 
       <!-- Chromatiques d'un ami -->
-      <section id="chromatiques-ami">
+      <section id="chromatiques-ami" class="vide">
         <?php include './pages/chromatiques-ami.html'; ?>
       </section>
 
