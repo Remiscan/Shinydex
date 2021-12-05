@@ -35,6 +35,11 @@ class spriteViewer extends HTMLElement {
       else return 0;
     });
 
+    const spriteScroller = this.querySelector('.sprite-scroller')!;
+    spriteScroller.classList.remove('single-sprite', 'two-sprites');
+    const className = formes.length === 2 ? 'two-sprites' : formes.length === 1 ? 'single-sprite' : null;
+    if (className) spriteScroller.classList.add(className);
+
     // On place les sprites
     const listeShiny = this.querySelector('.sprite-list.shiny')!;
     listeShiny.innerHTML = '';
@@ -47,7 +52,7 @@ class spriteViewer extends HTMLElement {
       const htmlS = `
         <div class="dex-sprite">
           <picture ${(typeof forme.noShiny != 'undefined' && forme.noShiny) ? 'class="no-shiny"' : ''}>
-            <pokemon-sprite dexid="${pokemon.dexid}" shiny="true" forme="${forme.dbid}" size="512"></pokemon-sprite>
+            <pokemon-sprite dexid="${pokemon.dexid}" shiny="true" forme="${forme.dbid}" size="512" lazy="false"></pokemon-sprite>
             ${(typeof forme.noShiny != 'undefined' && forme.noShiny) ? '<span>N\'existe pas<br>en chromatique</span>' : ''}
           </picture>
           <span ${afficherNomForme ? 'class="on"' : ''}>
@@ -60,7 +65,7 @@ class spriteViewer extends HTMLElement {
       const htmlR = `
       <div class="dex-sprite">
         <picture>
-          <pokemon-sprite dexid="${pokemon.dexid}" shiny="false" forme="${forme.dbid}" size="512"></pokemon-sprite>
+          <pokemon-sprite dexid="${pokemon.dexid}" shiny="false" forme="${forme.dbid}" size="512" lazy="false"></pokemon-sprite>
         </picture>
         <span ${afficherNomForme ? 'class="on"' : ''}>
           ${afficherNomForme ? (forme.nom != '' ? forme.nom : nomFormeNormale) : '&nbsp;'}
@@ -78,7 +83,7 @@ class spriteViewer extends HTMLElement {
 
   toggleShinyRegular(event: Event) {
     const shiny = (event.currentTarget as HTMLInputElement).checked;
-    this.setAttribute('shiny', String(shiny));
+    document.querySelector('#sprite-viewer sprite-viewer')!.setAttribute('shiny', String(shiny));
   }
   
 
@@ -90,8 +95,6 @@ class spriteViewer extends HTMLElement {
     const switchSR = this.querySelector('#switch-shy-reg')! as HTMLInputElement;
     switchSR.addEventListener('change', this.toggleShinyRegular);
     spriteScroller.addEventListener('click', this.toggle = () => switchSR.click());
-
-    this.update(this.getAttribute('dexid') || '');
   }
 
   disconnectedCallback() {
@@ -102,13 +105,14 @@ class spriteViewer extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ['dexid'];
+    return ['dexid', 'shiny'];
   }
 
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {
     if (oldValue === newValue) return;
     switch (name) {
       case 'dexid': this.update(newValue); break;
+      case 'shiny': (this.querySelector('#switch-shy-reg')! as HTMLInputElement).checked = newValue === 'true';
     }
   }
 }

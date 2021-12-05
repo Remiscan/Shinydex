@@ -1,20 +1,23 @@
-:host {
+sprite-viewer {
   grid-column: 1 / -1;
   grid-row: 1 / -1;
-  grid-template-columns: 1fr;
+  display: grid;
+  grid-template-columns: 0 1fr 0;
   grid-template-rows: calc(100% - 56px) 56px;
+  height: 100%;
+  overflow: hidden;
 }
 
 .bouton-retour {
   justify-self: center;
   align-self: center;
   grid-row: 2;
-  grid-column: 1;
+  grid-column: 2;
 }
 
 .switch-shiny-regular {
   grid-row: 2;
-  grid-column: 1;
+  grid-column: 2;
   width: fit-content;
   height: fit-content;
   justify-self: end;
@@ -31,18 +34,18 @@
   --color: var(--sprite-viewer-bg-color);
 }
 
-#sprite-viewer.shiny [for=switch-shy-reg] > shiny-stars {
+#switch-shy-reg:checked + [for=switch-shy-reg] > shiny-stars {
   display: block;
 }
 
-:host[data-shiny="false"] .sprite-list.shiny,
-:host[data-shiny="true"] .sprite-list.regular {
+sprite-viewer[shiny="false"] .sprite-list.shiny,
+sprite-viewer[shiny="true"] .sprite-list.regular {
   display: none;
 }
 
 .sprite-viewer-dex-info {
   grid-row: 2;
-  grid-column: 1;
+  grid-column: 2;
   justify-self: start;
   align-self: center;
   margin-left: 16px;
@@ -75,14 +78,17 @@
 
 .sprite-scroller {
   grid-row: 1;
-  grid-column: 1;
+  grid-column: 1 / -1;
   overflow-y: auto;
+  margin: auto;
+  max-height: 100%;
+}
+
+.sprite-list {
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+  flex-flow: row wrap;
   justify-content: center;
   align-items: center;
-  height: fit-content;
   margin: auto;
 }
 
@@ -92,6 +98,13 @@
   grid-template-rows: var(--sprite-size) min-content;
   width: var(--sprite-size);
   margin: 6px 5px;
+}
+
+.single-sprite .dex-sprite {
+  --sprite-size: calc(min(400px, 80vw));
+}
+.two-sprites .dex-sprite {
+  --sprite-size: calc(min(400px, 60vw));
 }
 
 .dex-sprite pokemon-sprite {
@@ -134,6 +147,8 @@
 
 .dex-sprite>picture {
   position: relative;
+  width: 100%;
+  overflow: hidden;
 }
 
 @keyframes sprite-loading {
@@ -174,4 +189,12 @@ picture.no-shiny>span {
   text-transform: none;
   text-align: center;
   line-height: 1.4em;
+}
+
+@media (min-width: 1140px) {
+  .dex-sprite,
+  .single-sprite .dex-sprite,
+  .two-sprites .dex-sprite {
+    --sprite-size: calc(min(400px, 80vw));
+  }
 }

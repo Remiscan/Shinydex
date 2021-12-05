@@ -154,7 +154,7 @@
 
     <!-- Sprite viewer -->
     <section id="sprite-viewer">
-      <sprite-viewer></sprite-viewer>
+      <sprite-viewer shiny="true"></sprite-viewer>
     </section>
 
     <!-- Obfuscator -->
