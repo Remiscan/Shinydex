@@ -8,8 +8,7 @@ import './components/sync-line/syncLine.js';
 import './components/sync-progress/syncProgress.js';
 import { DexDatalist } from './DexDatalist.js';
 import { export2json, json2import } from './exportToJSON.js';
-import { ListeFiltres, openFiltres } from './filtres.js';
-import { Hunt } from './Hunt.js';
+import { ListeFiltres } from './filtres.js';
 import { dataStorage, huntStorage } from './localforage.js';
 import { navigate, navLinkBubble, sectionActuelle } from './navigate.js';
 import { Notif } from './notification.js';
@@ -47,11 +46,19 @@ document.getElementById('obfuscator')!.addEventListener('click', () => history.b
 // FAB (filtres et nouvelle chasse)
 
 // Active le FAB
-document.querySelector('.fab')!.addEventListener('click', () => {
-  // Filtres
-  if (['mes-chromatiques', 'pokedex'].includes(sectionActuelle)) openFiltres();
-  // Nouvelle chasse
-  else if (sectionActuelle == 'chasses-en-cours') Hunt.build();
+document.querySelector('.fab')!.addEventListener('click', async () => {
+  // Crée une nouvelle chasse
+  if (['mes-chromatiques', 'pokedex', 'chasses-en-cours'].includes(sectionActuelle)) {
+    if (sectionActuelle !== 'chasses-en-cours') {
+      await navigate('chasses-en-cours', new Event('navigate'));
+    }
+    // Créer une nouvelle chasse ici
+  }
+
+  // Ajoute un nouvel ami
+  else if (sectionActuelle === 'partage') {
+    // Ajouter un nouvel ami ici
+  }
 });
 
 // Surveille le champ de filtrage par espèce de Pokémon

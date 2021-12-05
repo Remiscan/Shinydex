@@ -74,7 +74,7 @@ const sections: Section[] = [
     historique: true,
     closePrevious: true,
     preload: ['./ext/pokesprite.png'],
-    fab: null,
+    fab: 'person_add',
     element: document.getElementById('partage')!
   }, {
     nom: 'chromatiques-ami',
@@ -162,8 +162,6 @@ const sections: Section[] = [
   }, 
 ];
 export let sectionActuelle = 'mes-chromatiques';
-const sectionsActuelles = ['mes-chromatiques'];
-//export const sections = ['mes-chromatiques', 'pokedex', 'chasses-en-cours', 'corbeille', 'partage', 'chromatiques-ami', 'parametres', 'a-propos'];
 const lastPosition: Map<string, number> = new Map(sections.filter(section => section.rememberPosition).map(section => [section.nom, 0]));
 
 
@@ -225,7 +223,7 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
   const sectionsString = `${nouvelleSection.closePrevious ? '' : ancienneSection.nom} ${nouvelleSection.nom}`;
   document.body.dataset.sectionActuelle = sectionsString;
 
-  if (nouvelleSection.historique) history.pushState({section: sectionCible}, '');
+  if (nouvelleSection.historique && event.type !== 'popstate') history.pushState({section: sectionCible}, '');
   if (nouvelleSection.rememberPosition) mainElement.scroll(0, lastPosition.get(sectionCible) || 0); // scrolle vers la position précédemment enregistrée
 
   // On détermine quelles sections animer (sur PC, certaines sections apparaissent en couple)
@@ -245,7 +243,16 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
 
   // On prépare la nouvelle section si besoin
   switch (sectionCible) {
-    case 'sprite-viewer': nouvelleSection.element.querySelector('sprite-viewer')?.setAttribute('dexid', data.dexid || ''); break;
+    case 'sprite-viewer':
+      const viewer = nouvelleSection.element.querySelector('sprite-viewer')!;
+      viewer.setAttribute('dexid', data.dexid || '');
+      viewer.setAttribute('shiny', 'true');
+      break;
+  }
+
+  // On anime le FAB si besoin
+  if (ancienneSection.fab && nouvelleSection.fab && ancienneSection.fab != nouvelleSection.fab) {
+    animateFabIcon(ancienneSection, nouvelleSection);
   }
 
   // On anime l'apparition de la nouvelle section
@@ -260,6 +267,8 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
   // Active le lazy loading de la première carte
   const newFirstCard = firstCard(nouvelleSection.element);
   if (newFirstCard) enableLazyLoad(newFirstCard);
+
+  return;
 }
 
 
@@ -299,24 +308,18 @@ export function navLinkBubble(event: Event, element: Element): void {
 
 /**
  * Anime l'icône du FAB si elle change entre deux sections.
- * (Inutilisé pour l'instant, mais garder.)
- * @param sectionCible 
- * @param animations 
  */
-async function animateFabIcon(sectionCible: string, animations = false) {
+async function animateFabIcon(ancienneSection: Section, nouvelleSection: Section) {
   const fab = document.querySelector('.fab')!;
   const fabIcon = fab.querySelector('.material-icons')!;
   type startendAnimations = { start: Animation | null, end: Animation | null };
   const animFabIcon: startendAnimations = { start: null, end: null };
 
-  if (!animations) {
-    if (sectionCible == 'chasses-en-cours') fab.classList.add('add');
-    else fab.classList.remove('add');
-    return;
-  }
+  const k1 = sections.findIndex(section => section.nom === ancienneSection.nom);
+  const k2 = sections.findIndex(section => section.nom === nouvelleSection.nom);
 
   // On joue les animations
-  let deg = (sectionCible == 'chasses-en-cours') ? '90deg' : '-90deg';
+  let deg = (k2 >= k1) ? '90deg' : '-90deg';
   animFabIcon.start = fabIcon.animate([
     { transform: 'translate3D(0, 0, 0) rotate(0)', opacity: '1' },
     { transform: 'translate3D(0, 0, 0) rotate(' + deg + ')', opacity: '0' }
@@ -325,13 +328,11 @@ async function animateFabIcon(sectionCible: string, animations = false) {
     duration: 100,
     fill: 'forwards'
   });
-
   await wait(animFabIcon.start);
 
-  if (sectionCible == 'chasses-en-cours') fab.classList.add('add');
-  else fab.classList.remove('add');
+  fabIcon.innerHTML = nouvelleSection.fab || '';
   
-  deg = (sectionCible == 'chasses-en-cours') ? '-90deg' : '+90deg';
+  deg = (k2 >= k1) ? '-90deg' : '+90deg';
   animFabIcon.end = fabIcon.animate([
     { transform: 'translate3D(0, 0, 0) rotate(' + deg + ')', opacity: '0' },
     { transform: 'translate3D(0, 0, 0) rotate(0)', opacity: '1' }
@@ -340,7 +341,6 @@ async function animateFabIcon(sectionCible: string, animations = false) {
     duration: 100,
     fill: 'backwards'
   });
-
   await wait(animFabIcon.end);
 
   animFabIcon.start?.cancel();

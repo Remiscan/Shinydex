@@ -147,7 +147,7 @@
 
       <!-- FAB -->
       <button type="button" class="fab">
-        <i class="material-icons"></i>
+        <i class="material-icons">add</i>
       </button>
 
     </main>
