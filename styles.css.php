@@ -253,13 +253,16 @@ main {
   grid-row: 1 / 2;
   grid-column: 1 / 2;
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: hidden;
   position: relative;
+  height: 100%;
 }
 
 section {
   display: none;
   overflow-anchor: none;
+  height: 100%;
+  overflow: hidden;
 }
 
 main > section {
@@ -392,6 +395,10 @@ h1 {
   padding-top: 0;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: 100%;
+  box-sizing: border-box;
 }
 
 
