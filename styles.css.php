@@ -297,22 +297,11 @@ h1 {
   position: sticky;
   top: 0;
   z-index: var(--z-section-titre);
+  background-color: var(--bg-color);
 }
 
 .section-titre>* {
   z-index: 1;
-}
-
-.section-titre::before {
-  content: '';
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  background-color: var(--bg-color);
-  opacity: .95;
-  z-index: 0;
 }
 
 .spacer {
