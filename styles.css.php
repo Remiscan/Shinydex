@@ -401,6 +401,10 @@ h1 {
   box-sizing: border-box;
 }
 
+body[data-section-actuelle~="obfuscator"] .section-contenu {
+  overflow-y: hidden;
+}
+
 
 /*
  * FAB
