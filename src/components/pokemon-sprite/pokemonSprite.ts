@@ -169,16 +169,11 @@ class pokemonSprite extends HTMLElement {
     let value: number | string | boolean;
     switch (param) {
       case 'dexid':
-      case 'candy':
         value = Number(newValue) || 0;
-        break;
-      case 'gender':
-        value = ['m', 'f', 'mf', 'uk'].includes(newValue) ? newValue : 'uk';
         break;
       case 'forme':
         value = newValue || '';
         break;
-      case 'gigamax':
       case 'backside':
       case 'shiny':
         value = newValue === 'true' ? true : false;
@@ -215,7 +210,7 @@ class pokemonSprite extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ['dexid', 'forme', 'gender', 'gigamax', 'candy', 'backside', 'shiny', 'size', 'format', 'lazy'];
+    return ['dexid', 'forme', 'backside', 'shiny', 'size', 'format', 'lazy'];
   }
 
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {
