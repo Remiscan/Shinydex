@@ -134,7 +134,15 @@
 
       <!-- À propos -->
       <section id="a-propos">
-        <?php include './pages/a-propos.html'; ?>
+        <?php
+        ob_start();
+        include './pages/politique-confidentialite.html';
+        $politique = ob_get_clean();
+        ob_start();
+        include './pages/a-propos.html';
+        $apropos = ob_get_clean();
+        echo str_replace('{{polconf}}', $politique, $apropos);
+        ?>
       </section>
 
       <!-- FAB -->
