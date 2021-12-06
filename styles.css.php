@@ -2201,10 +2201,6 @@ input:disabled + label.switch {
     animation: bulle-nav .3s var(--easing-decelerate);
   }*/
 
-  body[data-section-actuelle~="parametres"] .nav-link[data-section="parametres"] {
-    --nav-text-color: var(--nav-text-color-on);
-  }
-
   main {
     grid-column: 2 / 3;
     display: grid;
@@ -2224,8 +2220,17 @@ input:disabled + label.switch {
     grid-row: 1 / 2;
   }
 
-  body[data-section-actuelle~="mes-chromatiques"] #pokedex {
+  body[data-section-actuelle~="mes-chromatiques"] #pokedex,
+  body[data-section-actuelle~="pokedex"] #mes-chromatiques,
+  body[data-section-actuelle~="parametres"] #a-propos,
+  body[data-section-actuelle~="a-propos"] #parametres {
     display: grid;
+  }
+
+  body[data-section-actuelle~="pokedex"] .nav-link[data-section="mes-chromatiques"],
+  body[data-section-actuelle~="parametres"] .nav-link[data-section="parametres"],
+  body[data-section-actuelle~="a-propos"] .nav-link[data-section="parametres"] {
+    --nav-text-color: var(--nav-text-color-on);
   }
 
   .titre-icones {
@@ -2248,10 +2253,6 @@ input:disabled + label.switch {
   #chasses-en-cours>.section-contenu {
     justify-content: flex-end;
     align-items: center;
-  }
-
-  body[data-section-actuelle~="parametres"] #a-propos {
-    display: grid;
   }
 
   body[data-section-actuelle~="parametres"] main {
