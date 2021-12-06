@@ -1,8 +1,9 @@
+import { DexDatalist } from '../../DexDatalist.js';
 import { Hunt, huntedPokemon } from '../../Hunt.js';
-import { huntStorage, shinyStorage } from '../../localforage.js';
+import { huntStorage, pokemonData, shinyStorage } from '../../localforage.js';
 import { Notif } from '../../notification.js';
-import { Params, warnBeforeDestruction } from '../../Params.js';
-import { Pokemon, Shiny } from '../../Pokemon.js';
+import { warnBeforeDestruction } from '../../Params.js';
+import { Forme, Methode, Pokemon, Shiny } from '../../Pokemon.js';
 import template from './template.js';
 
 
@@ -52,7 +53,7 @@ export class huntCard extends HTMLElement {
   changeHandlers: HandlerMap = {};
   propMap: Map<huntProperty, querySelector> = new Map([
     ['dexid', '#hunt-{id}-espece'],
-    ['formid', '#hunt-{id}-forme'],
+    ['forme', '#hunt-{id}-forme'],
     ['surnom', '#hunt-{id}-surnom'],
     ['methode', '#hunt-{id}-methode'],
     ['compteur', '#hunt-{id}-compteur'],
@@ -178,14 +179,7 @@ export class huntCard extends HTMLElement {
     else      this.classList.remove('edit');
 
     const jeu = hunt.jeu.replace(/[ \']/g, '');
-    const sprite = await hunt.getSprite({ shiny: hunt.caught, size: 64, format: Params.preferredImageFormat });
-  }
 
-  
-  /**
-   * Met à jour la Hunt sauvegardée à partir des informations saisies dans le formulaire.
-   */
-  inputListener() {
     /*
 
 
@@ -193,6 +187,80 @@ export class huntCard extends HTMLElement {
 
 
     */
+  }
+
+  
+  /**
+   * Met à jour la Hunt sauvegardée à partir des informations saisies dans le formulaire.
+   */
+  async inputToData() {
+    const hunt = this.hunt;
+    const getInput = (s: string) => this.querySelector(`#hunt-${hunt.huntid}-${s}`) as HTMLInputElement;
+    const sprite = this.querySelector('pokemon-sprite')!;
+
+    espece: {
+      const input = getInput('espece');
+      const allNames = await Pokemon.namesfr();
+      const dexid = allNames.findIndex(s => s === input.value);
+      hunt.dexid = dexid > 0 ? dexid : 0;
+    }
+    
+    for (const prop of ['forme', 'surnom', 'methode', 'jeu', 'ball', 'notes']) {
+      const input = getInput(prop);
+      Object.assign(hunt, { [prop as keyof Omit<Hunt, 'shinyRate' | 'mine' | 'Jeu'>]: input.value });
+    }
+
+    // Icônes
+    this.querySelector(`.icones.jeu`)!.className = `icones jeu ${hunt.jeu.replace(/[ \']/g, '')}`;
+    this.querySelector(`.icones.ball`)!.className = `pkspr item ball-${hunt.ball}`;
+
+    // Sprite
+    sprite.setAttribute('dexid', String(hunt.dexid));
+    sprite.setAttribute('forme', hunt.forme);
+    sprite.setAttribute('shiny', String(hunt.caught));
+
+    for (const prop of ['checkmark', 'DO', 'charm', 'hacked', 'horsChasse']) {
+      const input = this.querySelector(`input[name="hunt-${hunt.huntid}-${prop}"]:checked`) as HTMLInputElement;
+      let value: any = input.value;
+      switch (prop) {
+        case 'checkmark':
+        case 'hacked':
+          value = parseInt(value);
+          break;
+        default:
+          value = Boolean(parseInt(value));
+      }
+      Object.assign(hunt, { [prop as keyof Omit<Hunt, 'shinyRate' | 'mine' | 'Jeu'>]: value });
+    }
+
+    compteur: {
+      if (hunt.methode === 'Ultra-Brèche') {
+        hunt.compteur = JSON.stringify({
+          distance: parseInt((this.querySelector(`#hunt-${hunt.huntid}-compteur-distance`) as HTMLInputElement).value),
+          rings: parseInt((this.querySelector(`#hunt-${hunt.huntid}-compteur-anneaux`) as HTMLInputElement).value)
+        });
+      } else if (hunt.methode === 'Chaîne de captures') {
+        hunt.compteur = JSON.stringify({
+          chain: parseInt((this.querySelector(`#hunt-${hunt.huntid}-compteur`) as HTMLInputElement).value),
+          lure: ((document.querySelector(`input[name="hunt-${hunt.huntid}-compteur-leurre"]:checked`) as HTMLInputElement).value === '1') ? true : false
+        });
+      } else {
+        hunt.compteur = (this.querySelector(`#hunt-${hunt.huntid}-compteur`) as HTMLInputElement).value;
+      }
+    }
+
+    date: {
+      const input = getInput('date');
+      const date = input.value;
+      const oldDate = (new Date(hunt.timeCapture)).toISOString().split('T')[0];
+      const newTime = date !== oldDate ? (new Date(date)).getTime() : hunt.timeCapture;
+      hunt.timeCapture = newTime;
+    }
+
+    this.dataset.methode = hunt.methode;
+    this.dataset.jeu = hunt.jeu;
+
+    return await huntStorage.setItem(hunt.huntid, hunt);
   }
 
 
@@ -332,8 +400,82 @@ export class huntCard extends HTMLElement {
     };
     handle(this.handlers.deleteShiny);
 
-    // 🔽 Détecte les changements dans le formulaire
-    this.inputListener();
+    // 🔽 Détecte les changements dans le formulaire :
+
+    // Changements de tous les inputs
+    this.handlers.form = {
+      element: this,
+      type: 'change',
+      function: () => this.inputToData()
+    }
+    handle(this.handlers.form);
+
+    // Génère la liste des formes au choix d'un Pokémon
+    // et génère la liste des Pokémon correspondants quand on commence à écrire un nom
+    const inputEspece = this.querySelector('[list="datalist-pokedex"]')! as HTMLInputElement;
+    this.handlers.listeFormes = {
+      element: inputEspece,
+      type: 'input',
+      function: async () => {
+        DexDatalist.build(inputEspece.value);
+        this.genereFormes();
+      }
+    }
+
+    // Génère la liste des méthodes au choix du jeu
+    this.handlers.listeMethodes = {
+      element: this.querySelector('[list="datalist-jeux"]')!,
+      type: 'input',
+      function: () => this.genereMethodes()
+    }
+    handle(this.handlers.listeMethodes);
+  }
+
+
+  /** Génère la liste des formes à partir du Pokémon entré. */
+  async genereFormes() {
+    const inputEspece = this.querySelector('[list="datalist-pokedex"]') as HTMLInputElement;
+    const idFormes = inputEspece.id.replace('espece', 'forme');
+    const select = document.getElementById(idFormes)!;
+    select.innerHTML = '';
+
+    const allNames = await Pokemon.namesfr();
+    const k = allNames.findIndex(p => p == inputEspece.value);
+    if (k == -1) return 'Pokémon inexistant';
+    else {
+      const pkmn = await pokemonData.getItem(String(k));
+      const formes: Forme[] = pkmn.formes.slice().sort((a: Forme, b: Forme) => { if (a.nom == '') return -1; else return 0;});
+      formes.forEach(forme => {
+        if (forme.noShiny == true) return;
+
+        if (forme.dbid != '') select.innerHTML += `<option value="${forme.dbid}">${forme.nom}</option>`;
+        else select.innerHTML += `<option value="" selected>${forme.nom || 'Forme normale'}</option>`;
+      });
+    }
+  }
+
+
+  /** Génère la liste des méthodes à partir du jeu entré. */
+  genereMethodes() {
+    const inputJeu = this.querySelector('[list=datalist-jeux]') as HTMLInputElement;
+    const idMethodes = inputJeu.id.replace('jeu', 'methode');
+    const select = document.getElementById(idMethodes)!;
+    select.innerHTML = '';
+
+    const k = Pokemon.jeux.findIndex(jeu => jeu.nom == inputJeu.value);
+    if (k == -1) return 'Jeu inexistant';
+    else {
+      const methodes: Methode[] = [];
+
+      for (const methode of Shiny.allMethodes) {
+        const k = methode.jeux.findIndex(jeu => jeu.nom == inputJeu.value);
+        if (k != -1) methodes.push(methode);
+      }
+  
+      for (const methode of methodes) {
+        select.innerHTML += `<option>${methode.nom}</option>`;
+      }
+    }
   }
   
 
