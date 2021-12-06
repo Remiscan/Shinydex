@@ -176,43 +176,43 @@ template.innerHTML = `
   </div>
 
   <div class="liste-options caught">
-    <input type="radio" name="hunt-{id}-origin-icon" id="hunt-{id}-origin-icon-none" value="0" checked>
-    <label for="hunt-{id}-origin-icon-none" class="radio origin-icon">
+    <input type="radio" name="hunt-{id}-checkmark" id="hunt-{id}-checkmark-none" value="0" checked>
+    <label for="hunt-{id}-checkmark-none" class="radio checkmark">
       <span class="texte">Autre</span>
     </label>
 
-    <input type="radio" name="hunt-{id}-origin-icon" id="hunt-{id}-origin-icon-galar" value="6">
-    <label for="hunt-{id}-origin-icon-galar" class="radio origin-icon">
+    <input type="radio" name="hunt-{id}-checkmark" id="hunt-{id}-checkmark-galar" value="6">
+    <label for="hunt-{id}-checkmark-galar" class="radio checkmark">
       <span class="icones explain galarborn"></span>
       <span class="texte">Galar</span>
     </label>
 
-    <input type="radio" name="hunt-{id}-origin-icon" id="hunt-{id}-origin-icon-letsgo" value="4">
-    <label for="hunt-{id}-origin-icon-letsgo" class="radio origin-icon">
+    <input type="radio" name="hunt-{id}-checkmark" id="hunt-{id}-checkmark-letsgo" value="4">
+    <label for="hunt-{id}-checkmark-letsgo" class="radio checkmark">
       <span class="icones explain letsgoborn"></span>
       <span class="texte">Let's Go</span>
     </label>
 
-    <input type="radio" name="hunt-{id}-origin-icon" id="hunt-{id}-origin-icon-alola" value="2">
-    <label for="hunt-{id}-origin-icon-alola" class="radio origin-icon">
+    <input type="radio" name="hunt-{id}-checkmark" id="hunt-{id}-checkmark-alola" value="2">
+    <label for="hunt-{id}-checkmark-alola" class="radio checkmark">
       <span class="icones explain alolaborn"></span>
       <span class="texte">Alola</span>
     </label>
 
-    <input type="radio" name="hunt-{id}-origin-icon" id="hunt-{id}-origin-icon-kalos" value="1">
-    <label for="hunt-{id}-origin-icon-kalos" class="radio origin-icon">
+    <input type="radio" name="hunt-{id}-checkmark" id="hunt-{id}-checkmark-kalos" value="1">
+    <label for="hunt-{id}-checkmark-kalos" class="radio checkmark">
       <span class="icones explain kalosborn"></span>
       <span class="texte">Kalos</span>
     </label>
 
-    <input type="radio" name="hunt-{id}-origin-icon" id="hunt-{id}-origin-icon-vc" value="3">
-    <label for="hunt-{id}-origin-icon-vc" class="radio origin-icon">
+    <input type="radio" name="hunt-{id}-checkmark" id="hunt-{id}-checkmark-vc" value="3">
+    <label for="hunt-{id}-checkmark-vc" class="radio checkmark">
       <span class="icones explain vcborn"></span>
       <span class="texte">Console Virtuelle</span>
     </label>
 
-    <input type="radio" name="hunt-{id}-origin-icon" id="hunt-{id}-origin-icon-go" value="5">
-    <label for="hunt-{id}-origin-icon-go" class="radio origin-icon">
+    <input type="radio" name="hunt-{id}-checkmark" id="hunt-{id}-checkmark-go" value="5">
+    <label for="hunt-{id}-checkmark-go" class="radio checkmark">
       <span class="icones explain goborn"></span>
       <span class="texte">Pokémon GO</span>
     </label>
@@ -235,19 +235,19 @@ template.innerHTML = `
     </label>
   </div>
 
-  <div class="titre-options caught options-monjeu">
+  <div class="titre-options caught options-DO">
     <span><span class="oeuf">Œuf</span><span class="raid">Raid</span> trouvé dans mon jeu :</span>
   </div>
 
-  <div class="liste-options caught options-monjeu">
-    <input type="radio" name="hunt-{id}-monjeu" id="hunt-{id}-monjeu-oui" value="1" checked>
-    <label for="hunt-{id}-monjeu-oui" class="radio monjeu">
+  <div class="liste-options caught options-DO">
+    <input type="radio" name="hunt-{id}-DO" id="hunt-{id}-DO-oui" value="1" checked>
+    <label for="hunt-{id}-DO-oui" class="radio DO">
       <span class="icones explain mine"></span>
       <span class="texte">Oui</span>
     </label>
 
-    <input type="radio" name="hunt-{id}-monjeu" id="hunt-{id}-monjeu-non" value="0">
-    <label for="hunt-{id}-monjeu-non" class="radio monjeu">
+    <input type="radio" name="hunt-{id}-DO" id="hunt-{id}-DO-non" value="0">
+    <label for="hunt-{id}-DO-non" class="radio DO">
       <span class="texte">Non</span>
     </label>
   </div>
@@ -281,18 +281,18 @@ template.innerHTML = `
     </label>
   </div>
 
-  <div class="titre-options caught options-aupif">
+  <div class="titre-options caught options-horsChasse">
     <span>Trouvé pendant une shasse :</span>
   </div>
 
-  <div class="liste-options caught options-aupif">
-    <input type="radio" name="hunt-{id}-aupif" id="hunt-{id}-aupif-oui" value="0" checked>
-    <label for="hunt-{id}-aupif-oui" class="radio aupif">
+  <div class="liste-options caught options-horsChasse">
+    <input type="radio" name="hunt-{id}-horsChasse" id="hunt-{id}-horsChasse-oui" value="0" checked>
+    <label for="hunt-{id}-horsChasse-oui" class="radio horsChasse">
       <span class="texte">Oui</span>
     </label>
 
-    <input type="radio" name="hunt-{id}-aupif" id="hunt-{id}-aupif-non" value="1">
-    <label for="hunt-{id}-aupif-non" class="radio aupif">
+    <input type="radio" name="hunt-{id}-horsChasse" id="hunt-{id}-horsChasse-non" value="1">
+    <label for="hunt-{id}-horsChasse-non" class="radio horsChasse">
       <span class="icones explain lucky"></span>
       <span class="texte">Non</span>
     </label>

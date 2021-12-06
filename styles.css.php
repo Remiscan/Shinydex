@@ -1384,7 +1384,7 @@ body[data-hunt-uploading] .loading-bar>.bouton-retour {
   margin-top: 16px;
 }
 
-.hunt-card:not([data-methode="Raid Dynamax"]):not([data-methode="Œuf"]) .options-monjeu {
+.hunt-card:not([data-methode="Raid Dynamax"]):not([data-methode="Œuf"]) .options-DO {
   display: none;
 }
 
@@ -1393,22 +1393,22 @@ body[data-hunt-uploading] .loading-bar>.bouton-retour {
   display: none;
 }
 
-.hunt-card[data-methode="Masuda"] .options-aupif,
-.hunt-card[data-methode="Pokéradar"] .options-aupif,
-.hunt-card[data-methode="Pêche à la chaîne"] .options-aupif,
-.hunt-card[data-methode="Chaîne au Navi-Dex"] .options-aupif,
-.hunt-card[data-methode="Chaîne SOS"] .options-aupif,
-.hunt-card[data-methode="Ultra-Brèche"] .options-aupif,
-.hunt-card[data-methode="Chaîne de captures"] .options-aupif,
-.hunt-card[data-methode="Raid Dynamax"] .options-aupif,
-.hunt-card[data-methode="Sauvage (évènement)"] .options-aupif,
-.hunt-card[data-methode="Sauvage (garanti)"] .options-aupif,
-.hunt-card[data-methode="Glitch"] .options-aupif,
-.hunt-card[data-methode="Distribution"] .options-aupif,
-.hunt-card[data-methode="Échangé"] .options-aupif,
-.hunt-card[data-methode="Échangé (GTS)"] .options-aupif,
-.hunt-card[data-methode="Échange miracle"] .options-aupif,
-.hunt-card[data-methode="Échangé (œuf)"] .options-aupif {
+.hunt-card[data-methode="Masuda"] .options-horsChasse,
+.hunt-card[data-methode="Pokéradar"] .options-horsChasse,
+.hunt-card[data-methode="Pêche à la chaîne"] .options-horsChasse,
+.hunt-card[data-methode="Chaîne au Navi-Dex"] .options-horsChasse,
+.hunt-card[data-methode="Chaîne SOS"] .options-horsChasse,
+.hunt-card[data-methode="Ultra-Brèche"] .options-horsChasse,
+.hunt-card[data-methode="Chaîne de captures"] .options-horsChasse,
+.hunt-card[data-methode="Raid Dynamax"] .options-horsChasse,
+.hunt-card[data-methode="Sauvage (évènement)"] .options-horsChasse,
+.hunt-card[data-methode="Sauvage (garanti)"] .options-horsChasse,
+.hunt-card[data-methode="Glitch"] .options-horsChasse,
+.hunt-card[data-methode="Distribution"] .options-horsChasse,
+.hunt-card[data-methode="Échangé"] .options-horsChasse,
+.hunt-card[data-methode="Échangé (GTS)"] .options-horsChasse,
+.hunt-card[data-methode="Échange miracle"] .options-horsChasse,
+.hunt-card[data-methode="Échangé (œuf)"] .options-horsChasse {
   display: none;
 }
 
@@ -1444,10 +1444,10 @@ body[data-hunt-uploading] .loading-bar>.bouton-retour {
   margin-bottom: 0;
 }
 
-label.radio.origin-icon,
-label.radio.monjeu,
+label.radio.checkmark,
+label.radio.DO,
 label.radio.hacked,
-label.radio.aupif {
+label.radio.horsChasse {
   grid-template-columns: 25px 12px auto;
   align-items: center;
 }
@@ -1461,19 +1461,19 @@ label.radio>.charm {
   margin: 0;
 }
 
-.origin-icon>.icones,
-.monjeu>.icones,
+.checkmark>.icones,
+.DO>.icones,
 .charm>.icones,
 .hacked>.icones,
-.aupif>.icones {
+.horsChasse>.icones {
   grid-column: 2 / 3;
 }
 
-.origin-icon>.texte,
-.monjeu>.texte,
+.checkmark>.texte,
+.DO>.texte,
 .charm>.texte,
 .hacked>.texte,
-.aupif>.texte {
+.horsChasse>.texte {
   grid-column: 3 / 4;
 }
 
