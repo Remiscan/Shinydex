@@ -132,7 +132,7 @@ interface backendShiny {
   huntid: string,
   lastUpdate: string,
   dexid: number,
-  formid: string,
+  forme: string,
   surnom: string,
   methode: string,
   compteur: string,
@@ -261,7 +261,7 @@ class Shiny implements frontendShiny {
   huntid: string = '';
   lastUpdate: number = NaN;
   dexid: number = NaN;
-  formid: string = '';
+  forme: string = '';
   surnom: string = '';
   methode: string = '';
   compteur: string = '';
@@ -289,7 +289,7 @@ class Shiny implements frontendShiny {
    */
   async getEspece(): Promise<backendPokemon> {
     const pokemon = await pokemonData.getItem(String(this.dexid));
-    if (pokemon == null) throw `Aucun Pokémon ne correspond à ce Shiny (${this.surnom} / ${this.formid})`;
+    if (pokemon == null) throw `Aucun Pokémon ne correspond à ce Shiny (${this.surnom} / ${this.forme})`;
     return pokemon;
   }
 
@@ -299,8 +299,8 @@ class Shiny implements frontendShiny {
   async getForme(): Promise<Forme> {
     const pokemon = await this.getEspece();
 
-    const k = pokemon.formes.findIndex(p => p.dbid == this.formid);
-    if (k == -1) throw `La forme de ce Shiny est invalide (${this.surnom} / ${pokemon.namefr} / ${this.formid})`;
+    const k = pokemon.formes.findIndex(p => p.dbid == this.forme);
+    if (k == -1) throw `La forme de ce Shiny est invalide (${this.surnom} / ${pokemon.namefr} / ${this.forme})`;
     return pokemon.formes[k];
   }
 

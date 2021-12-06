@@ -115,7 +115,7 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
         huntid,
         lastUpdate,
         dexid,
-        formid,
+        forme,
         surnom,
         methode,
         compteur,
@@ -132,7 +132,7 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
         :huntid,
         :lastUpdate,
         :dexid,
-        :formid,
+        :forme,
         :surnom,
         :methode,
         :compteur,
@@ -149,7 +149,7 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
       $insert->bindParam(':huntid', $data->{'huntid'}, PDO::PARAM_STR, 13);
       $insert->bindParam(':lastUpdate', $data->{'lastUpdate'}, PDO::PARAM_STR, 13);
       $insert->bindParam(':dexid', $data->{'dexid'}, PDO::PARAM_INT, 4);
-      $insert->bindParam(':formid', $data->{'formid'}, PDO::PARAM_STR, 50);
+      $insert->bindParam(':forme', $data->{'forme'}, PDO::PARAM_STR, 50);
       $insert->bindParam(':surnom', $data->{'surnom'}, PDO::PARAM_STR, 50);
       $insert->bindParam(':methode', $data->{'methode'});
       $insert->bindParam(':compteur', $data->{'compteur'}, PDO::PARAM_STR, 50);
@@ -173,7 +173,7 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
       $insert = $link->prepare('UPDATE mes_shinies SET 
         lastUpdate = :lastUpdate,
         dexid = :dexid,
-        formid =:formid,
+        forme =:forme,
         surnom = :surnom,
         methode = :methode,
         compteur = :compteur,
@@ -190,7 +190,7 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
       $insert->bindParam(':huntid', $data->{'huntid'}, PDO::PARAM_STR, 13);
       $insert->bindParam(':lastUpdate', $data->{'lastUpdate'}, PDO::PARAM_STR, 13);
       $insert->bindParam(':dexid', $data->{'dexid'}, PDO::PARAM_INT, 4);
-      $insert->bindParam(':formid', $data->{'formid'}, PDO::PARAM_STR, 50);
+      $insert->bindParam(':forme', $data->{'forme'}, PDO::PARAM_STR, 50);
       $insert->bindParam(':surnom', $data->{'surnom'}, PDO::PARAM_STR, 50);
       $insert->bindParam(':methode', $data->{'methode'});
       $insert->bindParam(':compteur', $data->{'compteur'}, PDO::PARAM_STR, 50);

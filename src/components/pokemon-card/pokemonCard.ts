@@ -54,7 +54,7 @@ export class pokemonCard extends HTMLElement {
     card.setAttribute('huntid', shiny.huntid);
     card.setAttribute('last-update', String(shiny.lastUpdate));
     card.setAttribute('dexid', String(shiny.dexid));
-    card.setAttribute('forme', shiny.formid);
+    card.setAttribute('forme', shiny.forme);
     card.setAttribute('surnom', shiny.surnom);
     card.setAttribute('methode', shiny.methode);
     card.setAttribute('compteur', shiny.compteur);

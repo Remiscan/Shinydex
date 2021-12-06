@@ -40,7 +40,7 @@ function toNewFormat(shiny: { [key: string]: any }): { [key: string]: any } {
   const renames = new Map([
     ['last_update', 'lastUpdate'],
     ['numero_national', 'dexid'],
-    ['forme', 'formid'],
+    ['formid', 'forme'],
     ['origin', 'checkmark'],
     ['monjeu', 'DO'],
     ['aupif', 'horsChasse'],
