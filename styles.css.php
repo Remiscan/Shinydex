@@ -33,7 +33,6 @@
   --progress-bar-color: var(--fab-color);
   --button-color: var(--fab-color);
   --button-ghost-color: var(--button-color);
-  --loading-bar-color: hsl(0, 0%, 37%);
   --card-edit-bg-color: rgba(240, 240, 240, .7);
 }
 
@@ -67,7 +66,6 @@
   --progress-bar-color: white;
   --button-color: var(--fab-color);
   --button-ghost-color: var(--nav-text-color-on);
-  --loading-bar-color: hsl(0, 0%, 7%);
   --card-edit-bg-color: hsla(0, 0%, 7%, .7);
 }
 /*<?php $body = ob_get_clean();
@@ -88,7 +86,6 @@ html {
   --z-menu-filtres: 50;
   --z-obfuscator: 40;
   --z-section-titre: 35;
-  --z-loading-bar: 31;
   --z-nav: 30;
   --z-notification: 20;
   --z-fab: 10;
@@ -1150,45 +1147,9 @@ body:not([data-section-actuelle="pokedex"]) .only-pokedex {
   100% { opacity: 1; }
 }
 
-.loading-bar {
-  grid-row: 2 / 3;
-  grid-column: 1 / 2;
-  display: grid;
-  place-items: center;
-  z-index: var(--z-loading-bar);
-  --bg-color: var(--loading-bar-color);
-  background-color: var(--bg-color);
-  animation: apparition2 .05s linear .2s;
-  animation-fill-mode: backwards;
-}
-
-.loading-bar>load-spinner {
-  --size: 3em;
-}
-
-.loading-bar>load-spinner,
-.loading-bar>.bouton-retour {
-  grid-area: 1 / 1;
-  z-index: 1;
-}
-
-body:not([data-viewer-loading]):not([data-loading]) .loading-bar {
-  display: none;
-}
-
-body[data-viewer-loading] nav,
-body[data-viewer-open] nav,
-body[data-viewer-loading] .fab,
-body[data-viewer-open] .fab,
-nav.disabled,
-body[data-hunt-uploading] nav,
-body[data-hunt-uploading] .bouton-hunt-submit {
+nav.disabled {
   pointer-events: none;
   filter: brightness(0.4) grayscale(.5);
-}
-
-body[data-hunt-uploading] .loading-bar>.bouton-retour {
-  display: none;
 }
 
 
@@ -2327,10 +2288,6 @@ input:disabled + label.switch {
   .menu-filtres {
     width: 500px;
     left: 128px;
-  }
-
-  .loading-bar {
-    grid-row: 1 / 2;
   }
 
   .notification {

@@ -94,14 +94,6 @@
       </a>
     </nav>
 
-    <!-- Barre de chargement (superposé à nav) -->
-    <div class="loading-bar">
-      <load-spinner></load-spinner>
-      <a class="icone bouton-retour">
-        <i class="material-icons">close</i>
-      </a>
-    </div>
-
     <!-- Contenu de l'appli -->
     <main>
 
