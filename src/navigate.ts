@@ -103,7 +103,7 @@ const sections: Section[] = [
     closeAnimation: () => null,
     historique: true,
     closePrevious: true,
-    preload: [],
+    preload: ['./images/app-icons/icon.svg'],
     fab: null,
     element: document.getElementById('a-propos')!
   }, {
