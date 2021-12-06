@@ -884,6 +884,7 @@ section:not(.defered) .defer,
   height: 100%;
 }
 
+.message-vide-filtres,
 .message-vide {
   display: grid;
   grid-template-columns: 1fr;
@@ -898,15 +899,18 @@ section:not(.defered) .defer,
   justify-self: center;
 }
 
+.message-vide-filtres>.material-icons,
 .message-vide>.material-icons {
   font-size: 42px;
   grid-row: 2 / 3;
 }
 
+.message-vide-filtres>span,
 .message-vide>span {
   grid-row: 3 / 4;
 }
 
+section:not(.vide-filtres) .message-vide-filtres,
 section:not(.vide) .message-vide {
   display: none;
 }
