@@ -148,8 +148,15 @@ const sections: Section[] = [
   }, {
     nom: 'obfuscator',
     rememberPosition: false,
-    openAnimation: (section: Element, event: Event) => {
-      return null;
+    openAnimation: (section: Element, event: Event, data: any) => {
+      return section.animate([
+        { opacity: 0 },
+        { opacity: data?.opacity ?? .3 }
+      ], {
+        easing: Params.easingStandard,
+        duration: 200,
+        fill: 'both'
+      });
     },
     closeAnimation: (section: Element, event: Event) => {
       return null;

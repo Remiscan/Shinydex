@@ -1060,17 +1060,6 @@ body:not([data-section-actuelle="pokedex"]) .only-pokedex {
   display: none;
 }
 
-@keyframes apparition {
-  0% { opacity: 0; }
-  100% { opacity: .3; }
-}
-
-#obfuscator {
-  opacity: .3;
-  z-index: var(--z-obfuscator);
-  animation: apparition .2s var(--easing-standard);
-}
-
 
 
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -1963,7 +1952,6 @@ input:disabled + label.switch {
 
 #obfuscator {
   background-color: black;
-  opacity: .3;
   z-index: var(--z-obfuscator);
 }
 
