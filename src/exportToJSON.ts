@@ -32,7 +32,7 @@ export async function json2import(file: File | Blob | undefined): Promise<string
         importedData.hunts.map((hunt: huntedPokemon) => huntStorage.setItem(hunt.huntid, hunt))
       );
 
-      await upgradeStorage(true);
+      await upgradeStorage();
 
       window.dispatchEvent(new CustomEvent('dataupdate', {
         detail: {

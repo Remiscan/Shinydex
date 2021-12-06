@@ -2,12 +2,7 @@ import { dataStorage, huntStorage, shinyStorage } from './localforage.js';
 
 
 
-export async function upgradeStorage(fromJSON: boolean = false): Promise<void> {
-  const lastStorageUpgrade = Number(await dataStorage.getItem('last-storage-upgrade'));
-  const versionFichiers = await dataStorage.getItem('version-fichiers');
-
-  if (lastStorageUpgrade > versionFichiers && !fromJSON) return;
-
+export async function upgradeStorage(): Promise<void> {
   // Update the structure of stored shiny Pokémon
   const shinyKeys = await shinyStorage.keys();
   for (const key of shinyKeys) {
