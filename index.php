@@ -15,7 +15,7 @@
     <meta name="viewport" content="width=device-width, user-scalable=no">
     <meta name="theme-color" content="#222222">
     
-    <link rel="icon" type="image/png" href="./images/app-icons/icon-192.png">
+    <link rel="icon" type="image/svg+xml" href="./images/app-icons/icon.svg">
     <link rel="apple-touch-icon" href="./images/app-icons/apple-touch-icon.png">
     <link rel="manifest" href="./manifest.json">
 

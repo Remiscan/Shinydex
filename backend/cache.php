@@ -4,7 +4,7 @@ function getCacheFiles() {
   $cache['fichiers'] = [
       "./",
       "./images/app-icons/apple-touch-icon.png",
-      "./images/app-icons/icon-192.png",
+      "./images/app-icons/icon.svg",
       "./ext/pokesprite.css",
       "./ext/pokesprite.png",
       "./ext/localforage.min.js",
