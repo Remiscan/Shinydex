@@ -79,7 +79,9 @@ search-bar[section="ajouter-ami"] .search-options {
 }
 
 search-bar[section="partage"] input[type="radio"].if-partage,
-search-bar[section="partage"] label[for^="ordre"].if-partage {
+search-bar[section="partage"] label[for^="ordre"].if-partage,
+search-bar[section="partage"] input[type="radio"]#ordre-date-ajout,
+search-bar[section="partage"] label[for="ordre-date-ajout"] {
   display: grid;
 }
 
