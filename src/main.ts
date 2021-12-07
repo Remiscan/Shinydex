@@ -58,6 +58,7 @@ document.querySelector('.fab')!.addEventListener('click', async () => {
   // Ajoute un nouvel ami
   else if (sectionActuelle === 'partage') {
     // Ajouter un nouvel ami ici
+    await navigate('obfuscator', new Event('navigate'), { search: true, section: 'ajouter-ami' })
   }
 });
 

@@ -67,6 +67,11 @@ search-bar > input::placeholder {
   clip-path: polygon(0 0, 100% 0, 100% calc(100% + 10px), 0 calc(100% + 10px));
 }
 
+search-bar[section="partage"] .search-options,
+search-bar[section="ajouter-ami"] .search-options {
+  display: none;
+}
+
 .search-suggestions {
   grid-row: 1;
   grid-column: 1;

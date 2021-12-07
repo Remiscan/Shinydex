@@ -42,6 +42,7 @@ export class searchBar extends HTMLElement {
         const section = this.getAttribute('section') || '';
         switch (section) {
           case 'partage': placeholder = 'Rechercher un ami'; break;
+          case 'ajouter-ami': placeholder = 'Ajouter un ami'; break;
         }
         input.setAttribute('placeholder', placeholder);
       } break;
