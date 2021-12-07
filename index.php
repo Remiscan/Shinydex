@@ -62,7 +62,7 @@
 
     <!-- Barre de navigation -->
     <nav class="bottom-bar">
-      <a class="nav-link lien-section search-button" data-section="obfuscator" data-nav-data='{ "search": true, "opacity": 0.75 }'>
+      <a class="nav-link lien-section search-button" data-section="obfuscator" data-nav-data='{ "search": true }'>
         <i class="material-icons">search</i>
       </a>
 

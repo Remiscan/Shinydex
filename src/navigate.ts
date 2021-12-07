@@ -152,7 +152,7 @@ const sections: Section[] = [
     openAnimation: (section: Element, event: Event, data: any) => {
       return section.animate([
         { opacity: 0 },
-        { opacity: data?.opacity ?? .3 }
+        { opacity: data?.opacity ?? .75 }
       ], {
         easing: Params.easingStandard,
         duration: 200,
