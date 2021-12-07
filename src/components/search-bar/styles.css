@@ -9,6 +9,8 @@ search-bar {
   z-index: var(--z-search-bar);
   width: min(100%, 800px);
   margin: 0px auto;
+  --bg: var(--nav-bg-color);
+  background-color: var(--bg);
 }
 
 body[data-search="true"] search-bar {
@@ -23,7 +25,7 @@ search-bar > input[type="text"] {
   border: none;
   border-radius: 50px;
   box-shadow: none;
-  background-color: var(--nav-bg-color);
+  background-color: var(--bg-color);
   color: var(--text-color);
   box-shadow: 0 0px 2px rgb(0, 0, 0, .2);
 }
@@ -56,9 +58,13 @@ search-bar > input::placeholder {
   top: 100%;
   left: 0;
   margin: 0;
+  padding: 8px;
   box-sizing: border-box;
-  background-color: transparent;
+  background-color: var(--bg);
   font-size: 1rem;
+  border-radius: 0 0 10px 10px;
+  box-shadow: 0 1px 3px rgb(0, 0, 0, .1);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% + 10px), 0 calc(100% + 10px));
 }
 
 .search-suggestions {
@@ -72,8 +78,8 @@ search-bar > input::placeholder {
   margin: 0;
   padding: 0 16px 8px;
   box-sizing: border-box;
-  background-color: var(--bg-color);
-  border-radius: 0 0 10px 10px;
+  background-color: var(--bg);
+  border-bottom: 8px solid var(--bg-color);
 }
 
 .search-suggestions.on {
@@ -89,9 +95,9 @@ search-bar > input::placeholder {
   grid-column: 1;
   display: flex;
   width: 100%;
-  padding: 8px 0 0 8px;
+  padding-top: 16px 0 8px;
   box-sizing: border-box;
-  background-color: var(--card-bg-color);
+  background-color: var(--bg);
 }
 
 .menu-filtres {
@@ -101,9 +107,7 @@ search-bar > input::placeholder {
   grid-template-rows: 56px auto auto auto auto;
   grid-template-columns: 1fr;
   width: 100%;
-  padding: 0 8px 8px;
   box-sizing: border-box;
-  --bg: var(--card-bg-color);
   background-color: var(--bg);
 }
 
