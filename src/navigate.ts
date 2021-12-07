@@ -259,7 +259,7 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
     case 'obfuscator': {
       if (data.search) {
         const searchBar = document.querySelector(`search-bar`) as searchBar;
-        searchBar.setAttribute('section', ancienneSection.nom);
+        searchBar.setAttribute('section', data.section ?? ancienneSection.nom);
         searchBar?.open();
       }
     } break;
