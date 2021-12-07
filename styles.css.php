@@ -1869,6 +1869,29 @@ input:disabled + label.switch {
 }
 
 
+/*
+ * CHIP (ex: Recherches en cours)
+ */
+
+.chip {
+  display: grid;
+  grid-template-columns: auto 25px;
+  gap: 0 5px;
+  align-items: center;
+  min-height: 24px;
+  padding: 2px;
+  padding-left: 7px;
+  margin: 0 0 8px 8px;
+  position: relative;
+  cursor: pointer;
+  border-radius: 4px;
+  border: 2px solid var(--nav-text-color-on);
+  background: var(--nav-text-color-on);
+  color: var(--bg-color);
+  overflow: hidden;
+}
+
+
 
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!! À PROPOS DU SHINYDEX !!!!!!!!!!!!!!!!!!!!

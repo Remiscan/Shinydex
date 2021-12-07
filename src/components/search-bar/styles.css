@@ -111,22 +111,6 @@ search-bar > input::placeholder {
   background-color: var(--bg);
 }
 
-.search-hint {
-  display: grid;
-  grid-template-columns: auto 25px;
-  gap: 0 5px;
-  align-items: center;
-  min-height: 24px;
-  padding: 2px;
-  padding-left: 7px;
-  margin: 0 0 8px 8px;
-  position: relative;
-  cursor: pointer;
-  border-radius: 4px;
-  border: 2px solid var(--nav-text-color-on);
-  overflow: hidden;
-}
-
 search-bar .sous-titre>span {
   --bg: inherit;
 }
