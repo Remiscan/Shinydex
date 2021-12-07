@@ -128,6 +128,8 @@ export class huntCard extends HTMLElement {
     const shiny = new Shiny(await shinyStorage.getItem(this.hunt.huntid));
     shiny.lastUpdate = this.hunt.lastUpdate;
     shiny.deleted = true;
+    // Si la synchronisation en ligne est désactivée, marquer le shiny comme à 'destroy' immédiatement
+    // if (!onlineSync) shiny.destroy = true;
     await shinyStorage.setItem(this.hunt.huntid, shiny);
 
     window.dispatchEvent(new CustomEvent('dataupdate', {

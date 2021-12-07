@@ -121,12 +121,13 @@ export async function appStart() {
 
   // ÉTAPE 4 : on nettoie les données locales
 
-  // Si des shiny marqués à 'destroy' sont stockés, on les supprime
+  // Si des shiny marqués à 'destroy' sont stockés depuis plus d'un mois, on les supprime
   const shinyKeys = await shinyStorage.keys();
   const shinyMons = await Promise.all(
     shinyKeys.map(key => shinyStorage.getItem(key))
   );
-  const toDestroy = shinyMons.filter(shiny => shiny.destroy === true);
+  const month = 1000 * 60 * 60 * 24 * 30;
+  const toDestroy = shinyMons.filter(shiny => shiny.destroy === true && shiny.lastUpdate + month < Date.now());
   await Promise.all(
     toDestroy.map(shiny => shiny.huntid)
              .map(huntid => shinyStorage.removeItem(huntid))
