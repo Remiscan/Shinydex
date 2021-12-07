@@ -62,6 +62,10 @@
 
     <!-- Barre de navigation -->
     <nav class="bottom-bar">
+      <a class="nav-link lien-section search-button" data-section="obfuscator" data-nav-data='{ "search": true, "opacity": 0.5 }'>
+        <i class="material-icons">search</i>
+      </a>
+
       <a class="nav-link lien-section" data-section="mes-chromatiques">
         <i class="material-icons">catching_pokemon</i>
         <span>Pokémon <shiny-stars></shiny-stars></span>
@@ -70,11 +74,6 @@
       <a class="nav-link lien-section" data-section="pokedex">
         <i class="material-icons">public</i>
         <span>Pokédex <shiny-stars></shiny-stars></span>
-      </a>
-
-      <!-- Seulement sur mobile -->
-      <a class="nav-link lien-section only-mobile search-button" data-section="obfuscator" data-nav-data='{ "search": true }'>
-        <i class="material-icons">search</i>
       </a>
 
       <a class="nav-link lien-section" data-section="chasses-en-cours">
@@ -175,8 +174,5 @@
 
       <load-spinner></load-spinner>
     </div>
-
-    <!-- Menu des filtres (trnasférer vers élément custom) -->
-    <?php include './pages/menu-filtres.html'; ?> 
   </body>
 </html>

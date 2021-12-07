@@ -7,7 +7,6 @@ import './components/shiny-stars/shinyStars.js';
 import './components/sprite-viewer/spriteViewer.js';
 import './components/sync-line/syncLine.js';
 import './components/sync-progress/syncProgress.js';
-import { DexDatalist } from './DexDatalist.js';
 import { export2json, json2import } from './exportToJSON.js';
 import { ListeFiltres } from './filtres.js';
 import { dataStorage, huntStorage } from './localforage.js';
@@ -61,14 +60,6 @@ document.querySelector('.fab')!.addEventListener('click', async () => {
     // Ajouter un nouvel ami ici
   }
 });
-
-// Surveille le champ de filtrage par espèce de Pokémon
-{
-  const input = document.querySelector('.menu-filtres')!.querySelector('[list="datalist-pokedex"]') as HTMLInputElement;
-  input.addEventListener('input', async () => {
-    DexDatalist.build(input.value);
-  });
-}
 
 
 

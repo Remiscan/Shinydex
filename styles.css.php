@@ -156,6 +156,11 @@ nav {
   z-index: var(--z-nav);
 }
 
+.search-button {
+  grid-column: 3;
+  grid-row: 1;
+}
+
 .nav-link {
   display: flex;
   flex-direction: column;
@@ -928,33 +933,6 @@ section.vide .defer-loader {
 !!!!! MENU DES FILTRES !!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
-.menu-filtres {
-  display: grid;
-  grid-template-rows: 56px auto auto auto auto;
-  grid-template-columns: 1fr;
-  width: 100%;
-  height: auto;
-  min-height: 100px;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  padding: 0 8px 8px;
-  box-sizing: border-box;
-  background-color: var(--nav-bg-color);
-  border-radius: 10px 10px 0 0;
-  transform: translate3d(0, 100px, 0);
-  opacity: 0;
-  transition: all .1s var(--easing-standard);
-  z-index: var(--z-menu-filtres);
-  pointer-events: none;
-}
-
-.on.menu-filtres {
-  transform: translate3d(0, 0, 0);
-  opacity: 1;
-  pointer-events: auto;
-}
-
 .menu-filtres>.section-titre {
   padding: 0 0 0 8px;
 }
@@ -974,7 +952,11 @@ section.vide .defer-loader {
   margin-bottom: 16px;
 }
 
-body:not([data-section-actuelle="pokedex"]) .sous-titre:not(:nth-child(2)) {
+/*body:not([data-section-actuelle="pokedex"]) .sous-titre:not(:nth-child(2)) {
+  margin-top: 16px;
+}*/
+
+.sous-titre:not(:nth-of-type(1)) {
   margin-top: 16px;
 }
 
@@ -997,9 +979,9 @@ body:not([data-section-actuelle="pokedex"]) .sous-titre:not(:nth-child(2)) {
   margin: 0 32px;
 }
 
-.menu-filtres .sous-titre>span {
+/*.menu-filtres .sous-titre>span {
   --bg: var(--nav-bg-color);
-}
+}*/
 
 .reverse-order__container {
   width: 24px;
@@ -1958,7 +1940,7 @@ input:disabled + label.switch {
 }
 
 #obfuscator {
-  background-color: black;
+  background-color: var(--bg-color);
   z-index: var(--z-obfuscator);
 }
 
@@ -2111,14 +2093,17 @@ input:disabled + label.switch {
     grid-column: 1 / 2;
     grid-row: 1 / 2;
     --nombre-sections: 4;
-    grid-template-rows: repeat(var(--nombre-sections), 84px);
+    grid-template-rows: 56px repeat(var(--nombre-sections), 84px);
     grid-template-columns: auto;
-    padding-top: 56px;
     --nav-bg-color: var(--bg-color);
   }
 
   nav.bottom-bar {
     box-shadow: none;
+  }
+
+  .search-button {
+    grid-column: 1;
   }
 
   .nav-link {

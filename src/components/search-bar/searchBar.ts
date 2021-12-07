@@ -19,7 +19,7 @@ export class searchBar extends HTMLElement {
     document.body.setAttribute('data-search', 'true');
     this.animate([
       { clipPath: 'circle(0 at top center)' },
-      { clipPath: 'circle(100% at top center)' }
+      { clipPath: 'circle(100vmin at top center)' }
     ], {
       duration: 250,
       easing: Params.easingDecelerate,
