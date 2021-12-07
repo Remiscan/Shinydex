@@ -2,6 +2,7 @@ import { populatableSection, populateHandler } from './appContent.js';
 import { appStart, changeAutoMaj, checkUpdate, manualUpdate, setOnlineBackup } from './appLifeCycle.js';
 import './components/load-spinner/loadSpinner.js';
 import './components/pokemon-card/pokemonCard.js';
+import './components/search-bar/searchBar.js';
 import './components/shiny-stars/shinyStars.js';
 import './components/sprite-viewer/spriteViewer.js';
 import './components/sync-line/syncLine.js';

@@ -83,6 +83,7 @@ html {
 
   /* Élévation */
   --z-sprite-viewer: 60;
+  --z-search-bar: 50;
   --z-menu-filtres: 50;
   --z-obfuscator: 40;
   --z-section-titre: 35;
@@ -284,6 +285,7 @@ h1 {
   all: unset;
 }
 
+search-bar,
 .section-titre {
   grid-row: 1 / 2;
   grid-column: 1 / 2;
@@ -312,6 +314,7 @@ h1 {
   min-height: 48px;
 }
 
+search-bar,
 .section-titre.with-button {
   padding-left: 0;
 }

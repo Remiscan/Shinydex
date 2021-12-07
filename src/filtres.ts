@@ -17,7 +17,10 @@ const allFiltres: ListeFiltres = new Map([
 ]);
 const emptyFiltres: ListeFiltres = new Map([
   ['do', []],
-  ['legit', []]
+  ['legit', []],
+  ['jeu', ['*']],
+  ['espece', ['*']],
+  ['surnom', ['*']]
 ]);
 const defautFiltres = new Map(allFiltres);
 
@@ -61,6 +64,15 @@ function getShinyFiltres(shiny: Shiny): FiltresPokemon {
     default:
       filtres.set('legit', 'oui');
   }
+
+  // Jeu
+  filtres.set('jeu', shiny.jeu);
+
+  // Espèce
+  filtres.set('espece', String(shiny.dexid));
+
+  // Surnom
+  filtres.set('surnom', shiny.surnom);
 
   return filtres;
 }

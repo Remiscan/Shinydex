@@ -1,0 +1,32 @@
+@keyframes search-bar-reveal {
+  0% { clip-path: circle(0 at center center); }
+  100% { clip-path: circle(100% at center center); }
+}
+
+search-bar {
+  display: none;
+  animation: search-bar-reveal .5s var(--easing-standard);
+  animation-fill-mode: 'backwards';
+  position: relative;
+  z-index: var(--z-search-bar);
+}
+
+body[data-search="true"] search-bar {
+  display: flex;
+}
+
+search-bar > input[type="text"] {
+  box-sizing: border-box;
+  height: 100%;
+  flex-grow: 1;
+  padding: 2px 24px;
+  border: none;
+  border-radius: 50px;
+  box-shadow: none;
+  background-color: var(--nav-bg-color);
+  color: var(--text-color);
+}
+
+search-bar > input::placeholder {
+  color: var(--text-color-soft);
+}
