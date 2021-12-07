@@ -19,10 +19,10 @@ template.innerHTML = `
 
     <div class="search-hints">
       <template id="search-hint-template">
-        <span class="chip">type : valeur <i class="material-icons">close</i></span>
+        <span class="chip">type : valeur <i class="material-icons">cancel</i></span>
       </template>
-      <span class="chip">Surnom : truc <i class="material-icons">close</i></span>
-      <span class="chip">Jeu : truc <i class="material-icons">close</i></span>
+      <span class="chip">Surnom : truc <i class="material-icons">cancel</i></span>
+      <span class="chip">Jeu : truc <i class="material-icons">cancel</i></span>
     </div>
 
     <div class="menu-filtres">
