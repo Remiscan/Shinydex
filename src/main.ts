@@ -23,7 +23,7 @@ import { backgroundSync } from './syncBackup.js';
 
 // Active les liens de navigation
 for (const link of Array.from(document.querySelectorAll('[data-section]')) as HTMLElement[]) {
-  link.addEventListener('click', event => navigate(link.dataset.section || '', event));
+  link.addEventListener('click', event => navigate(link.dataset.section || '', event, JSON.parse(link.dataset.navData || '{}')));
 }
 
 // Active les bulles sur les liens de navigation

@@ -1,13 +1,9 @@
-@keyframes search-bar-reveal {
-  0% { clip-path: circle(0 at center center); }
-  100% { clip-path: circle(100% at center center); }
-}
-
 search-bar {
   display: none;
-  animation: search-bar-reveal .5s var(--easing-standard);
-  animation-fill-mode: 'backwards';
-  position: relative;
+  height: 56px;
+  box-sizing: border-box;
+  position: sticky;
+  top: 0;
   z-index: var(--z-search-bar);
 }
 
@@ -19,7 +15,7 @@ search-bar > input[type="text"] {
   box-sizing: border-box;
   height: 100%;
   flex-grow: 1;
-  padding: 2px 24px;
+  padding: 2px 56px;
   border: none;
   border-radius: 50px;
   box-shadow: none;
@@ -29,4 +25,42 @@ search-bar > input[type="text"] {
 
 search-bar > input::placeholder {
   color: var(--text-color-soft);
+}
+
+.search-icon {
+  position: absolute;
+  color: var(--text-color-soft);
+  left: calc(56px + 0.5 * 56px - 0.5 * 24px);
+}
+
+.reset-icon {
+  all: unset;
+  width: 56px;
+  height: 56px;
+  position: absolute;
+  color: var(--text-color-soft);
+  display: grid;
+  place-items: center;
+  right: 16px;
+}
+
+.search-suggestions {
+  display: none;
+  width: 100%;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin: 0;
+  padding: 0 16px 8px;
+  box-sizing: border-box;
+  background-color: var(--bg-color);
+  border-radius: 0 0 10px 10px;
+}
+
+.search-suggestions.on {
+  display: block;
+}
+
+.search-suggestions > li {
+  display: none;
 }

@@ -73,7 +73,7 @@
       </a>
 
       <!-- Seulement sur mobile -->
-      <a class="nav-link lien-section only-mobile search-button">
+      <a class="nav-link lien-section only-mobile search-button" data-section="obfuscator" data-nav-data='{ "search": true }'>
         <i class="material-icons">search</i>
       </a>
 
@@ -159,6 +159,9 @@
 
     <!-- Obfuscator -->
     <section id="obfuscator"></section>
+
+    <!-- Barre de recherches -->
+    <search-bar section="mes-chromatiques"></search-bar>
 
     <!-- Notification -->
     <div class="notification bottom-bar off" id="notification">

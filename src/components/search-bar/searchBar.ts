@@ -1,23 +1,51 @@
+import { Params } from '../../Params.js';
 // @ts-expect-error
 import sheet from './styles.css' assert { type: 'css' };
 import template from './template.js';
 
 
 
-class searchBar extends HTMLElement {
+export class searchBar extends HTMLElement {
   ready: boolean = false;
+  resetField: (e: Event) => void = () => {};
 
   constructor() {
     super();
   }
 
 
+  open() {
+    this.querySelector('.search-suggestions')!.removeAttribute('data-type');
+    document.body.setAttribute('data-search', 'true');
+    this.animate([
+      { clipPath: 'circle(0 at top center)' },
+      { clipPath: 'circle(100% at top center)' }
+    ], {
+      duration: 250,
+      easing: Params.easingDecelerate,
+      fill: 'backwards'
+    });
+    this.querySelector('input')!.focus();
+  }
+
+
+  close() {
+    document.body.removeAttribute('data-search');
+  }
+
+
   update(name: string, value: string | null = this.getAttribute(name)) {
     if (!this.ready) return;
     switch (name) {
-      case 'placeholder':
-        this.querySelector('input')?.setAttribute('placeholder', value || '');
-        break;
+      case 'section': {
+        const input = this.querySelector('input')!;
+        let placeholder = 'Rechercher un Pokémon';
+        const section = this.getAttribute('section') || '';
+        switch (section) {
+          case 'partage': placeholder = 'Rechercher un ami'; break;
+        }
+        input.setAttribute('placeholder', placeholder);
+      } break;
     }
   }
   
@@ -31,14 +59,23 @@ class searchBar extends HTMLElement {
     for (const attr of searchBar.observedAttributes) {
       this.update(attr);
     }
+
+    const resetIcon = this.querySelector('.reset-icon')!;
+    resetIcon.addEventListener('click', this.resetField = (event: Event) => {
+      const input = (event.currentTarget as HTMLButtonElement).parentElement?.querySelector('input')!;
+      input.value = '';
+      input.focus();
+    });
   }
 
   disconnectedCallback() {
+    const resetIcon = this.querySelector('.reset-icon')!;
+    resetIcon.removeEventListener('click', this.resetField);
     this.ready = false;
   }
 
   static get observedAttributes() {
-    return ['section', 'placeholder'];
+    return ['section'];
   }
 
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {

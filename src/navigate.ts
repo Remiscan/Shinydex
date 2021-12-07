@@ -1,3 +1,4 @@
+import { searchBar } from './components/search-bar/searchBar.js';
 import { disableLazyLoad, enableLazyLoad } from './lazyLoading.js';
 import { Notif } from './notification.js';
 import { loadAllImages, Params, wait } from './Params.js';
@@ -255,6 +256,16 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
       viewer.setAttribute('dexid', data.dexid || '');
       viewer.setAttribute('shiny', 'true');
       break;
+    case 'obfuscator': {
+      if (data.search) {
+        const searchBar = document.querySelector(`search-bar`) as searchBar;
+        searchBar.setAttribute('section', ancienneSection.nom);
+        searchBar?.open();
+      }
+    } break;
+    default: {
+      document.body.removeAttribute('data-search');
+    }
   }
 
   // On anime le FAB si besoin
