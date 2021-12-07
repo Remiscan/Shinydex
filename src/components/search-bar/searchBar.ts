@@ -20,9 +20,9 @@ export class searchBar extends HTMLElement {
     document.body.setAttribute('data-search', 'true');
     this.animate([
       { clipPath: 'circle(0 at top center)' },
-      { clipPath: 'circle(100vmin at top center)' }
+      { clipPath: 'circle(142% at top center)' }
     ], {
-      duration: 250,
+      duration: 500,
       easing: Params.easingDecelerate,
       fill: 'backwards'
     });
@@ -41,12 +41,18 @@ export class searchBar extends HTMLElement {
       case 'section': {
         const input = this.querySelector('input')!;
         let placeholder = 'Rechercher un Pokémon';
-        const section = this.getAttribute('section') || '';
-        switch (section) {
+        let searchSection = value;
+        switch (value) {
           case 'partage': placeholder = 'Rechercher un ami'; break;
           case 'ajouter-ami': placeholder = 'Ajouter un ami'; break;
+          case 'parametres':
+          case 'a-propos':
+            searchSection = 'mes-chromatiques';
+            break;
         }
         input.setAttribute('placeholder', placeholder);
+        // Ici, récupérer les filtres de la searchSection, et peupler le menu de filtres avec eux.
+        // À FAIRE !!!
       } break;
     }
   }
@@ -70,6 +76,7 @@ export class searchBar extends HTMLElement {
     });
 
     this.querySelector('.search-options')!.addEventListener('change', this.listenToChanges = async event => {
+      // Change l'icône de retour en ✅ si un filtre a été modifié
       const icon = this.querySelector('.bouton-retour>i')!;
       if (icon.innerHTML !== 'done') {
         const anims: { start?: Animation, end?: Animation } = {};
@@ -99,6 +106,9 @@ export class searchBar extends HTMLElement {
         anims.start?.cancel();
         anims.end?.cancel();
       }
+
+      // Ici, construire les filtres à partir du formulaire et de la section, et filtrer la section correspondante.
+      // À FAIRE !!!
     });
   }
 

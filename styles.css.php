@@ -290,7 +290,7 @@ h1 {
   all: unset;
 }
 
-search-bar,
+.search-header,
 .section-titre {
   grid-row: 1 / 2;
   grid-column: 1 / 2;
@@ -319,7 +319,7 @@ search-bar,
   min-height: 48px;
 }
 
-search-bar,
+.search-header,
 .section-titre.with-button {
   padding-left: 0;
 }
@@ -1413,7 +1413,6 @@ input[type=text],
 input[type=date],
 input[type=password],
 select {
-  text-transform: capitalize;
   background-color: var(--input-bg-color);
   color: black;
   border: none;

@@ -2,22 +2,35 @@ search-bar {
   grid-row: 1 / -1;
   grid-column: 1 / -1;
   display: none;
-  height: 56px;
+  grid-template-rows: 56px auto;
+  grid-template-columns: 1fr;
+  height: fit-content;
   box-sizing: border-box;
   position: sticky;
   top: 0;
   z-index: var(--z-search-bar);
   width: min(100%, 800px);
   margin: 0px auto;
+  padding: 0;
   --bg: var(--nav-bg-color);
   background-color: var(--bg);
+  border-radius: 0 0 10px 10px;
+  box-shadow: 0 1px 3px rgb(0, 0, 0, .1);
+  will-change: clip-path;
 }
 
 body[data-search="true"] search-bar {
-  display: flex;
+  display: grid;
 }
 
-search-bar > input[type="text"] {
+.search-header {
+  box-sizing: border-box;
+  padding-left: 0;
+  position: relative;
+  background-color: var(--bg);
+}
+
+.search-header > input[type="text"] {
   box-sizing: border-box;
   height: 100%;
   flex-grow: 1;
@@ -30,7 +43,7 @@ search-bar > input[type="text"] {
   box-shadow: 0 0px 2px rgb(0, 0, 0, .2);
 }
 
-search-bar > input::placeholder {
+.search-header > input::placeholder {
   color: var(--text-color-soft);
 }
 
@@ -52,19 +65,13 @@ search-bar > input::placeholder {
 }
 
 .search-options {
+  grid-row: 2;
   display: grid;
-  position: absolute;
   width: 100%;
   top: 100%;
-  left: 0;
-  margin: 0;
   padding: 8px;
   box-sizing: border-box;
-  background-color: var(--bg);
   font-size: 1rem;
-  border-radius: 0 0 10px 10px;
-  box-shadow: 0 1px 3px rgb(0, 0, 0, .1);
-  clip-path: polygon(0 0, 100% 0, 100% calc(100% + 10px), 0 calc(100% + 10px));
 }
 
 search-bar[section="pokedex"] .if-ordre,

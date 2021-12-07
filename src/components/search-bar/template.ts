@@ -1,13 +1,15 @@
 const template = document.createElement('template');
 template.innerHTML = `
-  <a class="icone bouton-retour">
-    <i class="material-icons">arrow_back</i>
-  </a>
-  <i class="material-icons search-icon">search</i>
-  <input type="text" inputmode="search" enterkeyhint="search" role="searchbox">
-  <button type="button" class="reset-icon">
-    <i class="material-icons">close</i>
-  </button>
+  <div class="search-header">
+    <a class="icone bouton-retour">
+      <i class="material-icons">arrow_back</i>
+    </a>
+    <i class="material-icons search-icon">search</i>
+    <input type="text" inputmode="search" enterkeyhint="search" role="searchbox">
+    <button type="button" class="reset-icon">
+      <i class="material-icons">close</i>
+    </button>
+  </div>
 
   <div class="search-options">
     <div class="search-hints">
