@@ -1885,10 +1885,16 @@ input:disabled + label.switch {
   position: relative;
   cursor: pointer;
   border-radius: 4px;
-  border: 2px solid var(--nav-text-color-on);
-  background: var(--nav-text-color-on);
-  color: var(--bg-color);
+  border: 2px solid var(--radio-off-color);
+  background-color: transparent;
+  color: var(--text-color);
   overflow: hidden;
+}
+
+.chip.checked {
+  border: 2px solid var(--nav-text-color-on);
+  background-color: var(--nav-text-color-on);
+  color: var(--bg-color);
 }
 
 
