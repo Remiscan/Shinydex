@@ -67,9 +67,20 @@ search-bar > input::placeholder {
   clip-path: polygon(0 0, 100% 0, 100% calc(100% + 10px), 0 calc(100% + 10px));
 }
 
-search-bar[section="partage"] .search-options,
+search-bar[section="pokedex"] .if-ordre,
+search-bar[section="chasses-en-cours"] .menu-filtres,
+search-bar[section="corbeille"] .menu-filtres,
+search-bar[section="partage"] .if-filtres,
+search-bar[section="partage"] input[type="radio"],
+search-bar[section="partage"] label[for^="ordre"],
+search-bar:not([section="partage"]) .if-partage,
 search-bar[section="ajouter-ami"] .search-options {
   display: none;
+}
+
+search-bar[section="partage"] input[type="radio"].if-partage,
+search-bar[section="partage"] label[for^="ordre"].if-partage {
+  display: grid;
 }
 
 .search-suggestions {

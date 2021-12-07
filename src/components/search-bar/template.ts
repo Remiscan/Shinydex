@@ -39,7 +39,7 @@ template.innerHTML = `
     </div>
 
     <div class="menu-filtres">
-      <div class="sous-titre">
+      <div class="sous-titre if-ordre">
         <span>Ordonner par :</span>
         <span class="reverse-order__container">
           <button type="button" class="reverse-order">
@@ -48,10 +48,10 @@ template.innerHTML = `
         </span>
       </div>
 
-      <div class="liste-options">
+      <div class="liste-options if-ordre">
         <input type="radio" name="ordre" id="ordre-date" value="date" checked>
         <label for="ordre-date" class="radio ordre">
-          <span>Date</span>
+          <span>Date de capture</span>
         </label>
 
         <input type="radio" name="ordre" id="ordre-taux" value="taux">
@@ -73,13 +73,23 @@ template.innerHTML = `
         <label for="ordre-surnom" class="radio ordre">
           <span>Surnom (alphabétique)</span>
         </label>
+
+        <input type="radio" name="ordre" id="ordre-date-ajout" value="date-ajout">
+        <label for="ordre-date-ajout" class="radio ordre">
+          <span>Date d'ajout</span>
+        </label>
+
+        <input type="radio" name="ordre" id="ordre-pseudo" value="pseudo" class="if-partage">
+        <label for="ordre-pseudo" class="radio ordre if-partage">
+          <span>Pseudo (alphabétique)</span>
+        </label>
       </div>
 
-      <div class="sous-titre">
+      <div class="sous-titre if-filtres">
         <span>Afficher :</span>
       </div>
 
-      <div class="cote-a-cote">
+      <div class="cote-a-cote if-filtres">
         <div class="liste-options">
           <span class="titre-options">Dresseur d'origine :</span>
 
