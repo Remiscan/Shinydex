@@ -1860,27 +1860,18 @@ input:checked + label.checkbox::after {
   margin: 0;
 }
 
-input:disabled + label.radio,
-input:disabled + label.checkbox,
-input:disabled + label.switch {
-  opacity: .5;
-  filter: grayscale(1);
-  cursor: not-allowed;
-}
-
 
 /*
  * CHIP (ex: Recherches en cours)
  */
 
-.chip {
+label.chip {
   display: grid;
-  grid-template-columns: auto 25px;
-  gap: 0 5px;
+  grid-template-columns: auto 0;
+  gap: 0;
   align-items: center;
   min-height: 24px;
-  padding: 2px;
-  padding-left: 7px;
+  padding: 2px 7px;
   margin: 0 0 8px 8px;
   position: relative;
   cursor: pointer;
@@ -1891,10 +1882,34 @@ input:disabled + label.switch {
   overflow: hidden;
 }
 
-.chip.checked {
-  border: 2px solid var(--nav-text-color-on);
+label.chip>span {
+  grid-column: 1;
+  grid-row: 1;
+  margin: auto;
+  font-size: 14px;
+}
+
+input:checked + label.chip {
+  grid-template-columns: auto 24px;
+  gap: 0 5px;
+  padding-right: 2px;
+  border-color: var(--nav-text-color-on);
   background-color: var(--nav-text-color-on);
   color: var(--bg-color);
+}
+
+input:not(:checked) + label.chip > i {
+  display: none;
+}
+
+
+input:disabled + label.radio,
+input:disabled + label.checkbox,
+input:disabled + label.switch,
+input:disabled + label.chip {
+  opacity: .5;
+  filter: grayscale(1);
+  cursor: not-allowed;
 }
 
 

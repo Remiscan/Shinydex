@@ -15,7 +15,6 @@ export class searchBar extends HTMLElement {
 
 
   open() {
-    this.querySelector('.search-suggestions')!.removeAttribute('data-type');
     document.body.setAttribute('data-search', 'true');
     this.animate([
       { clipPath: 'circle(0 at top center)' },

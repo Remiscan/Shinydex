@@ -10,20 +10,32 @@ template.innerHTML = `
   </button>
 
   <div class="search-options">
-    <ul class="search-suggestions">
-      <li class="espece">Pokémon d'espèce <strong>truc</strong></li>
-      <li class="surnom">Pokémon surnommés <strong>truc</strong></li>
-      <li class="jeu">Pokémon capturés dans la version <strong>truc</strong></li>
-      <li class="methode">Pokémon trouvés par la méthode <strong>truc</strong></li>
-    </ul>
-
     <div class="search-hints">
       <template id="search-hint-template">
-        <span class="chip">type : valeur <i class="material-icons">search</i></span>
+        <input type="checkbox" id="chip-id" value="value">
+        <label class="chip" for="chip-id">
+          <span>Type : valeur</span>
+          <i class="material-icons">cancel</i>
+        </label>
       </template>
-      <span class="chip">Espèce : truc <i class="material-icons">search</i></span>
-      <span class="chip checked">Surnom : truc <i class="material-icons">cancel</i></span>
-      <span class="chip checked">Jeu : truc <i class="material-icons">cancel</i></span>
+
+      <input type="checkbox" id="chip-ex1" value="value">
+      <label class="chip" for="chip-ex1">
+        <span>Espèce : truc</span>
+        <i class="material-icons">cancel</i>
+      </label>
+
+      <input type="checkbox" id="chip-ex2" value="value" checked>
+      <label class="chip" for="chip-ex2">
+        <span>Surnom : truc</span>
+        <i class="material-icons">cancel</i>
+      </label>
+
+      <input type="checkbox" id="chip-ex3" value="value" checked>
+      <label class="chip" for="chip-ex3">
+        <span>Jeu : truc</span>
+        <i class="material-icons">cancel</i>
+      </label>
     </div>
 
     <div class="menu-filtres">
