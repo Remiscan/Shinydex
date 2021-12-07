@@ -54,11 +54,6 @@ template.innerHTML = `
           <span>Date</span>
         </label>
 
-        <input type="radio" name="ordre" id="ordre-jeu" value="jeu">
-        <label for="ordre-jeu" class="radio ordre">
-          <span>Jeu</span>
-        </label>
-
         <input type="radio" name="ordre" id="ordre-taux" value="taux">
         <label for="ordre-taux" class="radio ordre">
           <span>Taux</span>
@@ -67,6 +62,16 @@ template.innerHTML = `
         <input type="radio" name="ordre" id="ordre-dex" value="dex">
         <label for="ordre-dex" class="radio ordre">
           <span>N° du Pokédex</span>
+        </label>
+
+        <input type="radio" name="ordre" id="ordre-espece" value="espece">
+        <label for="ordre-espece" class="radio ordre">
+          <span>Espèce (alphabétique)</span>
+        </label>
+
+        <input type="radio" name="ordre" id="ordre-surnom" value="surnom">
+        <label for="ordre-surnom" class="radio ordre">
+          <span>Surnom (alphabétique)</span>
         </label>
       </div>
 

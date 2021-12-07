@@ -1,6 +1,6 @@
 import { pokemonCard } from './components/pokemon-card/pokemonCard.js';
 import { dataStorage, pokemonData, shinyStorage } from './localforage.js';
-import { Shiny } from './Pokemon.js';
+import { Pokemon, Shiny } from './Pokemon.js';
 
 
 
@@ -201,10 +201,24 @@ export async function orderCards(section: string, _ordre?: string, _reversed?: b
       break;
   }
 
+  const noms = await Pokemon.namesfr();
+
   let orderedShiny = allShiny.sort((s1, s2) => {
     switch (ordre) {
       case 'jeu': {
         return s2.jeu.localeCompare(s1.jeu, 'fr') || s2.timeCapture - s1.timeCapture || Number(s2.huntid) - Number(s1.huntid);
+      }
+
+      case 'surnom': {
+        const nom1 = s1.surnom || noms[s1.dexid];
+        const nom2 = s2.surnom || noms[s2.dexid];
+        return nom2.localeCompare(nom1, 'fr') || s2.timeCapture - s1.timeCapture || Number(s2.huntid) - Number(s1.huntid);
+      }
+
+      case 'espece': {
+        const nom1 = noms[s1.dexid];
+        const nom2 = noms[s2.dexid];
+        return nom2.localeCompare(nom1, 'fr') || s2.timeCapture - s1.timeCapture || Number(s2.huntid) - Number(s1.huntid);;
       }
 
       case 'taux': {
