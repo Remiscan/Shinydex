@@ -286,6 +286,14 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
   const newFirstCard = firstCard(nouvelleSection.element);
   if (newFirstCard) enableLazyLoad(newFirstCard);
 
+  // On nettoie l'ancienne section si besoin
+  switch (ancienneSection.nom) {
+    case 'sprite-viewer': {
+      ancienneSection.element.querySelector('.sprite-list.shiny')!.innerHTML = '';
+      ancienneSection.element.querySelector('.sprite-list.regular')!.innerHTML = '';
+    }
+  }
+
   return;
 }
 

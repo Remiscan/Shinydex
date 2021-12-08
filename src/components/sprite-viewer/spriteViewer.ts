@@ -8,6 +8,7 @@ import template from './template.js';
 
 
 class spriteViewer extends HTMLElement {
+  ready: boolean = true;
   toggle: () => void = () => {};
   mode: 'shiny' | 'regular' = 'shiny';
 
@@ -25,7 +26,7 @@ class spriteViewer extends HTMLElement {
 
 
   /** Affiche les sprites de toutes les formes du Pokémon demandé. */
-  async update(dexid: string) {
+  async updateSprites(dexid: string) {
     const pokemon = new Pokemon(await pokemonData.getItem(dexid));
     const nomFormeNormale = 'Normale';
 
@@ -101,11 +102,26 @@ class spriteViewer extends HTMLElement {
     const shiny = (event.currentTarget as HTMLInputElement).checked;
     document.querySelector('#sprite-viewer sprite-viewer')!.setAttribute('shiny', String(shiny));
   }
+
+
+  update(name: string, value: string | null = this.getAttribute(name)) {
+    if (!this.ready) return;
+    switch (name) {
+      case 'dexid': this.updateSprites(value || '0'); break;
+      case 'shiny': (this.querySelector('#switch-shy-reg')! as HTMLInputElement).checked = value === 'true';
+    }
+  }
   
 
   connectedCallback() {
     this.appendChild(template.content.cloneNode(true));
-    document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
+    if (!(document.adoptedStyleSheets.includes(sheet))) {
+      document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
+    }
+    this.ready = true;
+    for (const attr of spriteViewer.observedAttributes) {
+      this.update(attr);
+    }
 
     const spriteScroller = this.querySelector('.sprite-scroller')!;
     const switchSR = this.querySelector('#switch-shy-reg')! as HTMLInputElement;
@@ -118,6 +134,7 @@ class spriteViewer extends HTMLElement {
     const switchSR = this.querySelector('#switch-shy-reg')! as HTMLInputElement;
     switchSR.removeEventListener('change', this.toggleShinyRegular);
     spriteScroller.removeEventListener('click', this.toggle);
+    this.ready = false;
   }
 
   static get observedAttributes() {
@@ -126,10 +143,7 @@ class spriteViewer extends HTMLElement {
 
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {
     if (oldValue === newValue) return;
-    switch (name) {
-      case 'dexid': this.update(newValue); break;
-      case 'shiny': (this.querySelector('#switch-shy-reg')! as HTMLInputElement).checked = newValue === 'true';
-    }
+    this.update(name, newValue);
   }
 }
 
