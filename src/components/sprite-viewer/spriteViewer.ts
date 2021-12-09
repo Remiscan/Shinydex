@@ -107,7 +107,13 @@ class spriteViewer extends HTMLElement {
   update(name: string, value: string | null = this.getAttribute(name)) {
     if (!this.ready) return;
     switch (name) {
-      case 'dexid': this.updateSprites(value || '0'); break;
+      case 'dexid': {
+        if (value != null) this.updateSprites(value);
+        else {
+          this.querySelector('.sprite-list.shiny')!.innerHTML = '';
+          this.querySelector('.sprite-list.regular')!.innerHTML = '';
+        }
+      } break;
       case 'shiny': (this.querySelector('#switch-shy-reg')! as HTMLInputElement).checked = value === 'true';
     }
   }

@@ -289,8 +289,7 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
   // On nettoie l'ancienne section si besoin
   switch (ancienneSection.nom) {
     case 'sprite-viewer': {
-      ancienneSection.element.querySelector('.sprite-list.shiny')!.innerHTML = '';
-      ancienneSection.element.querySelector('.sprite-list.regular')!.innerHTML = '';
+      ancienneSection.element.querySelector('sprite-viewer')?.removeAttribute('dexid');
     }
   }
 
