@@ -1960,7 +1960,7 @@ input:disabled + label.chip {
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-end;
-  opacity: .2;
+  opacity: .7;
   margin-right: -15px;
   font-size: 12px;
 }
