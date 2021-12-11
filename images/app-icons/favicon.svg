@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="70 70 372 372" width="512" height="512">
+  <style>
+  .eye-shadow,
+  .eye {
+    fill: #204098;
+  }
+  .body-circle,
+  #unown-arm > * {
+    stroke: #204098;
+  }
+  use[href="#shiny-star"] {
+    fill: #ffd400;
+  }
+  .ball-center {
+    fill: white;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .eye-shadow,
+    .eye {
+      fill: #60C8F8;
+    }
+    .body-circle,
+    #unown-arm > * {
+      stroke: #60C8F8;
+    }
+    use[href="#shiny-star"] {
+      fill: #fff6cc;
+    }
+  }
+  </style>
+  <defs>
+    <g id="unown-arm">
+      <line x1="256" y1="256" x2="256" y2="336" stroke-width="25" stroke-linecap="round" transform="translate(0 89)"/>
+      <path d="M 256,425 A 160,160 0 0,1 117.75,353.175" stroke-width="25" stroke-linecap="round" fill="transparent"/>
+      <line x1="117.75" y1="353.175" x2="117.75" y2="328" stroke-width="25" stroke-linecap="round" transform="rotate(55 135.6 353.175) translate(0 33)"/>
+    </g>
+    <g id="shiny-star">
+      <svg viewBox="0 0 30 30" width="30" height="30">
+        <path d="M 0 15 L 10.2 10.2 L 15 0 L 19.8 10.2 L 30 15 L 19.8 19.8 L 15 30 L 10.2 19.8 Z"/>
+      </svg>
+    </g>
+  </defs>
+  
+  <g transform="translate(-80 80) rotate(-20 256 256)">
+    <use href="#shiny-star" x="256" y="83" transform-origin="256 83" transform="scale(3) translate(-15 -15)"/>
+    <use href="#shiny-star" x="256" y="83" transform-origin="256 83" transform="scale(1) translate(25 -50)"/>
+  </g>
+
+  <g id="unown">
+    <circle class="body-circle ball-center" cx="256" cy="256" r="89" stroke-width="25"/>
+    <circle class="eye-shadow" cx="256" cy="256" r="52" fill-opacity="0.066"/>
+    <circle class="eye" cx="256" cy="256" r="24"/>
+    <circle class="eye-light" cx="251" cy="251" r="8" fill="white"/>
+    <use href="#unown-arm" transform="rotate(-20 256 256)"/>
+    <use href="#unown-arm" transform="rotate(160 256 256)"/>
+  </g>
+</svg>
