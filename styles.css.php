@@ -2218,8 +2218,10 @@ input:disabled + label.chip {
     display: flex;
   }
 
-  #mes-chromatiques>.section-contenu,
-  #pokedex>.section-contenu {
+  #mes-chromatiques > .section-contenu,
+  #pokedex > .section-contenu,
+  #chasses-en-cours > .section-contenu,
+  #partage > .section-contenu {
     padding-bottom: 0;
   }
 
