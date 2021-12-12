@@ -72,7 +72,7 @@
       </a>
 
       <a class="nav-link lien-section" data-section="pokedex">
-        <i class="material-icons">public</i>
+        <i class="material-icons">language</i>
         <span>Pokédex <shiny-stars></shiny-stars></span>
       </a>
 
