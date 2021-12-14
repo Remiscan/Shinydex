@@ -63,8 +63,11 @@ export async function appStart() {
 
   // On vérifie si les données sont installées
   await Promise.all([dataStorage.ready(), shinyStorage.ready(), pokemonData.ready(), huntStorage.ready()]);
-  const installedVersion = await dataStorage.getItem('version-fichiers');
-  const dataInstalled = installedVersion !== null;
+  const [installedVersion, installedPokemonData] = await Promise.all([
+    dataStorage.getItem('version-fichiers'),
+    pokemonData.getItem('0')
+  ]);
+  const dataInstalled = installedVersion != null && installedPokemonData != null;
 
   // On vérifie si les fichiers sont installés
   const keys = await caches.keys();
