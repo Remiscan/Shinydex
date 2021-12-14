@@ -2,6 +2,11 @@
 <html lang="fr">
 
   <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, user-scalable=no">
+    <meta name="theme-color" content="#222222">
+
     <title>Shinydex</title>
     <meta name="description" content="Pokédex recensant les Pokémon chromatiques possédés par Rémi.">
     <meta property="og:title" content="Shinydex">
@@ -9,11 +14,6 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://remiscan.fr/shinydex/">
     <meta property="og:image" content="https://remiscan.fr/shinydex/images/preview.png">
-
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, user-scalable=no">
-    <meta name="theme-color" content="#222222">
     
     <link rel="icon" type="image/svg+xml" href="./images/app-icons/favicon.svg">
     <link rel="apple-touch-icon" href="./images/app-icons/apple-touch-icon.png">
