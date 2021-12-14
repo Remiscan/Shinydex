@@ -125,29 +125,35 @@ class pokemonSprite extends HTMLElement {
   /** Récupère l'url du sprite demandé en fonction de l'objet des paramètres de sprite. */
   async getSpriteUrl(params = this.params): Promise<string> {
     const pkmn = await pokemonData.getItem(String(params.dexid));
-    const forme = pkmn.formes.find((form: Forme) => form.dbid === params.forme) || pkmn.formes[0];
+    const forme = pkmn?.formes.find((form: Forme) => form.dbid === params.forme) || pkmn?.formes[0];
 
-    // Alcremie shiny forms are all the same
-    const formToConsider = (params.shiny && params.dexid === 869) ? 0 : forme.form;
+    try {
+      if (!forme) throw 'no-form';
 
-    const spriteCaracs = [
-      pad(params.dexid.toString(), 4),
-      pad(formToConsider.toString(), 3),
-      forme.gender,
-      forme.gigamax ? 'g' : 'n',
-      pad(forme.candy.toString(), 8),
-      (typeof forme.hasBackside !== 'undefined' && params.backside === true) ? 'b' : 'f',
-      params.shiny ? 'r' : 'n'
-    ];
+      // Alcremie shiny forms are all the same
+      const formToConsider = (params.shiny && params.dexid === 869) ? 0 : forme.form;
 
-    if (typeof forme.noShiny !== 'undefined' && forme.noShiny === true && params.shiny === true) {
-      const newParams = Object.assign(
-        Object.assign({}, params),
-        { shiny: false }
-      );
-      return await this.getSpriteUrl(newParams);
-    } else {
-      return `/shinydex/pokemon-sprite-${spriteCaracs.join('_')}-${this.spriteSize}.${this.params.format}`;
+      const spriteCaracs = [
+        pad(params.dexid.toString(), 4),
+        pad(formToConsider.toString(), 3),
+        forme.gender,
+        forme.gigamax ? 'g' : 'n',
+        pad(forme.candy.toString(), 8),
+        (typeof forme.hasBackside !== 'undefined' && params.backside === true) ? 'b' : 'f',
+        params.shiny ? 'r' : 'n'
+      ];
+
+      if (typeof forme.noShiny !== 'undefined' && forme.noShiny === true && params.shiny === true) {
+        const newParams = Object.assign(
+          Object.assign({}, params),
+          { shiny: false }
+        );
+        return await this.getSpriteUrl(newParams);
+      } else {
+        return `/shinydex/pokemon-sprite-${spriteCaracs.join('_')}-${this.spriteSize}.${this.params.format}`;
+      }
+    } catch {
+      return `/shinydex/pokemon-sprite-0000_000_uk_n_00000000_f_n-${this.spriteSize}.${this.params.format}`;
     }
   }
 
