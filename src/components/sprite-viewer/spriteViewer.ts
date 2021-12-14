@@ -114,7 +114,10 @@ class spriteViewer extends HTMLElement {
           this.querySelector('.sprite-list.regular')!.innerHTML = '';
         }
       } break;
-      case 'shiny': (this.querySelector('#switch-shy-reg')! as HTMLInputElement).checked = value === 'true';
+      case 'shiny': {
+        const input = this.querySelector('#switch-shy-reg')! as HTMLInputElement;
+        input.checked = value === 'true';
+      } break;
     }
   }
   
