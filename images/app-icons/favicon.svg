@@ -2,11 +2,11 @@
   <style>
   .eye-shadow,
   .eye {
-    fill: #204098;
+    fill: #4051b1;
   }
   .body-circle,
   #unown-arm > * {
-    stroke: #204098;
+    stroke: #4051b1;
   }
   use[href="#shiny-star"] {
     fill: #ffd400;
@@ -18,11 +18,11 @@
   @media (prefers-color-scheme: dark) {
     .eye-shadow,
     .eye {
-      fill: #60C8F8;
+      fill: #87b2f8;
     }
     .body-circle,
     #unown-arm > * {
-      stroke: #60C8F8;
+      stroke: #87b2f8;
     }
     use[href="#shiny-star"] {
       fill: #fff6cc;
