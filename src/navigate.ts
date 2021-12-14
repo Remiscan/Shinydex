@@ -269,9 +269,7 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
   }
 
   // On anime le FAB si besoin
-  if (ancienneSection.fab && nouvelleSection.fab && ancienneSection.fab != nouvelleSection.fab) {
-    animateFabIcon(ancienneSection, nouvelleSection);
-  }
+  animateFabIcon(ancienneSection, nouvelleSection);
 
   // On anime l'apparition de la nouvelle section
   await Promise.all(sectionsToAnimate.map(nom => {
@@ -339,37 +337,42 @@ async function animateFabIcon(ancienneSection: Section, nouvelleSection: Section
   const fabIcon = fab.querySelector('.material-icons')!;
   type startendAnimations = { start: Animation | null, end: Animation | null };
   const animFabIcon: startendAnimations = { start: null, end: null };
+  const animate = ancienneSection.fab && nouvelleSection.fab && ancienneSection.fab != nouvelleSection.fab;
 
   const k1 = sections.findIndex(section => section.nom === ancienneSection.nom);
   const k2 = sections.findIndex(section => section.nom === nouvelleSection.nom);
 
   // On joue les animations
-  let deg = (k2 >= k1) ? '90deg' : '-90deg';
-  animFabIcon.start = fabIcon.animate([
-    { transform: 'translate3D(0, 0, 0) rotate(0)', opacity: '1' },
-    { transform: 'translate3D(0, 0, 0) rotate(' + deg + ')', opacity: '0' }
-  ], {
-    easing: Params.easingAccelerate,
-    duration: 100,
-    fill: 'forwards'
-  });
-  await wait(animFabIcon.start);
+  if (animate) {
+    const deg = (k2 >= k1) ? '90deg' : '-90deg';
+    animFabIcon.start = fabIcon.animate([
+      { transform: 'translate3D(0, 0, 0) rotate(0)', opacity: '1' },
+      { transform: 'translate3D(0, 0, 0) rotate(' + deg + ')', opacity: '0' }
+    ], {
+      easing: Params.easingAccelerate,
+      duration: 100,
+      fill: 'forwards'
+    });
+    await wait(animFabIcon.start);
+  }
 
   fabIcon.innerHTML = nouvelleSection.fab || '';
   
-  deg = (k2 >= k1) ? '-90deg' : '+90deg';
-  animFabIcon.end = fabIcon.animate([
-    { transform: 'translate3D(0, 0, 0) rotate(' + deg + ')', opacity: '0' },
-    { transform: 'translate3D(0, 0, 0) rotate(0)', opacity: '1' }
-  ], {
-    easing: Params.easingDecelerate,
-    duration: 100,
-    fill: 'backwards'
-  });
-  await wait(animFabIcon.end);
+  if (animate) {
+    const deg = (k2 >= k1) ? '-90deg' : '+90deg';
+    animFabIcon.end = fabIcon.animate([
+      { transform: 'translate3D(0, 0, 0) rotate(' + deg + ')', opacity: '0' },
+      { transform: 'translate3D(0, 0, 0) rotate(0)', opacity: '1' }
+    ], {
+      easing: Params.easingDecelerate,
+      duration: 100,
+      fill: 'backwards'
+    });
+    await wait(animFabIcon.end);
 
-  animFabIcon.start?.cancel();
-  animFabIcon.end?.cancel();
+    animFabIcon.start?.cancel();
+    animFabIcon.end?.cancel();
+  }
   return;
 }
 
