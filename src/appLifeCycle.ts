@@ -94,12 +94,26 @@ export async function appStart() {
       loadMessage.style.display = 'block';
     }
     await initServiceWorker();
-    try {
-      const installation = await appUpdate({ data: !dataInstalled, files: !filesInstalled });
-      console.log(...installation);
-    } catch (error) {
-      console.error(error);
-      if (typeof error === 'string') new Notif(error).prompt();
+
+    // On attend l'installation des données avant de continuer
+    if (!dataInstalled) {
+      try {
+        const installation = await appUpdate({ data: true, files: false });
+        console.log(installation[0]);
+      } catch (error) {
+        console.error(error);
+        if (typeof error === 'string') new Notif(error).prompt();
+      }
+    }
+
+    // On laisse l'installation des fichiers se faire en parallèle
+    if (!filesInstalled) {
+      appUpdate({ data: true, files: false })
+      .then(result => console.log(result[1]))
+      .catch(error => {
+        console.error(error);
+        if (typeof error === 'string') new Notif(error).prompt();
+      });
     }
   }
 
