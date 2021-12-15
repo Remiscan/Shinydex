@@ -163,7 +163,7 @@
     <search-bar section="mes-chromatiques"></search-bar>
 
     <!-- Notification -->
-    <div class="notification bottom-bar off" id="notification">
+    <div class="notification bottom-bar" id="notification">
       <span class="notif-texte"></span>
       <div class="notif-bouton">
         <span></span>
