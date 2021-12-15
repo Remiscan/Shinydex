@@ -34,12 +34,10 @@ const PRE_CACHE = 'remidex-sw';
 
 
 // INSTALLATION
-self.addEventListener('install', function(event)
-{
+self.addEventListener('install', function(event) {
   console.log('[install] Installation du service worker...');
   event.waitUntil(
-    getData(true)
-    .then(data => installData(data, 'install'))
+    Promise.all([installData(event), installFiles(event)])
     .catch(raison => console.log('[install] ' + raison))
     .then(() => {
       console.log('[install] Le service worker est bien installé !');
@@ -51,16 +49,14 @@ self.addEventListener('install', function(event)
 
 
 // ACTIVATION
-self.addEventListener('activate', function(event)
-{
+self.addEventListener('activate', function(event) {
   console.log('[activate] Activation du service worker');
   event.waitUntil(self.clients.claim()); // force le service worker à prendre le contrôle de la page immédiatement
 });
 
 
 // FETCH
-self.addEventListener('fetch', function(event)
-{
+self.addEventListener('fetch', function(event) {
   event.respondWith(
     caches.match(event.request)
     .then(matching => {
@@ -72,32 +68,43 @@ self.addEventListener('fetch', function(event)
 
 
 // MESSAGE
-self.addEventListener('message', function(event) {
+self.addEventListener('message', async function(event) {
   console.log('[sw] Message reçu :', event.data);
+  const source = event.source;
+  const action = event.data?.action;
 
-  // FULL UPDATE
-  if (event.data && event.data.action == 'update') {
-    const source = event.source;
-
-    event.waitUntil(
-      getData()
-      .then(data => installData(data, 'update', event))
-      .catch(error => {
-        source.postMessage({ loaded: false, erreur: true });
+  switch (action) {
+    case 'update-files': {
+      try {
+        await installFiles(event);
+        console.log(`[${action}] Installation des fichiers terminée !`);
+        source.postMessage({ action, complete: true });
+      } catch (error) {
         console.error(error);
-      })
-    );
-  }
+        source.postMessage({ action, error });
+      }
+    } break;
 
-  // COMPARE-BACKUP
-  else if (event.data && event.data.action == 'sync-backup') {
-    const source = event.ports[0];
+    case 'update-data': {
+      try {
+        await installData(event);
+        console.log(`[${action}] Installation des données terminée !`);
+        source.postMessage({ action, complete: true });
+      } catch (error) {
+        console.error(error);
+        source.postMessage({ action, error });
+      }
+    } break;
 
-    event.waitUntil(
-      syncBackup(false)
-      .then(() => source.postMessage({ successfulBackupComparison: true, noresponse: true }))
-      .catch(() => source.postMessage({ successfulBackupComparison: false, noresponse: true }))
-    );
+    case 'sync-backup': {
+      const source = event.ports[0];
+
+      event.waitUntil(
+        syncBackup(false)
+        .then(() => source.postMessage({ successfulBackupComparison: true, noresponse: true }))
+        .catch(() => source.postMessage({ successfulBackupComparison: false, noresponse: true }))
+      );
+    } break;
   }
 });
 
@@ -106,10 +113,12 @@ self.addEventListener('message', function(event) {
 self.addEventListener('sync', function(event) {
   console.log('[sw] Requête SYNC reçue :', event.tag);
 
-  if (event.tag == 'SYNC-BACKUP') {
-    event.waitUntil(
-      syncBackup()
-    );
+  switch (event.tag) {
+    case 'SYNC-BACKUP': {
+      event.waitUntil(
+        syncBackup()
+      );
+    } break;
   }
 });
 
@@ -118,42 +127,59 @@ self.addEventListener('sync', function(event) {
 ///// FONCTIONS
 
 
-// Récupérer les données du Shinydex
-function getData() {
-  // On récupère les données les plus récentes
-  const promiseData = fetch('/remidex/backend/update.php?type=full&date=' + Date.now())
-  .then(response => {
-    if (response.status == 200)
-      return response;
-    else
-      throw '[:(] Erreur ' + response.status + ' lors de la requête (mod_update.php)';
-  })
-  .then(response => response.json());
+// Installer les fichiers de l'application
+async function installFiles(event = null) {
+  const [versionRequest, filesRequest] = await Promise.all([
+    fetch(`backend/update.php?type=check&date=${Date.now()}`),
+    fetch(`cache.json.php?date=${Date.now()}`)
+  ]);
+  if (!filesRequest.ok) throw `[:(] Erreur ${response.status} lors de la requête (cache.json.php)`;
+  const files = (await filesRequest.json()).fichiers;
+  const version = (await versionRequest.json())['version-fichiers'];
 
-  // On récupère la liste des fichiers à mettre en cache
-  const promiseFiles = fetch('cache.json.php?date=' + Date.now())
-  .then(response => {
-    if (response.status == 200)
-      return response;
-    else
-      throw '[:(] Erreur ' + response.status + ' lors de la requête (cache.json.php)';
-  })
-  .then(response => response.json());
+  const newCACHE = `${PRE_CACHE}-${version}`;
+  const source = event?.source || null;
+  const action = event?.data?.action || 'install';
 
-  // On récupère en parallèle les données et la liste des fichiers
-  return Promise.all([promiseData, promiseFiles]);
+  try {
+    console.log(`[${action}] Mise en cache des fichiers :`, files);
+    const cache = await caches.open(newCACHE);
+    await Promise.all(files.map(async url => {
+      const request = new Request(url, { cache: 'reload' });
+      const response = await fetch(request);
+      if (!response.ok) throw Error(`[${action}] Un fichier n\'a pas pu être récupéré : (${request.url})`);
+      await cache.put(request, response);
+
+      if (source) source.postMessage({ action: 'update-files', loaded: true, total: files.length, url: url });
+      return;
+    }));
+    console.log(`[${action}] Mise en cache des fichiers terminée !`);
+    deleteOldCaches(newCACHE, action);
+  }
+
+  // Si le nouveau cache n'a pas été complété, ou que les données n'ont pas pu être récupérées,
+  // on supprime le nouveau cache.
+  catch (error) {
+    await caches.delete(newCACHE);
+    console.log(`[${action}] Installation des fichiers annulée.`);
+    throw error;
+  }
+  
+  return;
 }
 
 
-// Installer les données du Shinydex
-async function installData([data, files], action = 'install', event = null) {
-  const newCACHE = PRE_CACHE + '-' + data['version-fichiers'];
-  const totalFichiers = files.fichiers.length;
+// Installer les données de l'application
+async function installData(event = null) {
+  const dataRequest = await fetch(`backend/update.php?type=full&date=${Date.now()}`);
+  if (!dataRequest.ok) throw `[:(] Erreur ${response.status} lors de la requête (update.php)`;
+  const data = await dataRequest.json();
+
+  const action = event?.data?.action || 'install';
 
   try {
-    // Mise à jour des données
     console.log(`[${action}] Installation des données...`);
-    await Promise.all([dataStorage.ready(), shinyStorage.ready(), pokemonData.ready()]);
+    await Promise.all([dataStorage.ready(), pokemonData.ready()]);
     await dataStorage.setItem('version-fichiers', Number(data['version-fichiers']));
     await dataStorage.setItem('pokemon-names', data['pokemon-names']);
     await dataStorage.setItem('pokemon-names-fr', data['pokemon-names-fr']);
@@ -161,69 +187,34 @@ async function installData([data, files], action = 'install', event = null) {
       data['pokemon-data'].map(pkmn => pokemonData.setItem(String(pkmn.dexid), pkmn))
     );
     console.log(`[${action}] Installation des données terminée !`);
-
-    // Mise à jour des fichiers
-    console.log(`[${action}] Mise en cache des fichiers :`, files.fichiers);
-    const cache = await caches.open(newCACHE);
-    await Promise.all(
-      files.fichiers.map(async url => {
-        const request = new Request(url, {cache: 'reload'});
-        const response = await fetch(request);
-        if (!response.ok)
-          throw Error(`[${action}] Un fichier n\'a pas pu être récupéré : (${request.url})`);
-        await cache.put(request, response);
-        
-        if (event != null) {
-          const source = event.source;
-          source.postMessage({ loaded: true, total: totalFichiers, url: url });
-        }
-        return;
-      })
-    );
-    console.log(`[${action}] Mise en cache des fichiers terminée !`);
-  }
-
-  // Si le nouveau cache n'a pas été complété, ou que les données n'ont pas pu être récupérées,
-  // on supprime le nouveau cache.
-  catch(error) {
-    await caches.delete(newCACHE);
+  } catch (error) {
     console.error(error);
-    throw Error(`[${action}] Installation annulée.`);
-  }
-
-  // Si le nouveau cache et les nouvelles données ont tous deux été correctement installés
-  try {
-    await deleteOldCaches(newCACHE, action);
-    if (event != null) {
-      const responsePORT = event.ports[0];
-      responsePORT.postMessage({message: `[${action}] Installation de l'appli. terminée !`});
-    }
-  } catch(error) {
-    throw error;
+    throw Error(`[${action}] Installation des données annulée.`);
   }
 }
 
 
 // Supprimer tous les caches qui ne sont pas newCache
-async function deleteOldCaches(newCache, action)
-{
+async function deleteOldCaches(newCache, action) {
   try {
     const allCaches = await caches.keys();
-    if (allCaches.length <= 1)
-      throw 'Aucun cache redondant à supprimer';
-    console.log('[' + action + '] Nettoyage des anciennes versions du cache');
+    if (allCaches.length <= 1) throw 'no-cache';
+
+    console.log(`[${action}] Nettoyage des anciennes versions du cache`);
     await Promise.all(
       allCaches.map(ceCache => {
         if (ceCache.startsWith(PRE_CACHE) && newCache != ceCache) return caches.delete(ceCache);
-        else return;
+        else return Promise.resolve();
       })
     );
-    console.log('[' + action + '] Nettoyage terminé !');
-    return '[' + action + '] Nettoyage terminé !';
+    
+    console.log(`[${action}] Nettoyage terminé !`);
+  } catch (error) {
+    if (error === 'no-cache') console.log('Aucun cache redondant à supprimer');
+    else                      console.error(error);
   }
-  catch (error) {
-    return console.log(error);
-  }
+
+  return;
 }
 
 

@@ -95,8 +95,8 @@ export async function appStart() {
     }
     await initServiceWorker();
     try {
-      const installation = await appUpdate();
-      console.log(installation);
+      const installation = await appUpdate({ data: !dataInstalled, files: !filesInstalled });
+      console.log(...installation);
     } catch (error) {
       console.error(error);
       if (typeof error === 'string') new Notif(error).prompt();
@@ -240,45 +240,68 @@ export async function appStart() {
 
 ///////////////////////////
 // Met à jour l'application
-function appUpdate(update = false) {
+interface updateParams {
+  data: boolean;
+  files: boolean;
+};
+async function appUpdate(params: updateParams = { data: true, files: true }) {
   const progressBar = document.querySelector('.progression-maj') as HTMLElement;
   progressBar.style.setProperty('--progression', '0');
 
-  return new Promise((resolve, reject) => {
-    if (typeof currentWorker === 'undefined' || currentWorker == null)
-      return reject('[:(] Service worker indisponible');
+  if (!currentWorker) throw '[:(] Service worker indisponible';
 
-    // On demande au service worker de mettre à jour l'appli' et on attend sa réponse
-    const chan = new MessageChannel();
+  let dataHandler = (e: MessageEvent) => {};
+  let filesHandler = (e: MessageEvent) => {};
 
-    // On se prépare à recevoir la réponse
-    chan.port1.onmessage = function(event) {
-      if (event.data.error) {
-        console.error(event.data.error);
-        reject('[:(] Erreur de contact du service worker');
-      } else {
-        if (update) {
-          progressBar.style.setProperty('--progression', '1');
-          setTimeout(function() { location.reload(); }, 100);
-        }
-        resolve('[:)] Installation terminée !');
+  const promiseData = () => new Promise((resolve, reject) => {
+    if (!params.data) return resolve(true);
+
+    navigator.serviceWorker.addEventListener('message', dataHandler = (event: MessageEvent) => {
+      if (event.data.action !== 'update-data') return;
+
+      if (event.data.error)         reject(event.data.error);
+      else if (event.data.complete) resolve('[:)] Installation des données terminée !');
+    });
+
+    currentWorker?.postMessage({ 'action': 'update-data' });
+  });
+
+  const promiseFiles = () => new Promise((resolve, reject) => {
+    if (!params.files) return resolve(true);
+
+    let loaded = 0;
+    navigator.serviceWorker.addEventListener('message', filesHandler = (event: MessageEvent) => {
+      if (event.data.action !== 'update-files') return;
+
+      // En cas d'erreur
+      if (event.data.error) reject(event.data.error);
+  
+      // Si la mise à jour est terminée
+      else if (event.data.complete) {
+        progressBar.style.setProperty('--progression', '1');
+        resolve('[:)] Installation des fichiers terminée !');
       }
-    }
-
-    // On contacte le SW
-    currentWorker.postMessage({ 'action': 'update' }, [chan.port2]);
-
-    // On surveille l'avancée du SW grâce aux messages qu'il envoie
-    let totalLoaded = 0;
-    navigator.serviceWorker.addEventListener('message', event => {
-      if (event.data.loaded) {
-        totalLoaded++;
-        progressBar.style.setProperty('--progression', String(totalLoaded / (event.data.total + 1)));
-      } else if (!event.data.loaded && event.data.erreur) {
-        reject('[:(] Certains fichiers n\'ont pas pu être installés');
+      
+      // Si un fichier vient d'être installé
+      else if (event.data.loaded) {
+        loaded++;
+        const total = event.data.total + 1;
+        progressBar.style.setProperty('--progression', String(loaded / total));
       }
     });
+
+    currentWorker?.postMessage({ 'action': 'update-files' });
   });
+
+  try {
+    return await Promise.all([promiseData(), promiseFiles()]);
+  } catch (error) {
+    console.error(error);
+    throw error;
+  } finally {
+    navigator.serviceWorker.removeEventListener('message', dataHandler);
+    navigator.serviceWorker.removeEventListener('message', filesHandler);
+  }
 }
 
 
@@ -294,8 +317,9 @@ export async function manualUpdate() {
 
     document.querySelector('.notif-texte')!.innerHTML = 'Installation en cours...';
     document.getElementById('notification')!.classList.add('installing');
-    const result = await appUpdate(true);
-    return console.log(result);
+    const result = await appUpdate({ data: true, files: true });
+    console.log(result);
+    return location.reload();
   }
   catch (raison) {
     console.error(raison);

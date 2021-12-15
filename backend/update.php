@@ -10,8 +10,7 @@ clearstatcache();
 
 //////////////////////////////////////////////////////////
 // Vérifie les dates de dernière modification des fichiers
-function getFilesVersion()
-{
+function getFilesVersion() {
   $rootDir = dirname(__DIR__, 1);
 
   $listeFichiers = getCacheFiles()['fichiers'];
@@ -39,8 +38,7 @@ function getFilesVersion()
 
 //////////////////////////////////////////////////////////
 // Récupère les infos sur tous les Pokémon et leurs formes
-function getPokemonData()
-{
+function getPokemonData() {
   $rootDir = dirname(__DIR__, 1);
 
   $dir = "$rootDir/images/pokemon-sprites/home";
@@ -61,14 +59,12 @@ function getPokemonData()
 $results = array();
 
 // Si on vérifie juste la disponibilité d'une mise à jour de l'application
-if (isset($_GET['type']) && $_GET['type'] == 'check')
-{
+if (isset($_GET['type']) && $_GET['type'] == 'check') {
   $results['version-fichiers'] = getFilesVersion();
 }
 
 // Si on veut installer tous les fichiers et données
-else
-{
+else {
   $results['version-fichiers'] = getFilesVersion();
   $results['pokemon-data'] = getPokemonData();
   $results['pokemon-names'] = Pokemon::ALL_POKEMON;
