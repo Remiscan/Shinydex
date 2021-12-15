@@ -356,7 +356,7 @@ async function animateFabIcon(ancienneSection: Section, nouvelleSection: Section
     await wait(animFabIcon.start);
   }
 
-  fabIcon.innerHTML = nouvelleSection.fab || '';
+  if (nouvelleSection.fab) fabIcon.innerHTML = nouvelleSection.fab || '';
   
   if (animate) {
     const deg = (k2 >= k1) ? '-90deg' : '+90deg';
