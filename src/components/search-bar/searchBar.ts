@@ -40,12 +40,12 @@ export class searchBar extends HTMLElement {
     switch (name) {
       case 'section': {
         const input = this.querySelector('input')!;
-        let placeholder = 'Rechercher dans vos Pokémon';
+        let placeholder = 'Rechercher dans mes Pokémon';
         let searchSection = value;
         switch (value) {
-          case 'chasses-en-cours': placeholder = 'Rechercher dans vos chasses'; break;
+          case 'chasses-en-cours': placeholder = 'Rechercher dans mes chasses'; break;
           case 'corbeille':        placeholder = 'Rechercher dans la corbeille'; break;
-          case 'partage':          placeholder = 'Rechercher dans vos amis'; break;
+          case 'partage':          placeholder = 'Rechercher dans mes amis'; break;
           case 'ajouter-ami':      placeholder = 'Ajouter un ami'; break;
           case 'chromatiques-ami': placeholder = 'Rechercher dans les Pokémon de {pseudo}'; break;
           case 'parametres':
