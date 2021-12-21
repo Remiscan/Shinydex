@@ -130,15 +130,6 @@ body {
   font-family: Roboto, system-ui;
 }
 
-::-webkit-scrollbar {
-  width: 0;
-}
-@supports (scrollbar-width: 0) {
-  * {
-    scrollbar-width: 0;
-  }
-}
-
 
 
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -1664,7 +1655,7 @@ input[type=checkbox] {
   width: 0;
   margin: 0;
   opacity: 0;
-  pointer-events: 0;
+  pointer-events: none;
   position: absolute;
 }
 
