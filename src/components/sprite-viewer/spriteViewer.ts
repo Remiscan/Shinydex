@@ -20,7 +20,7 @@ class spriteViewer extends HTMLElement {
 
   reset() {
     this.setAttribute('shiny', 'true');
-    const switchSR = this.querySelector('#switch-shy-reg')! as HTMLInputElement;
+    const switchSR = this.querySelector('shiny-switch')! as HTMLInputElement;
     switchSR.checked = true;
   }
 
@@ -99,7 +99,7 @@ class spriteViewer extends HTMLElement {
 
 
   toggleShinyRegular(event: Event) {
-    const shiny = (event.currentTarget as HTMLInputElement).checked;
+    const shiny = (event.currentTarget! as HTMLInputElement).checked;
     document.querySelector('#sprite-viewer sprite-viewer')!.setAttribute('shiny', String(shiny));
   }
 
@@ -115,7 +115,7 @@ class spriteViewer extends HTMLElement {
         }
       } break;
       case 'shiny': {
-        const input = this.querySelector('#switch-shy-reg')! as HTMLInputElement;
+        const input = this.querySelector('shiny-switch')! as HTMLInputElement;
         input.checked = value === 'true';
       } break;
     }
@@ -133,14 +133,14 @@ class spriteViewer extends HTMLElement {
     }
 
     const spriteScroller = this.querySelector('.sprite-scroller')!;
-    const switchSR = this.querySelector('#switch-shy-reg')! as HTMLInputElement;
+    const switchSR = this.querySelector('shiny-switch')! as HTMLInputElement;
     switchSR.addEventListener('change', this.toggleShinyRegular);
-    spriteScroller.addEventListener('click', this.toggle = () => switchSR.click());
+    spriteScroller.addEventListener('click', this.toggle = () => switchSR.shadowRoot!.querySelector('button')?.click());
   }
 
   disconnectedCallback() {
     const spriteScroller = this.querySelector('.sprite-scroller')!;
-    const switchSR = this.querySelector('#switch-shy-reg')! as HTMLInputElement;
+    const switchSR = this.querySelector('shiny-switch')! as HTMLInputElement;
     switchSR.removeEventListener('change', this.toggleShinyRegular);
     spriteScroller.removeEventListener('click', this.toggle);
     this.ready = false;

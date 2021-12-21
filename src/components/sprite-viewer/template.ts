@@ -1,4 +1,5 @@
 import '../pokemon-sprite/pokemonSprite.js';
+import '../shiny-switch/shinySwitch.js';
 
 
 
@@ -16,10 +17,7 @@ template.innerHTML = `
   <i class="material-icons">close</i>
 </a>
 <div class="switch-shiny-regular">
-  <input type="checkbox" id="switch-shy-reg" value="shiny" checked>
-  <label for="switch-shy-reg" class="switch">
-    <shiny-stars></shiny-stars>
-  </label>
+  <shiny-switch hint="icon"></shiny-switch>
 </div>
 `;
 

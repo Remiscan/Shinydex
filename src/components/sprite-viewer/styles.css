@@ -26,16 +26,7 @@ sprite-viewer {
 }
 
 [for=switch-shy-reg] > shiny-stars {
-  display: none;
-  position: absolute;
-  top: 50%;
-  left: calc(50% - 10px);
-  transform: translate(-50%, -50%);
   --color: var(--sprite-viewer-bg-color);
-}
-
-#switch-shy-reg:checked + [for=switch-shy-reg] > shiny-stars {
-  display: block;
 }
 
 sprite-viewer[shiny="false"] .sprite-list.shiny,
