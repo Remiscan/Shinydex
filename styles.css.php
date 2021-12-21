@@ -1651,61 +1651,49 @@ textarea {
  * SWITCH ON/OFF (ex: Paramètres)
  */
 
-input[type=checkbox] {
-	height: 0;
-  width: 0;
-  margin: 0;
-  opacity: 0;
-  pointer-events: none;
-  position: absolute;
+/*<?php ob_start();?>*/
+:root[data-theme="light"] input-switch {
+  --off-bg-color: hsl(231, 0%, 50%);
+  --on-bg-color: hsl(231, 40%, 50%);
+  --handle-color: white;
+  --off-text-color: var(--handle-color);
+  --on-text-color: var(--handle-color);
 }
 
-label.switch {
-  display: block;
-  --height: 1.625rem;
-	width: calc(var(--height) * 2);
-  height: var(--height);
-  --padding: .1875rem;
-  position: relative;
-  cursor: pointer;
-  border-radius: var(--height);
-  background-color: var(--switch-unchecked-bg-color);
-  overflow: hidden;
+:root[data-theme="dark"] input-switch {
+  --off-bg-color: hsl(217, 0%, 55%);
+  --on-bg-color: hsl(217, 89%, 75%);
+  --handle-color: rgb(48, 48, 48);
+  --off-text-color: var(--handle-color);
+  --on-text-color: var(--handle-color);
+}
+/*<?php $body = ob_get_clean();
+require_once $_SERVER['DOCUMENT_ROOT'] . '/_common/components/theme-selector/build-css.php';
+echo buildThemesStylesheet($body); ?>*/
+
+shiny-switch {
+  --color: currentColor;
 }
 
-label.switch::before {
-	content: '';
-	display: block;
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	background-color: var(--checkbox-checked-bg-color);
-	opacity: 0;
-  transition: opacity .2s var(--easing-decelerate);
+/*<?php ob_start();?>*/
+:root[data-theme="light"] shiny-switch {
+  --off-bg-color: hsl(231, 0%, 50%);
+  --on-bg-color: hsl(231, 40%, 50%);
+  --handle-color: white;
+  --off-text-color: var(--handle-color);
+  --on-text-color: var(--handle-color);
 }
 
-label.switch::after {
-  content: '';
-  display: block;
-  width: calc(var(--height) - 2 * var(--padding));
-	height: calc(var(--height) - 2 * var(--padding));
-	position: absolute;
-	top: var(--padding);
-	left: var(--padding);
-  background-color: var(--bg-color);
-	border-radius: var(--height);
-  transition: transform .2s var(--easing-decelerate);
+:root[data-theme="dark"] shiny-switch {
+  --off-bg-color: hsl(217, 0%, 55%);
+  --on-bg-color: hsl(217, 89%, 75%);
+  --handle-color: rgb(48, 48, 48);
+  --off-text-color: var(--handle-color);
+  --on-text-color: var(--handle-color);
 }
-
-input:checked + label.switch::before {
-  opacity: 1;
-}
-
-input:checked + label.switch::after {
-	transform: translateX(calc(2.875rem - 100%));
-}
+/*<?php $body = ob_get_clean();
+require_once $_SERVER['DOCUMENT_ROOT'] . '/_common/components/theme-selector/build-css.php';
+echo buildThemesStylesheet($body); ?>*/
 
 
 /*
