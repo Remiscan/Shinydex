@@ -1774,6 +1774,15 @@ input:checked + label.radio::after {
  * INPUT TYPE CHECKBOX (ex: Choix des filtres)
  */
 
+input[type=checkbox] {
+	height: 0;
+  width: 0;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
 label.checkbox {
   display: grid;
   grid-template-columns: 25px auto;
