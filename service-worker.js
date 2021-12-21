@@ -158,7 +158,7 @@ async function installFiles(event = null, localVersion = 0) {
     const cache = await caches.open(newCACHE);
     await Promise.all(files.map(async url => {
       let response;
-      const request = new Request(url, { cache: 'reload' });
+      const request = new Request(url, { cache: 'no-store' });
 
       if (filesToInstall.includes(url)) {
         response = await fetch(request);

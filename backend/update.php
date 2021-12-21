@@ -16,12 +16,24 @@ function getFilesVersion(int $versionFrom = 0): array {
 
   $listeFichiers = getCacheFiles()['fichiers'];
   $listeFichiers[0] = './index.php';
-  foreach(glob('./pages/*.html') as $f) {
-    $listeFichiers[] = $f;
+
+  // Ajoute les pages HTML des sections à la liste de fichiers
+  $pages = new RecursiveIteratorIterator(
+    new RecursiveDirectoryIterator(
+      dirname(__DIR__, 1).'/pages',
+      RecursiveDirectoryIterator::SKIP_DOTS
+    ),
+    RecursiveIteratorIterator::SELF_FIRST
+  );
+  foreach($pages as $path => $filename) {
+    $listeFichiers[] = str_replace(dirname(__DIR__, 1), '.', $path);
   }
 
+  // Calcule la version de fichier la plus récente
+  // et la liste des fichiers modifiés.
   $versionFichiers = 0;
   $listeFichiersModifies = [];
+  $index = false;
   foreach($listeFichiers as $fichier) {
     $path = $fichier;
     if (str_starts_with($path, '../'))
@@ -30,11 +42,16 @@ function getFilesVersion(int $versionFrom = 0): array {
       $path = str_replace('./', dirname(__DIR__, 1).'/', $path);
     $dateFichier = filemtime($path);
 
-    if ($dateFichier > $versionFrom / 1000)
-      $listeFichiersModifies[] = $fichier;
+    if ($dateFichier > $versionFrom / 1000) {
+      if (str_ends_with($path, '.html') || str_ends_with($path, 'index.php'))
+        $index = true;
+      else
+        $listeFichiersModifies[] = $fichier;
+    }
     if ($dateFichier > $versionFichiers)
       $versionFichiers = $dateFichier;
   }
+  if ($index) $listeFichiersModifies[] = './index.php';
   // timestamp à 10 digits, généré par PHP
   return [
     $versionFichiers * 1000,
