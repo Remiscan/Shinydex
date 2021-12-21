@@ -1581,6 +1581,7 @@ textarea {
 
 .un-parametre>label,
 .un-parametre>input,
+.un-parametre>input-switch,
 .un-parametre>.param {
   grid-row: 1 / 3;
   grid-column: 2 / 3;

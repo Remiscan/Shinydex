@@ -1,3 +1,4 @@
+import '../../_common/components/input-switch/input-switch.js';
 import { populatableSection, populateHandler } from './appContent.js';
 import { appStart, changeAutoMaj, checkUpdate, manualUpdate, setOnlineBackup } from './appLifeCycle.js';
 import './components/load-spinner/loadSpinner.js';
