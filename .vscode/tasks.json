@@ -3,7 +3,7 @@
   "tasks": [
     {
       "type": "shell",
-      "command": "tsc.cmd",
+      "command": "tsc.cmd --incremental",
       "problemMatcher": ["$tsc"],
       "label": "compile to JS",
       "group": {

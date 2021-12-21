@@ -6,3 +6,4 @@ images/out/
 
 # Ignore compiled js for now
 modules
+tsconfig.tsbuildinfo

@@ -76,7 +76,13 @@ self.addEventListener('message', async function(event) {
   switch (action) {
     case 'update-files': {
       try {
-        await installFiles(event);
+        if (event.data?.partial) {
+          await dataStorage.ready();
+          const localVersion = await dataStorage.getItem('version-fichiers');
+          await installFiles(event, localVersion);
+        } else {
+          await installFiles(event);
+        }
         console.log(`[${action}] Installation des fichiers terminée !`);
         source.postMessage({ action, complete: true });
       } catch (error) {
@@ -128,29 +134,44 @@ self.addEventListener('sync', function(event) {
 
 
 // Installer les fichiers de l'application
-async function installFiles(event = null) {
+async function installFiles(event = null, localVersion = 0) {
   const [versionRequest, filesRequest] = await Promise.all([
-    fetch(`backend/update.php?type=check&date=${Date.now()}`),
+    fetch(`backend/update.php?type=check&from=${localVersion}&date=${Date.now()}`),
     fetch(`cache.json.php?date=${Date.now()}`)
   ]);
   if (!filesRequest.ok) throw `[:(] Erreur ${response.status} lors de la requête (cache.json.php)`;
+
+  const versionData = await versionRequest.json();
+  const version = versionData['version-fichiers'];
+
   const files = (await filesRequest.json()).fichiers;
-  const version = (await versionRequest.json())['version-fichiers'];
+  const modifiedFiles = versionData['liste-fichiers-modifies'];
 
   const newCACHE = `${PRE_CACHE}-${version}`;
   const source = event?.source || null;
   const action = event?.data?.action || 'install';
 
+  const filesToInstall = action === 'update-files' ? modifiedFiles : files;
+
   try {
-    console.log(`[${action}] Mise en cache des fichiers :`, files);
+    console.log(`[${action}] Mise en cache des fichiers :`, filesToInstall);
     const cache = await caches.open(newCACHE);
     await Promise.all(files.map(async url => {
+      let response;
       const request = new Request(url, { cache: 'reload' });
-      const response = await fetch(request);
+
+      if (filesToInstall.includes(url)) {
+        response = await fetch(request);
+      } else {
+        response = (await caches.match(new Request(url))) ?? (await fetch(request));
+      }
+      
+      //const request = new Request(url, { cache: 'reload' });
+      //const response = await fetch(request);
       if (!response.ok) throw Error(`[${action}] Un fichier n\'a pas pu être récupéré : (${request.url})`);
       await cache.put(request, response);
 
-      if (source) source.postMessage({ action: 'update-files', loaded: true, total: files.length, url: url });
+      if (source) source.postMessage({ action: 'update-files', loaded: true, total: filesToInstall.length, url: url });
       return;
     }));
     console.log(`[${action}] Mise en cache des fichiers terminée !`);

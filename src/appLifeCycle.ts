@@ -258,7 +258,7 @@ interface updateParams {
   data: boolean;
   files: boolean;
 };
-async function appUpdate(params: updateParams = { data: true, files: true }) {
+async function appUpdate(params: updateParams = { data: true, files: true }, partial: boolean = true) {
   const progressBar = document.querySelector('.progression-maj') as HTMLElement;
   progressBar.style.setProperty('--progression', '0');
 
@@ -304,7 +304,7 @@ async function appUpdate(params: updateParams = { data: true, files: true }) {
       }
     });
 
-    currentWorker?.postMessage({ 'action': 'update-files' });
+    currentWorker?.postMessage({ 'action': 'update-files', partial });
   });
 
   try {
@@ -322,7 +322,7 @@ async function appUpdate(params: updateParams = { data: true, files: true }) {
 
 ////////////////////////////////////////
 // Met à jour l'application manuellement
-export async function manualUpdate() {
+export async function manualUpdate(partial = true) {
   try {
     if (!navigator.onLine)
       throw 'Connexion internet indisponible';
@@ -331,7 +331,7 @@ export async function manualUpdate() {
 
     document.querySelector('.notif-texte')!.innerHTML = 'Installation en cours...';
     document.getElementById('notification')!.classList.add('installing');
-    const result = await appUpdate({ data: true, files: true });
+    const result = await appUpdate({ data: true, files: true }, partial);
     console.log(result);
     return location.reload();
   }
@@ -369,19 +369,20 @@ export async function checkUpdate(checkNotification = false) {
     if (updateAvailable)
       notifyMaj();
 
+    const versionFichiers = await dataStorage.getItem('version-fichiers');
+    
     // On lance mod_update.php pour récupérer les données les plus récentes
-    const response = await fetch('/shinydex/backend/update.php?type=check&date=' + Date.now());
+    const response = await fetch(`/shinydex/backend/update.php?type=check&from=${versionFichiers}&date=${Date.now()}`);
     if (response.status != 200)
       throw '[:(] Erreur ' + response.status + ' lors de la requête';
     const data = await response.json();
-
-    const versionFichiers = await dataStorage.getItem('version-fichiers');
 
     if ((versionFichiers != data['version-fichiers'])) {
       updateAvailable = 1;
       console.log('[:|] Mise à jour détectée');
       console.log('     Installé : fichiers v. ' + timestamp2date(versionFichiers));
       console.log('   Disponible : fichiers v. ' + timestamp2date(data['version-fichiers']));
+      console.log('     Modifiés :', data['liste-fichiers-modifies']);
 
       notifyMaj();
     } else {

@@ -137,7 +137,7 @@ dataStorage.getItem('last-sync').then((value?: string) => {
       if (startEvent === 'mousedown' && (event as MouseEvent).button != 0) return;
       event.preventDefault();
       clearTimeout(longClic);
-      longClic = setTimeout(() => { needCheck = 0; manualUpdate(); }, 3000);
+      longClic = setTimeout(() => { needCheck = 0; manualUpdate(false); }, 3000);
   
       majButton.addEventListener(endEvent, () => { clearTimeout(longClic); if (needCheck) checkUpdate(true); });
       majButton.addEventListener(cancelEvent, () => clearTimeout(longClic));

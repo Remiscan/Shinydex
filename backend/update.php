@@ -10,7 +10,8 @@ clearstatcache();
 
 //////////////////////////////////////////////////////////
 // Vérifie les dates de dernière modification des fichiers
-function getFilesVersion() {
+// et renvoie [ version, liste des fichiers modifiés ].
+function getFilesVersion(int $versionFrom = 0): array {
   $rootDir = dirname(__DIR__, 1);
 
   $listeFichiers = getCacheFiles()['fichiers'];
@@ -20,6 +21,7 @@ function getFilesVersion() {
   }
 
   $versionFichiers = 0;
+  $listeFichiersModifies = [];
   foreach($listeFichiers as $fichier) {
     $path = $fichier;
     if (str_starts_with($path, '../'))
@@ -28,11 +30,16 @@ function getFilesVersion() {
       $path = str_replace('./', dirname(__DIR__, 1).'/', $path);
     $dateFichier = filemtime($path);
 
+    if ($dateFichier > $versionFrom / 1000)
+      $listeFichiersModifies[] = $fichier;
     if ($dateFichier > $versionFichiers)
       $versionFichiers = $dateFichier;
   }
   // timestamp à 10 digits, généré par PHP
-  return $versionFichiers * 1000;
+  return [
+    $versionFichiers * 1000,
+    $listeFichiersModifies
+  ];
 }
 
 
@@ -58,18 +65,21 @@ function getPokemonData() {
 
 $results = array();
 
+$from = $_GET['from'] ?? 0;
+[ $results['version-fichiers'], $results['liste-fichiers-modifies'] ] = getFilesVersion($from);
+
 // Si on vérifie juste la disponibilité d'une mise à jour de l'application
 if (isset($_GET['type']) && $_GET['type'] == 'check') {
-  $results['version-fichiers'] = getFilesVersion();
+  //$results['version-fichiers'] = getFilesVersion();
 }
 
 // Si on veut installer tous les fichiers et données
 else {
-  $results['version-fichiers'] = getFilesVersion();
+  //$results['version-fichiers'] = getFilesVersion();
   $results['pokemon-data'] = getPokemonData();
   $results['pokemon-names'] = Pokemon::ALL_POKEMON;
   $results['pokemon-names-fr'] = Pokemon::ALL_POKEMON_FR;
 }
 
 header('Content-Type: application/json');
-echo json_encode($results, JSON_PRETTY_PRINT);
+echo json_encode($results, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
