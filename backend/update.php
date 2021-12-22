@@ -51,7 +51,7 @@ function getFilesVersion(int $versionFrom = 0): array {
     if ($dateFichier > $versionFichiers)
       $versionFichiers = $dateFichier;
   }
-  if ($index) $listeFichiersModifies[] = './index.php';
+  if ($index) $listeFichiersModifies[] = './';
   // timestamp à 10 digits, généré par PHP
   return [
     $versionFichiers * 1000,
