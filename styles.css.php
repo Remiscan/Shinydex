@@ -25,7 +25,7 @@
   --radio-checked-bg-color: white;
   --radio-check-color: var(--accent-color);
   --checkbox-check-color: white;
-  --switch-unchecked-bg-color: hsla(231, 0%, 50%, .7);
+  --switch-unchecked-bg-color: hsl(231, 0%, 50%);
   --input-bg-color: white;
   --progress-bar-color: var(--accent-color);
   --card-edit-bg-color: rgba(240, 240, 240, .7);
@@ -53,7 +53,7 @@
   --radio-checked-bg-color: var(--accent-color);
   --radio-check-color: var(--nav-bg-color);
   --checkbox-check-color: var(--nav-bg-color);
-  --switch-unchecked-bg-color: hsla(217, 0%, 75%, .5);
+  --switch-unchecked-bg-color: hsla(217, 0%, 55%);
   --input-bg-color: hsl(0, 0%, 90%);
   --progress-bar-color: white;
   --card-edit-bg-color: hsla(0, 0%, 7%, .7);
@@ -1651,49 +1651,18 @@ textarea {
  * SWITCH ON/OFF (ex: Paramètres)
  */
 
-/*<?php ob_start();?>*/
-:root[data-theme="light"] input-switch {
-  --off-bg-color: hsl(231, 0%, 50%);
-  --on-bg-color: hsl(231, 40%, 50%);
-  --handle-color: white;
+input-switch,
+shiny-switch {
+  --off-bg-color: var(--switch-unchecked-bg-color);
+  --on-bg-color: var(--accent-color);
+  --handle-color: var(--nav-bg-color);
   --off-text-color: var(--handle-color);
   --on-text-color: var(--handle-color);
 }
-
-:root[data-theme="dark"] input-switch {
-  --off-bg-color: hsl(217, 0%, 55%);
-  --on-bg-color: hsl(217, 89%, 75%);
-  --handle-color: rgb(48, 48, 48);
-  --off-text-color: var(--handle-color);
-  --on-text-color: var(--handle-color);
-}
-/*<?php $body = ob_get_clean();
-require_once $_SERVER['DOCUMENT_ROOT'] . '/_common/components/theme-selector/build-css.php';
-echo buildThemesStylesheet($body); ?>*/
 
 shiny-switch {
   --color: currentColor;
 }
-
-/*<?php ob_start();?>*/
-:root[data-theme="light"] shiny-switch {
-  --off-bg-color: hsl(231, 0%, 50%);
-  --on-bg-color: hsl(231, 40%, 50%);
-  --handle-color: white;
-  --off-text-color: var(--handle-color);
-  --on-text-color: var(--handle-color);
-}
-
-:root[data-theme="dark"] shiny-switch {
-  --off-bg-color: hsl(217, 0%, 55%);
-  --on-bg-color: hsl(217, 89%, 75%);
-  --handle-color: rgb(48, 48, 48);
-  --off-text-color: var(--handle-color);
-  --on-text-color: var(--handle-color);
-}
-/*<?php $body = ob_get_clean();
-require_once $_SERVER['DOCUMENT_ROOT'] . '/_common/components/theme-selector/build-css.php';
-echo buildThemesStylesheet($body); ?>*/
 
 
 /*
