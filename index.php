@@ -23,11 +23,7 @@
 
     <script>window.tempsChargementDebut = performance.now();</script>
     <script defer src="../_common/polyfills/adoptedStyleSheets.min.js"></script>
-    <script type="esms-options">
-    {
-      "polyfillEnable": ["css-modules", "json-modules"]
-    }
-    </script>
+    <script>window.esmsInitOptions = { polyfillEnable: ['css-modules', 'json-modules'] }</script>
     <script defer src="../_common/polyfills/es-module-shims.js"></script>
     <script defer src="./ext/localforage.min.js"></script>
     <script type="module" src="./modules/main.js"></script>
