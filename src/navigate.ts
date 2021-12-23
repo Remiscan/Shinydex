@@ -268,6 +268,14 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
     }
   }
 
+  // On prépare les liens de retour de la nouvelle section s'il y en a
+  if (event.type !== 'popstate') {
+    const container = (sectionCible === 'obfuscator' && data.search) ? document.querySelector(`search-bar`)! : nouvelleSection.element;
+    for (const a of [...container.querySelectorAll('a.bouton-retour')] as HTMLAnchorElement[]) {
+      a.href = `./${ancienneSection.nom}`;
+    }
+  }
+
   // On anime le FAB si besoin
   animateFabIcon(ancienneSection, nouvelleSection);
 

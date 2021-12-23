@@ -158,6 +158,7 @@ nav {
   justify-content: center;
   align-items: center;
   color: var(--nav-text-color);
+  text-decoration: none;
   font-size: 13px;
   font-weight: 500;
   position: relative;
@@ -330,6 +331,8 @@ h1 {
   display: flex;
   justify-content: center;
   align-items: center;
+  text-decoration: none;
+  color: var(--text-color);
 }
 
 .icone + .icone,
@@ -340,6 +343,11 @@ h1 {
 .icone.bouton-retour {
   width: 56px;
   height: 56px;
+}
+
+.bouton-retour,
+.reset-icon {
+  outline-offset: -3px;
 }
 
 .compteur {
@@ -1868,6 +1876,17 @@ input:disabled + label.chip {
   opacity: .5;
   filter: grayscale(1);
   cursor: not-allowed;
+}
+
+button:focus-visible,
+input[type="file"] + label,
+input:focus-visible + label.radio,
+input:focus-visible + label.checkbox,
+input:focus-visible + label.chip {
+  outline: 2px solid currentColor;
+  outline: 5px auto Highlight;
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: 1px;
 }
 
 

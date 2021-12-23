@@ -23,7 +23,10 @@ import { backgroundSync } from './syncBackup.js';
 
 // Active les liens de navigation
 for (const link of Array.from(document.querySelectorAll('[data-section]')) as HTMLElement[]) {
-  link.addEventListener('click', event => navigate(link.dataset.section || '', event, JSON.parse(link.dataset.navData || '{}')));
+  link.addEventListener('click', event => {
+    event.preventDefault();
+    navigate(link.dataset.section || '', event, JSON.parse(link.dataset.navData || '{}'));
+  });
 }
 
 // Active les bulles sur les liens de navigation
@@ -35,7 +38,10 @@ for (const link of Array.from(document.querySelectorAll('.nav-link')) as HTMLEle
 
 // Active le bouton retour / fermer
 for (const bouton of Array.from(document.querySelectorAll('.bouton-retour')) as HTMLButtonElement[]) {
-  bouton.addEventListener('click', () => history.back());
+  bouton.addEventListener('click', event => {
+    event.preventDefault();
+    history.back();
+  });
 }
 
 // L'obfuscator ramène en arrière quand on clique dessus
