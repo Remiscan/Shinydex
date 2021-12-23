@@ -163,6 +163,7 @@ nav {
   font-weight: 500;
   position: relative;
   overflow: hidden;
+  outline-offset: -3px;
 }
 
 .nav-link>* {
