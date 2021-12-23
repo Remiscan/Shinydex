@@ -1879,15 +1879,18 @@ input:disabled + label.chip {
   cursor: not-allowed;
 }
 
-button:focus-visible,
-input[type="file"] + label,
-input:focus-visible + label.radio,
-input:focus-visible + label.checkbox,
-input:focus-visible + label.chip {
+button:focus,
+input[type="file"]:focus + label,
+input:focus + label:is(.radio, .checkbox, .chip) {
   outline: 2px solid currentColor;
   outline: 5px auto Highlight;
   outline: 5px auto -webkit-focus-ring-color;
   outline-offset: 1px;
+}
+
+input[type="file"]:focus:not(:focus-visible) + label,
+input:focus:not(:focus-visible) + label:is(.radio, .checkbox, .chip) {
+  outline: none;
 }
 
 
