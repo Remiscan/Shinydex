@@ -205,9 +205,6 @@ class pokemonSprite extends HTMLElement {
 
   connectedCallback() {
     this.addEventListener('sparkle', this.sparkle);
-    for (const param of pokemonSprite.observedAttributes) {
-      this.update(param, this.getAttribute(param) || '');
-    }
     this.setSpriteUrl();
   }
 
