@@ -1665,6 +1665,8 @@ shiny-switch {
   --off-bg-color: var(--switch-unchecked-bg-color);
   --on-bg-color: var(--accent-color);
   --handle-color: var(--nav-bg-color);
+  --handle-hover-color: var(--handle-color);
+  --handle-active-color: var(--handle-color);
   --off-text-color: var(--handle-color);
   --on-text-color: var(--handle-color);
 }
