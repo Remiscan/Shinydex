@@ -21,11 +21,11 @@ function getCacheFiles() {
   ];
 
   $modules = new RecursiveIteratorIterator(
-  new RecursiveDirectoryIterator(
-    dirname(__DIR__, 1).'/modules',
-    RecursiveDirectoryIterator::SKIP_DOTS
-  ),
-  RecursiveIteratorIterator::SELF_FIRST
+    new RecursiveDirectoryIterator(
+      dirname(__DIR__, 1).'/modules',
+      RecursiveDirectoryIterator::SKIP_DOTS
+    ),
+    RecursiveIteratorIterator::SELF_FIRST
   );
   foreach($modules as $mod => $obj) {
     if (is_dir($mod)) continue;
