@@ -62,7 +62,7 @@ const generations: Generation[] = [
   { num: 5, start: 494, end: 649 },
   { num: 6, start: 650, end: 721 },
   { num: 7, start: 722, end: 809 },
-  { num: 8, start: 810, end: 898 },
+  { num: 8, start: 810, end: 905 },
 ];
 
 
