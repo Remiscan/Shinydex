@@ -25,6 +25,14 @@
     <script defer src="../_common/polyfills/adoptedStyleSheets.min.js"></script>
     <script>window.esmsInitOptions = { polyfillEnable: ['css-modules', 'json-modules'] }</script>
     <script defer src="../_common/polyfills/es-module-shims.js"></script>
+    <script type="importmap">
+    {
+      "imports": {
+        "input-switch-styles": "../_common/components/input-switch/styles.css",
+        "input-switch-template": "../_common/components/input-switch/template.js"
+      }
+    }
+    </script>
     <script defer src="./ext/localforage.min.js"></script>
     <script type="module" src="./modules/main.js"></script>
 
