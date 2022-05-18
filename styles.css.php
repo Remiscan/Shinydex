@@ -2135,7 +2135,7 @@ input:focus:not(:focus-visible) + label:is(.radio, .checkbox, .chip) {
 
   .nav-link {
     align-items: center;
-    overflow: visible;
+    /*overflow: visible;*/
   }
 
   .nav-link.only-pc {
