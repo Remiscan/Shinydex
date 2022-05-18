@@ -123,6 +123,14 @@ export async function appStart() {
 
   // ÉTAPE 3 : si la sauvegarde en ligne est activée, on met à jour les données locales
 
+  // Si aucun UUID n'existe pour l'utilisateur actuel, en créer un
+  let uuid = await dataStorage.getItem('user-uuid');
+  if (!uuid) {
+    uuid = crypto.randomUUID();
+    await dataStorage.setItem('user-uuid', uuid);
+  }
+  Params.userUUID = uuid;
+
   const onlineBackup = await dataStorage.getItem('online-backup');
   if (onlineBackup) {
     try {

@@ -32,6 +32,8 @@ export const Params = {
 
   spriteSize: 112,
   preferredImageFormat: <'webp' | 'png'> 'png',
+
+  userUUID: ''
 };
 
 

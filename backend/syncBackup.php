@@ -113,6 +113,7 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
 
       $insert = $link->prepare('INSERT INTO mes_shinies (
         huntid,
+        userid,
         lastUpdate,
         dexid,
         forme,
@@ -131,6 +132,7 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
         horsChasse
       ) VALUES (
         :huntid,
+        :userid,
         :lastUpdate,
         :dexid,
         :forme,
@@ -148,7 +150,8 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
         :hacked,
         :horsChasse
       )');
-      $insert->bindParam(':huntid', $data->{'huntid'}, PDO::PARAM_STR, 13);
+      $insert->bindParam(':huntid', $data->{'huntid'}, PDO::PARAM_STR, 36);
+      $insert->bindParam(':userid', $data->{'userid'}, PDO::PARAM_STR, 36);
       $insert->bindParam(':lastUpdate', $data->{'lastUpdate'}, PDO::PARAM_STR, 13);
       $insert->bindParam(':dexid', $data->{'dexid'}, PDO::PARAM_INT, 4);
       $insert->bindParam(':forme', $data->{'forme'}, PDO::PARAM_STR, 50);
@@ -190,8 +193,9 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
         charm = :charm,
         hacked = :hacked,
         horsChasse = :horsChasse 
-      WHERE huntid = :huntid');
-      $insert->bindParam(':huntid', $data->{'huntid'}, PDO::PARAM_STR, 13);
+      WHERE huntid = :huntid AND userid = :userid');
+      $insert->bindParam(':huntid', $data->{'huntid'}, PDO::PARAM_STR, 36);
+      $insert->bindParam(':userid', $data->{'userid'}, PDO::PARAM_STR, 36);
       $insert->bindParam(':lastUpdate', $data->{'lastUpdate'}, PDO::PARAM_STR, 13);
       $insert->bindParam(':dexid', $data->{'dexid'}, PDO::PARAM_INT, 4);
       $insert->bindParam(':forme', $data->{'forme'}, PDO::PARAM_STR, 50);
@@ -208,6 +212,7 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
       $insert->bindParam(':charm', $data->{'charm'}, PDO::PARAM_INT, 1);
       $insert->bindParam(':hacked', $data->{'hacked'}, PDO::PARAM_INT, 1);
       $insert->bindParam(':horsChasse', $data->{'aupif'}, PDO::PARAM_INT, 1);
+      
       $results[] = $insert->execute();
     }
 

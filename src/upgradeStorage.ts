@@ -1,4 +1,5 @@
 import { dataStorage, huntStorage, shinyStorage } from './localforage.js';
+import { Params } from './Params.js';
 
 
 
@@ -52,6 +53,7 @@ function toNewFormat(shiny: { [key: string]: any }): { [key: string]: any } {
   // Add properties that didn't exist before
   const newProperties = new Map([
     ['gene', ''],
+    ['userid', Params.userUUID]
   ]);
 
   for (const [prop, defaultValue] of newProperties) {

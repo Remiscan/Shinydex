@@ -130,6 +130,7 @@ interface backendPokemon {
 interface backendShiny {
   id: number,
   huntid: string,
+  userid: string,
   lastUpdate: string,
   dexid: number,
   forme: string,
@@ -260,6 +261,7 @@ class Pokemon {
 class Shiny implements frontendShiny {
   // frontendShiny fields
   huntid: string = '';
+  userid: string = '';
   lastUpdate: number = NaN;
   dexid: number = NaN;
   forme: string = '';

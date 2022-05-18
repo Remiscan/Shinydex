@@ -1,7 +1,5 @@
 import { lazyLoad } from './lazyLoading.js';
-import { dataStorage, huntStorage, pokemonData, shinyStorage } from './localforage.js';
-import { navigate } from './navigate.js';
-import { Notif } from './notification.js';
+import { dataStorage, huntStorage } from './localforage.js';
 import { Params } from './Params.js';
 import { frontendShiny, Pokemon, Shiny } from './Pokemon.js';
 
@@ -15,9 +13,11 @@ export interface huntedPokemon extends Omit<frontendShiny, 'id' | 'destroy'> {
 
 const defaultHunt: huntedPokemon = {
   huntid: '',
+  userid: '',
   lastUpdate: 0,
   dexid: 0,
   forme: '',
+  gene: '',
   surnom: '',
   methode: '',
   compteur: '',
@@ -40,7 +40,8 @@ export class Hunt extends Shiny implements huntedPokemon {
   uploaded: boolean = false;
   
   constructor(pokemon: huntedPokemon = defaultHunt) {
-    pokemon.huntid = pokemon.huntid || String(new Date().getTime());
+    pokemon.huntid = pokemon.huntid || crypto.randomUUID();
+    pokemon.userid = pokemon.userid || Params.userUUID;
     super(pokemon);
     Object.assign(this, {
       caught: pokemon.caught ?? false,
@@ -84,7 +85,7 @@ export class Hunt extends Shiny implements huntedPokemon {
 
   // Construit la carte qui affiche la chasse en HTML
   async buildHunt(start: boolean = false) {
-    const template = document.getElementById('template-hunt') as HTMLTemplateElement;
+    /*const template = document.getElementById('template-hunt') as HTMLTemplateElement;
     const card = (template.content.cloneNode(true) as Element).querySelector('.hunt-card') as HTMLElement;
     card.id = 'hunt-' + this.huntid;
 
@@ -136,10 +137,7 @@ export class Hunt extends Shiny implements huntedPokemon {
 
     if (this.caught) card.classList.add('caught');
 
-    //if (this.dexid == 0) setTimeout(() => card.classList.remove('new'), 400);
-
-    if (start) return;
-    //deferCards('chasses-en-cours');
+    if (start) return;*/
   }
 }
 
@@ -148,7 +146,7 @@ export class Hunt extends Shiny implements huntedPokemon {
 ////////////////////////////////////////////////////////////
 // Créer une chasse pour mettre à jour une carte dans la BDD
 export async function editHunt(id: string, nav = true) {
-  let k = await huntStorage.getItem(id);
+  /*let k = await huntStorage.getItem(id);
   if (k != null) {
     const message = 'Cette chasse est déjà en cours d\'édition.';
     new Notif(message).prompt();
@@ -162,7 +160,7 @@ export async function editHunt(id: string, nav = true) {
   pkmn.id = id;
   const hunt = await Hunt.build(pkmn);
   if (nav) navigate('chasses-en-cours');
-  return hunt;
+  return hunt;*/
 }
 
 
