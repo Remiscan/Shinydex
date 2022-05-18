@@ -80,6 +80,10 @@ class Forme extends Sprite
           $ids = ['', 'manaphy'];
           $noms = ['Œuf', 'Œuf de Manaphy'];
         break;
+        case 25: // Pikachu
+          $ids = ['', 'original-cap', 'hoenn-cap', 'sinnoh-cap', 'unys-cap', 'kalos-cap', 'alola-cap', 'partner-cap', '', 'world-cap'];
+          $noms = ['', 'Casquette Originale', 'Casquette de Hoenn', 'Casquette de Sinnoh', 'Casquette d\'Unys', 'Casquette de Kalos', 'Casquette d\'Alola', 'Casquette de Partenaire', '', 'Casquette Monde'];
+        break;
         case 201: // Zarbi
           $ids = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '!', '?'];
           $noms = array_map('strtoupper', $ids);
@@ -366,37 +370,6 @@ class Forme extends Sprite
         {
           $this->dbid = 'hisui';
           $this->nom = 'de Hisui';
-        }
-        // Pikachu
-        else if ($dexid == 25)
-        {
-          switch ($sprite->form)
-          {
-            case 1:
-              $this->nom = 'Casquette Originale';
-            break;
-            case 2:
-              $this->nom = 'Casquette de Hoenn';
-            break;
-            case 3:
-              $this->nom = 'Casquette de Sinnoh';
-            break;
-            case 4:
-              $this->nom = 'Casquette d\'Unys';
-            break;
-            case 5:
-              $this->nom = 'Casquette de Kalos';
-            break;
-            case 6:
-              $this->nom = 'Casquette d\'Alola';
-            break;
-            case 7:
-              $this->nom = 'Casquette Partenaire';
-            break;
-            case 9:
-              $this->nom = 'Casquette Monde';
-            break;
-          }
         }
         else
         {
