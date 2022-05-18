@@ -1,6 +1,8 @@
 <?php
 require_once 'class_Sprite.php';
 
+
+
 class Forme extends Sprite
 {
   public $dbid = '';
@@ -15,6 +17,7 @@ class Forme extends Sprite
       || ($dexid == 105 && $sprite->form == 2) // Ossatueur totem
       || ($dexid == 133 && $sprite->form == 1) // Évoli starter
       || ($dexid == 414 && $sprite->form > 0) // Papilord (formes capes de Cheniti)
+      || ($dexid == 658 && $sprite->form == 1) // Amphinobi de Sacha forme normale
       || ($dexid == 664 && $sprite->form > 0) // Lépidonille (formes de Prismillon)
       || ($dexid == 665 && $sprite->form > 0) // Pérégrain (formes de Prismillon)
       || ($dexid == 670 && $sprite->form == 5) // Floette de AZ
@@ -27,6 +30,7 @@ class Forme extends Sprite
       || ($dexid == 752 && $sprite->form == 1) // Tarenbulle totem
       || ($dexid == 754 && $sprite->form == 1) // Floramantis totem
       || ($dexid == 758 && $sprite->form == 1) // Malamandre totem
+      || ($dexid == 774 && $sprite->form >= 1 && $sprite->form <= 6) // Météno formes météories (toutes identiques)
       || ($dexid == 777 && $sprite->form == 1) // Togedemaru totem
       || ($dexid == 778 && $sprite->form >= 2) // Mimiqui totem
       || ($dexid == 784 && $sprite->form == 1) // Ékaïser totem
@@ -72,6 +76,10 @@ class Forme extends Sprite
       $done = true;
       switch ($dexid)
       {
+        case 0: // Œuf
+          $ids = ['', 'manaphy'];
+          $noms = ['Œuf', 'Œuf de Manaphy'];
+        break;
         case 201: // Zarbi
           $ids = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '!', '?'];
           $noms = array_map('strtoupper', $ids);
@@ -102,6 +110,8 @@ class Forme extends Sprite
           $ids = ['', 'heat', 'wash', 'frost', 'fan', 'mow'];
           $noms = ['', 'Chaleur', 'Lavage', 'Froid', 'Hélice', 'Tonte'];
         break;
+        case 483: // Dialga
+        case 484: // Palkia
         case 487: // Giratina
           $ids = ['', 'origin'];
           $noms = ['Alternative', 'Originelle'];
@@ -116,12 +126,12 @@ class Forme extends Sprite
           $noms = ['Normal', 'Combat', 'Vol', 'Poison', 'Sol', 'Roche', 'Insecte', 'Spectre', 'Acier', 'Feu', 'Eau', 'Plante', 'Électrik', 'Psy', 'Glace', 'Dragon', 'Ténèbres', 'Fée'];
         break;
         case 550: // Bargantua
-          $ids = ['red', 'blue'];
-          $noms = ['Rouge', 'Bleu'];
+          $ids = ['red', 'blue', 'white'];
+          $noms = ['Motif Rouge', 'Motif Bleu', 'Motif Blanc'];
         break;
         case 555: // Darumacho
           $ids = ['', 'zen', 'galar', 'galar-zen'];
-          $noms = ['Normal', 'Transe', 'de Galar', 'de Galar - Transe'];
+          $noms = ['', 'Mode Transe', 'de Galar', 'de Galar - Mode Transe'];
         break;
         case 585: // Vivaldaim
         case 586: // Haydaim
@@ -131,6 +141,7 @@ class Forme extends Sprite
         case 641: // Boréas
         case 642: // Fulguris
         case 645: // Démétéros
+        case 905: // Amovénus
           $ids = ['', 'therian'];
           $noms = ['Avatar', 'Totémique'];
         break;
@@ -267,6 +278,10 @@ class Forme extends Sprite
           $ids = ['', 'ice', 'ghost'];
           $noms = ['', 'Cavalier du Froid', 'Cavalier d\'Effroi'];
         break;
+        case 902: // Paragruel
+          $ids = ['', ''];
+          $noms = ['', ''];
+        break;
         default:
           $done = false;
       }
@@ -291,19 +306,14 @@ class Forme extends Sprite
       }
       else
       {
-        // Classification de certains Pokémon
-        $hasMega = [3, 9, 15, 18, 65, 80, 94, 115, 127, 130, 142, 181, 208, 212, 214, 229, 248, 254, 257, 260, 282, 302, 303, 306, 308, 310, 319, 323, 334, 354, 359, 362, 373, 376, 380, 381, 384, 428, 445, 448, 460, 475, 531, 719];
-        $hasMegaX = [6, 150];
-        $hasPrimal = [382, 383];
-        $hasAlolan = [19, 20, 26, 27, 28, 37, 38, 50, 51, 52, 53, 74, 75, 76, 88, 89, 103, 105];
-        $hasGalarian = [52, 77, 78, 79, 80, 83, 110, 122, 144, 145, 146, 199, 222, 263, 264, 554, 555, 562, 618];
-
-        if (in_array($spriteid, ['mf', 'uk', 'mo', 'fo']))
+        $this->dbid = '';
+        $this->nom = '';
+        if (in_array($spriteid, ['mf', 'uk', 'mo', 'fo', 'md', 'fd']))
         {
           $this->dbid = '';
           $this->nom = '';
         }
-        else if ($spriteid == 'md')
+        /*else if ($spriteid == 'md')
         {
           $this->dbid = '';
           $this->nom = 'Mâle';
@@ -312,15 +322,15 @@ class Forme extends Sprite
         {
           $this->dbid = 'female';
           $this->nom = 'Femelle';
-        }
+        }*/
         // Méga-évolutions
-        else if (in_array($dexid, $hasMega) && $sprite->form == 1)
+        else if (self::has('mega', $dexid) && $sprite->form == 1)
         {
           $this->dbid = 'mega';
           $this->nom = 'Méga';
         }
         // Méga-évolutions X et Y
-        else if (in_array($dexid, $hasMegaX) && in_array($sprite->form, [1, 2]))
+        else if (self::has('megaX', $dexid) && in_array($sprite->form, [1, 2]))
         {
           if ($sprite->form == 1)
           {
@@ -334,26 +344,28 @@ class Forme extends Sprite
           }
         }
         // Primo-résurgences
-        else if (in_array($dexid, $hasPrimal) && $sprite->form == 1)
+        else if (self::has('primal', $dexid) && $sprite->form == 1)
         {
           $this->dbid = 'primal';
           $this->nom = 'Primo';
         }
         // Formes d'Alola
-        else if (in_array($dexid, $hasAlolan) && $sprite->form == 1)
+        else if (self::has('alolan', $dexid) && self::isAlolan($sprite, $dexid))
         {
           $this->dbid = 'alola';
           $this->nom = 'd\'Alola';
         }
         // Formes de Galar
-        else if (
-          (in_array($dexid, $hasGalarian) && !in_array($dexid, $hasAlolan) && !in_array($dexid, $hasMega) && $sprite->form == 1)
-          || (in_array($dexid, $hasGalarian) && in_array($dexid, $hasAlolan) && !in_array($dexid, $hasMega) && $sprite->form == 2)
-          || (in_array($dexid, $hasGalarian) && !in_array($dexid, $hasAlolan) && in_array($dexid, $hasMega) && $sprite->form == 2)
-        )
+        else if (self::has('galarian', $dexid) && self::isGalarian($sprite, $dexid))
         {
           $this->dbid = 'galar';
           $this->nom = 'de Galar';
+        }
+        // Formes de Hisui
+        else if (self::has('hisuian', $dexid) && self::isHisuian($sprite, $dexid))
+        {
+          $this->dbid = 'hisui';
+          $this->nom = 'de Hisui';
         }
         // Pikachu
         else if ($dexid == 25)
@@ -392,6 +404,53 @@ class Forme extends Sprite
           $this->nom = 'Forme inconnue';
         }
       }
+
+      // Mâles et femelles
+      $ignoreGender = [905]; // Amovénus
+      if (!in_array($dexid, $ignoreGender)) // Amovénus
+      {
+        if ($sprite->gender == 'md') {
+          $this->nom = 'Mâle' . ($this->nom == '' ? '' : ' ' . $this->nom);
+        } else if ($sprite->gender == 'fd') {
+          $this->dbid = $this->dbid . ($this->dbid == '' ? '' : '-') . 'female';
+          $this->nom = 'Femelle' . ($this->nom == '' ? '' : ' ' . $this->nom);
+        }
+      }
     }
+  }
+
+
+
+  static private function has(string $formType, int $dexid): bool {
+    // Classification de certains Pokémon
+    $mega = [3, 9, 15, 18, 65, 80, 94, 115, 127, 130, 142, 181, 208, 212, 214, 229, 248, 254, 257, 260, 282, 302, 303, 306, 308, 310, 319, 323, 334, 354, 359, 362, 373, 376, 380, 381, 384, 428, 445, 448, 460, 475, 531, 719];
+    $megaX = [6, 150];
+    $primal = [382, 383];
+    $alolan = [19, 20, 26, 27, 28, 37, 38, 50, 51, 52, 53, 74, 75, 76, 88, 89, 103, 105];
+    $galarian = [52, 77, 78, 79, 80, 83, 110, 122, 144, 145, 146, 199, 222, 263, 264, 554, 555, 562, 618];
+    $hisuian = [58, 59, 100, 101, 157, 211, 215, 503, 549, 570, 571, 628, 705, 706, 713, 724];
+
+    return in_array($dexid, $$formType);
+  }
+
+  static private function isAlolan(Sprite $sprite, int $dexid): bool {
+    $tempForm = 1;
+    if (self::has('mega', $dexid)) $tempForm++;
+    return $sprite->form == $tempForm;
+  }
+
+  static private function isGalarian(Sprite $sprite, int $dexid): bool {
+    $tempForm = 1;
+    if (self::has('alolan', $dexid)) $tempForm++;
+    if (self::has('mega', $dexid)) $tempForm++;
+    return $sprite->form == $tempForm;
+  }
+
+  static private function isHisuian(Sprite $sprite, int $dexid): bool {
+    $tempForm = 1;
+    if (self::has('alolan', $dexid)) $tempForm++;
+    if (self::has('galarian', $dexid)) $tempForm++;
+    if (self::has('mega', $dexid)) $tempForm++;
+    return $sprite->form == $tempForm;
   }
 }
