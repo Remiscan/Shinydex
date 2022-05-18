@@ -133,6 +133,7 @@ interface backendShiny {
   lastUpdate: string,
   dexid: number,
   forme: string,
+  gene: string,
   surnom: string,
   methode: string,
   compteur: string,
@@ -262,6 +263,7 @@ class Shiny implements frontendShiny {
   lastUpdate: number = NaN;
   dexid: number = NaN;
   forme: string = '';
+  gene: string = '';
   surnom: string = '';
   methode: string = '';
   compteur: string = '';

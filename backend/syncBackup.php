@@ -116,6 +116,7 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
         lastUpdate,
         dexid,
         forme,
+        gene,
         surnom,
         methode,
         compteur,
@@ -133,6 +134,7 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
         :lastUpdate,
         :dexid,
         :forme,
+        :gene,
         :surnom,
         :methode,
         :compteur,
@@ -150,6 +152,7 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
       $insert->bindParam(':lastUpdate', $data->{'lastUpdate'}, PDO::PARAM_STR, 13);
       $insert->bindParam(':dexid', $data->{'dexid'}, PDO::PARAM_INT, 4);
       $insert->bindParam(':forme', $data->{'forme'}, PDO::PARAM_STR, 50);
+      $insert->bindParam(':gene', $data->{'gene'}, PDO::PARAM_STR, 50);
       $insert->bindParam(':surnom', $data->{'surnom'}, PDO::PARAM_STR, 50);
       $insert->bindParam(':methode', $data->{'methode'});
       $insert->bindParam(':compteur', $data->{'compteur'}, PDO::PARAM_STR, 50);
@@ -173,7 +176,8 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
       $insert = $link->prepare('UPDATE mes_shinies SET 
         lastUpdate = :lastUpdate,
         dexid = :dexid,
-        forme =:forme,
+        forme = :forme,
+        gene = :gene,
         surnom = :surnom,
         methode = :methode,
         compteur = :compteur,
@@ -191,6 +195,7 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
       $insert->bindParam(':lastUpdate', $data->{'lastUpdate'}, PDO::PARAM_STR, 13);
       $insert->bindParam(':dexid', $data->{'dexid'}, PDO::PARAM_INT, 4);
       $insert->bindParam(':forme', $data->{'forme'}, PDO::PARAM_STR, 50);
+      $insert->bindParam(':gene', $data->{'gene'}, PDO::PARAM_STR, 50);
       $insert->bindParam(':surnom', $data->{'surnom'}, PDO::PARAM_STR, 50);
       $insert->bindParam(':methode', $data->{'methode'});
       $insert->bindParam(':compteur', $data->{'compteur'}, PDO::PARAM_STR, 50);

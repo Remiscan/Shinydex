@@ -49,6 +49,17 @@ function toNewFormat(shiny: { [key: string]: any }): { [key: string]: any } {
     }
   }
 
+  // Add properties that didn't exist before
+  const newProperties = new Map([
+    ['gene', ''],
+  ]);
+
+  for (const [prop, defaultValue] of newProperties) {
+    if (!shiny.hasOwnProperty(prop)) {
+      shiny[prop] = defaultValue;
+    }
+  }
+
   // Replace date by timestamp
   // (date will be formatted on display)
   if (shiny.hasOwnProperty('date')) {
