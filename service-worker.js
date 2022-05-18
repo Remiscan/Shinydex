@@ -247,10 +247,14 @@ async function syncBackup(message = true) {
     const keys = await shinyStorage.keys();
     const localData = await Promise.all(keys.map(key => shinyStorage.getItem(key)));
 
+    await dataStorage.ready();
+    const userUUID = await dataStorage.getItem('user-uuid');
+
     // On envoie les données locales au serveur
     const formData = new FormData();
     formData.append('local-data', JSON.stringify(localData.filter(shiny => !shiny.deleted)));
     formData.append('deleted-local-data', JSON.stringify(localData.filter(shiny => shiny.deleted)));
+    formData.append('user-uuid', userUUID);
     formData.append('mdp', await dataStorage.getItem('mdp-bdd'));
 
     const response = await fetch('/remidex/backend/syncBackup.php?date=' + Date.now(), {

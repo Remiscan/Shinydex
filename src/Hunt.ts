@@ -13,7 +13,6 @@ export interface huntedPokemon extends Omit<frontendShiny, 'id' | 'destroy'> {
 
 const defaultHunt: huntedPokemon = {
   huntid: '',
-  userid: '',
   lastUpdate: 0,
   dexid: 0,
   forme: '',
@@ -41,7 +40,6 @@ export class Hunt extends Shiny implements huntedPokemon {
   
   constructor(pokemon: huntedPokemon = defaultHunt) {
     pokemon.huntid = pokemon.huntid || crypto.randomUUID();
-    pokemon.userid = pokemon.userid || Params.userUUID;
     super(pokemon);
     Object.assign(this, {
       caught: pokemon.caught ?? false,

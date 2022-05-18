@@ -18,6 +18,7 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
 {
   $response = '[:)] Données locales bien reçues !';
 
+  $userUUID = $_POST['user-uuid'];
   $localData = json_decode($_POST['local-data']);
   $deletedData = json_decode($_POST['deleted-local-data']);
   $mdp = $_POST['mdp'];
@@ -38,7 +39,8 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
     // On récupère les données de la BDD
     $link = new BDD();
 
-    $recup_shinies = $link->prepare('SELECT * FROM mes_shinies ORDER BY id DESC');
+    $recup_shinies = $link->prepare('SELECT * FROM mes_shinies WHERE userid = :userid ORDER BY id DESC');
+    $recup_shinies->bindParam(':userid', $userUUID, PDO::PARAM_STR, 36);
     $recup_shinies->execute();
     $onlineData = $recup_shinies->fetchAll(PDO::FETCH_ASSOC);
 
@@ -151,7 +153,7 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
         :horsChasse
       )');
       $insert->bindParam(':huntid', $data->{'huntid'}, PDO::PARAM_STR, 36);
-      $insert->bindParam(':userid', $data->{'userid'}, PDO::PARAM_STR, 36);
+      $insert->bindParam(':userid', $userUUID, PDO::PARAM_STR, 36);
       $insert->bindParam(':lastUpdate', $data->{'lastUpdate'}, PDO::PARAM_STR, 13);
       $insert->bindParam(':dexid', $data->{'dexid'}, PDO::PARAM_INT, 4);
       $insert->bindParam(':forme', $data->{'forme'}, PDO::PARAM_STR, 50);
@@ -195,7 +197,7 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
         horsChasse = :horsChasse 
       WHERE huntid = :huntid AND userid = :userid');
       $insert->bindParam(':huntid', $data->{'huntid'}, PDO::PARAM_STR, 36);
-      $insert->bindParam(':userid', $data->{'userid'}, PDO::PARAM_STR, 36);
+      $insert->bindParam(':userid', $userUUID, PDO::PARAM_STR, 36);
       $insert->bindParam(':lastUpdate', $data->{'lastUpdate'}, PDO::PARAM_STR, 13);
       $insert->bindParam(':dexid', $data->{'dexid'}, PDO::PARAM_INT, 4);
       $insert->bindParam(':forme', $data->{'forme'}, PDO::PARAM_STR, 50);
@@ -212,7 +214,7 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
       $insert->bindParam(':charm', $data->{'charm'}, PDO::PARAM_INT, 1);
       $insert->bindParam(':hacked', $data->{'hacked'}, PDO::PARAM_INT, 1);
       $insert->bindParam(':horsChasse', $data->{'aupif'}, PDO::PARAM_INT, 1);
-      
+
       $results[] = $insert->execute();
     }
 
@@ -229,13 +231,21 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
     } else {
       $response = '[:)] Toutes les insertions / éditions / suppressions ont réussi !';
     }
-
   }
 }
 else
 {
   $error = true;
   $response = '[:(] Données locales non reçues...';
+}
+
+// On supprime les données sensibles qui seront envoyées à l'application
+function dataWithoutUserID(array $arr): array {
+  foreach ($arr as $k => $pkmn) {
+    unset($pkmn['userid']);
+    $arr[$k] = $pkmn;
+  }
+  return $arr;
 }
 
 header('Content-Type: application/json');
@@ -245,8 +255,8 @@ echo json_encode(array(
   'mdp' => $passcheck,
   'inserts' => $dataToInsert,
   'updates' => $dataToUpdate,
-  'inserts-local' => $dataToInsertLocal,
-  'updates-local' => $dataToUpdateLocal,
+  'inserts-local' => dataWithoutUserID($dataToInsertLocal),
+  'updates-local' => dataWithoutUserID($dataToUpdateLocal),
   'deletions-local' => $toDelete,
   'results' => $results,
 ), JSON_PRETTY_PRINT);

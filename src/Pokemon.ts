@@ -150,7 +150,7 @@ interface backendShiny {
 };
 
 /** Structure d'un Pokémon shiny tel que stocké dans la BDD locale. */
-export interface frontendShiny extends Omit<backendShiny, 'id' | 'lastUpdate'> {
+export interface frontendShiny extends Omit<backendShiny, 'id' | 'lastUpdate' | 'userid'> {
   lastUpdate: number,
   deleted?: boolean,
   destroy?: boolean,
