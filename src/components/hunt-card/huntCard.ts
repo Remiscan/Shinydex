@@ -4,6 +4,7 @@ import { huntStorage, pokemonData, shinyStorage } from '../../localforage.js';
 import { Notif } from '../../notification.js';
 import { warnBeforeDestruction } from '../../Params.js';
 import { Forme, Methode, Pokemon, Shiny } from '../../Pokemon.js';
+import pokemonSprite from '../pokemon-sprite/pokemonSprite.js';
 import template from './template.js';
 
 
@@ -326,7 +327,7 @@ export class huntCard extends HTMLElement {
         if (container.classList.contains('caught')) this.hunt.caught = true;
         else                                        this.hunt.caught = false;
 
-        this.querySelector('pokemon-sprite')!.dispatchEvent(new Event('sparkle'));
+        (this.querySelector('pokemon-sprite')! as pokemonSprite).sparkle();
       }
     };
     handle(this.handlers.caught);

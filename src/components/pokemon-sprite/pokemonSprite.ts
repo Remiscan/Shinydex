@@ -7,7 +7,7 @@ import template from './template.js';
 
 
 
-class pokemonSprite extends HTMLElement {
+export default class pokemonSprite extends HTMLElement {
   shadow: ShadowRoot;
   params: { [key: string]: number | string | boolean } = {
     dexid: 0,
@@ -204,12 +204,10 @@ class pokemonSprite extends HTMLElement {
   
 
   connectedCallback() {
-    this.addEventListener('sparkle', this.sparkle);
     this.setSpriteUrl();
   }
 
   disconnectedCallback() {
-    this.removeEventListener('sparkle', this.sparkle);
   }
 
   static get observedAttributes() {
