@@ -96,7 +96,7 @@ export default class pokemonSprite extends HTMLElement {
       ], {
         easing: 'cubic-bezier(0, 0, 0, .7)',
         fill: 'both',
-        duration: 1500,
+        duration: 1000,
         delay: 200 * Math.random() + 500 * (late ? 1 : 0)
       });
       animations.push(anim);
