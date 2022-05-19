@@ -159,6 +159,7 @@ export async function editHunt(id: string, nav = true) {
   const hunt = await Hunt.build(pkmn);
   if (nav) navigate('chasses-en-cours');
   return hunt;*/
+  return true;
 }
 
 

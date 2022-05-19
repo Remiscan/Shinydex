@@ -52,21 +52,23 @@ export class huntCard extends HTMLElement {
   pokemon?: Pokemon;
   handlers: HandlerMap = {};
   changeHandlers: HandlerMap = {};
-  propMap: Map<huntProperty, querySelector> = new Map([
+  inputMap: Map<huntProperty, querySelector> = new Map([
     ['dexid', '#hunt-{id}-espece'],
     ['forme', '#hunt-{id}-forme'],
     ['surnom', '#hunt-{id}-surnom'],
     ['methode', '#hunt-{id}-methode'],
-    ['compteur', '#hunt-{id}-compteur'],
-    ['timeCapture', '#hunt-{id}-date'],
     ['jeu', '#hunt-{id}-jeu'],
     ['ball', '#hunt-{id}-ball'],
     ['notes', '#hunt-{id}-notes'],
-    ['checkmark', 'input[name="hunt-{id}-origin-icon"]'],
-    ['DO', 'input[name="hunt-{id}-monjeu"]'],
+
+    ['checkmark', 'input[name="hunt-{id}-checkmark"]'],
+    ['DO', 'input[name="hunt-{id}-DO"]'],
     ['charm', 'input[name="hunt-{id}-charm"]'],
     ['hacked', 'input[name="hunt-{id}-hacked"]'],
-    ['horsChasse', 'input[name="hunt-{id}-aupif"]']
+    ['horsChasse', 'input[name="hunt-{id}-horsChasse"]'],
+
+    ['compteur', '#hunt-{id}-compteur'],
+    ['timeCapture', '#hunt-{id}-date'],
   ]);
 
 
@@ -114,7 +116,9 @@ export class huntCard extends HTMLElement {
       }
     }));
 
-    const hunts = (await Promise.all((await huntStorage.keys()).map(key => huntStorage.getItem(key)))).filter(hunt => !(hunt.deleted));
+    const hunts = (await Promise.all(
+      (await huntStorage.keys()).map(key => huntStorage.getItem(key))
+    )).filter(hunt => !(hunt.deleted));
     if (hunts.length === 0) document.querySelector('#chasses-en-cours')!.classList.add('vide');
   }
 
@@ -158,6 +162,11 @@ export class huntCard extends HTMLElement {
       throw e;
     }
 
+    const getInput = (prop: huntProperty) => {
+      const selector = this.inputMap.get(prop)?.replace('{id}', hunt.huntid) || '';
+      return this.querySelector(selector) as HTMLInputElement;
+    }
+
     const card = this;
     const mine = hunt.mine;
 
@@ -198,32 +207,34 @@ export class huntCard extends HTMLElement {
    */
   async inputToData() {
     const hunt = this.hunt;
-    const getInput = (s: string) => this.querySelector(`#hunt-${hunt.huntid}-${s}`) as HTMLInputElement;
-    const sprite = this.querySelector('pokemon-sprite')!;
+    const getInput = (prop: huntProperty) => {
+      let selector = this.inputMap.get(prop)?.replace('{id}', hunt.huntid) || '';
+      switch (prop) {
+        case 'checkmark':
+        case 'DO':
+        case 'charm':
+        case 'hacked':
+        case 'horsChasse':
+          selector = `${selector}:checked`;
+          break;
+      }
+      return this.querySelector(selector) as HTMLInputElement;
+    }
 
     espece: {
-      const input = getInput('espece');
+      const input = getInput('dexid');
       const allNames = await Pokemon.namesfr();
       const dexid = allNames.findIndex(s => s === input.value);
       hunt.dexid = dexid > 0 ? dexid : 0;
     }
     
     for (const prop of ['forme', 'surnom', 'methode', 'jeu', 'ball', 'notes']) {
-      const input = getInput(prop);
+      const input = getInput(prop as huntProperty);
       Object.assign(hunt, { [prop as keyof Omit<Hunt, 'shinyRate' | 'mine' | 'Jeu'>]: input.value });
     }
 
-    // Icônes
-    this.querySelector(`.icones.jeu`)!.className = `icones jeu ${hunt.jeu.replace(/[ \']/g, '')}`;
-    this.querySelector(`.icones.ball`)!.className = `pkspr item ball-${hunt.ball}`;
-
-    // Sprite
-    sprite.setAttribute('dexid', String(hunt.dexid));
-    sprite.setAttribute('forme', hunt.forme);
-    sprite.setAttribute('shiny', String(hunt.caught));
-
     for (const prop of ['checkmark', 'DO', 'charm', 'hacked', 'horsChasse']) {
-      const input = this.querySelector(`input[name="hunt-${hunt.huntid}-${prop}"]:checked`) as HTMLInputElement;
+      const input = getInput(prop as huntProperty);
       let value: any = input.value;
       switch (prop) {
         case 'checkmark':
@@ -244,16 +255,16 @@ export class huntCard extends HTMLElement {
         });
       } else if (hunt.methode === 'Chaîne de captures') {
         hunt.compteur = JSON.stringify({
-          chain: parseInt((this.querySelector(`#hunt-${hunt.huntid}-compteur`) as HTMLInputElement).value),
+          chain: parseInt(getInput('compteur').value),
           lure: ((document.querySelector(`input[name="hunt-${hunt.huntid}-compteur-leurre"]:checked`) as HTMLInputElement).value === '1') ? true : false
         });
       } else {
-        hunt.compteur = (this.querySelector(`#hunt-${hunt.huntid}-compteur`) as HTMLInputElement).value;
+        hunt.compteur = getInput('compteur').value;
       }
     }
 
     date: {
-      const input = getInput('date');
+      const input = getInput('timeCapture');
       const date = input.value;
       const oldDate = (new Date(hunt.timeCapture)).toISOString().split('T')[0];
       const newTime = date !== oldDate ? (new Date(date)).getTime() : hunt.timeCapture;
@@ -267,9 +278,28 @@ export class huntCard extends HTMLElement {
   }
 
 
+  /**
+   * Met à jour certains éléments (ex : icônes) de la carte à partir des informations saisies dans le formulaire.
+   */
+  async inputToContent() {
+    const hunt = this.hunt;
+    const sprite = this.querySelector('pokemon-sprite')!;
+
+    // Icônes
+    this.querySelector(`.icones.jeu`)!.className = `icones jeu ${hunt.jeu.replace(/[ \']/g, '')}`;
+    this.querySelector(`.icones.ball`)!.className = `pkspr item ball-${hunt.ball}`;
+
+    // Sprite
+    sprite.setAttribute('dexid', String(hunt.dexid));
+    sprite.setAttribute('forme', hunt.forme);
+    sprite.setAttribute('shiny', String(hunt.caught));
+  }
+
+
   connectedCallback() {
     // Crée le HTML de la carte
     this.appendChild(template.content.cloneNode(true));
+
     for (const el of [...this.querySelectorAll('[id^="hunt-{id}"]')]) {
       (el as HTMLElement).dataset.id = el.getAttribute('id') || '';
     }
@@ -281,6 +311,7 @@ export class huntCard extends HTMLElement {
     for (const el of [...this.querySelectorAll('[name^="hunt-{id}"]')]) {
       (el as HTMLElement).dataset.name = el.getAttribute('name') || '';
     }
+    
     this.ready = true;
 
     // 🔽 Active les boutons du formulaire
@@ -409,7 +440,10 @@ export class huntCard extends HTMLElement {
     this.handlers.form = {
       element: this,
       type: 'change',
-      function: () => this.inputToData()
+      function: () => {
+        this.inputToData();
+        this.inputToContent();
+      }
     }
     handle(this.handlers.form);
 
