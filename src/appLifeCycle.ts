@@ -126,6 +126,9 @@ export async function appStart() {
   // Si aucun UUID n'existe pour l'utilisateur actuel, en créer un
   let uuid = await dataStorage.getItem('user-uuid');
   if (!uuid) {
+    // 🔽🔽🔽🔽
+    // Prompt ici pour nouveau compte ou connexion à un compte existant (via Google ?)
+    // 🔼🔼🔼🔼
     uuid = crypto.randomUUID();
     await dataStorage.setItem('user-uuid', uuid);
   }
@@ -315,9 +318,13 @@ async function appUpdate(params: updateParams = { data: true, files: true }, par
     currentWorker?.postMessage({ 'action': 'update-files', partial });
   });
 
+  const body = document.querySelector('body');
+
   try {
+    body?.setAttribute('inert', '');
     return await Promise.all([promiseData(), promiseFiles()]);
   } catch (error) {
+    body?.removeAttribute('inert');
     console.error(error);
     throw error;
   } finally {

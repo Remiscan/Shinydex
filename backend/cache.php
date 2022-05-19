@@ -15,6 +15,7 @@ function getCacheFiles() {
     "./styles.css.php",
     "../_common/polyfills/adoptedStyleSheets.min.js",
     "../_common/polyfills/es-module-shims.js",
+    "../_common/polyfills/inert.min.js",
     "../_common/components/input-switch/input-switch.js",
     "../_common/components/input-switch/styles.css",
     "../_common/components/input-switch/template.js"

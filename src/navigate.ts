@@ -279,6 +279,17 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
   // On anime le FAB si besoin
   animateFabIcon(ancienneSection, nouvelleSection);
 
+  // On rend l'ancienne section inerte si la nouvelle section s'affiche par-dessus
+  const main = document.querySelector('main');
+  const bottomBar = document.querySelector('nav.bottom-bar');
+  if (!nouvelleSection.closePrevious) {
+    main?.setAttribute('inert', '');
+    bottomBar?.setAttribute('inert', '');
+  } else {
+    main?.removeAttribute('inert');
+    bottomBar?.removeAttribute('inert');
+  }
+
   // On anime l'apparition de la nouvelle section
   await Promise.all(sectionsToAnimate.map(nom => {
     const section = sections.find(section => section.nom === nom);
