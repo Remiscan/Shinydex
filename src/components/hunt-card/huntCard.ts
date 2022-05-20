@@ -258,6 +258,11 @@ export class huntCard extends HTMLElement {
           chain: parseInt(getInput('compteur').value),
           lure: ((document.querySelector(`input[name="hunt-${hunt.huntid}-compteur-leurre"]:checked`) as HTMLInputElement).value === '1') ? true : false
         });
+      } else if (hunt.jeu === 'Légendes Arceus') {
+        hunt.compteur = JSON.stringify({
+          count: parseInt(getInput('compteur').value),
+          dexResearch: parseInt((document.querySelector(`input[name="hunt-${hunt.huntid}-dex-research"]:checked`) as HTMLInputElement).value)
+        });
       } else {
         hunt.compteur = getInput('compteur').value;
       }

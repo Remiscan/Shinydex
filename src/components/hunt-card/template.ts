@@ -12,6 +12,10 @@ template.innerHTML = `
     <span>Mode édit.</span>
   </div>
 
+
+
+  <!-- Espèce, forme, jeu, méthode -->
+
   <div class="on-top">
     <div class="titre-options">
       <span><label for="hunt-{id}-espece">Pokémon :</label></span>
@@ -42,6 +46,10 @@ template.innerHTML = `
     </div>
   </div>
 
+
+
+  <!-- Compteur de rencontres -->
+
   <div class="sous-titre">
     <span><label for="hunt-{id}-compteur">Compteur de rencontres :</label></span>
   </div>
@@ -55,6 +63,35 @@ template.innerHTML = `
       <i class="material-icons">add</i>
     </button>
   </div>
+
+
+
+  <!-- Bonus de Legends Arceus -->
+
+  <div class="titre-options options-bonus-legends-arceus">
+    <span>Niveau de recherches de la page Pokédex</span>
+  </div>
+
+  <div class="liste-options options-bonus-legends-arceus">
+    <input type="radio" name="hunt-{id}-dex-research" id="hunt-{id}-dex-incomplete" value="0" checked>
+    <label for="hunt-{id}-dex-incomplete" class="radio">
+      <span>Page incomplète (niv <9)</span>
+    </label>
+
+    <input type="radio" name="hunt-{id}-dex-research" id="hunt-{id}-dex-complete" value="1">
+    <label for="hunt-{id}-dex-complete" class="radio">
+      <span>Page complétée (niv 10)</span>
+    </label>
+
+    <input type="radio" name="hunt-{id}-dex-research" id="hunt-{id}-dex-perfect" value="2">
+    <label for="hunt-{id}-dex-perfect" class="radio">
+      <span>Page parfaite <shiny-stars></shiny-stars></span>
+    </label>
+  </div>
+
+
+
+  <!-- Bonus de Let's Go Pikachu / Évoli -->
 
   <div class="titre-options options-compteur-chaine-letsgo">
     <span>Parfum utilisé :</span>
@@ -71,6 +108,10 @@ template.innerHTML = `
       <span class="texte">Oui</span>
     </label>
   </div>
+
+
+
+  <!-- Bonus de Ultra Soleil / Lune -->
 
   <div class="cote-a-cote options-compteur-breche">
     <div class="liste-options">
@@ -93,6 +134,10 @@ template.innerHTML = `
     </div>
   </div>
 
+
+
+  <!-- Boutons Capturé et Annuler -->
+
   <div class="form-element boutons">
     <button type="button" class="bouton-hunt-remove ghost danger">
       <i class="material-icons">delete_forever</i>
@@ -109,6 +154,10 @@ template.innerHTML = `
       <span>Capturé</span>
     </button>
   </div>
+
+
+
+  <!-- Surnom, date, ball -->
 
   <div class="sous-titre caught">
     <span>Données de la capture :</span>
@@ -166,6 +215,10 @@ template.innerHTML = `
       </select>
     </div>
   </div>
+
+
+
+  <!-- Origine, charme chroma, légitimité -->
 
   <div class="sous-titre caught">
     <span>Détails supplémentaires :</span>
@@ -297,6 +350,10 @@ template.innerHTML = `
       <span class="texte">Non</span>
     </label>
   </div>
+
+
+
+  <!-- Notes -->
 
   <div class="sous-titre caught">
     <span>Notes additionnelles :</span>

@@ -43,7 +43,8 @@ const allGames: Jeu[] = [
   { nom: 'Bouclier', gen: 8, id: 'swsh' },
   { nom: 'Home', gen: 8, id: 'home' },
   { nom: 'Diamant Étincelant', gen: 8, id: 'bdsp' },
-  { nom: 'Perle Scintillante', gen: 8, id: 'bdsp' }
+  { nom: 'Perle Scintillante', gen: 8, id: 'bdsp' },
+  { nom: 'Légendes Arceus', gen: 8.1, id: 'la' }
 ];
 
 
@@ -77,9 +78,9 @@ export type Methode = {
 const allMethodes: Methode[] = [
   { nom: 'Sauvage', jeux: allGames, mine: true, charm: true },
   { nom: 'Œuf', jeux: allGames.filter(g => ![1, 7.1, 0].includes(g.gen)), mine: true, charm: true },
-  { nom: 'Masuda', jeux: allGames.filter(g => g.gen >= 4 && g.gen != 7.1), mine: true, charm: true },
+  { nom: 'Masuda', jeux: allGames.filter(g => g.gen >= 4 && g.gen != 7.1 && g.gen != 8.1), mine: true, charm: true },
   { nom: 'Reset', jeux: allGames.filter(g => g.gen >= 2), mine: true, charm: true },
-  { nom: 'Pokéradar', jeux: allGames.filter(g => [4, 6].includes(g.gen)), mine: true, charm: true },
+  { nom: 'Pokéradar', jeux: allGames.filter(g => [4, 6].includes(g.gen) || g.id == 'bdsp'), mine: true, charm: true },
   { nom: 'Pêche à la chaîne', jeux: allGames.filter(g => g.gen == 6), mine: true, charm: true },
   { nom: 'Sauvage (horde)', jeux: allGames.filter(g => g.id == 'xy'), mine: true, charm: true },
   { nom: 'Safari des Amis', jeux: allGames.filter(g => g.id == 'xy'), mine: true, charm: true },
@@ -97,7 +98,9 @@ const allMethodes: Methode[] = [
   { nom: 'Échangé', jeux: allGames, mine: false, charm: false },
   { nom: 'Échangé (GTS)', jeux: allGames.filter(g => g.gen >= 4 && g.gen != 7.1), mine: false, charm: false },
   { nom: 'Échange miracle', jeux: allGames.filter(g => g.gen >= 6 && g.gen != 7.1), mine: false, charm: false },
-  { nom: 'Échangé (œuf)', jeux: allGames.filter(g => g.gen >= 2 && g.gen != 7.1), mine: false, charm: false }
+  { nom: 'Échangé (œuf)', jeux: allGames.filter(g => g.gen >= 2 && g.gen != 7.1), mine: false, charm: false },
+  { nom: 'Apparition massive', jeux: allGames.filter(g => g.id == 'la'), mine: true, charm: true },
+  { nom: 'Mégapparition', jeux: allGames.filter(g => g.id == 'la'), mine: true, charm: true },
 ];
 
 
@@ -531,6 +534,25 @@ class Shiny implements frontendShiny {
       case 'Expédition Dynamax': {
         const rate = (charmRolls > 0) ? 100 : 300;
         return rate;
+      }
+
+      case 'Apparition massive': {
+        bonusRolls = 25;
+        break;
+      }
+
+      case 'Mégapparition': {
+        bonusRolls = 12;
+        break;
+      }
+    }
+
+    switch (game.id) {
+      case 'la': {
+        charmRolls = Number(this.charm) * 3;
+        const dexResearch = Number((JSON.parse(this.compteur)).dexResearch);
+        bonusRolls += dexResearch === 2 ? 3 : dexResearch;
+        break;
       }
     }
 

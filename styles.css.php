@@ -1357,6 +1357,10 @@ nav.disabled {
   display: none;
 }
 
+.hunt-card:not([data-jeu="Légendes Arceus"]) .options-bonus-legends-arceus {
+  display: none;
+}
+
 .options-compteur-chaine-letsgo.titre-options {
   grid-column: 1 / 2;
   white-space: nowrap;
