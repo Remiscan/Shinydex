@@ -42,6 +42,14 @@
           "dark": "true",
           "taille": [12, 12]
         }, {
+          "nom": "bdspborn",
+          "dark": "true",
+          "taille": [12, 12]
+        }, {
+          "nom": "hisuiborn",
+          "dark": "true",
+          "taille": [12, 12]
+        }, {
           "nom": "mine",
           "dark": "false",
           "taille": [12, 12]
@@ -60,7 +68,11 @@
         }, {
           "nom": "gigamax",
           "dark": "false",
-          "taille": [32, 25]
+          "taille": [20, 20]
+        }, {
+          "nom": "alpha",
+          "dark": "false",
+          "taille": [20, 20]
         }, {
           "nom": "oeuf",
           "dark": "false",

@@ -234,6 +234,18 @@ template.innerHTML = `
       <span class="texte">Autre</span>
     </label>
 
+    <input type="radio" name="hunt-{id}-checkmark" id="hunt-{id}-checkmark-hisui" value="8">
+    <label for="hunt-{id}-checkmark-hisui" class="radio checkmark">
+      <span class="icones explain hisuiborn"></span>
+      <span class="texte">Hisui</span>
+    </label>
+
+    <input type="radio" name="hunt-{id}-checkmark" id="hunt-{id}-checkmark-bdsp" value="7">
+    <label for="hunt-{id}-checkmark-bdsp" class="radio checkmark">
+      <span class="icones explain bdspborn"></span>
+      <span class="texte">Sinnoh (DÉ/PS)</span>
+    </label>
+
     <input type="radio" name="hunt-{id}-checkmark" id="hunt-{id}-checkmark-galar" value="6">
     <label for="hunt-{id}-checkmark-galar" class="radio checkmark">
       <span class="icones explain galarborn"></span>
@@ -243,7 +255,7 @@ template.innerHTML = `
     <input type="radio" name="hunt-{id}-checkmark" id="hunt-{id}-checkmark-letsgo" value="4">
     <label for="hunt-{id}-checkmark-letsgo" class="radio checkmark">
       <span class="icones explain letsgoborn"></span>
-      <span class="texte">Let's Go</span>
+      <span class="texte">Kanto (Let's Go)</span>
     </label>
 
     <input type="radio" name="hunt-{id}-checkmark" id="hunt-{id}-checkmark-alola" value="2">
