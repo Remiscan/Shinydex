@@ -39,7 +39,7 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
     // On récupère les données de la BDD
     $link = new BDD();
 
-    $recup_shinies = $link->prepare('SELECT * FROM mes_shinies WHERE userid = :userid ORDER BY id DESC');
+    $recup_shinies = $link->prepare('SELECT * FROM shinydex_pokemon WHERE userid = :userid ORDER BY id DESC');
     $recup_shinies->bindParam(':userid', $userUUID, PDO::PARAM_STR, 36);
     $recup_shinies->execute();
     $onlineData = $recup_shinies->fetchAll(PDO::FETCH_ASSOC);
@@ -113,7 +113,7 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
       $data = $localData[$id];
       $dataToInsert[] = $data;
 
-      $insert = $link->prepare('INSERT INTO mes_shinies (
+      $insert = $link->prepare('INSERT INTO shinydex_pokemon (
         huntid,
         userid,
         lastUpdate,
@@ -178,7 +178,7 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
       $data = $localData[$id];
       $dataToUpdate[] = $data;
 
-      $insert = $link->prepare('UPDATE mes_shinies SET 
+      $insert = $link->prepare('UPDATE shinydex_pokemon SET 
         lastUpdate = :lastUpdate,
         dexid = :dexid,
         forme = :forme,
@@ -220,7 +220,7 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
 
     // On supprime de la BDD ce qui doit l'être
     foreach($toDelete as $huntid) {
-      $insert = $link->prepare('DELETE FROM mes_shinies WHERE huntid = :huntid');
+      $insert = $link->prepare('DELETE FROM shinydex_pokemon WHERE huntid = :huntid');
       $insert->bindParam(':huntid', $huntid, PDO::PARAM_STR, 13);
       $results[] = $insert->execute();
     }
