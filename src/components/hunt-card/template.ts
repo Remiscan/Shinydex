@@ -190,18 +190,27 @@ template.innerHTML = `
         <option value="repeat">Bis Ball</option>
         <option value="timer">Chrono Ball</option>
         <option value="friend">Copain Ball</option>
+        <option value="wing">Envol Ball de Hisui</option>
         <option value="nest">Faiblo Ball</option>
         <option value="net">Filet Ball</option>
+        <option value="gigaton">Gigamasse Ball de Hisui</option>
         <option value="premier">Honor Ball</option>
         <option value="ultra">Hyper Ball</option>
+        <option value="hisuian-ultra">Hyper Ball de Hisui</option>
         <option value="love">Love Ball</option>
         <option value="moon">Lune Ball</option>
         <option value="luxury">Luxe Ball</option>
         <option value="heavy">Masse Ball</option>
+        <option value="hisuian-heavy">Masse Ball de Hisui</option>
         <option value="master">Master Ball</option>
+        <option value="leaden">Mégamasse Ball de Hisui</option>
         <option value="cherish">Mémoire Ball</option>
         <option value="level">Niveau Ball</option>
+        <option value="origin">Origine Ball de Hisui</option>
+        <option value="feather">Plume Ball de Hisui</option>
         <option value="poke" selected>Poké Ball</option>
+        <option value="hisuian-poke">Poké Ball de Hisui</option>
+        <option value="jet">Propulse Ball de Hisui</option>
         <option value="quick">Rapide Ball</option>
         <option value="dream">Rêve Ball</option>
         <option value="safari">Safari Ball</option>
@@ -211,7 +220,9 @@ template.innerHTML = `
         <option value="fast">Speed Ball</option>
         <option value="sport">Sport Ball</option>
         <option value="great">Super Ball</option>
+        <option value="hisuian-great">Super Ball de Hisui</option>
         <option value="beast">Ultra Ball</option>
+        <option value="strange">Étrange Ball</option>
       </select>
     </div>
   </div>
