@@ -48,6 +48,7 @@ function unhandle(handler: Handler) {
 
 export class huntCard extends HTMLElement {
   ready: boolean = false;
+  huntid: string = '';
   hunt: Hunt = new Hunt();
   pokemon?: Pokemon;
   handlers: HandlerMap = {};
@@ -76,22 +77,27 @@ export class huntCard extends HTMLElement {
     super();
   }
 
+  async getHunt() {
+    return new Hunt((await huntStorage.getItem(this.huntid)) ?? undefined);
+  }
+
 
   /**
    * Soumet la chasse à la BDD locale des shiny.
    */
   async submit() {
-    this.hunt.lastUpdate = Date.now();
+    const hunt = await this.getHunt();
+    hunt.lastUpdate = Date.now();
 
     try {
-      const shiny = new Shiny(this.hunt);
-      await shinyStorage.setItem(this.hunt.huntid, shiny);
+      const shiny = new Shiny(hunt);
+      await shinyStorage.setItem(hunt.huntid, shiny);
       await this.delete();
 
       window.dispatchEvent(new CustomEvent('dataupdate', {
         detail: {
           sections: ['mes-chromatiques', 'chasses-en-cours'],
-          ids: [this.hunt.huntid],
+          ids: [hunt.huntid],
         }
       }));
     }
@@ -105,14 +111,15 @@ export class huntCard extends HTMLElement {
    * Supprime la chasse.
    */
   async delete() {
-    this.hunt.lastUpdate = Date.now();
-    this.hunt.deleted = true;
+    const hunt = await this.getHunt();
+    hunt.lastUpdate = Date.now();
+    hunt.deleted = true;
     this.remove();
 
     window.dispatchEvent(new CustomEvent('dataupdate', {
       detail: {
         sections: ['chasses-en-cours', 'corbeille'],
-        ids: [this.hunt.huntid],
+        ids: [hunt.huntid],
       }
     }));
 
@@ -127,20 +134,22 @@ export class huntCard extends HTMLElement {
    * Supprime la chasse et le shiny qu'elle éditait.
    */
   async deleteShiny() {
+    const hunt = await this.getHunt();
+
     this.delete();
 
     // On marque le shiny comme supprimé (pour que la suppression se synchronise en ligne)
-    const shiny = new Shiny(await shinyStorage.getItem(this.hunt.huntid));
-    shiny.lastUpdate = this.hunt.lastUpdate;
+    const shiny = new Shiny(await shinyStorage.getItem(hunt.huntid));
+    shiny.lastUpdate = hunt.lastUpdate;
     shiny.deleted = true;
     // Si la synchronisation en ligne est désactivée, marquer le shiny comme à 'destroy' immédiatement
     // if (!onlineSync) shiny.destroy = true;
-    await shinyStorage.setItem(this.hunt.huntid, shiny);
+    await shinyStorage.setItem(hunt.huntid, shiny);
 
     window.dispatchEvent(new CustomEvent('dataupdate', {
       detail: {
         sections: ['mes-chromatiques'],
-        ids: [this.hunt.huntid],
+        ids: [hunt.huntid],
       }
     }));
   }
@@ -149,14 +158,12 @@ export class huntCard extends HTMLElement {
   /**
    * Met à jour le contenu de la carte à partir d'un objet Hunt.
    */
-  async dataToContent(event: HuntUpdateEvent): Promise<void> {
+  async dataToContent(): Promise<void> {
     if (!this.ready) return;
-    //if (event.detail.shiny.deleted) return this.remove();
 
     let hunt: Hunt;
     try {
-      hunt = new Hunt(event.detail.shiny);
-      this.hunt = hunt;
+      hunt = new Hunt(await huntStorage.getItem(this.huntid));
     } catch (e) {
       console.error('Échec de création de chasse', e);
       throw e;
@@ -167,11 +174,8 @@ export class huntCard extends HTMLElement {
       return this.querySelector(selector) as HTMLInputElement;
     }
 
-    const card = this;
-    const mine = hunt.mine;
-
     // Associe la carte au bon ID de chasse
-    card.setAttribute('id', `hunt-${hunt.huntid}`);
+    this.setAttribute('id', `hunt-${hunt.huntid}`);
     for (const el of Array.from(this.querySelectorAll('[data-id]'))) {
       const attr = (el as HTMLElement).dataset.id || '';
       el.setAttribute('id', attr.replace('{id}', hunt.huntid));
@@ -206,7 +210,8 @@ export class huntCard extends HTMLElement {
    * Met à jour la Hunt sauvegardée à partir des informations saisies dans le formulaire.
    */
   async inputToData() {
-    const hunt = this.hunt;
+    const hunt = await this.getHunt();
+
     const getInput = (prop: huntProperty) => {
       let selector = this.inputMap.get(prop)?.replace('{id}', hunt.huntid) || '';
       switch (prop) {
@@ -287,7 +292,7 @@ export class huntCard extends HTMLElement {
    * Met à jour certains éléments (ex : icônes) de la carte à partir des informations saisies dans le formulaire.
    */
   async inputToContent() {
-    const hunt = this.hunt;
+    const hunt = await this.getHunt();
     const sprite = this.querySelector('pokemon-sprite')!;
 
     // Icônes
@@ -298,6 +303,14 @@ export class huntCard extends HTMLElement {
     sprite.setAttribute('dexid', String(hunt.dexid));
     sprite.setAttribute('forme', hunt.forme);
     sprite.setAttribute('shiny', String(hunt.caught));
+  }
+
+
+  /**
+   * Met à jour la carte.
+   */
+  update() {
+
   }
 
 
@@ -471,6 +484,9 @@ export class huntCard extends HTMLElement {
       function: () => this.genereMethodes()
     }
     handle(this.handlers.listeMethodes);
+
+    // Peuple le contenu de la carte
+    if (this.huntid) this.dataToContent();
   }
 
 
@@ -532,6 +548,24 @@ export class huntCard extends HTMLElement {
     // Désactive la surveillance du formulaire
     for (const [name, handler] of Object.entries(this.changeHandlers)) {
       unhandle(handler);
+    }
+  }
+
+
+  static get observedAttributes() {
+    return ['huntid'];
+  }
+
+
+  attributeChangedCallback(attr: string, oldValue: string, newValue: string) {
+    if (oldValue === newValue) return;
+
+    switch (attr) {
+      case 'huntid': {
+        this.huntid = newValue;
+        if (!this.ready) return;
+        this.dataToContent();
+      } break
     }
   }
 }

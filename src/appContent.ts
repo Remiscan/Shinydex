@@ -76,28 +76,23 @@ export async function populateFromData(section: populatableSection, ids: string[
   let elementName: string; // Nom de l'élément de carte
   let dataStore: localForageAPI; // Base de données
   let filtres: ListeFiltres | undefined; // Filtres à appliquer aux cartes
-  let eventName: string; // Nom de l'événement de mise à jour d'une carte
   switch (section) {
     case 'mes-chromatiques':
       elementName = 'pokemon-card';
       dataStore = shinyStorage;
       filtres = await dataStorage.getItem('filtres');
-      eventName = 'shinyupdate';
       break;
     case 'chasses-en-cours':
       elementName = 'hunt-card';
       dataStore = huntStorage;
-      eventName = 'huntupdate';
       break;
     case 'chromatiques-ami':
       elementName = 'pokemon-card';
       dataStore = friendStorage;
-      eventName = '';
       break;
     case 'corbeille':
       elementName = 'corbeille-card';
       dataStore = huntStorage;
-      eventName = '';
       break;
   }
 
@@ -138,8 +133,7 @@ export async function populateFromData(section: populatableSection, ids: string[
         }
       }
       // DANS LA BDD & AVEC CARTE = Éditer
-      const updateEvent = new CustomEvent(eventName, { detail: { pkmn }});
-      card.dispatchEvent(updateEvent);
+      card.dataToContent();
       return Promise.resolve(huntid);
     }
   }));
