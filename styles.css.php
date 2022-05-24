@@ -1361,6 +1361,18 @@ nav.disabled {
   display: none;
 }
 
+.hunt-card:not([data-jeu="Épée"]):not([data-jeu="Bouclier"]):not([data-jeu="Légendes Arceus"]) .options-gene {
+  display: none;
+}
+
+.hunt-card:not([data-jeu="Épée"]):not([data-jeu="Bouclier"]) :is([id~="gene-gigamax"], [for~="gene-gigamax"]) {
+  display: none;
+}
+
+.hunt-card:not([data-jeu="Légendes Arceus"]) :is([id~="gene-alpha"], [for~="gene-alpha"]) {
+  display: none;
+}
+
 .options-compteur-chaine-letsgo.titre-options {
   grid-column: 1 / 2;
   white-space: nowrap;

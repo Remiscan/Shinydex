@@ -229,11 +229,12 @@ template.innerHTML = `
 
 
 
-  <!-- Origine, charme chroma, légitimité -->
+  <!-- Origine, gène, charme chroma, légitimité -->
 
   <div class="sous-titre caught">
     <span>Détails supplémentaires :</span>
   </div>
+
 
   <div class="titre-options caught">
     <span>Origine :</span>
@@ -293,6 +294,31 @@ template.innerHTML = `
       <span class="texte">Pokémon GO</span>
     </label>
   </div>
+
+
+  <div class="titre-options caught options-gene">
+    <span>Gène :</span>
+  </div>
+
+  <div class="liste-options caught options-gene">
+    <input type="radio" name="hunt-{id}-gene" id="hunt-{id}-gene-none" value="0" checked>
+    <label for="hunt-{id}-gene-none" class="radio gene">
+      <span class="texte">Aucun</span>
+    </label>
+
+    <input type="radio" name="hunt-{id}-gene" id="hunt-{id}-gene-gigamax" value="gigamax">
+    <label for="hunt-{id}-gene-gigamax" class="radio gene">
+      <span class="icones explain gigamax"></span>
+      <span class="texte">Gigamax</span>
+    </label>
+
+    <input type="radio" name="hunt-{id}-gene" id="hunt-{id}-gene-alpha" value="alpha">
+    <label for="hunt-{id}-gene-alpha" class="radio gene">
+      <span class="icones explain alpha"></span>
+      <span class="texte">Baron</span>
+    </label>
+  </div>
+
 
   <div class="titre-options caught">
     <span>Charme chroma possédé :</span>
