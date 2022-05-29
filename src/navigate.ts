@@ -189,6 +189,13 @@ const firstCard = (section: Element): Element | null | undefined => {
 };
 
 
+const backOnEscape = (event: KeyboardEvent) => {
+  if (event.code === 'Escape') {
+    history.back();
+  }
+};
+
+
 /**
  * Navigue vers la section demandée.
  * @param sectionCible - ID de la section demandée.
@@ -208,6 +215,9 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
   const mainElement = document.querySelector('main')!;
 
   if (ancienneSection) {
+    // On désactive le retour à la section précédente à l'appui sur Échap
+    window.removeEventListener('keydown', backOnEscape);
+    
     // On enregistre la position du scroll sur l'ancienne section
     if (ancienneSection.rememberPosition) lastPosition.set(sectionActuelle, mainElement.scrollTop);
 
@@ -285,6 +295,7 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
   if (!nouvelleSection.closePrevious) {
     main?.setAttribute('inert', '');
     bottomBar?.setAttribute('inert', '');
+    window.addEventListener('keydown', backOnEscape); // On ferme la section en appuyant sur Échap
   } else {
     main?.removeAttribute('inert');
     bottomBar?.removeAttribute('inert');
