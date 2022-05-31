@@ -49,7 +49,6 @@ function unhandle(handler: Handler) {
 export class huntCard extends HTMLElement {
   ready: boolean = false;
   huntid: string = '';
-  hunt: Hunt = new Hunt();
   pokemon?: Pokemon;
   handlers: HandlerMap = {};
   changeHandlers: HandlerMap = {};
@@ -78,7 +77,7 @@ export class huntCard extends HTMLElement {
   }
 
   async getHunt() {
-    return new Hunt((await huntStorage.getItem(this.huntid)) ?? undefined);
+    return await Hunt.make(this.huntid ?? undefined);
   }
 
 
@@ -163,7 +162,7 @@ export class huntCard extends HTMLElement {
 
     let hunt: Hunt;
     try {
-      hunt = new Hunt(await huntStorage.getItem(this.huntid));
+      hunt = await this.getHunt();
     } catch (e) {
       console.error('Échec de création de chasse', e);
       throw e;
@@ -368,15 +367,21 @@ export class huntCard extends HTMLElement {
       element: boutonCaught,
       type: 'click',
       function: async event => {
+        const hunt = await this.getHunt();
+
         const container = boutonCaught.parentElement!.parentElement!;
         container.classList.toggle('caught');
         const inputDate = this.querySelector('input[type="date"]') as HTMLInputElement;
   
         if (inputDate.value == '') inputDate.value = new Date().toISOString().split('T')[0];
-        if (container.classList.contains('caught')) this.hunt.caught = true;
-        else                                        this.hunt.caught = false;
+        if (container.classList.contains('caught')) {
+          hunt.caught = true;
+          (this.querySelector('pokemon-sprite')! as pokemonSprite).sparkle();
+        } else {
+          hunt.caught = false;
+        }
 
-        (this.querySelector('pokemon-sprite')! as pokemonSprite).sparkle();
+        await huntStorage.setItem(hunt.huntid, hunt);
       }
     };
     handle(this.handlers.caught);
@@ -411,13 +416,15 @@ export class huntCard extends HTMLElement {
       type: 'submit',
       function: async event => {
         event.preventDefault();
+
+        const hunt = await this.getHunt();
   
         // Gestion des erreurs de formulaire
         const erreurs = [];
-        if (this.hunt.dexid == 0) erreurs.push('Pokémon');
-        if (this.hunt.jeu == '') erreurs.push('jeu');
-        if (this.hunt.methode == '')  erreurs.push('méthode');
-        if (this.hunt.timeCapture == 0) erreurs.push('date');
+        if (hunt.dexid == 0) erreurs.push('Pokémon');
+        if (hunt.jeu == '') erreurs.push('jeu');
+        if (hunt.methode == '')  erreurs.push('méthode');
+        if (hunt.timeCapture == 0) erreurs.push('date');
   
         if (erreurs.length > 0) {
           let message = `Les champs suivants sont mal remplis : `;
@@ -440,7 +447,9 @@ export class huntCard extends HTMLElement {
       element: boutonDeleteShiny,
       type: 'click',
       function: async event => {
-        const edit = (await shinyStorage.getItem(this.hunt.huntid)) != null;
+        const hunt = await this.getHunt();
+
+        const edit = (await shinyStorage.getItem(hunt.huntid)) != null;
         if (!edit) {
           new Notif('Cette chasse n\'est pas dans la base de données').prompt();
           return;

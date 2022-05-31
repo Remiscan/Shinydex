@@ -1,5 +1,5 @@
-import { editHunt } from '../../Hunt.js';
-import { pokemonData, shinyStorage } from '../../localforage.js';
+import { huntStorage, pokemonData, shinyStorage } from '../../localforage.js';
+import { Notif } from '../../notification.js';
 import { Params, wait } from '../../Params.js';
 import { Shiny } from '../../Pokemon.js';
 import template from './template.js';
@@ -296,15 +296,31 @@ export class pokemonCard extends HTMLElement {
     longClic = true;
 
     appear.play();
-    await new Promise(resolve => appear.addEventListener('finish', resolve));
+    await wait(appear);
     anim.play();
-    await new Promise(resolve => anim.addEventListener('finish', resolve));
+    await wait(anim);
 
     if (!act) return;
-    let ready = await editHunt(this.getAttribute('huntid') || '');
-    ready = (ready != false);
-    appear.cancel(); anim.cancel();
-    if (ready) longClic = false;
+
+    try {
+      let k = await huntStorage.getItem(this.huntid);
+      if (k != null) {
+        throw `Ce Pokémon est déjà en cours de modification.`;
+      }
+
+      const card = document.createElement('hunt-card');
+      card.setAttribute('huntid', this.huntid);
+
+      (document.querySelector('.nav-link[data-section="chasses-en-cours"]') as HTMLElement)?.click();
+    } catch (error) {
+      const message = (typeof error === 'string') ? error : `Erreur : impossible de modifier ce Pokémon.`;
+      console.error(error);
+      new Notif(message).prompt();
+    }
+
+    appear.cancel();
+    anim.cancel();
+    longClic = false;
   }
 
 
