@@ -157,8 +157,8 @@ document.querySelector('.bouton-export')!.addEventListener('click', () => {
   try {
     export2json();
   } catch (error) {
-    const message = `Erreur pendant l'export' des données.`;
-    console.error(message, error);
+    const message = typeof error === 'string' ? error : `Erreur pendant l'export des données.`;
+    console.error(error);
     new Notif(message).prompt();
   }
 });
