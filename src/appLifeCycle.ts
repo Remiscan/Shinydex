@@ -1,6 +1,7 @@
 import { initPokedex, populateHandler } from './appContent.js';
 import { getNames } from './DexDatalist.js';
 import { initFiltres } from './filtres.js';
+import { initGamesDatalist } from './Hunt.js';
 import { dataStorage, huntStorage, pokemonData, shinyStorage } from './localforage.js';
 import { Notif } from './notification.js';
 import { loadAllImages, Params, setTheme, timestamp2date, wait, webpSupport } from './Params.js';
@@ -177,8 +178,10 @@ export async function appStart() {
   try {
     await initFiltres('mes-chromatiques');
     await initPokedex();
+    await initGamesDatalist();
     await populateHandler('mes-chromatiques');
     await populateHandler('chasses-en-cours');
+    await populateHandler('corbeille');
     // await initAmis();
   } catch (error) {
     console.error(error);
