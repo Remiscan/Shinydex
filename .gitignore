@@ -1,9 +1,4 @@
-\[backups\]/
-test.php
-
-# Ignore generated icon sheet
-images/out/
-
-# Ignore compiled js for now
+# Ignore generated files
 modules
+images/out/
 tsconfig.tsbuildinfo
