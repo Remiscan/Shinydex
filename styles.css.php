@@ -1544,7 +1544,7 @@ textarea {
   text-align: justify;
   box-sizing: border-box;
   width: 100%;
-  max-width: 500px;
+  max-width: 65ch;
   color: var(--text-color-soft);
 }
 
@@ -2182,7 +2182,7 @@ input:focus:not(:focus-visible) + label:is(.radio, .checkbox, .chip) {
     grid-column: 2 / 3;
     display: grid;
     grid-template-rows: 1fr;
-    grid-template-columns: calc(8px + 500px + 16px + 380px + 8px) 1fr;
+    grid-template-columns: 1fr 1fr;
     overflow-y: hidden;
     padding: 0 8px;
   }
