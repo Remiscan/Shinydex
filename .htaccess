@@ -25,16 +25,3 @@
     </ElseIf>
 
 </IfModule>
-
-
-
-### Rewrite URLs
-
-RewriteEngine On
-
-# Rewrite /remidex/sprites-home/small/poke_capture_... to /remidex/mod_resizeSprite.php?sprite=poke_capture_...
-RewriteRule ^(.*)sprites-home\/small\/poke_capture_(.*)\.(png)$ $1mod_resizeSprite.php?sprite=$2 [L,QSA]
-
-# Rewrite /shinydex/sprite-{params}.webp to /shinydex/backend/sprite.php?format=webp&params={params}
-# and /shinydex/sprite-{params}.png to /shinydex/backend/sprite.php?format=png&params={params}
-RewriteRule ^pokemon-sprite-(.*)-([0-9]+)\.(webp|png)$ backend/pokemon-sprite.php?params=$1&size=$2&format=$3 [L,QSA]
