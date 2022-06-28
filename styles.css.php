@@ -2,7 +2,7 @@
 !!!!! ÉLÉMENTS GLOBAUX !!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
-/*<?php ob_start();?>*/
+/*<?php themeSheetStart(); ?>*/
 :root[data-theme="light"] {
   color-scheme: light;
   --bg-color: rgb(224, 224, 224);
@@ -58,9 +58,7 @@
   --progress-bar-color: white;
   --card-edit-bg-color: hsla(0, 0%, 7%, .7);
 }
-/*<?php $body = ob_get_clean();
-require_once $_SERVER['DOCUMENT_ROOT'] . '/_common/components/theme-selector/build-css.php';
-echo buildThemesStylesheet($body); ?>*/
+/*<?php themeSheetEnd(closeComment: true); ?>*/
 
 :root {
   --nav-text-color-on: var(--accent-color);
