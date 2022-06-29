@@ -2,7 +2,7 @@
 class Params
 {
   public static function path() {
-    $paramsPath = '/home/remiscanmk/params/remidex.ini';
+    $paramsPath = '/home/remiscan/websites/params/remidex.ini';
     
     return $paramsPath;
   }
