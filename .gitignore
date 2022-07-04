@@ -1,5 +1,4 @@
 # Ignore generated files
 modules
 images/out/
-.deploy.sh
 tsconfig.tsbuildinfo
