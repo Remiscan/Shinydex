@@ -1,0 +1,7 @@
+.git
+.gitattributes
+.gitignore
+.rsyncignore
+.deploy.sh
+build
+src
