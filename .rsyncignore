@@ -2,6 +2,6 @@
 .gitattributes
 .gitignore
 .rsyncignore
-.deploy.sh
+.deploy
 build
 src

@@ -1,0 +1,1 @@
+deploy-to-prod "remiscanfr" "." "$basepath_prod/www/shinydex"
