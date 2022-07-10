@@ -1,4 +1,8 @@
 import { compile } from './mod.js';
 
-try { compile(); }
-catch (error) { console.log(error); }
+try {
+  compile();
+  Deno.exit();
+} catch (error) {
+  console.log(error);
+}
