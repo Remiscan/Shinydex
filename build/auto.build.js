@@ -9,9 +9,7 @@ for await (const event of watcher) {
     try {
       const newPath = path.replace('./src', './modules')
                           .replace('.ts', '.js');
-      if (event.kind === 'remove') await Deno.remove(newPath);
-      if (path.endsWith('.ts'))         compile(); // Compile whether a file got created, modified or removed
-      else if (event.kind !== 'remove') await Deno.copyFile(path, newPath);
+      if (path.endsWith('.ts'))         await compile();
     } catch (error) {
       console.log(error); continue;
     }

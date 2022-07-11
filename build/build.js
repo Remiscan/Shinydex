@@ -1,7 +1,7 @@
 import { compile } from './mod.js';
 
 try {
-  compile();
+  await compile();
   Deno.exit();
 } catch (error) {
   console.log(error);
