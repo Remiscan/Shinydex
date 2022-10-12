@@ -3,7 +3,7 @@
   "tasks": [
     {
       "type": "shell",
-      "command": "tsc.cmd --incremental",
+      "command": "tsc --incremental",
       "problemMatcher": ["$tsc"],
       "label": "compile to JS",
       "group": {
@@ -11,8 +11,11 @@
         "isDefault": true
       }
     }, {
-      "type": "shell",
-      "command": "deno run --allow-run --allow-read --allow-write=./modules build/auto.build.js",
+      "type": "deno",
+      "command": "run",
+      "args": [
+        "--allow-run", "--allow-read", "--allow-write=./modules", "build/auto.build.js"
+      ],
       "label": "[auto] compile to JS on file change",
       "runOptions": {
         "runOn": "folderOpen"
