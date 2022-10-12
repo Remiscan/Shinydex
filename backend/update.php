@@ -1,6 +1,4 @@
 <?php
-require_once './parametres.php';
-require_once './class_BDD.php';
 require_once './class_Pokemon.php';
 require_once './cache.php';
 

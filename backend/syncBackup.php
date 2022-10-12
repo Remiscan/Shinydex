@@ -1,5 +1,5 @@
 <?php
-require_once './parametres.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/_common/php/DotEnv.php';
 require_once './class_BDD.php';
 
 ///////////////////////////////////////////////////
@@ -21,11 +21,12 @@ if (isset($_POST['local-data']) && isset($_POST['deleted-local-data']))
   $userUUID = $_POST['user-uuid'];
   $localData = json_decode($_POST['local-data']);
   $deletedData = json_decode($_POST['deleted-local-data']);
-  $mdp = $_POST['mdp'];
 
   // Le mot de passe envoyé est-il le bon ?
-  $params = parse_ini_file(Params::path(), TRUE);
-  $passcheck = password_verify($mdp, $params['hunts']['hash']);
+  $hash = file_get_contents('/home/remiscan/remiscanfr/secrets/shinydex/hunts_hash.txt');
+  $passcheck = password_verify($_POST['mdp'], $hash);
+  unset($_POST['mdp']);
+  unset($hash);
 
   if ($passcheck != true)
   {
