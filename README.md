@@ -1,0 +1,1 @@
+> This app is currently being refactored (in the Typescript branch). It will be ready... someday. The version that is currently online may be a bit broken. Sorry.
