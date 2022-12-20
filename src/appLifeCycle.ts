@@ -1,6 +1,6 @@
 import { getNames } from './DexDatalist.js';
 import { initGamesDatalist } from './Hunt.js';
-import { loadAllImages, Params, setTheme, timestamp2date, wait, webpSupport } from './Params.js';
+import { Params, loadAllImages, setTheme, timestamp2date, wait, webpSupport } from './Params.js';
 import { initPokedex, populateHandler } from './appContent.js';
 import { initFiltres } from './filtres.js';
 import { dataStorage, huntStorage, pokemonData, shinyStorage } from './localforage.js';
@@ -26,17 +26,16 @@ let updateAvailable = 0;
 
 async function initServiceWorker() {
   try {
-    const registration = await navigator.serviceWorker.register('/shinydex/service-worker.js.php');
+    const registration = await navigator.serviceWorker.register('/shinydex/service-worker.js');
     console.log('Le service worker a été enregistré', registration);
 
     // On détecte les mises à jour du service worker lui-même
     registration.addEventListener('updatefound', () => {
       const newWorker = registration.installing;
       newWorker!.addEventListener('statechange', () => {
-        if (newWorker!.state == 'installed') {
+        if (newWorker!.state == 'activated') {
           console.log('[sw] Service worker mis à jour');
-          const updateNotif = new Notif('Mise à jour installée', 'Relancer', 'update', Notif.maxDelay, window.location.reload);
-          updateNotif.prompt();
+          currentWorker = newWorker;
         }
       });
     });
@@ -66,7 +65,7 @@ export async function appStart() {
   // On vérifie si les données sont installées
   await Promise.all([dataStorage.ready(), shinyStorage.ready(), pokemonData.ready(), huntStorage.ready()]);
   const [installedVersion, installedPokemonData] = await Promise.all([
-    dataStorage.getItem('file-versions'),
+    dataStorage.getItem('version-fichiers'),
     pokemonData.getItem('0')
   ]);
   const dataInstalled = installedVersion != null && installedPokemonData != null;
