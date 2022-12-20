@@ -1,10 +1,10 @@
-import { initPokedex, populateHandler } from './appContent.js';
 import { getNames } from './DexDatalist.js';
-import { initFiltres } from './filtres.js';
 import { initGamesDatalist } from './Hunt.js';
+import { loadAllImages, Params, setTheme, timestamp2date, wait, webpSupport } from './Params.js';
+import { initPokedex, populateHandler } from './appContent.js';
+import { initFiltres } from './filtres.js';
 import { dataStorage, huntStorage, pokemonData, shinyStorage } from './localforage.js';
 import { Notif } from './notification.js';
-import { loadAllImages, Params, setTheme, timestamp2date, wait, webpSupport } from './Params.js';
 import { backgroundSync, immediateSync } from './syncBackup.js';
 import { upgradeStorage } from './upgradeStorage.js';
 
@@ -26,16 +26,17 @@ let updateAvailable = 0;
 
 async function initServiceWorker() {
   try {
-    const registration = await navigator.serviceWorker.register('/shinydex/service-worker.js');
+    const registration = await navigator.serviceWorker.register('/shinydex/service-worker.js.php');
     console.log('Le service worker a été enregistré', registration);
 
     // On détecte les mises à jour du service worker lui-même
     registration.addEventListener('updatefound', () => {
       const newWorker = registration.installing;
       newWorker!.addEventListener('statechange', () => {
-        if (newWorker!.state == 'activated') {
+        if (newWorker!.state == 'installed') {
           console.log('[sw] Service worker mis à jour');
-          currentWorker = newWorker;
+          const updateNotif = new Notif('Mise à jour installée', 'Relancer', 'update', Notif.maxDelay, window.location.reload);
+          updateNotif.prompt();
         }
       });
     });
@@ -65,7 +66,7 @@ export async function appStart() {
   // On vérifie si les données sont installées
   await Promise.all([dataStorage.ready(), shinyStorage.ready(), pokemonData.ready(), huntStorage.ready()]);
   const [installedVersion, installedPokemonData] = await Promise.all([
-    dataStorage.getItem('version-fichiers'),
+    dataStorage.getItem('file-versions'),
     pokemonData.getItem('0')
   ]);
   const dataInstalled = installedVersion != null && installedPokemonData != null;
