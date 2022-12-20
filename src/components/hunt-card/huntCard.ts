@@ -1,11 +1,13 @@
 import { DexDatalist } from '../../DexDatalist.js';
 import { Hunt, huntedPokemon } from '../../Hunt.js';
-import { huntStorage, pokemonData, shinyStorage } from '../../localforage.js';
-import { Notif } from '../../notification.js';
 import { warnBeforeDestruction } from '../../Params.js';
 import { Forme, Methode, Pokemon, Shiny } from '../../Pokemon.js';
+import { huntStorage, pokemonData, shinyStorage } from '../../localforage.js';
+import { Notif } from '../../notification.js';
 import pokemonSprite from '../pokemon-sprite/pokemonSprite.js';
 import template from './template.js';
+// @ts-ignore
+import pokespriteSheet from '../ext/pokesprite.css' assert { type: 'css' };
 
 
 
@@ -53,27 +55,30 @@ export class huntCard extends HTMLElement {
   handlers: HandlerMap = {};
   changeHandlers: HandlerMap = {};
   inputMap: Map<huntProperty, querySelector> = new Map([
-    ['dexid', '#hunt-{id}-espece'],
-    ['forme', '#hunt-{id}-forme'],
-    ['surnom', '#hunt-{id}-surnom'],
-    ['methode', '#hunt-{id}-methode'],
-    ['jeu', '#hunt-{id}-jeu'],
-    ['ball', '#hunt-{id}-ball'],
-    ['notes', '#hunt-{id}-notes'],
+    ['dexid', '#hunt-espece'],
+    ['forme', '#hunt-forme'],
+    ['surnom', '#hunt-surnom'],
+    ['methode', '#hunt-methode'],
+    ['jeu', '#hunt-jeu'],
+    ['ball', '#hunt-ball'],
+    ['notes', '#hunt-notes'],
 
-    ['checkmark', 'input[name="hunt-{id}-checkmark"]'],
-    ['DO', 'input[name="hunt-{id}-DO"]'],
-    ['charm', 'input[name="hunt-{id}-charm"]'],
-    ['hacked', 'input[name="hunt-{id}-hacked"]'],
-    ['horsChasse', 'input[name="hunt-{id}-horsChasse"]'],
+    ['checkmark', 'input[name="hunt-checkmark"]'],
+    ['DO', 'input[name="hunt-DO"]'],
+    ['charm', 'input[name="hunt-charm"]'],
+    ['hacked', 'input[name="hunt-hacked"]'],
+    ['horsChasse', 'input[name="hunt-horsChasse"]'],
 
-    ['compteur', '#hunt-{id}-compteur'],
-    ['timeCapture', '#hunt-{id}-date'],
+    ['compteur', '#hunt-compteur'],
+    ['timeCapture', '#hunt-date'],
   ]);
 
 
   constructor() {
     super();
+    this.attachShadow({ mode: 'open' });
+    this.shadowRoot!.appendChild(template.content.cloneNode(true));
+    this.shadowRoot!.adoptedStyleSheets = [pokespriteSheet];
   }
 
   async getHunt() {
