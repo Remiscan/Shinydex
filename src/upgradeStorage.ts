@@ -1,4 +1,4 @@
-import { dataStorage, huntStorage, shinyStorage } from './localforage.js';
+import { dataStorage, huntStorage, shinyStorage } from './localForage.js';
 
 
 

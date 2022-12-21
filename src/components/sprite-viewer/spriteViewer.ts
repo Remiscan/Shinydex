@@ -1,6 +1,6 @@
-import { pokemonData } from '../../localforage.js';
 import { pad } from '../../Params.js';
 import { Pokemon } from '../../Pokemon.js';
+import { pokemonData } from '../../localForage.js';
 // @ts-expect-error
 import sheet from './styles.css' assert { type: 'css' };
 import template from './template.js';

@@ -1,6 +1,6 @@
-import { pokemonCard } from './components/pokemon-card/pokemonCard.js';
-import { dataStorage, pokemonData, shinyStorage } from './localforage.js';
 import { Pokemon, Shiny } from './Pokemon.js';
+import { pokemonCard } from './components/pokemon-card/pokemonCard.js';
+import { dataStorage, pokemonData, shinyStorage } from './localForage.js';
 
 
 

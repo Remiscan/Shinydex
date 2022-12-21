@@ -1,19 +1,24 @@
 import '../../_common/components/input-switch/input-switch.js';
+import { Hunt } from './Hunt.js';
+import { setTheme } from './Params.js';
 import { populatableSection, populateHandler } from './appContent.js';
 import { appStart, changeAutoMaj, checkUpdate, manualUpdate, setOnlineBackup } from './appLifeCycle.js';
+import './components/corbeille-card/corbeilleCard.js';
+import './components/hunt-card/huntCard.js';
 import './components/load-spinner/loadSpinner.js';
 import './components/pokemon-card/pokemonCard.js';
+import './components/pokemon-sprite/pokemonSprite.js';
 import './components/search-bar/searchBar.js';
 import './components/shiny-stars/shinyStars.js';
+import './components/shiny-switch/shinySwitch.js';
 import './components/sprite-viewer/spriteViewer.js';
 import './components/sync-line/syncLine.js';
 import './components/sync-progress/syncProgress.js';
 import { export2json, json2import } from './exportToJSON.js';
 import { ListeFiltres } from './filtres.js';
-import { dataStorage, huntStorage } from './localforage.js';
-import { navigate, navLinkBubble, sectionActuelle } from './navigate.js';
+import { dataStorage, huntStorage } from './localForage.js';
+import { navLinkBubble, navigate, sectionActuelle } from './navigate.js';
 import { Notif } from './notification.js';
-import { setTheme } from './Params.js';
 import { backgroundSync } from './syncBackup.js';
 
 
@@ -59,7 +64,15 @@ document.querySelector('.fab')!.addEventListener('click', async () => {
     if (sectionActuelle !== 'chasses-en-cours') {
       await navigate('chasses-en-cours', new Event('navigate'));
     }
+
     // Créer une nouvelle chasse ici
+    const hunt = await Hunt.make();
+    huntStorage.setItem(hunt.huntid, hunt);
+
+    const container = document.querySelector('#chasses-en-cours .section-contenu')!;
+    const huntCard = document.createElement('hunt-card');
+    huntCard.setAttribute('huntid', hunt.huntid);
+    container.insertBefore(huntCard, container.firstChild);
   }
 
   // Ajoute un nouvel ami

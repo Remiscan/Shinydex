@@ -1,7 +1,7 @@
-import { huntStorage, pokemonData, shinyStorage } from '../../localforage.js';
-import { Notif } from '../../notification.js';
 import { Params, wait } from '../../Params.js';
 import { Shiny } from '../../Pokemon.js';
+import { huntStorage, pokemonData, shinyStorage } from '../../localForage.js';
+import { Notif } from '../../notification.js';
 import template from './template.js';
 
 

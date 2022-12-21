@@ -1,8 +1,8 @@
 import { huntedPokemon } from "./Hunt.js";
-import { dataStorage, huntStorage, localForageAPI, shinyStorage } from "./localforage.js";
-import { Notif } from "./notification.js";
 import { timestamp2date, wait } from "./Params.js";
 import { frontendShiny } from "./Pokemon.js";
+import { dataStorage, huntStorage, localForageAPI, shinyStorage } from "./localForage.js";
+import { Notif } from "./notification.js";
 import { upgradeStorage } from "./upgradeStorage.js";
 
 

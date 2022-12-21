@@ -1,5 +1,5 @@
-import { dataStorage, pokemonData } from './localforage.js';
 import { pad } from './Params.js';
+import { dataStorage, pokemonData } from './localForage.js';
 
 
 

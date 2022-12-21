@@ -1,4 +1,4 @@
-import { pokemonCard } from '../pokemon-card/pokemonCard';
+import { pokemonCard } from '../pokemon-card/pokemonCard.js';
 
 
 

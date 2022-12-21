@@ -3,7 +3,7 @@ import { initGamesDatalist } from './Hunt.js';
 import { Params, loadAllImages, setTheme, timestamp2date, wait, webpSupport } from './Params.js';
 import { initPokedex, populateHandler } from './appContent.js';
 import { initFiltres } from './filtres.js';
-import { dataStorage, huntStorage, pokemonData, shinyStorage } from './localforage.js';
+import { dataStorage, huntStorage, pokemonData, shinyStorage } from './localForage.js';
 import { Notif } from './notification.js';
 import { backgroundSync, immediateSync } from './syncBackup.js';
 import { upgradeStorage } from './upgradeStorage.js';

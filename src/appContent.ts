@@ -1,12 +1,12 @@
+import { huntedPokemon } from './Hunt.js';
+import { frontendShiny, Pokemon } from './Pokemon.js';
 import { huntCard } from './components/hunt-card/huntCard.js';
 import { pokemonCard } from './components/pokemon-card/pokemonCard.js';
 import { filterCards, ListeFiltres, orderCards } from './filtres.js';
-import { huntedPokemon } from './Hunt.js';
 import { lazyLoad } from './lazyLoading.js';
-import { dataStorage, friendStorage, huntStorage, localForageAPI, shinyStorage } from './localforage.js';
+import { dataStorage, friendStorage, huntStorage, localForageAPI, shinyStorage } from './localForage.js';
 import { navigate } from './navigate.js';
 import { Notif } from './notification.js';
-import { frontendShiny, Pokemon } from './Pokemon.js';
 
 
 

@@ -1,4 +1,4 @@
-import { dataStorage } from './localforage.js';
+import { dataStorage } from './localForage.js';
 import { Notif } from './notification.js';
 
 
@@ -59,11 +59,14 @@ export function loadAllImages(liste: string[]): Promise<number[]> {
 ////////////
 // Sync wait
 export function wait(time: number | Animation): Promise<any> { 
-  if (time instanceof Animation)
+  if (time instanceof Animation) {
+    if (time.playState === 'finished') return Promise.resolve();
     return new Promise(resolve => time.addEventListener('finish', resolve));
-  else if (typeof time === 'number')
+  } else if (typeof time === 'number') {
     return new Promise(resolve => setTimeout(resolve, time));
-  else return Promise.resolve();
+  } else {
+    return Promise.resolve();
+  }
 }
 
 
