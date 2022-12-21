@@ -391,6 +391,7 @@ h1 {
   overflow-y: auto;
   height: 100%;
   box-sizing: border-box;
+  scrollbar-gutter: stable;
 }
 
 body[data-section-actuelle~="obfuscator"] .section-contenu {
