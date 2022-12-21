@@ -1,4 +1,4 @@
-import { frontendShiny, Pokemon, Shiny } from './Pokemon.js';
+import { Pokemon, Shiny, frontendShiny } from './Pokemon.js';
 import { huntStorage, shinyStorage } from './localforage.js';
 
 
@@ -57,6 +57,7 @@ export class Hunt extends Shiny implements huntedPokemon {
     if (huntid) {
       const huntData = await huntStorage.getItem(huntid);
       const data = huntData ?? (await shinyStorage.getItem(huntid));
+      if (data == null) throw `No hunt or shiny Pokémon found with huntid ${huntid}`;
       hunt = new Hunt(data);
       if (!huntData) await huntStorage.setItem(huntid, hunt);
     } else {
