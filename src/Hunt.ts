@@ -1,5 +1,5 @@
-import { huntStorage, shinyStorage } from './localforage.js';
 import { frontendShiny, Pokemon, Shiny } from './Pokemon.js';
+import { huntStorage, shinyStorage } from './localforage.js';
 
 
 

@@ -49,11 +49,10 @@ function unhandle(handler: Handler) {
 
 
 export class huntCard extends HTMLElement {
-  ready: boolean = false;
+  shadow: ShadowRoot;
   huntid: string = '';
   pokemon?: Pokemon;
   handlers: HandlerMap = {};
-  changeHandlers: HandlerMap = {};
   inputMap: Map<huntProperty, querySelector> = new Map([
     ['dexid', '#hunt-espece'],
     ['forme', '#hunt-forme'],
@@ -72,13 +71,14 @@ export class huntCard extends HTMLElement {
     ['compteur', '#hunt-compteur'],
     ['timeCapture', '#hunt-date'],
   ]);
+  changeNonce: Object = {};
 
 
   constructor() {
     super();
-    this.attachShadow({ mode: 'open' });
-    this.shadowRoot!.appendChild(template.content.cloneNode(true));
-    this.shadowRoot!.adoptedStyleSheets = [pokespriteSheet];
+    this.shadow = this.attachShadow({ mode: 'open' });
+    this.shadow.appendChild(template.content.cloneNode(true));
+    this.shadow.adoptedStyleSheets = [pokespriteSheet];
   }
 
   async getHunt() {
@@ -162,9 +162,7 @@ export class huntCard extends HTMLElement {
   /**
    * Met à jour le contenu de la carte à partir d'un objet Hunt.
    */
-  async dataToContent(): Promise<void> {
-    if (!this.ready) return;
-
+  async huntToForm(): Promise<void> {
     let hunt: Hunt;
     try {
       hunt = await this.getHunt();
@@ -173,180 +171,203 @@ export class huntCard extends HTMLElement {
       throw e;
     }
 
-    const getInput = (prop: huntProperty) => {
-      const selector = this.inputMap.get(prop)?.replace('{id}', hunt.huntid) || '';
-      return this.querySelector(selector) as HTMLInputElement;
+    for (const [prop, value] of Object.entries(hunt)) {
+      const input = this.shadow.querySelector(`input[name="${prop}"]`) as HTMLInputElement;
+
+      switch (prop as huntProperty) {
+        case 'dexid': {
+          const allNames = await Pokemon.namesfr();
+          const name = allNames[value];
+          input.value = name;
+        } break;
+
+        case 'forme':
+        case 'surnom':
+        case 'methode':
+        case 'jeu':
+        case 'ball':
+        case 'notes': {
+          input.value = value;
+        } break;
+
+        case 'checkmark':
+        case 'hacked': {
+          const input = this.shadow.querySelector(`input[name="${prop}"][value="${value}"]`) as HTMLInputElement;
+          input.checked = true;
+        } break;
+
+        case 'charm':
+        case 'hacked':
+        case 'horsChasse': {
+          input.checked = value;
+        } break;
+
+        case 'compteur': {
+          const methode = hunt.methode;
+          const jeu = hunt.jeu;
+          const compteur = JSON.parse(value);
+
+          if (methode === 'Ultra-Brèche') {
+            const inputDistance = this.shadow.querySelector(`input[name="usum-distance"]`) as HTMLInputElement;
+            inputDistance.value = String(compteur.distance);
+
+            const inputRings = this.shadow.querySelector(`select[name="usum-rings"]`) as HTMLInputElement;
+            inputRings.value = String(compteur.rings);
+          }
+
+          else if (methode === 'Chaîne de captures') {
+            input.value = String(compteur.chain);
+
+            const inputLure = this.shadow.querySelector(`input[name="lgpe-lure"]`) as HTMLInputElement;
+            inputLure.checked = compteur.lure;
+          }
+
+          else if (jeu === 'Légendes Arceus') {
+            input.value = String(compteur.count);
+
+            const inputDexResearch = this.shadow.querySelector(`input[name="pla-dexResearch"][value="${compteur.dexResearch}"]`) as HTMLInputElement;
+            inputDexResearch.checked = true;
+          }
+
+          else {
+            input.value = value;
+          }
+        } break;
+
+        case 'timeCapture': {
+          const date = (new Date(value)).toISOString().split('T')[0];
+          input.value = date;
+        } break;
+      }
     }
-
-    // Associe la carte au bon ID de chasse
-    this.setAttribute('id', `hunt-${hunt.huntid}`);
-    for (const el of Array.from(this.querySelectorAll('[data-id]'))) {
-      const attr = (el as HTMLElement).dataset.id || '';
-      el.setAttribute('id', attr.replace('{id}', hunt.huntid));
-    }
-    for (const el of Array.from(this.querySelectorAll('[data-for]'))) {
-      const attr = (el as HTMLElement).dataset.for || '';
-      el.setAttribute('id', attr.replace('{id}', hunt.huntid));
-    }
-    for (const el of Array.from(this.querySelectorAll('[data-name]'))) {
-      const attr = (el as HTMLElement).dataset.name || '';
-      el.setAttribute('id', attr.replace('{id}', hunt.huntid));
-    }
-
-    // Détermine si la chasse est une édition ou une création de Pokémon
-    const edit = (await shinyStorage.getItem(hunt.huntid)) != null;
-    if (edit) this.classList.add('edit');
-    else      this.classList.remove('edit');
-
-    const jeu = hunt.jeu.replace(/[ \']/g, '');
-
-    /*
-
-
-    STILL NOT DONE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
-    */
   }
 
-  
+
   /**
    * Met à jour la Hunt sauvegardée à partir des informations saisies dans le formulaire.
    */
-  async inputToData() {
+  async formToHunt(formData: FormData): Promise<Hunt> {
     const hunt = await this.getHunt();
 
-    const getInput = (prop: huntProperty) => {
-      let selector = this.inputMap.get(prop)?.replace('{id}', hunt.huntid) || '';
-      switch (prop) {
+    for (const [prop, value] of formData.entries()) {
+      switch (prop as huntProperty) {
+        case 'dexid': {
+          const allNames = await Pokemon.namesfr();
+          const dexid = allNames.findIndex(s => s === value);
+          hunt.dexid = dexid > 0 ? dexid : 0;
+        } break;
+
+        case 'forme':
+        case 'surnom':
+        case 'methode':
+        case 'jeu':
+        case 'ball':
+        case 'notes': {
+          Object.assign(hunt, { prop: value });
+        } break;
+
         case 'checkmark':
-        case 'DO':
+        case 'hacked': {
+          Object.assign(hunt, { prop: parseInt(value as string) });
+        } break;
+
         case 'charm':
         case 'hacked':
-        case 'horsChasse':
-          selector = `${selector}:checked`;
-          break;
-      }
-      return this.querySelector(selector) as HTMLInputElement;
-    }
+        case 'horsChasse': {
+          Object.assign(hunt, { prop: Boolean(parseInt(value as string)) });
+        } break;
 
-    espece: {
-      const input = getInput('dexid');
-      const allNames = await Pokemon.namesfr();
-      const dexid = allNames.findIndex(s => s === input.value);
-      hunt.dexid = dexid > 0 ? dexid : 0;
-    }
-    
-    for (const prop of ['forme', 'surnom', 'methode', 'jeu', 'ball', 'notes']) {
-      const input = getInput(prop as huntProperty);
-      Object.assign(hunt, { [prop as keyof Omit<Hunt, 'shinyRate' | 'mine' | 'Jeu'>]: input.value });
-    }
+        case 'compteur': {
+          const methode = formData.get('methode');
+          const jeu = formData.get('jeu');
 
-    for (const prop of ['checkmark', 'DO', 'charm', 'hacked', 'horsChasse']) {
-      const input = getInput(prop as huntProperty);
-      let value: any = input.value;
-      switch (prop) {
-        case 'checkmark':
-        case 'hacked':
-          value = parseInt(value);
-          break;
-        default:
-          value = Boolean(parseInt(value));
-      }
-      Object.assign(hunt, { [prop as keyof Omit<Hunt, 'shinyRate' | 'mine' | 'Jeu'>]: value });
-    }
+          if (methode === 'Ultra-Brèche') {
+            hunt.compteur = JSON.stringify({
+              distance: parseInt(formData.get('usum-distance') as string),
+              rings: parseInt(formData.get('usum-rings') as string)
+            });
+          }
 
-    compteur: {
-      if (hunt.methode === 'Ultra-Brèche') {
-        hunt.compteur = JSON.stringify({
-          distance: parseInt((this.querySelector(`#hunt-${hunt.huntid}-compteur-distance`) as HTMLInputElement).value),
-          rings: parseInt((this.querySelector(`#hunt-${hunt.huntid}-compteur-anneaux`) as HTMLInputElement).value)
-        });
-      } else if (hunt.methode === 'Chaîne de captures') {
-        hunt.compteur = JSON.stringify({
-          chain: parseInt(getInput('compteur').value),
-          lure: ((document.querySelector(`input[name="hunt-${hunt.huntid}-compteur-leurre"]:checked`) as HTMLInputElement).value === '1') ? true : false
-        });
-      } else if (hunt.jeu === 'Légendes Arceus') {
-        hunt.compteur = JSON.stringify({
-          count: parseInt(getInput('compteur').value),
-          dexResearch: parseInt((document.querySelector(`input[name="hunt-${hunt.huntid}-dex-research"]:checked`) as HTMLInputElement).value)
-        });
-      } else {
-        hunt.compteur = getInput('compteur').value;
+          else if (methode === 'Chaîne de captures') {
+            hunt.compteur = JSON.stringify({
+              chain: parseInt(value as string),
+              lure: formData.get('lgpe-lure') === '1',
+            });
+          }
+
+          else if (jeu === 'Légendes Arceus') {
+            hunt.compteur = JSON.stringify({
+              count: parseInt(value as string),
+              dexResearch: parseInt(formData.get('pla-dexResearch') as string)
+            });
+          }
+
+          else {
+            hunt.compteur = value as string;
+          }
+        } break;
+
+        case 'timeCapture': {
+          const oldDate = (new Date(hunt.timeCapture)).toISOString().split('T')[0];
+          const newTime = value !== oldDate ? (new Date(value as string)).getTime() : hunt.timeCapture;
+          hunt.timeCapture = newTime;
+        } break;
       }
     }
 
-    date: {
-      const input = getInput('timeCapture');
-      const date = input.value;
-      const oldDate = (new Date(hunt.timeCapture)).toISOString().split('T')[0];
-      const newTime = date !== oldDate ? (new Date(date)).getTime() : hunt.timeCapture;
-      hunt.timeCapture = newTime;
-    }
-
-    this.dataset.methode = hunt.methode;
-    this.dataset.jeu = hunt.jeu;
-
-    return await huntStorage.setItem(hunt.huntid, hunt);
+    return hunt;
   }
 
 
-  /**
-   * Met à jour certains éléments (ex : icônes) de la carte à partir des informations saisies dans le formulaire.
-   */
-  async inputToContent() {
-    const hunt = await this.getHunt();
-    const sprite = this.querySelector('pokemon-sprite')!;
+  async formChangeHandler(event: Event) {
+    const nonce = {};
+    this.changeNonce = {};
 
-    // Icônes
-    this.querySelector(`.icones.jeu`)!.className = `icones jeu ${hunt.jeu.replace(/[ \']/g, '')}`;
-    this.querySelector(`.icones.ball`)!.className = `pkspr item ball-${hunt.ball}`;
+    const form = this.shadow.querySelector('form');
+    if (form) {
+      // Update locally saved data with changes from the form
+      const formData = new FormData(form);
+      const hunt = await this.formToHunt(formData);
 
-    // Sprite
+      this.setAttribute('data-methode', hunt.methode);
+      this.setAttribute('data-jeu', hunt.jeu);
+
+      if (this.changeNonce !== nonce) return;
+      await huntStorage.setItem(hunt.huntid, hunt);
+
+      // Update some visuals with changes from the form
+      await this.updateVisuals(hunt);
+    }
+  }
+
+
+  async updateVisuals(_hunt?: Hunt) {
+    const hunt = _hunt ?? (await this.getHunt());
+    
+    // Icons
+    this.shadow.querySelector(`.icones.jeu`)!.className = `icones jeu ${hunt.jeu.replace(/[ \']/g, '')}`;
+    this.shadow.querySelector(`.icones.ball`)!.className = `pkspr item ball-${hunt.ball}`;
+
+    // Pokémon sprite
+    const sprite = this.shadow.querySelector('pokemon-sprite')!;
     sprite.setAttribute('dexid', String(hunt.dexid));
     sprite.setAttribute('forme', hunt.forme);
     sprite.setAttribute('shiny', String(hunt.caught));
   }
 
 
-  /**
-   * Met à jour la carte.
-   */
-  update() {
-
-  }
-
-
-  connectedCallback() {
-    // Crée le HTML de la carte
-    this.appendChild(template.content.cloneNode(true));
-
-    for (const el of [...this.querySelectorAll('[id^="hunt-{id}"]')]) {
-      (el as HTMLElement).dataset.id = el.getAttribute('id') || '';
-    }
-
-    for (const el of [...this.querySelectorAll('[for^="hunt-{id}"]')]) {
-      (el as HTMLElement).dataset.for = el.getAttribute('for') || '';
-    }
-
-    for (const el of [...this.querySelectorAll('[name^="hunt-{id}"]')]) {
-      (el as HTMLElement).dataset.name = el.getAttribute('name') || '';
-    }
-    
-    this.ready = true;
-
+  connectedCallback() {   
     // 🔽 Active les boutons du formulaire
 
     // Active les boutons d'incrémentation du compteur
-    const boutonAdd = this.querySelector('.bouton-compteur.add')!;
-    const boutonSub = this.querySelector('.bouton-compteur.sub')!;
-    const inputCompteur = this.querySelector('input[id$="-compteur"]') as HTMLInputElement;
+    const boutonAdd = this.shadow.querySelector('button.counter.add')!;
+    const boutonSub = this.shadow.querySelector('button.counter.sub')!;
+    const inputCompteur = this.shadow.querySelector('input[name="compteur"]') as HTMLInputElement;
 
     this.handlers.counterAdd = {
       element: boutonAdd,
       type: 'click',
-      function: async event => {
+      function: event => {
         const value = Number(inputCompteur.value);
         const newValue = Math.min(value + 1, 999999);
         inputCompteur.value = String(newValue);
@@ -357,7 +378,7 @@ export class huntCard extends HTMLElement {
     this.handlers.counterSub = {
       element: boutonSub,
       type: 'click',
-      function: async event => {
+      function: event => {
         const value = Number(inputCompteur.value);
         const newValue = Math.max(value - 1, 0);
         inputCompteur.value = String(newValue);
@@ -366,7 +387,7 @@ export class huntCard extends HTMLElement {
     handle(this.handlers.counterSub);
 
     // Active le bouton "capturé"
-    const boutonCaught = this.querySelector('.bouton-hunt-caught')!;
+    const boutonCaught = this.shadow.querySelector('button.capture')!;
 
     this.handlers.caught = {
       element: boutonCaught,
@@ -374,14 +395,14 @@ export class huntCard extends HTMLElement {
       function: async event => {
         const hunt = await this.getHunt();
 
-        const container = boutonCaught.parentElement!.parentElement!;
+        const container = this.shadow.querySelector('form')!;
         container.classList.toggle('caught');
-        const inputDate = this.querySelector('input[type="date"]') as HTMLInputElement;
+        const inputDate = this.shadow.querySelector('input[name="timeCapture"]') as HTMLInputElement;
   
         if (inputDate.value == '') inputDate.value = new Date().toISOString().split('T')[0];
         if (container.classList.contains('caught')) {
           hunt.caught = true;
-          (this.querySelector('pokemon-sprite')! as pokemonSprite).sparkle();
+          (this.shadow.querySelector('pokemon-sprite')! as pokemonSprite).sparkle();
         } else {
           hunt.caught = false;
         }
@@ -392,11 +413,10 @@ export class huntCard extends HTMLElement {
     handle(this.handlers.caught);
 
     // Active le bouton "annuler"
-    const boutonDelete = this.querySelector('.bouton-hunt-remove')!;
-    const boutonCancel = this.querySelector('.bouton-hunt-edit')!;
+    const boutonCancel = this.shadow.querySelector('button.cancel')!;
 
-    this.handlers.delete = {
-      element: boutonDelete,
+    this.handlers.cancel = {
+      element: boutonCancel,
       type: 'click',
       function: async event => {
         const cancelMessage = 'Les modifications ne seront pas enregistrées.';
@@ -404,17 +424,10 @@ export class huntCard extends HTMLElement {
         if (userResponse)  await this.delete();
       }
     };
-    handle(this.handlers.delete);
-
-    this.handlers.cancel = {
-      element: boutonCancel,
-      type: 'click',
-      function: this.handlers.delete.function
-    };
     handle(this.handlers.cancel);
 
     // Active le bouton "enregistrer"
-    const boutonSubmit = this.querySelector('.bouton-hunt-submit')!;
+    const boutonSubmit = this.shadow.querySelector('button.submit')!;
 
     this.handlers.submit = {
       element: this,
@@ -446,7 +459,7 @@ export class huntCard extends HTMLElement {
     handle(this.handlers.submit);
 
     // Active le bouton "supprimer"
-    const boutonDeleteShiny = this.querySelector('.bouton-hunt-eraseDB')!;
+    const boutonDeleteShiny = this.shadow.querySelector('button.delete')!;
 
     this.handlers.deleteShiny = {
       element: boutonDeleteShiny,
@@ -472,16 +485,13 @@ export class huntCard extends HTMLElement {
     this.handlers.form = {
       element: this,
       type: 'change',
-      function: () => {
-        this.inputToData();
-        this.inputToContent();
-      }
+      function: this.formChangeHandler.bind(this)
     }
     handle(this.handlers.form);
 
     // Génère la liste des formes au choix d'un Pokémon
     // et génère la liste des Pokémon correspondants quand on commence à écrire un nom
-    const inputEspece = this.querySelector('[list="datalist-pokedex"]')! as HTMLInputElement;
+    const inputEspece = this.shadow.querySelector('[list="datalist-pokedex"]')! as HTMLInputElement;
     this.handlers.listeFormes = {
       element: inputEspece,
       type: 'input',
@@ -493,20 +503,20 @@ export class huntCard extends HTMLElement {
 
     // Génère la liste des méthodes au choix du jeu
     this.handlers.listeMethodes = {
-      element: this.querySelector('[list="datalist-jeux"]')!,
+      element: this.shadow.querySelector('[list="datalist-jeux"]')!,
       type: 'input',
-      function: () => this.genereMethodes()
+      function: this.genereMethodes.bind(this)
     }
     handle(this.handlers.listeMethodes);
 
     // Peuple le contenu de la carte
-    if (this.huntid) this.dataToContent();
+    if (this.huntid) this.updateVisuals();
   }
 
 
   /** Génère la liste des formes à partir du Pokémon entré. */
   async genereFormes() {
-    const inputEspece = this.querySelector('[list="datalist-pokedex"]') as HTMLInputElement;
+    const inputEspece = this.shadow.querySelector('[list="datalist-pokedex"]') as HTMLInputElement;
     const idFormes = inputEspece.id.replace('espece', 'forme');
     const select = document.getElementById(idFormes)!;
     select.innerHTML = '';
@@ -529,7 +539,7 @@ export class huntCard extends HTMLElement {
 
   /** Génère la liste des méthodes à partir du jeu entré. */
   genereMethodes() {
-    const inputJeu = this.querySelector('[list=datalist-jeux]') as HTMLInputElement;
+    const inputJeu = this.shadow.querySelector('[list=datalist-jeux]') as HTMLInputElement;
     const idMethodes = inputJeu.id.replace('jeu', 'methode');
     const select = document.getElementById(idMethodes)!;
     select.innerHTML = '';
@@ -552,15 +562,7 @@ export class huntCard extends HTMLElement {
   
 
   disconnectedCallback() {
-    this.ready = false;
-
-    // Désactive les boutons du formulaire
     for (const [name, handler] of Object.entries(this.handlers)) {
-      unhandle(handler);
-    }
-
-    // Désactive la surveillance du formulaire
-    for (const [name, handler] of Object.entries(this.changeHandlers)) {
       unhandle(handler);
     }
   }
@@ -577,8 +579,7 @@ export class huntCard extends HTMLElement {
     switch (attr) {
       case 'huntid': {
         this.huntid = newValue;
-        if (!this.ready) return;
-        this.dataToContent();
+        this.huntToForm();
       } break
     }
   }

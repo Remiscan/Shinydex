@@ -12,7 +12,7 @@ template.innerHTML = /*html*/`
   <fieldset class="pokemon-inputs">
     <legend>Pokémon</legend>
 
-    <input type="text" name="species" list="datalist-pokedex" autocomplete="off" placeholder="Bulbizarre" size="8">
+    <input type="text" name="dexid" list="datalist-pokedex" autocomplete="off" placeholder="Bulbizarre" size="8">
     <select name="forme">
       <option value="">Forme normale</option>
     </select>
@@ -23,11 +23,12 @@ template.innerHTML = /*html*/`
   <fieldset class="game-method-inputs">
     <legend>Jeu et méthode</legend>
 
-    <label for="game">Jeu :</label>
-    <input type="text" name="game" id="game" list="datalist-jeux" autocomplete="off" placeholder="Epee" size="8">
+    <span class="icones jeu"></span>
+    <label for="jeu">Jeu :</label>
+    <input type="text" name="jeu" id="jeu" list="datalist-jeux" autocomplete="off" placeholder="Epee" size="8">
 
-    <label for="method">Méthode :</label>
-    <select name="method" id="method">
+    <label for="methode">Méthode :</label>
+    <select name="methode" id="methode">
       <option>Sauvage</option>
     </select>
   </fieldset>
@@ -37,11 +38,11 @@ template.innerHTML = /*html*/`
   <fieldset class="counter-inputs">
     <legend>Compteur de rencontres</legend>
 
-    <button type="button">
+    <button type="button" class="counter sub">
       <i class="material-icons">remove</i>
     </button>
-    <input type="number" name="counter" id="counter" min="0" max="999999" value="0">
-    <button type="button">
+    <input type="number" name="compteur" id="compteur" min="0" max="999999" value="0">
+    <button type="button" class="counter add">
       <i class="material-icons">add</i>
     </button>
   </fieldset>
@@ -52,17 +53,17 @@ template.innerHTML = /*html*/`
     <fieldset>
       <legend>Niveau de recherche de la page du Pokédex</legend>
 
-      <input type="radio" name="pla-dex-research" id="pla-dex-incomplete" value="0" checked>
+      <input type="radio" name="pla-dexResearch" id="pla-dex-incomplete" value="0" checked>
       <label for="pla-dex-incomplete" class="radio">
         <span>Page incomplète (niv &lt;9)</span>
       </label>
 
-      <input type="radio" name="pla-dex-research" id="pla-dex-complete" value="1">
+      <input type="radio" name="pla-dexResearch" id="pla-dex-complete" value="1">
       <label for="pla-dex-complete" class="radio">
         <span>Page complétée (niv 10)</span>
       </label>
 
-      <input type="radio" name="pla-dex-research" id="pla-dex-perfect" value="2">
+      <input type="radio" name="pla-dexResearch" id="pla-dex-perfect" value="2">
       <label for="pla-dex-perfect" class="radio">
         <span>Page parfaite <shiny-stars></shiny-stars></span>
       </label>
@@ -110,11 +111,11 @@ template.innerHTML = /*html*/`
   <fieldset class="capture-data">
     <legend>Données de la capture</legend>
 
-    <label for="name">Surnom</label>
-    <input type="text" name="name" id="name">
+    <label for="surnom">Surnom</label>
+    <input type="text" name="surnom" id="surnom">
 
-    <label for="date">Date de capture</label>
-    <input type="date" name="date" id="date" min="1996-02-27">
+    <label for="timeCapture">Date de capture</label>
+    <input type="date" name="timeCapture" id="timeCapture" min="1996-02-27">
 
     <label for="ball">Capturé dans une</label>
     <select name="ball" id="ball">
@@ -245,20 +246,20 @@ template.innerHTML = /*html*/`
 
   <!-- Données de légitimité -->
   <div class="legality-data">
-    <input type="checkbox" name="shiny-charm" id="shiny-charm">
-    <label for="shiny-charm">
+    <input type="checkbox" name="charm" id="charm">
+    <label for="charm">
       <span class="icones explain charm"></span>
       Charme chroma possédé
     </label>
 
-    <input type="checkbox" name="not-hunted" id="not-hunted">
-    <label for="not-hunted">
+    <input type="checkbox" name="horsChasse" id="horsChasse">
+    <label for="horsChasse">
       <span class="icones explain lucky"></span>
       Trouvé au hasard, sans le chasser
     </label>
 
-    <input type="checkbox" name="from-my-game" id="from-my-game">
-    <label for="from-my-game">
+    <input type="checkbox" name="DO" id="DO">
+    <label for="DO">
       <span class="icones explain mine"></span>
       <span class="egg">Œuf</span><span class="raid">Raid</span> trouvé dans mon jeu
     </label>
