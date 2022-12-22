@@ -180,6 +180,7 @@ export class huntCard extends HTMLElement {
         case 'surnom':
         case 'notes':
         case 'forme':
+        case 'gene':
         case 'methode':
         case 'ball': {
           const value = hunt[prop] as string;
@@ -238,6 +239,13 @@ export class huntCard extends HTMLElement {
           const date = (new Date(value)).toISOString().split('T')[0];
           input.value = date;
         } break;
+
+        case 'caught': {
+          const value = hunt.caught;
+          const form = this.shadow.querySelector('form');
+          if (value) form?.classList.add('caught');
+          else       form?.classList.remove('caught');
+        } break;
       }
     }
   }
@@ -260,23 +268,24 @@ export class huntCard extends HTMLElement {
         } break;
 
         case 'forme':
+        case 'gene':
         case 'surnom':
         case 'methode':
         case 'jeu':
         case 'ball':
         case 'notes': {
-          Object.assign(hunt, { prop: value });
+          Object.assign(hunt, { [prop]: value });
         } break;
 
         case 'checkmark':
         case 'hacked': {
-          Object.assign(hunt, { prop: parseInt(value as string) });
+          Object.assign(hunt, { [prop]: parseInt(value as string) });
         } break;
 
         case 'charm':
         case 'hacked':
         case 'horsChasse': {
-          Object.assign(hunt, { prop: Boolean(parseInt(value as string)) });
+          Object.assign(hunt, { [prop]: Boolean(parseInt(value as string)) });
         } break;
 
         case 'compteur': {
@@ -399,11 +408,11 @@ export class huntCard extends HTMLElement {
         const inputDate = this.shadow.querySelector('input[name="timeCapture"]') as HTMLInputElement;
         const sprite = this.shadow.querySelector('pokemon-sprite')! as pokemonSprite;
   
-        if (inputDate.value == '') inputDate.value = new Date().toISOString().split('T')[0];
         if (container.classList.contains('caught')) {
           hunt.caught = true;
           sprite.setAttribute('shiny', 'true');
           sprite.sparkle();
+          inputDate.value = new Date().toISOString().split('T')[0];
         } else {
           hunt.caught = false;
           sprite.setAttribute('shiny', 'false');
