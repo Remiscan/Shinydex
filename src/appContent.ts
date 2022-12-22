@@ -196,28 +196,3 @@ export async function initPokedex() {
   pokedexInitialized = true;
   return;
 }
-
-
-
-////////////////////////
-// Affiche l'application
-export async function appDisplay(start = true)
-{
-  async function promiseInit() {
-    // Nombre de cartes en tout (filtrées ou non)
-    const keys = await shinyStorage.keys();
-    const dbShiny = await Promise.all(keys.map(key => shinyStorage.getItem(key)));
-    const numberOfCards = dbShiny.filter(shiny => !shiny.deleted).length;
-    if (numberOfCards <= 0) {
-      // 🔽🔽🔽🔽🔽🔽🔽🔽🔽🔽🔽🔽🔽🔽🔽🔽🔽🔽🔽🔽🔽
-      // Placer ce message vide quelque part hors d'ici
-      // 🔼🔼🔼🔼🔼🔼🔼🔼🔼🔼🔼🔼🔼🔼🔼🔼🔼🔼🔼🔼🔼
-      document.querySelector('#mes-chromatiques')!.classList.add('vide');
-      document.querySelector('#mes-chromatiques .message-vide>.material-icons')!.innerHTML = 'cloud_off';
-      document.querySelector('#mes-chromatiques .message-vide>span')!.innerHTML = 'Aucun Pokémon chromatique dans la base de données. Pour en ajouter, complétez une Chasse !';
-      document.querySelector('.compteur')!.innerHTML = '0';
-    }
-    
-    return;
-  };
-}
