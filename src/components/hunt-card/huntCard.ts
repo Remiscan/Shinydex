@@ -178,13 +178,20 @@ export class huntCard extends HTMLElement {
           const value = hunt.jeu;
           input.value = value;
           this.genereMethodes(value);
+          const idJeu = Pokemon.jeux.find(jeu => jeu.uid === value)?.id ?? '';
+          this.setAttribute('data-jeu', idJeu);
+        } break;
+
+        case 'methode': {
+          const value = hunt.methode;
+          input.value = value;
+          this.setAttribute('data-methode', value);
         } break;
 
         case 'surnom':
         case 'notes':
         case 'forme':
         case 'gene':
-        case 'methode':
         case 'ball': {
           const value = hunt[prop] as string;
           input.value = value;
@@ -353,9 +360,10 @@ export class huntCard extends HTMLElement {
       // Update locally saved data with changes from the form
       const formData = new FormData(form);
       const hunt = await this.formToHunt(formData);
+      const jeu = Pokemon.jeux.find(jeu => jeu.uid === hunt.jeu)?.id ?? '';
 
       this.setAttribute('data-methode', hunt.methode);
-      this.setAttribute('data-jeu', hunt.jeu);
+      this.setAttribute('data-jeu', jeu);
 
       if (this.changeNonce !== nonce) return;
       await huntStorage.setItem(hunt.huntid, hunt);
