@@ -25,6 +25,10 @@ async function initServiceWorker() {
     const registration = await navigator.serviceWorker.register('/shinydex/service-worker.js.php');
     console.log('Le service worker a été enregistré', registration);
 
+    window.addEventListener('updatecheck', event => {
+      registration.update();
+    });
+
     registration.addEventListener('updatefound', () => {
       const newWorker = registration.installing;
       let updating = false;
@@ -233,7 +237,7 @@ export async function appStart() {
   // On affiche la version de l'appli
   const tempsChargement = performance.now() - window.tempsChargementDebut;
   document.getElementById('version-tempschargement')!.innerHTML = String(Math.round(tempsChargement));
-  document.getElementById('version-fichiers')!.innerHTML = timestamp2date(await dataStorage.getItem('version-fichiers'));
+  document.getElementById('version-fichiers')!.innerHTML = timestamp2date(cacheVersion * 1000);
 
   // On pré-charge les icônes
   try {
@@ -298,7 +302,9 @@ export async function checkUpdate(checkNotification = false) {
   const texteSucces = 'Mise à jour disponible...';
   const notifyMaj = async () => {
     checkingUpdate = 0;
-    const updateNotif = new Notif(texteSucces, 'Installer', 'update', 10000, () => location.reload());
+    const updateNotif = new Notif(texteSucces, 'Installer', 'update', 10000, () => {
+      window.dispatchEvent(new Event('updatecheck'));
+    });
     const userActed = await updateNotif.prompt();
     if (userActed) {
       updateNotif.priorite = true;
