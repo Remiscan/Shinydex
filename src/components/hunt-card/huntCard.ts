@@ -305,7 +305,7 @@ export class huntCard extends HTMLElement {
           }
 
           else {
-            hunt.compteur = value as string;
+            hunt.compteur = (value as string) || '0';
           }
         } break;
 
