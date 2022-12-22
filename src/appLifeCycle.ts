@@ -193,7 +193,7 @@ export async function appStart() {
   // On met à jour la structure de la BDD locale si nécessaire
   try {
     const lastStorageUpgrade = Number(await dataStorage.getItem('last-storage-upgrade'));
-    if (lastStorageUpgrade < cacheVersion) await upgradeStorage();
+    if (lastStorageUpgrade < cacheVersion * 1000) await upgradeStorage();
   } catch (error) {
     const message = `Erreur pendant la mise à jour du format des données.`;
     console.error(message, error);
