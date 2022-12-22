@@ -165,8 +165,11 @@ export class huntCard extends HTMLElement {
       switch (prop as huntProperty) {
         case 'dexid': {
           const value = hunt.dexid;
-          const allNames = await Pokemon.names();
-          const name = allNames[value];
+          let name = '';
+          if (value > 0) {
+            const allNames = await Pokemon.names();
+            name = allNames[value];
+          }
           input.value = name;
           this.genereFormes(name);
         } break;
