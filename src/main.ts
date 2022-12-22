@@ -2,7 +2,7 @@ import '../../_common/components/input-switch/input-switch.js';
 import { Hunt } from './Hunt.js';
 import { setTheme } from './Params.js';
 import { populatableSection, populateHandler } from './appContent.js';
-import { appStart, changeAutoMaj, checkUpdate, setOnlineBackup } from './appLifeCycle.js';
+import { appStart, checkUpdate, setOnlineBackup } from './appLifeCycle.js';
 import './components/corbeille-card/corbeilleCard.js';
 import './components/hunt-card/huntCard.js';
 import './components/load-spinner/loadSpinner.js';
@@ -97,19 +97,6 @@ dataStorage.getItem('theme').then((theme?: string) => {
 // Détecte le changement de paramètre de thème
 for (const input of Array.from(document.querySelectorAll('input[name=theme]')) as HTMLInputElement[]) {
   input.addEventListener('change', () => setTheme(input.value));
-}
-
-// Applique le paramètre sauvegardé au switch des mises à jour auto
-dataStorage.getItem('check-updates').then((value: boolean) => {
-  const box = document.getElementById('switch-auto-maj') as HTMLInputElement;
-  if (value === true) box.checked = true;
-  else                box.checked = false;
-});
-
-// Détecte le changemet de paramètre de détection automatique des mises à jour
-{
-  const input = document.getElementById('switch-auto-maj')! as HTMLInputElement;
-  input.addEventListener('change', () => changeAutoMaj(input.checked));
 }
 
 // Applique le paramètre sauvegardé au switch de la sauvegarde en ligne

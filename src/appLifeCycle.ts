@@ -261,15 +261,9 @@ export async function appStart() {
 
   // ---
 
-  // ÉTAPE 7 : on vérifie si l'application peut être installée ou mise à jour
+  // ÉTAPE 7 : on vérifie si l'application peut être installée
 
   checkInstall();
-  const shouldCheckUpdate = await dataStorage.getItem('check-updates');
-  if (shouldCheckUpdate == true) {
-    await navigator.serviceWorker.ready;
-    await wait(1000);
-    await checkUpdate();
-  }
 
   return;
 
@@ -409,12 +403,4 @@ export async function setOnlineBackup(checked: boolean): Promise<void> {
     document.getElementById('parametres')!.removeAttribute('data-online-backup');
     await dataStorage.setItem('online-backup', 0);
   }
-}
-
-
-///////////////////////////////////////////////////////
-// Change le paramètre de vérification des mises à jour
-export async function changeAutoMaj(checked: boolean): Promise<void> {
-  if (checked) await dataStorage.setItem('check-updates', true);
-  else         await dataStorage.setItem('check-updates', false);
 }
