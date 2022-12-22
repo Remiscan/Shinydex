@@ -122,10 +122,19 @@ async function initPokemonData() {
 // Démarre l'application (update? => populate => display)
 export async function appStart() {
   if (!('serviceWorker' in navigator)) throw 'Application non supportée.';
+  let perfLog = true;
+  const logPerf = (message: string) => {
+    if (perfLog) {
+      const tempsChargement = performance.now() - window.tempsChargementDebut;
+      console.log(message, tempsChargement);
+    }
+  };
 
   // ---
 
   // ÉTAPE 1 : on vérifie si l'application est installée localement
+
+  logPerf('Étape 1');
 
   // On initialise supportsWebp
   if (await webpSupport()) Params.preferredImageFormat = 'webp';
@@ -147,6 +156,8 @@ export async function appStart() {
   // ÉTAPE 2 : si la réponse est oui, on passe à la suite ;
   //           si la réponse est non, on installe l'application
 
+  logPerf('Étape 2');
+
   if (filesInstalled && serviceWorkerReady) {
     console.log('[:)] L\'application est déjà installée localement.');
     initServiceWorker();
@@ -167,6 +178,8 @@ export async function appStart() {
 
   // ÉTAPE 3 : si la sauvegarde en ligne est activée, on met à jour les données locales
 
+  logPerf('Étape 3');
+
   /*const onlineBackup = await dataStorage.getItem('online-backup');
   if (onlineBackup) {
     try {
@@ -181,6 +194,8 @@ export async function appStart() {
   // ---
 
   // ÉTAPE 4 : on nettoie les données locales
+
+  logPerf('Étape 4');
 
   // Si des shiny marqués à 'destroy' sont stockés depuis plus d'un mois, on les supprime
   const shinyKeys = await shinyStorage.keys();
@@ -207,13 +222,22 @@ export async function appStart() {
   // ---
 
   // ÉTAPE 5 : on peuple l'application à partir des données locales
+
+  logPerf('Étape 5');
+
   try {
     await initPokemonData();
+    logPerf('initPokemonData');
     await initFiltres('mes-chromatiques');
+    logPerf('initFiltres');
     await initPokedex();
+    logPerf('initPokedex');
     await populateHandler('mes-chromatiques');
+    logPerf('populateHandler("mes-chromatiques")');
     await populateHandler('chasses-en-cours');
+    logPerf('populateHandler("chasses-en-cours")');
     await populateHandler('corbeille');
+    logPerf('populateHandler("corbeille")');
     // await initAmis();
   } catch (error) {
     console.error(error);
@@ -222,6 +246,8 @@ export async function appStart() {
   // ---
 
   // ÉTAPE 6 : on affiche l'application
+
+  logPerf('Étape 6');
 
   // Préparation du thème
   const theme = await dataStorage.getItem('theme');
@@ -235,9 +261,11 @@ export async function appStart() {
   }
 
   // On affiche la version de l'appli
-  const tempsChargement = performance.now() - window.tempsChargementDebut;
-  document.getElementById('version-tempschargement')!.innerHTML = String(Math.round(tempsChargement));
-  document.getElementById('version-fichiers')!.innerHTML = timestamp2date(cacheVersion * 1000);
+  {
+    const tempsChargement = performance.now() - window.tempsChargementDebut;
+    document.getElementById('version-tempschargement')!.innerHTML = String(Math.round(tempsChargement));
+    document.getElementById('version-fichiers')!.innerHTML = timestamp2date(cacheVersion * 1000);
+  }
 
   // On pré-charge les icônes
   try {
@@ -266,6 +294,8 @@ export async function appStart() {
   // ---
 
   // ÉTAPE 7 : on vérifie si l'application peut être installée
+
+  logPerf('Étape 7');
 
   checkInstall();
 
