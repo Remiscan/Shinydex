@@ -46,6 +46,16 @@ template.innerHTML = /*html*/`
   </fieldset>
 
 
+  <!-- Bonus globaux -->
+  <div class="bonus-inputs">
+    <input type="checkbox" name="charm" id="charm">
+    <label for="charm">
+      <span class="icones explain charm"></span>
+      Charme chroma possédé
+    </label>
+  </div>
+
+
   <!-- Bonus de Legends Arceus (PLA) -->
   <div class="pla-inputs">
     <fieldset>
@@ -248,12 +258,6 @@ template.innerHTML = /*html*/`
 
   <!-- Données de légitimité -->
   <div class="legality-data">
-    <input type="checkbox" name="charm" id="charm">
-    <label for="charm">
-      <span class="icones explain charm"></span>
-      Charme chroma possédé
-    </label>
-
     <input type="checkbox" name="horsChasse" id="horsChasse">
     <label for="horsChasse">
       <span class="icones explain lucky"></span>
