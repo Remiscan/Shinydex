@@ -7,6 +7,7 @@ type Jeu = {
   uid: string, // id de la version précise du jeu
   id: string, // id du jeu (incluant versions alternatives)
   gen: number, // numéro de la génération du jeu
+  originMark?: number, // numéro de la marque d'origine affichée sur les Pokémon capturés dans le jeu
 };
 
 const allGames: Jeu[] = [
@@ -30,25 +31,25 @@ const allGames: Jeu[] = [
   { uid: 'white', gen: 5, id: 'bw' },
   { uid: 'black2', gen: 5, id: 'bw2' },
   { uid: 'white2', gen: 5, id: 'bw2' },
-  { uid: 'x', gen: 6, id: 'xy' },
-  { uid: 'y', gen: 6, id: 'xy' },
-  { uid: 'omegaruby', gen: 6, id: 'oras' },
-  { uid: 'alphasapphire', gen: 6, id: 'oras' },
-  { uid: 'sun', gen: 7, id: 'sm' },
-  { uid: 'moon', gen: 7, id: 'sm' },
-  { uid: 'ultrasun', gen: 7, id: 'usum' },
-  { uid: 'ultramoon', gen: 7, id: 'usum' },
-  { uid: 'go', gen: 0, id: 'go' },
-  { uid: 'letsgopikachu', gen: 7.1, id: 'lgpe' },
-  { uid: 'letsgoeevee', gen: 7.1, id: 'lgpe' },
-  { uid: 'sword', gen: 8, id: 'swsh' },
-  { uid: 'shield', gen: 8, id: 'swsh' },
+  { uid: 'x', gen: 6, id: 'xy', originMark: 1 },
+  { uid: 'y', gen: 6, id: 'xy', originMark: 1 },
+  { uid: 'omegaruby', gen: 6, id: 'oras', originMark: 1 },
+  { uid: 'alphasapphire', gen: 6, id: 'oras', originMark: 1 },
+  { uid: 'sun', gen: 7, id: 'sm', originMark: 2 },
+  { uid: 'moon', gen: 7, id: 'sm', originMark: 2 },
+  { uid: 'ultrasun', gen: 7, id: 'usum', originMark: 2 },
+  { uid: 'ultramoon', gen: 7, id: 'usum', originMark: 2 },
+  { uid: 'go', gen: 0, id: 'go', originMark: 5 },
+  { uid: 'letsgopikachu', gen: 7.1, id: 'lgpe', originMark: 4 },
+  { uid: 'letsgoeevee', gen: 7.1, id: 'lgpe', originMark: 4 },
+  { uid: 'sword', gen: 8, id: 'swsh', originMark: 6 },
+  { uid: 'shield', gen: 8, id: 'swsh', originMark: 6 },
   { uid: 'home', gen: 8, id: 'home' },
-  { uid: 'brilliantdiamond', gen: 8, id: 'bdsp' },
-  { uid: 'shiningpearl', gen: 8, id: 'bdsp' },
-  { uid: 'legendsarceus', gen: 8.1, id: 'pla' },
-  { uid: 'scarlet', gen: 9, id: 'sv' },
-  { uid: 'violet', gen: 9, id: 'sv' }
+  { uid: 'brilliantdiamond', gen: 8, id: 'bdsp', originMark: 7 },
+  { uid: 'shiningpearl', gen: 8, id: 'bdsp', originMark: 7 },
+  { uid: 'legendsarceus', gen: 8.1, id: 'pla', originMark: 8 },
+  { uid: 'scarlet', gen: 9, id: 'sv', originMark: 9 },
+  { uid: 'violet', gen: 9, id: 'sv', originMark: 9 }
 ];
 
 
@@ -371,6 +372,17 @@ class Shiny implements frontendShiny {
     let k = Shiny.methodes('notmine').findIndex(m => m.id == this.methode);
     if (k == -1) return true;
     else return false;
+  }
+
+  get originMark(): number {
+    if (this.hacked) return 0; // Hacked Pokémon don't deserve an origin mark
+    if (!this.mine) return this.checkmark; // Traded Pokémon can have been born on earlier games
+
+    const jeu = this.Jeu;
+    if (jeu.gen === 1 || jeu.gen === 2) return this.checkmark; // gen 1 & 2 games could come from 3DS Virtual Console
+    if (jeu.originMark) return jeu.originMark;
+
+    return 0;
   }
 
   /**
