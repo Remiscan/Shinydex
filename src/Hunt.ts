@@ -36,7 +36,7 @@ export class Hunt extends Shiny implements huntedPokemon {
   caught: boolean = false;
   uploaded: boolean = false;
   
-  private constructor(pokemon: huntedPokemon = defaultHunt) {
+  private constructor(pokemon: huntedPokemon = {...defaultHunt}) {
     pokemon.huntid = pokemon.huntid || crypto.randomUUID();
     super(pokemon);
     Object.assign(this, {
