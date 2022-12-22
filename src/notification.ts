@@ -71,13 +71,11 @@ export class Notif {
     
         // Fait apparaître la notification à l'écran
         const fab = document.querySelector('.fab')!;
-        requestAnimationFrame(() => {
-          notif.classList.add('on');
-          fab.classList.add('notif');
-          this.visible = true;
-          if (this.bouton.icone === 'loading') notif.classList.add('loading');
-          else                                 notif.classList.remove('loading');
-        });
+        notif.classList.add('on');
+        fab.classList.add('notif');
+        this.visible = true;
+        if (this.bouton.icone === 'loading') notif.classList.add('loading');
+        else                                 notif.classList.remove('loading');
     
         // Fait disparaître la notification de l'écran
         // après avoir vérifié que le délai n'a pas changé.
@@ -100,7 +98,7 @@ export class Notif {
       const maxWaitTime = 5000;
       if (visibleNotif instanceof Notif) {
         await new Promise(resolve => {
-          window.addEventListener('notifqueueshift', resolve);
+          window.addEventListener('notifqueueshift', resolve, { once: true });
           if (!(visibleNotif?.priorite)) setTimeout(resolve, maxWaitTime);
         });
         visibleNotif.hide();

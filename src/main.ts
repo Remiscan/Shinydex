@@ -67,12 +67,18 @@ document.querySelector('.fab')!.addEventListener('click', async () => {
 
     // Créer une nouvelle chasse ici
     const hunt = await Hunt.make();
-    huntStorage.setItem(hunt.huntid, hunt);
+    await huntStorage.setItem(hunt.huntid, hunt);
 
-    const container = document.querySelector('#chasses-en-cours .section-contenu')!;
+    /*const container = document.querySelector('#chasses-en-cours .section-contenu')!;
     const huntCard = document.createElement('hunt-card');
     huntCard.setAttribute('huntid', hunt.huntid);
-    container.insertBefore(huntCard, container.firstChild);
+    container.insertBefore(huntCard, container.firstChild);*/
+    window.dispatchEvent(new CustomEvent('dataupdate', {
+      detail: {
+        sections: ['chasses-en-cours'],
+        ids: [hunt.huntid],
+      }
+    }));
   }
 
   // Ajoute un nouvel ami
@@ -278,18 +284,26 @@ declare global {
   }
 }
 
+let dataUpdateNotification: Notif | null = null;
+let dataUpdateNotificationCount = 0;
 window.addEventListener('dataupdate', async (event: Event) => {
+  console.log(event);
+
   // On peuple l'application avec les nouvelles données
-  const notification = new Notif('Mise à jour des données...', '', 'loading', Notif.maxDelay, () => {}, true);
-  notification.prompt();
+  if (dataUpdateNotificationCount === 0) {
+    dataUpdateNotificationCount++;
+    dataUpdateNotification = new Notif('Mise à jour des données...', '', 'loading', Notif.maxDelay, () => {}, true);
+    dataUpdateNotification.prompt();
+  }
   const { sections, ids, filtres, ordre, ordreReversed } = (event as DataUpdateEvent).detail;
   for (const section of sections) {
     await populateHandler(section, ids, { filtres, ordre, ordreReversed });
   }
-  notification.hide();
+  if (dataUpdateNotificationCount === 1) dataUpdateNotification?.hide();
+  dataUpdateNotificationCount--;
 
   // On demande une synchronisation des données
-  await backgroundSync();
+  //await backgroundSync();
 });
 
 
