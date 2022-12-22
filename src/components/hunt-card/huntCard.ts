@@ -245,9 +245,18 @@ export class huntCard extends HTMLElement {
 
         case 'caught': {
           const value = hunt.caught;
+          input.checked = value;
           const form = this.shadow.querySelector('form');
           if (value) form?.classList.add('caught');
           else       form?.classList.remove('caught');
+        } break;
+
+        case 'huntid': {
+          const value = hunt.huntid;
+          const form = this.shadow.querySelector('form');
+          const edit = (await shinyStorage.getItem(value)) != null;
+          if (edit) form?.classList.add('edit');
+          else      form?.classList.remove('edit');
         } break;
       }
     }
@@ -285,6 +294,7 @@ export class huntCard extends HTMLElement {
           Object.assign(hunt, { [prop]: parseInt(value as string) });
         } break;
 
+        case 'caught':
         case 'charm':
         case 'hacked':
         case 'horsChasse': {
@@ -386,6 +396,7 @@ export class huntCard extends HTMLElement {
         const value = Number(inputCompteur.value);
         const newValue = Math.min(value + 1, 999999);
         inputCompteur.value = String(newValue);
+        form.dispatchEvent(new Event('change'));
       }
     };
     handle(this.handlers.counterAdd);
@@ -397,16 +408,21 @@ export class huntCard extends HTMLElement {
         const value = Number(inputCompteur.value);
         const newValue = Math.max(value - 1, 0);
         inputCompteur.value = String(newValue);
+        form.dispatchEvent(new Event('change'));
       }
     };
     handle(this.handlers.counterSub);
 
     // Active le bouton "capturé"
     this.handlers.caught = {
-      element: this.shadow.querySelector('button.capture') as HTMLButtonElement,
-      type: 'click',
+      element: this.shadow.querySelector('input[name="caught"]') as HTMLButtonElement,
+      type: 'change',
       function: async event => {
-        if (!form.checkValidity()) return;
+        if (!form.checkValidity()) {
+          (event.currentTarget as HTMLInputElement).checked = false;
+          form.dispatchEvent(new Event('change'));
+          return;
+        }
         
         const hunt = await this.getHunt();
 
@@ -430,17 +446,28 @@ export class huntCard extends HTMLElement {
     handle(this.handlers.caught);
 
     // Active le bouton "annuler"
-    const boutonCancel = this.shadow.querySelector('button.cancel') as HTMLButtonElement;
     this.handlers.cancel = {
-      element: boutonCancel,
+      element: this.shadow.querySelector('button.edit-cancel') as HTMLButtonElement,
       type: 'click',
       function: async event => {
         const cancelMessage = 'Les modifications ne seront pas enregistrées.';
-        const userResponse = await warnBeforeDestruction((event.currentTarget! as Element), event.currentTarget === boutonCancel ? cancelMessage : undefined);
+        const userResponse = await warnBeforeDestruction((event.currentTarget! as Element), cancelMessage);
         if (userResponse)  await this.delete();
       }
     };
     handle(this.handlers.cancel);
+
+    // Active le bouton "supprimer"
+    this.handlers.delete = {
+      element: this.shadow.querySelector('button.hunt-delete') as HTMLButtonElement,
+      type: 'click',
+      function: async event => {
+        const cancelMessage = 'Les modifications ne seront pas enregistrées.';
+        const userResponse = await warnBeforeDestruction((event.currentTarget! as Element), cancelMessage);
+        if (userResponse)  await this.delete();
+      }
+    };
+    handle(this.handlers.delete);
 
     // Active le bouton "enregistrer"
     this.handlers.submit = {
@@ -475,7 +502,7 @@ export class huntCard extends HTMLElement {
 
     // Active le bouton "supprimer"
     this.handlers.deleteShiny = {
-      element: this.shadow.querySelector('button.delete') as HTMLButtonElement,
+      element: this.shadow.querySelector('button.full-delete') as HTMLButtonElement,
       type: 'click',
       function: async event => {
         const hunt = await this.getHunt();

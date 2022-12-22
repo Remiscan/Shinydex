@@ -5,7 +5,7 @@ template.innerHTML = /*html*/`
 
   <pokemon-sprite size="112"></pokemon-sprite>
 
-  <div class="hunt-edit">
+  <div class="yes-edit">
     <span>Mode édit.</span>
   </div>
 
@@ -93,15 +93,18 @@ template.innerHTML = /*html*/`
 
   <!-- Boutons de capture / annulation -->
   <div class="confirm-buttons">
-    <button type="button" class="cancel">
+    <button type="button" class="hunt-delete not-edit">
+      <i class="material-icons">delete</i>
+      <span>Supprimer</span>
+    </button>
+
+    <button type="button" class="edit-cancel yes-edit">
       <i class="material-icons">cancel</i>
       <span>Annuler</span>
     </button>
 
-    <button type="button" class="capture">
-      <i class="material-icons">done</i>
-      <span>Capturé</span>
-    </button>
+    <input type="checkbox" name="caught" id="caught">
+    <label for="caught">Capturé</label>
   </div>
 
 
@@ -296,9 +299,9 @@ template.innerHTML = /*html*/`
 
 
   <!-- Boutons supprimer / enregistrer -->
-  <button type="button" class="delete">
+  <button type="button" class="full-delete yes-edit">
     <i class="material-icons">delete_forever</i>
-    Supprimer
+    Supprimer définitivement
   </button>
 
   <button type="button" class="submit">

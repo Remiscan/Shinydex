@@ -1,4 +1,5 @@
-form:not(.edit) .hunt-edit,
+form:not(.edit) .yes-edit,
+form.edit .not-edit,
 form:not(.caught) .confirm-buttons ~ * {
   display: none;
 }
