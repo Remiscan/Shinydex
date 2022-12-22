@@ -48,7 +48,7 @@
     foreach($modules as $mod => $obj) {
       if (is_dir($mod)) continue;
       else if (str_ends_with($mod, '.html')) continue;
-      else if (str_ends_with($mod, '.css')) { $rel = 'preload'; $as = 'style'; }
+      else if (str_ends_with($mod, '.css')) continue; // can't preload css modules yet
       else                                  { $rel = 'modulepreload'; $as = null; }
       ?>
     <link rel="<?=$rel?>" <?=($as ? 'as="'.$as.'"' : '')?> href="<?=str_replace(__DIR__, '.', $mod)?>">
