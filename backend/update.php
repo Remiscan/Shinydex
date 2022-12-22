@@ -1,6 +1,6 @@
 <?php
-require_once './class_Pokemon.php';
-require_once './cache.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/shinydex/backend/class_Pokemon.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/shinydex/backend/cache.php';
 
 // Vide le cache des stats des fichiers
 clearstatcache();
@@ -52,7 +52,7 @@ function getFilesVersion(int $versionFrom = 0): array {
   if ($index) $listeFichiersModifies[] = './';
   // timestamp à 10 digits, généré par PHP
   return [
-    $versionFichiers * 1000,
+    $versionFichiers,
     $listeFichiersModifies
   ];
 }
@@ -67,9 +67,9 @@ function getPokemonData() {
   $files = scandir($dir);
 
   $pokemons = [];
-  forEach(Pokemon::ALL_POKEMON as $id => $name) {
+  forEach(Pokemon::POKEMON_NAMES_EN as $id => $name) {
     $sprites = preg_grep('/poke_capture_([0]+)?' . intval($id) . '_.+_n\.png/', $files);
-    $pokemons[] = new Pokemon($id, $name, $sprites);
+    $pokemons[] = new Pokemon($id, $sprites);
   }
   return $pokemons;
 }
@@ -91,9 +91,6 @@ if (isset($_GET['type']) && $_GET['type'] == 'check') {
 // Si on veut installer tous les fichiers et données
 else {
   //$results['version-fichiers'] = getFilesVersion();
-  $results['pokemon-data'] = getPokemonData();
-  $results['pokemon-names'] = Pokemon::ALL_POKEMON;
-  $results['pokemon-names-fr'] = Pokemon::ALL_POKEMON_FR;
 }
 
 header('Content-Type: application/json');

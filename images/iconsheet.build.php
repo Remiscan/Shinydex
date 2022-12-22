@@ -174,7 +174,7 @@ function buildIconSheet($logs = false)
 
   imagepng($outputImage, $imagePath, 9, PNG_NO_FILTER);
 
-  if ($logs) echo '<br>' . date('Y-m-d H:i:s') . ' - Image créée !';
+  if ($logs) echo '<br>' . date('Y-m-d H:i:s') . ' - <a href="out/">Image créée</a> !';
 }
 
 buildIconSheet(true);

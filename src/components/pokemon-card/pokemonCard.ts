@@ -169,7 +169,7 @@ export class pokemonCard extends HTMLElement {
       const methode = shiny.methode || '';
 
       // Icône du charme chroma
-      if (charmlessMethods == null) charmlessMethods = Shiny.methodes('charmless').map(m => m.nom);
+      if (charmlessMethods == null) charmlessMethods = Shiny.methodes('charmless').map(m => m.id);
       if (charm && !(charmlessMethods.includes(methode))) {
         srContainer.classList.add('with-charm');
       } else {

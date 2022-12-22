@@ -2,7 +2,7 @@ import '../../_common/components/input-switch/input-switch.js';
 import { Hunt } from './Hunt.js';
 import { setTheme } from './Params.js';
 import { populatableSection, populateHandler } from './appContent.js';
-import { appStart, changeAutoMaj, checkUpdate, manualUpdate, setOnlineBackup } from './appLifeCycle.js';
+import { appStart, changeAutoMaj, checkUpdate, setOnlineBackup } from './appLifeCycle.js';
 import './components/corbeille-card/corbeilleCard.js';
 import './components/hunt-card/huntCard.js';
 import './components/load-spinner/loadSpinner.js';
@@ -142,27 +142,10 @@ dataStorage.getItem('last-sync').then((value?: string) => {
 
 // Détecte le clic (court ou long) sur le bouton de recherche de mise à jour
 {
-  let longClic: number | undefined;
-  let needCheck = 1;
   const majButton = document.querySelector('.bouton-recherche-maj')!;
-
-  for (const startEvent of ['mousedown', 'touchstart']) {
-    let endEvent: string, cancelEvent: string;
-    switch (startEvent) {
-      case 'touchstart': endEvent = 'touchend'; cancelEvent = 'touchcancel';
-      default:           endEvent = 'mouseup';  cancelEvent = 'mouseout';
-    }
-
-    majButton.addEventListener(startEvent, (event: Event) => {
-      if (startEvent === 'mousedown' && (event as MouseEvent).button != 0) return;
-      event.preventDefault();
-      clearTimeout(longClic);
-      longClic = setTimeout(() => { needCheck = 0; manualUpdate(false); }, 3000);
-  
-      majButton.addEventListener(endEvent, () => { clearTimeout(longClic); if (needCheck) checkUpdate(true); });
-      majButton.addEventListener(cancelEvent, () => clearTimeout(longClic));
-    });
-  }
+  majButton.addEventListener('click', (event: Event) => {
+    checkUpdate(true);
+  });
 }
 
 // Détecte le clic sur le bouton d'export des données

@@ -37,7 +37,7 @@ const PRE_CACHE = 'remidex-sw';
 self.addEventListener('install', function(event) {
   console.log('[install] Installation du service worker...');
   event.waitUntil(
-    Promise.all([installData(event), installFiles(event)])
+    installFiles(event)
     .catch(raison => console.log('[install] ' + raison))
     .then(() => {
       console.log('[install] Le service worker est bien installé !');
@@ -84,17 +84,6 @@ self.addEventListener('message', async function(event) {
           await installFiles(event);
         }
         console.log(`[${action}] Installation des fichiers terminée !`);
-        source.postMessage({ action, complete: true });
-      } catch (error) {
-        console.error(error);
-        source.postMessage({ action, error });
-      }
-    } break;
-
-    case 'update-data': {
-      try {
-        await installData(event);
-        console.log(`[${action}] Installation des données terminée !`);
         source.postMessage({ action, complete: true });
       } catch (error) {
         console.error(error);
@@ -175,6 +164,8 @@ async function installFiles(event = null, localVersion = 0) {
       return;
     }));
     console.log(`[${action}] Mise en cache des fichiers terminée !`);
+    await dataStorage.ready();
+    await dataStorage.setItem('version-fichiers', Number(version));
     deleteOldCaches(newCACHE, action);
   }
 
@@ -187,31 +178,6 @@ async function installFiles(event = null, localVersion = 0) {
   }
   
   return;
-}
-
-
-// Installer les données de l'application
-async function installData(event = null) {
-  const dataRequest = await fetch(`backend/update.php?type=full&date=${Date.now()}`);
-  if (!dataRequest.ok) throw `[:(] Erreur ${response.status} lors de la requête (update.php)`;
-  const data = await dataRequest.json();
-
-  const action = event?.data?.action || 'install';
-
-  try {
-    console.log(`[${action}] Installation des données...`);
-    await Promise.all([dataStorage.ready(), pokemonData.ready()]);
-    await dataStorage.setItem('version-fichiers', Number(data['version-fichiers']));
-    await dataStorage.setItem('pokemon-names', data['pokemon-names']);
-    await dataStorage.setItem('pokemon-names-fr', data['pokemon-names-fr']);
-    await Promise.all(
-      data['pokemon-data'].map(pkmn => pokemonData.setItem(String(pkmn.dexid), pkmn))
-    );
-    console.log(`[${action}] Installation des données terminée !`);
-  } catch (error) {
-    console.error(error);
-    throw Error(`[${action}] Installation des données annulée.`);
-  }
 }
 
 

@@ -1,5 +1,5 @@
 <?php
-require_once 'class_Sprite.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/shinydex/backend/class_Sprite.php';
 
 
 

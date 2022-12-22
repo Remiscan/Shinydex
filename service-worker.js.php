@@ -1,6 +1,5 @@
 /* <?php
 require_once './backend/cache.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/_common/php/FilePath.php';
 $cache = getCacheFiles();
 
 $fileVersions = [];
@@ -8,6 +7,8 @@ foreach ($cache['fichiers'] as $file) {
   if ($file === './') $file = './index.php';
   $fileVersions[$file] = version([$file]);
 }
+
+$maxVersion = max($fileVersions);
 ?> */
 
 importScripts('./ext/localforage.min.js');
@@ -38,7 +39,8 @@ const huntStorage = localforage.createInstance({
   driver: localforage.INDEXEDDB
 });
 
-const PRE_CACHE = 'remidex-sw';
+const cachePrefix = 'remidex-sw';
+const currentCacheName = `${cachePrefix}-<?=$maxVersion?>`;
 const liveFileVersions = JSON.parse(`<?=json_encode($fileVersions, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES)?>`);
 
 
@@ -50,7 +52,7 @@ const liveFileVersions = JSON.parse(`<?=json_encode($fileVersions, JSON_PRETTY_P
 self.addEventListener('install', function(event) {
   console.log('[install] Installing service worker...');
   event.waitUntil(
-    Promise.all([installData(event), installFiles(event)])
+    installFiles(event)
     .catch(raison => console.log('[install] ' + raison))
     .then(() => {
       console.log('[install] Service worker installed!');
@@ -65,13 +67,15 @@ self.addEventListener('install', function(event) {
 self.addEventListener('activate', function(event) {
   console.log('[activate] Activating service worker...');
   event.waitUntil(self.clients.claim()); // makes the service worker take control of all clients
+  console.log('[activate] Service worker active!');
 });
 
 
 // FETCH
 self.addEventListener('fetch', function(event) {
   event.respondWith(
-    caches.match(event.request)
+    caches.open(currentCacheName)
+    .then(cache => cache.match(event.request))
     .then(matching => {
       return matching || fetch(event.request);
     })
@@ -87,16 +91,6 @@ self.addEventListener('message', async function(event) {
   const action = event.data?.action;
 
   switch (action) {
-    case 'update-data': {
-      try {
-        await installData(event);
-        source.postMessage({ action, complete: true });
-      } catch (error) {
-        console.error(error);
-        source.postMessage({ action, error });
-      }
-    } break;
-
     case 'sync-backup': {
       const source = event.ports[0];
 
@@ -106,6 +100,17 @@ self.addEventListener('message', async function(event) {
         .catch(() => source.postMessage({ successfulBackupComparison: false, noresponse: true }))
       );
     } break;
+
+    case 'force-update': {
+      const source = event.ports[0];
+
+      try {
+        await self.skipWaiting();
+        source.postMessage({ ready: true });
+      } catch (error) {
+        source.postMessage({ ready: false, error });
+      }
+    }
   }
 });
 
@@ -136,8 +141,7 @@ async function installFiles(event = null) {
   const localFileVersions = (await dataStorage.getItem('file-versions')) ?? {};
   const filesQuantity = Object.keys(liveFileVersions).length;
 
-  const newCacheName = `${PRE_CACHE}-${Math.max(...Object.values(liveFileVersions))}`;
-  const newCache = await caches.open(newCacheName);
+  const newCache = await caches.open(currentCacheName);
 
   const source = event?.source || null;
   const action = event?.data?.action || 'install';
@@ -155,11 +159,12 @@ async function installFiles(event = null) {
       // If the online file is more recent than the locally installed file
       if (newVersion > oldVersion || oldVersion === 0) {
         response = await fetch(request);
+        console.log(`File ${file} updated (${oldVersion} => ${newVersion})`);
       }
 
       // If the locally installed file is already the most recent version
       else {
-        response = (await caches.match(new Request(url))) ?? (await fetch(request));
+        response = (await caches.match(new Request(file))) ?? (await fetch(request));
       }
 
       if (!response.ok) throw Error(`[${action}] File download failed: (${request.url})`);
@@ -170,7 +175,7 @@ async function installFiles(event = null) {
     }));
 
     console.log(`[${action}] File installation complete!`);
-    deleteOldCaches(newCacheName, action);
+    deleteOldCaches(currentCacheName, action);
     dataStorage.setItem('file-versions', liveFileVersions);
   }
 
@@ -187,33 +192,6 @@ async function installFiles(event = null) {
 
 
 /**
- * Installs app data.
- * @param {Event} event - The event that caused the data installation.
- */
-async function installData(event = null) {
-  const dataRequest = await fetch(`backend/update.php?type=full&date=${Date.now()}`);
-  if (!dataRequest.ok) throw `[:(] Error ${response.status} while fetching update`;
-  const data = await dataRequest.json();
-
-  const action = event?.data?.action || 'install';
-
-  try {
-    console.log(`[${action}] Installing data...`);
-    await Promise.all([dataStorage.ready(), pokemonData.ready()]);
-    await dataStorage.setItem('pokemon-names', data['pokemon-names']);
-    await dataStorage.setItem('pokemon-names-fr', data['pokemon-names-fr']);
-    await Promise.all(
-      data['pokemon-data'].map(pkmn => pokemonData.setItem(String(pkmn.dexid), pkmn))
-    );
-    console.log(`[${action}] Data installation complete!`);
-  } catch (error) {
-    console.error(error);
-    throw Error(`[${action}] Data installation cancelled.`);
-  }
-}
-
-
-/**
  * Deletes old caches.
  * @param {string} newCacheName - The new cache's name.
  * @param {'install'|'update'} action - The action during which the caches were removed.
@@ -226,7 +204,7 @@ async function deleteOldCaches(newCacheName, action) {
     console.log(`[${action}] Deleting old cached files`);
     await Promise.all(
       allCaches.map(cache => {
-        if (cache.startsWith(PRE_CACHE) && newCacheName != cache) return caches.delete(cache);
+        if (cache.startsWith(cachePrefix) && newCacheName != cache) return caches.delete(cache);
         else return Promise.resolve();
       })
     );

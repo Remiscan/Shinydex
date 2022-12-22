@@ -1,6 +1,6 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/_common/php/DotEnv.php';
-require_once './class_BDD.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/shinydex/backend/class_BDD.php';
 
 ///////////////////////////////////////////////////
 // ÉTAPES DU BACKUP DES DONNÉES LOCALES VERS LA BDD

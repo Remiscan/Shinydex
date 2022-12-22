@@ -1,5 +1,5 @@
 <?php
-require_once 'class_Pokemon.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/shinydex/backend/class_Pokemon.php';
 
 $dir = "../images/pokemon-sprites/home";
 $files = scandir($dir);

@@ -1,4 +1,5 @@
 # Ignore generated files
 modules
 images/out/
+data/out/
 tsconfig.tsbuildinfo

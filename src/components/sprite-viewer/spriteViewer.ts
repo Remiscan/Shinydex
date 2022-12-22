@@ -94,7 +94,7 @@ class spriteViewer extends HTMLElement {
 
     // On place le numéro et nom
     this.querySelector('.info-dexid')!.innerHTML = pad(String(pokemon.dexid), 3);
-    this.querySelector('.info-nom')!.innerHTML = pokemon.namefr;
+    this.querySelector('.info-nom')!.innerHTML = pokemon.getName();
   }
 
 

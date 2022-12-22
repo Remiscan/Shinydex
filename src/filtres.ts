@@ -91,7 +91,7 @@ async function filterPokemon(filtres: ListeFiltres, shiny: Shiny): Promise<boole
     let contient: boolean = false;
     let exact: boolean = false;
     search: for (const mot of recherche) {
-      for (const champ of [await shiny.getNamefr(), shiny.surnom, shiny.methode, shiny.jeu]) {
+      for (const champ of [await shiny.getName(), shiny.surnom, shiny.methode, shiny.jeu]) {
         if (champ.includes(mot)) contient = true;
         break search;
       }
@@ -201,7 +201,7 @@ export async function orderCards(section: string, _ordre?: string, _reversed?: b
       break;
   }
 
-  const noms = await Pokemon.namesfr();
+  const noms = await Pokemon.names();
 
   let orderedShiny = allShiny.sort((s1, s2) => {
     switch (ordre) {

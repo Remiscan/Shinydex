@@ -1,11 +1,10 @@
-import { getNames } from './DexDatalist.js';
-import { initGamesDatalist } from './Hunt.js';
 import { Params, loadAllImages, setTheme, timestamp2date, wait, webpSupport } from './Params.js';
+import { backendPokemon } from './Pokemon.js';
 import { initPokedex, populateHandler } from './appContent.js';
 import { initFiltres } from './filtres.js';
 import { dataStorage, huntStorage, pokemonData, shinyStorage } from './localForage.js';
 import { Notif } from './notification.js';
-import { backgroundSync, immediateSync } from './syncBackup.js';
+import { backgroundSync } from './syncBackup.js';
 import { upgradeStorage } from './upgradeStorage.js';
 
 
@@ -21,30 +20,95 @@ declare global {
 /////////////////////////////////////////////////////
 // On enregistre le service worker
 // et on le met à jour si la version du site a changé
-let currentWorker: ServiceWorker | null;
-let updateAvailable = 0;
-
 async function initServiceWorker() {
   try {
-    const registration = await navigator.serviceWorker.register('/shinydex/service-worker.js');
+    const registration = await navigator.serviceWorker.register('/shinydex/service-worker.js.php');
     console.log('Le service worker a été enregistré', registration);
 
-    // On détecte les mises à jour du service worker lui-même
     registration.addEventListener('updatefound', () => {
       const newWorker = registration.installing;
-      newWorker!.addEventListener('statechange', () => {
-        if (newWorker!.state == 'activated') {
+      let updating = false;
+
+      newWorker?.addEventListener('statechange', async event => {
+        const updateHandler = async () => {
+          await new Promise((resolve, reject) => {
+            const chan = new MessageChannel();
+    
+            chan.port1.onmessage = event => {
+              if (event.data.error) {
+                console.error(event.data.error);
+                reject('[:(] Erreur de contact du service worker.');
+              }
+    
+              if (event.data.ready) {
+                console.log('[:)] Nouvelle version prête !');
+                resolve(true);
+              } else {
+                reject('[:(] Nouvelle version pas prête.');
+              }
+            };
+    
+            chan.port1.onmessageerror = event => {
+              reject('[:(] Erreur de communication avec le service worker.');
+            };
+    
+            updating = true;
+            newWorker.postMessage({ 'action': 'force-update' }, [chan.port2]);
+          });
+        };
+
+        if (newWorker.state == 'installed') {
           console.log('[sw] Service worker mis à jour');
-          currentWorker = newWorker;
+          
+          const updateNotif = new Notif('Mise à jour installée', 'Actualiser', 'update', Notif.maxDelay, updateHandler);
+          const userActed = await updateNotif.prompt();
+          if (userActed) {
+            updateNotif.priorite = true;
+            updateNotif.duree = Notif.maxDelay;
+            document.getElementById('notification')!.classList.add('installing');
+          }
+        }
+
+        else if (newWorker.state == 'activated') {
+          if (updating) return location.reload();
         }
       });
     });
 
-    currentWorker = registration.installing || navigator.serviceWorker.controller || registration.active;
-    return currentWorker;
+    return navigator.serviceWorker.controller;
   } catch(error) {
     console.error(error);
     throw null;
+  }
+}
+
+
+
+//////////////////////////////////////////////////////////////////////
+// On récupère les données des Pokémon et on les stocke dans indexedDB
+async function initPokemonData() {
+  await dataStorage.ready();
+  const fileVersion = (await dataStorage.getItem('file-versions'))['./data/pokemon.json'];
+  const dataVersion = await dataStorage.getItem('pokemon-data-version');
+
+  if (fileVersion === dataVersion) return;
+
+  try {
+    // @ts-ignore
+    const pokemonDataModule = await import('../data/pokemon.json', { assert: { type: 'json' }});
+    // @ts-expect-error
+    const data = pokemonDataModule.default;
+
+    console.log(`[:)] Préparation des données...`);
+    await pokemonData.ready();
+    await Promise.all(
+      data.map((pkmn: backendPokemon) => pokemonData.setItem(String(pkmn.dexid), pkmn))
+    );
+    await dataStorage.setItem('pokemon-data-version', fileVersion);
+    console.log(`[:)] Préparation des données terminée !`);
+  } catch (error) {
+    console.error(error);
+    throw Error(`[:()] Préparation des données échouée.`);
   }
 }
 
@@ -64,16 +128,12 @@ export async function appStart() {
 
   // On vérifie si les données sont installées
   await Promise.all([dataStorage.ready(), shinyStorage.ready(), pokemonData.ready(), huntStorage.ready()]);
-  const [installedVersion, installedPokemonData] = await Promise.all([
-    dataStorage.getItem('version-fichiers'),
-    pokemonData.getItem('0')
-  ]);
-  const dataInstalled = installedVersion != null && installedPokemonData != null;
+  const installedFiles = await dataStorage.getItem('file-versions');
+  const cacheVersion = Math.max(...Object.values(installedFiles).map(v => Number(v)));
 
   // On vérifie si les fichiers sont installés
-  const keys = await caches.keys();
-  const trueKeys = keys.filter(e => e.includes('remidex-sw-' + installedVersion));
-  const filesInstalled = trueKeys.length >= 1;
+  const cacheKeys = (await caches.keys()).filter(e => e.includes(`remidex-sw-${cacheVersion}`));
+  const filesInstalled = cacheKeys.length >= 1;
 
   // On vérifie si le service worker est prêt
   const serviceWorkerReady = navigator.serviceWorker.controller != null;
@@ -83,7 +143,7 @@ export async function appStart() {
   // ÉTAPE 2 : si la réponse est oui, on passe à la suite ;
   //           si la réponse est non, on installe l'application
 
-  if (filesInstalled && dataInstalled && serviceWorkerReady) {
+  if (filesInstalled && serviceWorkerReady) {
     console.log('[:)] L\'application est déjà installée localement.');
     initServiceWorker();
   } else {
@@ -95,27 +155,6 @@ export async function appStart() {
       loadMessage.style.display = 'block';
     }
     await initServiceWorker();
-
-    // On attend l'installation des données avant de continuer
-    if (!dataInstalled) {
-      try {
-        const installation = await appUpdate({ data: true, files: false });
-        console.log(installation[0]);
-      } catch (error) {
-        console.error(error);
-        if (typeof error === 'string') new Notif(error).prompt();
-      }
-    }
-
-    // On laisse l'installation des fichiers se faire en parallèle
-    if (!filesInstalled) {
-      appUpdate({ data: true, files: false })
-      .then(result => console.log(result[1]))
-      .catch(error => {
-        console.error(error);
-        if (typeof error === 'string') new Notif(error).prompt();
-      });
-    }
   }
 
   console.log('[:)] Chargement de l\'application...');
@@ -124,18 +163,7 @@ export async function appStart() {
 
   // ÉTAPE 3 : si la sauvegarde en ligne est activée, on met à jour les données locales
 
-  // Si aucun UUID n'existe pour l'utilisateur actuel, en créer un
-  let uuid = await dataStorage.getItem('user-uuid');
-  if (!uuid) {
-    // 🔽🔽🔽🔽
-    // Prompt ici pour nouveau compte ou connexion à un compte existant (via Google ?)
-    // 🔼🔼🔼🔼
-    uuid = crypto.randomUUID();
-    await dataStorage.setItem('user-uuid', uuid);
-  }
-  Params.userUUID = uuid;
-
-  const onlineBackup = await dataStorage.getItem('online-backup');
+  /*const onlineBackup = await dataStorage.getItem('online-backup');
   if (onlineBackup) {
     try {
       await immediateSync();
@@ -144,7 +172,7 @@ export async function appStart() {
       console.error(message, error);
       new Notif(message).prompt();
     }
-  }
+  }*/
 
   // ---
 
@@ -165,7 +193,7 @@ export async function appStart() {
   // On met à jour la structure de la BDD locale si nécessaire
   try {
     const lastStorageUpgrade = Number(await dataStorage.getItem('last-storage-upgrade'));
-    if (lastStorageUpgrade < installedVersion) await upgradeStorage();
+    if (lastStorageUpgrade < cacheVersion) await upgradeStorage();
   } catch (error) {
     const message = `Erreur pendant la mise à jour du format des données.`;
     console.error(message, error);
@@ -176,9 +204,9 @@ export async function appStart() {
 
   // ÉTAPE 5 : on peuple l'application à partir des données locales
   try {
+    await initPokemonData();
     await initFiltres('mes-chromatiques');
     await initPokedex();
-    await initGamesDatalist();
     await populateHandler('mes-chromatiques');
     await populateHandler('chasses-en-cours');
     await populateHandler('corbeille');
@@ -213,9 +241,6 @@ export async function appStart() {
   } catch (error) {
     console.error(`Erreur de chargement d'image`, error);
   }
-
-  // On pré-charge les noms des Pokémon
-  getNames();
 
   console.log('[:)] Chargement terminé !');
 
@@ -266,114 +291,20 @@ export async function appStart() {
 
 
 
-///////////////////////////
-// Met à jour l'application
-interface updateParams {
-  data: boolean;
-  files: boolean;
-};
-async function appUpdate(params: updateParams = { data: true, files: true }, partial: boolean = true) {
-  const progressBar = document.querySelector('.progression-maj') as HTMLElement;
-  progressBar.style.setProperty('--progression', '0');
-
-  if (!currentWorker) throw '[:(] Service worker indisponible';
-
-  let dataHandler = (e: MessageEvent) => {};
-  let filesHandler = (e: MessageEvent) => {};
-
-  const promiseData = () => new Promise((resolve, reject) => {
-    if (!params.data) return resolve(true);
-
-    navigator.serviceWorker.addEventListener('message', dataHandler = (event: MessageEvent) => {
-      if (event.data.action !== 'update-data') return;
-
-      if (event.data.error)         reject(event.data.error);
-      else if (event.data.complete) resolve('[:)] Installation des données terminée !');
-    });
-
-    currentWorker?.postMessage({ 'action': 'update-data' });
-  });
-
-  const promiseFiles = () => new Promise((resolve, reject) => {
-    if (!params.files) return resolve(true);
-
-    let loaded = 0;
-    navigator.serviceWorker.addEventListener('message', filesHandler = (event: MessageEvent) => {
-      if (event.data.action !== 'update-files') return;
-
-      // En cas d'erreur
-      if (event.data.error) reject(event.data.error);
-  
-      // Si la mise à jour est terminée
-      else if (event.data.complete) {
-        progressBar.style.setProperty('--progression', '1');
-        resolve('[:)] Installation des fichiers terminée !');
-      }
-      
-      // Si un fichier vient d'être installé
-      else if (event.data.loaded) {
-        loaded++;
-        const total = event.data.total + 1;
-        progressBar.style.setProperty('--progression', String(loaded / total));
-      }
-    });
-
-    currentWorker?.postMessage({ 'action': 'update-files', partial });
-  });
-
-  const body = document.querySelector('body');
-
-  try {
-    body?.setAttribute('inert', '');
-    return await Promise.all([promiseData(), promiseFiles()]);
-  } catch (error) {
-    body?.removeAttribute('inert');
-    console.error(error);
-    throw error;
-  } finally {
-    navigator.serviceWorker.removeEventListener('message', dataHandler);
-    navigator.serviceWorker.removeEventListener('message', filesHandler);
-  }
-}
-
-
-
-////////////////////////////////////////
-// Met à jour l'application manuellement
-export async function manualUpdate(partial = true) {
-  try {
-    if (!navigator.onLine)
-      throw 'Connexion internet indisponible';
-    if (!('serviceWorker' in navigator))
-      throw 'Service worker indisponible';
-
-    document.querySelector('.notif-texte')!.innerHTML = 'Installation en cours...';
-    document.getElementById('notification')!.classList.add('installing');
-    const result = await appUpdate({ data: true, files: true }, partial);
-    console.log(result);
-    return location.reload();
-  }
-  catch (raison) {
-    console.error(raison);
-    document.getElementById('notification')!.classList.remove('installing');
-    new Notif('Échec de mise à jour', 'Réessayer', 'update', 10000, manualUpdate).prompt();
-  }
-}
-
-
-
 /////////////////////////////////////////////
 // Vérifie la disponibilité d'une mise à jour
 let checkingUpdate = 0;
+let updateAvailable = 0;
 export async function checkUpdate(checkNotification = false) {
   const notif = document.getElementById('notification');
   if (notif!.classList.contains('on') || checkingUpdate)
     return;
   checkingUpdate = 1;
+
   const texteSucces = 'Mise à jour disponible...';
   const notifyMaj = async () => {
     checkingUpdate = 0;
-    const updateNotif = new Notif(texteSucces, 'Installer', 'update', 10000, manualUpdate);
+    const updateNotif = new Notif(texteSucces, 'Installer', 'update', 10000, () => location.reload());
     const userActed = await updateNotif.prompt();
     if (userActed) {
       updateNotif.priorite = true;
@@ -382,34 +313,35 @@ export async function checkUpdate(checkNotification = false) {
   };
 
   try {
-    if (!navigator.onLine)
-      throw 'Pas de connexion internet';
-    if (updateAvailable)
-      notifyMaj();
+    if (!navigator.onLine) throw 'Pas de connexion internet';
+    if (updateAvailable) return notifyMaj();
 
-    const versionFichiers = await dataStorage.getItem('version-fichiers');
-    
+    const installedFiles = await dataStorage.getItem('file-versions');
+    const cacheVersion = Math.max(...Object.values(installedFiles).map(v => Number(v)));
+  
     // On lance mod_update.php pour récupérer les données les plus récentes
-    const response = await fetch(`/shinydex/backend/update.php?type=check&from=${versionFichiers}&date=${Date.now()}`);
+    const response = await fetch(`/shinydex/backend/update.php?type=check&from=${cacheVersion}&date=${Date.now()}`);
     if (response.status != 200)
       throw '[:(] Erreur ' + response.status + ' lors de la requête';
     const data = await response.json();
 
-    if ((versionFichiers != data['version-fichiers'])) {
+    if ((cacheVersion != data['version-fichiers'])) {
       updateAvailable = 1;
       console.log('[:|] Mise à jour détectée');
-      console.log('     Installé : fichiers v. ' + timestamp2date(versionFichiers));
+      console.log('     Installé : fichiers v. ' + timestamp2date(cacheVersion));
       console.log('   Disponible : fichiers v. ' + timestamp2date(data['version-fichiers']));
       console.log('     Modifiés :', data['liste-fichiers-modifies']);
 
-      notifyMaj();
+      return notifyMaj();
     } else {
       updateAvailable = 0;
       console.log('[:)] Aucune mise à jour disponible');
-      console.log('     Installé : fichiers v. ' + timestamp2date(versionFichiers));
+      console.log('     Installé : fichiers v. ' + timestamp2date(cacheVersion));
       throw 'Pas de mise à jour';
     }
-  } catch(error) {
+  }
+  
+  catch(error) {
     if (checkNotification && typeof error === 'string')
       new Notif(error).prompt();
     checkingUpdate = 0;

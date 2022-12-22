@@ -1,4 +1,4 @@
-import { Pokemon, Shiny, frontendShiny } from './Pokemon.js';
+import { Shiny, frontendShiny } from './Pokemon.js';
 import { huntStorage, shinyStorage } from './localForage.js';
 
 
@@ -66,13 +66,9 @@ export class Hunt extends Shiny implements huntedPokemon {
     
     return hunt;
   }
-}
 
 
-// Crée la datalist Jeux
-export function initGamesDatalist() {
-  const datalistJeux = document.getElementById('datalist-jeux')!;
-  Pokemon.jeux.forEach(jeu => {
-    datalistJeux.innerHTML += `<option value="${jeu.nom}">`;
-  });
+  get orderedKeys(): Set<keyof Hunt> {
+    return new Set(['dexid', 'forme', 'jeu', 'methode', 'compteur', ...(Object.keys(this) as Array<keyof Hunt>)]);
+  }
 }

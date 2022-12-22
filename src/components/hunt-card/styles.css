@@ -1,0 +1,15 @@
+form:not(.edit) .hunt-edit,
+form:not(.caught) .confirm-buttons ~ * {
+  display: none;
+}
+
+:host(:not([data-jeu="la"])) .pla-inputs,
+:host(:not([data-jeu="lgpe"])) .lgpe-inputs,
+:host(:not([data-jeu="usum"])) .usum-inputs {
+  display: none;
+}
+
+input[name="dexid"],
+input[name="jeu"] {
+  text-transform: capitalize;
+}

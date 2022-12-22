@@ -6,8 +6,14 @@ import { huntStorage, pokemonData, shinyStorage } from '../../localForage.js';
 import { Notif } from '../../notification.js';
 import pokemonSprite from '../pokemon-sprite/pokemonSprite.js';
 import template from './template.js';
-// @ts-ignore
+// @ts-expect-error
 import pokespriteSheet from '../../../ext/pokesprite.css' assert { type: 'css' };
+// @ts-expect-error
+import sheet from './styles.css' assert { type: 'css' };
+// @ts-expect-error
+import gameStrings from '../../../strings/games.json' assert { type: 'json' };
+// @ts-expect-error
+import methodStrings from '../../../strings/methods.json' assert { type: 'json' };
 
 
 
@@ -26,7 +32,6 @@ declare global {
 
 
 type huntProperty = keyof Hunt;
-type querySelector = string;
 
 interface Handler {
   element: Element;
@@ -53,24 +58,6 @@ export class huntCard extends HTMLElement {
   huntid: string = '';
   pokemon?: Pokemon;
   handlers: HandlerMap = {};
-  inputMap: Map<huntProperty, querySelector> = new Map([
-    ['dexid', '#hunt-espece'],
-    ['forme', '#hunt-forme'],
-    ['surnom', '#hunt-surnom'],
-    ['methode', '#hunt-methode'],
-    ['jeu', '#hunt-jeu'],
-    ['ball', '#hunt-ball'],
-    ['notes', '#hunt-notes'],
-
-    ['checkmark', 'input[name="hunt-checkmark"]'],
-    ['DO', 'input[name="hunt-DO"]'],
-    ['charm', 'input[name="hunt-charm"]'],
-    ['hacked', 'input[name="hunt-hacked"]'],
-    ['horsChasse', 'input[name="hunt-horsChasse"]'],
-
-    ['compteur', '#hunt-compteur'],
-    ['timeCapture', '#hunt-date'],
-  ]);
   changeNonce: Object = {};
 
 
@@ -78,7 +65,8 @@ export class huntCard extends HTMLElement {
     super();
     this.shadow = this.attachShadow({ mode: 'open' });
     this.shadow.appendChild(template.content.cloneNode(true));
-    this.shadow.adoptedStyleSheets = [pokespriteSheet];
+    this.shadow.adoptedStyleSheets = [pokespriteSheet, sheet];
+    this.genereJeux();
   }
 
   async getHunt() {
@@ -171,20 +159,22 @@ export class huntCard extends HTMLElement {
       throw e;
     }
 
-    for (const [prop, value] of Object.entries(hunt)) {
+    for (const prop of hunt.orderedKeys) {
       const input = this.shadow.querySelector(`input[name="${prop}"], select[name="${prop}"], textarea[name="${prop}"]`) as HTMLInputElement;
 
       switch (prop as huntProperty) {
         case 'dexid': {
-          const allNames = await Pokemon.namesfr();
+          const value = hunt.dexid;
+          const allNames = await Pokemon.names();
           const name = allNames[value];
           input.value = name;
-          await this.handlers.listeFormes.function(new Event(''));
+          this.genereFormes(name);
         } break;
 
         case 'jeu': {
+          const value = hunt.jeu;
           input.value = value;
-          await this.handlers.listeMethodes.function(new Event(''));
+          this.genereMethodes(value);
         } break;
 
         case 'surnom':
@@ -192,11 +182,13 @@ export class huntCard extends HTMLElement {
         case 'forme':
         case 'methode':
         case 'ball': {
+          const value = hunt[prop] as string;
           input.value = value;
         } break;
 
         case 'checkmark':
         case 'hacked': {
+          const value = hunt[prop] as number;
           const input = this.shadow.querySelector(`input[name="${prop}"][value="${value}"]`) as HTMLInputElement;
           input.checked = true;
         } break;
@@ -204,10 +196,12 @@ export class huntCard extends HTMLElement {
         case 'charm':
         case 'hacked':
         case 'horsChasse': {
+          const value = hunt[prop] as boolean;
           input.checked = value;
         } break;
 
         case 'compteur': {
+          const value = hunt.compteur;
           const methode = hunt.methode;
           const jeu = hunt.jeu;
           const compteur = value ? JSON.parse(value) : 0;
@@ -240,6 +234,7 @@ export class huntCard extends HTMLElement {
         } break;
 
         case 'timeCapture': {
+          const value = hunt.timeCapture;
           const date = (new Date(value)).toISOString().split('T')[0];
           input.value = date;
         } break;
@@ -259,8 +254,8 @@ export class huntCard extends HTMLElement {
     for (const [prop, value] of formData.entries()) {
       switch (prop as huntProperty) {
         case 'dexid': {
-          const allNames = await Pokemon.namesfr();
-          const dexid = allNames.findIndex(s => s === value);
+          const allNames = await Pokemon.names();
+          const dexid = allNames.findIndex(s => s === (value as string).toLowerCase());
           hunt.dexid = dexid > 0 ? dexid : 0;
         } break;
 
@@ -327,8 +322,9 @@ export class huntCard extends HTMLElement {
 
 
   async formChangeHandler(event: Event) {
+    console.log(event);
     const nonce = {};
-    this.changeNonce = {};
+    this.changeNonce = nonce;
 
     const form = this.shadow.querySelector('form');
     if (form) {
@@ -352,8 +348,8 @@ export class huntCard extends HTMLElement {
     const hunt = _hunt ?? (await this.getHunt());
     
     // Icons
-    this.shadow.querySelector(`.icones.jeu`)!.className = `icones jeu ${hunt.jeu.replace(/[ \']/g, '')}`;
-    this.shadow.querySelector(`.icones.ball`)!.className = `pkspr item ball-${hunt.ball}`;
+    this.shadow.querySelector(`[data-icon="jeu"]`)!.className = `icones jeu ${hunt.jeu}`;
+    this.shadow.querySelector(`[data-icon="ball"]`)!.className = `pkspr item ball-${hunt.ball}`;
 
     // Pokémon sprite
     const sprite = this.shadow.querySelector('pokemon-sprite')!;
@@ -367,12 +363,10 @@ export class huntCard extends HTMLElement {
     // 🔽 Active les boutons du formulaire
 
     // Active les boutons d'incrémentation du compteur
-    const boutonAdd = this.shadow.querySelector('button.counter.add')!;
-    const boutonSub = this.shadow.querySelector('button.counter.sub')!;
     const inputCompteur = this.shadow.querySelector('input[name="compteur"]') as HTMLInputElement;
 
     this.handlers.counterAdd = {
-      element: boutonAdd,
+      element: this.shadow.querySelector('button.counter.add') as HTMLButtonElement,
       type: 'click',
       function: event => {
         const value = Number(inputCompteur.value);
@@ -383,7 +377,7 @@ export class huntCard extends HTMLElement {
     handle(this.handlers.counterAdd);
 
     this.handlers.counterSub = {
-      element: boutonSub,
+      element: this.shadow.querySelector('button.counter.sub') as HTMLButtonElement,
       type: 'click',
       function: event => {
         const value = Number(inputCompteur.value);
@@ -394,10 +388,8 @@ export class huntCard extends HTMLElement {
     handle(this.handlers.counterSub);
 
     // Active le bouton "capturé"
-    const boutonCaught = this.shadow.querySelector('button.capture')!;
-
     this.handlers.caught = {
-      element: boutonCaught,
+      element: this.shadow.querySelector('button.capture') as HTMLButtonElement,
       type: 'click',
       function: async event => {
         const hunt = await this.getHunt();
@@ -405,13 +397,16 @@ export class huntCard extends HTMLElement {
         const container = this.shadow.querySelector('form')!;
         container.classList.toggle('caught');
         const inputDate = this.shadow.querySelector('input[name="timeCapture"]') as HTMLInputElement;
+        const sprite = this.shadow.querySelector('pokemon-sprite')! as pokemonSprite;
   
         if (inputDate.value == '') inputDate.value = new Date().toISOString().split('T')[0];
         if (container.classList.contains('caught')) {
           hunt.caught = true;
-          (this.shadow.querySelector('pokemon-sprite')! as pokemonSprite).sparkle();
+          sprite.setAttribute('shiny', 'true');
+          sprite.sparkle();
         } else {
           hunt.caught = false;
+          sprite.setAttribute('shiny', 'false');
         }
 
         await huntStorage.setItem(hunt.huntid, hunt);
@@ -420,8 +415,7 @@ export class huntCard extends HTMLElement {
     handle(this.handlers.caught);
 
     // Active le bouton "annuler"
-    const boutonCancel = this.shadow.querySelector('button.cancel')!;
-
+    const boutonCancel = this.shadow.querySelector('button.cancel') as HTMLButtonElement;
     this.handlers.cancel = {
       element: boutonCancel,
       type: 'click',
@@ -434,10 +428,8 @@ export class huntCard extends HTMLElement {
     handle(this.handlers.cancel);
 
     // Active le bouton "enregistrer"
-    const boutonSubmit = this.shadow.querySelector('button.submit')!;
-
     this.handlers.submit = {
-      element: this,
+      element: this.shadow.querySelector('form') as HTMLFormElement,
       type: 'submit',
       function: async event => {
         event.preventDefault();
@@ -458,6 +450,7 @@ export class huntCard extends HTMLElement {
           new Notif(message).prompt();
           return;
         } else {
+          const boutonSubmit = this.shadow.querySelector('button.submit') as HTMLButtonElement;
           const userResponse = await warnBeforeDestruction(boutonSubmit, 'Ajouter ce Pokémon à vos chromatiques ?', 'done');
           if (userResponse) await this.submit();
         }
@@ -466,10 +459,8 @@ export class huntCard extends HTMLElement {
     handle(this.handlers.submit);
 
     // Active le bouton "supprimer"
-    const boutonDeleteShiny = this.shadow.querySelector('button.delete')!;
-
     this.handlers.deleteShiny = {
-      element: boutonDeleteShiny,
+      element: this.shadow.querySelector('button.delete') as HTMLButtonElement,
       type: 'click',
       function: async event => {
         const hunt = await this.getHunt();
@@ -480,7 +471,7 @@ export class huntCard extends HTMLElement {
           return;
         }
   
-        const userResponse = await warnBeforeDestruction(boutonDeleteShiny);
+        const userResponse = await warnBeforeDestruction(event.currentTarget as Element);
         if (userResponse) await this.deleteShiny();
       }
     };
@@ -490,7 +481,7 @@ export class huntCard extends HTMLElement {
 
     // Changements de tous les inputs
     this.handlers.form = {
-      element: this,
+      element: this.shadow.querySelector('form') as HTMLFormElement,
       type: 'change',
       function: this.formChangeHandler.bind(this)
     }
@@ -498,21 +489,45 @@ export class huntCard extends HTMLElement {
 
     // Génère la liste des formes au choix d'un Pokémon
     // et génère la liste des Pokémon correspondants quand on commence à écrire un nom
-    const inputEspece = this.shadow.querySelector('[list="datalist-pokedex"]')! as HTMLInputElement;
+    const inputEspece = this.shadow.querySelector('[list="datalist-pokedex"]') as HTMLInputElement;
     this.handlers.listeFormes = {
       element: inputEspece,
-      type: 'input',
-      function: async () => {
-        DexDatalist.build(inputEspece.value);
-        this.genereFormes();
+      type: 'focus',
+      function: event => {
+        const inputHandler = (inputEvent: Event) => {
+          DexDatalist.build(inputEspece.value, this.shadow.querySelector('datalist#datalist-pokedex')!);
+          this.genereFormes(inputEspece.value);
+        };
+
+        const blurHandler = (blurEvent: Event) => {
+          inputEspece.removeEventListener('input', inputHandler);
+          inputEspece.removeEventListener('blur', blurHandler);
+        };
+
+        inputEspece.addEventListener('input', inputHandler);
+        inputEspece.addEventListener('blur', blurHandler);
       }
     }
+    handle(this.handlers.listeFormes);
 
     // Génère la liste des méthodes au choix du jeu
+    const inputJeu = this.shadow.querySelector('select[name="jeu"]') as HTMLInputElement;
     this.handlers.listeMethodes = {
-      element: this.shadow.querySelector('[list="datalist-jeux"]')!,
-      type: 'input',
-      function: this.genereMethodes.bind(this)
+      element: inputJeu,
+      type: 'focus',
+      function: event => {
+        const inputHandler = (inputEvent: Event) => {
+          this.genereMethodes(inputJeu.value);
+        };
+
+        const blurHandler = (blurEvent: Event) => {
+          inputJeu.removeEventListener('input', inputHandler);
+          inputJeu.removeEventListener('blur', blurHandler);
+        };
+
+        inputJeu.addEventListener('input', inputHandler);
+        inputJeu.addEventListener('blur', blurHandler);
+      }
     }
     handle(this.handlers.listeMethodes);
 
@@ -522,46 +537,57 @@ export class huntCard extends HTMLElement {
 
 
   /** Génère la liste des formes à partir du Pokémon entré. */
-  async genereFormes() {
-    const inputEspece = this.shadow.querySelector('[list="datalist-pokedex"]') as HTMLInputElement;
+  async genereFormes(value: string) {
     const select = this.shadow.querySelector('select[name="forme"]') as HTMLInputElement;
     select.innerHTML = '';
 
-    const allNames = await Pokemon.namesfr();
-    const k = allNames.findIndex(p => p == inputEspece.value);
+    const allNames = await Pokemon.names();
+    const k = allNames.findIndex(p => p == value.toLowerCase());
     if (k == -1) return 'Pokémon inexistant';
     else {
       const pkmn = await pokemonData.getItem(String(k));
       const formes: Forme[] = pkmn.formes.slice().sort((a: Forme, b: Forme) => { if (a.nom == '') return -1; else return 0;});
-      formes.forEach(forme => {
+      for (const forme of formes) {
         if (forme.noShiny == true) return;
 
         if (forme.dbid != '') select.innerHTML += `<option value="${forme.dbid}">${forme.nom}</option>`;
         else select.innerHTML += `<option value="" selected>${forme.nom || 'Forme normale'}</option>`;
-      });
+      }
     }
   }
 
 
   /** Génère la liste des méthodes à partir du jeu entré. */
-  genereMethodes() {
-    const inputJeu = this.shadow.querySelector('[list=datalist-jeux]') as HTMLInputElement;
+  genereMethodes(value: string) {
     const select = this.shadow.querySelector('select[name="methode"]') as HTMLInputElement;
     select.innerHTML = '';
 
-    const k = Pokemon.jeux.findIndex(jeu => jeu.nom == inputJeu.value);
+    const k = Pokemon.jeux.findIndex(jeu => jeu.uid == value);
     if (k == -1) return 'Jeu inexistant';
     else {
       const methodes: Methode[] = [];
 
       for (const methode of Shiny.allMethodes) {
-        const k = methode.jeux.findIndex(jeu => jeu.nom == inputJeu.value);
+        const k = methode.jeux.findIndex(jeu => jeu.uid == value);
         if (k != -1) methodes.push(methode);
       }
   
+      const lang = document.documentElement.getAttribute('lang');
       for (const methode of methodes) {
-        select.innerHTML += `<option>${methode.nom}</option>`;
+        const nom = methodStrings[lang][methode.id];
+        select.innerHTML += `<option value="${methode.id}">${nom}</option>`;
       }
+    }
+  }
+
+
+  /** Génère la liste des jeux. */
+  genereJeux() {
+    const select = this.shadow.querySelector('select[name="jeu"]')!;
+    const lang = document.documentElement.getAttribute('lang');
+    for (const jeu of Pokemon.jeux.reverse()) {
+      const nom = gameStrings[lang][jeu.uid];
+      select.innerHTML += `<option value="${jeu.uid}">${nom}</option>`;
     }
   }
   

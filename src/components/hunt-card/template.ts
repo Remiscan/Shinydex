@@ -1,6 +1,8 @@
 const template = document.createElement('template');
 template.innerHTML = /*html*/`
 <form>
+  <datalist id="datalist-pokedex"></datalist>
+
   <pokemon-sprite size="112"></pokemon-sprite>
 
   <div class="hunt-edit">
@@ -13,9 +15,7 @@ template.innerHTML = /*html*/`
     <legend>Pokémon</legend>
 
     <input type="text" name="dexid" list="datalist-pokedex" autocomplete="off" placeholder="Bulbizarre" size="8">
-    <select name="forme">
-      <option value="">Forme normale</option>
-    </select>
+    <select name="forme"></select>
   </fieldset>
 
 
@@ -23,14 +23,12 @@ template.innerHTML = /*html*/`
   <fieldset class="game-method-inputs">
     <legend>Jeu et méthode</legend>
 
-    <span class="icones jeu"></span>
+    <span data-icon="jeu"></span>
     <label for="jeu">Jeu :</label>
-    <input type="text" name="jeu" id="jeu" list="datalist-jeux" autocomplete="off" placeholder="Epee" size="8">
+    <select name="jeu" id="jeu"></select>
 
     <label for="methode">Méthode :</label>
-    <select name="methode" id="methode">
-      <option>Sauvage</option>
-    </select>
+    <select name="methode" id="methode"></select>
   </fieldset>
 
 
@@ -117,6 +115,7 @@ template.innerHTML = /*html*/`
     <label for="timeCapture">Date de capture</label>
     <input type="date" name="timeCapture" id="timeCapture" min="1996-02-27">
 
+    <span data-icon="ball"></span>
     <label for="ball">Capturé dans une</label>
     <select name="ball" id="ball">
       <option value="lure">Appât Ball</option>

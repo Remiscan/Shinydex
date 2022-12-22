@@ -1,8 +1,8 @@
 import { huntedPokemon } from './Hunt.js';
-import { frontendShiny, Pokemon } from './Pokemon.js';
+import { Pokemon, frontendShiny } from './Pokemon.js';
 import { huntCard } from './components/hunt-card/huntCard.js';
 import { pokemonCard } from './components/pokemon-card/pokemonCard.js';
-import { filterCards, ListeFiltres, orderCards } from './filtres.js';
+import { ListeFiltres, filterCards, orderCards } from './filtres.js';
 import { lazyLoad } from './lazyLoading.js';
 import { dataStorage, friendStorage, huntStorage, localForageAPI, shinyStorage } from './localForage.js';
 import { navigate } from './navigate.js';
@@ -111,7 +111,7 @@ export async function populateFromData(section: populatableSection, ids: string[
   const cardsToCreate: Array<pokemonCard | huntCard> = [];
   const results = await Promise.allSettled(ids.map(async huntid => {
     const pkmn = await dataStore.getItem(huntid) as frontendShiny | huntedPokemon | null;
-    let card = document.getElementById(`pokemon-card-${huntid}`) as pokemonCard | huntCard;
+    let card = document.querySelector(`${elementName}[huntid="${huntid}"]`) as pokemonCard | huntCard;
 
     // ABSENT DE LA BDD = Supprimer (manuellement)
     if (pkmn === null) {
@@ -129,6 +129,7 @@ export async function populateFromData(section: populatableSection, ids: string[
         // DANS LA BDD & SANS CARTE = Créer
         else {
           card = document.createElement(elementName) as pokemonCard | huntCard;
+          card.setAttribute('huntid', huntid);
           cardsToCreate.push(card);
         }
       }
@@ -156,7 +157,7 @@ export async function initPokedex() {
 
   let gensToPopulate = [];
   const generations = Pokemon.generations;
-  const names = await Pokemon.names();
+  const names = await Pokemon.names('en');
 
   for (const gen of generations) {
     let monsToPopulate = [];
