@@ -374,6 +374,8 @@ export class huntCard extends HTMLElement {
   connectedCallback() {   
     // 🔽 Active les boutons du formulaire
 
+    const form = this.shadow.querySelector('form') as HTMLFormElement;
+
     // Active les boutons d'incrémentation du compteur
     const inputCompteur = this.shadow.querySelector('input[name="compteur"]') as HTMLInputElement;
 
@@ -404,14 +406,15 @@ export class huntCard extends HTMLElement {
       element: this.shadow.querySelector('button.capture') as HTMLButtonElement,
       type: 'click',
       function: async event => {
+        if (!form.checkValidity()) return;
+        
         const hunt = await this.getHunt();
 
-        const container = this.shadow.querySelector('form')!;
-        container.classList.toggle('caught');
+        form.classList.toggle('caught');
         const inputDate = this.shadow.querySelector('input[name="timeCapture"]') as HTMLInputElement;
         const sprite = this.shadow.querySelector('pokemon-sprite')! as pokemonSprite;
   
-        if (container.classList.contains('caught')) {
+        if (form.classList.contains('caught')) {
           hunt.caught = true;
           sprite.setAttribute('shiny', 'true');
           sprite.sparkle();
@@ -493,7 +496,7 @@ export class huntCard extends HTMLElement {
 
     // Changements de tous les inputs
     this.handlers.form = {
-      element: this.shadow.querySelector('form') as HTMLFormElement,
+      element: form,
       type: 'change',
       function: this.formChangeHandler.bind(this)
     }
@@ -563,7 +566,7 @@ export class huntCard extends HTMLElement {
         if (forme.noShiny == true) return;
 
         if (forme.dbid != '') select.innerHTML += `<option value="${forme.dbid}">${forme.nom}</option>`;
-        else select.innerHTML += `<option value="" selected>${forme.nom || 'Forme normale'}</option>`;
+        else select.innerHTML += `<option value="">${forme.nom || 'Forme normale'}</option>`;
       }
     }
   }

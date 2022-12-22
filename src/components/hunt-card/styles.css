@@ -9,7 +9,18 @@ form:not(.caught) .confirm-buttons ~ * {
   display: none;
 }
 
+select:empty,
+label:has(+ select:empty) {
+  display: none;
+}
+
 input[name="dexid"],
 input[name="jeu"] {
   text-transform: capitalize;
+}
+
+input:invalid,
+select:invalid,
+textarea:invalid {
+  outline: 2px dashed red;
 }

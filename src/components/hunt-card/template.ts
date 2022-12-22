@@ -14,7 +14,7 @@ template.innerHTML = /*html*/`
   <fieldset class="pokemon-inputs">
     <legend>Pokémon</legend>
 
-    <input type="text" name="dexid" list="datalist-pokedex" autocomplete="off" placeholder="Bulbizarre" size="8">
+    <input type="text" name="dexid" required list="datalist-pokedex" autocomplete="off" placeholder="Bulbizarre" size="8">
     <select name="forme"></select>
   </fieldset>
 
@@ -25,7 +25,7 @@ template.innerHTML = /*html*/`
 
     <span data-icon="jeu"></span>
     <label for="jeu">Jeu :</label>
-    <select name="jeu" id="jeu"></select>
+    <select name="jeu" id="jeu" required></select>
 
     <label for="methode">Méthode :</label>
     <select name="methode" id="methode"></select>
@@ -113,7 +113,7 @@ template.innerHTML = /*html*/`
     <input type="text" name="surnom" id="surnom">
 
     <label for="timeCapture">Date de capture</label>
-    <input type="date" name="timeCapture" id="timeCapture" min="1996-02-27">
+    <input type="date" name="timeCapture" id="timeCapture">
 
     <span data-icon="ball"></span>
     <label for="ball">Capturé dans une</label>
