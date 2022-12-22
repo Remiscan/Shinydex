@@ -132,9 +132,10 @@ export async function populateFromData(section: populatableSection, ids: string[
           card.setAttribute('huntid', huntid);
           cardsToCreate.push(card);
         }
+      } else {
+        // DANS LA BDD & AVEC CARTE = Éditer
+        card.dataToContent();
       }
-      // DANS LA BDD & AVEC CARTE = Éditer
-      card.dataToContent();
       return Promise.resolve(huntid);
     }
   }));
