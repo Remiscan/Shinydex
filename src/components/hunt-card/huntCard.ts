@@ -351,7 +351,6 @@ export class huntCard extends HTMLElement {
 
 
   async formChangeHandler(event: Event) {
-    console.log(event);
     const nonce = {};
     this.changeNonce = nonce;
 
