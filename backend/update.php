@@ -40,7 +40,7 @@ function getFilesVersion(int $versionFrom = 0): array {
       $path = str_replace('./', dirname(__DIR__, 1).'/', $path);
     $dateFichier = filemtime($path);
 
-    if ($dateFichier > $versionFrom / 1000) {
+    if ($dateFichier > $versionFrom) {
       if (str_ends_with($path, '.html') || str_ends_with($path, 'index.php'))
         $index = true;
       else

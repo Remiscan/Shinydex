@@ -328,15 +328,15 @@ export async function checkUpdate(checkNotification = false) {
     if ((cacheVersion != data['version-fichiers'])) {
       updateAvailable = 1;
       console.log('[:|] Mise à jour détectée');
-      console.log('     Installé : fichiers v. ' + timestamp2date(cacheVersion));
-      console.log('   Disponible : fichiers v. ' + timestamp2date(data['version-fichiers']));
+      console.log('     Installé : fichiers v. ' + timestamp2date(cacheVersion * 1000));
+      console.log('   Disponible : fichiers v. ' + timestamp2date(data['version-fichiers'] * 1000));
       console.log('     Modifiés :', data['liste-fichiers-modifies']);
 
       return notifyMaj();
     } else {
       updateAvailable = 0;
       console.log('[:)] Aucune mise à jour disponible');
-      console.log('     Installé : fichiers v. ' + timestamp2date(cacheVersion));
+      console.log('     Installé : fichiers v. ' + timestamp2date(cacheVersion * 1000));
       throw 'Pas de mise à jour';
     }
   }
