@@ -178,14 +178,13 @@ export class huntCard extends HTMLElement {
           const value = hunt.jeu;
           input.value = value;
           this.genereMethodes(value);
-          const idJeu = Pokemon.jeux.find(jeu => jeu.uid === value)?.id ?? '';
-          this.setAttribute('data-jeu', idJeu);
+          this.updateAttribute('methode', value);
         } break;
 
         case 'methode': {
           const value = hunt.methode;
           input.value = value;
-          this.setAttribute('data-methode', value);
+          this.updateAttribute('methode', value);
         } break;
 
         case 'surnom':
@@ -305,7 +304,8 @@ export class huntCard extends HTMLElement {
         case 'charm':
         case 'hacked':
         case 'horsChasse': {
-          Object.assign(hunt, { [prop]: Boolean(parseInt(value as string)) });
+          const boolean = value === 'false' ? false : true;
+          Object.assign(hunt, { [prop]: boolean });
         } break;
 
         case 'compteur': {
@@ -356,14 +356,22 @@ export class huntCard extends HTMLElement {
     this.changeNonce = nonce;
 
     const form = this.shadow.querySelector('form');
+    // Update locally saved data with changes from the form
     if (form) {
-      // Update locally saved data with changes from the form
       const formData = new FormData(form);
-      const hunt = await this.formToHunt(formData);
-      const jeu = Pokemon.jeux.find(jeu => jeu.uid === hunt.jeu)?.id ?? '';
+    
+      // Add checkboxes state to formData
+      const checkboxes = [...this.shadow.querySelectorAll('input[type="checkbox"][name]')] as HTMLInputElement[];
+      checkboxes.forEach(checkbox => {
+        const name = checkbox.getAttribute('name')!;
+        const checked = String(checkbox.checked);
+        formData.append(name, checked);
+      });
 
-      this.setAttribute('data-methode', hunt.methode);
-      this.setAttribute('data-jeu', jeu);
+      const hunt = await this.formToHunt(formData);
+      
+      this.updateAttribute('methode', hunt.methode);
+      this.updateAttribute('jeu', hunt.jeu);
 
       if (this.changeNonce !== nonce) return;
       await huntStorage.setItem(hunt.huntid, hunt);
@@ -386,6 +394,22 @@ export class huntCard extends HTMLElement {
     sprite.setAttribute('dexid', String(hunt.dexid));
     sprite.setAttribute('forme', hunt.forme);
     sprite.setAttribute('shiny', String(hunt.caught));
+  }
+
+
+  updateAttribute(attr: string, value: string) {
+    switch (attr) {
+      case 'methode': {
+        this.setAttribute('data-methode', value);
+        const methode = Shiny.allMethodes.find(methode => methode.id === value);
+        this.setAttribute('data-methode-mine', String(methode?.mine ?? false));
+      } break;
+
+      case 'jeu': {
+        const jeu = Pokemon.jeux.find(jeu => jeu.uid === value)?.id ?? '';
+        this.setAttribute('data-jeu', jeu);
+      }
+    }
   }
 
 
@@ -431,24 +455,18 @@ export class huntCard extends HTMLElement {
           form.dispatchEvent(new Event('change'));
           return;
         }
-        
-        const hunt = await this.getHunt();
 
         form.classList.toggle('caught');
         const inputDate = this.shadow.querySelector('input[name="timeCapture"]') as HTMLInputElement;
         const sprite = this.shadow.querySelector('pokemon-sprite')! as pokemonSprite;
   
         if (form.classList.contains('caught')) {
-          hunt.caught = true;
           sprite.setAttribute('shiny', 'true');
           sprite.sparkle();
           inputDate.value = new Date().toISOString().split('T')[0];
         } else {
-          hunt.caught = false;
           sprite.setAttribute('shiny', 'false');
         }
-
-        await huntStorage.setItem(hunt.huntid, hunt);
       }
     };
     handle(this.handlers.caught);
