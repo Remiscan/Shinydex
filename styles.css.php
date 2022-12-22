@@ -1076,32 +1076,35 @@ body:not([data-section-actuelle="pokedex"]) .only-pokedex {
 }
 
 .pokedex-gen>.pkspr {
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
+
   position: relative;
-  margin: 0 var(--side-margin);
-  --side-margin: -2px;
+  margin: 0;
 }
 
+.pokedex-gen>.pkspr:focus,
 .pokedex-gen>.got.pkspr {
   z-index: 1;
-  /*--border-color: var(--text-color);
-  --border-size: 1px;
-  filter: drop-shadow(var(--border-size) 0 0 var(--border-color))
-          drop-shadow(0 var(--border-size) 0 var(--border-color))
-          drop-shadow(calc(-1 * var(--border-size)) 0 0 var(--border-color))
-          drop-shadow(0 calc(-1 * var(--border-size)) 0 var(--border-color));*/
 }
 
 .pokedex-gen>:not(.got).pkspr::after {
   content: '';
   display: block;
-  width: calc(100% + 2 * var(--side-margin));
+  width: 100%;
   height: 100%;
   position: absolute;
   top: 0;
-  left: calc(-1 * var(--side-margin));
-  /*opacity: .6;*/
+  left: 0;
   opacity: .7;
   background-color: var(--card-bg-color);
+}
+
+.pokedex-gen>:not(.got).pkspr:hover::after {
+  opacity: .1;
 }
 
 .section-titre>load-spinner {

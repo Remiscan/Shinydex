@@ -166,7 +166,8 @@ export async function initPokedex() {
     genConteneur.classList.add('pokedex-gen');
 
     for (let i = gen.start; i <= gen.end; i++) {
-      const pkmn = document.createElement('span');
+      const pkmn = document.createElement('button');
+      pkmn.setAttribute('type', 'button');
       const name = names[i];
       pkmn.classList.add('pkspr', 'pokemon', name + '-shiny');
       pkmn.dataset.dexid = String(i);
