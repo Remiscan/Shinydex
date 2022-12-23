@@ -7,7 +7,13 @@ import { Notif } from '../../notification.js';
 import pokemonSprite from '../pokemon-sprite/pokemonSprite.js';
 import template from './template.js';
 // @ts-expect-error
+import materialIconsSheet from '../../../ext/material_icons.css' assert { type: 'css' };
+// @ts-expect-error
 import pokespriteSheet from '../../../ext/pokesprite.css' assert { type: 'css' };
+// @ts-expect-error
+import iconSheet from '../../../images/iconsheet.css' assert { type: 'css' };
+// @ts-expect-error
+import commonSheet from '../../../styles/common.css' assert { type: 'css' };
 // @ts-expect-error
 import sheet from './styles.css' assert { type: 'css' };
 // @ts-expect-error
@@ -65,7 +71,7 @@ export class huntCard extends HTMLElement {
     super();
     this.shadow = this.attachShadow({ mode: 'open' });
     this.shadow.appendChild(template.content.cloneNode(true));
-    this.shadow.adoptedStyleSheets = [pokespriteSheet, sheet];
+    this.shadow.adoptedStyleSheets = [materialIconsSheet, pokespriteSheet, iconSheet, commonSheet, sheet];
     this.genereJeux();
   }
 
@@ -218,7 +224,7 @@ export class huntCard extends HTMLElement {
           const jeu = hunt.jeu;
           const compteur = value ? JSON.parse(value) : 0;
 
-          if (methode === 'Ultra-Brèche') {
+          if (methode === 'ultrawormhole') {
             const inputDistance = this.shadow.querySelector(`input[name="usum-distance"]`) as HTMLInputElement;
             inputDistance.value = String(compteur.distance);
 
@@ -226,14 +232,14 @@ export class huntCard extends HTMLElement {
             inputRings.value = String(compteur.rings);
           }
 
-          else if (methode === 'Chaîne de captures') {
+          else if (methode === 'catchcombo') {
             input.value = String(compteur.chain);
 
             const inputLure = this.shadow.querySelector(`input[name="lgpe-lure"]`) as HTMLInputElement;
             inputLure.checked = compteur.lure;
           }
 
-          else if (jeu === 'Légendes Arceus') {
+          else if (jeu === 'legendsarceus') {
             input.value = String(compteur.count);
 
             const inputDexResearch = this.shadow.querySelector(`input[name="pla-dexResearch"][value="${compteur.dexResearch}"]`) as HTMLInputElement;

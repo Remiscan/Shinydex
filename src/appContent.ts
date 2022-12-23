@@ -144,9 +144,12 @@ export async function populateFromData(section: populatableSection, ids: string[
   }
 
   // Compte le nombre de cartes affichées
-  const displayedCards = [...conteneur.querySelectorAll(elementName)];
-  if (displayedCards.length > 0) conteneur.closest('section')?.classList.remove('vide');
-  else                           conteneur.closest('section')?.classList.add('vide');
+  const allCards = [...conteneur.querySelectorAll(elementName)];
+  if (allCards.length > 0) conteneur.closest('section')?.classList.remove('vide');
+  else                     conteneur.closest('section')?.classList.add('vide');
+  const filteredCards = allCards.filter(card => card.classList.contains('filtered'));
+  if ((allCards.length - filteredCards.length) > 0) conteneur.closest('section')?.classList.remove('vide-filtres');
+  else                                              conteneur.closest('section')?.classList.add('vide-filtres');
 
   return results;
 }

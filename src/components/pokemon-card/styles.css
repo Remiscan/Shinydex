@@ -1,0 +1,340 @@
+:host {
+  width: 100%;
+  height: 120px;
+  min-height: 120px;
+  overflow: hidden;
+  border-radius: 10px;
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14);
+  background-color: var(--card-bg-color);
+  display: grid;
+  grid-template-columns: 120px 1fr auto;
+  grid-template-rows: 1fr;
+  position: relative;
+  order: var(--order, 0);
+}
+
+pokemon-sprite,
+.edit-icon {
+  grid-column: 1;
+  grid-row: 1;
+  --size: 112px;
+  width: var(--size);
+  height: var(--size);
+  padding: calc(.5 * (120px - var(--size)));
+  background-color: var(--card-sprite-bg-color);
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+}
+
+.edit-icon {
+  display: grid;
+  background-color: var(--card-edit-bg-color);
+  position: relative;
+  opacity: 0;
+}
+
+.edit-icon > .material-icons {
+  display: grid;
+  width: 50px;
+  height: 50px;
+  place-items: center;
+  background-color: var(--card-sprite-bg-color);
+  border-radius: 50%;
+}
+
+.edit-icon svg {
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  overflow: visible;
+}
+
+.edit-icon circle {
+  --diametre: 50;
+  fill: transparent;
+  stroke: var(--progress-bar-color);
+  stroke-width: 2;
+  --perimetre: calc(3.14 * var(--diametre));
+  stroke-dasharray: var(--perimetre);
+  stroke-dashoffset: var(--perimetre);
+  transform: rotate(-90deg);
+  transform-origin: center;
+}
+
+.pokemon-infos {
+  grid-column: 2 / 3;
+  grid-row: 1 / 2;
+  display: grid;
+  grid-template-rows: 15px auto 1fr auto 15px;
+}
+
+.pokemon-infos__nom {
+  grid-row: 2 / 3;
+  display: grid;
+  grid-template-rows: 32px auto;
+  grid-template-columns: 32px fit-content(100%) 20px;
+  position: relative;
+  left: -16px;
+}
+
+[data-type="ball"] {
+  grid-row: 1;
+  grid-column: 1;
+  transition: all .2s var(--easing-decelerate);
+  transform: translate(0) rotate(0);
+}
+
+:host([open]) [data-type="ball"] {
+  transition: all .11s var(--easing-accelerate);
+  transform: translate(15px) rotate(120deg);
+}
+
+[data-type="espece"] {
+  grid-row: 2;
+  grid-column: 2;
+  font-size: 15px;
+  font-weight: 300;
+  text-transform: capitalize;
+  opacity: .8;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  position: relative;
+  left: 25px;
+  top: -6px;
+}
+
+[data-type="surnom"],
+[data-type="surnom"]:empty + [data-type="espece"] {
+  grid-row: 1;
+  grid-column: 2;
+  font-size: 24px;
+  font-weight: 300;
+  opacity: 1;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  text-shadow: 1px 1px var(--card-bg-color);
+  position: relative;
+  left: 0;
+  top: 0;
+}
+
+[data-type="surnom"]:empty {
+  display: none;
+}
+
+[data-type="gene"] {
+  grid-row: 1;
+  grid-column: 3;
+}
+
+.pokemon-infos__capture {
+  grid-row: 4 / 5;
+  color: var(--card-infos-text-color);
+  font-size: 13px;
+  display: grid;
+  grid-template-columns: 32px auto;
+  grid-template-rows: auto auto auto;
+  gap: 0 5px;
+  margin-left: 15px;
+}
+
+.pokemon-infos__capture > [data-type="jeu"] {
+	grid-row: 1 / -1;
+  grid-column: 1;
+}
+.pokemon-infos__capture > [data-type="methode"] {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.pokemon-icones {
+  grid-column: 3 / 4;
+  grid-row: 1 / 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: flex-end;
+  margin: 10px;
+}
+
+.pokemon-notes {
+  grid-row: 1 / 2;
+  grid-column: 2 / 4;
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  max-height: 120px;
+  font-size: 13px;
+  text-align: justify;
+  line-height: 20px;
+  color: var(--text-color);
+  background-color: var(--card-bg-color);
+  padding: 10px;
+  z-index: 4;
+  opacity: 0;
+  transform: translate3d(100px, 0, 0);
+  transition: transform .1s var(--easing-accelerate),
+              opacity .1s var(--easing-accelerate);
+  overflow: visible;
+  scrollbar-width: thin;
+}
+
+:host([open]) > .pokemon-notes {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition: transform .1s var(--easing-decelerate),
+              opacity .1s var(--easing-decelerate);
+}
+
+.pokemon-notes__texte {
+  margin: auto;
+  max-height: 100%;
+  overflow: auto;
+}
+
+.icones.explain.offborn,
+.icones.explain.off {
+  display: none;
+}
+
+
+
+/* Icônes */
+
+.icones.explain.oeuf {
+  margin: 0;
+  margin-right: 3px;
+}
+
+
+
+/* Shiny rate */
+
+.shiny-rate {
+  display: grid;
+  grid-template-columns: auto;
+  grid-template-rows: 20px;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  position: relative;
+  --hue-min: 30;
+  --hue-max: 170;
+  background: hsl(calc(var(--hue-min) + var(--coeff) * (var(--hue-max) - var(--hue-min))), 50%, 50%);
+}
+
+.full-odds {
+  background: repeating-linear-gradient(-45deg, 
+    hsl(2,80%,50%) 0, 
+    hsl(24,100%,50%) 5px, 
+    hsl(39,100%,50%) 10px, 
+    hsl(70,100%,50%) 15px, 
+    hsl(158,100%,50%) 20px, 
+    hsl(230,70%,50%) 25px, 
+    hsl(252,100%,70%) 30px, 
+    hsl(2,80%,50%) 35px
+  );
+}
+
+.charm-odds {
+  background: repeating-linear-gradient(-45deg, 
+    mediumslateblue 0, 
+    cyan 5px, 
+    white 10px, 
+    cyan 15px, 
+    mediumslateblue 20px
+  );
+}
+
+.one-odds {
+  background: white;
+}
+
+.shiny-rate::before {
+  content: '';
+  display: block;
+  position: absolute;
+  width: calc(100% - 4px);
+  height: calc(100% - 4px);
+  background-color: var(--card-bg-color);
+  opacity: 1;
+  top: 2px;
+  left: 2px;
+  border-radius: 20px;
+}
+
+.shiny-rate.with-charm {
+  grid-template-columns: 13px auto;
+}
+
+.shiny-rate > div {
+  display: flex;
+  position: relative;
+  justify-content: center;
+  align-items: center;
+}
+
+.shiny-rate:not(.with-charm)>.shiny-charm {
+  display: none;
+}
+
+.shiny-charm {
+  grid-row: 1 / 2;
+  grid-column: 1 / 2;
+}
+
+.shiny-charm > .charm {
+  top: -2px;
+  position: relative;
+  margin-left: -6px; /* Compense le placement décrit dans iconsheet.css */
+  margin-right: -3px;
+}
+
+.shiny-rate-text {
+  color: var(--card_supporting_text_color);
+  font-size: 13px;
+}
+
+.numerator.shiny-rate-text {
+  font-size: 8px;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.separator.shiny-rate-text {
+  opacity: .6;
+  margin: 0 1px 0 3px;
+  font-size: 16px;
+}
+
+.spacer {
+  flex-grow: 1;
+}
+
+@container (min-width: 700px) {
+  :host {
+    grid-template-columns: 120px 1fr auto auto;
+  }
+
+  .pokemon-notes {
+    grid-column: -2;
+    opacity: 1;
+    transform: none;
+    width: calc(100cqi - 500px);
+  }
+
+  .pokemon-notes,
+  :host([open]) > .pokemon-notes {
+    transition: none;
+  }
+
+  :host([open]) [data-type="ball"] {
+    transform: translate(0) rotate(0);
+  }
+}

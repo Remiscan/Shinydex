@@ -3,6 +3,18 @@ import { Shiny } from '../../Pokemon.js';
 import { huntStorage, pokemonData, shinyStorage } from '../../localForage.js';
 import { Notif } from '../../notification.js';
 import template from './template.js';
+// @ts-expect-error
+import methodStrings from '../../../strings/methods.json' assert { type: 'json' };
+// @ts-expect-error
+import materialIconsSheet from '../../../ext/material_icons.css' assert { type: 'css' };
+// @ts-expect-error
+import pokespriteSheet from '../../../ext/pokesprite.css' assert { type: 'css' };
+// @ts-expect-error
+import iconSheet from '../../../images/iconsheet.css' assert { type: 'css' };
+// @ts-expect-error
+import commonSheet from '../../../styles/common.css' assert { type: 'css' };
+// @ts-expect-error
+import sheet from './styles.css' assert { type: 'css' };
 
 
 
@@ -13,14 +25,17 @@ let longClic = false;
 
 
 export class pokemonCard extends HTMLElement {
+  shadow: ShadowRoot;
   huntid: string = '';
-  ready: boolean = false;
   clickHandler: (e: Event) => any = () => {};
   pointerdownHandler: (e: MouseEvent) => any = () => {};
 
 
   constructor() {
     super();
+    this.shadow = this.attachShadow({ mode: 'open' });
+    this.shadow.appendChild(template.content.cloneNode(true));
+    this.shadow.adoptedStyleSheets = [materialIconsSheet, pokespriteSheet, iconSheet, commonSheet, sheet];
   }
 
 
@@ -28,8 +43,6 @@ export class pokemonCard extends HTMLElement {
    * Met à jour le contenu de la carte à partir des données sauvegardées.
    */
   async dataToContent() {
-    if (!this.ready) return;
-
     let shiny: Shiny;
     try {
       shiny = new Shiny(await shinyStorage.getItem(this.huntid));
@@ -42,77 +55,84 @@ export class pokemonCard extends HTMLElement {
 
     this.setAttribute('last-update', String(shiny.lastUpdate));
 
+    const lang = document.documentElement.getAttribute('lang');
+
     // Espèce
     {
       const dexid = String(shiny.dexid);
       const pokemon = await pokemonData.getItem(dexid);
-      const element = this.querySelector('.pokemon-espece')!;
-      element.innerHTML = pokemon.namefr;
+      const element = this.shadow.querySelector('[data-type="espece"]')!;
+      const name = pokemon.name[lang ?? 'fr'];
+      element.innerHTML = name;
 
-      const surnom = this.getAttribute('surnom') || '';
-      if (surnom === '' || surnom === pokemon.namefr) {
-        this.querySelector('.pokemon-infos__nom')!.classList.add('no-surnom');
-      } else {
-        this.querySelector('.pokemon-infos__nom')!.classList.remove('no-surnom');
-      }
-
-      const sprite = this.querySelector('pokemon-sprite')!;
+      const sprite = this.shadow.querySelector('pokemon-sprite')!;
       sprite.setAttribute('dexid', dexid);
     }
 
     // Forme
     {
-      const sprite = this.querySelector('pokemon-sprite')!;
+      const sprite = this.shadow.querySelector('pokemon-sprite')!;
       sprite.setAttribute('forme', shiny.forme);
     }
 
     // Surnom
     {
-      const element = this.querySelector('.pokemon-surnom')!;
+      const element = this.shadow.querySelector('[data-type="surnom"]')!;
       element.innerHTML = shiny.surnom;
     }
 
     // Compteur
     {
       const compteur = JSON.parse(shiny.compteur || '0');
-      const element = this.querySelector('.methode-compteur')!;
-      element.innerHTML = '<span class="icones explain oeuf"></span>';
-      if (this.getAttribute('methode') === 'Masuda' && typeof compteur === 'number' && compteur > 0) {
-        element.innerHTML += compteur;
-        element.classList.remove('off');
+      const element = this.shadow.querySelector('[data-type="compteur"]')!;
+      let compteurString: string;
+
+      if (shiny.methode === 'ultrawormhole') {
+        compteurString = `Distance : ${compteur.distance}m, ${compteur.rings} anneaux`;
       }
-      else element.classList.add('off');
+
+      else if (shiny.methode === 'catchcombo') {
+        compteurString = `Combo Capture : ${compteur.chain}${compteur.lure ? ', avec parfum' : ''}`;
+      }
+
+      else if (shiny.jeu === 'legendsarceus') {
+        compteurString = `${compteur.count > 0 ? `${compteur.count} rencontres, ` : ''}niv. rech. ${compteur.dexResearch}`;
+      }
+
+      else {
+        compteurString = compteur.count > 0 ? `${compteur.count} rencontres` : '';
+      }
+
+      element.innerHTML = compteurString;
     }
 
     // Temps de capture / date
     {
       const time = shiny.timeCapture;
+      const element = this.shadow.querySelector('[data-type="timeCapture"]')!;
       if (time > 0) {
         const date = new Intl.DateTimeFormat('fr-FR', {day: 'numeric', month: 'short', year: 'numeric'})
                             .format(new Date(time));
-        const element = this.querySelector('.capture-date')!;
         element.innerHTML = date;
-        this.querySelector('.pokemon-infos__capture')!.classList.remove('no-date');
       } else {
-        this.querySelector('.pokemon-infos__capture')!.classList.add('no-date');
+        element.innerHTML = '';
       }
     }
 
     // Jeu
     {
       const jeu = shiny.jeu.replace(/[ \']/g, '') || '';
-      const element = this.querySelector('.icones.jeu')!
+      const element = this.shadow.querySelector('[data-type="jeu"]')!
       element.className = `icones jeu ${jeu}`;
     }
 
     // Ball
     {
       const ball = shiny.ball || '';
-      const element = this.querySelector('.pokemon-ball')!;
-      const baseClassList = 'pkspr pokemon-ball';
+      const element = this.shadow.querySelector('[data-type="ball"]')!;
+      const baseClassList = 'pkspr';
       element.className = baseClassList;
       if (shiny.ball) {
-        element.classList.add(ball);
         element.classList.add('item', `ball-${ball}`);
       } else {
         element.classList.add('off');
@@ -121,47 +141,45 @@ export class pokemonCard extends HTMLElement {
 
     // Notes
     {
-      const element = this.querySelector('.pokemon-notes__texte')!;
       const notes = shiny.notes || 'Pas de note.';
+      const element = this.shadow.querySelector('.pokemon-notes__texte')!;
       element.innerHTML = notes;
     }
 
     // Checkmark
     {
-      const element = this.querySelector('.icones.checkmark')!;
-      element.className = 'icones explain checkmark';
-
       const originsList = ['off', 'kalos', 'alola', 'vc', 'letsgo', 'go', 'galar', 'bdsp', 'hisui'];
-      const origin = originsList[shiny.checkmark] || 'off';
-
-      element.classList.add(`${origin}born`);
+      const origin = originsList[shiny.originMark] || 'off';
+      const element = this.shadow.querySelector('[data-type="checkmark"]')!;
+      element.className = `icones explain checkmark ${origin}born`;
     }
 
     // Gène (gigamax ou alpha)
     {
-      // à faire
+      const gene = shiny.gene;
+      const element = this.shadow.querySelector('[data-type="gene"]')!;
+      element.className = 'icones explain';
+      if (gene) element.classList.add(gene);
+      else      element.classList.add('off');
     }
 
     // DO
     {
       const mine = shiny.mine;
-      const element = this.querySelector('.icones.mine')!;
-      if (mine) {
-        element.classList.remove('off');
-      } else {
-        element.classList.add('off');
-      }
+      const element = this.shadow.querySelector('[data-type="do"]')!;
+      if (mine) element.classList.remove('off');
+      else      element.classList.add('off');
     }
 
     // Méthode
     {
-      const element = this.querySelector('.capture-methode')!;
-      element.innerHTML = shiny.methode || '';
+      const element = this.shadow.querySelector('[data-type="methode"]')!;
+      element.innerHTML = methodStrings[lang][shiny.methode] ?? '';
     }
 
     // Charme chroma et shiny rate
     {
-      const srContainer = this.querySelector('.shiny-rate')!;
+      const srContainer = this.shadow.querySelector('.shiny-rate')!;
       const charm = shiny.charm;
       const shinyRate = shiny.shinyRate ?? 0;
       const methode = shiny.methode || '';
@@ -181,7 +199,7 @@ export class pokemonCard extends HTMLElement {
         srContainer.classList.add('off');
       }
       
-      const element = this.querySelector('.shiny-rate-text.denominator')!;
+      const element = this.shadow.querySelector('.shiny-rate-text.denominator')!;
       element.innerHTML = String(shinyRate || '???');
 
       // Couleur du shiny rate
@@ -197,23 +215,17 @@ export class pokemonCard extends HTMLElement {
 
     // Legit ou hacké ?
     {
-      const element = this.querySelector('.icones.hacked')!;
-      element.className = 'icones explain hacked';
-
       const hacksList = ['off', 'ptethack', 'hack', 'clone'];
       const hack = hacksList[shiny.hacked] || 'off';
-
-      element.classList.add(hack);
+      const element = this.shadow.querySelector('[data-type="hacked"]')!;
+      element.className = `icones explain hacked ${hack}`;
     }
 
     // Hors chasse ?
     {
-      const element = this.querySelector('.icones.lucky')!;
-      if (shiny.horsChasse) {
-        element.classList.remove('off');
-      } else {
-        element.classList.add('off');
-      }
+      const element = this.shadow.querySelector('[data-type="horsChasse"]')!;
+      if (shiny.horsChasse) element.classList.remove('off');
+      else                  element.classList.add('off');
     }
   }
 
@@ -226,16 +238,15 @@ export class pokemonCard extends HTMLElement {
 
     // On ferme la carte déjà ouverte
     if (currentCardId != null)
-      document.getElementById(`pokemon-card-${currentCardId}`)!.removeAttribute('open');
+      document.querySelector(`pokemon-card[huntid="${currentCardId}"]`)!.removeAttribute('open');
 
     // Si la carte demandée n'est pas celle qu'on vient de fermer, on l'ouvre
-    if (huntid != currentCardId)
-    {
+    if (huntid != currentCardId) {
       this.setAttribute('open', 'true');
       currentCardId = huntid;
-    }
-    else
+    } else {
       currentCardId = null;
+    }
   }
 
 
@@ -252,9 +263,8 @@ export class pokemonCard extends HTMLElement {
    */
   async makeEdit(event: Event) {
     let act = true;
-    const card = this;
 
-    const editIcon = card.querySelector('.edit-icon')!;
+    const editIcon = this.shadow.querySelector('.edit-icon')!;
     let appear = editIcon.animate([
       { opacity: '0' },
       { opacity: '1' }
@@ -282,12 +292,12 @@ export class pokemonCard extends HTMLElement {
       setTimeout(() => { longClic = false; }, 50);
 
       for (const eventType of cancelEvents) {
-        card.removeEventListener(eventType, clear);
+        this.removeEventListener(eventType, clear);
       }
     };
 
     for (const eventType of cancelEvents) {
-      card.addEventListener(eventType, clear);
+      this.addEventListener(eventType, clear);
     }
 
     await wait(500);
@@ -325,10 +335,6 @@ export class pokemonCard extends HTMLElement {
 
 
   connectedCallback() {
-    // Crée le HTML de la carte
-    this.appendChild(template.content.cloneNode(true));
-    this.ready = true;
-
     // Détecte le long clic pour éditer
     this.addEventListener('click', this.clickHandler = () => {
       if (!longClic) this.toggleNotes();
@@ -336,7 +342,7 @@ export class pokemonCard extends HTMLElement {
     });
     this.addEventListener('pointerdown', this.pointerdownHandler = async (event) => {
       this.makeEdit(event);
-    }, { passive: true });
+    });
 
     // Peuple le contenu de la carte
     this.dataToContent();
@@ -344,7 +350,6 @@ export class pokemonCard extends HTMLElement {
 
 
   disconnectedCallback() {
-    this.ready = false;
     this.removeEventListener('click', this.clickHandler);
     this.removeEventListener('pointerdown', this.pointerdownHandler);
   }
@@ -361,7 +366,6 @@ export class pokemonCard extends HTMLElement {
     switch (attr) {
       case 'huntid': {
         this.huntid = newValue;
-        if (!this.ready) return;
         this.dataToContent();
       } break
     }

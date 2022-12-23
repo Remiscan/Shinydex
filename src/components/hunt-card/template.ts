@@ -50,8 +50,10 @@ template.innerHTML = /*html*/`
   <div class="bonus-inputs">
     <input type="checkbox" name="charm" id="charm">
     <label for="charm">
-      <span class="icones explain charm"></span>
-      Charme chroma possédé
+      <span>
+        <span class="icones explain charm"></span>
+        Charme chroma possédé
+      </span>
     </label>
   </div>
 
@@ -182,56 +184,74 @@ template.innerHTML = /*html*/`
   
       <input type="radio" name="checkmark" id="checkmark-paldea" value="9">
       <label for="checkmark-paldea">
-        <span class="icones explain paldeaborn"></span>
-        Paldea
+        <span>
+          <span class="icones explain paldeaborn"></span>
+          Paldea
+        </span>
       </label>
   
       <input type="radio" name="checkmark" id="checkmark-hisui" value="8">
       <label for="checkmark-hisui">
-        <span class="icones explain hisuiborn"></span>
-        Hisui
+        <span>
+          <span class="icones explain hisuiborn"></span>
+          Hisui
+        </span>
       </label>
   
       <input type="radio" name="checkmark" id="checkmark-bdsp" value="7">
       <label for="checkmark-bdsp">
-        <span class="icones explain bdspborn"></span>
-        Sinnoh (DÉ/PS)
+        <span>
+          <span class="icones explain bdspborn"></span>
+          Sinnoh (DÉ/PS)
+        </span>
       </label>
   
       <input type="radio" name="checkmark" id="checkmark-galar" value="6">
       <label for="checkmark-galar">
-        <span class="icones explain galarborn"></span>
-        Galar
+        <span>
+          <span class="icones explain galarborn"></span>
+          Galar
+        </span>
       </label>
   
       <input type="radio" name="checkmark" id="checkmark-letsgo" value="4">
       <label for="checkmark-letsgo">
-        <span class="icones explain letsgoborn"></span>
-        Kanto (Let's Go)
+        <span>
+          <span class="icones explain letsgoborn"></span>
+          Kanto (Let's Go)
+        </span>
       </label>
   
       <input type="radio" name="checkmark" id="checkmark-alola" value="2">
       <label for="checkmark-alola">
-        <span class="icones explain alolaborn"></span>
-        Alola
+        <span>
+          <span class="icones explain alolaborn"></span>
+          Alola
+        </span>
       </label>
   
       <input type="radio" name="checkmark" id="checkmark-kalos" value="1">
       <label for="checkmark-kalos">
-        <span class="icones explain kalosborn"></span>
-        Kalos
+        <span>
+          <span class="icones explain kalosborn"></span>
+          Kalos
+        </span>
       </label>
   
       <input type="radio" name="checkmark" id="checkmark-vc" value="3">
       <label for="checkmark-vc">
-        <span class="icones explain vcborn"></span>
-        Console Virtuelle
+        <span>
+          <span class="icones explain vcborn"></span>
+          Console Virtuelle
+        </span>
       </label>
   
       <input type="radio" name="checkmark" id="checkmark-go" value="5">
       <label for="checkmark-go">
-        <span class="icones explain goborn"></span>
-        Pokémon GO
+        <span>
+          <span class="icones explain goborn"></span>
+          Pokémon GO
+        </span>
       </label>
     </fieldset>
 
@@ -243,14 +263,18 @@ template.innerHTML = /*html*/`
 
       <input type="radio" name="gene" id="gene-gigamax" value="gigamax">
       <label for="gene-gigamax">
-        <span class="icones explain gigamax"></span>
-        Gigamax
+        <span>
+          <span class="icones explain gigamax"></span>
+          Gigamax
+        </span>
       </label>
 
       <input type="radio" name="gene" id="gene-alpha" value="alpha">
       <label for="gene-alpha">
-        <span class="icones explain alpha"></span>
-        Baron
+        <span>
+          <span class="icones explain alpha"></span>
+          Baron
+        </span>
       </label>
     </fieldset>
   </div>
@@ -260,14 +284,18 @@ template.innerHTML = /*html*/`
   <div class="legality-data">
     <input type="checkbox" name="horsChasse" id="horsChasse">
     <label for="horsChasse">
-      <span class="icones explain lucky"></span>
-      Trouvé au hasard, sans le chasser
+      <span>
+        <span class="icones explain lucky"></span>
+        Trouvé au hasard, sans le chasser
+      </span>
     </label>
 
     <input type="checkbox" name="DO" id="DO">
     <label for="DO">
-      <span class="icones explain mine"></span>
-      <span class="egg">Œuf</span><span class="raid">Raid</span> trouvé dans mon jeu
+      <span>
+        <span class="icones explain mine"></span>
+        <span class="egg">Œuf</span><span class="raid">Raid</span> trouvé dans mon jeu
+      </span>
     </label>
 
     <fieldset>
@@ -278,20 +306,26 @@ template.innerHTML = /*html*/`
 
       <input type="radio" name="hacked" id="hacked-maybe" value="1">
       <label for="hacked-maybe">
-        <span class="icones explain ptethack"></span>
-        Pas sûr
+        <span>
+          <span class="icones explain ptethack"></span>
+          Pas sûr
+        </span>
       </label>
 
       <input type="radio" name="hacked" id="hacked-yes" value="2">
       <label for="hacked-yes">
-        <span class="icones explain hack"></span>
-        Hacké
+        <span>
+          <span class="icones explain hack"></span>
+          Hacké
+        </span>
       </label>
 
       <input type="radio" name="hacked" id="hacked-clone" value="3">
       <label for="hacked-clone">
-        <span class="icones explain clone"></span>
-        Cloné
+        <span>
+          <span class="icones explain clone"></span>
+          Cloné
+        </span>
       </label>
     </fieldset>
   </div>
