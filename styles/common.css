@@ -1,0 +1,279 @@
+/* Empêcher le contour bizarre que Chrome ajoute autour d'éléments en focus */
+* {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+} 
+*:focus:not(:focus-visible) {
+	outline-style: none;
+}
+
+shiny-stars {
+  display: inline-grid;
+  --color: currentColor;
+}
+
+.icone {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  color: var(--text-color);
+}
+
+/* Buttons */
+
+input[type=file] + label,
+button {
+  all: unset;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--button-color);
+  height: 32px;
+  width: fit-content;
+  padding: 0 16px;
+  border-radius: 32px;
+  margin: 8px auto;
+  box-shadow: 0 4px 5px 0 rgba(0,0,0,.14),
+              0 1px 10px 0 rgba(0,0,0,.12),
+              0 2px 4px -1px rgba(0,0,0,.2);
+  color: white;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+input[type=file] + label.ghost,
+button.ghost {
+  background-color: transparent;
+  color: var(--text-color);
+  border: 2px solid var(--button-ghost-color);
+  box-sizing: border-box;
+  box-shadow: none;
+}
+
+button:disabled {
+  opacity: .5;
+  filter: grayscale(1);
+  cursor: not-allowed;
+}
+
+button.danger.ghost {
+  border-color: var(--danger-color);
+}
+
+button:not(.ghost).danger {
+  background-color: var(--danger-color);
+}
+
+button>.material-icons + span {
+  margin-left: 5px;
+}
+
+/* Inputs */
+
+label {
+  color: var(--text-color);
+}
+
+:is(
+  input[type=text],
+  input[type=date],
+  input[type=password],
+  select
+) {
+  min-width: calc(.5 * var(--tap-safe-size));
+  min-height: calc(.5 * var(--tap-safe-size));
+  box-sizing: border-box;
+}
+
+@media (any-pointer: coarse) {
+  :is(
+    input[type=text],
+    input[type=date],
+    input[type=password],
+    select
+  ) {
+    min-width: var(--tap-safe-size);
+    min-height: var(--tap-safe-size);
+  }
+}
+
+textarea {
+  background-color: var(--input-bg-color);
+  color: black;
+  border: none;
+  border-radius: 5px;
+  padding: 2px 4px;
+  box-shadow: inset 0 1px 2px 0px rgba(0, 0, 0, .15);
+  font-family: inherit;
+  width: 100%;
+}
+
+/* Switch */
+
+input-switch,
+shiny-switch {
+  --off-bg-color: var(--switch-unchecked-bg-color);
+  --on-bg-color: var(--accent-color);
+  --handle-color: var(--nav-bg-color);
+  --handle-hover-color: var(--handle-color);
+  --handle-active-color: var(--handle-color);
+  --off-text-color: var(--handle-color);
+  --on-text-color: var(--handle-color);
+}
+
+shiny-switch {
+  --color: currentColor;
+}
+
+input[type=radio],
+input[type=checkbox] {
+	height: 0;
+  width: 0;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+input:is([type=radio], [type=checkbox]) + label {
+  display: inline-grid;
+  grid-template-columns: 25px auto;
+  gap: 0 5px;
+  align-items: center;
+  min-height: 24px;
+  padding: 2px;
+  padding-right: 7px;
+  margin: 0;
+  position: relative;
+  cursor: pointer;
+  border-radius: 4px;
+  border: 2px solid var(--radio-off-color);
+  overflow: hidden;
+}
+
+input[type=radio] + label {
+  border-radius: 24px;
+}
+
+input:is([type=radio], [type=checkbox]) + label > span {
+  grid-column: 2 / 3;
+  grid-row: 1 / 2;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+input:is([type=radio], [type=checkbox]) + label::before {
+	content: '';
+  display: flex;
+  grid-column: 1 / 2;
+  grid-row: 1 / 2;
+	width: 20px;
+	height: 20px;
+  background-color: var(--input-bg-color);
+  border-radius: 2px;
+  margin: auto;
+  box-shadow: inset 0 0 2px 1px rgba(0, 0, 0, .3);
+}
+
+input[type=radio] + label::before {
+  border-radius: 20px;
+}
+
+input:is([type=radio], [type=checkbox]) + label::after {
+  content: '';
+  display: flex;
+  grid-column: 1 / 2;
+  grid-row: 1 / 2;
+  opacity: 0;
+  margin: auto;
+}
+
+input[type=radio] + label::after {
+  width: 10px;
+	height: 10px;
+	background-color: var(--radio-check-color);
+  border-radius: 6px;
+}
+
+input[type=checkbox] + label::after {
+  width: 8px;
+  height: 14px;
+  box-sizing: border-box;
+  border-right: 3px solid var(--checkbox-check-color);
+  border-bottom: 3px solid var(--checkbox-check-color);
+  transform: translateY(-2px) rotate(45deg);
+}
+
+input:is([type=radio], [type=checkbox]):checked + label {
+  border-color: var(--nav-text-color-on);
+}
+
+input:is([type=radio], [type=checkbox]):checked + label::before {
+  background-color: var(--radio-checked-bg-color);
+}
+
+input:is([type=radio], [type=checkbox]):checked + label::after {
+  opacity: 1;
+}
+
+/* Chip (ex : suggestions de recherche) */
+
+label.chip {
+  grid-template-columns: auto 0;
+  gap: 0;
+  padding: 2px 7px;
+  background-color: transparent;
+  color: var(--text-color);
+  overflow: hidden;
+}
+
+label.chip > span {
+  grid-column: 1;
+  grid-row: 1;
+  margin: auto;
+}
+
+input:checked + label.chip {
+  grid-template-columns: auto 24px;
+  gap: 0 5px;
+  padding-right: 2px;
+  border-color: var(--nav-text-color-on);
+  background-color: var(--nav-text-color-on);
+  color: var(--bg-color);
+}
+
+input:not(:checked) + label.chip > i {
+  display: none;
+}
+
+
+input:disabled + label {
+  opacity: .5;
+  filter: grayscale(1);
+  cursor: not-allowed;
+}
+
+button:focus,
+input:focus + label {
+  outline: 2px solid currentColor;
+  outline: 5px auto Highlight;
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: 1px;
+}
+
+button:focus:not(:focus-visible),
+input:focus:not(:focus-visible) + label {
+  outline: none;
+}
+
+.filtered,
+.off {
+  display: none;
+}

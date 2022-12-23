@@ -55,10 +55,11 @@
       <?php
     } ?>
 
-    <link rel="stylesheet" href="./styles.css.php">
     <link rel="stylesheet" href="./ext/material_icons.css">
     <link rel="stylesheet" href="./ext/pokesprite.css">
     <link rel="stylesheet" href="./images/iconsheet.css">
+    <link rel="stylesheet" href="./styles/common.css">
+    <link rel="stylesheet" href="./styles/app.css.php">
   </head>
 
   <body data-section-actuelle="mes-chromatiques">
