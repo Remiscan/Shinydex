@@ -2,7 +2,7 @@ import { huntedPokemon } from './Hunt.js';
 import { Pokemon, frontendShiny } from './Pokemon.js';
 import { huntCard } from './components/hunt-card/huntCard.js';
 import { pokemonCard } from './components/pokemon-card/pokemonCard.js';
-import { ListeFiltres, filterCards, orderCards } from './filtres.js';
+import { ListeFiltres } from './filtres.js';
 import { lazyLoad } from './lazyLoading.js';
 import { dataStorage, friendStorage, huntStorage, localForageAPI, shinyStorage } from './localForage.js';
 import { navigate } from './navigate.js';
@@ -19,13 +19,8 @@ let pokedexInitialized = false;
 
 
 export type populatableSection = 'mes-chromatiques' | 'chasses-en-cours' | 'chromatiques-ami' | 'corbeille';
-interface PopulateOptions {
-  filtres?: ListeFiltres;
-  ordre?: string;
-  ordreReversed?: boolean;
-}
 
-export async function populateHandler(section: populatableSection, _ids?: string[], options: PopulateOptions = {}): Promise<PromiseSettledResult<string>[]> {
+export async function populateHandler(section: populatableSection, _ids?: string[], filtres: ListeFiltres = new ListeFiltres()): Promise<PromiseSettledResult<string>[]> {
   let dataStore: localForageAPI; // base de données
   switch (section) {
     case 'mes-chromatiques':
@@ -54,18 +49,18 @@ export async function populateHandler(section: populatableSection, _ids?: string
     if (result.status === 'fulfilled') currentQueue.delete(result.value);
   }
 
-  switch (section) {
+  /*switch (section) {
     case 'mes-chromatiques':
     case 'chromatiques-ami':
       await filterCards(section, options.filtres, ids);
-      await orderCards(section, options.ordre, options.ordreReversed, ids);
-  }
+      await orderCards(section, options.filtres.ordre, options.filtres.ordreReverse, ids);
+  }*/
 
   populating.set(section, false);
 
   const newQueue = new Set([...(queue.get(section) || []), ...currentQueue]);
   queue.set(section, newQueue);
-  if (newQueue.size > 0) return populateHandler(section, [...newQueue], options);
+  if (newQueue.size > 0) return populateHandler(section, [...newQueue], filtres);
 
   return populated;
 }
@@ -147,6 +142,11 @@ export async function populateFromData(section: populatableSection, ids: string[
     conteneur.appendChild(card);
     lazyLoad(card);
   }
+
+  // Compte le nombre de cartes affichées
+  const displayedCards = [...conteneur.querySelectorAll(elementName)];
+  if (displayedCards.length > 0) conteneur.closest('section')?.classList.remove('vide');
+  else                           conteneur.closest('section')?.classList.add('vide');
 
   return results;
 }

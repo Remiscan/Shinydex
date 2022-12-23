@@ -119,26 +119,19 @@ search-bar[section="partage"] label[for="ordre-date-ajout"] {
 }
 
 .search-hints {
-  grid-row: 2;
-  grid-column: 1;
   display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   width: 100%;
   padding-top: 16px 0 8px;
   box-sizing: border-box;
   background-color: var(--bg);
 }
 
-.menu-filtres {
-  grid-row: 3;
-  grid-column: 1;
-  display: grid;
-  grid-template-rows: 56px auto auto auto auto;
-  grid-template-columns: 1fr;
-  width: 100%;
-  box-sizing: border-box;
-  background-color: var(--bg);
-}
-
 search-bar .sous-titre>span {
   --bg: inherit;
+}
+
+input[name="ordre-reverse"]:checked + label > i {
+  transform: scaleY(-1);
 }

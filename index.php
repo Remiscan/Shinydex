@@ -168,7 +168,7 @@
     <section id="obfuscator"></section>
 
     <!-- Barre de recherches -->
-    <search-bar section="mes-chromatiques"></search-bar>
+    <search-bar></search-bar>
 
     <!-- Notification -->
     <div class="notification bottom-bar" id="notification">

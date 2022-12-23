@@ -958,7 +958,7 @@ section.vide .defer-loader {
   margin-top: 16px;
 }*/
 
-.sous-titre:not(:nth-of-type(1)) {
+.sous-titre:not(:first-child) {
   margin-top: 16px;
 }
 
@@ -1022,6 +1022,13 @@ body[data-reversed=true] .reverse-order {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+}
+
+fieldset.search-hints,
+fieldset.liste-options {
+  margin: 0;
+  padding: 0;
+  border: 0;
 }
 
 :not(.cote-a-cote)>.liste-options + .liste-options {
@@ -1861,7 +1868,6 @@ label.chip {
   align-items: center;
   min-height: 24px;
   padding: 2px 7px;
-  margin: 0 0 8px 8px;
   position: relative;
   cursor: pointer;
   border-radius: 4px;

@@ -15,7 +15,7 @@ export async function upgradeStorage(): Promise<void> {
   }
 
   // Update the structure of stored Hunts
-  const huntKeys = await shinyStorage.keys();
+  const huntKeys = await huntStorage.keys();
   for (const key of huntKeys) {
     const hunt = toNewFormat(await huntStorage.getItem(key));
     await shinyStorage.setItem(key, hunt);
@@ -23,7 +23,9 @@ export async function upgradeStorage(): Promise<void> {
 
   // Remove old filters
   const filtres = await dataStorage.getItem('filtres');
-  if (!(filtres instanceof Map)) await dataStorage.removeItem('filtres');
+  if (!(filtres instanceof Map) || filtres.get('mes-chromatiques') == null) {
+    await dataStorage.removeItem('filtres');
+  }
 
   // Delete old, now obsolete stored items
   await dataStorage.removeItem('version-bdd');

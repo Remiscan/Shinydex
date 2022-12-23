@@ -295,9 +295,9 @@ window.addEventListener('dataupdate', async (event: Event) => {
     dataUpdateNotification = new Notif('Mise à jour des données...', '', 'loading', Notif.maxDelay, () => {}, true);
     dataUpdateNotification.prompt();
   }
-  const { sections, ids, filtres, ordre, ordreReversed } = (event as DataUpdateEvent).detail;
+  const { sections, ids } = (event as DataUpdateEvent).detail;
   for (const section of sections) {
-    await populateHandler(section, ids, { filtres, ordre, ordreReversed });
+    await populateHandler(section, ids);
   }
   if (dataUpdateNotificationCount === 1) dataUpdateNotification?.hide();
   dataUpdateNotificationCount--;

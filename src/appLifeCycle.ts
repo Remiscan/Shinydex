@@ -1,5 +1,5 @@
 import { Params, loadAllImages, setTheme, timestamp2date, wait, webpSupport } from './Params.js';
-import { backendPokemon } from './Pokemon.js';
+import { Pokemon, backendPokemon } from './Pokemon.js';
 import { initPokedex, populateHandler } from './appContent.js';
 import { initFiltres } from './filtres.js';
 import { dataStorage, huntStorage, pokemonData, shinyStorage } from './localForage.js';
@@ -228,10 +228,12 @@ export async function appStart() {
   try {
     await initPokemonData();
     logPerf('initPokemonData');
-    await initFiltres('mes-chromatiques');
-    logPerf('initFiltres');
+    Pokemon.names(); // met en cache les noms des Pokémon (pas besoin d'attendre la fin)
     await initPokedex();
     logPerf('initPokedex');
+    await initFiltres();
+    logPerf('initFiltres');
+    document.querySelector('search-bar')?.setAttribute('section', 'mes-chromatiques');
     await populateHandler('mes-chromatiques');
     logPerf('populateHandler("mes-chromatiques")');
     await populateHandler('chasses-en-cours');
