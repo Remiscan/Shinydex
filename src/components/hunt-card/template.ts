@@ -308,7 +308,7 @@ template.innerHTML = /*html*/`
     Supprimer définitivement
   </button>
 
-  <button type="button" class="submit">
+  <button type="submit" class="submit">
     <i class="material-icons">backup</i>
     Enregistrer
   </button>

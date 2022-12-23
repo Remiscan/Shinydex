@@ -83,13 +83,13 @@ export class huntCard extends HTMLElement {
 
     try {
       const shiny = new Shiny(hunt);
-      await shinyStorage.setItem(hunt.huntid, shiny);
-      await this.delete();
+      await shinyStorage.setItem(this.huntid, shiny);
+      await this.delete(false);
 
       window.dispatchEvent(new CustomEvent('dataupdate', {
         detail: {
           sections: ['mes-chromatiques', 'chasses-en-cours'],
-          ids: [hunt.huntid],
+          ids: [this.huntid],
         }
       }));
     }
@@ -102,46 +102,48 @@ export class huntCard extends HTMLElement {
   /**
    * Supprime la chasse.
    */
-  async delete() {
-    const hunt = await this.getHunt();
-    hunt.lastUpdate = Date.now();
-    hunt.deleted = true;
-    this.remove();
+  async delete(populate = true) {
+    await huntStorage.removeItem(this.huntid);
 
-    window.dispatchEvent(new CustomEvent('dataupdate', {
-      detail: {
-        sections: ['chasses-en-cours', 'corbeille'],
-        ids: [hunt.huntid],
-      }
-    }));
-
-    const hunts = (await Promise.all(
-      (await huntStorage.keys()).map(key => huntStorage.getItem(key))
-    )).filter(hunt => !(hunt.deleted));
-    if (hunts.length === 0) document.querySelector('#chasses-en-cours')!.classList.add('vide');
+    if (populate) {
+      window.dispatchEvent(new CustomEvent('dataupdate', {
+        detail: {
+          sections: ['chasses-en-cours'],
+          ids: [this.huntid],
+        }
+      }));
+    }
   }
 
   
   /**
-   * Supprime la chasse et le shiny qu'elle éditait.
+   * Supprime la chasse et le shiny qu'elle éditait, et déplace ce dernier dans la corbeille.
    */
   async deleteShiny() {
-    const hunt = await this.getHunt();
+    const storedShiny = await shinyStorage.getItem(this.huntid);
+    const edit = storedShiny != null;
+    if (!edit) {
+      new Notif('Cette chasse n\'est pas dans la base de données').prompt();
+      return;
+    }
 
-    this.delete();
+    const hunt = await this.getHunt();
+    hunt.lastUpdate = Date.now();
+    hunt.deleted = true;
+    await huntStorage.setItem(this.huntid, hunt);
 
     // On marque le shiny comme supprimé (pour que la suppression se synchronise en ligne)
-    const shiny = new Shiny(await shinyStorage.getItem(hunt.huntid));
+    const shiny = new Shiny(storedShiny);
     shiny.lastUpdate = hunt.lastUpdate;
     shiny.deleted = true;
     // Si la synchronisation en ligne est désactivée, marquer le shiny comme à 'destroy' immédiatement
     // if (!onlineSync) shiny.destroy = true;
-    await shinyStorage.setItem(hunt.huntid, shiny);
+    await shinyStorage.setItem(this.huntid, shiny);
 
     window.dispatchEvent(new CustomEvent('dataupdate', {
       detail: {
-        sections: ['mes-chromatiques'],
-        ids: [hunt.huntid],
+        sections: ['mes-chromatiques', 'chasses-en-cours'],
+        ids: [this.huntid],
       }
     }));
   }
@@ -475,7 +477,7 @@ export class huntCard extends HTMLElement {
       element: this.shadow.querySelector('button.edit-cancel') as HTMLButtonElement,
       type: 'click',
       function: async event => {
-        const cancelMessage = 'Les modifications ne seront pas enregistrées.';
+        const cancelMessage = 'Cette chasse sera supprimée.';
         const userResponse = await warnBeforeDestruction((event.currentTarget! as Element), cancelMessage);
         if (userResponse)  await this.delete();
       }
@@ -487,7 +489,7 @@ export class huntCard extends HTMLElement {
       element: this.shadow.querySelector('button.hunt-delete') as HTMLButtonElement,
       type: 'click',
       function: async event => {
-        const cancelMessage = 'Les modifications ne seront pas enregistrées.';
+        const cancelMessage = 'Cette chasse sera supprimée.';
         const userResponse = await warnBeforeDestruction((event.currentTarget! as Element), cancelMessage);
         if (userResponse)  await this.delete();
       }
@@ -530,15 +532,8 @@ export class huntCard extends HTMLElement {
       element: this.shadow.querySelector('button.full-delete') as HTMLButtonElement,
       type: 'click',
       function: async event => {
-        const hunt = await this.getHunt();
-
-        const edit = (await shinyStorage.getItem(hunt.huntid)) != null;
-        if (!edit) {
-          new Notif('Cette chasse n\'est pas dans la base de données').prompt();
-          return;
-        }
-  
-        const userResponse = await warnBeforeDestruction(event.currentTarget as Element);
+        const deleteMessage = 'Ce Pokémon chromatique sera supprimé et déplacé dans la corbeille.';
+        const userResponse = await warnBeforeDestruction(event.currentTarget as Element, deleteMessage);
         if (userResponse) await this.deleteShiny();
       }
     };
