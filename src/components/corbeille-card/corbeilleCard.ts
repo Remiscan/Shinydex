@@ -9,8 +9,7 @@ export class corbeilleCard extends pokemonCard {
 
   connectedCallback() {
     super.connectedCallback();
-    this.removeEventListener('mousedown', this.mousedownHandler);
-    this.removeEventListener('touchstart', this.touchstartHandler);
+    this.removeEventListener('pointerdown', this.pointerdownHandler);
   }
 }
 

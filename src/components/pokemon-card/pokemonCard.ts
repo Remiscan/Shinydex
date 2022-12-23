@@ -16,8 +16,7 @@ export class pokemonCard extends HTMLElement {
   huntid: string = '';
   ready: boolean = false;
   clickHandler: (e: Event) => any = () => {};
-  mousedownHandler: (e: MouseEvent) => any = () => {};
-  touchstartHandler: (e: TouchEvent) => any = () => {};
+  pointerdownHandler: (e: MouseEvent) => any = () => {};
 
 
   constructor() {
@@ -41,7 +40,6 @@ export class pokemonCard extends HTMLElement {
 
     if (shiny.deleted) return this.remove();
 
-    this.setAttribute('id', `pokemon-card-${shiny.huntid}`);
     this.setAttribute('last-update', String(shiny.lastUpdate));
 
     // Espèce
@@ -276,20 +274,22 @@ export class pokemonCard extends HTMLElement {
     });
     anim.pause();
 
+    const cancelEvents = ['pointerleave', 'pointerout', 'pointercancel', 'pointerup'];
+
     const clear = () => {
       act = false;
       appear.cancel(); anim.cancel();
-      setTimeout(() => { longClic = false; }, 50)
+      setTimeout(() => { longClic = false; }, 50);
+
+      for (const eventType of cancelEvents) {
+        card.removeEventListener(eventType, clear);
+      }
     };
 
-    if (event.type == 'touchstart') {
-      card.addEventListener('touchmove', clear, { passive: true });
-      card.addEventListener('touchend', clear);
-      card.addEventListener('touchcancel', clear);
-    } else {
-      card.addEventListener('mouseup', clear);
-      card.addEventListener('mouseout', clear);
+    for (const eventType of cancelEvents) {
+      card.addEventListener(eventType, clear);
     }
+
     await wait(500);
 
     if (!act) return;
@@ -334,11 +334,7 @@ export class pokemonCard extends HTMLElement {
       if (!longClic) this.toggleNotes();
       longClic = false;
     });
-    this.addEventListener('mousedown', this.mousedownHandler = async (event) => {
-      if (event.button != 0) return;
-      this.makeEdit(event);
-    });
-    this.addEventListener('touchstart', this.touchstartHandler = async event => {
+    this.addEventListener('pointerdown', this.pointerdownHandler = async (event) => {
       this.makeEdit(event);
     }, { passive: true });
 
@@ -350,8 +346,7 @@ export class pokemonCard extends HTMLElement {
   disconnectedCallback() {
     this.ready = false;
     this.removeEventListener('click', this.clickHandler);
-    this.removeEventListener('mousedown', this.mousedownHandler);
-    this.removeEventListener('touchstart', this.touchstartHandler);
+    this.removeEventListener('pointerdown', this.pointerdownHandler);
   }
 
 
