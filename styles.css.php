@@ -547,8 +547,10 @@ hunt-card pokemon-sprite,
 .edit-icon {
   grid-column: 1;
   grid-row: 1;
-  width: 112px;
-  height: 112px;
+  --size: 112px;
+  width: var(--size);
+  height: var(--size);
+  padding: calc(.5 * (120px - var(--size)));
   background-color: var(--card-sprite-bg-color);
   display: grid;
   place-items: center;
