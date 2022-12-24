@@ -29,6 +29,7 @@
   --input-bg-color: white;
   --progress-bar-color: var(--accent-color);
   --card-edit-bg-color: rgba(240, 240, 240, .7);
+  --dark-coeff: 0;
 }
 
 :root[data-theme="dark"] {
@@ -57,6 +58,7 @@
   --input-bg-color: hsl(0, 0%, 90%);
   --progress-bar-color: white;
   --card-edit-bg-color: hsla(0, 0%, 7%, .7);
+  --dark-coeff: 1;
 }
 /*<?php themeSheetEnd(closeComment: true); ?>*/
 

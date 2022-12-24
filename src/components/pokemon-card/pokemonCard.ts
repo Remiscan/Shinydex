@@ -129,9 +129,8 @@ export class pokemonCard extends HTMLElement {
       const ball = shiny.ball || '';
       const element = this.shadow.querySelector('[data-type="ball"]')!;
       element.setAttribute('data-icon', `ball/${ball}`);
-      element.className = 'icon';
-      if (shiny.mine && ball) element.className = 'icon';
-      else                    element.className = 'off';
+      if (shiny.mine && ball) element.classList.remove('off');
+      else                    element.classList.add('off');
     }
 
     // Notes
@@ -146,8 +145,8 @@ export class pokemonCard extends HTMLElement {
       const origin = shiny.originMark;
       const element = this.shadow.querySelector('[data-type="checkmark"]')!;
       element.setAttribute('data-icon', `origin-mark/${origin}`);
-      if (origin) element.className = 'icon';
-      else        element.className = 'off';
+      if (origin) element.classList.remove('off');
+      else        element.classList.add('off');
     }
 
     // Gène (gigamax ou alpha)
@@ -155,7 +154,7 @@ export class pokemonCard extends HTMLElement {
       const gene = shiny.gene;
       const element = this.shadow.querySelector('[data-type="gene"]')!;
       element.setAttribute('data-icon', `gene/${gene}`);
-      if (gene) element.classList.add(gene);
+      if (gene) element.classList.remove('off');
       else      element.classList.add('off');
     }
 

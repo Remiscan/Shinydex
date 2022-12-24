@@ -13,14 +13,14 @@ template.innerHTML = /*html*/`
 
   <div class="pokemon-infos">
     <div class="pokemon-infos__nom">
-      <span data-type="ball"></span>
+      <span data-type="ball" class="icon"></span>
       <span data-type="surnom"></span>
       <span data-type="espece"></span>
       <span data-type="gene"></span>
     </div>
 
     <div class="pokemon-infos__capture">
-      <span data-type="jeu"></span>
+      <span data-type="jeu" class="icon"></span>
       <span data-type="methode"></span>
       <span data-type="timeCapture"></span>
       <span data-type="compteur"></span>
@@ -28,13 +28,13 @@ template.innerHTML = /*html*/`
   </div>
 
   <div class="pokemon-icones">
-    <span data-type="checkmark"></span>
+    <span data-type="checkmark" class="icon"></span>
 
     <span class="spacer"></span>
     
     <div class="shiny-rate">
       <div class="shiny-charm">
-        <span class="icones explain charm"></span>
+        <span class="icon" data-icon="key/shiny-charm"></span>
       </div>
       <div class="shiny-rate-data">
         <span class="shiny-rate-text numerator">1</span>

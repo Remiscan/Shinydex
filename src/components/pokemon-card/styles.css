@@ -216,6 +216,10 @@ pokemon-sprite,
   margin-right: 3px;
 }
 
+[data-type="checkmark"] {
+  filter: invert(var(--dark-coeff));
+}
+
 
 
 /* Shiny rate */
@@ -274,7 +278,7 @@ pokemon-sprite,
 }
 
 .shiny-rate.with-charm {
-  grid-template-columns: 13px auto;
+  grid-template-columns: auto auto;
 }
 
 .shiny-rate > div {
@@ -293,11 +297,9 @@ pokemon-sprite,
   grid-column: 1 / 2;
 }
 
-.shiny-charm > .charm {
-  top: -2px;
-  position: relative;
-  margin-left: -6px; /* Compense le placement décrit dans iconsheet.css */
-  margin-right: -3px;
+.shiny-charm > .icon {
+  margin: -5px;
+  margin-left: -10px;
 }
 
 .shiny-rate-text {
