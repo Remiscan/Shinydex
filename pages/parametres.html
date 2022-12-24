@@ -13,71 +13,73 @@
 </header>
 
 <div class="section-contenu">
-  <p class="un-parametre theme">
-    <span class="param-nom">Thème</span>
+  <form name="app-settings">
+    <p class="un-parametre theme">
+      <span class="param-nom">Thème</span>
 
-    <span class="param">
-      <input type="radio" name="theme" id="theme-system" value="system" checked>
-      <label for="theme-system" class="radio">
-        <span>Système</span>
-      </label>
+      <span class="param">
+        <input type="radio" name="theme" id="theme-system" value="system" checked>
+        <label for="theme-system" class="radio">
+          <span>Système</span>
+        </label>
 
-      <input type="radio" name="theme" id="theme-light" value="light">
-      <label for="theme-light" class="radio">
-        <span>Clair</span>
-      </label>
+        <input type="radio" name="theme" id="theme-light" value="light">
+        <label for="theme-light" class="radio">
+          <span>Clair</span>
+        </label>
 
-      <input type="radio" name="theme" id="theme-dark" value="dark">
-      <label for="theme-dark" class="radio">
-        <span>Sombre</span>
-      </label>
+        <input type="radio" name="theme" id="theme-dark" value="dark">
+        <label for="theme-dark" class="radio">
+          <span>Sombre</span>
+        </label>
+      </span>
+    </p>
+
+    <span class="sous-titre">
+      <span>Sauvegarde des données</span>
+      <sync-line></sync-line>
     </span>
-  </p>
 
-  <span class="sous-titre">
-    <span>Sauvegarde des données</span>
-    <sync-line></sync-line>
-  </span>
+    <p class="un-parametre">
+      <span class="param-nom">
+        Sauvegarde en ligne
+        <span class="param-description info-backup success if-backup">dernière : réussie</span>
+        <span class="param-description info-backup failure if-backup">dernière : échec</span>
+      </span>
+      <span class="param-description no-backup">Si désactivé, vos données seront perdues si vous désinstallez l'application ou nettoyez son stockage.</span>
+      <span class="param-description if-backup">Vos données sont sauvegardées en ligne.</span>
+      <input-switch id="switch-online-backup" hint="icon"></input-switch>
+    </p>
 
-  <p class="un-parametre">
-    <span class="param-nom">
-      Sauvegarde en ligne
-      <span class="param-description info-backup success if-backup">dernière : réussie</span>
-      <span class="param-description info-backup failure if-backup">dernière : échec</span>
+    <span class="sous-titre">
+      <span>Gestion des données</span>
     </span>
-    <span class="param-description no-backup">Si désactivé, vos données seront perdues si vous désinstallez l'application ou nettoyez son stockage.</span>
-    <span class="param-description if-backup">Vos données sont sauvegardées en ligne.</span>
-    <input-switch id="switch-online-backup" hint="icon"></input-switch>
-  </p>
 
-  <span class="sous-titre">
-    <span>Gestion des données</span>
-  </span>
+    <p class="un-parametre">
+      <span class="param-nom">Exporter mes données</span>
+      <span class="param-description">au format JSON.</span>
+      <span class="param">
+        <button type="button" class="bouton-export ghost">Exporter</button>
+      </span>
+    </p>
 
-  <p class="un-parametre">
-    <span class="param-nom">Exporter mes données</span>
-    <span class="param-description">au format JSON.</span>
-    <span class="param">
-      <button type="button" class="bouton-export ghost">Exporter</button>
-    </span>
-  </p>
+    <p class="un-parametre">
+      <span class="param-nom">Importer des données</span>
+      <span class="param-description">depuis un fichier JSON.</span>
+      <span class="param">
+        <input type="file" id="pick-import-file" accept=".json">
+        <label for="pick-import-file" class="ghost">Importer</label>
+      </span>
+    </p>
 
-  <p class="un-parametre">
-    <span class="param-nom">Importer des données</span>
-    <span class="param-description">depuis un fichier JSON.</span>
-    <span class="param">
-      <input type="file" id="pick-import-file" accept=".json">
-      <label for="pick-import-file" class="ghost">Importer</label>
-    </span>
-  </p>
-
-  <p class="un-parametre no-backup">
-    <span class="param-nom">Supprimer mes données</span>
-    <span class="param-description">Supprime la sauvegarde locale, mais pas la sauvegarde en ligne.</span>
-    <span class="param">
-      <button type="button" class="bouton-supprimer-local ghost danger">Supprimer</button>
-    </span>
-  </p>
+    <p class="un-parametre no-backup">
+      <span class="param-nom">Supprimer mes données</span>
+      <span class="param-description">Supprime la sauvegarde locale, mais pas la sauvegarde en ligne.</span>
+      <span class="param">
+        <button type="button" class="bouton-supprimer-local ghost danger">Supprimer</button>
+      </span>
+    </p>
+  </form>
 
   <div class="spacer"></div>
 
