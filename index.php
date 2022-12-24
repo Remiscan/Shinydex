@@ -55,6 +55,9 @@
       <?php
     } ?>
 
+    <link rel="preload" as="image" href="./images/pokemonsheet.webp">
+    <link rel="preload" as="image" href="./images/iconsheet.webp">
+
     <link rel="stylesheet" href="./ext/material_icons.css">
     <link rel="stylesheet" href="./images/pokemonsheet.css">
     <link rel="stylesheet" href="./images/iconsheet.css">
