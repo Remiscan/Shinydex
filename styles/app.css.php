@@ -660,6 +660,7 @@ body:not([data-section-actuelle="pokedex"]) .only-pokedex {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+  gap: 10px;
   justify-content: center;
   align-items: flex-start;
 }
