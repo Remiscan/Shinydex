@@ -34,5 +34,5 @@ function buildWebpSprites(int $size = 512, bool $logs = true) {
 
 
 
-//buildWebpSprites(112);
+buildWebpSprites(112);
 buildWebpSprites(512);
