@@ -30,6 +30,18 @@
         "--allow-run", "--allow-read", "--allow-env", "--allow-sys", "build/test.ts"
       ],
       "label": "run tests with mocha"
+    }, {
+      "type": "shell",
+      "command": "sudo php build/webp-pokemon-sprites.php",
+      "label": "build .webp Pokémon sprites"
+    }, {
+      "type": "shell",
+      "command": "sudo php build/pokemonsheet.php",
+      "label": "build Pokémon sprite sheet"
+    }, {
+      "type": "shell",
+      "command": "sudo php build/pokemon-data.php",
+      "label": "build Pokémon data JSON"
     }
   ]
 }

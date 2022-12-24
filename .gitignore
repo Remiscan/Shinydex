@@ -1,5 +1,6 @@
 # Ignore generated files
 modules
 images/out/
+images/pokemon-sprites/webp/
 data/out/
 tsconfig.tsbuildinfo

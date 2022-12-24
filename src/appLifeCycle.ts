@@ -229,7 +229,7 @@ export async function appStart() {
     await initPokemonData();
     logPerf('initPokemonData');
     Pokemon.names(); // met en cache les noms des Pokémon (pas besoin d'attendre la fin)
-    await initPokedex();
+    initPokedex();
     logPerf('initPokedex');
     await initFiltres();
     logPerf('initFiltres');

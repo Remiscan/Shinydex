@@ -1,5 +1,5 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'].'/shinydex/backend/class_Forme.php';
+require_once __DIR__.'/class_Forme.php';
 
 class Pokemon
 {
@@ -12,7 +12,7 @@ class Pokemon
   public $formes = [];
   private $formes_ids = [];
 
-  function __construct($id, $sprites) {
+  function __construct(int $id, array $sprites) {
     $this->dexid = $id;
     $this->name = [
       'fr' => self::POKEMON_NAMES_FR[$id],
@@ -23,10 +23,10 @@ class Pokemon
       try {
         $forme = new Forme(new Sprite($s), $id);
 
-        if (!file_exists('../images/pokemon-sprites/home/' . str_replace('_n.png', '_r.png', $s)) && $this->dexid != 869)
+        if (!file_exists(__DIR__.'/../images/pokemon-sprites/home/' . str_replace('_n.png', '_r.png', $s)) && $this->dexid != 869)
           $forme->noShiny = true;
 
-        if (file_exists('../images/pokemon-sprites/home/' . str_replace('_f_n.png', '_b_n.png', $s)))
+        if (file_exists(__DIR__.'/../images/pokemon-sprites/home/' . str_replace('_f_n.png', '_b_n.png', $s)))
           $forme->hasBackside = true;
 
         $formeCaracs = [
@@ -53,20 +53,13 @@ class Pokemon
     {
       $options = (object) [
         'shiny' => false,
-        'backside' => false,
-        'size' => 512,
-        'format' => 'png'
+        'backside' => false
       ];
     }
 
     if (!is_object($options)) throw new Exception('options must be an object');
 
     $shiny = property_exists($options, 'shiny') ? $options->shiny : false;
-    $shinySuffix = $shiny ? 'r' : 'n';
-
-    $size = (property_exists($options, 'size') && is_numeric($options->size)) ? $options->size : 512;
-    $format = property_exists($options, 'format') ? match(strtolower($options->format)) { 'webp' => 'webp', default => 'png' } : 'png';
-
     $side = (property_exists($forme, 'hasBackside') && property_exists($options, 'backside') && $options->backside) ? 'b' : 'f';
 
     $formToConsider = ($shiny && $this->dexid == 869) ? 0 : $forme->form;
@@ -78,13 +71,14 @@ class Pokemon
       $forme->gigamax ? 'g' : 'n',
       str_pad($forme->candy, 8, "0", STR_PAD_LEFT),
       $side,
-      $shinySuffix
+      $shiny ? 'r' : 'n'
     ];
 
-    $spriteUrl = '/shinydex/pokemon-sprite-' . implode('_', $spriteCaracs) . '-' . $size . '.' . $format;
+    $basePath = '/shinydex/images/pokemon-sprites/home/poke_capture_';
+    $spriteUrl = $basePath . implode('_', $spriteCaracs) . '.png';
 
-    if (property_exists($forme, 'noShiny') && $forme->noShiny == true && $shiny)
-      $spriteUrl = '/shinydex/pokemon-sprite-0000_000_uk_n_00000000_f_n-' . $size . '.' . $format;
+    if (property_exists($forme, 'noShiny') && $forme->noShiny === true && $shiny)
+      $spriteUrl = $basePath . '0000_000_uk_n_00000000_f_n.png';
 
     return $spriteUrl;
   }

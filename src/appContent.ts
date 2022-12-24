@@ -156,12 +156,11 @@ export async function populateFromData(section: populatableSection, ids: string[
 
 
 /** Initialise le Pokédex. */
-export async function initPokedex() {
+export function initPokedex() {
   if (pokedexInitialized) return;
 
   let gensToPopulate = [];
   const generations = Pokemon.generations;
-  const names = await Pokemon.names('en');
 
   for (const gen of generations) {
     let monsToPopulate = [];
@@ -171,8 +170,7 @@ export async function initPokedex() {
     for (let i = gen.start; i <= gen.end; i++) {
       const pkmn = document.createElement('button');
       pkmn.setAttribute('type', 'button');
-      const name = names[i];
-      pkmn.classList.add('pkspr', 'pokemon', name + '-shiny');
+      pkmn.classList.add('pkmnicon');
       pkmn.dataset.dexid = String(i);
       pkmn.addEventListener('click', event => {
         try {

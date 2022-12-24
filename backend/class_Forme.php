@@ -1,15 +1,13 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'].'/shinydex/backend/class_Sprite.php';
+require_once __DIR__.'/class_Sprite.php';
 
 
 
-class Forme extends Sprite
-{
+class Forme extends Sprite {
   public $dbid = '';
   public $nom = '';
 
-  function __construct(Sprite $sprite, int $dexid)
-  {
+  function __construct(Sprite $sprite, int $dexid) {
     // Formes à ne pas compter
     if (
       ($dexid == 25 && $sprite->form == 8) // Pikachu starter
@@ -36,8 +34,9 @@ class Forme extends Sprite
       || ($dexid == 784 && $sprite->form == 1) // Ékaïser totem
       || ($dexid == 849 && $sprite->form == 1 && $sprite->gigamax == 1) // Salarsen Gigamax Grave (identique au Aigu)
       || ($dexid == 869 && $sprite->gigamax == 1 && ($sprite->form > 0 || $sprite->candy > 0)) // Charmilly Gigamax (autres friandises)
-    )
+    ) {
       throw new Exception('Forme ignorée');
+    }
     
     $this->form = $sprite->form;
     $this->gender = $sprite->gender;
@@ -48,13 +47,10 @@ class Forme extends Sprite
     
     // Cas par cas selon le Pokémon
     
-    if ($spriteid == 'gigamax')
-    {
-      switch($dexid)
-      {
+    if ($spriteid == 'gigamax') {
+      switch($dexid) {
         case 892: // Shifours
-          switch($this->form)
-          {
+          switch($this->form) {
             case 0:
               $this->dbid = 'gigamax';
               $this->nom = 'Poing Final - Gigamax';
@@ -71,11 +67,9 @@ class Forme extends Sprite
       }
     }
 
-    else
-    {
+    else {
       $done = true;
-      switch ($dexid)
-      {
+      switch ($dexid) {
         case 0: // Œuf
           $ids = ['', 'manaphy'];
           $noms = ['Œuf', 'Œuf de Manaphy'];
@@ -291,8 +285,7 @@ class Forme extends Sprite
       }
 
       // Charmilly
-      if ($dexid == 869)
-      {
+      if ($dexid == 869) {
         $ids = ['vanille', 'ruby', 'matcha', 'menthe', 'citron', 'sale', 'melruby', 'caramel', 'tricolore'];
         $noms = ['Lait Vanille', 'Lait Ruby', 'Lait Matcha', 'Lait Menthe', 'Lait Citron', 'Lait Salé', 'Mélange Ruby', 'Mélange Caramel', 'Mélange Tricolore'];
 
@@ -303,17 +296,15 @@ class Forme extends Sprite
         $this->nom = $noms[$sprite->form] . ' - ' . $friandisesNoms[$sprite->candy];
       }
 
-      else if ($done)
-      {
+      else if ($done) {
         $this->dbid = $ids[$sprite->form];
         $this->nom = $noms[$sprite->form];
       }
-      else
-      {
+      
+      else {
         $this->dbid = '';
         $this->nom = '';
-        if (in_array($spriteid, ['mf', 'uk', 'mo', 'fo', 'md', 'fd']))
-        {
+        if (in_array($spriteid, ['mf', 'uk', 'mo', 'fo', 'md', 'fd'])) {
           $this->dbid = '';
           $this->nom = '';
         }
@@ -328,51 +319,42 @@ class Forme extends Sprite
           $this->nom = 'Femelle';
         }*/
         // Méga-évolutions
-        else if (self::has('mega', $dexid) && $sprite->form == 1)
-        {
+        else if (self::has('mega', $dexid) && $sprite->form == 1) {
           $this->dbid = 'mega';
           $this->nom = 'Méga';
         }
         // Méga-évolutions X et Y
-        else if (self::has('megaX', $dexid) && in_array($sprite->form, [1, 2]))
-        {
-          if ($sprite->form == 1)
-          {
+        else if (self::has('megaX', $dexid) && in_array($sprite->form, [1, 2])) {
+          if ($sprite->form == 1) {
             $this->dbid = 'xmega';
             $this->nom = 'Méga (X)';
           }
-          else if ($sprite->form == 2)
-          {
+          else if ($sprite->form == 2) {
             $this->dbid = 'ymega';
             $this->nom = 'Méga (Y)';
           }
         }
         // Primo-résurgences
-        else if (self::has('primal', $dexid) && $sprite->form == 1)
-        {
+        else if (self::has('primal', $dexid) && $sprite->form == 1) {
           $this->dbid = 'primal';
           $this->nom = 'Primo';
         }
         // Formes d'Alola
-        else if (self::has('alolan', $dexid) && self::isAlolan($sprite, $dexid))
-        {
+        else if (self::has('alolan', $dexid) && self::isAlolan($sprite, $dexid)) {
           $this->dbid = 'alola';
           $this->nom = 'd\'Alola';
         }
         // Formes de Galar
-        else if (self::has('galarian', $dexid) && self::isGalarian($sprite, $dexid))
-        {
+        else if (self::has('galarian', $dexid) && self::isGalarian($sprite, $dexid)) {
           $this->dbid = 'galar';
           $this->nom = 'de Galar';
         }
         // Formes de Hisui
-        else if (self::has('hisuian', $dexid) && self::isHisuian($sprite, $dexid))
-        {
+        else if (self::has('hisuian', $dexid) && self::isHisuian($sprite, $dexid)) {
           $this->dbid = 'hisui';
           $this->nom = 'de Hisui';
         }
-        else
-        {
+        else {
           $this->dbid = 'unknown';
           $this->nom = 'Forme inconnue';
         }
@@ -380,8 +362,7 @@ class Forme extends Sprite
 
       // Mâles et femelles
       $ignoreGender = [905]; // Amovénus
-      if (!in_array($dexid, $ignoreGender)) // Amovénus
-      {
+      if (!in_array($dexid, $ignoreGender)) {
         if ($sprite->gender == 'md') {
           $this->nom = 'Mâle' . ($this->nom == '' ? '' : ' ' . $this->nom);
         } else if ($sprite->gender == 'fd') {

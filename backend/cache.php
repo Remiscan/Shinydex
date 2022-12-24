@@ -12,6 +12,8 @@ function getCacheFiles() {
     "./ext/material_icons.woff2",
     "./images/iconsheet.css",
     "./images/iconsheet.png",
+    "./images/pokemonsheet.css",
+    "./images/pokemonsheet.webp",
     "./data/pokemon.json",
     "./strings/games.json",
     "./strings/methods.json",

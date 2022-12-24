@@ -72,6 +72,7 @@
 
 html {
   --link-iconsheet: url(/shinydex/images/iconsheet.png);
+  --link-pokemonsheet: url(/shinydex/images/pokemonsheet.webp);
   --link-pokesprite: url(/shinydex/ext/pokesprite.png);
   --easing-standard: cubic-bezier(0.4, 0.0, 0.2, 1);
   --easing-decelerate: cubic-bezier(0.0, 0.0, 0.2, 1);
@@ -667,6 +668,7 @@ body:not([data-section-actuelle="pokedex"]) .only-pokedex {
   contain-intrinsic-size: 10px 1000px;
 }
 
+.pkmnicon,
 .pokedex-gen>.pkspr {
   background-color: transparent;
   border: none;
@@ -678,11 +680,14 @@ body:not([data-section-actuelle="pokedex"]) .only-pokedex {
   margin: 0;
 }
 
+.pokedex-gen > .pkmnicon:focus,
+.pokedex-gen > .got.pkmnicon,
 .pokedex-gen>.pkspr:focus,
 .pokedex-gen>.got.pkspr {
   z-index: 1;
 }
 
+.pokedex-gen > :not(.got).pkmnicon::after,
 .pokedex-gen>:not(.got).pkspr::after {
   content: '';
   display: block;
@@ -691,10 +696,11 @@ body:not([data-section-actuelle="pokedex"]) .only-pokedex {
   position: absolute;
   top: 0;
   left: 0;
-  opacity: .7;
+  opacity: .5;
   background-color: var(--card-bg-color);
 }
 
+.pokedex-gen > :not(.got).pkmnicon:hover::after,
 .pokedex-gen>:not(.got).pkspr:hover::after {
   opacity: .1;
 }
