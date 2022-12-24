@@ -76,6 +76,7 @@ pokemon-sprite,
   grid-template-columns: 32px fit-content(100%) 20px;
   position: relative;
   left: -16px;
+  align-items: center;
 }
 
 [data-type="ball"] {
@@ -93,7 +94,7 @@ pokemon-sprite,
 [data-type="espece"] {
   grid-row: 2;
   grid-column: 2;
-  font-size: 15px;
+  font-size: 1em;
   font-weight: 300;
   text-transform: capitalize;
   opacity: .8;
@@ -109,7 +110,7 @@ pokemon-sprite,
 [data-type="surnom"]:empty + [data-type="espece"] {
   grid-row: 1;
   grid-column: 2;
-  font-size: 24px;
+  font-size: 1.5em;
   font-weight: 300;
   opacity: 1;
   display: flex;
@@ -130,10 +131,14 @@ pokemon-sprite,
   grid-column: 3;
 }
 
+[data-type="gene"].icones.explain {
+  margin: 3px 5px;
+}
+
 .pokemon-infos__capture {
   grid-row: 4 / 5;
   color: var(--card-infos-text-color);
-  font-size: 13px;
+  font-size: 1em;
   display: grid;
   grid-template-columns: 32px auto;
   grid-template-rows: auto auto auto;
@@ -169,7 +174,7 @@ pokemon-sprite,
   width: 100%;
   height: 100%;
   max-height: 120px;
-  font-size: 13px;
+  font-size: 1em;
   text-align: justify;
   line-height: 20px;
   color: var(--text-color);
@@ -297,11 +302,11 @@ pokemon-sprite,
 
 .shiny-rate-text {
   color: var(--card_supporting_text_color);
-  font-size: 13px;
+  font-size: 1em;
 }
 
 .numerator.shiny-rate-text {
-  font-size: 8px;
+  font-size: .5em;
   position: absolute;
   top: 0;
   left: 0;
@@ -310,7 +315,7 @@ pokemon-sprite,
 .separator.shiny-rate-text {
   opacity: .6;
   margin: 0 1px 0 3px;
-  font-size: 16px;
+  font-size: 1em;
 }
 
 .spacer {
@@ -327,6 +332,8 @@ pokemon-sprite,
     opacity: 1;
     transform: none;
     width: calc(100cqi - 500px);
+    background-color: var(--card-sprite-bg-color);
+    border-radius: 10px;
   }
 
   .pokemon-notes,
