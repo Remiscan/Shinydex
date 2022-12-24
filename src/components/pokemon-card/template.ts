@@ -4,7 +4,7 @@ import '../pokemon-sprite/pokemonSprite.js';
 
 const template = document.createElement('template');
 template.innerHTML = /*html*/`
-  <pokemon-sprite size="112"></pokemon-sprite>
+  <pokemon-sprite size="112" shiny="true"></pokemon-sprite>
 
   <div class="edit-icon">
     <i class="material-icons">edit</i>
