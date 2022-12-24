@@ -156,7 +156,7 @@ export async function populateFromData(section: populatableSection, ids: string[
 
 
 /** Initialise le Pokédex. */
-export function initPokedex() {
+export async function initPokedex() {
   if (pokedexInitialized) return;
 
   let gensToPopulate = [];
@@ -166,10 +166,12 @@ export function initPokedex() {
     let monsToPopulate = [];
     const genConteneur = document.createElement('div');
     genConteneur.classList.add('pokedex-gen');
+    const allNames = await Pokemon.names();
 
     for (let i = gen.start; i <= gen.end; i++) {
       const pkmn = document.createElement('button');
       pkmn.setAttribute('type', 'button');
+      pkmn.setAttribute('aria-label', allNames[i]);
       pkmn.classList.add('pkmnicon');
       pkmn.dataset.dexid = String(i);
       pkmn.addEventListener('click', event => {

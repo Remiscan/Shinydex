@@ -71,9 +71,8 @@
 }
 
 html {
-  --link-iconsheet: url(/shinydex/images/iconsheet.png);
+  --link-iconsheet: url(/shinydex/images/iconsheet.webp);
   --link-pokemonsheet: url(/shinydex/images/pokemonsheet.webp);
-  --link-pokesprite: url(/shinydex/ext/pokesprite.png);
   --easing-standard: cubic-bezier(0.4, 0.0, 0.2, 1);
   --easing-decelerate: cubic-bezier(0.0, 0.0, 0.2, 1);
   --easing-accelerate: cubic-bezier(0.4, 0.0, 1, 1);
@@ -355,6 +354,7 @@ h1 {
 .section-contenu {
   grid-row: 2 / 3;
   grid-column: 1 / 2;
+  gap: 6px;
   padding: 8px;
   padding-top: 0;
   display: flex;
@@ -653,7 +653,6 @@ body:not([data-section-actuelle="pokedex"]) .only-pokedex {
   box-sizing: border-box;
   border-radius: 10px;
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14);
-  margin-bottom: 6px;
   padding: 5px 0;
   background-color: var(--card-bg-color);
   display: flex;
@@ -668,8 +667,7 @@ body:not([data-section-actuelle="pokedex"]) .only-pokedex {
   contain-intrinsic-size: 10px 1000px;
 }
 
-.pkmnicon,
-.pokedex-gen>.pkspr {
+.pkmnicon {
   background-color: transparent;
   border: none;
   border-radius: 0;
@@ -681,14 +679,11 @@ body:not([data-section-actuelle="pokedex"]) .only-pokedex {
 }
 
 .pokedex-gen > .pkmnicon:focus,
-.pokedex-gen > .got.pkmnicon,
-.pokedex-gen>.pkspr:focus,
-.pokedex-gen>.got.pkspr {
+.pokedex-gen > .got.pkmnicon {
   z-index: 1;
 }
 
-.pokedex-gen > :not(.got).pkmnicon::after,
-.pokedex-gen>:not(.got).pkspr::after {
+.pokedex-gen > :not(.got).pkmnicon::after {
   content: '';
   display: block;
   width: 100%;
@@ -700,8 +695,7 @@ body:not([data-section-actuelle="pokedex"]) .only-pokedex {
   background-color: var(--card-bg-color);
 }
 
-.pokedex-gen > :not(.got).pkmnicon:hover::after,
-.pokedex-gen>:not(.got).pkspr:hover::after {
+.pokedex-gen > :not(.got).pkmnicon:hover::after {
   opacity: .1;
 }
 
@@ -1048,8 +1042,15 @@ select[id$="-methode"] {
   min-height: 100%;
 }
 
-#a-propos>.section-contenu,
-#parametres>.section-contenu {
+form[name="app-settings"] {
+  text-align: justify;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 65ch;
+  margin: auto;
+}
+
+#a-propos>.section-contenu {
   margin: 0 auto 8px auto;
   padding: 15px 30px 8px;
   text-align: justify;

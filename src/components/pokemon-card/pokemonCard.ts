@@ -8,8 +8,6 @@ import methodStrings from '../../../strings/methods.json' assert { type: 'json' 
 // @ts-expect-error
 import materialIconsSheet from '../../../ext/material_icons.css' assert { type: 'css' };
 // @ts-expect-error
-import pokespriteSheet from '../../../ext/pokesprite.css' assert { type: 'css' };
-// @ts-expect-error
 import iconSheet from '../../../images/iconsheet.css' assert { type: 'css' };
 // @ts-expect-error
 import commonSheet from '../../../styles/common.css' assert { type: 'css' };
@@ -35,7 +33,7 @@ export class pokemonCard extends HTMLElement {
     super();
     this.shadow = this.attachShadow({ mode: 'open' });
     this.shadow.appendChild(template.content.cloneNode(true));
-    this.shadow.adoptedStyleSheets = [materialIconsSheet, pokespriteSheet, iconSheet, commonSheet, sheet];
+    this.shadow.adoptedStyleSheets = [materialIconsSheet, iconSheet, commonSheet, sheet];
   }
 
 
@@ -121,22 +119,19 @@ export class pokemonCard extends HTMLElement {
 
     // Jeu
     {
-      const jeu = shiny.jeu.replace(/[ \']/g, '') || '';
+      const jeu = shiny.jeu;
       const element = this.shadow.querySelector('[data-type="jeu"]')!
-      element.className = `icones jeu ${jeu}`;
+      element.setAttribute('data-icon', `game/${jeu}`);
     }
 
     // Ball
     {
       const ball = shiny.ball || '';
       const element = this.shadow.querySelector('[data-type="ball"]')!;
-      const baseClassList = 'pkspr';
-      element.className = baseClassList;
-      if (shiny.ball) {
-        element.classList.add('item', `ball-${ball}`);
-      } else {
-        element.classList.add('off');
-      }
+      element.setAttribute('data-icon', `ball/${ball}`);
+      element.className = 'icon';
+      if (shiny.mine && ball) element.className = 'icon';
+      else                    element.className = 'off';
     }
 
     // Notes
@@ -148,26 +143,19 @@ export class pokemonCard extends HTMLElement {
 
     // Checkmark
     {
-      const originsList = ['off', 'kalos', 'alola', 'vc', 'letsgo', 'go', 'galar', 'bdsp', 'hisui'];
-      const origin = originsList[shiny.originMark] || 'off';
+      const origin = shiny.originMark;
       const element = this.shadow.querySelector('[data-type="checkmark"]')!;
-      element.className = `icones explain checkmark ${origin}born`;
+      element.setAttribute('data-icon', `origin-mark/${origin}`);
+      if (origin) element.className = 'icon';
+      else        element.className = 'off';
     }
 
     // Gène (gigamax ou alpha)
     {
       const gene = shiny.gene;
       const element = this.shadow.querySelector('[data-type="gene"]')!;
-      element.className = 'icones explain';
+      element.setAttribute('data-icon', `gene/${gene}`);
       if (gene) element.classList.add(gene);
-      else      element.classList.add('off');
-    }
-
-    // DO
-    {
-      const mine = shiny.mine;
-      const element = this.shadow.querySelector('[data-type="do"]')!;
-      if (mine) element.classList.remove('off');
       else      element.classList.add('off');
     }
 
@@ -203,29 +191,21 @@ export class pokemonCard extends HTMLElement {
       element.innerHTML = String(shinyRate || '???');
 
       // Couleur du shiny rate
+      const jeu = shiny.Jeu;
       srContainer.classList.remove('full-odds', 'charm-ods', 'one-odds');
-      if (!charm && [8192, 4096].includes(shinyRate)) {
+      if (
+        (jeu.gen <= 5 && shinyRate >= 8192 - 1) ||
+        (jeu.gen > 5 && shinyRate >= 4096 - 1)
+      ) {
         srContainer.classList.add('full-odds');
-      } else if (charm && [2731, 1365].includes(shinyRate)) {
+      } else if (
+        (jeu.gen <= 5 && shinyRate >= 2731 - 1) ||
+        (jeu.gen > 5 && shinyRate >= 1365 - 1)
+      ) {
         srContainer.classList.add('charm-odds');
       } else if (shinyRate <= 1) {
         srContainer.classList.add('one-odds');
       }
-    }
-
-    // Legit ou hacké ?
-    {
-      const hacksList = ['off', 'ptethack', 'hack', 'clone'];
-      const hack = hacksList[shiny.hacked] || 'off';
-      const element = this.shadow.querySelector('[data-type="hacked"]')!;
-      element.className = `icones explain hacked ${hack}`;
-    }
-
-    // Hors chasse ?
-    {
-      const element = this.shadow.querySelector('[data-type="horsChasse"]')!;
-      if (shiny.horsChasse) element.classList.remove('off');
-      else                  element.classList.add('off');
     }
   }
 

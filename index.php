@@ -56,7 +56,6 @@
     } ?>
 
     <link rel="stylesheet" href="./ext/material_icons.css">
-    <link rel="stylesheet" href="./ext/pokesprite.css">
     <link rel="stylesheet" href="./images/pokemonsheet.css">
     <link rel="stylesheet" href="./images/iconsheet.css">
     <link rel="stylesheet" href="./styles/common.css">

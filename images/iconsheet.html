@@ -1,0 +1,333 @@
+  <html class="light">
+    <head>
+      <meta charset="utf-8">
+      <style>
+        html {
+          width:100%;
+          height:100%;
+          --link-iconsheet:url("iconsheet.webp");
+          --color:black;
+        }
+
+        html.dark {
+          --color:white
+        }
+
+        body {
+          display:flex;
+          flex-wrap:wrap;
+          justify-content:space-between;
+          margin:100px;
+          background-color:#ccc;
+          color:var(--color)
+        }
+
+        html.dark > body {
+          background-color:#333
+        }
+
+        .container {
+          border:1px solid var(--color);
+          display:flex;
+          justify-content:center;
+          align-items:center;
+          margin:5px;
+          display:grid;
+          overflow:hidden;
+          height:32px;
+          grid-template-columns: 32px 220px
+        }
+        
+        .container > div:not(.icon) {
+          padding:5px;
+        }
+
+        a {
+          color:blue
+        }
+        
+        html.dark a{
+          color:lightblue
+        }
+      </style>
+      <link rel="stylesheet"href="iconsheet.css">
+    </head>
+
+    <body>
+      <main style="flex-basis:100%">
+        <ul>
+          <li>
+            <a href="iconsheet.webp">Link to image (iconsheet.webp)</a>
+          </li>
+          <li>
+            <a href="iconsheet.css">Link to style sheet (iconsheet.css)</a>
+          </li>
+          <li>
+            <input type="checkbox" onclick="document.documentElement.classList.toggle(`dark`);document.documentElement.classList.toggle(`light`)" id="theme"> <label for="theme">Dark</label>
+          </li>
+        </ul>
+      </main>  <div class="container">
+    <div class="icon" data-icon="game/alphasapphire"></div>
+    <div>game/alphasapphire</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="game/black"></div>
+    <div>game/black</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="game/black2"></div>
+    <div>game/black2</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="game/blue"></div>
+    <div>game/blue</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="game/brilliantdiamond"></div>
+    <div>game/brilliantdiamond</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="game/crystal"></div>
+    <div>game/crystal</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="game/diamond"></div>
+    <div>game/diamond</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="game/emerald"></div>
+    <div>game/emerald</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="game/firered"></div>
+    <div>game/firered</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="game/go"></div>
+    <div>game/go</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="game/gold"></div>
+    <div>game/gold</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="game/heartgold"></div>
+    <div>game/heartgold</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="game/home"></div>
+    <div>game/home</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="game/leafgreen"></div>
+    <div>game/leafgreen</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="game/legendsarceus"></div>
+    <div>game/legendsarceus</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="game/letsgoeevee"></div>
+    <div>game/letsgoeevee</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="game/letsgopikachu"></div>
+    <div>game/letsgopikachu</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="game/moon"></div>
+    <div>game/moon</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="game/omegaruby"></div>
+    <div>game/omegaruby</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="game/pearl"></div>
+    <div>game/pearl</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="game/platinum"></div>
+    <div>game/platinum</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="game/red"></div>
+    <div>game/red</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="game/ruby"></div>
+    <div>game/ruby</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="game/sapphire"></div>
+    <div>game/sapphire</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="game/shield"></div>
+    <div>game/shield</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="game/shiningpearl"></div>
+    <div>game/shiningpearl</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="game/silver"></div>
+    <div>game/silver</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="game/soulsilver"></div>
+    <div>game/soulsilver</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="game/sun"></div>
+    <div>game/sun</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="game/sword"></div>
+    <div>game/sword</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="game/ultramoon"></div>
+    <div>game/ultramoon</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="game/ultrasun"></div>
+    <div>game/ultrasun</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="game/white"></div>
+    <div>game/white</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="game/white2"></div>
+    <div>game/white2</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="game/x"></div>
+    <div>game/x</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="game/y"></div>
+    <div>game/y</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="game/yellow"></div>
+    <div>game/yellow</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="ball/beast"></div>
+    <div>ball/beast</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="ball/cherish"></div>
+    <div>ball/cherish</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="ball/dive"></div>
+    <div>ball/dive</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="ball/dream"></div>
+    <div>ball/dream</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="ball/dusk"></div>
+    <div>ball/dusk</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="ball/fast"></div>
+    <div>ball/fast</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="ball/feather"></div>
+    <div>ball/feather</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="ball/friend"></div>
+    <div>ball/friend</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="ball/gigaton"></div>
+    <div>ball/gigaton</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="ball/great"></div>
+    <div>ball/great</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="ball/heal"></div>
+    <div>ball/heal</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="ball/heavy"></div>
+    <div>ball/heavy</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="ball/hisuian-great"></div>
+    <div>ball/hisuian-great</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="ball/hisuian-heavy"></div>
+    <div>ball/hisuian-heavy</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="ball/hisuian-poke"></div>
+    <div>ball/hisuian-poke</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="ball/hisuian-ultra"></div>
+    <div>ball/hisuian-ultra</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="ball/jet"></div>
+    <div>ball/jet</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="ball/leaden"></div>
+    <div>ball/leaden</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="ball/level"></div>
+    <div>ball/level</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="ball/love"></div>
+    <div>ball/love</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="ball/lure"></div>
+    <div>ball/lure</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="ball/luxury"></div>
+    <div>ball/luxury</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="ball/master"></div>
+    <div>ball/master</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="ball/moon"></div>
+    <div>ball/moon</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="ball/nest"></div>
+    <div>ball/nest</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="ball/net"></div>
+    <div>ball/net</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="ball/origin"></div>
+    <div>ball/origin</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="ball/park"></div>
+    <div>ball/park</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="ball/poke"></div>
+    <div>ball/poke</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="ball/premier"></div>
+    <div>ball/premier</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="ball/quick"></div>
+    <div>ball/quick</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="ball/repeat"></div>
+    <div>ball/repeat</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="ball/safari"></div>
+    <div>ball/safari</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="ball/sport"></div>
+    <div>ball/sport</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="ball/strange"></div>
+    <div>ball/strange</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="ball/timer"></div>
+    <div>ball/timer</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="ball/ultra"></div>
+    <div>ball/ultra</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="ball/wing"></div>
+    <div>ball/wing</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="key/shiny-charm"></div>
+    <div>key/shiny-charm</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="gene/alpha"></div>
+    <div>gene/alpha</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="gene/gigantamax"></div>
+    <div>gene/gigantamax</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="origin-mark/clover"></div>
+    <div>origin-mark/clover</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="origin-mark/galar"></div>
+    <div>origin-mark/galar</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="origin-mark/game-boy"></div>
+    <div>origin-mark/game-boy</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="origin-mark/go"></div>
+    <div>origin-mark/go</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="origin-mark/hisui"></div>
+    <div>origin-mark/hisui</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="origin-mark/lets-go"></div>
+    <div>origin-mark/lets-go</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="origin-mark/old"></div>
+    <div>origin-mark/old</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="origin-mark/paldea"></div>
+    <div>origin-mark/paldea</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="origin-mark/pentagon"></div>
+    <div>origin-mark/pentagon</div>
+  </div>  <div class="container">
+    <div class="icon" data-icon="origin-mark/sinnoh-gen8"></div>
+    <div>origin-mark/sinnoh-gen8</div>
+  </div>

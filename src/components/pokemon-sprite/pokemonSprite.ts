@@ -2,16 +2,30 @@ import { pad, wait } from '../../Params.js';
 import { Forme, Pokemon } from '../../Pokemon.js';
 import { pokemonData } from '../../localForage.js';
 // @ts-expect-error
+import pokemonSheet from '../../../images/pokemonsheet.css' assert { type: 'css' };
+// @ts-expect-error
 import sheet from './styles.css' assert { type: 'css' };
 import template from './template.js';
 
 
 
+type SpriteParams = { 
+  dexid: number,
+  forme: string,
+  gender: string,
+  gigamax: boolean,
+  candy: number,
+  backside: boolean,
+  shiny: boolean,
+  size: number | 'sheet',
+  lazy: boolean
+};
+
 export default class pokemonSprite extends HTMLElement {
   static supportedSizes = [112, 512];
   
   shadow: ShadowRoot;
-  params: { [key: string]: number | string | boolean } = {
+  params: SpriteParams = {
     dexid: 0,
     forme: '',
     gender: 'mf',
@@ -30,7 +44,7 @@ export default class pokemonSprite extends HTMLElement {
     super();
     this.shadow = this.attachShadow({ mode: 'open' });
     this.shadow.appendChild(template.content.cloneNode(true));
-    this.shadow.adoptedStyleSheets = [sheet];
+    this.shadow.adoptedStyleSheets = [pokemonSheet, sheet];
   }
 
 
@@ -113,13 +127,23 @@ export default class pokemonSprite extends HTMLElement {
     const currentChange = this.lastChange;
     const img = this.shadow.querySelector('img')!;
     const url = await this.getSpriteUrl();
-    this.style.setProperty('--size', `${this.params.size}px`);
+    const isSheet = this.params.size === 'sheet';
+    this.style.setProperty('--size', `${isSheet ? 56 : this.params.size}px`);
     // On affiche le nouveau sprite uniquement si aucune nouvelle demande n'a été faite entre temps
     if (currentChange === this.lastChange) {
       img.loading = this.params.lazy ? 'lazy' : 'eager';
       img.src = url;
+      img.setAttribute('width', String(isSheet ? 56 : this.params.size));
+      img.setAttribute('height', String(isSheet ? 56 : this.params.size));
       const name = (await Pokemon.names())[Number(this.params.dexid)];
       img.setAttribute('alt', `${name}${this.params.shiny ? ' chromatique' : ''}`);
+      if (isSheet) {
+        img.setAttribute('data-dexid', String(this.params.dexid));
+        img.classList.add('pkmnicon');
+      } else {
+        img.removeAttribute('data-dexid');
+        img.classList.remove('pkmnicon');
+      }
     }
     return;
   }
@@ -127,6 +151,8 @@ export default class pokemonSprite extends HTMLElement {
 
   /** Récupère l'url du sprite demandé en fonction de l'objet des paramètres de sprite. */
   async getSpriteUrl(params = this.params): Promise<string> {
+    if (this.params.size === 'sheet') return '/shinydex/images/pokemonsheet.webp';
+
     const pkmn = await pokemonData.getItem(String(params.dexid));
     const forme = pkmn?.formes.find((form: Forme) => form.dbid === params.forme) || pkmn?.formes[0];
 
@@ -182,33 +208,31 @@ export default class pokemonSprite extends HTMLElement {
 
   /** Met à jour ${this.params} en fonction des arguments de l'élément HTML. */
   update(param: string, newValue: string) {
-    let value: number | string | boolean;
+    let value;
     switch (param) {
       case 'dexid':
         value = Number(newValue) || 0;
+        this.params.dexid = value;
         break;
       case 'forme':
         value = newValue || '';
+        this.params.forme = value;
         break;
       case 'backside':
       case 'shiny':
         value = newValue === 'true' ? true : false;
+        this.params[param] = value;
         break;
       case 'size':
-        value = Number(newValue) || 112;
-        break;
-      case 'format':
-        value = newValue === 'webp' ? 'webp' : 'png';
+        if (newValue === 'sheet') this.params.size = 'sheet';
+        else                      this.params.size = Number(newValue) || 112;
         break;
       case 'lazy':
         value = newValue === 'false' ? false : true;
+        this.params.lazy = value;
         break;
       default:
         value = '';
-    }
-    if (this.params.hasOwnProperty(param)) {
-      this.lastChange = Date.now();
-      this.params[param] = value;
     }
   }
   
@@ -221,7 +245,7 @@ export default class pokemonSprite extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ['dexid', 'forme', 'backside', 'shiny', 'size', 'format', 'lazy'];
+    return ['dexid', 'forme', 'backside', 'shiny', 'size', 'lazy'];
   }
 
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {

@@ -18,7 +18,7 @@ export async function upgradeStorage(): Promise<void> {
   const huntKeys = await huntStorage.keys();
   for (const key of huntKeys) {
     const hunt = toNewFormat(await huntStorage.getItem(key));
-    await shinyStorage.setItem(key, hunt);
+    await huntStorage.setItem(key, hunt);
   }
 
   // Remove old filters
@@ -68,6 +68,15 @@ function toNewFormat(shiny: { [key: string]: any }): { [key: string]: any } {
   for (const [prop, defaultValue] of newProperties) {
     if (!shiny.hasOwnProperty(prop)) {
       shiny[prop] = defaultValue;
+    }
+  }
+
+  // Delete properties that don't exist any more
+  const oldProperties = ['userid', 'DO', 'horsChasse'];
+
+  for (const prop of oldProperties) {
+    if (shiny.hasOwnProperty(prop)) {
+      delete shiny[prop];
     }
   }
 
@@ -128,6 +137,11 @@ function toNewFormat(shiny: { [key: string]: any }): { [key: string]: any } {
         }
       }
     }
+  }
+
+  if (shiny.hasOwnProperty('checkmark') && typeof shiny.checkmark === 'number') {
+    const names = ['old', 'pentagon', 'clover', 'game-boy', 'lets-go', 'go', 'galar', 'sinnoh-gen8', 'hisui', 'paldea'];
+    shiny.checkmark = names[shiny.checkmark];
   }
 
   return shiny;

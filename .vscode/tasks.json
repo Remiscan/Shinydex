@@ -40,6 +40,10 @@
       "label": "build Pokémon sprite sheet"
     }, {
       "type": "shell",
+      "command": "sudo php build/iconsheet.php",
+      "label": "build icon sheet"
+    }, {
+      "type": "shell",
       "command": "sudo php build/pokemon-data.php",
       "label": "build Pokémon data JSON"
     }

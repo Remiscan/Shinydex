@@ -1,7 +1,7 @@
+import { loadAllImages, Params, wait } from './Params.js';
 import { searchBar } from './components/search-bar/searchBar.js';
 import { disableLazyLoad, enableLazyLoad } from './lazyLoading.js';
 import { Notif } from './notification.js';
-import { loadAllImages, Params, wait } from './Params.js';
 
 
 
@@ -34,7 +34,7 @@ const sections: Section[] = [
     closeAnimation: () => null,
     historique: true,
     closePrevious: true,
-    preload: ['./ext/pokesprite.png'],
+    preload: [`./images/iconsheet.webp`, `./images/pokemonsheet.webp`],
     fab: 'add',
     element: document.getElementById('mes-chromatiques')!
   }, {
@@ -44,7 +44,7 @@ const sections: Section[] = [
     closeAnimation: () => null,
     historique: true,
     closePrevious: true,
-    preload: ['./ext/pokesprite.png'],
+    preload: [`./images/pokemonsheet.webp`],
     fab: 'add',
     element: document.getElementById('pokedex')!
   }, {
@@ -54,7 +54,7 @@ const sections: Section[] = [
     closeAnimation: () => null,
     historique: true,
     closePrevious: true,
-    preload: ['./ext/pokesprite.png'],
+    preload: [`./images/iconsheet.webp`],
     fab: 'add',
     element: document.getElementById('chasses-en-cours')!
   }, {
@@ -64,7 +64,7 @@ const sections: Section[] = [
     closeAnimation: () => null,
     historique: true,
     closePrevious: true,
-    preload: ['./ext/pokesprite.png'],
+    preload: [`./images/iconsheet.webp`],
     fab: null,
     element: document.getElementById('corbeille')!
   }, {
@@ -74,7 +74,7 @@ const sections: Section[] = [
     closeAnimation: () => null,
     historique: true,
     closePrevious: true,
-    preload: ['./ext/pokesprite.png'],
+    preload: [`./images/iconsheet.webp`],
     fab: 'person_add',
     element: document.getElementById('partage')!
   }, {
@@ -84,7 +84,7 @@ const sections: Section[] = [
     closeAnimation: () => null,
     historique: true,
     closePrevious: true,
-    preload: ['./ext/pokesprite.png'],
+    preload: [`./images/iconsheet.webp`],
     fab: null,
     element: document.getElementById('chromatiques-ami')!
   }, {
@@ -117,7 +117,7 @@ const sections: Section[] = [
         originX = evt.clientX;
         originY = evt.clientY;
       } else {
-        const rect = document.querySelector(`.pkspr.pokemon[data-dexid="${data.dexid}"]`)!.getBoundingClientRect();
+        const rect = document.querySelector(`#pokedex .pkmnicon[data-dexid="${data.dexid}"]`)!.getBoundingClientRect();
         originX = rect.x;
         originY = rect.y;
       }

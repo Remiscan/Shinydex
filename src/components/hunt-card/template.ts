@@ -23,7 +23,7 @@ template.innerHTML = /*html*/`
   <fieldset class="game-method-inputs">
     <legend>Jeu et méthode</legend>
 
-    <span data-icon="jeu"></span>
+    <span data-icon="game"></span>
     <label for="jeu">Jeu :</label>
     <select name="jeu" id="jeu" required></select>
 
@@ -51,7 +51,7 @@ template.innerHTML = /*html*/`
     <input type="checkbox" name="charm" id="charm">
     <label for="charm">
       <span>
-        <span class="icones explain charm"></span>
+        <span class="icon" data-icon="key/shiny-charm"></span>
         Charme chroma possédé
       </span>
     </label>
@@ -179,77 +179,77 @@ template.innerHTML = /*html*/`
     <fieldset>
       <legend>Origine</legend>
 
-      <input type="radio" name="checkmark" id="checkmark-none" value="0" checked>
+      <input type="radio" name="checkmark" id="checkmark-none" value="old" checked>
       <label for="checkmark-none">Autre</label>
   
-      <input type="radio" name="checkmark" id="checkmark-paldea" value="9">
+      <input type="radio" name="checkmark" id="checkmark-paldea" value="paldea">
       <label for="checkmark-paldea">
         <span>
-          <span class="icones explain paldeaborn"></span>
+          <span class="icon" data-icon="origin-mark/paldea"></span>
           Paldea
         </span>
       </label>
   
-      <input type="radio" name="checkmark" id="checkmark-hisui" value="8">
+      <input type="radio" name="checkmark" id="checkmark-hisui" value="hisui">
       <label for="checkmark-hisui">
         <span>
-          <span class="icones explain hisuiborn"></span>
+          <span class="icon" data-icon="origin-mark/hisui"></span>
           Hisui
         </span>
       </label>
   
-      <input type="radio" name="checkmark" id="checkmark-bdsp" value="7">
+      <input type="radio" name="checkmark" id="checkmark-bdsp" value="sinnoh-gen8">
       <label for="checkmark-bdsp">
         <span>
-          <span class="icones explain bdspborn"></span>
+          <span class="icon" data-icon="origin-mark/sinnoh-gen8"></span>
           Sinnoh (DÉ/PS)
         </span>
       </label>
   
-      <input type="radio" name="checkmark" id="checkmark-galar" value="6">
+      <input type="radio" name="checkmark" id="checkmark-galar" value="galar">
       <label for="checkmark-galar">
         <span>
-          <span class="icones explain galarborn"></span>
+          <span class="icon" data-icon="origin-mark/galar"></span>
           Galar
         </span>
       </label>
   
-      <input type="radio" name="checkmark" id="checkmark-letsgo" value="4">
+      <input type="radio" name="checkmark" id="checkmark-letsgo" value="lets-go">
       <label for="checkmark-letsgo">
         <span>
-          <span class="icones explain letsgoborn"></span>
+          <span class="icon" data-icon="origin-mark/lets-go"></span>
           Kanto (Let's Go)
         </span>
       </label>
   
-      <input type="radio" name="checkmark" id="checkmark-alola" value="2">
+      <input type="radio" name="checkmark" id="checkmark-alola" value="clover">
       <label for="checkmark-alola">
         <span>
-          <span class="icones explain alolaborn"></span>
+          <span class="icon" data-icon="origin-mark/clover"></span>
           Alola
         </span>
       </label>
   
-      <input type="radio" name="checkmark" id="checkmark-kalos" value="1">
+      <input type="radio" name="checkmark" id="checkmark-kalos" value="pentagon">
       <label for="checkmark-kalos">
         <span>
-          <span class="icones explain kalosborn"></span>
+          <span class="icon" data-icon="origin-mark/pentagon"></span>
           Kalos
         </span>
       </label>
   
-      <input type="radio" name="checkmark" id="checkmark-vc" value="3">
+      <input type="radio" name="checkmark" id="checkmark-vc" value="game-boy">
       <label for="checkmark-vc">
         <span>
-          <span class="icones explain vcborn"></span>
+          <span class="icon" data-icon="origin-mark/game-boy"></span>
           Console Virtuelle
         </span>
       </label>
   
-      <input type="radio" name="checkmark" id="checkmark-go" value="5">
+      <input type="radio" name="checkmark" id="checkmark-go" value="go">
       <label for="checkmark-go">
         <span>
-          <span class="icones explain goborn"></span>
+          <span class="icon" data-icon="origin-mark/go"></span>
           Pokémon GO
         </span>
       </label>
@@ -264,7 +264,7 @@ template.innerHTML = /*html*/`
       <input type="radio" name="gene" id="gene-gigamax" value="gigamax">
       <label for="gene-gigamax">
         <span>
-          <span class="icones explain gigamax"></span>
+          <span class="icon" data-icon="gene/gigantamax"></span>
           Gigamax
         </span>
       </label>
@@ -272,7 +272,7 @@ template.innerHTML = /*html*/`
       <input type="radio" name="gene" id="gene-alpha" value="alpha">
       <label for="gene-alpha">
         <span>
-          <span class="icones explain alpha"></span>
+          <span class="icon" data-icon="gene/alpha"></span>
           Baron
         </span>
       </label>
@@ -282,22 +282,6 @@ template.innerHTML = /*html*/`
 
   <!-- Données de légitimité -->
   <div class="legality-data">
-    <input type="checkbox" name="horsChasse" id="horsChasse">
-    <label for="horsChasse">
-      <span>
-        <span class="icones explain lucky"></span>
-        Trouvé au hasard, sans le chasser
-      </span>
-    </label>
-
-    <input type="checkbox" name="DO" id="DO">
-    <label for="DO">
-      <span>
-        <span class="icones explain mine"></span>
-        <span class="egg">Œuf</span><span class="raid">Raid</span> trouvé dans mon jeu
-      </span>
-    </label>
-
     <fieldset>
       <legend>Légitimité du Pokémon</legend>
 

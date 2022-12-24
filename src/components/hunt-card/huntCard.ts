@@ -9,8 +9,6 @@ import template from './template.js';
 // @ts-expect-error
 import materialIconsSheet from '../../../ext/material_icons.css' assert { type: 'css' };
 // @ts-expect-error
-import pokespriteSheet from '../../../ext/pokesprite.css' assert { type: 'css' };
-// @ts-expect-error
 import iconSheet from '../../../images/iconsheet.css' assert { type: 'css' };
 // @ts-expect-error
 import commonSheet from '../../../styles/common.css' assert { type: 'css' };
@@ -71,7 +69,7 @@ export class huntCard extends HTMLElement {
     super();
     this.shadow = this.attachShadow({ mode: 'open' });
     this.shadow.appendChild(template.content.cloneNode(true));
-    this.shadow.adoptedStyleSheets = [materialIconsSheet, pokespriteSheet, iconSheet, commonSheet, sheet];
+    this.shadow.adoptedStyleSheets = [materialIconsSheet, iconSheet, commonSheet, sheet];
     this.genereJeux();
   }
 
@@ -206,14 +204,13 @@ export class huntCard extends HTMLElement {
 
         case 'checkmark':
         case 'hacked': {
-          const value = hunt[prop] as number;
+          const value = hunt[prop] as number | string;
           const input = this.shadow.querySelector(`input[name="${prop}"][value="${value}"]`) as HTMLInputElement;
           input.checked = true;
         } break;
 
         case 'charm':
-        case 'hacked':
-        case 'horsChasse': {
+        case 'hacked': {
           const value = hunt[prop] as boolean;
           input.checked = value;
         } break;
@@ -303,15 +300,17 @@ export class huntCard extends HTMLElement {
           Object.assign(hunt, { [prop]: value });
         } break;
 
-        case 'checkmark':
+        case 'checkmark': {
+          Object.assign(hunt, { [prop]: value as string });
+        } break;
+
         case 'hacked': {
           Object.assign(hunt, { [prop]: parseInt(value as string) });
         } break;
 
         case 'caught':
         case 'charm':
-        case 'hacked':
-        case 'horsChasse': {
+        case 'hacked': {
           const boolean = value === 'false' ? false : true;
           Object.assign(hunt, { [prop]: boolean });
         } break;
@@ -392,11 +391,24 @@ export class huntCard extends HTMLElement {
   async updateVisuals(_hunt?: Hunt) {
     const hunt = _hunt ?? (await this.getHunt());
     
-    // Icons
-    this.shadow.querySelector(`[data-icon="jeu"]`)!.className = `icones jeu ${hunt.jeu}`;
-    this.shadow.querySelector(`[data-icon="ball"]`)!.className = `pkspr item ball-${hunt.ball}`;
+    const gameIcon = this.shadow.querySelector(`[data-icon^="game"]`)!;
+    if (hunt.jeu) {
+      gameIcon.classList.add('icon');
+      gameIcon.setAttribute('data-icon', `game/${hunt.jeu}`);
+    } else {
+      gameIcon.classList.remove('icon');
+      gameIcon.setAttribute('data-icon', 'game');
+    }
 
-    // Pokémon sprite
+    const ballIcon = this.shadow.querySelector(`[data-icon^="ball"]`)!;
+    if (hunt.ball) {
+      ballIcon.classList.add('icon');
+      ballIcon.setAttribute('data-icon', `ball/${hunt.ball}`);
+    } else {
+      ballIcon.classList.remove('icon');
+      ballIcon.setAttribute('data-icon', 'ball');
+    }
+
     const sprite = this.shadow.querySelector('pokemon-sprite')!;
     sprite.setAttribute('dexid', String(hunt.dexid));
     sprite.setAttribute('forme', hunt.forme);

@@ -2,7 +2,7 @@ import '../../_common/components/input-switch/input-switch.js';
 import { Hunt } from './Hunt.js';
 import { setTheme } from './Params.js';
 import { populatableSection, populateHandler } from './appContent.js';
-import { appStart, checkUpdate, setOnlineBackup } from './appLifeCycle.js';
+import { appStart, checkUpdate } from './appLifeCycle.js';
 import './components/corbeille-card/corbeilleCard.js';
 import './components/hunt-card/huntCard.js';
 import './components/load-spinner/loadSpinner.js';
@@ -115,12 +115,6 @@ dataStorage.getItem('online-backup').then((value: boolean) => {
     box.checked = false;
   }
 });
-
-// Détecte le changement de paramètre de la sauvegarde en ligne
-{
-  const input = document.getElementById('switch-online-backup')! as HTMLInputElement;
-  input.addEventListener('change', () => setOnlineBackup(input.checked));
-}
 
 // Applique l'info sauvegardée au badge indiquant le succès / échec de la dernière synchronisation des BDD
 dataStorage.getItem('last-sync').then((value?: string) => {

@@ -145,7 +145,7 @@ export async function filterCards(section: filtrableSection, ids: string[] = [],
 
   if (section === 'mes-chromatiques') {
     // Filtre les icônes du Pokédex
-    const dexIcons = document.querySelectorAll('#pokedex .pkspr');
+    const dexIcons = document.querySelectorAll('#pokedex .pkmnicon');
     dexIcons.forEach(icon => {
       const id = Number(icon.getAttribute('data-dexid') ?? '0');
       if (dexids.includes(id)) icon.classList.add('got');

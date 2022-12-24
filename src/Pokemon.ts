@@ -1,5 +1,5 @@
 import { pad } from './Params.js';
-import { pokemonData } from './localForage.js';
+import { dataStorage, pokemonData } from './localForage.js';
 
 
 
@@ -7,7 +7,7 @@ type Jeu = {
   uid: string, // id de la version précise du jeu
   id: string, // id du jeu (incluant versions alternatives)
   gen: number, // numéro de la génération du jeu
-  originMark?: number, // numéro de la marque d'origine affichée sur les Pokémon capturés dans le jeu
+  originMark?: string, // numéro de la marque d'origine affichée sur les Pokémon capturés dans le jeu
 };
 
 const allGames: Jeu[] = [
@@ -31,25 +31,25 @@ const allGames: Jeu[] = [
   { uid: 'white', gen: 5, id: 'bw' },
   { uid: 'black2', gen: 5, id: 'bw2' },
   { uid: 'white2', gen: 5, id: 'bw2' },
-  { uid: 'x', gen: 6, id: 'xy', originMark: 1 },
-  { uid: 'y', gen: 6, id: 'xy', originMark: 1 },
-  { uid: 'omegaruby', gen: 6, id: 'oras', originMark: 1 },
-  { uid: 'alphasapphire', gen: 6, id: 'oras', originMark: 1 },
-  { uid: 'sun', gen: 7, id: 'sm', originMark: 2 },
-  { uid: 'moon', gen: 7, id: 'sm', originMark: 2 },
-  { uid: 'ultrasun', gen: 7, id: 'usum', originMark: 2 },
-  { uid: 'ultramoon', gen: 7, id: 'usum', originMark: 2 },
-  { uid: 'go', gen: 0, id: 'go', originMark: 5 },
-  { uid: 'letsgopikachu', gen: 7.1, id: 'lgpe', originMark: 4 },
-  { uid: 'letsgoeevee', gen: 7.1, id: 'lgpe', originMark: 4 },
-  { uid: 'sword', gen: 8, id: 'swsh', originMark: 6 },
-  { uid: 'shield', gen: 8, id: 'swsh', originMark: 6 },
+  { uid: 'x', gen: 6, id: 'xy', originMark: 'pentagon' },
+  { uid: 'y', gen: 6, id: 'xy', originMark: 'pentagon' },
+  { uid: 'omegaruby', gen: 6, id: 'oras', originMark: 'pentagon' },
+  { uid: 'alphasapphire', gen: 6, id: 'oras', originMark: 'pentagon' },
+  { uid: 'sun', gen: 7, id: 'sm', originMark: 'clover' },
+  { uid: 'moon', gen: 7, id: 'sm', originMark: 'clover' },
+  { uid: 'ultrasun', gen: 7, id: 'usum', originMark: 'clover' },
+  { uid: 'ultramoon', gen: 7, id: 'usum', originMark: 'clover' },
+  { uid: 'go', gen: 0, id: 'go', originMark: 'go' },
+  { uid: 'letsgopikachu', gen: 7.1, id: 'lgpe', originMark: 'lets-go' },
+  { uid: 'letsgoeevee', gen: 7.1, id: 'lgpe', originMark: 'lets-go' },
+  { uid: 'sword', gen: 8, id: 'swsh', originMark: 'galar' },
+  { uid: 'shield', gen: 8, id: 'swsh', originMark: 'galar' },
   { uid: 'home', gen: 8, id: 'home' },
-  { uid: 'brilliantdiamond', gen: 8, id: 'bdsp', originMark: 7 },
-  { uid: 'shiningpearl', gen: 8, id: 'bdsp', originMark: 7 },
-  { uid: 'legendsarceus', gen: 8.1, id: 'pla', originMark: 8 },
-  { uid: 'scarlet', gen: 9, id: 'sv', originMark: 9 },
-  { uid: 'violet', gen: 9, id: 'sv', originMark: 9 }
+  { uid: 'brilliantdiamond', gen: 8, id: 'bdsp', originMark: 'sinnoh-gen8' },
+  { uid: 'shiningpearl', gen: 8, id: 'bdsp', originMark: 'sinnoh-gen8' },
+  { uid: 'legendsarceus', gen: 8.1, id: 'pla', originMark: 'hisui' },
+  { uid: 'scarlet', gen: 9, id: 'sv', originMark: 'paldea' },
+  { uid: 'violet', gen: 9, id: 'sv', originMark: 'paldea' }
 ];
 
 
@@ -142,7 +142,6 @@ type nameLang = keyof backendPokemon['name'];
 interface backendShiny {
   id: number,
   huntid: string,
-  userid: string,
   lastUpdate: string,
   dexid: number,
   forme: string,
@@ -154,11 +153,9 @@ interface backendShiny {
   jeu: string,
   ball: string,
   notes: string,
-  checkmark: number,
-  DO: boolean,
+  checkmark: string,
   charm: boolean,
   hacked: number,
-  horsChasse: boolean,
 };
 
 /** Structure d'un Pokémon shiny tel que stocké dans la BDD locale. */
@@ -283,6 +280,33 @@ class Pokemon {
   static get generations() {
     return generations;
   }
+
+  /** Récupère les données de tous les Pokémon et leurs formes et les stocke dans indexedDB. */
+  static async initData() {
+    await dataStorage.ready();
+    const fileVersion = (await dataStorage.getItem('file-versions'))['./data/pokemon.json'];
+    const dataVersion = await dataStorage.getItem('pokemon-data-version');
+  
+    if (fileVersion === dataVersion) return;
+  
+    try {
+      // @ts-ignore
+      const pokemonDataModule = await import('../data/pokemon.json', { assert: { type: 'json' }});
+      // @ts-expect-error
+      const data = pokemonDataModule.default;
+  
+      console.log(`[:)] Préparation des données...`);
+      await pokemonData.ready();
+      await Promise.all(
+        data.map((pkmn: backendPokemon) => pokemonData.setItem(String(pkmn.dexid), pkmn))
+      );
+      await dataStorage.setItem('pokemon-data-version', fileVersion);
+      console.log(`[:)] Préparation des données terminée !`);
+    } catch (error) {
+      console.error(error);
+      throw Error(`[:()] Préparation des données échouée.`);
+    }
+  }
 }
 
 
@@ -290,7 +314,6 @@ class Pokemon {
 class Shiny implements frontendShiny {
   // frontendShiny fields
   huntid: string = '';
-  userid: string = '';
   lastUpdate: number = NaN;
   dexid: number = NaN;
   forme: string = '';
@@ -302,11 +325,9 @@ class Shiny implements frontendShiny {
   jeu: string = '';
   ball: string = '';
   notes: string = '';
-  checkmark: number = NaN;
-  DO: boolean = false;
+  checkmark: string = '';
   charm: boolean = false;
   hacked: number = NaN;
-  horsChasse: boolean = false;
 
   // additional fields
   deleted: boolean = false;
@@ -374,15 +395,14 @@ class Shiny implements frontendShiny {
     else return false;
   }
 
-  get originMark(): number {
-    if (this.hacked) return 0; // Hacked Pokémon don't deserve an origin mark
+  get originMark(): string {
+    if (this.hacked) return ''; // Hacked Pokémon don't deserve an origin mark
     if (!this.mine) return this.checkmark; // Traded Pokémon can have been born on earlier games
 
     const jeu = this.Jeu;
     if (jeu.gen === 1 || jeu.gen === 2) return this.checkmark; // gen 1 & 2 games could come from 3DS Virtual Console
-    if (jeu.originMark) return jeu.originMark;
-
-    return 0;
+    else if (jeu.originMark) return jeu.originMark;
+    else return 'old';
   }
 
   /**

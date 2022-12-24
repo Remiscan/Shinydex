@@ -1,10 +1,9 @@
 import { Params, loadAllImages, setTheme, timestamp2date, wait } from './Params.js';
-import { Pokemon, backendPokemon } from './Pokemon.js';
+import { Pokemon } from './Pokemon.js';
 import { initPokedex, populateHandler } from './appContent.js';
 import { initFiltres } from './filtres.js';
 import { dataStorage, huntStorage, pokemonData, shinyStorage } from './localForage.js';
 import { Notif } from './notification.js';
-import { backgroundSync } from './syncBackup.js';
 import { upgradeStorage } from './upgradeStorage.js';
 
 
@@ -88,36 +87,6 @@ async function initServiceWorker() {
 
 
 
-//////////////////////////////////////////////////////////////////////
-// On récupère les données des Pokémon et on les stocke dans indexedDB
-async function initPokemonData() {
-  await dataStorage.ready();
-  const fileVersion = (await dataStorage.getItem('file-versions'))['./data/pokemon.json'];
-  const dataVersion = await dataStorage.getItem('pokemon-data-version');
-
-  if (fileVersion === dataVersion) return;
-
-  try {
-    // @ts-ignore
-    const pokemonDataModule = await import('../data/pokemon.json', { assert: { type: 'json' }});
-    // @ts-expect-error
-    const data = pokemonDataModule.default;
-
-    console.log(`[:)] Préparation des données...`);
-    await pokemonData.ready();
-    await Promise.all(
-      data.map((pkmn: backendPokemon) => pokemonData.setItem(String(pkmn.dexid), pkmn))
-    );
-    await dataStorage.setItem('pokemon-data-version', fileVersion);
-    console.log(`[:)] Préparation des données terminée !`);
-  } catch (error) {
-    console.error(error);
-    throw Error(`[:()] Préparation des données échouée.`);
-  }
-}
-
-
-
 /////////////////////////////////////////////////////////
 // Démarre l'application (update? => populate => display)
 export async function appStart() {
@@ -142,8 +111,7 @@ export async function appStart() {
   const cacheVersion = Math.max(...Object.values(installedFiles).map(v => Number(v)));
 
   // On vérifie si les fichiers sont installés
-  const cacheKeys = (await caches.keys()).filter(e => e.includes(`remidex-sw-${cacheVersion}`));
-  const filesInstalled = cacheKeys.length >= 1;
+  const filesInstalled = await caches.has(`remidex-sw-${cacheVersion}`);
 
   // On vérifie si le service worker est prêt
   const serviceWorkerReady = navigator.serviceWorker.controller != null;
@@ -194,17 +162,14 @@ export async function appStart() {
 
   logPerf('Étape 4');
 
-  // Si des shiny marqués à 'destroy' sont stockés depuis plus d'un mois, on les supprime
-  const shinyKeys = await shinyStorage.keys();
-  const shinyMons = await Promise.all(
-    shinyKeys.map(key => shinyStorage.getItem(key))
-  );
+  // Si des shiny marqués à 'destroy' sont stockés depuis plus d'un mois, on les supprime (sans await)
   const month = 1000 * 60 * 60 * 24 * 30;
-  const toDestroy = shinyMons.filter(shiny => shiny.destroy === true && shiny.lastUpdate + month < Date.now());
-  await Promise.all(
-    toDestroy.map(shiny => shiny.huntid)
-             .map(huntid => shinyStorage.removeItem(huntid))
-  );
+  shinyStorage.keys()
+  .then(keys => Promise.all(keys.map(key => shinyStorage.getItem(key))))
+  .then(shinyMons => Promise.all(
+    shinyMons.filter(shiny => shiny.destroy === true && shiny.lastUpdate + month < Date.now())
+             .map(shiny => shinyStorage.removeItem(shiny.huntid))
+  ));
 
   // On met à jour la structure de la BDD locale si nécessaire
   try {
@@ -223,10 +188,10 @@ export async function appStart() {
   logPerf('Étape 5');
 
   try {
-    await initPokemonData();
+    await Pokemon.initData();
     logPerf('initPokemonData');
-    Pokemon.names(); // met en cache les noms des Pokémon (pas besoin d'attendre la fin)
-    initPokedex();
+    await Pokemon.names(); // met en cache les noms des Pokémon
+    await initPokedex();
     logPerf('initPokedex');
     await initFiltres();
     logPerf('initFiltres');
@@ -268,7 +233,7 @@ export async function appStart() {
 
   // On pré-charge les icônes
   try {
-    await loadAllImages([`./ext/pokesprite.png`]);
+    await loadAllImages([`./images/iconsheet.webp`, `./images/pokemonsheet.webp`]);
   } catch (error) {
     console.error(`Erreur de chargement d'image`, error);
   }
@@ -423,19 +388,4 @@ function checkInstall() {
   window.addEventListener('appinstalled', e => {
     console.log('[app] Installation terminée !');
   });
-}
-
-
-
-/////////////////////////////////////////////////////////
-// Change le paramètre de sauvegarde des données en ligne
-export async function setOnlineBackup(checked: boolean): Promise<void> {
-  if (checked) {
-    document.getElementById('parametres')!.dataset.onlineBackup = '1';
-    await dataStorage.setItem('online-backup', 1);
-    await backgroundSync();
-  } else {
-    document.getElementById('parametres')!.removeAttribute('data-online-backup');
-    await dataStorage.setItem('online-backup', 0);
-  }
 }

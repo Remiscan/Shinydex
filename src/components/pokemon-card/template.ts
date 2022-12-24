@@ -29,9 +29,6 @@ template.innerHTML = /*html*/`
 
   <div class="pokemon-icones">
     <span data-type="checkmark"></span>
-    <span data-type="do"></span>
-    <span data-type="horsChasse"></span>
-    <span data-type="hacked"></span>
 
     <span class="spacer"></span>
     
