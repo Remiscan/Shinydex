@@ -1,5 +1,5 @@
-import { pad, Params, wait } from '../../Params.js';
-import { Forme } from '../../Pokemon.js';
+import { pad, wait } from '../../Params.js';
+import { Forme, Pokemon } from '../../Pokemon.js';
 import { pokemonData } from '../../localForage.js';
 // @ts-expect-error
 import sheet from './styles.css' assert { type: 'css' };
@@ -8,6 +8,8 @@ import template from './template.js';
 
 
 export default class pokemonSprite extends HTMLElement {
+  static supportedSizes = [112, 512];
+  
   shadow: ShadowRoot;
   params: { [key: string]: number | string | boolean } = {
     dexid: 0,
@@ -18,7 +20,6 @@ export default class pokemonSprite extends HTMLElement {
     backside: false,
     shiny: false,
     size: 112,
-    format: Params.preferredImageFormat,
     lazy: true
   };
   lastChange: number = 0;
@@ -117,6 +118,8 @@ export default class pokemonSprite extends HTMLElement {
     if (currentChange === this.lastChange) {
       img.loading = this.params.lazy ? 'lazy' : 'eager';
       img.src = url;
+      const name = (await Pokemon.names())[Number(this.params.dexid)];
+      img.setAttribute('alt', `${name}${this.params.shiny ? ' chromatique' : ''}`);
     }
     return;
   }
@@ -126,6 +129,8 @@ export default class pokemonSprite extends HTMLElement {
   async getSpriteUrl(params = this.params): Promise<string> {
     const pkmn = await pokemonData.getItem(String(params.dexid));
     const forme = pkmn?.formes.find((form: Forme) => form.dbid === params.forme) || pkmn?.formes[0];
+
+    const basePath = '/shinydex/images/pokemon-sprites/webp';
 
     try {
       if (!forme) throw 'no-form';
@@ -150,17 +155,22 @@ export default class pokemonSprite extends HTMLElement {
         );
         return await this.getSpriteUrl(newParams);
       } else {
-        return `/shinydex/pokemon-sprite-${spriteCaracs.join('_')}-${this.spriteSize}.${this.params.format}`;
+        return `${basePath}/${this.spriteSize}/poke_capture_${spriteCaracs.join('_')}.webp`;
       }
     } catch {
-      return `/shinydex/pokemon-sprite-0000_000_uk_n_00000000_f_n-${this.spriteSize}.${this.params.format}`;
+      return `${basePath}/${this.spriteSize}/poke_capture_0000_000_uk_n_00000000_f_n-${this.spriteSize}.webp`;
     }
   }
 
 
   /** Taille du sprite (limitée par la taille originale de l'image). */
   get spriteSize() {
-    return Math.max(1, Math.min(this.params.size as number, 512));
+    const supportedSizes = pokemonSprite.supportedSizes.sort().reverse();
+    let bestSize;
+    for (const size of supportedSizes) {
+      if (this.params.size <= size) bestSize = size;
+    }
+    return bestSize ?? Math.max(1, Math.min(this.params.size as number, 512));
   }
 
 

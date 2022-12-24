@@ -31,7 +31,6 @@ export const Params = {
   easingAccelerate: 'cubic-bezier(0.4, 0.0, 1, 1)',
 
   spriteSize: 112,
-  preferredImageFormat: <'webp' | 'png'> 'png',
 
   userUUID: ''
 };
@@ -85,33 +84,6 @@ export function pad(s: string, long: number): string {
   while (chaine.length < long)
     chaine = `0${chaine}`;
   return chaine;
-}
-
-
-/////////////////////////////////////////////////////////////////////////
-// Vérifie si les images au format webp sont supportées par le navigateur
-export async function webpSupport(): Promise<boolean> {
-  const features = [
-    'UklGRiIAAABXRUJQVlA4IBYAAAAwAQCdASoBAAEADsD+JaQAA3AAAAAA', // lossy
-    'UklGRkoAAABXRUJQVlA4WAoAAAAQAAAAAAAAAAAAQUxQSAwAAAARBxAR/Q9ERP8DAABWUDggGAAAABQBAJ0BKgEAAQAAAP4AAA3AAP7mtQAAAA==' // alpha
-  ];
-  
-  const results = await Promise.all(features.map(feature => {
-    return new Promise(resolve => {
-      const img = new Image();
-      
-      img.onload = function() {
-        const result = (img.width > 0) && (img.height > 0);
-        resolve(result);
-      }
-      
-      img.onerror = function() { resolve(false); }
-      
-      img.src = 'data:image/webp;base64,' + feature;
-    });
-  }));
-  
-  return results.every(r => r === true);
 }
 
 

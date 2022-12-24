@@ -1,4 +1,4 @@
-import { Params, loadAllImages, setTheme, timestamp2date, wait, webpSupport } from './Params.js';
+import { Params, loadAllImages, setTheme, timestamp2date, wait } from './Params.js';
 import { Pokemon, backendPokemon } from './Pokemon.js';
 import { initPokedex, populateHandler } from './appContent.js';
 import { initFiltres } from './filtres.js';
@@ -135,9 +135,6 @@ export async function appStart() {
   // ÉTAPE 1 : on vérifie si l'application est installée localement
 
   logPerf('Étape 1');
-
-  // On initialise supportsWebp
-  if (await webpSupport()) Params.preferredImageFormat = 'webp';
 
   // On vérifie si les données sont installées
   await Promise.all([dataStorage.ready(), shinyStorage.ready(), pokemonData.ready(), huntStorage.ready()]);
