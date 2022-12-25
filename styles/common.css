@@ -206,8 +206,8 @@ input[type=checkbox] + label::after {
   width: 8px;
   height: 14px;
   box-sizing: border-box;
-  border-right: 3px solid var(--checkbox-check-color);
-  border-bottom: 3px solid var(--checkbox-check-color);
+  border-right: 3px solid var(--radio-check-color);
+  border-bottom: 3px solid var(--radio-check-color);
   transform: translateY(-2px) rotate(45deg);
 }
 
