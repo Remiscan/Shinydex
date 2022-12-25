@@ -24,13 +24,6 @@
         "reveal": "silent"
       }
     }, {
-      "type": "deno",
-      "command": "run",
-      "args": [
-        "--allow-run", "--allow-read", "--allow-env", "--allow-sys", "build/test.ts"
-      ],
-      "label": "run tests with mocha"
-    }, {
       "type": "shell",
       "command": "sudo php build/webp-pokemon-sprites.php",
       "label": "build .webp Pokémon sprites"
@@ -46,6 +39,10 @@
       "type": "shell",
       "command": "sudo php build/pokemon-data.php",
       "label": "build Pokémon data JSON"
+    }, {
+      "type": "shell",
+      "command": "bash -ic deno --version",
+      "label": "test deno in task"
     }
   ]
 }
