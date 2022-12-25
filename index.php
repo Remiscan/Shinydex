@@ -61,8 +61,9 @@
     <link rel="stylesheet" href="./ext/material_icons.css">
     <link rel="stylesheet" href="./images/pokemonsheet.css">
     <link rel="stylesheet" href="./images/iconsheet.css">
+    <link rel="stylesheet" href="./styles/themes.css.php">
     <link rel="stylesheet" href="./styles/common.css">
-    <link rel="stylesheet" href="./styles/app.css.php">
+    <link rel="stylesheet" href="./styles/app.css">
   </head>
 
   <body data-section-actuelle="mes-chromatiques">
