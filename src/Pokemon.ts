@@ -468,7 +468,7 @@ class Shiny implements frontendShiny {
         return 1;
       
       case 'masuda': {
-        bonusRolls = (game.gen >= 5) ? 5 : 4;
+        bonusRolls = (game.gen >= 8) ? 6 : (game.gen >= 5) ? 5 : 4;
         break;
       }
       
@@ -611,6 +611,10 @@ class Shiny implements frontendShiny {
         bonusRolls += sparklingPower;
       } break;
     }
+
+    if (game.gen >= 8 && ['egg', 'masuda'].includes(methode.id)) {
+      // If any other bonus is applied, skip the first shiny roll
+      if (charmRolls || bonusRolls) bonusRolls--;
     }
 
     rolls += charmRolls + bonusRolls;
