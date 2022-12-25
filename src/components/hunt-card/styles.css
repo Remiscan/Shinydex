@@ -4,9 +4,9 @@ form:not(.caught) .confirm-buttons ~ * {
   display: none;
 }
 
-:host(:not([data-jeu="pla"])) .pla-inputs,
-:host(:not([data-jeu="lgpe"])) .lgpe-inputs,
-:host(:not([data-jeu="usum"])) .usum-inputs {
+:host [data-jeu],
+:host(:not([data-gen-vc="true"]):not([data-methode-mine="false"])) [data-checkmark-unsure],
+:host(:not([data-charm-available="true"])) :is([name="charm"], [for="charm"]) {
   display: none;
 }
 

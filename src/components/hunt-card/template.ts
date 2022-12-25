@@ -59,7 +59,7 @@ template.innerHTML = /*html*/`
 
 
   <!-- Bonus de Legends Arceus (PLA) -->
-  <div class="pla-inputs">
+  <div class="pla-inputs" data-jeu="pla">
     <fieldset>
       <legend>Niveau de recherche de la page du Pokédex</legend>
 
@@ -82,14 +82,14 @@ template.innerHTML = /*html*/`
 
 
   <!-- Bonus de Let's Go Pikachu / Évoli (LGPE) -->
-  <div class="lgpe-inputs">
+  <div class="lgpe-inputs" data-jeu="lgpe">
     <input type="checkbox" name="lgpe-lure" id="lgpe-lure">
     <label for="lpge-lure">Parfum utilisé</label>
   </div>
 
 
   <!-- Bonus de Ultra Soleil / Lune (USUM) -->
-  <div class="usum-inputs">
+  <div class="usum-inputs" data-jeu="usum">
     <label for="usum-distance">Distance</label>
     <input type="text" name="usum-distance" id="usum-distance" inputmode="numeric" pattern="[0-9]*" value="0">
 
@@ -137,27 +137,27 @@ template.innerHTML = /*html*/`
       <option value="repeat">Bis Ball</option>
       <option value="timer">Chrono Ball</option>
       <option value="friend">Copain Ball</option>
-      <option value="wing">Envol Ball de Hisui</option>
+      <option value="wing" data-jeu="pla">Envol Ball de Hisui</option>
       <option value="nest">Faiblo Ball</option>
       <option value="net">Filet Ball</option>
-      <option value="gigaton">Gigamasse Ball de Hisui</option>
+      <option value="gigaton" data-jeu="pla">Gigamasse Ball de Hisui</option>
       <option value="premier">Honor Ball</option>
       <option value="ultra">Hyper Ball</option>
-      <option value="hisuian-ultra">Hyper Ball de Hisui</option>
+      <option value="hisuian-ultra" data-jeu="pla">Hyper Ball de Hisui</option>
       <option value="love">Love Ball</option>
       <option value="moon">Lune Ball</option>
       <option value="luxury">Luxe Ball</option>
       <option value="heavy">Masse Ball</option>
-      <option value="hisuian-heavy">Masse Ball de Hisui</option>
+      <option value="hisuian-heavy" data-jeu="pla">Masse Ball de Hisui</option>
       <option value="master">Master Ball</option>
-      <option value="leaden">Mégamasse Ball de Hisui</option>
+      <option value="leaden" data-jeu="pla">Mégamasse Ball de Hisui</option>
       <option value="cherish">Mémoire Ball</option>
       <option value="level">Niveau Ball</option>
-      <option value="origin">Origine Ball de Hisui</option>
-      <option value="feather">Plume Ball de Hisui</option>
+      <option value="origin" data-jeu="pla">Origine Ball de Hisui</option>
+      <option value="feather" data-jeu="pla">Plume Ball de Hisui</option>
       <option value="poke" selected>Poké Ball</option>
-      <option value="hisuian-poke">Poké Ball de Hisui</option>
-      <option value="jet">Propulse Ball de Hisui</option>
+      <option value="hisuian-poke" data-jeu="pla">Poké Ball de Hisui</option>
+      <option value="jet" data-jeu="pla">Propulse Ball de Hisui</option>
       <option value="quick">Rapide Ball</option>
       <option value="dream">Rêve Ball</option>
       <option value="safari">Safari Ball</option>
@@ -167,7 +167,7 @@ template.innerHTML = /*html*/`
       <option value="fast">Speed Ball</option>
       <option value="sport">Sport Ball</option>
       <option value="great">Super Ball</option>
-      <option value="hisuian-great">Super Ball de Hisui</option>
+      <option value="hisuian-great" data-jeu="pla">Super Ball de Hisui</option>
       <option value="beast">Ultra Ball</option>
       <option value="strange">Étrange Ball</option>
     </select>
@@ -175,79 +175,79 @@ template.innerHTML = /*html*/`
 
 
   <!-- Origine -->
-  <div class="pokemon-data">
+  <div class="pokemon-data" data-checkmark-unsure>
     <fieldset>
       <legend>Origine</legend>
 
       <input type="radio" name="checkmark" id="checkmark-none" value="old" checked>
       <label for="checkmark-none">Autre</label>
   
-      <input type="radio" name="checkmark" id="checkmark-paldea" value="paldea">
-      <label for="checkmark-paldea">
+      <input type="radio" name="checkmark" id="checkmark-paldea" value="paldea" data-jeu="sv">
+      <label for="checkmark-paldea" data-jeu="sv">
         <span>
           <span class="icon" data-icon="origin-mark/paldea"></span>
           Paldea
         </span>
       </label>
   
-      <input type="radio" name="checkmark" id="checkmark-hisui" value="hisui">
-      <label for="checkmark-hisui">
+      <input type="radio" name="checkmark" id="checkmark-hisui" value="hisui" data-jeu="pla">
+      <label for="checkmark-hisui" data-jeu="pla">
         <span>
           <span class="icon" data-icon="origin-mark/hisui"></span>
           Hisui
         </span>
       </label>
   
-      <input type="radio" name="checkmark" id="checkmark-bdsp" value="sinnoh-gen8">
-      <label for="checkmark-bdsp">
+      <input type="radio" name="checkmark" id="checkmark-bdsp" value="sinnoh-gen8" data-jeu="bdsp">
+      <label for="checkmark-bdsp" data-jeu="bdsp">
         <span>
           <span class="icon" data-icon="origin-mark/sinnoh-gen8"></span>
           Sinnoh (DÉ/PS)
         </span>
       </label>
   
-      <input type="radio" name="checkmark" id="checkmark-galar" value="galar">
-      <label for="checkmark-galar">
+      <input type="radio" name="checkmark" id="checkmark-galar" value="galar" data-jeu="swsh">
+      <label for="checkmark-galar" data-jeu="swsh">
         <span>
           <span class="icon" data-icon="origin-mark/galar"></span>
           Galar
         </span>
       </label>
   
-      <input type="radio" name="checkmark" id="checkmark-letsgo" value="lets-go">
-      <label for="checkmark-letsgo">
+      <input type="radio" name="checkmark" id="checkmark-letsgo" value="lets-go" data-jeu="lgpe">
+      <label for="checkmark-letsgo" data-jeu="lgpe">
         <span>
           <span class="icon" data-icon="origin-mark/lets-go"></span>
           Kanto (Let's Go)
         </span>
       </label>
   
-      <input type="radio" name="checkmark" id="checkmark-alola" value="clover">
-      <label for="checkmark-alola">
+      <input type="radio" name="checkmark" id="checkmark-alola" value="clover" data-jeu="sm usum">
+      <label for="checkmark-alola" data-jeu="sm usum">
         <span>
           <span class="icon" data-icon="origin-mark/clover"></span>
           Alola
         </span>
       </label>
   
-      <input type="radio" name="checkmark" id="checkmark-kalos" value="pentagon">
-      <label for="checkmark-kalos">
+      <input type="radio" name="checkmark" id="checkmark-kalos" value="pentagon" data-jeu="xy oras">
+      <label for="checkmark-kalos" data-jeu="xy oras">
         <span>
           <span class="icon" data-icon="origin-mark/pentagon"></span>
           Kalos
         </span>
       </label>
   
-      <input type="radio" name="checkmark" id="checkmark-vc" value="game-boy">
-      <label for="checkmark-vc">
+      <input type="radio" name="checkmark" id="checkmark-vc" value="game-boy" data-jeu="rb yellow gs crystal">
+      <label for="checkmark-vc" data-jeu="rb yellow gs crystal">
         <span>
           <span class="icon" data-icon="origin-mark/game-boy"></span>
           Console Virtuelle
         </span>
       </label>
   
-      <input type="radio" name="checkmark" id="checkmark-go" value="go">
-      <label for="checkmark-go">
+      <input type="radio" name="checkmark" id="checkmark-go" value="go" data-jeu="go">
+      <label for="checkmark-go" data-jeu="go">
         <span>
           <span class="icon" data-icon="origin-mark/go"></span>
           Pokémon GO
@@ -255,22 +255,22 @@ template.innerHTML = /*html*/`
       </label>
     </fieldset>
 
-    <fieldset>
+    <fieldset data-jeu="swsh pla">
       <legend>Gène</legend>
 
       <input type="radio" name="gene" id="gene-none" value="0" checked>
       <label for="gene-none">Aucun</label>
 
-      <input type="radio" name="gene" id="gene-gigamax" value="gigamax">
-      <label for="gene-gigamax">
+      <input type="radio" name="gene" id="gene-gigamax" value="gigamax" data-jeu="swsh">
+      <label for="gene-gigamax" data-jeu="swsh">
         <span>
           <span class="icon" data-icon="gene/gigantamax"></span>
           Gigamax
         </span>
       </label>
 
-      <input type="radio" name="gene" id="gene-alpha" value="alpha">
-      <label for="gene-alpha">
+      <input type="radio" name="gene" id="gene-alpha" value="alpha" data-jeu="pla">
+      <label for="gene-alpha" data-jeu="pla">
         <span>
           <span class="icon" data-icon="gene/alpha"></span>
           Baron

@@ -21,6 +21,14 @@ import methodStrings from '../../../strings/methods.json' assert { type: 'json' 
 
 
 
+const gameIds: Set<string> = new Set(Pokemon.jeux.map(jeu => jeu.id));
+const gameSpecificSheet = new CSSStyleSheet();
+gameSpecificSheet.replaceSync(
+  [...gameIds].map(id => `:host([data-jeu="${id}"]) [data-jeu~="${id}"] { display: revert; }`).join('')
+);
+
+
+
 interface HuntUpdateEvent extends CustomEvent {
   detail: {
     shiny: huntedPokemon;
@@ -69,7 +77,7 @@ export class huntCard extends HTMLElement {
     super();
     this.shadow = this.attachShadow({ mode: 'open' });
     this.shadow.appendChild(template.content.cloneNode(true));
-    this.shadow.adoptedStyleSheets = [materialIconsSheet, iconSheet, commonSheet, sheet];
+    this.shadow.adoptedStyleSheets = [materialIconsSheet, iconSheet, commonSheet, sheet, gameSpecificSheet];
     this.genereJeux();
   }
 
@@ -183,8 +191,7 @@ export class huntCard extends HTMLElement {
         case 'jeu': {
           const value = hunt.jeu;
           input.value = value;
-          this.genereMethodes(value);
-          this.updateAttribute('methode', value);
+          this.updateAttribute('jeu', value);
         } break;
 
         case 'methode': {
@@ -426,9 +433,13 @@ export class huntCard extends HTMLElement {
       } break;
 
       case 'jeu': {
-        const jeu = Pokemon.jeux.find(jeu => jeu.uid === value)?.id ?? '';
-        this.setAttribute('data-jeu', jeu);
-      }
+        const jeu = Pokemon.jeux.find(jeu => jeu.uid === value);
+        this.setAttribute('data-jeu', jeu?.id ?? '');
+        const charmAvailable = jeu ? jeu.gen >= 5 : false;
+        this.setAttribute('data-charm-available', String(charmAvailable));
+        const virtualconsoleGen = jeu ? (jeu.gen === 1 || jeu.gen === 2) : false;
+        this.setAttribute('data-gen-vc', String(virtualconsoleGen));
+      } break;
     }
   }
 
