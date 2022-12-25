@@ -679,13 +679,12 @@ body:not([data-section-actuelle="pokedex"]) .only-pokedex {
   box-sizing: border-box;
   border-radius: 10px;
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14);
-  padding: 5px 0;
+  padding: 10px;
   background-color: var(--card-bg-color);
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 44px);
   gap: 10px;
-  justify-content: center;
+  justify-content: space-evenly;
   align-items: flex-start;
 }
 
@@ -700,9 +699,12 @@ body:not([data-section-actuelle="pokedex"]) .only-pokedex {
   border-radius: 0;
   padding: 0;
   box-shadow: none;
-
   position: relative;
   margin: 0;
+}
+
+.pkmnicon:not(.got) {
+  filter: grayscale(1);
 }
 
 .pokedex-gen > .pkmnicon:focus,
