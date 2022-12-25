@@ -109,22 +109,22 @@
     <main>
 
       <!-- Mes chromatiques -->
-      <section id="mes-chromatiques" class="vide">
+      <section id="mes-chromatiques" class="vide loading">
         <?php include './pages/mes-chromatiques.html'; ?>
       </section>
 
       <!-- Pokédex chromatique -->
-      <section id="pokedex">
+      <section id="pokedex" class="loading">
         <?php include './pages/pokedex.html'; ?>
       </section>
 
       <!-- Chasses en cours -->
-      <section id="chasses-en-cours" class="vide">
+      <section id="chasses-en-cours" class="vide loading">
         <?php include './pages/chasses-en-cours.html'; ?>
       </section>
 
       <!-- Corbeille -->
-      <section id="corbeille" class="vide">
+      <section id="corbeille" class="vide loading">
         <?php include './pages/corbeille.html'; ?>
       </section>
 

@@ -373,6 +373,10 @@ body[data-section-actuelle~="obfuscator"] .section-contenu {
   overflow-y: hidden;
 }
 
+section.loading .compteur {
+  display: none;
+}
+
 
 /*
  * FAB
@@ -412,11 +416,22 @@ body[data-section-actuelle~="obfuscator"] .section-contenu {
   transition: transform .15s var(--easing-decelerate);
 }
 
-body[data-section-actuelle~="mes-chromatiques"] .fab,
-body[data-section-actuelle~="pokedex"] .fab,
-body[data-section-actuelle~="chasses-en-cours"]:not([data-section-actuelle~="corbeille"]) .fab,
-body[data-section-actuelle~="partage"] .fab {
-  display: flex;
+@supports (selector(:has(*))) {
+  body[data-section-actuelle~="mes-chromatiques"]:has(#mes-chromatiques:not(.loading)) .fab,
+  body[data-section-actuelle~="pokedex"]:has(#pokedex:not(.loading)) .fab,
+  body[data-section-actuelle~="chasses-en-cours"]:not([data-section-actuelle~="corbeille"]):has(#chasses-en-cours:not(.loading)) .fab,
+  body[data-section-actuelle~="partage"]:has(#partage:not(.loading)) .fab {
+    display: flex;
+  }
+}
+
+@supports not (selector(:has(*))) {
+  body[data-section-actuelle~="mes-chromatiques"] .fab,
+  body[data-section-actuelle~="pokedex"] .fab,
+  body[data-section-actuelle~="chasses-en-cours"]:not([data-section-actuelle~="corbeille"]) .fab,
+  body[data-section-actuelle~="partage"] .fab {
+    display: flex;
+  }
 }
 
 #mes-chromatiques > .section-contenu,
@@ -511,7 +526,16 @@ section:not(.vide) .message-vide {
   display: none;
 }
 
-section.vide .defer-loader {
+.section-loader {
+  margin: auto;
+}
+
+section:not(.loading) .section-loader {
+  display: none;
+}
+
+section.loading .message-vide-filtres,
+section.loading .message-vide {
   display: none;
 }
 

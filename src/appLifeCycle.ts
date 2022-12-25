@@ -1,6 +1,6 @@
 import { Params, loadAllImages, setTheme, timestamp2date, wait } from './Params.js';
 import { Pokemon } from './Pokemon.js';
-import { initPokedex, populateHandler } from './appContent.js';
+import { initPokedex, populatableSection, populateHandler } from './appContent.js';
 import { initFiltres } from './filtres.js';
 import { dataStorage, huntStorage, pokemonData, shinyStorage } from './localForage.js';
 import { Notif } from './notification.js';
@@ -62,6 +62,7 @@ async function initServiceWorker() {
 
         if (newWorker.state == 'installed') {
           console.log('[sw] Service worker mis à jour');
+          document.getElementById('notification')!.classList.remove('installing');
           
           const updateNotif = new Notif('Mise à jour installée', 'Actualiser', 'update', Notif.maxDelay, updateHandler);
           const userActed = await updateNotif.prompt();
@@ -189,19 +190,24 @@ export async function appStart() {
 
   try {
     await Pokemon.initData();
-    logPerf('initPokemonData');
     await Pokemon.names(); // met en cache les noms des Pokémon
+    logPerf('initPokemonData');
+
     await initPokedex();
     logPerf('initPokedex');
+
     await initFiltres();
     logPerf('initFiltres');
     document.querySelector('search-bar')?.setAttribute('section', 'mes-chromatiques');
-    await populateHandler('mes-chromatiques');
-    logPerf('populateHandler("mes-chromatiques")');
-    await populateHandler('chasses-en-cours');
-    logPerf('populateHandler("chasses-en-cours")');
-    await populateHandler('corbeille');
-    logPerf('populateHandler("corbeille")');
+
+    await Promise.all(['mes-chromatiques', 'chasses-en-cours', 'corbeille'].map(async section => {
+      await populateHandler(section as populatableSection);
+      document.querySelector(`#${section}`)?.classList.remove('loading');
+      if (section === 'mes-chromatiques') {
+        document.querySelector(`#pokedex`)?.classList.remove('loading');
+      }
+    }));
+
     // await initAmis();
   } catch (error) {
     console.error(error);
@@ -303,6 +309,7 @@ export async function checkUpdate(checkNotification = false) {
     if (userActed) {
       updateNotif.priorite = true;
       updateNotif.duree = Notif.maxDelay;
+      document.getElementById('notification')!.classList.add('installing');
     }
   };
 
