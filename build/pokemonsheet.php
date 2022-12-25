@@ -3,7 +3,7 @@ require_once __DIR__.'/../backend/class_Pokemon.php';
 
 
 
-function buildPokemonSheet(int $columns = 32, int $spriteSize = 56, string $format = 'webp', bool $logs = true) {
+function buildPokemonSheet(int $columns = 32, int $spriteSize = 44, string $format = 'webp', bool $logs = true) {
   // Get Pokémon data
   $spriteFiles = scandir(__DIR__.'/../images/pokemon-sprites/home');
   $pokemons = [];
@@ -31,7 +31,7 @@ function buildPokemonSheet(int $columns = 32, int $spriteSize = 56, string $form
   }
 
   // Initialize CSS file
-  file_put_contents($cssPath, ".pkmnicon {background-image: var(--link-pokemonsheet);background-repeat: no-repeat;display: inline-block;width:56px;height:56px}");
+  file_put_contents($cssPath, ".pkmnicon{background-image: var(--link-pokemonsheet);background-repeat: no-repeat;display: inline-block;width:{$spriteSize}px;height:{$spriteSize}px}");
 
   // Initialize preview file
   file_put_contents($previewPath, <<<preview
@@ -156,7 +156,7 @@ function buildPokemonSheet(int $columns = 32, int $spriteSize = 56, string $form
 
   switch ($format) {
     case 'webp':
-      imagewebp($sheet, $imagePath, 90);
+      imagewebp($sheet, $imagePath, 80);
       break;
     case 'png':
     default:
