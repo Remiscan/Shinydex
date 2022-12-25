@@ -47,7 +47,9 @@ template.innerHTML = /*html*/`
 
 
   <!-- Bonus globaux -->
-  <div class="bonus-inputs">
+  <fieldset>
+    <legend>Bonus globaux</legend>
+
     <input type="checkbox" name="charm" id="charm">
     <label for="charm">
       <span>
@@ -55,87 +57,76 @@ template.innerHTML = /*html*/`
         Charme chroma possédé
       </span>
     </label>
-  </div>
+  </fieldset>
 
 
   <!-- Bonus de Écarlate / Violet (SV) -->
-  <div class="sv-inputs" data-jeu="sv">
-    <fieldset data-methode="massoutbreak">
-      <legend>Nombre de Pokémon battus dans cette apparition massive</legend>
+  <fieldset data-jeu="sv">
+    <legend>Bonus de Pokémon Écarlate et Violet</legend>
 
-      <input type="radio" name="sv-outbreakCleared" id="sv-outbreakCleared-0" value="0" checked>
-      <label for="sv-outbreakCleared-0">
-        <span>Entre 0 et 29</span>
-      </label>
+    <label for="sv-outbreakCleared">Nombre de Pokémon battus dans cette apparition massive</label>
+    <select name="sv-outbreakCleared" id="sv-outbreakCleared">
+      <option value="0" selected>Entre 0 et 29</option>
+      <option value="1">Entre 30 et 59</option>
+      <option value="2">Plus de 60</option>
+    </select>
 
-      <input type="radio" name="sv-outbreakCleared" id="sv-outbreakCleared-1" value="1">
-      <label for="sv-outbreakCleared-1">
-        <span>Entre 30 et 59</span>
-      </label>
-
-      <input type="radio" name="sv-outbreakCleared" id="sv-outbreakCleared-2" value="2">
-      <label for="sv-outbreakCleared-2">
-        <span>Plus de 60</span>
-      </label>
-    </fieldset>
-
-    <fieldset>
-      <legend>Niveau de Rencontre brillante du sanwdich actif</legend>
-
-      <input type="radio" name="sv-sparklingPower" id="sv-sparklingPower-0" value="0" checked>
-      <label for="sv-sparklingPower-0">
-        <span>Aucun</span>
-      </label>
-
-      <input type="radio" name="sv-sparklingPower" id="sv-sparklingPower-1" value="1">
-      <label for="sv-sparklingPower-1">
-        <span>Niveau 1</span>
-      </label>
-
-      <input type="radio" name="sv-sparklingPower" id="sv-sparklingPower-2" value="2">
-      <label for="sv-sparklingPower-2">
-        <span>Niveau 2</span>
-      </label>
-
-      <input type="radio" name="sv-sparklingPower" id="sv-sparklingPower-3" value="3">
-      <label for="sv-sparklingPower-3">
-        <span>Niveau 3</span>
-      </label>
-  </div>
+    <label for="sv-sparklingPower">Nombre de Pokémon battus dans cette apparition massive</label>
+    <select name="sv-sparklingPower" id="sv-sparklingPower">
+      <option value="0" selected>Aucun</option>
+      <option value="1">Niveau 1</option>
+      <option value="2">Niveau 2</option>
+      <option value="3">Niveau 3</option>
+    </select>
+  </fieldset>
 
 
   <!-- Bonus de Legends Arceus (PLA) -->
-  <div class="pla-inputs" data-jeu="pla">
-    <fieldset>
-      <legend>Niveau de recherche de la page du Pokédex</legend>
+  <fieldset data-jeu="pla">
+    <legend>Bonus de Légendes Pokémon: Arceus</legend>
 
-      <input type="radio" name="pla-dexResearch" id="pla-dex-incomplete" value="0" checked>
-      <label for="pla-dex-incomplete">
-        <span>Page incomplète (niv &lt;9)</span>
-      </label>
+    <label for="pla-dexResearch">Niveau de recherche de la page du Pokédex</label>
+    <select name="pla-dexResearch" id="pla-dexResearch">
+      <option value="0" selected>Page incomplète (niv &lt;9)</option>
+      <option value="1">Page complétée (niv 10)</option>
+      <option value="2">Page complétée à 100%</option>
+    </select>
+  </fieldset>
 
-      <input type="radio" name="pla-dexResearch" id="pla-dex-complete" value="1">
-      <label for="pla-dex-complete">
-        <span>Page complétée (niv 10)</span>
-      </label>
 
-      <input type="radio" name="pla-dexResearch" id="pla-dex-perfect" value="2">
-      <label for="pla-dex-perfect">
-        <span>Page parfaite <shiny-stars></shiny-stars></span>
-      </label>
-    </fieldset>
-  </div>
+  <!-- Bonus de Épée / Bouclier (SWSH) -->
+  <fieldset data-jeu="swsh">
+    <legend>Bonus de Pokémon Épée et Bouclier</legend>
+
+    <label for="swsh-dexKo">Compteur de KO du Pokédex</label>
+    <input type="text" name="swsh-dexKo" id="swsh-dexKo" inputmode="numeric" pattern="[0-9]*" value="0">
+  </fieldset>
 
 
   <!-- Bonus de Let's Go Pikachu / Évoli (LGPE) -->
-  <div class="lgpe-inputs" data-jeu="lgpe">
-    <input type="checkbox" name="lgpe-lure" id="lgpe-lure">
+  <fieldset data-jeu="lgpe">
+    <legend>Bonus de Pokémon Let's Go Pikachu et Évoli</legend>
+
+    <label for="lgpe-catchCombo" data-methode="wild">Combo Capture</label>
+    <select name="lgpe-catchCombo" id="lgpe-catchCombo" data-methode="wild">
+      <option value="0" selected>Entre 0 et 10</option>
+      <option value="1">Entre 11 et 20</option>
+      <option value="2">Entre 21 et 30</option>
+      <option value="3">Plus de 31</option>
+    </select>
+
+    <input type="checkbox" name="lgpe-lure" id="lgpe-lure" value="1">
     <label for="lpge-lure">Parfum utilisé</label>
-  </div>
+
+    <input type="checkbox" name="lgpe-nextSpawn" id="lgpe-nextSpawn" data-methode="wild" value="1">
+    <label for="lpge-nextSpawn" data-methode="widl">Le chromatique est apparu immédiatement après avoir augmenté le Combo Capture</label>
+  </fieldset>
 
 
   <!-- Bonus de Ultra Soleil / Lune (USUM) -->
-  <div class="usum-inputs" data-jeu="usum">
+  <fieldset data-jeu="usum">
+    <legend>Bonus de Pokémon Ultra-Soleil et Ultra-Lune</legend>
+
     <label for="usum-distance">Distance</label>
     <input type="text" name="usum-distance" id="usum-distance" inputmode="numeric" pattern="[0-9]*" value="0">
 
@@ -146,7 +137,7 @@ template.innerHTML = /*html*/`
       <option>2</option>
       <option>3</option>
     </select>
-  </div>
+  </fieldset>
 
 
   <!-- Boutons de capture / annulation -->
@@ -268,18 +259,18 @@ template.innerHTML = /*html*/`
         </span>
       </label>
   
-      <input type="radio" name="checkmark" id="checkmark-alola" value="clover" data-jeu="sm usum">
+      <input type="radio" name="checkmark" id="checkmark-alola" value="alola" data-jeu="sm usum">
       <label for="checkmark-alola" data-jeu="sm usum">
         <span>
-          <span class="icon" data-icon="origin-mark/clover"></span>
+          <span class="icon" data-icon="origin-mark/alola"></span>
           Alola
         </span>
       </label>
   
-      <input type="radio" name="checkmark" id="checkmark-kalos" value="pentagon" data-jeu="xy oras">
+      <input type="radio" name="checkmark" id="checkmark-kalos" value="gen6" data-jeu="xy oras">
       <label for="checkmark-kalos" data-jeu="xy oras">
         <span>
-          <span class="icon" data-icon="origin-mark/pentagon"></span>
+          <span class="icon" data-icon="origin-mark/gen6"></span>
           Kalos
         </span>
       </label>

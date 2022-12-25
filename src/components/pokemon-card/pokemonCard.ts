@@ -81,25 +81,51 @@ export class pokemonCard extends HTMLElement {
 
     // Compteur
     {
-      const compteur = JSON.parse(shiny.compteur || '0');
       const element = this.shadow.querySelector('[data-type="compteur"]')!;
-      let compteurString: string;
+      let compteurString: string = '';
 
-      if (shiny.methode === 'ultrawormhole') {
-        compteurString = `Distance : ${compteur.distance}m, ${compteur.rings} anneaux`;
+      const getProp = (prop: keyof Shiny['compteur']) => shiny.compteur[prop] || 0;
+
+      const parts = [];
+      if (getProp('count')) parts.push(`${getProp('count')} rencontres`);
+
+      if ((shiny.jeu === 'ultrasun' || shiny.jeu === 'ultramoon') && shiny.methode === 'ultrawormhole') {
+        parts.push(`Distance ${getProp('usum-distance')}m, ${getProp('usum-rings')} anneaux`);
       }
 
-      else if (shiny.methode === 'catchcombo') {
-        compteurString = `Combo Capture : ${compteur.chain}${compteur.lure ? ', avec parfum' : ''}`;
+      else if (shiny.jeu === 'letsgopikachu' || shiny.jeu === 'letsgoeevee') {
+        if (getProp('lgpe-nextSpawn')) parts.push(`Combo Capture ${getProp('lgpe-catchCombo')}`);
+        if (getProp('lgpe-lure')) parts.push('Parfum utilisé');
+      }
+
+      else if (shiny.jeu === 'sword' || shiny.jeu === 'shield') {
+        if (getProp('swsh-dexKo')) parts.push(`Compteur de KO ${getProp('swsh-dexKo')}`);
       }
 
       else if (shiny.jeu === 'legendsarceus') {
-        compteurString = `${compteur.count > 0 ? `${compteur.count} rencontres, ` : ''}niv. rech. ${compteur.dexResearch}`;
+        if (getProp('pla-dexResearch')) {
+          const dexResearch = getProp('pla-dexResearch');
+          const niv = dexResearch === 2 ? '100%' : dexResearch === 1 ? '10' : '9 ou -';
+          parts.push(`niv. rech. ${niv}`);
+        };
       }
 
-      else {
-        compteurString = compteur.count > 0 ? `${compteur.count} rencontres` : '';
+      else if (shiny.jeu === 'scarlet' || shiny.jeu === 'violet') {
+        if (getProp('sv-outbreakCleared')) {
+          const outbreakCleared = getProp('sv-outbreakCleared');
+          const num = outbreakCleared === 2 ? '60+'
+                    : outbreakCleared === 1 ? '30 à 59'
+                    : '29-';
+          parts.push(`${num} KO`);
+        }
+
+        if (getProp('sv-sparklingPower')) {
+          const sparklingPower = getProp('sv-sparklingPower');
+          parts.push(`Rencontre brillance niv ${sparklingPower}`);
+        }
       }
+
+      compteurString = parts.join(', ');
 
       element.innerHTML = compteurString;
     }
@@ -190,7 +216,7 @@ export class pokemonCard extends HTMLElement {
       element.innerHTML = String(shinyRate || '???');
 
       // Couleur du shiny rate
-      const jeu = shiny.Jeu;
+      const jeu = shiny.jeuObj;
       srContainer.classList.remove('full-odds', 'charm-ods', 'one-odds');
       if (
         (jeu.gen <= 5 && shinyRate >= 8192 - 1) ||

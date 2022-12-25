@@ -29,6 +29,9 @@ gameSpecificSheet.replaceSync(`
 `);
 
 
+const compteurProps: Array<keyof Shiny['compteur']> = ['usum-distance', 'usum-rings', 'lgpe-catchCombo', 'lgpe-lure', 'lgpe-nextSpawn', 'swsh-dexKo', 'pla-dexResearch', 'sv-outbreakCleared', 'sv-sparklingPower'];
+
+
 
 interface HuntUpdateEvent extends CustomEvent {
   detail: {
@@ -226,44 +229,11 @@ export class huntCard extends HTMLElement {
 
         case 'compteur': {
           const value = hunt.compteur;
-          const methode = hunt.methode;
-          const jeu = hunt.jeu;
-          const compteur = value ? JSON.parse(value) : 0;
+          input.value = String(value['count'] || 0);
 
-          if (methode === 'ultrawormhole') {
-            const inputDistance = this.shadow.querySelector(`input[name="usum-distance"]`) as HTMLInputElement;
-            inputDistance.value = String(compteur.distance);
-
-            const inputRings = this.shadow.querySelector(`select[name="usum-rings"]`) as HTMLInputElement;
-            inputRings.value = String(compteur.rings);
-          }
-
-          else if (methode === 'catchcombo') {
-            input.value = String(compteur.chain);
-
-            const inputLure = this.shadow.querySelector(`input[name="lgpe-lure"]`) as HTMLInputElement;
-            inputLure.checked = compteur.lure;
-          }
-
-          else if (jeu === 'legendsarceus') {
-            input.value = String(compteur.count);
-
-            const inputDexResearch = this.shadow.querySelector(`input[name="pla-dexResearch"][value="${compteur.dexResearch}"]`) as HTMLInputElement;
-            inputDexResearch.checked = true;
-          }
-
-          else if (jeu === 'scarlet' || jeu === 'violet') {
-            input.value = String(compteur.count);
-
-            const inputOutbreakCleared = this.shadow.querySelector(`input[name="sv-outbreakCleared"][value="${compteur.outbreakCleared}"]`) as HTMLInputElement;
-            inputOutbreakCleared.checked = true;
-
-            const inputSparklingPower = this.shadow.querySelector(`input[name="sv-sparklingPower"][value="${compteur.sparklingPower}"]`) as HTMLInputElement;
-            inputSparklingPower.checked = true;
-          }
-
-          else {
-            input.value = value;
+          for (const compteurProp of compteurProps) {
+            const input = this.shadow.querySelector(`input[name="${compteurProp}"], select[name="${compteurProp}"]`) as HTMLInputElement;
+            input.value = String(value[compteurProp] || 0);
           }
         } break;
 
@@ -335,41 +305,16 @@ export class huntCard extends HTMLElement {
         } break;
 
         case 'compteur': {
-          const methode = formData.get('methode');
-          const jeu = formData.get('jeu');
+          const compteur: Shiny['compteur'] = {
+            count: Number(value) || 0
+          };
 
-          if (methode === 'ultrawormhole') {
-            hunt.compteur = JSON.stringify({
-              distance: parseInt(formData.get('usum-distance') as string),
-              rings: parseInt(formData.get('usum-rings') as string)
-            });
+          for (const compteurProp of compteurProps) {
+            const val = parseInt(formData.get(compteurProp) as string) || 0;
+            if (val > 0) compteur[compteurProp] = val;
           }
 
-          else if (methode === 'catchcombo') {
-            hunt.compteur = JSON.stringify({
-              chain: parseInt(value as string),
-              lure: formData.get('lgpe-lure') === '1',
-            });
-          }
-
-          else if (jeu === 'legendsarceus') {
-            hunt.compteur = JSON.stringify({
-              count: parseInt(value as string),
-              dexResearch: parseInt(formData.get('pla-dexResearch') as string)
-            });
-          }
-
-          else if (jeu === 'scarlet' || jeu === 'violet') {
-            hunt.compteur = JSON.stringify({
-              count: parseInt(value as string),
-              outbreakCleared: parseInt(formData.get('sv-outbreakCleared') as string),
-              sparklingPower: parseInt(formData.get('sv-sparklingPower') as string)
-            });
-          }
-
-          else {
-            hunt.compteur = (value as string) || '0';
-          }
+          hunt.compteur = compteur;
         } break;
 
         case 'timeCapture': {

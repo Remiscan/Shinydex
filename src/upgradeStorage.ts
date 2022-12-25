@@ -88,6 +88,7 @@ function toNewFormat(shiny: { [key: string]: any }): { [key: string]: any } {
     delete shiny.date;
   }
 
+  // Replace game names with game uid
   if (shiny.hasOwnProperty('jeu')) {
     // Replace game names with accented versions
     const renames = new Map([
@@ -114,6 +115,7 @@ function toNewFormat(shiny: { [key: string]: any }): { [key: string]: any } {
     }
   }
 
+  // Replace method names with method id
   if (shiny.hasOwnProperty('methode')) {
     // Replace method names with updated versions
     const renames = new Map([
@@ -139,9 +141,36 @@ function toNewFormat(shiny: { [key: string]: any }): { [key: string]: any } {
     }
   }
 
+  // Replace checkmark number with checkmark name
   if (shiny.hasOwnProperty('checkmark') && typeof shiny.checkmark === 'number') {
-    const names = ['old', 'pentagon', 'clover', 'game-boy', 'lets-go', 'go', 'galar', 'sinnoh-gen8', 'hisui', 'paldea'];
+    const names = ['old', 'gen6', 'alola', 'game-boy', 'lets-go', 'go', 'galar', 'sinnoh-gen8', 'hisui', 'paldea'];
     shiny.checkmark = names[shiny.checkmark];
+  }
+
+  // Replace compteur string by object
+  if (shiny.hasOwnProperty('compteur') && typeof shiny.compteur === 'string') {
+    const compteur = JSON.parse(shiny.compteur);
+    if (typeof compteur === 'number') shiny.compteur = { count: compteur };
+    else {
+      const renames = new Map([
+        ['distance', 'usum-distance'],
+        ['rings', 'usum-rings'],
+        ['chain', 'lgpe-catchCombo'],
+        ['lure', 'lgpe-lure'],
+        ['dexResearch', 'pla-dexResearch'],
+      ]);
+
+      for (const [oldName, newName] of renames) {
+        if (compteur.hasOwnProperty(oldName)) {
+          const value = Number(compteur[oldName]) || 0;
+          if (value) compteur[newName] = value;
+          delete compteur[oldName];
+        }
+      }
+
+      compteur.count = Number(compteur.count) || 0;
+      shiny.compteur = compteur;
+    }
   }
 
   return shiny;

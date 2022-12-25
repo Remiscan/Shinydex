@@ -31,14 +31,14 @@ const allGames: Jeu[] = [
   { uid: 'white', gen: 5, id: 'bw' },
   { uid: 'black2', gen: 5, id: 'bw2' },
   { uid: 'white2', gen: 5, id: 'bw2' },
-  { uid: 'x', gen: 6, id: 'xy', originMark: 'pentagon' },
-  { uid: 'y', gen: 6, id: 'xy', originMark: 'pentagon' },
-  { uid: 'omegaruby', gen: 6, id: 'oras', originMark: 'pentagon' },
-  { uid: 'alphasapphire', gen: 6, id: 'oras', originMark: 'pentagon' },
-  { uid: 'sun', gen: 7, id: 'sm', originMark: 'clover' },
-  { uid: 'moon', gen: 7, id: 'sm', originMark: 'clover' },
-  { uid: 'ultrasun', gen: 7, id: 'usum', originMark: 'clover' },
-  { uid: 'ultramoon', gen: 7, id: 'usum', originMark: 'clover' },
+  { uid: 'x', gen: 6, id: 'xy', originMark: 'gen6' },
+  { uid: 'y', gen: 6, id: 'xy', originMark: 'gen6' },
+  { uid: 'omegaruby', gen: 6, id: 'oras', originMark: 'gen6' },
+  { uid: 'alphasapphire', gen: 6, id: 'oras', originMark: 'gen6' },
+  { uid: 'sun', gen: 7, id: 'sm', originMark: 'alola' },
+  { uid: 'moon', gen: 7, id: 'sm', originMark: 'alola' },
+  { uid: 'ultrasun', gen: 7, id: 'usum', originMark: 'alola' },
+  { uid: 'ultramoon', gen: 7, id: 'usum', originMark: 'alola' },
   { uid: 'go', gen: 0, id: 'go', originMark: 'go' },
   { uid: 'letsgopikachu', gen: 7.1, id: 'lgpe', originMark: 'lets-go' },
   { uid: 'letsgoeevee', gen: 7.1, id: 'lgpe', originMark: 'lets-go' },
@@ -92,7 +92,6 @@ const allMethodes: Methode[] = [
   { id: 'dexnavchain', jeux: allGames.filter(g => g.id == 'oras'), mine: true, charm: true },
   { id: 'soschain', jeux: allGames.filter(g => g.gen == 7), mine: true, charm: true },
   { id: 'ultrawormhole', jeux: allGames.filter(g => g.gen == 7), mine: true, charm: false },
-  { id: 'catchcombo', jeux: allGames.filter(g => g.gen == 7.1), mine: true, charm: true },
   { id: 'battlebonus', jeux: allGames.filter(g => g.gen == 8), mine: true, charm: true },
   { id: 'raid', jeux: allGames.filter(g => g.id == 'swsh' || g.id == 'sv'), mine: true, charm: false },
   { id: 'dynamaxadventure', jeux: allGames.filter(g => g.gen == 8), mine: true, charm: true },
@@ -139,6 +138,21 @@ type nameLang = keyof backendPokemon['name'];
 
 
 
+type compteur = {
+  'count': number,
+  'usum-distance'?: number,
+  'usum-rings'?: number,
+  'lgpe-catchCombo'?: number,
+  'lgpe-lure'?: number,
+  'lgpe-nextSpawn'?: number,
+  'swsh-dexKo'?: number,
+  'pla-dexResearch'?: number,
+  'sv-outbreakCleared'?: number,
+  'sv-sparklingPower'?: number
+};
+
+
+
 /** Structure d'un Pokémon shiny tel que stocké dans la BDD en ligne. */
 interface backendShiny {
   id: number,
@@ -160,8 +174,9 @@ interface backendShiny {
 };
 
 /** Structure d'un Pokémon shiny tel que stocké dans la BDD locale. */
-export interface frontendShiny extends Omit<backendShiny, 'id' | 'lastUpdate' | 'userid'> {
+export interface frontendShiny extends Omit<backendShiny, 'id' | 'lastUpdate' | 'compteur'> {
   lastUpdate: number,
+  compteur: compteur,
   deleted?: boolean,
   destroy?: boolean,
 }
@@ -321,7 +336,7 @@ class Shiny implements frontendShiny {
   gene: string = '';
   surnom: string = '';
   methode: string = '';
-  compteur: string = '';
+  compteur: compteur = { count: 0 };
   timeCapture: number = NaN;
   jeu: string = '';
   ball: string = '';
@@ -400,7 +415,7 @@ class Shiny implements frontendShiny {
     if (this.hacked) return ''; // Hacked Pokémon don't deserve an origin mark
     if (!this.mine) return this.checkmark; // Traded Pokémon can have been born on earlier games
 
-    const jeu = this.Jeu;
+    const jeu = this.jeuObj;
     if (jeu.gen === 1 || jeu.gen === 2) return this.checkmark; // gen 1 & 2 games could come from 3DS Virtual Console
     else if (jeu.originMark) return jeu.originMark;
     else return 'old';
@@ -416,7 +431,7 @@ class Shiny implements frontendShiny {
   /**
    * @returns Jeu dans lequel le Pokémon a été capturé.
    */
-  get Jeu(): Jeu {
+  get jeuObj(): Jeu {
     let k = Pokemon.jeux.findIndex(p => p.uid == this.jeu);
     if (k == -1) throw `Jeu invalide (${this.jeu})`;
 
@@ -446,7 +461,7 @@ class Shiny implements frontendShiny {
    */
   get shinyRate(): number | null {
     // Taux de base
-    const game = this.Jeu;
+    const game = this.jeuObj;
     const baseRate = (game.gen === 0) ? 450
                    : (game.gen <= 5) ? 8192
                    : 4096;
@@ -462,6 +477,43 @@ class Shiny implements frontendShiny {
     let charmRolls = Number(game.gen >= 5) * Number(this.charm) * 2;
 
     switch (methode.id) {
+      case 'wild': {
+        if (game.id === 'lgpe') {
+          const lureRolls = this.compteur['lgpe-lure'] ? 1 : 0;
+          const combo = this.compteur['lgpe-catchCombo'] || 0;
+          const chainRolls = (combo >= 31) ? 11
+                          : (combo >= 21) ? 7
+                          : (combo >= 11) ? 3
+                          : 0
+          bonusRolls = lureRolls + chainRolls;
+        }
+
+        else if (game.id === 'swsh') {
+          const dexKo = this.compteur['swsh-dexKo'] || 0;
+          if (!dexKo) break;
+
+          const chainRolls = (dexKo >= 500) ? 5
+                           : (dexKo >= 300) ? 4
+                           : (dexKo >= 200) ? 3
+                           : (dexKo >= 100) ? 2
+                           : (dexKo >= 50) ? 1
+                           : 0;
+          const brilliantChance = (dexKo >= 500) ? 3
+                                : (dexKo >= 300) ? 3
+                                : (dexKo >= 200) ? 2.5
+                                : (dexKo >= 100) ? 2
+                                : (dexKo >= 50) ? 1.5
+                                : 0;
+          const rolls = 1 + charmRolls + chainRolls;
+          let rate = Math.round(baseRate / rolls);
+          rate = (brilliantChance / 100) * rate + ((100 - brilliantChance) / 100) * baseRate;
+          rate = Math.round(rate);
+          return rate;
+        }
+
+        break;
+      }
+
       case 'glitch':
       case 'wildalwaysshiny':
       case 'event':
@@ -473,7 +525,7 @@ class Shiny implements frontendShiny {
       }
       
       case 'pokeradar': {
-        const chain = Math.min(40, Math.max(0, Number(this.compteur)));
+        const chain = Math.min(40, Math.max(0, this.compteur.count));
         let odds = 0;
         switch (game.id) {
           case 'dp':
@@ -495,7 +547,7 @@ class Shiny implements frontendShiny {
       }
       
       case 'chainfishing': {
-        const chain = Math.min(20, Number(this.compteur));
+        const chain = Math.min(20, this.compteur.count);
         bonusRolls = 2 * chain;
         break;
       }
@@ -511,7 +563,7 @@ class Shiny implements frontendShiny {
       }
 
       case 'soschain': {
-        const compteur = Number(this.compteur);
+        const compteur = this.compteur.count;
         const chainCoeff = (compteur >= 31) ? 3
                          : (compteur >= 21) ? 2
                          : (compteur >= 11) ? 1
@@ -522,12 +574,11 @@ class Shiny implements frontendShiny {
 
       case 'ultrawormhole': {
         // this.compteur == au format { "distance": 30, "rings": 2 }
-        const compteur = (this.compteur === '0') ? { distance: 0, rings: 0 }
-                       : JSON.parse(this.compteur);
-        let d = Math.min(9, Math.floor(compteur.distance) / 500 - 1);
-        const odds = (compteur.rings == 3) ? (4 * d)
-                   : (compteur.rings == 2) ? ((1 + 2 * d))
-                   : (compteur.rings == 1) ? ((1 + d))
+        let d = Math.min(9, Math.floor(this.compteur['usum-distance'] || 0) / 500 - 1);
+        const rings = this.compteur['usum-rings'] || 0;
+        const odds = (rings == 3) ? (4 * d)
+                   : (rings == 2) ? ((1 + 2 * d))
+                   : (rings == 1) ? ((1 + d))
                    : 1;
         const rate = Math.round(100 / odds);
         return rate;
@@ -535,41 +586,7 @@ class Shiny implements frontendShiny {
 
       case 'wildevent': {
         // ???
-        return Number(this.compteur);
-      }
-
-      case 'catchcombo': {
-        // this.compteur == au format { "chain": 20, "lure": true }
-        const compteur = (this.compteur === '0') ? { chain: 0, lure: false }
-                       : JSON.parse(this.compteur);
-        const lureRolls = (compteur.lure) ? 1 : 0;
-        const chainRolls = (compteur.chain >= 31) ? 11
-                         : (compteur.chain >= 21) ? 7
-                         : (compteur.chain >= 11) ? 3
-                         : 0
-        bonusRolls = lureRolls + chainRolls;
-        break;
-      }
-
-      case 'battlebonus': {
-        const compteur = Number(this.compteur);
-        const chainRolls = (compteur >= 500) ? 5
-                         : (compteur >= 300) ? 4
-                         : (compteur >= 200) ? 3
-                         : (compteur >= 100) ? 2
-                         : (compteur >= 50) ? 1
-                         : 0;
-        const brilliantChance = (compteur >= 500) ? 3
-                              : (compteur >= 300) ? 3
-                              : (compteur >= 200) ? 2.5
-                              : (compteur >= 100) ? 2
-                              : (compteur >= 50) ? 1.5
-                              : 0;
-        const rolls = 1 + charmRolls + chainRolls;
-        let rate = Math.round(baseRate / rolls);
-        rate = (brilliantChance / 100) * rate + ((100 - brilliantChance) / 100) * baseRate;
-        rate = Math.round(rate);
-        return rate;
+        return null;
       }
 
       case 'raid': {
@@ -584,7 +601,7 @@ class Shiny implements frontendShiny {
 
       case 'massoutbreak': {
         if (game.id === 'pla') bonusRolls = 25;
-        else if (game.id === 'sv') bonusRolls = Number((JSON.parse(this.compteur)).outbreakCleared);
+        else if (game.id === 'sv') bonusRolls = this.compteur['sv-outbreakCleared'] || 0;
         break;
       }
 
@@ -601,13 +618,13 @@ class Shiny implements frontendShiny {
     switch (game.id) {
       case 'pla': {
         charmRolls = Number(this.charm) * 3;
-        const dexResearch = Number((JSON.parse(this.compteur)).dexResearch);
+        const dexResearch = this.compteur['pla-dexResearch'] || 0;
         bonusRolls += dexResearch === 2 ? 3 : dexResearch;
         break;
       }
 
       case 'sv': {
-        const sparklingPower = Number((JSON.parse(this.compteur)).sparklingPower);
+        const sparklingPower = this.compteur['sv-sparklingPower'] || 0;
         bonusRolls += sparklingPower;
       } break;
     }

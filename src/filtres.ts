@@ -61,7 +61,7 @@ export class PokemonFiltres implements Filtres {
     const conditionMien = shiny.mine;
     this.do = conditionMien ? 'moi' : 'autre';
     this.legit = shiny.hacked > 0 ? 'non' : 'oui';
-    this.jeu = shiny.Jeu.uid;
+    this.jeu = shiny.jeuObj.uid;
     this.espece = shiny.dexid;
     this.surnom = shiny.surnom;
   }

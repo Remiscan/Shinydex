@@ -17,7 +17,7 @@ const defaultHunt: huntedPokemon = {
   gene: '',
   surnom: '',
   methode: '',
-  compteur: '',
+  compteur: { count: 0 },
   timeCapture: 0,
   jeu: '',
   ball: 'poke',
