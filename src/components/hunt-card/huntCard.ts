@@ -483,7 +483,10 @@ export class huntCard extends HTMLElement {
         if (form.classList.contains('caught')) {
           sprite.setAttribute('shiny', 'true');
           sprite.sparkle();
-          if (!form.classList.contains('edit')) inputDate.value = new Date().toISOString().split('T')[0];
+          if (!form.classList.contains('edit')) {
+            inputDate.value = new Date().toISOString().split('T')[0];
+            form.dispatchEvent(new Event('change'));
+          }
         } else {
           sprite.setAttribute('shiny', 'false');
         }
