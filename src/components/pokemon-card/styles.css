@@ -66,14 +66,14 @@ pokemon-sprite,
   grid-column: 2 / 3;
   grid-row: 1 / 2;
   display: grid;
-  grid-template-rows: 15px auto 1fr auto 15px;
+  grid-template-rows: 1fr auto 1fr auto 1fr;
 }
 
 .pokemon-infos__nom {
   grid-row: 2 / 3;
   display: grid;
   grid-template-rows: 32px auto;
-  grid-template-columns: 32px fit-content(100%) 20px;
+  grid-template-columns: 32px fit-content(100%) 32px;
   position: relative;
   left: -16px;
   align-items: center;
@@ -129,6 +129,8 @@ pokemon-sprite,
 [data-type="gene"] {
   grid-row: 1;
   grid-column: 3;
+  scale: 0.9;
+  transform-origin: center bottom;
 }
 
 [data-type="gene"].icones.explain {
