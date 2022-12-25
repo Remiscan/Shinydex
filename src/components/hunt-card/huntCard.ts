@@ -249,7 +249,7 @@ export class huntCard extends HTMLElement {
         } break;
 
         case 'timeCapture': {
-          const value = hunt.timeCapture;
+          const value = hunt.timeCapture || 0;
           const date = (new Date(value)).toISOString().split('T')[0];
           input.value = date;
         } break;
@@ -346,8 +346,9 @@ export class huntCard extends HTMLElement {
         } break;
 
         case 'timeCapture': {
-          const oldDate = (new Date(hunt.timeCapture)).toISOString().split('T')[0];
-          const newTime = value !== oldDate ? (new Date(value as string)).getTime() : hunt.timeCapture;
+          const timeCapture = hunt.timeCapture || 0;
+          const oldDate = (new Date(timeCapture)).toISOString().split('T')[0];
+          const newTime = value !== oldDate ? (new Date(value as string)).getTime() : timeCapture;
           hunt.timeCapture = newTime;
         } break;
       }
@@ -482,7 +483,7 @@ export class huntCard extends HTMLElement {
         if (form.classList.contains('caught')) {
           sprite.setAttribute('shiny', 'true');
           sprite.sparkle();
-          inputDate.value = new Date().toISOString().split('T')[0];
+          if (!form.classList.contains('edit')) inputDate.value = new Date().toISOString().split('T')[0];
         } else {
           sprite.setAttribute('shiny', 'false');
         }
