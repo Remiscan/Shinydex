@@ -1,6 +1,5 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'].'/shinydex/backend/class_Pokemon.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/shinydex/backend/cache.php';
+require_once __DIR__.'/cache.php';
 
 // Vide le cache des stats des fichiers
 clearstatcache();
@@ -58,40 +57,13 @@ function getFilesVersion(int $versionFrom = 0): array {
 }
 
 
-//////////////////////////////////////////////////////////
-// Récupère les infos sur tous les Pokémon et leurs formes
-function getPokemonData() {
-  $rootDir = dirname(__DIR__, 1);
-
-  $dir = "$rootDir/images/pokemon-sprites/home";
-  $files = scandir($dir);
-
-  $pokemons = [];
-  forEach(Pokemon::POKEMON_NAMES_EN as $id => $name) {
-    $sprites = preg_grep('/poke_capture_([0]+)?' . intval($id) . '_.+_n\.png/', $files);
-    $pokemons[] = new Pokemon($id, $sprites);
-  }
-  return $pokemons;
-}
-
-
 ////////////////////////////////////////
 // Transmission des données à JavaScript
 
-$results = array();
-
 $from = $_GET['from'] ?? 0;
+
+$results = array();
 [ $results['version-fichiers'], $results['liste-fichiers-modifies'] ] = getFilesVersion($from);
-
-// Si on vérifie juste la disponibilité d'une mise à jour de l'application
-if (isset($_GET['type']) && $_GET['type'] == 'check') {
-  //$results['version-fichiers'] = getFilesVersion();
-}
-
-// Si on veut installer tous les fichiers et données
-else {
-  //$results['version-fichiers'] = getFilesVersion();
-}
 
 header('Content-Type: application/json');
 echo json_encode($results, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);

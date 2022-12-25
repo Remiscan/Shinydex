@@ -14,12 +14,6 @@ $maxVersion = max($fileVersions);
 importScripts('./ext/localforage.min.js');
 
 // Data storage
-//// Pokédex
-const pokemonData = localforage.createInstance({
-  name: 'remidex',
-  storeName: 'pokemon-data',
-  driver: localforage.INDEXEDDB
-});
 //// Shiny Pokémon
 const shinyStorage = localforage.createInstance({
   name: 'remidex',
@@ -30,12 +24,6 @@ const shinyStorage = localforage.createInstance({
 const dataStorage = localforage.createInstance({
   name: 'remidex',
   storeName: 'misc',
-  driver: localforage.INDEXEDDB
-});
-//// Current hunts
-const huntStorage = localforage.createInstance({
-  name: 'remidex',
-  storeName: 'hunts',
   driver: localforage.INDEXEDDB
 });
 
@@ -225,6 +213,7 @@ async function deleteOldCaches(newCacheName, action) {
  * @returns {boolean} Whether the data sync was successful.
  */
 async function syncBackup(message = true) {
+  return;
   try {
     // On récupère les données locales
     await shinyStorage.ready();
