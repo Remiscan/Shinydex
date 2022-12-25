@@ -617,7 +617,7 @@ class Shiny implements frontendShiny {
       if (charmRolls || bonusRolls) bonusRolls--;
     }
 
-    rolls += charmRolls + bonusRolls;
+    rolls += (charmRolls || 0) + (bonusRolls || 0);
     const rate = Math.round(baseRate / rolls);
     return rate;
   }
