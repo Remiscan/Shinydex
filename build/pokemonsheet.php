@@ -21,7 +21,7 @@ function buildPokemonSheet(int $columns = 32, int $spriteSize = 44, string $form
   $x = 0;
   $y = 0;
 
-  $imagePath = __DIR__.'/../images/pokemonsheet.webp';
+  $imagePath = __DIR__.'/../images/pokemonsheet.'.$format;
   $cssPath = __DIR__.'/../images/pokemonsheet.css';
   $previewPath = __DIR__.'/../images/pokemonsheet.html';
 
@@ -157,6 +157,9 @@ function buildPokemonSheet(int $columns = 32, int $spriteSize = 44, string $form
   switch ($format) {
     case 'webp':
       imagewebp($sheet, $imagePath, 80);
+      break;
+    case 'avif':
+      imageavif($sheet, $imagePath, 80);
       break;
     case 'png':
     default:

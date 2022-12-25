@@ -174,6 +174,9 @@ function buildIconSheet(int $columns = 24, int $iconSize = 32, string $format = 
     case 'webp':
       imagewebp($sheet, $imagePath, 100);
       break;
+    case 'avif':
+      imageavif($sheet, $imagePath, 100);
+      break;
     case 'png':
     default:
       imagepng($sheet, $imagePath, 9, PNG_NO_FILTER);
