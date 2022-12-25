@@ -79,6 +79,7 @@ export class huntCard extends HTMLElement {
     this.shadow.appendChild(template.content.cloneNode(true));
     this.shadow.adoptedStyleSheets = [materialIconsSheet, iconSheet, commonSheet, sheet, gameSpecificSheet];
     this.genereJeux();
+    this.genereMethodes();
   }
 
   async getHunt() {
@@ -185,7 +186,7 @@ export class huntCard extends HTMLElement {
             name = allNames[value];
           }
           input.value = name;
-          this.genereFormes(name);
+          this.genereFormes(name, hunt.forme);
         } break;
 
         case 'jeu': {
@@ -605,34 +606,13 @@ export class huntCard extends HTMLElement {
     }
     handle(this.handlers.listeFormes);
 
-    // Génère la liste des méthodes au choix du jeu
-    const inputJeu = this.shadow.querySelector('select[name="jeu"]') as HTMLInputElement;
-    this.handlers.listeMethodes = {
-      element: inputJeu,
-      type: 'focus',
-      function: event => {
-        const inputHandler = (inputEvent: Event) => {
-          this.genereMethodes(inputJeu.value);
-        };
-
-        const blurHandler = (blurEvent: Event) => {
-          inputJeu.removeEventListener('input', inputHandler);
-          inputJeu.removeEventListener('blur', blurHandler);
-        };
-
-        inputJeu.addEventListener('input', inputHandler);
-        inputJeu.addEventListener('blur', blurHandler);
-      }
-    }
-    handle(this.handlers.listeMethodes);
-
     // Peuple le contenu de la carte
     if (this.huntid) this.updateVisuals();
   }
 
 
   /** Génère la liste des formes à partir du Pokémon entré. */
-  async genereFormes(value: string) {
+  async genereFormes(value: string, formeToSelect?: string) {
     const select = this.shadow.querySelector('select[name="forme"]') as HTMLInputElement;
     select.innerHTML = '';
 
@@ -643,35 +623,23 @@ export class huntCard extends HTMLElement {
       const pkmn = await pokemonData.getItem(String(k));
       const formes: Forme[] = pkmn.formes.slice().sort((a: Forme, b: Forme) => { if (a.nom == '') return -1; else return 0;});
       for (const forme of formes) {
-        if (forme.noShiny == true) return;
+        if (forme.noShiny == true) continue;
 
-        if (forme.dbid != '') select.innerHTML += `<option value="${forme.dbid}">${forme.nom}</option>`;
-        else select.innerHTML += `<option value="">${forme.nom || 'Forme normale'}</option>`;
+        const selected = forme.dbid === formeToSelect;
+        select.innerHTML += `<option value="${forme.dbid}"${selected ? ' selected' : ''}>${forme.nom || 'Forme normale'}</option>`;
       }
     }
   }
 
 
   /** Génère la liste des méthodes à partir du jeu entré. */
-  genereMethodes(value: string) {
+  genereMethodes() {
     const select = this.shadow.querySelector('select[name="methode"]') as HTMLInputElement;
-    select.innerHTML = '';
-
-    const k = Pokemon.jeux.findIndex(jeu => jeu.uid == value);
-    if (k == -1) return 'Jeu inexistant';
-    else {
-      const methodes: Methode[] = [];
-
-      for (const methode of Shiny.allMethodes) {
-        const k = methode.jeux.findIndex(jeu => jeu.uid == value);
-        if (k != -1) methodes.push(methode);
-      }
-  
-      const lang = document.documentElement.getAttribute('lang');
-      for (const methode of methodes) {
-        const nom = methodStrings[lang][methode.id];
-        select.innerHTML += `<option value="${methode.id}">${nom}</option>`;
-      }
+    const lang = document.documentElement.getAttribute('lang');
+    for (const methode of Shiny.allMethodes) {
+      const nom = methodStrings[lang][methode.id];
+      const gameIds = new Set(methode.jeux.map(jeu => jeu.id));
+      select.innerHTML += `<option value="${methode.id}" data-jeu="${[...gameIds].join(' ')}">${nom}</option>`;
     }
   }
 
