@@ -64,7 +64,7 @@ async function initServiceWorker() {
           console.log('[sw] Service worker mis à jour');
           document.getElementById('notification')!.classList.remove('installing');
           
-          const updateNotif = new Notif('Mise à jour installée', 'Actualiser', 'update', Notif.maxDelay, updateHandler);
+          const updateNotif = new Notif('Mise à jour installée !', 'Actualiser', 'update', Notif.maxDelay, updateHandler);
           const userActed = await updateNotif.prompt();
           if (userActed) {
             updateNotif.priorite = true;
