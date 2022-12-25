@@ -1,7 +1,7 @@
 import { DexDatalist } from '../../DexDatalist.js';
 import { Hunt, huntedPokemon } from '../../Hunt.js';
 import { warnBeforeDestruction } from '../../Params.js';
-import { Forme, Methode, Pokemon, Shiny } from '../../Pokemon.js';
+import { Forme, Pokemon, Shiny } from '../../Pokemon.js';
 import { huntStorage, pokemonData, shinyStorage } from '../../localForage.js';
 import { Notif } from '../../notification.js';
 import pokemonSprite from '../pokemon-sprite/pokemonSprite.js';
@@ -23,9 +23,10 @@ import methodStrings from '../../../strings/methods.json' assert { type: 'json' 
 
 const gameIds: Set<string> = new Set(Pokemon.jeux.map(jeu => jeu.id));
 const gameSpecificSheet = new CSSStyleSheet();
-gameSpecificSheet.replaceSync(
-  [...gameIds].map(id => `:host([data-jeu="${id}"]) [data-jeu~="${id}"] { display: revert; }`).join('')
-);
+gameSpecificSheet.replaceSync(`
+  ${[...gameIds].map(id => `:host([data-jeu="${id}"]) [data-jeu~="${id}"] { display: revert; }`).join('')}
+  ${Shiny.allMethodes.map(id => `:host([data-methode="${id}"]) [data-methode~="${id}"] { display: revert; }`).join('')}
+`);
 
 
 
@@ -251,6 +252,16 @@ export class huntCard extends HTMLElement {
             inputDexResearch.checked = true;
           }
 
+          else if (jeu === 'scarlet' || jeu === 'violet') {
+            input.value = String(compteur.count);
+
+            const inputOutbreakCleared = this.shadow.querySelector(`input[name="sv-outbreakCleared"][value="${compteur.outbreakCleared}"]`) as HTMLInputElement;
+            inputOutbreakCleared.checked = true;
+
+            const inputSparklingPower = this.shadow.querySelector(`input[name="sv-sparklingPower"][value="${compteur.sparklingPower}"]`) as HTMLInputElement;
+            inputSparklingPower.checked = true;
+          }
+
           else {
             input.value = value;
           }
@@ -327,24 +338,32 @@ export class huntCard extends HTMLElement {
           const methode = formData.get('methode');
           const jeu = formData.get('jeu');
 
-          if (methode === 'Ultra-Brèche') {
+          if (methode === 'ultrawormhole') {
             hunt.compteur = JSON.stringify({
               distance: parseInt(formData.get('usum-distance') as string),
               rings: parseInt(formData.get('usum-rings') as string)
             });
           }
 
-          else if (methode === 'Chaîne de captures') {
+          else if (methode === 'catchcombo') {
             hunt.compteur = JSON.stringify({
               chain: parseInt(value as string),
               lure: formData.get('lgpe-lure') === '1',
             });
           }
 
-          else if (jeu === 'Légendes Arceus') {
+          else if (jeu === 'legendsarceus') {
             hunt.compteur = JSON.stringify({
               count: parseInt(value as string),
               dexResearch: parseInt(formData.get('pla-dexResearch') as string)
+            });
+          }
+
+          else if (jeu === 'scarlet' || jeu === 'violet') {
+            hunt.compteur = JSON.stringify({
+              count: parseInt(value as string),
+              outbreakCleared: parseInt(formData.get('sv-outbreakCleared') as string),
+              sparklingPower: parseInt(formData.get('sv-sparklingPower') as string)
             });
           }
 

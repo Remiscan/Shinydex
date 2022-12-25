@@ -24,7 +24,8 @@
     "wondertrade": "Échange miracle",
     "eggtrade": "Échange (œuf)",
     "massoutbreak": "Apparition massive",
-    "massivemassoutbreak": "Mégapparition"
+    "massivemassoutbreak": "Mégapparition",
+    "fixedencounter": "Rencontre fixe"
   },
 
   "en": {
@@ -52,6 +53,7 @@
     "wondertrade": "Wonder trade",
     "eggtrade": "Trade (egg)",
     "massoutbreak": "Mass outbreak",
-    "massivemassoutbreak": "Massive mass outbreak"
+    "massivemassoutbreak": "Massive mass outbreak",
+    "fixedencounter": "Fixed encounter"
   }
 }

@@ -58,23 +58,69 @@ template.innerHTML = /*html*/`
   </div>
 
 
+  <!-- Bonus de Écarlate / Violet (SV) -->
+  <div class="sv-inputs" data-jeu="sv">
+    <fieldset data-methode="massoutbreak">
+      <legend>Nombre de Pokémon battus dans cette apparition massive</legend>
+
+      <input type="radio" name="sv-outbreakCleared" id="sv-outbreakCleared-0" value="0" checked>
+      <label for="sv-outbreakCleared-0">
+        <span>Entre 0 et 29</span>
+      </label>
+
+      <input type="radio" name="sv-outbreakCleared" id="sv-outbreakCleared-1" value="1">
+      <label for="sv-outbreakCleared-1">
+        <span>Entre 30 et 59</span>
+      </label>
+
+      <input type="radio" name="sv-outbreakCleared" id="sv-outbreakCleared-2" value="2">
+      <label for="sv-outbreakCleared-2">
+        <span>Plus de 60</span>
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Niveau de Rencontre brillante du sanwdich actif</legend>
+
+      <input type="radio" name="sv-sparklingPower" id="sv-sparklingPower-0" value="0" checked>
+      <label for="sv-sparklingPower-0">
+        <span>Aucun</span>
+      </label>
+
+      <input type="radio" name="sv-sparklingPower" id="sv-sparklingPower-1" value="1">
+      <label for="sv-sparklingPower-1">
+        <span>Niveau 1</span>
+      </label>
+
+      <input type="radio" name="sv-sparklingPower" id="sv-sparklingPower-2" value="2">
+      <label for="sv-sparklingPower-2">
+        <span>Niveau 2</span>
+      </label>
+
+      <input type="radio" name="sv-sparklingPower" id="sv-sparklingPower-3" value="3">
+      <label for="sv-sparklingPower-3">
+        <span>Niveau 3</span>
+      </label>
+  </div>
+
+
   <!-- Bonus de Legends Arceus (PLA) -->
   <div class="pla-inputs" data-jeu="pla">
     <fieldset>
       <legend>Niveau de recherche de la page du Pokédex</legend>
 
       <input type="radio" name="pla-dexResearch" id="pla-dex-incomplete" value="0" checked>
-      <label for="pla-dex-incomplete" class="radio">
+      <label for="pla-dex-incomplete">
         <span>Page incomplète (niv &lt;9)</span>
       </label>
 
       <input type="radio" name="pla-dexResearch" id="pla-dex-complete" value="1">
-      <label for="pla-dex-complete" class="radio">
+      <label for="pla-dex-complete">
         <span>Page complétée (niv 10)</span>
       </label>
 
       <input type="radio" name="pla-dexResearch" id="pla-dex-perfect" value="2">
-      <label for="pla-dex-perfect" class="radio">
+      <label for="pla-dex-perfect">
         <span>Page parfaite <shiny-stars></shiny-stars></span>
       </label>
     </fieldset>

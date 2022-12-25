@@ -106,6 +106,7 @@ const allMethodes: Methode[] = [
   { id: 'eggtrade', jeux: allGames.filter(g => g.gen >= 2 && g.gen != 7.1), mine: false, charm: false },
   { id: 'massoutbreak', jeux: allGames.filter(g => g.id == 'pla' || g.id == 'sv'), mine: true, charm: true },
   { id: 'massivemassoutbreak', jeux: allGames.filter(g => g.id == 'pla'), mine: true, charm: true },
+  { id: 'fixedencounter', jeux: allGames.filter(g => g.id === 'sv'), mine: true, charm: false },
 ];
 
 
@@ -571,8 +572,9 @@ class Shiny implements frontendShiny {
         return rate;
       }
 
-      case 'maxraidbattle': {
-        return null;
+      case 'raid': {
+        if (game.id === 'swsh') return null;
+        else if (game.id === 'sv') return Math.round(4103.05);
       }
 
       case 'dynamaxadventure': {
@@ -581,13 +583,18 @@ class Shiny implements frontendShiny {
       }
 
       case 'massoutbreak': {
-        bonusRolls = 25;
+        if (game.id === 'pla') bonusRolls = 25;
+        else if (game.id === 'sv') bonusRolls = Number((JSON.parse(this.compteur)).outbreakCleared);
         break;
       }
 
       case 'massivemassoutbreak': {
         bonusRolls = 12;
         break;
+      }
+
+      case 'fixedencounter': {
+        return baseRate;
       }
     }
 
@@ -598,6 +605,12 @@ class Shiny implements frontendShiny {
         bonusRolls += dexResearch === 2 ? 3 : dexResearch;
         break;
       }
+
+      case 'sv': {
+        const sparklingPower = Number((JSON.parse(this.compteur)).sparklingPower);
+        bonusRolls += sparklingPower;
+      } break;
+    }
     }
 
     rolls += charmRolls + bonusRolls;
