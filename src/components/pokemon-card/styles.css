@@ -82,12 +82,12 @@ pokemon-sprite,
 [data-type="ball"] {
   grid-row: 1;
   grid-column: 1;
-  transition: all .2s var(--easing-decelerate);
+  transition: transform .2s var(--easing-decelerate);
   transform: translate(0) rotate(0);
 }
 
 :host([open]) [data-type="ball"] {
-  transition: all .11s var(--easing-accelerate);
+  transition: transform .11s var(--easing-accelerate);
   transform: translate(15px) rotate(120deg);
 }
 
