@@ -318,7 +318,7 @@ template.innerHTML = /*html*/`
 
 
   <!-- Données de légitimité -->
-  <div class="legality-data">
+  <div class="legality-data" data-not-mine>
     <fieldset>
       <legend>Légitimité du Pokémon</legend>
 
