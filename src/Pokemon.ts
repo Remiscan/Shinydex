@@ -459,7 +459,7 @@ class Shiny implements frontendShiny {
     const methode = methodes[k];
     let rolls = 1;
     let bonusRolls = 0;
-    let charmRolls = Number(this.charm) * 2;
+    let charmRolls = Number(game.gen >= 5) * Number(this.charm) * 2;
 
     switch (methode.id) {
       case 'glitch':
