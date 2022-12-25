@@ -156,7 +156,7 @@ function buildPokemonSheet(int $columns = 32, int $spriteSize = 56, string $form
 
   switch ($format) {
     case 'webp':
-      imagewebp($sheet, $imagePath, 100);
+      imagewebp($sheet, $imagePath, 90);
       break;
     case 'png':
     default:
