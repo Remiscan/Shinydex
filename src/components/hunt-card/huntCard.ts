@@ -349,7 +349,7 @@ export class huntCard extends HTMLElement {
           const timeCapture = hunt.timeCapture || 0;
           const oldDate = (new Date(timeCapture)).toISOString().split('T')[0];
           const newTime = value !== oldDate ? (new Date(value as string)).getTime() : timeCapture;
-          hunt.timeCapture = newTime;
+          if (!isNaN(newTime)) hunt.timeCapture = newTime;
         } break;
       }
     }
