@@ -202,9 +202,9 @@ pokemon-sprite,
   overflow: auto;
 }
 
-.icones.explain.offborn,
-.icones.explain.off {
-  display: none;
+.empty {
+  color: var(--text-color-soft);
+  opacity: .5;
 }
 
 

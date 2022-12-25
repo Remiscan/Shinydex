@@ -431,7 +431,8 @@ pokemon-card + pokemon-card {
   grid-template-columns: 1fr;
   grid-template-rows: 1fr min-content min-content 1fr;
   font-size: 1.125rem;
-  color: var(--radio-off-color);
+  color: var(--text-color-soft);
+  opacity: .5;
   flex-grow: 1;
   text-align: center;
   width: 60%;

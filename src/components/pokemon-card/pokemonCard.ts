@@ -161,7 +161,7 @@ export class pokemonCard extends HTMLElement {
 
     // Notes
     {
-      const notes = shiny.notes || 'Pas de note.';
+      const notes = shiny.notes || '<span class="empty">Pas de note.</span>';
       const element = this.shadow.querySelector('.pokemon-notes__texte')!;
       element.innerHTML = notes;
     }
