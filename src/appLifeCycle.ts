@@ -108,8 +108,8 @@ export async function appStart() {
 
   // On vérifie si les données sont installées
   await Promise.all([dataStorage.ready(), shinyStorage.ready(), pokemonData.ready(), huntStorage.ready()]);
-  const installedFiles = await dataStorage.getItem('file-versions');
-  const cacheVersion = Math.max(...Object.values(installedFiles).map(v => Number(v)));
+  let installedFiles = await dataStorage.getItem('file-versions');
+  let cacheVersion = Math.max(...Object.values(installedFiles).map(v => Number(v)));
 
   // On vérifie si les fichiers sont installés
   const filesInstalled = await caches.has(`remidex-sw-${cacheVersion}`);
@@ -136,8 +136,12 @@ export async function appStart() {
       loadMessage.style.display = 'block';
     }
     await initServiceWorker();
+
+    installedFiles = await dataStorage.getItem('file-versions');
+    cacheVersion = Math.max(...Object.values(installedFiles).map(v => Number(v)));
   }
 
+  document.getElementById('version-fichiers')!.innerHTML = timestamp2date(cacheVersion * 1000);
   console.log('[:)] Chargement de l\'application...');
 
   // ---
