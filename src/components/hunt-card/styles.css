@@ -56,7 +56,8 @@ textarea:invalid {
 .group,
 fieldset {
   grid-column: 1 / -1;
-  display: flex;
+  --display: flex;
+  display: var(--display);
   flex-direction: row;
   align-items: center;
   gap: 2ch;
@@ -71,7 +72,8 @@ fieldset:first-of-type {
 }
 
 .one-input {
-  display: flex;
+  --display: flex;
+  display: var(--display);
   flex-direction: row;
   align-items: center;
   gap: 1ch;

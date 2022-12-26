@@ -24,8 +24,8 @@ import methodStrings from '../../../strings/methods.json' assert { type: 'json' 
 const gameIds: Set<string> = new Set(Pokemon.jeux.map(jeu => jeu.id));
 const gameSpecificSheet = new CSSStyleSheet();
 gameSpecificSheet.replaceSync(`
-  ${[...gameIds].map(id => `:host([data-game="${id}"]) [data-game~="${id}"] { display: revert; }`).join('')}
-  ${Shiny.allMethodes.map(id => `:host([data-method="${id}"]) [data-method~="${id}"] { display: revert; }`).join('')}
+  ${[...gameIds].map(id => `:host([data-game="${id}"]) [data-game~="${id}"] { display: var(--display, revert); }`).join('')}
+  ${Shiny.allMethodes.map(methode => `:host([data-method="${methode.id}"]) [data-method~="${methode.id}"] { display: var(--display, revert); }`).join('')}
 `);
 
 

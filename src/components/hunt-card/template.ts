@@ -137,12 +137,12 @@ template.innerHTML = /*html*/`
 
     <span class="one-input">
       <input type="checkbox" name="lgpe-lure" id="lgpe-lure" value="1">
-      <label for="lpge-lure">Parfum utilisé</label>
+      <label for="lgpe-lure">Parfum utilisé</label>
     </span>
 
     <span class="one-input" data-method="wild">
       <input type="checkbox" name="lgpe-nextSpawn" id="lgpe-nextSpawn" value="1">
-      <label for="lpge-nextSpawn">Le chromatique est apparu immédiatement après avoir augmenté le Combo Capture</label>
+      <label for="lgpe-nextSpawn">Le chromatique est apparu immédiatement après avoir augmenté le Combo Capture</label>
     </span>
   </fieldset>
 
