@@ -30,10 +30,10 @@ template.innerHTML = /*html*/`
       <span id="label-ordre">Ordonner par :</span>
 
       <span class="reverse-order__container">
-        <input type="checkbox" name="ordre-reverse" id="ordre-reverse">
         <label for="ordre-reverse" aria-label="Inverser l'ordre">
           <i class="material-icons">vertical_align_bottom</i>
         </label>
+        <input type="checkbox" name="ordre-reverse" id="ordre-reverse">
       </span>
     </div>
 

@@ -44,6 +44,7 @@ body[data-search="true"] search-bar {
   background-color: var(--bg-color);
   color: var(--text-color);
   box-shadow: 0 0px 2px rgb(0, 0, 0, .2);
+  font-size: 1rem;
 }
 
 .search-header > input::placeholder {
@@ -54,6 +55,8 @@ body[data-search="true"] search-bar {
   position: absolute;
   color: var(--text-color-soft);
   left: calc(56px + 0.5 * 56px - 0.5 * 24px);
+  display: flex;
+  align-items: center;
 }
 
 .reset-icon {

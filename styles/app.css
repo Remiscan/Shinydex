@@ -563,6 +563,7 @@ body[data-reversed=true] .reverse-order {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+  gap: 6px;
 }
 
 fieldset.search-hints,
