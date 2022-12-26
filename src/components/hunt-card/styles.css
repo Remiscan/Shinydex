@@ -32,7 +32,7 @@ pokemon-sprite {
   grid-column: 2;
   grid-row: 1;
   padding: .2em;
-  border-radius: 0 0 10px 0;
+  border-radius: 0;
   background-color: var(--card-sprite-bg-color);
   height: fit-content;
   text-align: center;

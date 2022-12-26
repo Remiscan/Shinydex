@@ -1239,10 +1239,10 @@ form[name="app-settings"] {
   justify-content: space-between;
   align-items: center;
   position: absolute;
-  bottom: 0;
+  bottom: 56px;
   left: 0;
   width: 100%;
-  height: calc(2 * 56px);
+  height: 56px;
   padding: 20px;
   background-color: var(--notif-bg-color);
   z-index: var(--z-notification);
@@ -1484,7 +1484,6 @@ form[name="app-settings"] {
   }
 
   .notification {
-    height: 56px;
     grid-column: 2 / 3;
     grid-row: 1 / 2;
     left: 16px;
