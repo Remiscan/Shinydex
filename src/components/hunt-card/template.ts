@@ -12,7 +12,10 @@ template.innerHTML = /*html*/`
   <fieldset>
     <legend>Pokémon</legend>
 
-    <input type="text" name="dexid" required list="datalist-pokedex" autocomplete="off" placeholder="Bulbizarre" size="8">
+    <span class="one-input">
+      <label for="dexid">Espèce :</label>
+      <input type="text" name="dexid" required list="datalist-pokedex" autocomplete="off" placeholder="Bulbizarre" size="8">
+    </span>
 
     <span class="one-input">
       <label for="forme">Forme :</label>

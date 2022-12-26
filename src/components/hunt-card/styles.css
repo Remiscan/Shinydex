@@ -71,6 +71,10 @@ fieldset:first-of-type {
   grid-column: unset;
 }
 
+legend {
+  color: var(--text-color-soft);
+}
+
 .one-input {
   --display: flex;
   display: var(--display);
