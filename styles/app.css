@@ -639,6 +639,10 @@ body:not([data-section-actuelle="pokedex"]) .only-pokedex {
   filter: grayscale(1);
 }
 
+.pkmnicon::before {
+  display: none;
+}
+
 .pokedex-gen > .pkmnicon:focus,
 .pokedex-gen > .got.pkmnicon {
   z-index: 1;
@@ -1091,7 +1095,7 @@ form[name="app-settings"] {
 }
 
 .bouton-recherche-maj {
-  margin-top: 0;
+  margin: auto;
 }
 
 #parametres:not([data-online-backup]) .if-backup,
@@ -1181,7 +1185,7 @@ form[name="app-settings"] {
   justify-content: flex-start;
   align-items: center;
 	text-decoration: none;
-  color: var(--button-ghost-color);
+  color: var(--accent-color);
   height: 2em;
 }
 .lien-source + .lien-source {
@@ -1192,13 +1196,9 @@ form[name="app-settings"] {
 }
 
 .version {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-end;
   opacity: .7;
-  margin-right: -15px;
   font-size: .8rem;
+  margin: auto;
 }
 
 
@@ -1237,13 +1237,13 @@ form[name="app-settings"] {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   position: absolute;
   bottom: 0;
   left: 0;
   width: 100%;
   height: calc(2 * 56px);
-  padding-bottom: 56px;
+  padding: 20px;
   background-color: var(--notif-bg-color);
   z-index: var(--z-notification);
   color: var(--text-color);
@@ -1261,24 +1261,6 @@ form[name="app-settings"] {
 .notification.on {
   transform: translate3D(0, 0, 0);
   transition: transform .15s var(--easing-decelerate);
-}
-
-.notif-bouton,
-.notif-texte {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: auto 20px;
-}
-
-.notif-bouton {
-  cursor: pointer;
-  text-transform: uppercase;
-}
-
-.notif-bouton span {
-  margin-right: 5px;
-  font-weight: 500;
 }
 
 .progression-maj {
@@ -1307,6 +1289,10 @@ form[name="app-settings"] {
 }
 
 :not(.installing):not(.loading).notification>load-spinner {
+  display: none;
+}
+
+.notif-bouton > span:empty {
   display: none;
 }
 
@@ -1498,7 +1484,6 @@ form[name="app-settings"] {
   }
 
   .notification {
-    padding-bottom: 0;
     height: 56px;
     grid-column: 2 / 3;
     grid-row: 1 / 2;

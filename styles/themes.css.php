@@ -13,7 +13,7 @@
   --card-infos-text-color: rgba(0, 0, 0, 0.54);
   --notif-bg-color: rgb(245, 245, 245);
   --sprite-viewer-bg-color: rgb(255, 255, 255);
-  --danger-color: hsl(0, 40%, 50%);
+  --danger-color: #b04041;
   --success-color: hsl(120, 73%, 40%);
   --failure-color: hsl(0, 53%, 40%);
   --radio-disabled-color: rgba(100, 100, 100, .2);
@@ -21,6 +21,8 @@
   --radio-checked-bg-color: white;
   --radio-check-color: var(--accent-color);
   --switch-unchecked-bg-color: hsl(231, 0%, 50%);
+  --button-hover-color: rgb(64, 81, 177, .2);
+  --button-active-color: rgb(64, 81, 177, .1);
   --input-bg-color: white;
   --progress-bar-color: var(--accent-color);
   --card-edit-bg-color: rgba(240, 240, 240, .7);
@@ -41,7 +43,7 @@
   --card-infos-text-color: rgb(200, 200, 200);
   --notif-bg-color: rgb(45, 45, 45);
   --sprite-viewer-bg-color: rgb(0, 0, 0);
-  --danger-color: hsl(0, 40%, 50%);
+  --danger-color: #f88788;
   --success-color: hsl(120, 73%, 75%);
   --failure-color: hsl(0, 53%, 75%);
   --radio-disabled-color: rgba(193, 193, 193, .3);
@@ -49,6 +51,8 @@
   --radio-checked-bg-color: var(--accent-color);
   --radio-check-color: var(--nav-bg-color);
   --switch-unchecked-bg-color: hsla(217, 0%, 55%);
+  --button-hover-color: hsl(217, 89%, 75%, .2);
+  --button-active-color: hsl(217, 89%, 75%, .1);
   --input-bg-color: hsl(0, 0%, 90%);
   --progress-bar-color: white;
   --card-edit-bg-color: hsla(0, 0%, 7%, .7);
@@ -63,5 +67,4 @@
   --radio-on-color: var(--accent-color);
   --checkbox-checked-bg-color: var(--accent-color);
   --button-color: var(--accent-color);
-  --button-ghost-color: var(--accent-color);
 }

@@ -178,10 +178,10 @@
     <!-- Notification -->
     <div class="notification bottom-bar" id="notification">
       <span class="notif-texte"></span>
-      <div class="notif-bouton">
+      <button type="button" class="notif-bouton text">
         <span></span>
         <i class="material-icons"></i>
-      </div>
+      </button>
 
       <div class="progression-maj"></div>
 
