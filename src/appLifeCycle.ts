@@ -230,13 +230,6 @@ export async function appStart() {
     window.matchMedia('(prefers-color-scheme: light)').addListener(event => setTheme(undefined));
   }
 
-  // On affiche la version de l'appli
-  {
-    const tempsChargement = performance.now() - window.tempsChargementDebut;
-    document.getElementById('version-tempschargement')!.innerHTML = String(Math.round(tempsChargement));
-    document.getElementById('version-fichiers')!.innerHTML = timestamp2date(cacheVersion * 1000);
-  }
-
   // On pré-charge les icônes
   try {
     await loadAllImages([`./images/iconsheet.webp`, `./images/pokemonsheet.webp`]);
