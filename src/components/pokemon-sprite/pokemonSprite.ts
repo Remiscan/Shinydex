@@ -37,7 +37,6 @@ export default class pokemonSprite extends HTMLElement {
     lazy: true
   };
   lastChange: number = 0;
-  animating: boolean = false;
 
   
   constructor() {
@@ -50,9 +49,6 @@ export default class pokemonSprite extends HTMLElement {
 
   /** Animation d'étoiles, similaire à celle des jeux. */
   async sparkle() {
-    if (this.animating) return;
-    this.animating = true;
-
     const animations: Animation[] = [];
 
     const starField = this.shadow.querySelector('#star-field')!;
@@ -118,7 +114,6 @@ export default class pokemonSprite extends HTMLElement {
     }
 
     await Promise.all(animations.map(anim => wait(anim)));
-    this.animating = false;
   }
 
 

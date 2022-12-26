@@ -19,3 +19,7 @@ img, svg {
 .star-field > use {
   opacity: 0;
 }
+
+:host(:not([shiny="true"])) svg {
+  display: none;
+}
