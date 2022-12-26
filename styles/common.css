@@ -63,6 +63,7 @@ button.text {
 button.text {
   border: none;
   --button-color: var(--text-color);
+  margin: 0 -0.6em;
 }
 
 input[type=file] + label > *,
