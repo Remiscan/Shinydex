@@ -5,6 +5,7 @@ form:not(.caught) .confirm-buttons ~ * {
 }
 
 :host [data-jeu],
+:host [data-methode],
 :host(:not([data-gen-vc="true"]):not([data-methode-mine="false"])) [data-checkmark-unsure],
 :host(:not([data-methode-mine="false"])) [data-not-mine],
 :host(:not([data-charm-available="true"])) :is([name="charm"], [for="charm"]) {
@@ -25,10 +26,4 @@ input:invalid,
 select:invalid,
 textarea:invalid {
   outline: 2px dashed red;
-}
-
-input[type=number] {
-  all: unset;
-  font-size: 24px;
-  text-align: center;
 }

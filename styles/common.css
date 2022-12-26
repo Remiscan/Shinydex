@@ -81,6 +81,7 @@ label {
 
 :is(
   input[type=text],
+  input[type=number],
   input[type=date],
   input[type=password],
   textarea,
@@ -90,11 +91,13 @@ label {
   min-height: calc(.6 * var(--tap-safe-size));
   box-sizing: border-box;
   font-family: inherit;
+  font-size: inherit;
 }
 
 @media (any-pointer: coarse) {
   :is(
     input[type=text],
+    input[type=number],
     input[type=date],
     input[type=password],
     textarea,

@@ -15,7 +15,8 @@ template.innerHTML = /*html*/`
     <legend>Pokémon</legend>
 
     <input type="text" name="dexid" required list="datalist-pokedex" autocomplete="off" placeholder="Bulbizarre" size="8">
-    <select name="forme"></select>
+    <label for="forme">Forme :</label>
+    <select name="forme" id="forme"></select>
   </fieldset>
 
 
@@ -64,14 +65,14 @@ template.innerHTML = /*html*/`
   <fieldset data-jeu="sv">
     <legend>Bonus de Pokémon Écarlate et Violet</legend>
 
-    <label for="sv-outbreakCleared">Nombre de Pokémon battus dans cette apparition massive</label>
-    <select name="sv-outbreakCleared" id="sv-outbreakCleared">
+    <label for="sv-outbreakCleared" data-methode="massoutbreak">Nombre de Pokémon battus dans cette apparition massive</label>
+    <select name="sv-outbreakCleared" id="sv-outbreakCleared" data-methode="massoutbreak">
       <option value="0" selected>Entre 0 et 29</option>
       <option value="1">Entre 30 et 59</option>
       <option value="2">Plus de 60</option>
     </select>
 
-    <label for="sv-sparklingPower">Nombre de Pokémon battus dans cette apparition massive</label>
+    <label for="sv-sparklingPower">Niveau de Rencontre brillante du sandwich actif</label>
     <select name="sv-sparklingPower" id="sv-sparklingPower">
       <option value="0" selected>Aucun</option>
       <option value="1">Niveau 1</option>
@@ -127,11 +128,11 @@ template.innerHTML = /*html*/`
   <fieldset data-jeu="usum">
     <legend>Bonus de Pokémon Ultra-Soleil et Ultra-Lune</legend>
 
-    <label for="usum-distance">Distance</label>
-    <input type="text" name="usum-distance" id="usum-distance" inputmode="numeric" pattern="[0-9]*" value="0">
+    <label for="usum-distance" data-methode="ultrawormhole">Distance</label>
+    <input type="text" name="usum-distance" id="usum-distance" inputmode="numeric" pattern="[0-9]*" value="0" data-methode="ultrawormhole">
 
-    <label for="usum-rings">Anneaux</label>
-    <select name="usum-rings" id="usum-rings">
+    <label for="usum-rings" data-methode="ultrawormhole">Anneaux</label>
+    <select name="usum-rings" id="usum-rings" data-methode="ultrawormhole">
       <option selected>0</option>
       <option>1</option>
       <option>2</option>
