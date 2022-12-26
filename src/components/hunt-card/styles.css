@@ -76,7 +76,7 @@ fieldset:first-of-type {
 
 .button-group {
   width: fit-content;
-  margin: auto;
+  margin-inline: auto;
   border: none;
 }
 
