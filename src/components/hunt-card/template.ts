@@ -58,13 +58,15 @@ template.innerHTML = /*html*/`
   <fieldset>
     <legend>Bonus globaux</legend>
 
-    <input type="checkbox" name="charm" id="charm">
-    <label for="charm">
-      <span>
-        <span class="icon" data-icon="key/shiny-charm"></span>
-        Charme chroma possédé
-      </span>
-    </label>
+    <span class="one-input">
+      <input type="checkbox" name="charm" id="charm">
+      <label for="charm">
+        <span>
+          Charme chroma possédé
+          <span class="icon" data-icon="key/shiny-charm"></span>
+        </span>
+      </label>
+    </span>
   </fieldset>
 
 
@@ -98,7 +100,7 @@ template.innerHTML = /*html*/`
     <legend>Bonus de Légendes Pokémon: Arceus</legend>
 
     <span class="one-input">
-      <label for="pla-dexResearch">Niveau de recherche de la page du Pokédex</label>
+      <label for="pla-dexResearch">Niveau de recherche de la page du Pokédex :</label>
       <select name="pla-dexResearch" id="pla-dexResearch">
         <option value="0" selected>Page incomplète (niv &lt;9)</option>
         <option value="1">Page complétée (niv 10)</option>
@@ -113,7 +115,7 @@ template.innerHTML = /*html*/`
     <legend>Bonus de Pokémon Épée et Bouclier</legend>
 
     <span class="one-input">
-      <label for="swsh-dexKo">Compteur de KO du Pokédex</label>
+      <label for="swsh-dexKo">Compteur de KO du Pokédex :</label>
       <input type="text" name="swsh-dexKo" id="swsh-dexKo" inputmode="numeric" pattern="[0-9]*" value="0">
     </span>
   </fieldset>
@@ -124,7 +126,7 @@ template.innerHTML = /*html*/`
     <legend>Bonus de Pokémon Let's Go Pikachu et Évoli</legend>
 
     <span class="one-input" data-method="wild">
-      <label for="lgpe-catchCombo">Combo Capture</label>
+      <label for="lgpe-catchCombo">Combo Capture :</label>
       <select name="lgpe-catchCombo" id="lgpe-catchCombo">
         <option value="0" selected>Entre 0 et 10</option>
         <option value="1">Entre 11 et 20</option>
@@ -150,12 +152,12 @@ template.innerHTML = /*html*/`
     <legend>Bonus de Pokémon Ultra-Soleil et Ultra-Lune</legend>
 
     <span class="one-input" data-method="ultrawormhole">
-      <label for="usum-distance">Distance</label>
+      <label for="usum-distance">Distance :</label>
       <input type="text" name="usum-distance" id="usum-distance" inputmode="numeric" pattern="[0-9]*" value="0">
     </span>
 
     <span class="one-input" data-method="ultrawormhole">
-      <label for="usum-rings">Anneaux</label>
+      <label for="usum-rings">Anneaux :</label>
       <select name="usum-rings" id="usum-rings">
         <option selected>0</option>
         <option>1</option>
@@ -188,18 +190,18 @@ template.innerHTML = /*html*/`
     <legend>Données de la capture</legend>
 
     <span class="one-input">
-      <label for="name">Surnom</label>
+      <label for="name">Surnom :</label>
       <input type="text" name="name" id="name">
     </span>
 
     <span class="one-input">
-      <label for="catchTime">Date de capture</label>
+      <label for="catchTime">Date de capture :</label>
       <input type="date" name="catchTime" id="catchTime">
     </span>
 
     <span class="one-input">
       <span data-icon="ball"></span>
-      <label for="ball">Capturé dans une</label>
+      <label for="ball">Capturé dans une :</label>
       <select name="ball" id="ball">
         <option value="lure">Appât Ball</option>
         <option value="repeat">Bis Ball</option>
@@ -247,121 +249,154 @@ template.innerHTML = /*html*/`
   <fieldset data-checkmark-unsure>
     <legend>Origine</legend>
 
-    <input type="radio" name="originMark" id="checkmark-none" value="old" checked>
-    <label for="checkmark-none">Autre</label>
+    <span class="one-input">
+      <input type="radio" name="originMark" id="checkmark-none" value="old" checked>
+      <label for="checkmark-none">
+        <span>
+          Autre
+          <span class="icon" data-icon="origin-mark/old"></span>
+        </span>
+      </label>
+    </span>
 
-    <input type="radio" name="originMark" id="checkmark-paldea" value="paldea" data-game="sv">
-    <label for="checkmark-paldea" data-game="sv">
-      <span>
-        <span class="icon" data-icon="origin-mark/paldea"></span>
-        Paldea
-      </span>
-    </label>
+    <span class="one-input" data-game="sv">
+      <input type="radio" name="originMark" id="checkmark-paldea" value="paldea">
+      <label for="checkmark-paldea">
+        <span>
+          Paldea
+          <span class="icon" data-icon="origin-mark/paldea"></span>
+        </span>
+      </label>
+    </span>
 
-    <input type="radio" name="originMark" id="checkmark-hisui" value="hisui" data-game="pla">
-    <label for="checkmark-hisui" data-game="pla">
-      <span>
-        <span class="icon" data-icon="origin-mark/hisui"></span>
-        Hisui
-      </span>
-    </label>
+    <span class="one-input" data-game="pla">
+      <input type="radio" name="originMark" id="checkmark-hisui" value="hisui">
+      <label for="checkmark-hisui">
+        <span>
+          Hisui
+          <span class="icon" data-icon="origin-mark/hisui"></span>
+        </span>
+      </label>
+    </span>
 
-    <input type="radio" name="originMark" id="checkmark-bdsp" value="sinnoh-gen8" data-game="bdsp">
-    <label for="checkmark-bdsp" data-game="bdsp">
-      <span>
-        <span class="icon" data-icon="origin-mark/sinnoh-gen8"></span>
-        Sinnoh (DÉ/PS)
-      </span>
-    </label>
+    <span class="one-input" data-game="bdsp">
+      <input type="radio" name="originMark" id="checkmark-bdsp" value="sinnoh-gen8">
+      <label for="checkmark-bdsp">
+        <span>
+          Sinnoh (DÉ/PS)
+          <span class="icon" data-icon="origin-mark/sinnoh-gen8"></span>
+        </span>
+      </label>
+    </span>
 
-    <input type="radio" name="originMark" id="checkmark-galar" value="galar" data-game="swsh">
-    <label for="checkmark-galar" data-game="swsh">
-      <span>
-        <span class="icon" data-icon="origin-mark/galar"></span>
-        Galar
-      </span>
-    </label>
+    <span class="one-input" data-game="swsh">
+      <input type="radio" name="originMark" id="checkmark-galar" value="galar">
+      <label for="checkmark-galar">
+        <span>
+          Galar
+          <span class="icon" data-icon="origin-mark/galar"></span>
+        </span>
+      </label>
+    </span>
 
-    <input type="radio" name="originMark" id="checkmark-letsgo" value="lets-go" data-game="lgpe">
-    <label for="checkmark-letsgo" data-game="lgpe">
-      <span>
-        <span class="icon" data-icon="origin-mark/lets-go"></span>
-        Kanto (Let's Go)
-      </span>
-    </label>
+    <span class="one-input" data-game="lgpe">
+      <input type="radio" name="originMark" id="checkmark-letsgo" value="lets-go">
+      <label for="checkmark-letsgo">
+        <span>
+          Kanto (Let's Go)
+          <span class="icon" data-icon="origin-mark/lets-go"></span>
+        </span>
+      </label>
+    </span>
 
-    <input type="radio" name="originMark" id="checkmark-alola" value="alola" data-game="sm usum">
-    <label for="checkmark-alola" data-game="sm usum">
-      <span>
-        <span class="icon" data-icon="origin-mark/alola"></span>
-        Alola
-      </span>
-    </label>
+    <span class="one-input" data-game="sm usum">
+      <input type="radio" name="originMark" id="checkmark-alola" value="alola">
+      <label for="checkmark-alola">
+        <span>
+          Alola
+          <span class="icon" data-icon="origin-mark/alola"></span>
+        </span>
+      </label>
+    </span>
 
-    <input type="radio" name="originMark" id="checkmark-kalos" value="gen6" data-game="xy oras">
-    <label for="checkmark-kalos" data-game="xy oras">
-      <span>
-        <span class="icon" data-icon="origin-mark/gen6"></span>
-        Kalos
-      </span>
-    </label>
+    <span class="one-input" data-game="xy oras">
+      <input type="radio" name="originMark" id="checkmark-kalos" value="gen6">
+      <label for="checkmark-kalos">
+        <span>
+          Kalos
+          <span class="icon" data-icon="origin-mark/gen6"></span>
+        </span>
+      </label>
+    </span>
 
-    <input type="radio" name="originMark" id="checkmark-vc" value="game-boy" data-game="rb yellow gs crystal">
-    <label for="checkmark-vc" data-game="rb yellow gs crystal">
-      <span>
-        <span class="icon" data-icon="origin-mark/game-boy"></span>
-        Console Virtuelle
-      </span>
-    </label>
+    <span class="one-input" data-game="rb yellow gs crystal">
+      <input type="radio" name="originMark" id="checkmark-vc" value="game-boy">
+      <label for="checkmark-vc">
+        <span>
+          Console Virtuelle
+          <span class="icon" data-icon="origin-mark/game-boy"></span>
+        </span>
+      </label>
+    </span>
 
-    <input type="radio" name="originMark" id="checkmark-go" value="go" data-game="go">
-    <label for="checkmark-go" data-game="go">
-      <span>
-        <span class="icon" data-icon="origin-mark/go"></span>
-        Pokémon GO
-      </span>
-    </label>
+    <span class="one-input" data-game="go">
+      <input type="radio" name="originMark" id="checkmark-go" value="go">
+      <label for="checkmark-go">
+        <span>
+          Pokémon GO
+          <span class="icon" data-icon="origin-mark/go"></span>
+        </span>
+      </label>
+    </span>
   </fieldset>
 
   <fieldset data-game="swsh pla">
     <legend>Gène</legend>
 
-    <input type="radio" name="gene" id="gene-none" value="0" checked>
-    <label for="gene-none">Aucun</label>
+    <span class="one-input">
+      <input type="radio" name="gene" id="gene-none" value="0" checked>
+      <label for="gene-none">Aucun</label>
+    </span>
 
-    <input type="radio" name="gene" id="gene-gigamax" value="gigamax" data-game="swsh">
-    <label for="gene-gigamax" data-game="swsh">
-      <span>
-        <span class="icon" data-icon="gene/gigantamax"></span>
-        Gigamax
-      </span>
-    </label>
+    <span class="one-input" data-game="swsh">
+      <input type="radio" name="gene" id="gene-gigamax" value="gigamax">
+      <label for="gene-gigamax">
+        <span>
+          Gigamax
+          <span class="icon" data-icon="gene/gigantamax"></span>
+        </span>
+      </label>
+    </span>
 
-    <input type="radio" name="gene" id="gene-alpha" value="alpha" data-game="pla">
-    <label for="gene-alpha" data-game="pla">
-      <span>
-        <span class="icon" data-icon="gene/alpha"></span>
-        Baron
-      </span>
-    </label>
+    <span class="one-input" data-game="pla">
+      <input type="radio" name="gene" id="gene-alpha" value="alpha">
+      <label for="gene-alpha">
+        <span>
+          Baron
+          <span class="icon" data-icon="gene/alpha"></span>
+        </span>
+      </label>
+    </span>
   </fieldset>
 
 
   <!-- Données de légitimité -->
   <div class="group legality-data" data-not-mine>
-    <label for="hacked">Légitimité</label>
-    <select name="hacked" id="hacked">
-      <option value="0" selected>Legit</option>
-      <option value="1">Pas sûr</option>
-      <option value="2">Hacké</option>
-      <option value="3">Cloné</option>
-    </select>
+    <span class="one-input">
+      <label for="hacked">Légitimité :</label>
+      <select name="hacked" id="hacked">
+        <option value="0" selected>Legit</option>
+        <option value="1">Pas sûr</option>
+        <option value="2">Hacké</option>
+        <option value="3">Cloné</option>
+      </select>
+    </span>
   </div>
 
 
   <!-- Notes -->
   <div class="group">
-    <label for="notes">Notes additionnelles</label>
+    <label for="notes">Notes additionnelles :</label>
     <textarea name="notes" id="notes" rows="3"></textarea>
   </div>
 

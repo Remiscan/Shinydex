@@ -34,13 +34,17 @@ pokemon-sprite {
   padding: .2em;
   border-radius: 0 0 10px 0;
   background-color: var(--card-sprite-bg-color);
-  width: fit-content;
   height: fit-content;
+  text-align: center;
 }
 
 input[name="dexid"],
 input[name="game"] {
   text-transform: capitalize;
+}
+
+[data-icon^="origin-mark"] {
+  filter: invert(var(--dark-coeff));
 }
 
 input:invalid,
