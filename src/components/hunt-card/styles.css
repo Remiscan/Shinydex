@@ -1,20 +1,41 @@
-form:not(.edit) .yes-edit,
-form.edit .not-edit,
-form:not(.caught) .confirm-buttons ~ * {
-  display: none;
+:host {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 10px;
+  box-shadow: rgb(0 0 0 / 14%) 0px 2px 2px 0px;
+  background-color: var(--card-bg-color);
+  display: grid;
+  order: var(--order, 0);
+  position: relative;
 }
 
-:host [data-game],
-:host [data-method],
-:host(:not([data-gen-vc="true"]):not([data-method-mine="false"])) [data-checkmark-unsure],
-:host(:not([data-method-mine="false"])) [data-not-mine],
-:host(:not([data-charm-available="true"])) :is([name="charm"], [for="charm"]) {
-  display: none;
+form {
+  display: grid;
+  grid-template-columns: 120px 1fr;
 }
 
-select:empty,
-label:has(+ select:empty) {
-  display: none;
+pokemon-sprite {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  --size: 112px;
+  width: var(--size);
+  height: var(--size);
+  padding: calc(.5 * (120px - var(--size)));
+  background-color: var(--card-sprite-bg-color);
+  display: grid;
+  place-items: center;
+  border-radius: 10px 0 10px 0;
+}
+
+.edit-notice {
+  display: inline-block;
+  grid-column: 2;
+  grid-row: 1;
+  padding: .2em;
+  border-radius: 0 0 10px 0;
+  background-color: var(--card-sprite-bg-color);
+  width: fit-content;
+  height: fit-content;
 }
 
 input[name="dexid"],
@@ -26,4 +47,56 @@ input:invalid,
 select:invalid,
 textarea:invalid {
   outline: 2px dashed red;
+}
+
+.group,
+fieldset {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 2ch;
+  flex-wrap: wrap;
+  margin: 10px;
+  border: 2px solid var(--card-sprite-bg-color);
+  border-radius: 10px;
+}
+
+fieldset:first-of-type {
+  grid-column: unset;
+}
+
+.one-input {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1ch;
+  flex-wrap: nowrap;
+}
+
+.button-group {
+  width: fit-content;
+  margin: auto;
+  border: none;
+}
+
+form:not([data-edit]) [data-edit],
+form[data-edit] [data-not-edit],
+form:not(.caught) .capture-button-group ~ * {
+  display: none;
+}
+
+:host [data-game],
+:host [data-method],
+:host(:not([data-gen-vc="true"]):not([data-method-mine="false"])) [data-checkmark-unsure],
+:host(:not([data-method-mine="false"])) [data-not-mine],
+:host(:not([data-charm-available="true"])) :is([name="charm"], [for="charm"]) {
+  display: none;
+}
+
+fieldset:empty,
+.one-input:empty,
+select:empty,
+label:has(+ select:empty) {
+  display: none;
 }

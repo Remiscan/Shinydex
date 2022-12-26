@@ -209,20 +209,19 @@ export class huntCard extends HTMLElement {
         case 'notes':
         case 'forme':
         case 'gene':
-        case 'ball': {
-          const value = hunt[prop] as string;
+        case 'ball':
+        case 'hacked': {
+          const value = String(hunt[prop]);
           input.value = value;
         } break;
 
-        case 'originMark':
-        case 'hacked': {
+        case 'originMark': {
           const value = hunt[prop] as number | string;
           const input = this.shadow.querySelector(`input[name="${prop}"][value="${value}"]`) as HTMLInputElement;
           input.checked = true;
         } break;
 
-        case 'charm':
-        case 'hacked': {
+        case 'charm': {
           const value = hunt[prop] as boolean;
           input.checked = value;
         } break;
@@ -255,8 +254,8 @@ export class huntCard extends HTMLElement {
           const value = hunt.huntid;
           const form = this.shadow.querySelector('form');
           const edit = (await shinyStorage.getItem(value)) != null;
-          if (edit) form?.classList.add('edit');
-          else      form?.classList.remove('edit');
+          if (edit) form?.setAttribute('data-edit', '');
+          else      form?.removeAttribute('data-edit');
         } break;
       }
     }
@@ -298,8 +297,7 @@ export class huntCard extends HTMLElement {
         } break;
 
         case 'caught':
-        case 'charm':
-        case 'hacked': {
+        case 'charm': {
           const boolean = value === 'false' ? false : true;
           Object.assign(hunt, { [prop]: boolean });
         } break;
@@ -415,7 +413,7 @@ export class huntCard extends HTMLElement {
     const form = this.shadow.querySelector('form') as HTMLFormElement;
 
     // Active les boutons d'incrémentation du compteur
-    const inputCompteur = this.shadow.querySelector('input[name="compteur"]') as HTMLInputElement;
+    const inputCompteur = this.shadow.querySelector('input[name="count"]') as HTMLInputElement;
 
     this.handlers.counterAdd = {
       element: this.shadow.querySelector('button.counter.add') as HTMLButtonElement,
@@ -453,13 +451,13 @@ export class huntCard extends HTMLElement {
         }
 
         form.classList.toggle('caught');
-        const inputDate = this.shadow.querySelector('input[name="timeCapture"]') as HTMLInputElement;
+        const inputDate = this.shadow.querySelector('input[name="catchTime"]') as HTMLInputElement;
         const sprite = this.shadow.querySelector('pokemon-sprite')! as pokemonSprite;
   
         if (form.classList.contains('caught')) {
           sprite.setAttribute('shiny', 'true');
           sprite.sparkle();
-          if (!form.classList.contains('edit')) {
+          if (!form.getAttribute('edit') != null) {
             inputDate.value = new Date().toISOString().split('T')[0];
             form.dispatchEvent(new Event('change'));
           }
