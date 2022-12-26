@@ -128,15 +128,17 @@ export default class pokemonSprite extends HTMLElement {
     const img = this.shadow.querySelector('img')!;
     const url = await this.getSpriteUrl();
     const isSheet = this.params.size === 'sheet';
-    this.style.setProperty('--size', `${isSheet ? 56 : this.params.size}px`);
+    const name = (await Pokemon.names())[Number(this.params.dexid)];
+    
     // On affiche le nouveau sprite uniquement si aucune nouvelle demande n'a été faite entre temps
     if (currentChange === this.lastChange) {
       img.loading = this.params.lazy ? 'lazy' : 'eager';
       img.src = url;
+      img.setAttribute('alt', `${name}${this.params.shiny ? ' chromatique' : ''}`);
       img.setAttribute('width', String(isSheet ? 56 : this.params.size));
       img.setAttribute('height', String(isSheet ? 56 : this.params.size));
-      const name = (await Pokemon.names())[Number(this.params.dexid)];
-      img.setAttribute('alt', `${name}${this.params.shiny ? ' chromatique' : ''}`);
+      this.style.setProperty('--size', `${isSheet ? 56 : this.params.size}px`);
+      
       if (isSheet) {
         img.setAttribute('data-dexid', String(this.params.dexid));
         img.classList.add('pkmnicon');
@@ -234,6 +236,8 @@ export default class pokemonSprite extends HTMLElement {
       default:
         value = '';
     }
+
+    this.lastChange = Date.now();
   }
   
 
