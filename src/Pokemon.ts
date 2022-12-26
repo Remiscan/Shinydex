@@ -138,8 +138,8 @@ type nameLang = keyof backendPokemon['name'];
 
 
 
-type compteur = {
-  'count': number,
+type count = {
+  'encounters': number,
   'usum-distance'?: number,
   'usum-rings'?: number,
   'lgpe-catchCombo'?: number,
@@ -158,25 +158,29 @@ interface backendShiny {
   id: number,
   huntid: string,
   lastUpdate: string,
+
   dexid: number,
   forme: string,
-  gene: string,
-  surnom: string,
-  methode: string,
-  compteur: string,
-  timeCapture: number,
-  jeu: string,
-  ball: string,
-  notes: string,
-  checkmark: string,
+  game: string,
+  method: string,
+  count: string,
   charm: boolean,
+
+  catchTime: string,
+  name: string,
+  ball: string,
+  gene: string,
+  originMark: string,
   hacked: number,
+
+  notes: string,
 };
 
 /** Structure d'un Pokémon shiny tel que stocké dans la BDD locale. */
-export interface frontendShiny extends Omit<backendShiny, 'id' | 'lastUpdate' | 'compteur'> {
+export interface frontendShiny extends Omit<backendShiny, 'id' | 'lastUpdate' | 'count' | 'catchTime'> {
   lastUpdate: number,
-  compteur: compteur,
+  count: count,
+  catchTime: number,
   deleted?: boolean,
   destroy?: boolean,
 }
@@ -330,20 +334,23 @@ class Pokemon {
 class Shiny implements frontendShiny {
   // frontendShiny fields
   huntid: string = '';
-  lastUpdate: number = NaN;
-  dexid: number = NaN;
+  lastUpdate: number = 0;
+
+  dexid: number = 0;
   forme: string = '';
-  gene: string = '';
-  surnom: string = '';
-  methode: string = '';
-  compteur: compteur = { count: 0 };
-  timeCapture: number = NaN;
-  jeu: string = '';
-  ball: string = '';
-  notes: string = '';
-  checkmark: string = '';
+  game: string = '';
+  method: string = '';
+  count: count = { encounters: 0 };
   charm: boolean = false;
-  hacked: number = NaN;
+
+  catchTime: number = 0;
+  name: string = '';
+  ball: string = '';
+  gene: string = '';
+  originMark: string = '';
+  hacked: number = 0;
+  
+  notes: string = '';
 
   // additional fields
   deleted: boolean = false;
@@ -359,7 +366,7 @@ class Shiny implements frontendShiny {
    */
   async getEspece(): Promise<backendPokemon> {
     const pokemon = await pokemonData.getItem(String(this.dexid));
-    if (pokemon == null) throw `Aucun Pokémon ne correspond à ce Shiny (${this.surnom} / ${this.forme})`;
+    if (pokemon == null) throw `Aucun Pokémon ne correspond à ce Shiny (${this.name} / ${this.forme})`;
     return pokemon;
   }
 
@@ -370,7 +377,7 @@ class Shiny implements frontendShiny {
     const pokemon = await this.getEspece();
 
     const k = pokemon.formes.findIndex(p => p.dbid == this.forme);
-    if (k == -1) throw `La forme de ce Shiny est invalide (${this.surnom} / ${pokemon.name.fr} / ${this.forme})`;
+    if (k == -1) throw `La forme de ce Shiny est invalide (${this.name} / ${pokemon.name.fr} / ${this.forme})`;
     return pokemon.formes[k];
   }
 
@@ -406,17 +413,17 @@ class Shiny implements frontendShiny {
    * @returns Si le Pokémon chromatique a été trouvé par moi.
    */
   get mine(): boolean {
-    let k = Shiny.methodes('notmine').findIndex(m => m.id == this.methode);
+    let k = Shiny.methodes('notmine').findIndex(m => m.id == this.method);
     if (k == -1) return true;
     else return false;
   }
 
-  get originMark(): string {
+  get appliedOriginMark(): string {
     if (this.hacked) return ''; // Hacked Pokémon don't deserve an origin mark
-    if (!this.mine) return this.checkmark; // Traded Pokémon can have been born on earlier games
+    if (!this.mine) return this.originMark; // Traded Pokémon can have been born on earlier games
 
     const jeu = this.jeuObj;
-    if (jeu.gen === 1 || jeu.gen === 2) return this.checkmark; // gen 1 & 2 games could come from 3DS Virtual Console
+    if (jeu.gen === 1 || jeu.gen === 2) return this.originMark; // gen 1 & 2 games could come from 3DS Virtual Console
     else if (jeu.originMark) return jeu.originMark;
     else return 'old';
   }
@@ -432,8 +439,8 @@ class Shiny implements frontendShiny {
    * @returns Jeu dans lequel le Pokémon a été capturé.
    */
   get jeuObj(): Jeu {
-    let k = Pokemon.jeux.findIndex(p => p.uid == this.jeu);
-    if (k == -1) throw `Jeu invalide (${this.jeu})`;
+    let k = Pokemon.jeux.findIndex(p => p.uid == this.game);
+    if (k == -1) throw `Jeu invalide (${this.game})`;
 
     return Pokemon.jeux[k];
   }
@@ -468,8 +475,8 @@ class Shiny implements frontendShiny {
 
     const methodes = Shiny.methodes();
 
-    let k = methodes.findIndex(p => p.id == this.methode);
-    if (k == -1) throw `Méthode invalide (${this.methode})`;
+    let k = methodes.findIndex(p => p.id == this.method);
+    if (k == -1) throw `Méthode invalide (${this.method})`;
 
     const methode = methodes[k];
     let rolls = 1;
@@ -479,8 +486,8 @@ class Shiny implements frontendShiny {
     switch (methode.id) {
       case 'wild': {
         if (game.id === 'lgpe') {
-          const lureRolls = this.compteur['lgpe-lure'] ? 1 : 0;
-          const combo = this.compteur['lgpe-catchCombo'] || 0;
+          const lureRolls = this.count['lgpe-lure'] ? 1 : 0;
+          const combo = this.count['lgpe-catchCombo'] || 0;
           const chainRolls = (combo >= 31) ? 11
                           : (combo >= 21) ? 7
                           : (combo >= 11) ? 3
@@ -489,7 +496,7 @@ class Shiny implements frontendShiny {
         }
 
         else if (game.id === 'swsh') {
-          const dexKo = this.compteur['swsh-dexKo'] || 0;
+          const dexKo = this.count['swsh-dexKo'] || 0;
           if (!dexKo) break;
 
           const chainRolls = (dexKo >= 500) ? 5
@@ -525,7 +532,7 @@ class Shiny implements frontendShiny {
       }
       
       case 'pokeradar': {
-        const chain = Math.min(40, Math.max(0, this.compteur.count));
+        const chain = Math.min(40, Math.max(0, this.count.encounters));
         let odds = 0;
         switch (game.id) {
           case 'dp':
@@ -547,7 +554,7 @@ class Shiny implements frontendShiny {
       }
       
       case 'chainfishing': {
-        const chain = Math.min(20, this.compteur.count);
+        const chain = Math.min(20, this.count.encounters);
         bonusRolls = 2 * chain;
         break;
       }
@@ -563,7 +570,7 @@ class Shiny implements frontendShiny {
       }
 
       case 'soschain': {
-        const compteur = this.compteur.count;
+        const compteur = this.count.encounters;
         const chainCoeff = (compteur >= 31) ? 3
                          : (compteur >= 21) ? 2
                          : (compteur >= 11) ? 1
@@ -574,8 +581,8 @@ class Shiny implements frontendShiny {
 
       case 'ultrawormhole': {
         // this.compteur == au format { "distance": 30, "rings": 2 }
-        let d = Math.min(9, Math.floor(this.compteur['usum-distance'] || 0) / 500 - 1);
-        const rings = this.compteur['usum-rings'] || 0;
+        let d = Math.min(9, Math.floor(this.count['usum-distance'] || 0) / 500 - 1);
+        const rings = this.count['usum-rings'] || 0;
         const odds = (rings == 3) ? (4 * d)
                    : (rings == 2) ? ((1 + 2 * d))
                    : (rings == 1) ? ((1 + d))
@@ -601,7 +608,7 @@ class Shiny implements frontendShiny {
 
       case 'massoutbreak': {
         if (game.id === 'pla') bonusRolls = 25;
-        else if (game.id === 'sv') bonusRolls = this.compteur['sv-outbreakCleared'] || 0;
+        else if (game.id === 'sv') bonusRolls = this.count['sv-outbreakCleared'] || 0;
         break;
       }
 
@@ -618,13 +625,13 @@ class Shiny implements frontendShiny {
     switch (game.id) {
       case 'pla': {
         charmRolls = Number(this.charm) * 3;
-        const dexResearch = this.compteur['pla-dexResearch'] || 0;
+        const dexResearch = this.count['pla-dexResearch'] || 0;
         bonusRolls += dexResearch === 2 ? 3 : dexResearch;
         break;
       }
 
       case 'sv': {
-        const sparklingPower = this.compteur['sv-sparklingPower'] || 0;
+        const sparklingPower = this.count['sv-sparklingPower'] || 0;
         bonusRolls += sparklingPower;
       } break;
     }

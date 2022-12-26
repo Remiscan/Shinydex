@@ -24,12 +24,12 @@ import methodStrings from '../../../strings/methods.json' assert { type: 'json' 
 const gameIds: Set<string> = new Set(Pokemon.jeux.map(jeu => jeu.id));
 const gameSpecificSheet = new CSSStyleSheet();
 gameSpecificSheet.replaceSync(`
-  ${[...gameIds].map(id => `:host([data-jeu="${id}"]) [data-jeu~="${id}"] { display: revert; }`).join('')}
-  ${Shiny.allMethodes.map(id => `:host([data-methode="${id}"]) [data-methode~="${id}"] { display: revert; }`).join('')}
+  ${[...gameIds].map(id => `:host([data-game="${id}"]) [data-game~="${id}"] { display: revert; }`).join('')}
+  ${Shiny.allMethodes.map(id => `:host([data-method="${id}"]) [data-method~="${id}"] { display: revert; }`).join('')}
 `);
 
 
-const compteurProps: Array<keyof Shiny['compteur']> = ['usum-distance', 'usum-rings', 'lgpe-catchCombo', 'lgpe-lure', 'lgpe-nextSpawn', 'swsh-dexKo', 'pla-dexResearch', 'sv-outbreakCleared', 'sv-sparklingPower'];
+const compteurProps: Array<keyof Shiny['count']> = ['usum-distance', 'usum-rings', 'lgpe-catchCombo', 'lgpe-lure', 'lgpe-nextSpawn', 'swsh-dexKo', 'pla-dexResearch', 'sv-outbreakCleared', 'sv-sparklingPower'];
 
 
 
@@ -193,19 +193,19 @@ export class huntCard extends HTMLElement {
           this.genereFormes(name, hunt.forme);
         } break;
 
-        case 'jeu': {
-          const value = hunt.jeu;
+        case 'game': {
+          const value = hunt.game;
           input.value = value;
-          this.updateAttribute('jeu', value);
+          this.updateAttribute('game', value);
         } break;
 
-        case 'methode': {
-          const value = hunt.methode;
+        case 'method': {
+          const value = hunt.method;
           input.value = value;
-          this.updateAttribute('methode', value);
+          this.updateAttribute('method', value);
         } break;
 
-        case 'surnom':
+        case 'name':
         case 'notes':
         case 'forme':
         case 'gene':
@@ -214,7 +214,7 @@ export class huntCard extends HTMLElement {
           input.value = value;
         } break;
 
-        case 'checkmark':
+        case 'originMark':
         case 'hacked': {
           const value = hunt[prop] as number | string;
           const input = this.shadow.querySelector(`input[name="${prop}"][value="${value}"]`) as HTMLInputElement;
@@ -227,9 +227,9 @@ export class huntCard extends HTMLElement {
           input.checked = value;
         } break;
 
-        case 'compteur': {
-          const value = hunt.compteur;
-          input.value = String(value['count'] || 0);
+        case 'count': {
+          const value = hunt.count;
+          input.value = String(value['encounters'] || 0);
 
           for (const compteurProp of compteurProps) {
             const input = this.shadow.querySelector(`input[name="${compteurProp}"], select[name="${compteurProp}"]`) as HTMLInputElement;
@@ -237,8 +237,8 @@ export class huntCard extends HTMLElement {
           }
         } break;
 
-        case 'timeCapture': {
-          const value = hunt.timeCapture || 0;
+        case 'catchTime': {
+          const value = hunt.catchTime || 0;
           const date = (new Date(value)).toISOString().split('T')[0];
           input.value = date;
         } break;
@@ -281,15 +281,15 @@ export class huntCard extends HTMLElement {
 
         case 'forme':
         case 'gene':
-        case 'surnom':
-        case 'methode':
-        case 'jeu':
+        case 'name':
+        case 'method':
+        case 'game':
         case 'ball':
         case 'notes': {
           Object.assign(hunt, { [prop]: value });
         } break;
 
-        case 'checkmark': {
+        case 'originMark': {
           Object.assign(hunt, { [prop]: value as string });
         } break;
 
@@ -304,9 +304,9 @@ export class huntCard extends HTMLElement {
           Object.assign(hunt, { [prop]: boolean });
         } break;
 
-        case 'compteur': {
-          const compteur: Shiny['compteur'] = {
-            count: Number(value) || 0
+        case 'count': {
+          const compteur: Shiny['count'] = {
+            encounters: Number(value) || 0
           };
 
           for (const compteurProp of compteurProps) {
@@ -314,14 +314,14 @@ export class huntCard extends HTMLElement {
             if (val > 0) compteur[compteurProp] = val;
           }
 
-          hunt.compteur = compteur;
+          hunt.count = compteur;
         } break;
 
-        case 'timeCapture': {
-          const timeCapture = hunt.timeCapture || 0;
+        case 'catchTime': {
+          const timeCapture = hunt.catchTime || 0;
           const oldDate = (new Date(timeCapture)).toISOString().split('T')[0];
           const newTime = value !== oldDate ? (new Date(value as string)).getTime() : timeCapture;
-          if (!isNaN(newTime)) hunt.timeCapture = newTime;
+          if (!isNaN(newTime)) hunt.catchTime = newTime;
         } break;
       }
     }
@@ -349,8 +349,8 @@ export class huntCard extends HTMLElement {
 
       const hunt = await this.formToHunt(formData);
       
-      this.updateAttribute('methode', hunt.methode);
-      this.updateAttribute('jeu', hunt.jeu);
+      this.updateAttribute('method', hunt.method);
+      this.updateAttribute('game', hunt.game);
 
       if (this.changeNonce !== nonce) return;
       await huntStorage.setItem(hunt.huntid, hunt);
@@ -365,9 +365,9 @@ export class huntCard extends HTMLElement {
     const hunt = _hunt ?? (await this.getHunt());
     
     const gameIcon = this.shadow.querySelector(`[data-icon^="game"]`)!;
-    if (hunt.jeu) {
+    if (hunt.game) {
       gameIcon.classList.add('icon');
-      gameIcon.setAttribute('data-icon', `game/${hunt.jeu}`);
+      gameIcon.setAttribute('data-icon', `game/${hunt.game}`);
     } else {
       gameIcon.classList.remove('icon');
       gameIcon.setAttribute('data-icon', 'game');
@@ -391,15 +391,15 @@ export class huntCard extends HTMLElement {
 
   updateAttribute(attr: string, value: string) {
     switch (attr) {
-      case 'methode': {
-        this.setAttribute('data-methode', value);
+      case 'method': {
+        this.setAttribute('data-method', value);
         const methode = Shiny.allMethodes.find(methode => methode.id === value);
-        this.setAttribute('data-methode-mine', String(methode?.mine ?? false));
+        this.setAttribute('data-method-mine', String(methode?.mine ?? false));
       } break;
 
-      case 'jeu': {
+      case 'game': {
         const jeu = Pokemon.jeux.find(jeu => jeu.uid === value);
-        this.setAttribute('data-jeu', jeu?.id ?? '');
+        this.setAttribute('data-game', jeu?.id ?? '');
         const charmAvailable = jeu ? jeu.gen >= 5 : false;
         this.setAttribute('data-charm-available', String(charmAvailable));
         const virtualconsoleGen = jeu ? (jeu.gen === 1 || jeu.gen === 2) : false;
@@ -506,9 +506,9 @@ export class huntCard extends HTMLElement {
         // Gestion des erreurs de formulaire
         const erreurs = [];
         if (hunt.dexid == 0) erreurs.push('Pokémon');
-        if (hunt.jeu == '') erreurs.push('jeu');
-        if (hunt.methode == '')  erreurs.push('méthode');
-        if (hunt.timeCapture == 0) erreurs.push('date');
+        if (hunt.game == '') erreurs.push('jeu');
+        if (hunt.method == '')  erreurs.push('méthode');
+        if (hunt.catchTime == 0) erreurs.push('date');
   
         if (erreurs.length > 0) {
           let message = `Les champs suivants sont mal remplis : `;
@@ -598,19 +598,19 @@ export class huntCard extends HTMLElement {
 
   /** Génère la liste des méthodes à partir du jeu entré. */
   genereMethodes() {
-    const select = this.shadow.querySelector('select[name="methode"]') as HTMLInputElement;
+    const select = this.shadow.querySelector('select[name="method"]') as HTMLInputElement;
     const lang = document.documentElement.getAttribute('lang');
     for (const methode of Shiny.allMethodes) {
       const nom = methodStrings[lang][methode.id];
       const gameIds = new Set(methode.jeux.map(jeu => jeu.id));
-      select.innerHTML += `<option value="${methode.id}" data-jeu="${[...gameIds].join(' ')}">${nom}</option>`;
+      select.innerHTML += `<option value="${methode.id}" data-game="${[...gameIds].join(' ')}">${nom}</option>`;
     }
   }
 
 
   /** Génère la liste des jeux. */
   genereJeux() {
-    const select = this.shadow.querySelector('select[name="jeu"]')!;
+    const select = this.shadow.querySelector('select[name="game"]')!;
     const lang = document.documentElement.getAttribute('lang');
     for (const jeu of Pokemon.jeux.reverse()) {
       const nom = gameStrings[lang][jeu.uid];

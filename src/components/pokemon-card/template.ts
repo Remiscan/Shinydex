@@ -11,22 +11,22 @@ template.innerHTML = /*html*/`
     <svg><circle r="25" cx="25" cy="25"/></svg>
   </div>
 
-  <div class="pokemon-infos__nom">
+  <div class="pokemon-infos__identity">
     <span data-type="ball" class="icon"></span>
-    <span data-type="surnom"></span>
-    <span data-type="espece"></span>
+    <span data-type="name"></span>
+    <span data-type="species"></span>
     <span data-type="gene"></span>
   </div>
 
   <div class="pokemon-infos__misc">
-    <span data-type="checkmark" class="icon"></span>
+    <span data-type="originMark" class="icon"></span>
   </div>
 
   <div class="pokemon-infos__capture">
-    <span data-type="jeu" class="icon"></span>
-    <span data-type="methode"></span>
-    <span data-type="timeCapture"></span>
-    <span data-type="compteur"></span>
+    <span data-type="game" class="icon"></span>
+    <span data-type="method"></span>
+    <span data-type="catchTime"></span>
+    <span data-type="count"></span>
   </div>
 
   <div class="shiny-rate">

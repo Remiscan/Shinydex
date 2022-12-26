@@ -6,28 +6,30 @@ import { huntStorage, shinyStorage } from './localForage.js';
 // Structure d'un Pokémon en cours de chasse tel que stocké dans la BDD locale
 export interface huntedPokemon extends Omit<frontendShiny, 'id' | 'destroy'> {
   caught: boolean,
-  uploaded: boolean,
 }
 
 const defaultHunt: huntedPokemon = {
   huntid: '',
   lastUpdate: 0,
+
   dexid: 0,
   forme: '',
-  gene: '',
-  surnom: '',
-  methode: '',
-  compteur: { count: 0 },
-  timeCapture: 0,
-  jeu: '',
-  ball: 'poke',
-  notes: '',
-  checkmark: '',
+  game: '',
+  method: '',
+  count: { encounters: 0 },
   charm: false,
+
+  catchTime: 0,
+  name: '',
+  ball: 'poke',
+  gene: '',
+  originMark: '',
   hacked: 0,
+
+  notes: '',
+  
   deleted: false,
   caught: false,
-  uploaded: false,
 };
 
 export class Hunt extends Shiny implements huntedPokemon {
@@ -39,7 +41,6 @@ export class Hunt extends Shiny implements huntedPokemon {
     super(pokemon);
     Object.assign(this, {
       caught: pokemon.caught ?? false,
-      uploaded: pokemon.uploaded ?? false
     });
   }
 
@@ -67,6 +68,6 @@ export class Hunt extends Shiny implements huntedPokemon {
 
 
   get orderedKeys(): Set<keyof Hunt> {
-    return new Set(['dexid', 'forme', 'jeu', 'methode', 'compteur', ...(Object.keys(this) as Array<keyof Hunt>)]);
+    return new Set(['dexid', 'forme', 'game', 'method', 'count', ...(Object.keys(this) as Array<keyof Hunt>)]);
   }
 }

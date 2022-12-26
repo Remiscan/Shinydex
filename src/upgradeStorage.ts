@@ -51,6 +51,12 @@ function toNewFormat(shiny: { [key: string]: any }): { [key: string]: any } {
     ['monjeu', 'DO'],
     ['aupif', 'horsChasse'],
     ['description', 'notes'],
+    ['jeu', 'game'],
+    ['methode', 'method'],
+    ['compteur', 'count'],
+    ['timeCapture', 'catchTime'],
+    ['surnom', 'name'],
+    ['checkmark', 'originMark']
   ]);
 
   for (const [oldName, newName] of renames) {
@@ -84,12 +90,12 @@ function toNewFormat(shiny: { [key: string]: any }): { [key: string]: any } {
   // (date will be formatted on display)
   if (shiny.hasOwnProperty('date')) {
     const timestamp = new Date(shiny.date).getTime();
-    shiny.timeCapture = Math.max(0, timestamp);
+    shiny['catchTime'] = Math.max(0, timestamp);
     delete shiny.date;
   }
 
   // Replace game names with game uid
-  if (shiny.hasOwnProperty('jeu')) {
+  if (shiny.hasOwnProperty('game')) {
     // Replace game names with accented versions
     const renames = new Map([
       ['Emeraude', 'Émeraude'],
@@ -100,15 +106,15 @@ function toNewFormat(shiny: { [key: string]: any }): { [key: string]: any } {
       ['GO', 'Pokémon GO'],
       ['Légendes Arceus', 'Légendes Pokémon : Arceus'],
     ]);
-    const newName = renames.get(shiny.jeu);
-    if (newName) shiny.jeu = newName;
+    const newName = renames.get(shiny['game']);
+    if (newName) shiny['game'] = newName;
 
     // Replace game names with game uid
     gameStringsLoop:
     for (const lang of Object.keys(gameStrings)) {
       for (const uid of Object.keys(gameStrings[lang])) {
-        if (gameStrings[lang][uid] === shiny.jeu) {
-          shiny.jeu = uid;
+        if (gameStrings[lang][uid] === shiny['game']) {
+          shiny['game'] = uid;
           break gameStringsLoop;
         }
       }
@@ -116,7 +122,7 @@ function toNewFormat(shiny: { [key: string]: any }): { [key: string]: any } {
   }
 
   // Replace method names with method id
-  if (shiny.hasOwnProperty('methode')) {
+  if (shiny.hasOwnProperty('method')) {
     // Replace method names with updated versions
     const renames = new Map([
       ['Chaîne de captures', 'Combo Capture'],
@@ -126,15 +132,15 @@ function toNewFormat(shiny: { [key: string]: any }): { [key: string]: any } {
       ['Échangé (GTS)', 'Échange (GTS)'],
       ['Échangé (œuf)', 'Échange (œuf)'],
     ]);
-    const newName = renames.get(shiny.methode);
-    if (newName) shiny.methode = newName;
+    const newName = renames.get(shiny['method']);
+    if (newName) shiny['method'] = newName;
 
     // Replace method names with method id
     methodStringsLoop:
     for (const lang of Object.keys(methodStrings)) {
       for (const id of Object.keys(methodStrings[lang])) {
-        if (methodStrings[lang][id] === shiny.methode) {
-          shiny.methode = id;
+        if (methodStrings[lang][id] === shiny['method']) {
+          shiny['method'] = id;
           break methodStringsLoop;
         }
       }
@@ -142,15 +148,15 @@ function toNewFormat(shiny: { [key: string]: any }): { [key: string]: any } {
   }
 
   // Replace checkmark number with checkmark name
-  if (shiny.hasOwnProperty('checkmark') && typeof shiny.checkmark === 'number') {
+  if (shiny.hasOwnProperty('originMark') && typeof shiny['originMark'] === 'number') {
     const names = ['old', 'gen6', 'alola', 'game-boy', 'lets-go', 'go', 'galar', 'sinnoh-gen8', 'hisui', 'paldea'];
-    shiny.checkmark = names[shiny.checkmark];
+    shiny['originMark'] = names[shiny['originMark']];
   }
 
   // Replace compteur string by object
-  if (shiny.hasOwnProperty('compteur') && typeof shiny.compteur === 'string') {
-    const compteur = JSON.parse(shiny.compteur);
-    if (typeof compteur === 'number') shiny.compteur = { count: compteur };
+  if (shiny.hasOwnProperty('count') && typeof shiny['count'] === 'string') {
+    const count = JSON.parse(shiny['count']);
+    if (typeof count === 'number') shiny['count'] = { 'encounters': count };
     else {
       const renames = new Map([
         ['distance', 'usum-distance'],
@@ -161,15 +167,15 @@ function toNewFormat(shiny: { [key: string]: any }): { [key: string]: any } {
       ]);
 
       for (const [oldName, newName] of renames) {
-        if (compteur.hasOwnProperty(oldName)) {
-          const value = Number(compteur[oldName]) || 0;
-          if (value) compteur[newName] = value;
-          delete compteur[oldName];
+        if (count.hasOwnProperty(oldName)) {
+          const value = Number(count[oldName]) || 0;
+          if (value) count[newName] = value;
+          delete count[oldName];
         }
       }
 
-      compteur.count = Number(compteur.count) || 0;
-      shiny.compteur = compteur;
+      count['encounters'] = Number(count.count) || 0;
+      shiny['count'] = count;
     }
   }
 

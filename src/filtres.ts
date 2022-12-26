@@ -5,25 +5,25 @@ import { dataStorage, friendStorage, huntStorage, localForageAPI, pokemonData, s
 
 type filtreDo = 'moi' | 'autre';
 type filtreLegit = 'oui' | 'non';
-type ordre = 'date' | 'taux' | 'dex' | 'espece' | 'surnom' | 'date-ajout' | 'pseudo';
+type ordre = 'date' | 'rate' | 'dex' | 'species' | 'name' | 'game' | 'added' | 'username';
 export type filtrableSection = 'mes-chromatiques' | 'chasses-en-cours' | 'corbeille' | 'partage' | 'chromatiques-ami';
 const filtrableSections: filtrableSection[] = ['mes-chromatiques', 'chasses-en-cours', 'corbeille', 'partage', 'chromatiques-ami'];
 
 interface Filtres {
   do: any;
   legit: any;
-  jeu: any;
-  espece: any;
-  surnom: any;
+  game: any;
+  species: any;
+  name: any;
 }
 
 /** Liste de filtres appliqués à une section. */
 export class ListeFiltres implements Filtres {
   do: Set<filtreDo> = new Set();
   legit: Set<filtreLegit> = new Set();
-  jeu: Set<string> = new Set();
-  espece: Set<number> = new Set();
-  surnom: string = '';
+  game: Set<string> = new Set();
+  species: Set<number> = new Set();
+  name: string = '';
   ordre: ordre = 'date';
   ordreReverse: boolean = false;
 
@@ -35,15 +35,15 @@ export class ListeFiltres implements Filtres {
       } else if (prop === 'ordre-reverse') {
         this.ordreReverse = value === 'on';
       } else if (prop === 'chip-nickname') {
-        this.surnom = value as string;
+        this.name = value as string;
       } else if (prop.startsWith('filtre-do')) {
         if (value !== 'false') this.do.add(value as filtreDo);
       } else if (prop.startsWith('filtre-legit')) {
         if (value !== 'false') this.legit.add(value as filtreLegit);
       } else if (prop.startsWith('chip-species')) {
-        this.espece.add(parseInt(value as string));
+        this.species.add(parseInt(value as string));
       } else if (prop.startsWith('chip-game')) {
-        this.jeu.add(value as string);
+        this.game.add(value as string);
       }
     }
   }
@@ -53,17 +53,17 @@ export class ListeFiltres implements Filtres {
 export class PokemonFiltres implements Filtres {
   do: filtreDo;
   legit: filtreLegit;
-  jeu: string;
-  espece: number;
-  surnom: string;
+  game: string;
+  species: number;
+  name: string;
 
   constructor(shiny: Shiny) {
     const conditionMien = shiny.mine;
     this.do = conditionMien ? 'moi' : 'autre';
     this.legit = shiny.hacked > 0 ? 'non' : 'oui';
-    this.jeu = shiny.jeuObj.uid;
-    this.espece = shiny.dexid;
-    this.surnom = shiny.surnom;
+    this.game = shiny.jeuObj.uid;
+    this.species = shiny.dexid;
+    this.name = shiny.name;
   }
 }
 
@@ -170,7 +170,7 @@ export async function filterCards(section: filtrableSection, ids: string[] = [],
 ////////////////////////////////////////////////////////////////////
 // Ordonner les cartes de Pokémon selon une certaine caractéristique
 export async function orderCards(section: filtrableSection, filteredPokemon: Shiny[] = [], _filtres?: ListeFiltres): Promise<void> {
-  const filtres = _filtres ?? (await dataStorage.getItem('filtres')).get(section) ?? new ListeFiltres();
+  const filtres: ListeFiltres = _filtres ?? (await dataStorage.getItem('filtres')).get(section) ?? new ListeFiltres();
   const ordre = filtres.ordre;
   const reversed = filtres.ordreReverse;
 
@@ -182,32 +182,32 @@ export async function orderCards(section: filtrableSection, filteredPokemon: Shi
                            : 0;
 
     switch (ordre) {
-      case 'jeu': {
-        return s2.jeu.localeCompare(s1.jeu, 'fr') || s2.timeCapture - s1.timeCapture || huntidComparison;
+      case 'game': {
+        return s2.game.localeCompare(s1.game, 'fr') || s2.catchTime - s1.catchTime || huntidComparison;
       }
 
-      case 'surnom': {
-        const nom1 = s1.surnom || noms[s1.dexid];
-        const nom2 = s2.surnom || noms[s2.dexid];
-        return nom2.localeCompare(nom1, 'fr') || s2.timeCapture - s1.timeCapture || huntidComparison;
+      case 'name': {
+        const nom1 = s1.name || noms[s1.dexid];
+        const nom2 = s2.name || noms[s2.dexid];
+        return nom2.localeCompare(nom1, 'fr') || s2.catchTime - s1.catchTime || huntidComparison;
       }
 
-      case 'espece': {
+      case 'species': {
         const nom1 = noms[s1.dexid];
         const nom2 = noms[s2.dexid];
-        return nom2.localeCompare(nom1, 'fr') || s2.timeCapture - s1.timeCapture || huntidComparison;
+        return nom2.localeCompare(nom1, 'fr') || s2.catchTime - s1.catchTime || huntidComparison;
       }
 
-      case 'taux': {
-        return (s2.shinyRate || 0) - (s1.shinyRate || 0) || s2.timeCapture - s1.timeCapture || huntidComparison;
+      case 'rate': {
+        return (s2.shinyRate || 0) - (s1.shinyRate || 0) || s2.catchTime - s1.catchTime || huntidComparison;
       }
 
       case 'dex': {
-        return s2.dexid - s1.dexid || s2.timeCapture - s1.timeCapture || huntidComparison;
+        return s2.dexid - s1.dexid || s2.catchTime - s1.catchTime || huntidComparison;
       }
 
       case 'date': {
-        return s2.timeCapture - s1.timeCapture || huntidComparison;
+        return s2.catchTime - s1.catchTime || huntidComparison;
       }
 
       default: return huntidComparison;

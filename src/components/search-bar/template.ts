@@ -43,8 +43,8 @@ template.innerHTML = /*html*/`
         <span>Date de capture</span>
       </label>
 
-      <input type="radio" name="ordre" id="ordre-taux" value="taux">
-      <label for="ordre-taux" class="radio">
+      <input type="radio" name="ordre" id="ordre-rate" value="rate">
+      <label for="ordre-rate" class="radio">
         <span>Taux</span>
       </label>
 
@@ -53,23 +53,23 @@ template.innerHTML = /*html*/`
         <span>N° du Pokédex</span>
       </label>
 
-      <input type="radio" name="ordre" id="ordre-espece" value="espece">
-      <label for="ordre-espece" class="radio">
+      <input type="radio" name="ordre" id="ordre-species" value="species">
+      <label for="ordre-species" class="radio">
         <span>Espèce (alphabétique)</span>
       </label>
 
-      <input type="radio" name="ordre" id="ordre-surnom" value="surnom">
-      <label for="ordre-surnom" class="radio">
+      <input type="radio" name="ordre" id="ordre-name" value="name">
+      <label for="ordre-name" class="radio">
         <span>Surnom (alphabétique)</span>
       </label>
 
-      <input type="radio" name="ordre" id="ordre-date-ajout" value="date-ajout">
-      <label for="ordre-date-ajout" class="radio">
+      <input type="radio" name="ordre" id="ordre-added" value="added">
+      <label for="ordre-added" class="radio">
         <span>Date d'ajout</span>
       </label>
 
-      <input type="radio" name="ordre" id="ordre-pseudo" value="pseudo" class="if-partage">
-      <label for="ordre-pseudo" class="radio if-partage">
+      <input type="radio" name="ordre" id="ordre-username" value="username" class="if-partage">
+      <label for="ordre-username" class="radio if-partage">
         <span>Pseudo (alphabétique)</span>
       </label>
     </fieldset>

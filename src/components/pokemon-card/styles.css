@@ -8,8 +8,8 @@
   background-color: var(--card-bg-color);
   display: grid;
   --last-column: 0;
-  grid-template-columns: [sprite] 120px [noms] 1fr [misc] auto [note] var(--last-column);
-  grid-template-rows: 1fr [noms] auto 1fr [capture] auto 1fr;
+  grid-template-columns: [sprite] 120px [identity] 1fr [misc] auto [note] var(--last-column);
+  grid-template-rows: 1fr [identity] auto 1fr [capture] auto 1fr;
   position: relative;
   order: var(--order, 0);
 }
@@ -63,19 +63,19 @@ pokemon-sprite,
   transform-origin: center;
 }
 
-.pokemon-infos__nom {
-  grid-row: noms;
-  grid-column: noms;
+.pokemon-infos__identity {
+  grid-row: identity;
+  grid-column: identity;
   display: grid;
-  grid-template-rows: [surnom] 32px [espece] auto;
-  grid-template-columns: [ball] 32px [nom] fit-content(100%) [gene] 32px;
+  grid-template-rows: [name] 32px [species] auto;
+  grid-template-columns: [ball] 32px [name] fit-content(100%) [gene] 32px;
   position: relative;
   left: -16px;
   align-items: center;
 }
 
 [data-type="ball"] {
-  grid-row: surnom;
+  grid-row: name;
   grid-column: ball;
   transition: transform .2s var(--easing-decelerate);
   transform: translate(0) rotate(0);
@@ -86,9 +86,9 @@ pokemon-sprite,
   transform: translate(15px) rotate(120deg);
 }
 
-[data-type="espece"] {
-  grid-row: espece;
-  grid-column: nom;
+[data-type="species"] {
+  grid-row: species;
+  grid-column: name;
   font-size: 1em;
   font-weight: 300;
   text-transform: capitalize;
@@ -101,10 +101,10 @@ pokemon-sprite,
   top: -6px;
 }
 
-[data-type="surnom"],
-[data-type="surnom"]:empty + [data-type="espece"] {
-  grid-row: surnom;
-  grid-column: nom;
+[data-type="name"],
+[data-type="name"]:empty + [data-type="species"] {
+  grid-row: name;
+  grid-column: name;
   font-size: 1.5em;
   font-weight: 300;
   opacity: 1;
@@ -117,12 +117,12 @@ pokemon-sprite,
   top: 0;
 }
 
-[data-type="surnom"]:empty {
+[data-type="name"]:empty {
   display: none;
 }
 
 [data-type="gene"] {
-  grid-row: surnom;
+  grid-row: name;
   grid-column: gene;
   scale: 0.9;
   transform-origin: center bottom;
@@ -144,13 +144,13 @@ pokemon-sprite,
   margin: 10px;
 }
 
-[data-type="checkmark"] {
+[data-type="originMark"] {
   filter: invert(var(--dark-coeff));
 }
 
 .pokemon-infos__capture {
   grid-row: capture;
-  grid-column: noms;
+  grid-column: identity;
   color: var(--card-infos-text-color);
   font-size: .85em;
   display: grid;
@@ -161,11 +161,11 @@ pokemon-sprite,
   align-items: center;
 }
 
-.pokemon-infos__capture > [data-type="jeu"] {
+.pokemon-infos__capture > [data-type="game"] {
 	grid-row: 1 / -1;
   grid-column: game;
 }
-.pokemon-infos__capture > [data-type="methode"] {
+.pokemon-infos__capture > [data-type="method"] {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -173,7 +173,7 @@ pokemon-sprite,
 
 .pokemon-notes {
   grid-row: 1 / -1;
-  grid-column: noms / -1;
+  grid-column: identity / -1;
   box-sizing: border-box;
   display: flex;
   width: 100%;

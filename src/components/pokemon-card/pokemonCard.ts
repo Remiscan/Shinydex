@@ -59,7 +59,7 @@ export class pokemonCard extends HTMLElement {
     {
       const dexid = String(shiny.dexid);
       const pokemon = await pokemonData.getItem(dexid);
-      const element = this.shadow.querySelector('[data-type="espece"]')!;
+      const element = this.shadow.querySelector('[data-type="species"]')!;
       const name = pokemon.name[lang ?? 'fr'];
       element.innerHTML = name;
 
@@ -75,34 +75,34 @@ export class pokemonCard extends HTMLElement {
 
     // Surnom
     {
-      const element = this.shadow.querySelector('[data-type="surnom"]')!;
-      element.innerHTML = shiny.surnom;
+      const element = this.shadow.querySelector('[data-type="name"]')!;
+      element.innerHTML = shiny.name;
     }
 
     // Compteur
     {
-      const element = this.shadow.querySelector('[data-type="compteur"]')!;
-      let compteurString: string = '';
+      const element = this.shadow.querySelector('[data-type="count"]')!;
+      let countString: string = '';
 
-      const getProp = (prop: keyof Shiny['compteur']) => shiny.compteur[prop] || 0;
+      const getProp = (prop: keyof Shiny['count']) => shiny.count[prop] || 0;
 
       const parts = [];
-      if (getProp('count')) parts.push(`${getProp('count')} rencontres`);
+      if (getProp('encounters')) parts.push(`${getProp('encounters')} rencontres`);
 
-      if ((shiny.jeu === 'ultrasun' || shiny.jeu === 'ultramoon') && shiny.methode === 'ultrawormhole') {
+      if ((shiny.game === 'ultrasun' || shiny.game === 'ultramoon') && shiny.method === 'ultrawormhole') {
         parts.push(`Distance ${getProp('usum-distance')}m, ${getProp('usum-rings')} anneaux`);
       }
 
-      else if (shiny.jeu === 'letsgopikachu' || shiny.jeu === 'letsgoeevee') {
+      else if (shiny.game === 'letsgopikachu' || shiny.game === 'letsgoeevee') {
         if (getProp('lgpe-nextSpawn')) parts.push(`Combo Capture ${getProp('lgpe-catchCombo')}`);
         if (getProp('lgpe-lure')) parts.push('Parfum utilisé');
       }
 
-      else if (shiny.jeu === 'sword' || shiny.jeu === 'shield') {
+      else if (shiny.game === 'sword' || shiny.game === 'shield') {
         if (getProp('swsh-dexKo')) parts.push(`Compteur de KO ${getProp('swsh-dexKo')}`);
       }
 
-      else if (shiny.jeu === 'legendsarceus') {
+      else if (shiny.game === 'legendsarceus') {
         if (getProp('pla-dexResearch')) {
           const dexResearch = getProp('pla-dexResearch');
           const niv = dexResearch === 2 ? '100%' : dexResearch === 1 ? '10' : '9 ou -';
@@ -110,7 +110,7 @@ export class pokemonCard extends HTMLElement {
         };
       }
 
-      else if (shiny.jeu === 'scarlet' || shiny.jeu === 'violet') {
+      else if (shiny.game === 'scarlet' || shiny.game === 'violet') {
         if (getProp('sv-outbreakCleared')) {
           const outbreakCleared = getProp('sv-outbreakCleared');
           const num = outbreakCleared === 2 ? '60+'
@@ -125,15 +125,15 @@ export class pokemonCard extends HTMLElement {
         }
       }
 
-      compteurString = parts.join(', ');
+      countString = parts.join(', ');
 
-      element.innerHTML = compteurString;
+      element.innerHTML = countString;
     }
 
     // Temps de capture / date
     {
-      const time = shiny.timeCapture;
-      const element = this.shadow.querySelector('[data-type="timeCapture"]')!;
+      const time = shiny.catchTime;
+      const element = this.shadow.querySelector('[data-type="catchTime"]')!;
       if (time > 0) {
         const date = new Intl.DateTimeFormat('fr-FR', {day: 'numeric', month: 'short', year: 'numeric'})
                             .format(new Date(time));
@@ -145,9 +145,9 @@ export class pokemonCard extends HTMLElement {
 
     // Jeu
     {
-      const jeu = shiny.jeu;
-      const element = this.shadow.querySelector('[data-type="jeu"]')!
-      element.setAttribute('data-icon', `game/${jeu}`);
+      const game = shiny.game;
+      const element = this.shadow.querySelector('[data-type="game"]')!
+      element.setAttribute('data-icon', `game/${game}`);
     }
 
     // Ball
@@ -168,8 +168,8 @@ export class pokemonCard extends HTMLElement {
 
     // Checkmark
     {
-      const origin = shiny.originMark;
-      const element = this.shadow.querySelector('[data-type="checkmark"]')!;
+      const origin = shiny.appliedOriginMark;
+      const element = this.shadow.querySelector('[data-type="originMark"]')!;
       element.setAttribute('data-icon', `origin-mark/${origin}`);
       if (origin) element.classList.remove('off');
       else        element.classList.add('off');
@@ -186,8 +186,8 @@ export class pokemonCard extends HTMLElement {
 
     // Méthode
     {
-      const element = this.shadow.querySelector('[data-type="methode"]')!;
-      element.innerHTML = methodStrings[lang][shiny.methode] ?? '';
+      const element = this.shadow.querySelector('[data-type="method"]')!;
+      element.innerHTML = methodStrings[lang][shiny.method] ?? '';
     }
 
     // Charme chroma et shiny rate
@@ -195,7 +195,7 @@ export class pokemonCard extends HTMLElement {
       const srContainer = this.shadow.querySelector('.shiny-rate')!;
       const charm = shiny.charm;
       const shinyRate = shiny.shinyRate ?? 0;
-      const methode = shiny.methode || '';
+      const methode = shiny.method || '';
 
       // Icône du charme chroma
       if (charmlessMethods == null) charmlessMethods = Shiny.methodes('charmless').map(m => m.id);
@@ -216,16 +216,16 @@ export class pokemonCard extends HTMLElement {
       element.innerHTML = String(shinyRate || '???');
 
       // Couleur du shiny rate
-      const jeu = shiny.jeuObj;
+      const game = shiny.jeuObj;
       srContainer.classList.remove('full-odds', 'charm-ods', 'one-odds');
       if (
-        (jeu.gen <= 5 && shinyRate >= 8192 - 1) ||
-        (jeu.gen > 5 && shinyRate >= 4096 - 1)
+        (game.gen <= 5 && shinyRate >= 8192 - 1) ||
+        (game.gen > 5 && shinyRate >= 4096 - 1)
       ) {
         srContainer.classList.add('full-odds');
       } else if (
-        (jeu.gen <= 5 && shinyRate >= 2731 - 1) ||
-        (jeu.gen > 5 && shinyRate >= 1365 - 1)
+        (game.gen <= 5 && shinyRate >= 2731 - 1) ||
+        (game.gen > 5 && shinyRate >= 1365 - 1)
       ) {
         srContainer.classList.add('charm-odds');
       } else if (shinyRate <= 1) {
