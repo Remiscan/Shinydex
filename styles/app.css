@@ -996,6 +996,55 @@ select[id$="-methode"] {
 
 
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!! FILTERS & ORDER !!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+
+section:not([data-filter-mine~="true"]) [data-mine="true"],
+section:not([data-filter-mine~="false"]) [data-mine="false"],
+section:not([data-filter-legit~="true"]) [data-legit="true"],
+section:not([data-filter-legit~="false"]) [data-legit="false"] {
+  display: none;
+}
+
+:is(pokemon-card, hunt-card, corbeille-card, friend-card) {
+  --order-reversed: 1;
+}
+
+section[data-order-reversed="true"] :is(pokemon-card, hunt-card, corbeille-card, friend-card) {
+  --order-reversed: -1;
+}
+
+section[data-order="catchTime"] :is(pokemon-card, hunt-card, corbeille-card, friend-card) {
+  order: calc(-1 * var(--order-reversed) * var(--catch-time, 0));
+}
+
+section[data-order="shinyRate"] :is(pokemon-card, hunt-card, corbeille-card, friend-card) {
+  order: calc(-1 * var(--order-reversed) * var(--shiny-rate, 0));
+}
+
+section[data-order="dexid"] :is(pokemon-card, hunt-card, corbeille-card, friend-card) {
+  order: calc(var(--order-reversed) * var(--dexid, 0));
+}
+
+section[data-order="species"] :is(pokemon-card, hunt-card, corbeille-card, friend-card) {
+  order: calc(var(--order-reversed) * var(--species-alpha-order, 0));
+}
+
+section[data-order="name"] :is(pokemon-card, hunt-card, corbeille-card, friend-card) {
+  order: calc(var(--order-reversed) * var(--name-alpha-order, 0));
+}
+
+section[data-order="game"] :is(pokemon-card, hunt-card, corbeille-card, friend-card) {
+  order: calc(var(--order-reversed) * var(--game-release-order, 0));
+}
+
+section[data-order="lastUpdate"] :is(pokemon-card, hunt-card, corbeille-card, friend-card) {
+  order: calc(-1 * var(--order-reversed) * var(--last-update));
+}
+
+
+
+/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!! PARAMÈTRES !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 

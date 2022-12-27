@@ -30,46 +30,51 @@ template.innerHTML = /*html*/`
       <span id="label-ordre">Ordonner par :</span>
 
       <span class="reverse-order__container">
-        <label for="ordre-reverse" aria-label="Inverser l'ordre">
+        <label for="orderReversed" aria-label="Inverser l'ordre">
           <i class="material-icons">vertical_align_bottom</i>
         </label>
-        <input type="checkbox" name="ordre-reverse" id="ordre-reverse">
+        <input type="checkbox" name="orderReversed" id="orderReversed" value="true">
       </span>
     </div>
 
     <fieldset class="liste-options if-ordre" aria-labelledby="label-ordre">
-      <input type="radio" name="ordre" id="ordre-date" value="date" checked>
-      <label for="ordre-date" class="radio">
+      <input type="radio" name="order" id="ordre-date" value="catchTime" checked data-section="mes-chromatiques corbeille chromatiques-ami">
+      <label for="ordre-date" class="radio" data-section="mes-chromatiques corbeille chromatiques-ami">
         <span>Date de capture</span>
       </label>
 
-      <input type="radio" name="ordre" id="ordre-rate" value="rate">
-      <label for="ordre-rate" class="radio">
+      <input type="radio" name="order" id="ordre-rate" value="shinyRate" data-section="mes-chromatiques corbeille chromatiques-ami">
+      <label for="ordre-rate" class="radio" data-section="mes-chromatiques corbeille chromatiques-ami">
         <span>Taux</span>
       </label>
 
-      <input type="radio" name="ordre" id="ordre-dex" value="dex">
-      <label for="ordre-dex" class="radio">
+      <input type="radio" name="order" id="ordre-dex" value="dexid" data-section="mes-chromatiques corbeille chromatiques-ami">
+      <label for="ordre-dex" class="radio" data-section="mes-chromatiques corbeille chromatiques-ami">
         <span>N° du Pokédex</span>
       </label>
 
-      <input type="radio" name="ordre" id="ordre-species" value="species">
-      <label for="ordre-species" class="radio">
+      <input type="radio" name="order" id="ordre-species" value="species" data-section="mes-chromatiques corbeille chromatiques-ami">
+      <label for="ordre-species" class="radio" data-section="mes-chromatiques corbeille chromatiques-ami">
         <span>Espèce (alphabétique)</span>
       </label>
 
-      <input type="radio" name="ordre" id="ordre-name" value="name">
-      <label for="ordre-name" class="radio">
+      <input type="radio" name="order" id="ordre-name" value="name" data-section="mes-chromatiques corbeille chromatiques-ami">
+      <label for="ordre-name" class="radio" data-section="mes-chromatiques corbeille chromatiques-ami">
         <span>Surnom (alphabétique)</span>
       </label>
 
-      <input type="radio" name="ordre" id="ordre-added" value="added">
-      <label for="ordre-added" class="radio">
-        <span>Date d'ajout</span>
+      <input type="radio" name="order" id="ordre-game" value="game" data-section="mes-chromatiques corbeille chromatiques-ami">
+      <label for="ordre-game" class="radio" data-section="mes-chromatiques corbeille chromatiques-ami">
+        <span>Jeu (date de sortie)</span>
       </label>
 
-      <input type="radio" name="ordre" id="ordre-username" value="username" class="if-partage">
-      <label for="ordre-username" class="radio if-partage">
+      <input type="radio" name="order" id="ordre-added" value="modified" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours">
+      <label for="ordre-added" class="radio" data-section="mes-chromatiques corbeille chromatiques-ami">
+        <span>Date de modification</span>
+      </label>
+
+      <input type="radio" name="order" id="ordre-username" value="username" class="if-partage" data-section="partage">
+      <label for="ordre-username" class="radio if-partage" data-section="partage">
         <span>Pseudo (alphabétique)</span>
       </label>
     </fieldset>
@@ -79,7 +84,7 @@ template.innerHTML = /*html*/`
     </div>
 
     <div class="cote-a-cote if-filtres">
-      <fieldset class="liste-options">
+      <fieldset class="liste-options" data-section="mes-chromatiques corbeille chromatiques-ami">
         <legend class="titre-options">Dresseur d'origine :</legend>
 
         <input type="checkbox" name="filtre-do-moi" id="filtre-do-moi" value="moi">
@@ -93,7 +98,7 @@ template.innerHTML = /*html*/`
         </label>
       </fieldset>
 
-      <fieldset class="liste-options">
+      <fieldset class="liste-options" data-section="mes-chromatiques corbeille chromatiques-ami">
         <legend class="titre-options">Legit :</legend>
 
         <input type="checkbox" name="filtre-legit-oui" id="filtre-legit-oui" value="oui">

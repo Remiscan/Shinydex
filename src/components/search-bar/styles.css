@@ -138,3 +138,11 @@ search-bar .sous-titre>span {
 input[name="ordre-reverse"]:checked + label > i {
   transform: scaleY(-1);
 }
+
+search-bar[section="mes-chromatiques"] [data-section]:not([data-section~="mes-chromatiques"]),
+search-bar[section="chromatiques-ami"] [data-section]:not([data-section~="chromatiques-ami"]),
+search-bar[section="corbeille"] [data-section]:not([data-section~="corbeille"]),
+search-bar[section="chasses-en-cours"] [data-section]:not([data-section~="chasses-en-cours"]),
+search-bar[section="partage"] [data-section]:not([data-section~="partage"]) {
+  display: none;
+}

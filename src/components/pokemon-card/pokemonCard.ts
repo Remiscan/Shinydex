@@ -1,5 +1,5 @@
 import { Params, wait } from '../../Params.js';
-import { Shiny } from '../../Pokemon.js';
+import { Pokemon, Shiny } from '../../Pokemon.js';
 import { huntStorage, pokemonData, shinyStorage } from '../../localForage.js';
 import { Notif } from '../../notification.js';
 import template from './template.js';
@@ -54,17 +54,16 @@ export class pokemonCard extends HTMLElement {
     this.setAttribute('last-update', String(shiny.lastUpdate));
 
     const lang = document.documentElement.getAttribute('lang');
+    const pokemon = await pokemonData.getItem(String(shiny.dexid));
 
     // Espèce
     {
-      const dexid = String(shiny.dexid);
-      const pokemon = await pokemonData.getItem(dexid);
       const element = this.shadow.querySelector('[data-type="species"]')!;
       const name = pokemon.name[lang ?? 'fr'];
       element.innerHTML = name;
 
       const sprite = this.shadow.querySelector('pokemon-sprite')!;
-      sprite.setAttribute('dexid', dexid);
+      sprite.setAttribute('dexid', String(shiny.dexid));
     }
 
     // Forme
@@ -232,6 +231,22 @@ export class pokemonCard extends HTMLElement {
         srContainer.classList.add('one-odds');
       }
     }
+
+    // Filters
+    this.setAttribute('data-mine', String(shiny.mine));
+    this.setAttribute('data-legit', String(shiny.hacked === 0));
+    this.setAttribute('data-species', String(pokemon.name));
+    this.setAttribute('data-name', shiny.name);
+    this.setAttribute('data-game', shiny.game);
+
+    // Order
+    this.style.setProperty('--catchTime-order', String(shiny.catchTime));
+    this.style.setProperty('--shinyRate-order', String(shiny.shinyRate || 0));
+    this.style.setProperty('--dexid-order', String(shiny.dexid));
+    // --species-order - Species (alphabetical) can't be done just with CSS
+    // --name-order - Name (alphabetical) can't be done just with CSS
+    this.style.setProperty('--game-order', String(Pokemon.jeux.findIndex(jeu => jeu.uid === shiny.game)));
+    this.style.setProperty('--lastUpdate-order', String(shiny.lastUpdate));
   }
 
 

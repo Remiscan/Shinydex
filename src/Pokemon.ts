@@ -103,7 +103,7 @@ const allMethodes: Methode[] = [
   { id: 'wildalwaysshiny', jeux: allGames.filter(g => ['gs', 'hgss', 'bw2'].includes(g.id)), mine: true, charm: false },
   { id: 'glitch', jeux: allGames.filter(g => [1, 2].includes(g.gen)), mine: true, charm: false },
   { id: 'event', jeux: allGames, mine: false, charm: false },
-  
+
   { id: 'trade', jeux: allGames, mine: false, charm: false },
   { id: 'gtstrade', jeux: allGames.filter(g => g.gen >= 4 && g.gen != 7.1), mine: false, charm: false },
   { id: 'wondertrade', jeux: allGames.filter(g => g.gen >= 6 && g.gen != 7.1), mine: false, charm: false },
@@ -272,14 +272,14 @@ class Pokemon {
   }
 
   /**
-   * @returns Liste des noms anglais de tous les Pokémon, dans l'ordre du Pokédex national.
+   * @returns Liste des noms de tous les Pokémon, dans l'ordre du Pokédex national.
    */
   static async names(lang = document.documentElement.getAttribute('lang')): Promise<string[]> {
     const cachedNames = Pokemon.#names[lang as nameLang];
     if (cachedNames.length > 0) return cachedNames;
 
     const keys = (await pokemonData.keys()).sort((a, b) => Number(a) - Number(b));
-    const names = [];
+    const names: string[] = [];
     for (const key of keys) {
       const pkmn = await pokemonData.getItem(key);
       const name = pkmn.name[lang as nameLang];

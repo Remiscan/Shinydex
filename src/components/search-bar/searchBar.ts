@@ -10,6 +10,15 @@ import { dataStorage } from '../../localForage.js';
 
 
 
+const savedFiltres: Map<filtrableSection, ListeFiltres> = new Map([
+  ['chasses-en-cours', new ListeFiltres('chasses-en-cours')],
+  ['chromatiques-ami', new ListeFiltres('chromatiques-ami')],
+  ['corbeille', new ListeFiltres('corbeille')],
+  ['partage', new ListeFiltres('partage')]
+]);
+
+
+
 export class searchBar extends HTMLElement {
   ready: boolean = false;
   htmlready: boolean = false;
@@ -182,20 +191,20 @@ export class searchBar extends HTMLElement {
 
   /** Builds Filtres from the selected options. */
   optionsToFiltres(formData: FormData): ListeFiltres {
-    return new ListeFiltres(formData);
+    return new ListeFiltres(this.section as filtrableSection, formData);
   }
 
 
   /** Checks options inputs corresponding to a list of filters. */
   filtresToOptions(filtres: ListeFiltres) {
     ordre: {
-      const input = this.querySelector(`input[name="ordre"][value="${filtres.ordre}"]`) as HTMLInputElement;
+      const input = this.querySelector(`input[name="ordre"][value="${filtres.order}"]`) as HTMLInputElement;
       input.checked = true;
     }
   
     ordreReverse: {
       const input = this.querySelector(`input[name="ordre-reverse"]`) as HTMLInputElement;
-      input.checked = filtres.ordreReverse;
+      input.checked = filtres.orderReversed;
     }
   
     filtres: {
@@ -247,11 +256,14 @@ export class searchBar extends HTMLElement {
         if (value === 'ajouter-ami') return;
 
         // On applique au formulaire les filtres enregistrés de la section demandée
-        const savedFiltres = (await dataStorage.getItem('filtres')).get(searchSection);
-        this.filtresToOptions(savedFiltres ?? new ListeFiltres());
+        this.filtresToOptions(savedFiltres.get(searchSection) ?? new ListeFiltres(searchSection));
       } break;
     }
   }
+
+
+  get section() { return this.getAttribute('section'); }
+  set section(value) { this.setAttribute('section', value ?? ''); }
   
 
   connectedCallback() {
