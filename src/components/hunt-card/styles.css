@@ -12,7 +12,7 @@ form {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  grid-template-columns: 1fr 1fr;
+  gap: 1ch;
 }
 
 .edit-notice {
@@ -42,6 +42,10 @@ textarea:invalid {
   outline: 2px dashed red;
 }
 
+form:has(:invalid) label[for="caught"] {
+  cursor: not-allowed;
+}
+
 fieldset {
   grid-column: 1 / -1;
   flex-grow: 1;
@@ -53,7 +57,6 @@ fieldset {
   row-gap: 1ch;
   padding: 1ch;
   flex-wrap: wrap;
-  margin: 10px;
   border: 2px solid var(--card-sprite-bg-color);
   border-radius: 10px;
   background: var(--card-sprite-bg-color);

@@ -14,7 +14,7 @@ template.innerHTML = /*html*/`
 
     <span class="one-input">
       <label for="dexid">Espèce :</label>
-      <input type="text" name="dexid" required list="datalist-pokedex" autocomplete="off" placeholder="Bulbizarre" size="8">
+      <input type="text" name="dexid" required list="datalist-pokedex" autocomplete="off" placeholder="Bulbizarre">
     </span>
 
     <span class="one-input">
