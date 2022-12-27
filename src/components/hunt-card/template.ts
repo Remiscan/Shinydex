@@ -3,14 +3,14 @@ template.innerHTML = /*html*/`
 <form>
   <datalist id="datalist-pokedex"></datalist>
 
-  <pokemon-sprite size="112"></pokemon-sprite>
-
   <span data-edit class="edit-notice">Modification</span>
 
 
   <!-- Espèce, forme -->
   <fieldset>
     <legend>Pokémon</legend>
+
+    <pokemon-sprite size="112"></pokemon-sprite>
 
     <span class="one-input">
       <label for="dexid">Espèce :</label>
@@ -26,7 +26,7 @@ template.innerHTML = /*html*/`
 
   <!-- Jeu, méthode -->
   <fieldset>
-    <legend>Jeu et méthode</legend>
+    <legend>Méthode de chasse</legend>
 
     <span class="one-input">
       <span data-icon="game"></span>
@@ -78,7 +78,7 @@ template.innerHTML = /*html*/`
     <legend>Bonus de Pokémon Écarlate et Violet</legend>
 
     <span class="one-input" data-method="massoutbreak">
-      <label for="sv-outbreakCleared">Nombre de Pokémon battus dans cette apparition massive</label>
+      <label for="sv-outbreakCleared">Nombre de Pokémon battus dans cette apparition massive :</label>
       <select name="sv-outbreakCleared" id="sv-outbreakCleared">
         <option value="0" selected>Entre 0 et 29</option>
         <option value="1">Entre 30 et 59</option>
@@ -87,7 +87,7 @@ template.innerHTML = /*html*/`
     </span>
 
     <span class="one-input">
-      <label for="sv-sparklingPower">Niveau de Rencontre brillante du sandwich actif</label>
+      <label for="sv-sparklingPower">Niveau de Rencontre brillante du sandwich actif :</label>
       <select name="sv-sparklingPower" id="sv-sparklingPower">
         <option value="0" selected>Aucun</option>
         <option value="1">Niveau 1</option>
@@ -151,7 +151,7 @@ template.innerHTML = /*html*/`
 
 
   <!-- Bonus de Ultra Soleil / Lune (USUM) -->
-  <fieldset data-method="ultrawormhole">
+  <fieldset data-game="usum">
     <legend>Bonus de Pokémon Ultra-Soleil et Ultra-Lune</legend>
 
     <span class="one-input" data-method="ultrawormhole">
@@ -245,12 +245,22 @@ template.innerHTML = /*html*/`
         <option value="strange">Étrange Ball</option>
       </select>
     </span>
+
+    <span class="one-input" data-not-mine>
+      <label for="hacked">Légitimité :</label>
+      <select name="hacked" id="hacked">
+        <option value="0" selected>Legit</option>
+        <option value="1">Pas sûr</option>
+        <option value="2">Hacké</option>
+        <option value="3">Cloné</option>
+      </select>
+    </span>
   </fieldset>
 
 
   <!-- Origine -->
-  <fieldset data-checkmark-unsure>
-    <legend>Origine</legend>
+  <fieldset data-checkmark-unsure class="single">
+    <legend>Marque d'origine</legend>
 
     <span class="one-input">
       <input type="radio" name="originMark" id="checkmark-none" value="old" checked>
@@ -353,7 +363,7 @@ template.innerHTML = /*html*/`
     </span>
   </fieldset>
 
-  <fieldset data-game="swsh pla">
+  <fieldset data-game="swsh pla" class="single">
     <legend>Gène</legend>
 
     <span class="one-input">
@@ -383,25 +393,15 @@ template.innerHTML = /*html*/`
   </fieldset>
 
 
-  <!-- Données de légitimité -->
-  <div class="group legality-data" data-not-mine>
-    <span class="one-input">
-      <label for="hacked">Légitimité :</label>
-      <select name="hacked" id="hacked">
-        <option value="0" selected>Legit</option>
-        <option value="1">Pas sûr</option>
-        <option value="2">Hacké</option>
-        <option value="3">Cloné</option>
-      </select>
-    </span>
-  </div>
-
-
   <!-- Notes -->
-  <div class="group">
-    <label for="notes">Notes additionnelles :</label>
-    <textarea name="notes" id="notes" rows="3"></textarea>
-  </div>
+  <fieldset>
+    <legend>Informations additionnelles</legend>
+
+    <span class="one-input">
+      <label for="notes">Notes :</label>
+      <textarea name="notes" id="notes" rows="4" cols="40"></textarea>
+    </span>
+  </fieldset>
 
 
   <!-- Boutons supprimer / enregistrer -->

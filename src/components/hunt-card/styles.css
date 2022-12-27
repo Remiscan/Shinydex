@@ -9,21 +9,10 @@
 }
 
 form {
-  display: grid;
-  grid-template-columns: 120px 1fr;
-}
-
-pokemon-sprite {
-  grid-column: 1;
-  grid-row: 1 / span 2;
-  --size: 112px;
-  width: var(--size);
-  height: var(--size);
-  padding: calc(.5 * (120px - var(--size)));
-  background-color: var(--card-sprite-bg-color);
-  display: grid;
-  place-items: center;
-  border-radius: 10px 0 10px 0;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  grid-template-columns: 1fr 1fr;
 }
 
 .edit-notice {
@@ -31,10 +20,11 @@ pokemon-sprite {
   grid-column: 2;
   grid-row: 1;
   padding: .2em;
-  border-radius: 0 10px 0 0;
+  border-radius: 10px 10px 0 0;
   background-color: var(--card-sprite-bg-color);
   height: fit-content;
   text-align: center;
+  flex-basis: 100%;
 }
 
 input[name="dexid"],
@@ -52,18 +42,35 @@ textarea:invalid {
   outline: 2px dashed red;
 }
 
-.group,
 fieldset {
   grid-column: 1 / -1;
+  flex-grow: 1;
   --display: flex;
   display: var(--display);
   flex-direction: row;
   align-items: center;
-  gap: 2ch;
+  column-gap: 2ch;
+  row-gap: 1ch;
+  padding: 1ch;
   flex-wrap: wrap;
   margin: 10px;
   border: 2px solid var(--card-sprite-bg-color);
   border-radius: 10px;
+  background: var(--card-sprite-bg-color);
+}
+
+fieldset.single {
+  column-gap: 1ch;
+}
+
+.group {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  column-gap: 2ch;
+  row-gap: 1ch;
+  margin: 10px;
 }
 
 fieldset:first-of-type {
@@ -72,6 +79,7 @@ fieldset:first-of-type {
 
 legend {
   color: var(--text-color-soft);
+  font-variant: small-caps;
 }
 
 .one-input {
@@ -87,6 +95,9 @@ legend {
   width: fit-content;
   margin-inline: auto;
   border: none;
+  background: none;
+  flex-basis: 100%;
+  justify-content: center;
 }
 
 form:not([data-edit]) [data-edit],
