@@ -368,7 +368,7 @@ section.loading .compteur {
 #pokedex > .section-contenu,
 #chasses-en-cours > .section-contenu,
 #partage > .section-contenu {
-  padding-bottom: calc(56px + 2 * 15px - 6px);
+  padding-bottom: calc(56px + 2 * 15px);
 }
 
 .fab.mini {
@@ -1438,7 +1438,7 @@ form[name="app-settings"] {
   #pokedex > .section-contenu,
   #chasses-en-cours > .section-contenu,
   #partage > .section-contenu {
-    padding-bottom: 0;
+    padding-bottom: 8px;
   }
 
   #pokedex .defer-loader {
