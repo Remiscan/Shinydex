@@ -616,7 +616,7 @@ export class huntCard extends HTMLElement {
   genereJeux() {
     const select = this.shadow.querySelector('select[name="game"]')!;
     const lang = document.documentElement.getAttribute('lang');
-    for (const jeu of Pokemon.jeux.reverse()) {
+    for (const jeu of [...Pokemon.jeux].reverse()) {
       const nom = gameStrings[lang][jeu.uid];
       select.innerHTML += `<option value="${jeu.uid}">${nom}</option>`;
     }
