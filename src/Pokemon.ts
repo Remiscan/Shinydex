@@ -84,6 +84,7 @@ const allMethodes: Methode[] = [
   { id: 'wild', jeux: allGames, mine: true, charm: true },
   { id: 'egg', jeux: allGames.filter(g => ![1, 7.1, 0].includes(g.gen)), mine: true, charm: true },
   { id: 'masuda', jeux: allGames.filter(g => g.gen >= 4 && g.gen != 7.1 && g.gen != 8.1), mine: true, charm: true },
+  { id: 'fixedencounter', jeux: allGames.filter(g => g.id === 'sv'), mine: true, charm: false },
   { id: 'reset', jeux: allGames.filter(g => g.gen >= 2), mine: true, charm: true },
   { id: 'pokeradar', jeux: allGames.filter(g => [4, 6].includes(g.gen) || g.id == 'bdsp'), mine: true, charm: true },
   { id: 'chainfishing', jeux: allGames.filter(g => g.gen == 6), mine: true, charm: true },
@@ -95,17 +96,18 @@ const allMethodes: Methode[] = [
   { id: 'battlebonus', jeux: allGames.filter(g => g.gen == 8), mine: true, charm: true },
   { id: 'raid', jeux: allGames.filter(g => g.id == 'swsh' || g.id == 'sv'), mine: true, charm: false },
   { id: 'dynamaxadventure', jeux: allGames.filter(g => g.gen == 8), mine: true, charm: true },
+  { id: 'massoutbreak', jeux: allGames.filter(g => g.id == 'pla' || g.id == 'sv'), mine: true, charm: true },
+  { id: 'massivemassoutbreak', jeux: allGames.filter(g => g.id == 'pla'), mine: true, charm: true },
+  
   { id: 'wildevent', jeux: allGames.filter(g => g.gen == 0), mine: true, charm: false },
   { id: 'wildalwaysshiny', jeux: allGames.filter(g => ['gs', 'hgss', 'bw2'].includes(g.id)), mine: true, charm: false },
   { id: 'glitch', jeux: allGames.filter(g => [1, 2].includes(g.gen)), mine: true, charm: false },
   { id: 'event', jeux: allGames, mine: false, charm: false },
+  
   { id: 'trade', jeux: allGames, mine: false, charm: false },
   { id: 'gtstrade', jeux: allGames.filter(g => g.gen >= 4 && g.gen != 7.1), mine: false, charm: false },
-  { id: "wondertrade", jeux: allGames.filter(g => g.gen >= 6 && g.gen != 7.1), mine: false, charm: false },
+  { id: 'wondertrade', jeux: allGames.filter(g => g.gen >= 6 && g.gen != 7.1), mine: false, charm: false },
   { id: 'eggtrade', jeux: allGames.filter(g => g.gen >= 2 && g.gen != 7.1), mine: false, charm: false },
-  { id: 'massoutbreak', jeux: allGames.filter(g => g.id == 'pla' || g.id == 'sv'), mine: true, charm: true },
-  { id: 'massivemassoutbreak', jeux: allGames.filter(g => g.id == 'pla'), mine: true, charm: true },
-  { id: 'fixedencounter', jeux: allGames.filter(g => g.id === 'sv'), mine: true, charm: false },
 ];
 
 
