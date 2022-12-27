@@ -24,8 +24,9 @@ import methodStrings from '../../../strings/methods.json' assert { type: 'json' 
 const gameIds: Set<string> = new Set(Pokemon.jeux.map(jeu => jeu.id));
 const gameSpecificSheet = new CSSStyleSheet();
 gameSpecificSheet.replaceSync(`
+  :host [data-game],:host [data-method] { display: none; }
   ${[...gameIds].map(id => `:host([data-game="${id}"]) [data-game~="${id}"] { display: var(--display, revert); }`).join('')}
-  ${Shiny.allMethodes.map(methode => `:host([data-method="${methode.id}"]) [data-method~="${methode.id}"] { display: var(--display, revert); }`).join('')}
+  ${Shiny.allMethodes.map(m => `:host([data-method="${m.id}"]) [data-method~="${m.id}"] { display: var(--display, revert); }`).join('')}
 `);
 
 
@@ -208,13 +209,13 @@ export class huntCard extends HTMLElement {
         case 'name':
         case 'notes':
         case 'forme':
-        case 'gene':
         case 'ball':
         case 'hacked': {
           const value = String(hunt[prop]);
           input.value = value;
         } break;
 
+        case 'gene':
         case 'originMark': {
           const value = hunt[prop] as number | string;
           const input = this.shadow.querySelector(`input[name="${prop}"][value="${value}"]`) as HTMLInputElement;
@@ -232,7 +233,9 @@ export class huntCard extends HTMLElement {
 
           for (const compteurProp of compteurProps) {
             const input = this.shadow.querySelector(`input[name="${compteurProp}"], select[name="${compteurProp}"]`) as HTMLInputElement;
-            input.value = String(value[compteurProp] || 0);
+            const propValue = String(value[compteurProp] || 0);
+            if (input.type === 'checkbox') input.checked = input.value === propValue;
+            else input.value = propValue;
           }
         } break;
 
@@ -268,6 +271,9 @@ export class huntCard extends HTMLElement {
    * Met à jour la Hunt sauvegardée à partir des informations saisies dans le formulaire.
    */
   async formToHunt(formData: FormData): Promise<Hunt> {
+    for (const pair of formData.entries()) {
+      console.log(`${pair[0]}, ${pair[1]}`);
+    }
     const hunt = await this.getHunt();
 
     for (const [prop, value] of formData.entries()) {
@@ -276,6 +282,7 @@ export class huntCard extends HTMLElement {
           const allNames = await Pokemon.names();
           const dexid = allNames.findIndex(s => s === (value as string).toLowerCase());
           hunt.dexid = dexid > 0 ? dexid : 0;
+          hunt.forme = '';
         } break;
 
         case 'forme':
@@ -341,8 +348,7 @@ export class huntCard extends HTMLElement {
       const checkboxes = [...this.shadow.querySelectorAll('input[type="checkbox"][name]')] as HTMLInputElement[];
       checkboxes.forEach(checkbox => {
         const name = checkbox.getAttribute('name')!;
-        const checked = String(checkbox.checked);
-        formData.append(name, checked);
+        if (!checkbox.checked) formData.append(name, 'false');
       });
 
       const hunt = await this.formToHunt(formData);

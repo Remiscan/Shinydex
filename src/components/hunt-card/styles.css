@@ -93,11 +93,9 @@ legend {
 form:not([data-edit]) [data-edit],
 form[data-edit] [data-not-edit],
 form:not(.caught) .capture-button-group ~ * {
-  display: none;
+  display: none !important;
 }
 
-:host [data-game],
-:host [data-method],
 :host(:not([data-gen-vc="true"]):not([data-method-mine="false"])) [data-checkmark-unsure],
 :host(:not([data-method-mine="false"])) [data-not-mine],
 :host(:not([data-charm-available="true"])) :is([name="charm"], [for="charm"]) {

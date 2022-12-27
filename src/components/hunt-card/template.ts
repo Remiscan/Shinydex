@@ -357,7 +357,7 @@ template.innerHTML = /*html*/`
     <legend>Gène</legend>
 
     <span class="one-input">
-      <input type="radio" name="gene" id="gene-none" value="0" checked>
+      <input type="radio" name="gene" id="gene-none" value="" checked>
       <label for="gene-none">Aucun</label>
     </span>
 
