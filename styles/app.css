@@ -687,10 +687,6 @@ nav.disabled {
 !!!!! CHASSES EN COURS !!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
-#chasses-en-cours>.section-contenu {
-  flex-direction: column-reverse;
-}
-
 hunt-card + hunt-card {
   content-visibility: auto;
   contain-intrinsic-size: 10px 126px;
@@ -1447,11 +1443,6 @@ form[name="app-settings"] {
 
   #pokedex .defer-loader {
     display: none;
-  }
-
-  #chasses-en-cours>.section-contenu {
-    justify-content: flex-end;
-    align-items: center;
   }
 
   body[data-section-actuelle~="parametres"] main {

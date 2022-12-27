@@ -1,6 +1,5 @@
 :host {
   width: 100%;
-  overflow: hidden;
   border-radius: 10px;
   box-shadow: rgb(0 0 0 / 14%) 0px 2px 2px 0px;
   background-color: var(--card-bg-color);
@@ -32,7 +31,7 @@ pokemon-sprite {
   grid-column: 2;
   grid-row: 1;
   padding: .2em;
-  border-radius: 0;
+  border-radius: 0 10px 0 0;
   background-color: var(--card-sprite-bg-color);
   height: fit-content;
   text-align: center;
