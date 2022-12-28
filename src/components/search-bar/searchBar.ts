@@ -1,4 +1,4 @@
-import { Params, wait } from '../../Params.js';
+import { Params, noAccent, wait } from '../../Params.js';
 import { Pokemon } from '../../Pokemon.js';
 // @ts-expect-error
 import sheet from './styles.css' assert { type: 'css' };
@@ -7,6 +7,11 @@ import template from './template.js';
 import gameNames from '../../../strings/games.json' assert { type: 'json' };
 import { ListeFiltres, filtrableSection } from '../../filtres.js';
 import { dataStorage } from '../../localForage.js';
+
+
+
+const searchSheet = new CSSStyleSheet();
+document.adoptedStyleSheets = [...document.adoptedStyleSheets, searchSheet];
 
 
 
@@ -35,7 +40,7 @@ export class searchBar extends HTMLElement {
       this.inputNonce = inputNonce;
 
       const searchBar = this.querySelector('[role="searchbox"]') as HTMLInputElement;
-      const value = event.type === 'reset' ? '' : searchBar.value.toLowerCase();
+      const value = event.type === 'reset' ? '' : noAccent(searchBar.value).toLowerCase();
 
       // Build search hints based on user input
       const hintsContainer = this.querySelector('.search-hints')!;

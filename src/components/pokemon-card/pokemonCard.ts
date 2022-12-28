@@ -1,4 +1,4 @@
-import { Params, wait } from '../../Params.js';
+import { Params, noAccent, wait } from '../../Params.js';
 import { Pokemon, Shiny } from '../../Pokemon.js';
 import { huntStorage, pokemonData, shinyStorage } from '../../localForage.js';
 import { Notif } from '../../notification.js';
@@ -235,8 +235,8 @@ export class pokemonCard extends HTMLElement {
     // Filters
     this.setAttribute('data-mine', String(shiny.mine));
     this.setAttribute('data-legit', String(shiny.hacked === 0));
-    this.setAttribute('data-species', String(pokemon.name));
-    this.setAttribute('data-name', shiny.name);
+    this.setAttribute('data-species', noAccent(String(pokemon.name)).toLowerCase());
+    this.setAttribute('data-name', noAccent(shiny.name).toLowerCase());
     this.setAttribute('data-game', shiny.game);
 
     // Order

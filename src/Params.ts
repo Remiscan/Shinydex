@@ -77,6 +77,13 @@ export function timestamp2date(timestamp: number): string {
 }
 
 
+//////////////////////////////////////////////////
+// Supprime les accents d'une chaîne de caractères
+export function noAccent(str: string): string {
+  return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
+
 ////////////////////////////////
 // Pads a string with leading 0s
 export function pad(s: string, long: number): string {
