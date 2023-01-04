@@ -1,7 +1,7 @@
 import { DexDatalist } from '../../DexDatalist.js';
 import { Hunt, huntedPokemon } from '../../Hunt.js';
 import { warnBeforeDestruction } from '../../Params.js';
-import { Forme, Pokemon, Shiny } from '../../Pokemon.js';
+import { Count, Forme, Pokemon, Shiny } from '../../Pokemon.js';
 import { huntStorage, pokemonData, shinyStorage } from '../../localForage.js';
 import { Notif } from '../../notification.js';
 import pokemonSprite from '../pokemon-sprite/pokemonSprite.js';
@@ -51,7 +51,7 @@ declare global {
 type huntProperty = keyof Hunt;
 
 interface Handler {
-  element: Element;
+  element: Element | null;
   type: string;
   function: (e: Event) => void;
 }
@@ -61,11 +61,11 @@ interface HandlerMap {
 }
 
 function handle(handler: Handler) {
-  handler.element.addEventListener(handler.type, handler.function);
+  handler.element?.addEventListener(handler.type, handler.function);
 }
 
 function unhandle(handler: Handler) {
-  handler.element.removeEventListener(handler.type, handler.function);
+  handler.element?.removeEventListener(handler.type, handler.function);
 }
 
 
@@ -180,10 +180,11 @@ export class huntCard extends HTMLElement {
     }
 
     for (const prop of hunt.orderedKeys) {
-      const input = this.shadow.querySelector(`input[name="${prop}"], select[name="${prop}"], textarea[name="${prop}"]`) as HTMLInputElement;
+      const input = this.shadow.querySelector(`input[name="${prop}"], select[name="${prop}"], textarea[name="${prop}"]`);
 
-      switch (prop as huntProperty) {
+      switch (prop) {
         case 'dexid': {
+          if (!(input instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
           const value = hunt.dexid;
           let name = '';
           if (value > 0) {
@@ -195,57 +196,76 @@ export class huntCard extends HTMLElement {
         } break;
 
         case 'game': {
+          if (!(input instanceof HTMLSelectElement)) throw new TypeError(`Expecting HTMLSelectElement`);
           const value = hunt.game;
           input.value = value;
           this.updateAttribute('game', value);
         } break;
 
         case 'method': {
+          if (!(input instanceof HTMLSelectElement)) throw new TypeError(`Expecting HTMLSelectElement`);
           const value = hunt.method;
           input.value = value;
           this.updateAttribute('method', value);
         } break;
 
-        case 'name':
-        case 'notes':
         case 'forme':
         case 'ball':
         case 'hacked': {
+          if (!(input instanceof HTMLSelectElement)) throw new TypeError(`Expecting HTMLSelectElement`);
+          const value = String(hunt[prop]);
+          input.value = value;
+        } break;
+
+        case 'name': {
+          if (!(input instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
+          const value = String(hunt[prop]);
+          input.value = value;
+        } break;
+
+        case 'notes': {
+          if (!(input instanceof HTMLTextAreaElement)) throw new TypeError(`Expecting HTMLTextAreaElement`);
           const value = String(hunt[prop]);
           input.value = value;
         } break;
 
         case 'gene':
         case 'originMark': {
-          const value = hunt[prop] as number | string;
-          const input = this.shadow.querySelector(`input[name="${prop}"][value="${value}"]`) as HTMLInputElement;
+          const value = hunt[prop];
+          const input = this.shadow.querySelector(`input[name="${prop}"][value="${value}"]`);
+          if (!(input instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
           input.checked = true;
         } break;
 
         case 'charm': {
-          const value = hunt[prop] as boolean;
+          if (!(input instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
+          const value = hunt[prop];
           input.checked = value;
         } break;
 
         case 'count': {
+          if (!(input instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
           const value = hunt.count;
           input.value = String(value['encounters'] || 0);
 
           for (const compteurProp of compteurProps) {
-            const input = this.shadow.querySelector(`input[name="${compteurProp}"], select[name="${compteurProp}"]`) as HTMLInputElement;
+            const input = this.shadow.querySelector(`input[name="${compteurProp}"], select[name="${compteurProp}"]`);
+            if (!(input instanceof HTMLInputElement) && !(input instanceof HTMLSelectElement)) throw new TypeError(`Expecting HTMLInputElement or HTMLSelectElement`);
             const propValue = String(value[compteurProp] || 0);
-            if (input.type === 'checkbox') input.checked = input.value === propValue;
+            if (input instanceof HTMLInputElement && input.type === 'checkbox') input.checked = input.value === propValue;
             else input.value = propValue;
           }
         } break;
 
         case 'catchTime': {
+          if (!(input instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
           const value = hunt.catchTime || 0;
           const date = (new Date(value)).toISOString().split('T')[0];
           input.value = date;
         } break;
 
         case 'caught': {
+          if (!(input instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
           const value = hunt.caught;
           input.checked = value;
           const form = this.shadow.querySelector('form');
@@ -277,10 +297,10 @@ export class huntCard extends HTMLElement {
     const hunt = await this.getHunt();
 
     for (const [prop, value] of formData.entries()) {
-      switch (prop as huntProperty) {
+      switch (prop) {
         case 'dexid': {
           const allNames = await Pokemon.names();
-          const dexid = allNames.findIndex(s => s === (value as string).toLowerCase());
+          const dexid = allNames.findIndex(s => s === String(value).toLowerCase());
           hunt.dexid = dexid > 0 ? dexid : 0;
           hunt.forme = '';
         } break;
@@ -291,16 +311,13 @@ export class huntCard extends HTMLElement {
         case 'method':
         case 'game':
         case 'ball':
+        case 'originMark':
         case 'notes': {
-          Object.assign(hunt, { [prop]: value });
-        } break;
-
-        case 'originMark': {
-          Object.assign(hunt, { [prop]: value as string });
+          Object.assign(hunt, { [prop]: String(value) });
         } break;
 
         case 'hacked': {
-          Object.assign(hunt, { [prop]: parseInt(value as string) });
+          Object.assign(hunt, { [prop]: parseInt(String(value)) });
         } break;
 
         case 'caught':
@@ -310,12 +327,12 @@ export class huntCard extends HTMLElement {
         } break;
 
         case 'count': {
-          const compteur: Shiny['count'] = {
+          const compteur: Shiny['count'] = new Count({
             encounters: Number(value) || 0
-          };
+          });
 
           for (const compteurProp of compteurProps) {
-            const val = parseInt(formData.get(compteurProp) as string) || 0;
+            const val = parseInt(String(formData.get(compteurProp))) || 0;
             if (val > 0) compteur[compteurProp] = val;
           }
 
@@ -325,7 +342,7 @@ export class huntCard extends HTMLElement {
         case 'catchTime': {
           const timeCapture = hunt.catchTime || 0;
           const oldDate = (new Date(timeCapture)).toISOString().split('T')[0];
-          const newTime = value !== oldDate ? (new Date(value as string)).getTime() : timeCapture;
+          const newTime = value !== oldDate ? (new Date(String(value))).getTime() : timeCapture;
           if (!isNaN(newTime)) hunt.catchTime = newTime;
         } break;
       }
@@ -345,8 +362,9 @@ export class huntCard extends HTMLElement {
       const formData = new FormData(form);
     
       // Add checkboxes state to formData
-      const checkboxes = [...this.shadow.querySelectorAll('input[type="checkbox"][name]')] as HTMLInputElement[];
+      const checkboxes = [...this.shadow.querySelectorAll('input[type="checkbox"][name]')];
       checkboxes.forEach(checkbox => {
+        if (!(checkbox instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
         const name = checkbox.getAttribute('name')!;
         if (!checkbox.checked) formData.append(name, 'false');
       });
@@ -416,13 +434,15 @@ export class huntCard extends HTMLElement {
   connectedCallback() {   
     // 🔽 Active les boutons du formulaire
 
-    const form = this.shadow.querySelector('form') as HTMLFormElement;
+    const form = this.shadow.querySelector('form');
+    if (!(form instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
 
     // Active les boutons d'incrémentation du compteur
-    const inputCompteur = this.shadow.querySelector('input[name="count"]') as HTMLInputElement;
+    const inputCompteur = this.shadow.querySelector('input[name="count"]');
+    if (!(inputCompteur instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
 
     this.handlers.counterAdd = {
-      element: this.shadow.querySelector('button.counter.add') as HTMLButtonElement,
+      element: this.shadow.querySelector('button.counter.add'),
       type: 'click',
       function: event => {
         const value = Number(inputCompteur.value);
@@ -434,7 +454,7 @@ export class huntCard extends HTMLElement {
     handle(this.handlers.counterAdd);
 
     this.handlers.counterSub = {
-      element: this.shadow.querySelector('button.counter.sub') as HTMLButtonElement,
+      element: this.shadow.querySelector('button.counter.sub'),
       type: 'click',
       function: event => {
         const value = Number(inputCompteur.value);
@@ -447,28 +467,30 @@ export class huntCard extends HTMLElement {
 
     // Active le bouton "capturé"
     this.handlers.caught = {
-      element: this.shadow.querySelector('input[name="caught"]') as HTMLButtonElement,
+      element: this.shadow.querySelector('input[name="caught"]'),
       type: 'change',
       function: async event => {
         if (!form.checkValidity()) {
-          (event.currentTarget as HTMLInputElement).checked = false;
+          if (!(event.currentTarget instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
+          event.currentTarget.checked = false;
           form.dispatchEvent(new Event('change'));
           return;
         }
 
         form.classList.toggle('caught');
-        const inputDate = this.shadow.querySelector('input[name="catchTime"]') as HTMLInputElement;
-        const sprite = this.shadow.querySelector('pokemon-sprite')! as pokemonSprite;
+        const inputDate = this.shadow.querySelector('input[name="catchTime"]');
+        if (!(inputDate instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
+        const sprite: pokemonSprite | null = this.shadow.querySelector('pokemon-sprite');
   
         if (form.classList.contains('caught')) {
-          sprite.setAttribute('shiny', 'true');
-          sprite.sparkle();
+          sprite?.setAttribute('shiny', 'true');
+          sprite?.sparkle();
           if (!form.getAttribute('edit') != null) {
             inputDate.value = new Date().toISOString().split('T')[0];
             form.dispatchEvent(new Event('change'));
           }
         } else {
-          sprite.setAttribute('shiny', 'false');
+          sprite?.setAttribute('shiny', 'false');
         }
       }
     };
@@ -476,11 +498,12 @@ export class huntCard extends HTMLElement {
 
     // Active le bouton "annuler"
     this.handlers.cancel = {
-      element: this.shadow.querySelector('button.edit-cancel') as HTMLButtonElement,
+      element: this.shadow.querySelector('button.edit-cancel'),
       type: 'click',
       function: async event => {
         const cancelMessage = 'Cette chasse sera supprimée.';
-        const userResponse = await warnBeforeDestruction((event.currentTarget! as Element), cancelMessage);
+        if (!(event.currentTarget instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
+        const userResponse = await warnBeforeDestruction(event.currentTarget, cancelMessage);
         if (userResponse)  await this.delete();
       }
     };
@@ -488,11 +511,12 @@ export class huntCard extends HTMLElement {
 
     // Active le bouton "supprimer"
     this.handlers.delete = {
-      element: this.shadow.querySelector('button.hunt-delete') as HTMLButtonElement,
+      element: this.shadow.querySelector('button.hunt-delete'),
       type: 'click',
       function: async event => {
         const cancelMessage = 'Cette chasse sera supprimée.';
-        const userResponse = await warnBeforeDestruction((event.currentTarget! as Element), cancelMessage);
+        if (!(event.currentTarget instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
+        const userResponse = await warnBeforeDestruction(event.currentTarget, cancelMessage);
         if (userResponse)  await this.delete();
       }
     };
@@ -500,7 +524,7 @@ export class huntCard extends HTMLElement {
 
     // Active le bouton "enregistrer"
     this.handlers.submit = {
-      element: this.shadow.querySelector('form') as HTMLFormElement,
+      element: this.shadow.querySelector('form'),
       type: 'submit',
       function: async event => {
         event.preventDefault();
@@ -521,7 +545,8 @@ export class huntCard extends HTMLElement {
           new Notif(message).prompt();
           return;
         } else {
-          const boutonSubmit = this.shadow.querySelector('button.submit') as HTMLButtonElement;
+          const boutonSubmit = this.shadow.querySelector('button.submit');
+          if (!(boutonSubmit instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
           const userResponse = await warnBeforeDestruction(boutonSubmit, 'Ajouter ce Pokémon à vos chromatiques ?', 'done');
           if (userResponse) await this.submit();
         }
@@ -531,11 +556,12 @@ export class huntCard extends HTMLElement {
 
     // Active le bouton "supprimer"
     this.handlers.deleteShiny = {
-      element: this.shadow.querySelector('button.full-delete') as HTMLButtonElement,
+      element: this.shadow.querySelector('button.full-delete'),
       type: 'click',
       function: async event => {
         const deleteMessage = 'Ce Pokémon chromatique sera supprimé et déplacé dans la corbeille.';
-        const userResponse = await warnBeforeDestruction(event.currentTarget as Element, deleteMessage);
+        if (!(event.currentTarget instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
+        const userResponse = await warnBeforeDestruction(event.currentTarget, deleteMessage);
         if (userResponse) await this.deleteShiny();
       }
     };
@@ -553,7 +579,8 @@ export class huntCard extends HTMLElement {
 
     // Génère la liste des formes au choix d'un Pokémon
     // et génère la liste des Pokémon correspondants quand on commence à écrire un nom
-    const inputEspece = this.shadow.querySelector('[list="datalist-pokedex"]') as HTMLInputElement;
+    const inputEspece = this.shadow.querySelector('[list="datalist-pokedex"]');
+    if (!(inputEspece instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
     this.handlers.listeFormes = {
       element: inputEspece,
       type: 'focus',
@@ -581,7 +608,8 @@ export class huntCard extends HTMLElement {
 
   /** Génère la liste des formes à partir du Pokémon entré. */
   async genereFormes(value: string, formeToSelect?: string) {
-    const select = this.shadow.querySelector('select[name="forme"]') as HTMLInputElement;
+    const select = this.shadow.querySelector('select[name="forme"]');
+    if (!(select instanceof HTMLSelectElement)) throw new TypeError(`Expecting HTMLSelectElement`);
     select.innerHTML = '';
 
     const allNames = await Pokemon.names();
@@ -602,7 +630,8 @@ export class huntCard extends HTMLElement {
 
   /** Génère la liste des méthodes à partir du jeu entré. */
   genereMethodes() {
-    const select = this.shadow.querySelector('select[name="method"]') as HTMLInputElement;
+    const select = this.shadow.querySelector('select[name="method"]');
+    if (!(select instanceof HTMLSelectElement)) throw new TypeError(`Expecting HTMLSelectElement`);
     const lang = document.documentElement.getAttribute('lang');
     for (const methode of Shiny.allMethodes) {
       const nom = methodStrings[lang][methode.id];
@@ -614,7 +643,8 @@ export class huntCard extends HTMLElement {
 
   /** Génère la liste des jeux. */
   genereJeux() {
-    const select = this.shadow.querySelector('select[name="game"]')!;
+    const select = this.shadow.querySelector('select[name="game"]');
+    if (!(select instanceof HTMLSelectElement)) throw new TypeError(`Expecting HTMLSelectElement`);
     const lang = document.documentElement.getAttribute('lang');
     for (const jeu of [...Pokemon.jeux].reverse()) {
       const nom = gameStrings[lang][jeu.uid];

@@ -1,10 +1,8 @@
-import { huntedPokemon } from './Hunt.js';
-import { Pokemon, frontendShiny } from './Pokemon.js';
+import { Pokemon } from './Pokemon.js';
 import { huntCard } from './components/hunt-card/huntCard.js';
 import { pokemonCard } from './components/pokemon-card/pokemonCard.js';
-import { ListeFiltres } from './filtres.js';
 import { lazyLoad } from './lazyLoading.js';
-import { dataStorage, friendStorage, huntStorage, localForageAPI, shinyStorage } from './localForage.js';
+import { friendStorage, huntStorage, localForageAPI, shinyStorage } from './localForage.js';
 import { navigate } from './navigate.js';
 import { Notif } from './notification.js';
 
@@ -20,7 +18,7 @@ let pokedexInitialized = false;
 
 export type populatableSection = 'mes-chromatiques' | 'chasses-en-cours' | 'chromatiques-ami' | 'corbeille';
 
-export async function populateHandler(section: populatableSection, _ids?: string[], filtres: ListeFiltres = new ListeFiltres()): Promise<PromiseSettledResult<string>[]> {
+export async function populateHandler(section: populatableSection, _ids?: string[]): Promise<PromiseSettledResult<string>[]> {
   let dataStore: localForageAPI; // base de données
   switch (section) {
     case 'mes-chromatiques':
@@ -60,7 +58,7 @@ export async function populateHandler(section: populatableSection, _ids?: string
 
   const newQueue = new Set([...(queue.get(section) || []), ...currentQueue]);
   queue.set(section, newQueue);
-  if (newQueue.size > 0) return populateHandler(section, [...newQueue], filtres);
+  if (newQueue.size > 0) return populateHandler(section, [...newQueue]);
 
   return populated;
 }
@@ -70,12 +68,10 @@ export async function populateHandler(section: populatableSection, _ids?: string
 export async function populateFromData(section: populatableSection, ids: string[]): Promise<PromiseSettledResult<string>[]> {
   let elementName: string; // Nom de l'élément de carte
   let dataStore: localForageAPI; // Base de données
-  let filtres: ListeFiltres | undefined; // Filtres à appliquer aux cartes
   switch (section) {
     case 'mes-chromatiques':
       elementName = 'pokemon-card';
       dataStore = shinyStorage;
-      filtres = await dataStorage.getItem('filtres');
       break;
     case 'chasses-en-cours':
       elementName = 'hunt-card';
@@ -105,8 +101,8 @@ export async function populateFromData(section: populatableSection, ids: string[
 
   const cardsToCreate: Array<pokemonCard | huntCard> = [];
   const results = await Promise.allSettled(ids.map(async huntid => {
-    const pkmn = await dataStore.getItem(huntid) as frontendShiny | huntedPokemon | null;
-    let card = document.querySelector(`${elementName}[huntid="${huntid}"]`) as pokemonCard | huntCard;
+    const pkmn = await dataStore.getItem(huntid);
+    let card: pokemonCard | huntCard | null = document.querySelector(`${elementName}[huntid="${huntid}"]`);
 
     // ABSENT DE LA BDD = Supprimer (manuellement)
     if (pkmn === null) {

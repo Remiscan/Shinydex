@@ -193,7 +193,7 @@ export default class pokemonSprite extends HTMLElement {
     for (const size of supportedSizes) {
       if (this.params.size <= size) bestSize = size;
     }
-    return bestSize ?? Math.max(1, Math.min(this.params.size as number, 512));
+    return bestSize ?? Math.max(1, Math.min(Number(this.params.size) || 112, 512));
   }
 
 

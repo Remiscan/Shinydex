@@ -113,15 +113,26 @@ const allMethodes: Methode[] = [
 
 
 /** Structure d'une Forme de Pokémon. */
-export type Forme = {
-  dbid: string,
-  nom: string,
-  form: number,
-  gender: string,
-  gigamax: boolean,
-  candy: number,
-  hasBackside?: boolean,
-  noShiny?: boolean,
+export class Forme {
+  dbid: string = '';
+  nom: string = '';
+  form: number = 0;
+  gender: string = 'mf';
+  gigamax: boolean = false;
+  candy: number = 0;
+  hasBackside?: boolean;
+  noShiny?: boolean;
+
+  constructor(forme: object = {}) {
+    if ('dbid' in forme) this.dbid = String(forme.dbid);
+    if ('nom' in forme) this.nom = String(forme.nom);
+    if ('form' in forme) this.form = Number(forme.form) || 0;
+    if ('gender' in forme) this.gender = String(forme.gender);
+    if ('gigamax' in forme) this.gigamax = Boolean(forme.gigamax);
+    if ('candy' in forme) this.candy = Number(forme.candy) || 0;
+    if ('hasBackside' in forme) this.hasBackside = Boolean(forme.hasBackside);
+    if ('noShiny' in forme) this.noShiny = Boolean(forme.noShiny);
+  }
 };
 
 
@@ -137,20 +148,34 @@ export interface backendPokemon {
 };
 
 type nameLang = keyof backendPokemon['name'];
+const supportedLangs: Array<nameLang> = ['fr', 'en'];
 
 
 
-type count = {
-  'encounters': number,
-  'usum-distance'?: number,
-  'usum-rings'?: number,
-  'lgpe-catchCombo'?: number,
-  'lgpe-lure'?: number,
-  'lgpe-nextSpawn'?: number,
-  'swsh-dexKo'?: number,
-  'pla-dexResearch'?: number,
-  'sv-outbreakCleared'?: number,
-  'sv-sparklingPower'?: number
+export class Count {
+  'encounters': number = 0;
+  'usum-distance'?: number;
+  'usum-rings'?: number;
+  'lgpe-catchCombo'?: number;
+  'lgpe-lure'?: number;
+  'lgpe-nextSpawn'?: number;
+  'swsh-dexKo'?: number;
+  'pla-dexResearch'?: number;
+  'sv-outbreakCleared'?: number;
+  'sv-sparklingPower'?: number;
+
+  constructor(obj: object) {
+    if ('encounters' in obj) this['encounters'] = Number(obj['encounters']) || 0;
+    if ('usum-distance' in obj) this['usum-distance'] = Number(obj['usum-distance']) || 0;
+    if ('usum-rings' in obj) this['usum-rings'] = Number(obj['usum-rings']) || 0;
+    if ('lgpe-catchCombo' in obj) this['lgpe-catchCombo'] = Number(obj['lgpe-catchCombo']) || 0;
+    if ('lgpe-lure' in obj) this['lgpe-lure'] = Number(obj['lgpe-lure']) || 0;
+    if ('lgpe-nextSpawn' in obj) this['lgpe-nextSpawn'] = Number(obj['lgpe-nextSpawn']) || 0;
+    if ('swsh-dexKo' in obj) this['swsh-dexKo'] = Number(obj['swsh-dexKo']) || 0;
+    if ('pla-dexResearch' in obj) this['pla-dexResearch'] = Number(obj['pla-dexResearch']) || 0;
+    if ('sv-outbreakCleared' in obj) this['sv-outbreakCleared'] = Number(obj['sv-outbreakCleared']) || 0;
+    if ('sv-sparklingPower' in obj) this['sv-sparklingPower'] = Number(obj['sv-sparklingPower']) || 0;
+  }
 };
 
 
@@ -181,7 +206,7 @@ interface backendShiny {
 /** Structure d'un Pokémon shiny tel que stocké dans la BDD locale. */
 export interface frontendShiny extends Omit<backendShiny, 'id' | 'lastUpdate' | 'count' | 'catchTime'> {
   lastUpdate: number,
-  count: count,
+  count: Count,
   catchTime: number,
   deleted?: boolean,
   destroy?: boolean,
@@ -199,24 +224,35 @@ type SpriteOptions = {
 
 
 class Pokemon {
-  public dexid: number;
+  public dexid: number = 0;
   public name: {
     'fr': string,
     'en': string
-  };
-  public formes: Forme[];
-  static #names: {
-    fr: string[],
-    en: string[]
   } = {
-    fr: [],
-    en: []
+    'fr': '',
+    'en': ''
+  };
+  public formes: Forme[] = [];
+
+  static #names: {
+    'fr': string[],
+    'en': string[]
+  } = {
+    'fr': [],
+    'en': []
   };
 
-  constructor(pkmn: backendPokemon) {
-    this.dexid = pkmn.dexid;
-    this.name = pkmn.name;
-    this.formes = pkmn.formes;
+  constructor(pkmn: object = {}) {
+    if ('dexid' in pkmn) this.dexid = Number(pkmn.dexid) || 0;
+    if ('name' in pkmn && typeof pkmn.name === 'object' && pkmn.name != null) {
+      this.name = {
+        fr: 'fr' in pkmn.name ? String(pkmn.name.fr) : '',
+        en: 'en' in pkmn.name ? String(pkmn.name.en) : ''
+      };
+    }
+    if ('formes' in pkmn && Array.isArray(pkmn.formes)) {
+      this.formes = pkmn.formes.map(forme => new Forme(forme));
+    }
   }
 
   /**
@@ -267,25 +303,28 @@ class Pokemon {
   /**
    * @returns Nom du Pokémon.
    */
-  getName(lang = document.documentElement.getAttribute('lang')): string {
-    return this.name[lang as nameLang ?? 'fr'];
+  getName(lang = document.documentElement.getAttribute('lang') ?? 'fr'): string {
+    const _lang = (supportedLangs as string[]).includes(lang) ? lang as nameLang : 'fr';
+    return this.name[_lang];
   }
 
   /**
    * @returns Liste des noms de tous les Pokémon, dans l'ordre du Pokédex national.
    */
-  static async names(lang = document.documentElement.getAttribute('lang')): Promise<string[]> {
-    const cachedNames = Pokemon.#names[lang as nameLang];
+  static async names(lang = document.documentElement.getAttribute('lang') ?? 'fr'): Promise<string[]> {
+    const _lang = (supportedLangs as string[]).includes(lang) ? lang as nameLang : 'fr';
+
+    const cachedNames = Pokemon.#names[_lang];
     if (cachedNames.length > 0) return cachedNames;
 
     const keys = (await pokemonData.keys()).sort((a, b) => Number(a) - Number(b));
     const names: string[] = [];
     for (const key of keys) {
       const pkmn = await pokemonData.getItem(key);
-      const name = pkmn.name[lang as nameLang];
+      const name = pkmn.name[_lang];
       names.push(name);
     }
-    Pokemon.#names[lang as nameLang] = names;
+    Pokemon.#names[_lang] = names;
     return names;
   }
 
@@ -335,14 +374,14 @@ class Pokemon {
 
 class Shiny implements frontendShiny {
   // frontendShiny fields
-  huntid: string = '';
+  huntid: string = crypto.randomUUID();
   lastUpdate: number = 0;
 
   dexid: number = 0;
   forme: string = '';
   game: string = '';
   method: string = '';
-  count: count = { encounters: 0 };
+  count: Count = new Count({ encounters: 0 });
   charm: boolean = false;
 
   catchTime: number = 0;
@@ -358,9 +397,30 @@ class Shiny implements frontendShiny {
   deleted: boolean = false;
   destroy: boolean = false;
 
-  constructor(shiny: frontendShiny) {
-    Object.assign(this, shiny);
-    this.deleted = Boolean(shiny.deleted);
+  constructor(shiny: object = {}) {
+    if ('huntid' in shiny) this.huntid = String(shiny.huntid);
+    if ('lastUpdate' in shiny) this.lastUpdate = Number(shiny.lastUpdate) || 0;
+
+    if ('dexid' in shiny) this.dexid = Number(shiny.dexid) || 0;
+    if ('forme' in shiny) this.forme = String(shiny.forme);
+    if ('game' in shiny) this.game = String(shiny.game);
+    if ('method' in shiny) this.method = String(shiny.method);
+    if ('count' in shiny && typeof shiny.count === 'object' && shiny.count != null && 'encounters' in shiny.count) {
+      this.count = new Count(shiny.count);
+    }
+    if ('charm' in shiny) this.charm = Boolean(shiny.charm);
+
+    if ('catchTime' in shiny) this.catchTime = Number(shiny.catchTime) || 0;
+    if ('name' in shiny) this.name = String(shiny.name);
+    if ('ball' in shiny) this.ball = String(shiny.ball);
+    if ('gene' in shiny) this.gene = String(shiny.gene);
+    if ('originMark' in shiny) this.originMark = String(shiny.originMark);
+    if ('hacked' in shiny) this.hacked = Number(shiny.hacked) || 0;
+
+    if ('notes' in shiny) this.notes = String(shiny.notes);
+
+    if ('deleted' in shiny) this.deleted = Boolean(shiny.deleted);
+    if ('destroy' in shiny) this.destroy = Boolean(shiny.destroy);
   }
 
   /**
@@ -386,10 +446,11 @@ class Shiny implements frontendShiny {
   /**
    * @returns Nom du Pokémon.
    */
-  async getName(lang = document.documentElement.getAttribute('lang')): Promise<string> {
+  async getName(lang = document.documentElement.getAttribute('lang') ?? 'fr'): Promise<string> {
     try {
+      const _lang = (supportedLangs as string[]).includes(lang) ? lang as nameLang : 'fr';
       const pokemon = await this.getEspece();
-      return pokemon.name[lang as nameLang ?? 'fr'];
+      return pokemon.name[_lang];
     } catch (error) { 
       console.error(error);
       return 'error';

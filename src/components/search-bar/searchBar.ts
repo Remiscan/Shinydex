@@ -24,7 +24,7 @@ const savedFiltres: Map<filtrableSection, ListeFiltres> = new Map([
 
 
 
-export class searchBar extends HTMLElement {
+export class SearchBar extends HTMLElement {
   ready: boolean = false;
   htmlready: boolean = false;
   inputNonce: object = {};
@@ -39,7 +39,8 @@ export class searchBar extends HTMLElement {
       const inputNonce = {};
       this.inputNonce = inputNonce;
 
-      const searchBar = this.querySelector('[role="searchbox"]') as HTMLInputElement;
+      const searchBar = this.querySelector('[role="searchbox"]');
+      if (!(searchBar instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
       const value = event.type === 'reset' ? '' : noAccent(searchBar.value).toLowerCase();
 
       // Build search hints based on user input
@@ -55,7 +56,8 @@ export class searchBar extends HTMLElement {
       nickname: {
         if (value.length <= 0) break nickname;
 
-        const hint = hintTemplate.content.cloneNode(true) as HTMLElement;
+        const hint = hintTemplate.content.cloneNode(true);
+        if (!(hint instanceof DocumentFragment)) throw new TypeError(`Expecting DocumentFragment`);
         const input = hint.querySelector('input')!;
         const label = hint.querySelector('label')!;
         const text = label?.querySelector('span')!;
@@ -76,7 +78,8 @@ export class searchBar extends HTMLElement {
         allNames.forEach((name, dexid) => { if (name.includes(value)) fittingNames.add({ name, dexid }) });
 
         for (const { name, dexid } of fittingNames) {
-          const hint = hintTemplate.content.cloneNode(true) as HTMLElement;
+          const hint = hintTemplate.content.cloneNode(true);
+          if (!(hint instanceof DocumentFragment)) throw new TypeError(`Expecting DocumentFragment`);
           const input = hint.querySelector('input')!;
           const label = hint.querySelector('label')!;
           const text = label?.querySelector('span')!;
@@ -99,7 +102,8 @@ export class searchBar extends HTMLElement {
         allGames.forEach(game => { if (game.name.includes(value)) fittingNames.add({ name: game.name, uid: game.uid }) });
 
         for (const { name, uid } of fittingNames) {
-          const hint = hintTemplate.content.cloneNode(true) as HTMLElement;
+          const hint = hintTemplate.content.cloneNode(true);
+          if (!(hint instanceof DocumentFragment)) throw new TypeError(`Expecting DocumentFragment`);
           const input = hint.querySelector('input')!;
           const label = hint.querySelector('label')!;
           const text = label?.querySelector('span')!;
@@ -126,12 +130,14 @@ export class searchBar extends HTMLElement {
 
       if (!oldFiltres) return;
 
-      const form = this.querySelector('form[name="search-options"]') as HTMLFormElement;
+      const form = this.querySelector('form[name="search-options"]');
+      if (!(form instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
       const formData = new FormData(form);
     
       // Add checkboxes state to formData
-      const checkboxes = [...form.querySelectorAll('input[type="checkbox"][name]')] as HTMLInputElement[];
+      const checkboxes = [...form.querySelectorAll('input[type="checkbox"][name]')];
       checkboxes.forEach(checkbox => {
+        if (!(checkbox instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
         const name = checkbox.getAttribute('name')!;
         if (!checkbox.checked) formData.append(name, 'false');
       });
@@ -203,22 +209,25 @@ export class searchBar extends HTMLElement {
   /** Checks options inputs corresponding to a list of filters. */
   filtresToOptions(filtres: ListeFiltres) {
     ordre: {
-      const input = this.querySelector(`input[name="ordre"][value="${filtres.order}"]`) as HTMLInputElement;
+      const input = this.querySelector(`input[name="order"][value="${filtres.order}"]`);
+      if (!(input instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
       input.checked = true;
     }
   
     ordreReverse: {
-      const input = this.querySelector(`input[name="ordre-reverse"]`) as HTMLInputElement;
+      const input = this.querySelector(`input[name="orderReversed"]`);
+      if (!(input instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
       input.checked = filtres.orderReversed;
     }
   
     filtres: {
-      const allInputs = [...this.querySelectorAll('input[name^="filtre"]')] as HTMLInputElement[];
+      const allInputs = [...this.querySelectorAll('input[name^="filtre"]')];
       for (const input of allInputs) {
+        if (!(input instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
         const [x, key, value] = input.getAttribute('name')!.split('-');
         const filtre = filtres[key as keyof ListeFiltres] as Set<string>;
-        if (filtre.size === 0 || filtre.has(value)) input.checked = true;
-        else                                        input.checked = false;
+        if (filtre && (filtre.size === 0 || filtre.has(value))) input.checked = true;
+        else                                                    input.checked = false;
       }
     }
   }
@@ -281,7 +290,7 @@ export class searchBar extends HTMLElement {
     }
     this.ready = true;
 
-    for (const attr of searchBar.observedAttributes) {
+    for (const attr of SearchBar.observedAttributes) {
       this.update(attr);
     }
 
@@ -314,4 +323,4 @@ export class searchBar extends HTMLElement {
   }
 }
 
-if (!customElements.get('search-bar')) customElements.define('search-bar', searchBar);
+if (!customElements.get('search-bar')) customElements.define('search-bar', SearchBar);

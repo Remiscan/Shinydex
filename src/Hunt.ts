@@ -4,44 +4,16 @@ import { huntStorage, shinyStorage } from './localForage.js';
 
 
 // Structure d'un Pokémon en cours de chasse tel que stocké dans la BDD locale
-export interface huntedPokemon extends Omit<frontendShiny, 'id' | 'destroy'> {
+export interface huntedPokemon extends frontendShiny {
   caught: boolean,
 }
 
-const defaultHunt: huntedPokemon = {
-  huntid: '',
-  lastUpdate: 0,
-
-  dexid: 0,
-  forme: '',
-  game: '',
-  method: '',
-  count: { encounters: 0 },
-  charm: false,
-
-  catchTime: 0,
-  name: '',
-  ball: 'poke',
-  gene: '',
-  originMark: '',
-  hacked: 0,
-
-  notes: '',
-  
-  deleted: false,
-  caught: false,
-};
-
 export class Hunt extends Shiny implements huntedPokemon {
   caught: boolean = false;
-  uploaded: boolean = false;
   
-  private constructor(pokemon: huntedPokemon = {...defaultHunt}) {
-    pokemon.huntid = pokemon.huntid || crypto.randomUUID();
-    super(pokemon);
-    Object.assign(this, {
-      caught: pokemon.caught ?? false,
-    });
+  private constructor(shiny: object = {}) {
+    super(shiny);
+    if ('caught' in shiny) this.caught = Boolean(shiny.caught);
   }
 
 

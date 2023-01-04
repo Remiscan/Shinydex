@@ -53,7 +53,8 @@ export class Notif {
       if (notif.classList.contains('on')) return false;
 
       const notifTexte = notif.querySelector('.notif-texte')!;
-      const notifBouton = notif.querySelector('.notif-bouton')! as HTMLButtonElement;
+      const notifBouton = notif.querySelector('.notif-bouton');
+      if (!(notifBouton instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
       const notifTexteBouton = notifBouton.querySelector('span')!;
       const notifIcone = notifBouton.querySelector('i')!;
 
@@ -122,7 +123,8 @@ export class Notif {
     fab.classList.remove('notif');
 
     // Désactive le bouton d'action de la notification.
-    const notifBouton = notif.querySelector('.notif-bouton')! as HTMLButtonElement;
+    const notifBouton = notif.querySelector('.notif-bouton');
+    if (!(notifBouton instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
     notifBouton.removeEventListener('click', this.handler);
 
     queue.shift();

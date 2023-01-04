@@ -1,5 +1,5 @@
-import { loadAllImages, Params, wait } from './Params.js';
-import { searchBar } from './components/search-bar/searchBar.js';
+import { Params, loadAllImages, wait } from './Params.js';
+import { SearchBar } from './components/search-bar/searchBar.js';
 import { disableLazyLoad, enableLazyLoad } from './lazyLoading.js';
 import { Notif } from './notification.js';
 
@@ -8,8 +8,8 @@ import { Notif } from './notification.js';
 interface Section {
   nom: string;
   rememberPosition: boolean;
-  openAnimation: (el: Element, ev: Event, data?: any) => (Animation | null);
-  closeAnimation: (el: Element, ev: Event, data?: any) => (Animation | null);
+  openAnimation: (el: HTMLElement, ev: Event, data?: any) => (Animation | null);
+  closeAnimation: (el: HTMLElement, ev: Event, data?: any) => (Animation | null);
   historique: boolean;
   closePrevious: boolean;
   preload: string[];
@@ -110,18 +110,17 @@ const sections: Section[] = [
   }, {
     nom: 'sprite-viewer',
     rememberPosition: false,
-    openAnimation: (section: Element, event: Event, data: any) => {
+    openAnimation: (section: HTMLElement, event: Event, data: any) => {
       let originX, originY;
-      const evt = event as MouseEvent;
-      if (evt.clientX && evt.clientY) {
-        originX = evt.clientX;
-        originY = evt.clientY;
+      if (event instanceof MouseEvent && event.clientX && event.clientY) {
+        originX = event.clientX;
+        originY = event.clientY;
       } else {
         const rect = document.querySelector(`#pokedex .pkmnicon[data-dexid="${data.dexid}"]`)!.getBoundingClientRect();
         originX = rect.x;
         originY = rect.y;
       }
-      (section as HTMLElement).style.transformOrigin = originX + 'px ' + originY + 'px';
+      section.style.transformOrigin = originX + 'px ' + originY + 'px';
 
       return section.animate([
         { opacity: 0, transform: 'scale(.7) translateZ(0)' },
@@ -178,14 +177,14 @@ const lastPosition: Map<string, number> = new Map(sections.filter(section => sec
  * @param section - La section en question.
  * @returns La première carte.
  */
-const firstCard = (section: Element): Element | null | undefined => {
+const firstCard = (section: Element): HTMLElement | null | undefined => {
   let card;
   switch (section.id) {
     case 'mes-chromatiques': card = section.querySelector('pokemon-card'); break;
     case 'pokedex':          card = section.querySelector('.pokedex-gen'); break;
     case 'hunts':            card = section.querySelector('.hunt-card'); break;
   }
-  return card;
+  return card instanceof HTMLElement ? card : undefined;
 };
 
 
@@ -268,7 +267,8 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
       break;
     case 'obfuscator': {
       if (data.search) {
-        const searchBar = document.querySelector(`search-bar`) as searchBar;
+        const searchBar = document.querySelector(`search-bar`);
+        if (!(searchBar instanceof SearchBar)) throw new TypeError(`Expecting SearchBar`);
         searchBar.setAttribute('section', data.section ?? ancienneSection.nom);
         searchBar?.open();
       }
@@ -281,7 +281,8 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
   // On prépare les liens de retour de la nouvelle section s'il y en a
   if (event.type !== 'popstate') {
     const container = (sectionCible === 'obfuscator' && data.search) ? document.querySelector(`search-bar`)! : nouvelleSection.element;
-    for (const a of [...container.querySelectorAll('a.bouton-retour')] as HTMLAnchorElement[]) {
+    for (const a of [...container.querySelectorAll('a.bouton-retour')]) {
+      if (!(a instanceof HTMLAnchorElement)) throw new TypeError(`Expecting HTMLAnchorElement`);
       a.href = `./${ancienneSection.nom}`;
     }
   }
@@ -330,26 +331,16 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
  * @param event - L'event mousedown ou touchstart sur le bouton de nav.
  * @param element - Le bouton de nav.
  */
-export function navLinkBubble(event: Event, element: Element): void {
+export function navLinkBubble(event: PointerEvent, element: HTMLElement): void {
   element.classList.remove('bubbly');
-  if ((element as HTMLElement).dataset.section === document.body.dataset.sectionActuelle) return;
+  if (element.dataset.section === document.body.dataset.sectionActuelle) return;
   if (element.classList.contains('search-button')) return;
 
   let transformOrigin = 'center center';
   const rect = element.getBoundingClientRect();
+  transformOrigin = `${event.clientX - rect.x}px ${event.clientY - rect.y}px`;
 
-  switch (event.type) {
-    case 'mousedown': {
-      const evt = event as MouseEvent;
-      transformOrigin = `${evt.clientX - rect.x}px ${evt.clientY - rect.y}px`;
-    } break;
-    case 'touchstart': {
-      const evt = event as TouchEvent;
-      transformOrigin = `${evt.touches[0].clientX - rect.x}px ${evt.touches[0].clientY - rect.y}px`;
-    } break;
-  }
-
-  (element as HTMLElement).style.setProperty('--transform-origin', transformOrigin);
+  element.style.setProperty('--transform-origin', transformOrigin);
   
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {

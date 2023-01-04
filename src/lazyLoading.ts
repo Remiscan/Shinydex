@@ -7,16 +7,17 @@ function isRectSame(r1: DOMRect, r2: DOMRect): boolean {
   return (closeEnough(r1.width, r2.width) && closeEnough(r1.height, r2.height));
 }
 
-function computeSize(element: Element, rect: DOMRect = element.getBoundingClientRect()): void {
+function computeSize(element: HTMLElement, rect: DOMRect = element.getBoundingClientRect()): void {
   const oldRect = loaded.get(element);
   if ((!oldRect || !isRectSame(oldRect, rect)) && (rect.width > 0 && rect.height > 0)) {
     loaded.set(element, rect);
-    (element as HTMLElement).style.setProperty('contain-intrinsic-size', `100px ${rect.height}px`);
+    element.style.setProperty('contain-intrinsic-size', `100px ${rect.height}px`);
   }
 }
 
 const intersector = new IntersectionObserver((entries: IntersectionObserverEntry[]) => {
   for (const entry of entries) {
+    if (!(entry.target instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
     computeSize(entry.target, entry.boundingClientRect);
   }
 }, {
@@ -25,23 +26,24 @@ const intersector = new IntersectionObserver((entries: IntersectionObserverEntry
 
 const resizor = new ResizeObserver((entries: ResizeObserverEntry[]) => {
   for (const entry of entries) {
+    if (!(entry.target instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
     computeSize(entry.target, entry.contentRect);
   }
 });
 
-export function lazyLoad(element: Element) {
+export function lazyLoad(element: HTMLElement) {
   intersector.observe(element);
   resizor.observe(element);
 }
 
-export function enableLazyLoad(element: Element) {
+export function enableLazyLoad(element: HTMLElement) {
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      (element as HTMLElement).style.setProperty('content-visibility', 'auto');
+      element.style.setProperty('content-visibility', 'auto');
     })
   });
 }
 
-export function disableLazyLoad(element: Element) {
-  (element as HTMLElement).style.setProperty('content-visibility', 'visible');
+export function disableLazyLoad(element: HTMLElement) {
+  element.style.setProperty('content-visibility', 'visible');
 }

@@ -20,7 +20,8 @@ class spriteViewer extends HTMLElement {
 
   reset() {
     this.setAttribute('shiny', 'true');
-    const switchSR = this.querySelector('shiny-switch')! as HTMLInputElement;
+    const switchSR = this.querySelector('shiny-switch');
+    if (switchSR == null || !('checked' in switchSR)) throw new TypeError(`Expecting ShinySwitch`);
     switchSR.checked = true;
   }
 
@@ -99,7 +100,8 @@ class spriteViewer extends HTMLElement {
 
 
   toggleShinyRegular(event: Event) {
-    const shiny = (event.currentTarget! as HTMLInputElement).checked;
+    if (event.currentTarget == null || !('checked' in event.currentTarget)) throw new TypeError(`Expecting ShinySwitch`);
+    const shiny = event.currentTarget.checked;
     document.querySelector('#sprite-viewer sprite-viewer')!.setAttribute('shiny', String(shiny));
   }
 
@@ -115,7 +117,8 @@ class spriteViewer extends HTMLElement {
         }
       } break;
       case 'shiny': {
-        const input = this.querySelector('shiny-switch')! as HTMLInputElement;
+        const input = this.querySelector('shiny-switch');
+        if (input == null || !('checked' in input)) throw new TypeError(`Expecting ShinySwitch`);
         input.checked = value === 'true';
       } break;
     }
@@ -133,14 +136,16 @@ class spriteViewer extends HTMLElement {
     }
 
     const spriteScroller = this.querySelector('.sprite-scroller')!;
-    const switchSR = this.querySelector('shiny-switch')! as HTMLInputElement;
+    const switchSR = this.querySelector('shiny-switch');
+    if (switchSR == null || !('checked' in switchSR)) throw new TypeError(`Expecting ShinySwitch`);
     switchSR.addEventListener('change', this.toggleShinyRegular);
     spriteScroller.addEventListener('click', this.toggle = () => switchSR.shadowRoot!.querySelector('button')?.click());
   }
 
   disconnectedCallback() {
     const spriteScroller = this.querySelector('.sprite-scroller')!;
-    const switchSR = this.querySelector('shiny-switch')! as HTMLInputElement;
+    const switchSR = this.querySelector('shiny-switch');
+    if (switchSR == null || !('checked' in switchSR)) throw new TypeError(`Expecting ShinySwitch`);
     switchSR.removeEventListener('change', this.toggleShinyRegular);
     spriteScroller.removeEventListener('click', this.toggle);
     this.ready = false;

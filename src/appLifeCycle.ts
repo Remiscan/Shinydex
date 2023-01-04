@@ -204,8 +204,9 @@ export async function appStart() {
     logPerf('initFiltres');
     document.querySelector('search-bar')?.setAttribute('section', 'mes-chromatiques');
 
-    await Promise.all(['mes-chromatiques', 'chasses-en-cours', 'corbeille'].map(async section => {
-      await populateHandler(section as populatableSection);
+    const sectionsToPopulate: populatableSection[] = ['mes-chromatiques', 'chasses-en-cours', 'corbeille'];
+    await Promise.all(sectionsToPopulate.map(async section => {
+      await populateHandler(section);
       document.querySelector(`#${section}`)?.classList.remove('loading');
       if (section === 'mes-chromatiques') {
         document.querySelector(`#pokedex`)?.classList.remove('loading');

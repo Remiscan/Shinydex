@@ -27,7 +27,8 @@ import { backgroundSync } from './syncBackup.js';
 // NAVIGATION
 
 // Active les liens de navigation
-for (const link of Array.from(document.querySelectorAll('[data-section]')) as HTMLElement[]) {
+for (const link of Array.from(document.querySelectorAll('[data-section]'))) {
+  if (!(link instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
   link.addEventListener('click', event => {
     event.preventDefault();
     navigate(link.dataset.section || '', event, JSON.parse(link.dataset.navData || '{}'));
@@ -35,14 +36,13 @@ for (const link of Array.from(document.querySelectorAll('[data-section]')) as HT
 }
 
 // Active les bulles sur les liens de navigation
-for (const link of Array.from(document.querySelectorAll('.nav-link')) as HTMLElement[]) {
-  for (const startEvent of ['mousedown', 'touchstart']) {
-    link.addEventListener(startEvent, event => navLinkBubble(event, link));
-  }
+for (const link of Array.from(document.querySelectorAll('.nav-link'))) {
+  if (!(link instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
+  link.addEventListener('pointerdown', event => navLinkBubble(event, link));
 }
 
 // Active le bouton retour / fermer
-for (const bouton of Array.from(document.querySelectorAll('.bouton-retour')) as HTMLButtonElement[]) {
+for (const bouton of Array.from(document.querySelectorAll('.bouton-retour'))) {
   bouton.addEventListener('click', event => {
     event.preventDefault();
     history.back();
@@ -96,36 +96,31 @@ document.querySelector('.fab')!.addEventListener('click', async () => {
 // Applique le paramètre sauvegardé au switch du thème
 dataStorage.getItem('theme').then((theme?: string) => {
   const storedTheme = theme || 'system';
-  const input = document.getElementById(`theme-${storedTheme}`) as HTMLInputElement;
+  const input = document.getElementById(`theme-${storedTheme}`);
+  if (!(input instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
   input.checked = true;
 });
 
 // Détecte le changement de paramètre de thème
-for (const input of Array.from(document.querySelectorAll('input[name=theme]')) as HTMLInputElement[]) {
+for (const input of Array.from(document.querySelectorAll('input[name=theme]'))) {
+  if (!(input instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
   input.addEventListener('change', () => setTheme(input.value));
 }
 
-// Applique le paramètre sauvegardé au switch de la sauvegarde en ligne
-dataStorage.getItem('online-backup').then((value: boolean) => {
-  const box = document.getElementById('switch-online-backup')! as HTMLInputElement;
-  if (value === true) {
-    box.checked = true;
-    document.getElementById('parametres')!.dataset.onlineBackup = '1';
-  } else {
-    box.checked = false;
-  }
-});
-
 // Applique l'info sauvegardée au badge indiquant le succès / échec de la dernière synchronisation des BDD
 dataStorage.getItem('last-sync').then((value?: string) => {
-  const params = document.querySelector('#parametres')! as HTMLElement;
+  const params = document.querySelector('#parametres');
+  if (!(params instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
   if (value === 'success') params.dataset.lastSync = 'success';
   else                     params.dataset.lastSync = 'failure';
 });
 
 // Détecte le clic sur l'état du dernier backup pour en lancer un nouveau
-(document.querySelector('.info-backup.failure') as HTMLButtonElement).onclick = backgroundSync;
-(document.querySelector('.info-backup.success') as HTMLButtonElement).onclick = backgroundSync;
+const backgroundSyncTriggers = [document.querySelector('.info-backup.failure'), document.querySelector('.info-backup.success')];
+backgroundSyncTriggers.forEach(element => {
+  if (!(element instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
+  element.onclick = backgroundSync;
+});
 
 // Détecte le clic (court ou long) sur le bouton de recherche de mise à jour
 {
@@ -147,7 +142,8 @@ document.querySelector('.bouton-export')!.addEventListener('click', () => {
 });
 
 // Détecte le choix d'un fichier JSON d'import de données
-const importInput = document.getElementById('pick-import-file') as HTMLInputElement;
+const importInput = document.getElementById('pick-import-file');
+if (!(importInput instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
 importInput.addEventListener('change', async event => {
   try {
     await json2import(importInput.files?.[0]);
@@ -158,7 +154,8 @@ importInput.addEventListener('change', async event => {
 });
 
 // Détecte le clic sur le bouton de suppression des données locales
-/*const boutonSupprimer = document.querySelector('.bouton-supprimer-local')! as HTMLButtonElement;
+/*const boutonSupprimer = document.querySelector('.bouton-supprimer-local');
+if (!(boutonSupprimer instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
 boutonSupprimer.addEventListener('click', async event => {
   event.preventDefault();
 
@@ -237,7 +234,8 @@ navigator.serviceWorker.addEventListener('message', async event => {
     if ('noresponse' in event.data) return;
 
     const loaders = Array.from(document.querySelectorAll('sync-progress, sync-line'));
-    const params = document.querySelector('#parametres') as HTMLElement;
+    const params = document.querySelector('#parametres');
+    if (!(params instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
 
     if (event.data.successfulBackupComparison === true) {
       // Toutes les chasses locales plus récentes que celles de la BDD ont été ajoutées / éditées
@@ -280,7 +278,7 @@ declare global {
 
 let dataUpdateNotification: Notif | null = null;
 let dataUpdateNotificationCount = 0;
-window.addEventListener('dataupdate', async (event: Event) => {
+window.addEventListener('dataupdate', async (event: DataUpdateEvent) => {
   console.log(event);
 
   // On peuple l'application avec les nouvelles données
@@ -289,7 +287,7 @@ window.addEventListener('dataupdate', async (event: Event) => {
     dataUpdateNotification = new Notif('Mise à jour des données...', '', 'loading', Notif.maxDelay, () => {}, true);
     dataUpdateNotification.prompt();
   }
-  const { sections, ids } = (event as DataUpdateEvent).detail;
+  const { sections, ids } = event.detail;
   for (const section of sections) {
     await populateHandler(section, ids);
   }

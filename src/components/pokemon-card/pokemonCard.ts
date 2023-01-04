@@ -341,7 +341,9 @@ export class pokemonCard extends HTMLElement {
       const card = document.createElement('hunt-card');
       card.setAttribute('huntid', this.huntid);
 
-      (document.querySelector('.nav-link[data-section="chasses-en-cours"]') as HTMLElement)?.click();
+      const navLink = document.querySelector('.nav-link[data-section="chasses-en-cours"]');
+      if (!(navLink instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
+      navLink.click();
     } catch (error) {
       const message = (typeof error === 'string') ? error : `Erreur : impossible de modifier ce Pokémon.`;
       console.error(error);
