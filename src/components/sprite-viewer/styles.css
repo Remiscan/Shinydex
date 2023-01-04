@@ -71,8 +71,9 @@ sprite-viewer[shiny="true"] .sprite-list.regular {
   grid-row: 1;
   grid-column: 1 / -1;
   overflow-y: auto;
-  margin: auto;
-  max-height: 100%;
+  height: 100%;
+  width: 100%;
+  display: flex;
 }
 
 .sprite-list {
