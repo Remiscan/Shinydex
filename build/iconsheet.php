@@ -159,7 +159,7 @@ function buildIconSheet(int $columns = 24, int $iconSize = 32, string $format = 
         </div>
       preview, FILE_APPEND);
 
-      if ($logs) echo "\nicon $id added to sheet";
+      if ($logs) echo "icon $id added to sheet\n";
 
       // Increment current position
       $x += $iconSize;
@@ -182,7 +182,7 @@ function buildIconSheet(int $columns = 24, int $iconSize = 32, string $format = 
       imagepng($sheet, $imagePath, 9, PNG_NO_FILTER);
   }
 
-  if ($logs) echo "\n" . date('Y-m-d H:i:s') . " sheet created!";
+  if ($logs) echo date('Y-m-d H:i:s') . " sheet created!\n";
 }
 
 

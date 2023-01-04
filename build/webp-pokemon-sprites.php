@@ -26,10 +26,10 @@ function buildWebpSprites(int $size = 512, bool $logs = true) {
     $outPath = "$outDir/$filename";
     imagewebp($webpSprite, $outPath, 100);
 
-    if ($logs) echo "\n Sprite $file resized ($size)";
+    if ($logs) echo "Sprite $file resized ($size)\n";
   }
 
-  if ($logs) echo "\n" . date('Y-m-d H:i:s') . ' sprites resized!';
+  if ($logs) echo date('Y-m-d H:i:s') . " sprites resized!\n";
 }
 
 

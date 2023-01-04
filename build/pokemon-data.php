@@ -18,4 +18,4 @@ forEach(Pokemon::POKEMON_NAMES_EN as $id => $name) {
 // Sauvegarde des données dans pokemon-data.json
 file_put_contents(__DIR__.'/../data/pokemon.json', json_encode($pokemons, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
 
-echo "\n" . date('Y-m-d H:i:s') . ' Pokémon data built!';
+echo date('Y-m-d H:i:s') . " Pokémon data built!\n";

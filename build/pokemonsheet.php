@@ -144,7 +144,7 @@ function buildPokemonSheet(int $columns = 32, int $spriteSize = 44, string $form
       </div>
     preview, FILE_APPEND);
 
-    if ($logs) echo "\nPokémon $dexid added to sheet";
+    if ($logs) echo "Pokémon $dexid added to sheet\n";
 
     // Increment current position
     $x += $spriteSize;
@@ -166,7 +166,7 @@ function buildPokemonSheet(int $columns = 32, int $spriteSize = 44, string $form
       imagepng($sheet, $imagePath, 9, PNG_NO_FILTER);
   }
 
-  if ($logs) echo "\n" . date('Y-m-d H:i:s') . " sheet created!";
+  if ($logs) echo date('Y-m-d H:i:s') . " sheet created!\n";
 }
 
 
