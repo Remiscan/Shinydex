@@ -134,7 +134,10 @@ export async function orderCards(section: filtrableSection, pokemonList: Shiny[]
   });
   
   orderedShiny.map(shiny => document.querySelector(`#${section} [huntid="${shiny.huntid}"]`))
-              .forEach((card, ordre) => (card as HTMLElement).style.setProperty(`--${order}-order`, String(ordre)));
+  .forEach((card, ordre) => {
+    if (!(card instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
+    card.style.setProperty(`--${order}-order`, String(ordre))
+  });
 
   return;
 }

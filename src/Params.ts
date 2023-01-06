@@ -121,6 +121,8 @@ export async function setTheme(askedTheme?: string) {
 }
 
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Envoie une notification et attend confirmation de l'utilisateur avant de réaliser une action destructrice.
 export async function warnBeforeDestruction(bouton: Element, message: string = 'Supprimer définitivement ces données ?', icon: string = 'delete') {
   bouton.setAttribute('disabled', 'true');
   const warning = `Êtes-vous sûr ? ${message}`;

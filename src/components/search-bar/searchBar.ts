@@ -222,7 +222,9 @@ export class SearchBar extends HTMLElement {
 
   /** Builds Filters from the selected options. */
   optionsToFilters(formData: FormData): FilterList {
-    return new FilterList(this.section as filtrableSection, formData);
+    const section = this.section ?? '';
+    if (!isFiltrableSection(section)) throw new Error(`Should not be trying to filter ${section}`);
+    return new FilterList(section, formData);
   }
 
 

@@ -149,6 +149,9 @@ export interface backendPokemon {
 
 type nameLang = keyof backendPokemon['name'];
 const supportedLangs: Array<nameLang> = ['fr', 'en'];
+function isNameLang(string: string): string is nameLang {
+  return supportedLangs.includes(string as nameLang);
+}
 
 
 
@@ -304,7 +307,8 @@ class Pokemon {
    * @returns Nom du Pokémon.
    */
   getName(lang = document.documentElement.getAttribute('lang') ?? 'fr'): string {
-    const _lang = (supportedLangs as string[]).includes(lang) ? lang as nameLang : 'fr';
+    if (!isNameLang(lang)) throw new Error('language-not-supported');
+    const _lang = supportedLangs.includes(lang) ? lang : 'fr';
     return this.name[_lang];
   }
 
@@ -312,7 +316,8 @@ class Pokemon {
    * @returns Liste des noms de tous les Pokémon, dans l'ordre du Pokédex national.
    */
   static async names(lang = document.documentElement.getAttribute('lang') ?? 'fr'): Promise<string[]> {
-    const _lang = (supportedLangs as string[]).includes(lang) ? lang as nameLang : 'fr';
+    if (!isNameLang(lang)) throw new Error('language-not-supported');
+    const _lang = supportedLangs.includes(lang) ? lang : 'fr';
 
     const cachedNames = Pokemon.#names[_lang];
     if (cachedNames.length > 0) return cachedNames;
@@ -448,7 +453,8 @@ class Shiny implements frontendShiny {
    */
   async getName(lang = document.documentElement.getAttribute('lang') ?? 'fr'): Promise<string> {
     try {
-      const _lang = (supportedLangs as string[]).includes(lang) ? lang as nameLang : 'fr';
+      if (!isNameLang(lang)) throw new Error('language-not-supported');
+      const _lang = supportedLangs.includes(lang) ? lang : 'fr';
       const pokemon = await this.getEspece();
       return pokemon.name[_lang];
     } catch (error) { 
