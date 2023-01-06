@@ -88,7 +88,7 @@ export class huntCard extends HTMLElement {
   }
 
   async getHunt() {
-    return await Hunt.make(this.huntid ?? undefined);
+    return await Hunt.getOrMake(this.huntid ?? undefined);
   }
 
 

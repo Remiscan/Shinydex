@@ -1,3 +1,5 @@
+import { Hunt } from './Hunt.js';
+import { Shiny } from './Pokemon.js';
 import { dataStorage, huntStorage, shinyStorage } from './localForage.js';
 // @ts-expect-error
 import gameStrings from '../strings/games.json' assert { type: 'json' };
@@ -10,14 +12,14 @@ export async function upgradeStorage(): Promise<void> {
   // Update the structure of stored shiny Pokémon
   const shinyKeys = await shinyStorage.keys();
   for (const key of shinyKeys) {
-    const shiny = toNewFormat(await shinyStorage.getItem(key));
+    const shiny = new Shiny(updateDataFormat(await shinyStorage.getItem(key)));
     await shinyStorage.setItem(key, shiny);
   }
 
   // Update the structure of stored Hunts
   const huntKeys = await huntStorage.keys();
   for (const key of huntKeys) {
-    const hunt = toNewFormat(await huntStorage.getItem(key));
+    const hunt = new Hunt(updateDataFormat(await huntStorage.getItem(key)));
     await huntStorage.setItem(key, hunt);
   }
 
@@ -41,7 +43,7 @@ export async function upgradeStorage(): Promise<void> {
 
 
 
-function toNewFormat(shiny: { [key: string]: any }): { [key: string]: any } {
+export function updateDataFormat(shiny: { [key: string]: any }): { [key: string]: any } {
   // Rename properties whose name changed
   const renames = new Map([
     ['last_update', 'lastUpdate'],

@@ -1,5 +1,5 @@
 import { Params, loadAllImages, setTheme, timestamp2date, wait } from './Params.js';
-import { Pokemon } from './Pokemon.js';
+import { Pokemon, Shiny } from './Pokemon.js';
 import { initPokedex, populatableSection, populateHandler } from './appContent.js';
 import { dataStorage, huntStorage, pokemonData, shinyStorage } from './localForage.js';
 import { Notif } from './notification.js';
@@ -171,7 +171,8 @@ export async function appStart() {
   shinyStorage.keys()
   .then(keys => Promise.all(keys.map(key => shinyStorage.getItem(key))))
   .then(shinyMons => Promise.all(
-    shinyMons.filter(shiny => shiny.destroy === true && shiny.lastUpdate + month < Date.now())
+    shinyMons.map(shiny => new Shiny(shiny))
+             .filter(shiny => shiny.destroy === true && shiny.lastUpdate + month < Date.now())
              .map(shiny => shinyStorage.removeItem(shiny.huntid))
   ));
 

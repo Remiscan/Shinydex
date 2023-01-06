@@ -403,6 +403,8 @@ class Shiny implements frontendShiny {
   destroy: boolean = false;
 
   constructor(shiny: object = {}) {
+    if (typeof shiny !== 'object') throw new Error('Invalid argument');
+
     if ('huntid' in shiny) this.huntid = String(shiny.huntid);
     if ('lastUpdate' in shiny) this.lastUpdate = Number(shiny.lastUpdate) || 0;
 

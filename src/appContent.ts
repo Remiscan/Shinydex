@@ -1,4 +1,5 @@
-import { Pokemon } from './Pokemon.js';
+import { Hunt } from './Hunt.js';
+import { Pokemon, Shiny } from './Pokemon.js';
 import { huntCard } from './components/hunt-card/huntCard.js';
 import { pokemonCard } from './components/pokemon-card/pokemonCard.js';
 import { lazyLoad } from './lazyLoading.js';
@@ -68,22 +69,27 @@ export async function populateHandler(section: populatableSection, _ids?: string
 export async function populateFromData(section: populatableSection, ids: string[]): Promise<PromiseSettledResult<string>[]> {
   let elementName: string; // Nom de l'élément de carte
   let dataStore: localForageAPI; // Base de données
+  let dataClass: (typeof Shiny) | (typeof Hunt);
   switch (section) {
     case 'mes-chromatiques':
       elementName = 'pokemon-card';
       dataStore = shinyStorage;
+      dataClass = Shiny;
       break;
     case 'chasses-en-cours':
       elementName = 'hunt-card';
       dataStore = huntStorage;
+      dataClass = Hunt;
       break;
     case 'chromatiques-ami':
       elementName = 'pokemon-card';
       dataStore = friendStorage;
+      dataClass = Shiny;
       break;
     case 'corbeille':
       elementName = 'corbeille-card';
       dataStore = huntStorage;
+      dataClass = Hunt;
       break;
   }
 
@@ -101,7 +107,7 @@ export async function populateFromData(section: populatableSection, ids: string[
 
   const cardsToCreate: Array<pokemonCard | huntCard> = [];
   const results = await Promise.allSettled(ids.map(async huntid => {
-    const pkmn = await dataStore.getItem(huntid);
+    const pkmn = new dataClass(await dataStore.getItem(huntid));
     let card: pokemonCard | huntCard | null = document.querySelector(`${elementName}[huntid="${huntid}"]`);
 
     // ABSENT DE LA BDD = Supprimer (manuellement)

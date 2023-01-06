@@ -11,7 +11,7 @@ export interface huntedPokemon extends frontendShiny {
 export class Hunt extends Shiny implements huntedPokemon {
   caught: boolean = false;
   
-  private constructor(shiny: object = {}) {
+  constructor(shiny: object = {}) {
     super(shiny);
     if ('caught' in shiny) this.caught = Boolean(shiny.caught);
   }
@@ -22,7 +22,7 @@ export class Hunt extends Shiny implements huntedPokemon {
    * @param huntid - L'id de la Hunt / du Shiny déjà existant.
    * @returns La Hunt ainsi créée.
    */
-  static async make(huntid?: string): Promise<Hunt> {
+  static async getOrMake(huntid?: string): Promise<Hunt> {
     let hunt: Hunt;
 
     if (huntid) {

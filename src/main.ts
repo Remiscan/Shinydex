@@ -65,7 +65,7 @@ document.querySelector('.fab')!.addEventListener('click', async () => {
     }
 
     // Créer une nouvelle chasse ici
-    const hunt = await Hunt.make();
+    const hunt = await Hunt.getOrMake();
     await huntStorage.setItem(hunt.huntid, hunt);
 
     /*const container = document.querySelector('#chasses-en-cours .section-contenu')!;
@@ -181,55 +181,8 @@ boutonSupprimer.addEventListener('click', async event => {
 ///////////////////////////////////////
 // COMMUNICATION AVEC LE SERVICE WORKER
 navigator.serviceWorker.addEventListener('message', async event => {
-  // --- Réponse à HUNT-ADD-id, HUNT-EDIT-id ou HUNT-REMOVE-id ---
-  if ('successfulDBUpdate' in event.data) {
-    const huntid = event.data.huntid;
-    const card = document.getElementById('hunt-' + huntid)!;
-
-    if (event.data.successfulDBUpdate === true) {
-      // On reçoit la confirmation du succès de l'ajout à la DB
-
-      // La façon dont l'appli gère cette réponse dépend du moment où la confirmation est reçue.
-      // 1️⃣ Si on reçoit la confirmation de suite après avoir contacté le sw (test = ❔)
-      //// ✅ Visuellement, la chasse est en cours de "chargement" (data-loaded a été set par submitHunt)
-      //// - ✅ On supprime la chasse de uploaded-hunts (liste des chasses à supprimer au prochain démarrage)
-      //// - ✅ On supprime la chasse de huntStorage
-      //// - ✅ On supprime la carte de la chasse
-      //// - ✅ On met à jour le contenu de l'appli (et on notifie)
-      // 2️⃣ Si on reçoit la confirmation pendant une prochaine visite (test = ❔)
-      //// ✅ Visuellement, la chasse est en cours de chargement (car initialisée avec this.uploaded)
-      //// ✅ On reproduit l'étape 1
-      // 3️⃣ Si on reçoit la confirmation après avoir fermé l'application (test = ❔)
-      //// - ✅ La chasse ne sera pas initialisée au prochain lancement (car elle est dans uploaded-hunts)
-      //// - ✅ Les nouvelles données seront chargées au prochain lancement (car mises à jour dans la DB par le sw) - pas de notif
-
-      // ✅ faire disparaître la carte de la chasse
-      let uploadConfirmed = await dataStorage.getItem('uploaded-hunts');
-      if (uploadConfirmed == null) uploadConfirmed = [];
-      await dataStorage.setItem('uploaded-hunts', uploadConfirmed.filter((v: number) => v != huntid));
-      card.remove();
-      const keys = await huntStorage.keys();
-      if (keys.length == 0) document.querySelector('#chasses-en-cours')!.classList.add('vide');
-      // ✅ animation de chargement
-      window.dispatchEvent(new Event('populate'));
-    }
-    else {
-      // On reçoit la confirmation de l'échec de l'ajout à la DB
-      // ✅ animer l'échec
-      new Notif('Échec d\'envoi des données.').prompt();
-      // ✅ laisser la carte de la chasse et désactiver son animation de chargement
-      card.removeAttribute('data-loading');
-      let uploadConfirmed = await dataStorage.getItem('uploaded-hunts');
-      if (uploadConfirmed == null) uploadConfirmed = [];
-      await dataStorage.setItem('uploaded-hunts', uploadConfirmed.filter((v: number) => v != huntid));
-      const hunt = await huntStorage.getItem(huntid);
-      hunt.uploaded = false;
-      await huntStorage.setItem(huntid, hunt);
-    }
-  }
-
   // --- Réponse à COMPARE-BACKUP ---
-  else if ('successfulBackupComparison' in event.data) {
+  if ('successfulBackupComparison' in event.data) {
     if ('noresponse' in event.data) return;
 
     const loaders = Array.from(document.querySelectorAll('sync-progress, sync-line'));

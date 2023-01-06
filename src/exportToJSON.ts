@@ -1,9 +1,9 @@
-import { huntedPokemon } from "./Hunt.js";
+import { Hunt, huntedPokemon } from "./Hunt.js";
 import { timestamp2date, wait } from "./Params.js";
-import { frontendShiny } from "./Pokemon.js";
+import { Shiny, frontendShiny } from "./Pokemon.js";
 import { dataStorage, huntStorage, localForageAPI, shinyStorage } from "./localForage.js";
 import { Notif } from "./notification.js";
-import { upgradeStorage } from "./upgradeStorage.js";
+import { updateDataFormat, upgradeStorage } from "./upgradeStorage.js";
 
 
 
@@ -25,11 +25,13 @@ export async function json2import(file: File | Blob | undefined): Promise<string
 
       await shinyStorage.ready();
       await Promise.all(
-        importedData.shiny.map((shiny: frontendShiny) => shinyStorage.setItem(shiny.huntid, shiny))
+        importedData.shiny.map((shiny: any) => updateDataFormat(shiny))
+                          .map((shiny: any) => shinyStorage.setItem(shiny.huntid, new Shiny(shiny)))
       );
       await huntStorage.ready();
       await Promise.all(
-        importedData.hunts.map((hunt: huntedPokemon) => huntStorage.setItem(hunt.huntid, hunt))
+        importedData.hunts.map((hunt: any) => updateDataFormat(hunt))
+                          .map((hunt: any) => huntStorage.setItem(hunt.huntid, new Hunt(hunt)))
       );
 
       await upgradeStorage();
