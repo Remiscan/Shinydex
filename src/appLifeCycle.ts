@@ -1,7 +1,6 @@
 import { Params, loadAllImages, setTheme, timestamp2date, wait } from './Params.js';
 import { Pokemon } from './Pokemon.js';
 import { initPokedex, populatableSection, populateHandler } from './appContent.js';
-import { initFiltres } from './filtres.js';
 import { dataStorage, huntStorage, pokemonData, shinyStorage } from './localForage.js';
 import { Notif } from './notification.js';
 import { upgradeStorage } from './upgradeStorage.js';
@@ -200,8 +199,6 @@ export async function appStart() {
     await initPokedex();
     logPerf('initPokedex');
 
-    await initFiltres();
-    logPerf('initFiltres');
     document.querySelector('search-bar')?.setAttribute('section', 'mes-chromatiques');
 
     const sectionsToPopulate: populatableSection[] = ['mes-chromatiques', 'chasses-en-cours', 'corbeille'];

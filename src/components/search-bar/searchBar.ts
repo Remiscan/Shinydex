@@ -5,7 +5,7 @@ import sheet from './styles.css' assert { type: 'css' };
 import template from './template.js';
 // @ts-expect-error
 import gameNames from '../../../strings/games.json' assert { type: 'json' };
-import { ListeFiltres, filtrableSection } from '../../filtres.js';
+import { FilterList, Search, filtrableSection, isFiltrableSection } from '../../filtres.js';
 import { dataStorage } from '../../localForage.js';
 
 
@@ -15,27 +15,21 @@ document.adoptedStyleSheets = [...document.adoptedStyleSheets, searchSheet];
 
 
 
-const savedFiltres: Map<filtrableSection, ListeFiltres> = new Map([
-  ['chasses-en-cours', new ListeFiltres('chasses-en-cours')],
-  ['chromatiques-ami', new ListeFiltres('chromatiques-ami')],
-  ['corbeille', new ListeFiltres('corbeille')],
-  ['partage', new ListeFiltres('partage')]
-]);
-
-
-
 export class SearchBar extends HTMLElement {
   ready: boolean = false;
   htmlready: boolean = false;
   inputNonce: object = {};
   changeNonce: object = {};
-  inputHandler: (e: Event) => void = () => {};
-  optionsChangeHandler: (e: Event) => void = () => {};
+  searchInputHandler: (e: Event) => void = () => {};
+  searchSuggestionsChangeHandler: (e: Event) => void = () => {};
+  filtersChangeHandler: (e: Event) => void = () => {};
 
   constructor() {
     super();
 
-    this.inputHandler = async event => {
+    // Called when text is input in the search bar.
+    // Creates search hints.
+    this.searchInputHandler = async event => {
       const inputNonce = {};
       this.inputNonce = inputNonce;
 
@@ -123,12 +117,32 @@ export class SearchBar extends HTMLElement {
       }
     };
 
-    this.optionsChangeHandler = async event => {
-      const section = this.getAttribute('section');
-      const filtresMap = await dataStorage.getItem('filtres');
-      const oldFiltres = filtresMap.get(section);
+    // Called when search hints are selected or unselected.
+    // Filters current section.
+    this.searchSuggestionsChangeHandler = event => {
+      const section = this.getAttribute('section') ?? '';
+      if (!isFiltrableSection(section)) return;
 
-      if (!oldFiltres) return;
+      const form = this.querySelector('form[name="search-bar"]');
+      if (!(form instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
+      const formData = new FormData(form);
+
+      // Add checkboxes state to formData
+      const checkboxes = [...form.querySelectorAll('input[type="checkbox"][name]')];
+      checkboxes.forEach(checkbox => {
+        if (!(checkbox instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
+        const name = checkbox.getAttribute('name')!;
+        if (!checkbox.checked) formData.append(name, 'false');
+      });
+
+      const newSearch = new Search(formData);
+      this.searchSection(section, newSearch);
+    };
+
+    // Called when filters or order are selected or unselected.
+    // Filters the current section.
+    this.filtersChangeHandler = async event => {
+      const section = this.getAttribute('section');
 
       const form = this.querySelector('form[name="search-options"]');
       if (!(form instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
@@ -142,9 +156,15 @@ export class SearchBar extends HTMLElement {
         if (!checkbox.checked) formData.append(name, 'false');
       });
 
-      const newFiltres = this.optionsToFiltres(formData);
-      filtresMap.set(section, newFiltres);
-      await dataStorage.setItem('filtres', filtresMap);
+      const newFilters = this.optionsToFilters(formData);
+
+      // Save filters if needed
+      const shouldSaveFilters = (section === 'mes-chromatiques');
+      if (shouldSaveFilters) {
+        const savedFilters = await dataStorage.getItem('filters');
+        savedFilters.set(section, newFilters);
+        await dataStorage.setItem('filters', savedFilters);
+      }
 
       // Change l'icône de retour en ✅ si un filtre a été modifié
       const icon = this.querySelector('.bouton-retour>i')!;
@@ -200,36 +220,64 @@ export class SearchBar extends HTMLElement {
   }
 
 
-  /** Builds Filtres from the selected options. */
-  optionsToFiltres(formData: FormData): ListeFiltres {
-    return new ListeFiltres(this.section as filtrableSection, formData);
+  /** Builds Filters from the selected options. */
+  optionsToFilters(formData: FormData): FilterList {
+    return new FilterList(this.section as filtrableSection, formData);
   }
 
 
   /** Checks options inputs corresponding to a list of filters. */
-  filtresToOptions(filtres: ListeFiltres) {
-    ordre: {
-      const input = this.querySelector(`input[name="order"][value="${filtres.order}"]`);
+  filtersToOptions(filters: FilterList) {
+    order: {
+      const input = this.querySelector(`input[name="order"][value="${filters.order}"]`);
       if (!(input instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
       input.checked = true;
     }
   
-    ordreReverse: {
+    orderReverse: {
       const input = this.querySelector(`input[name="orderReversed"]`);
       if (!(input instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
-      input.checked = filtres.orderReversed;
+      input.checked = filters.orderReversed;
     }
   
-    filtres: {
-      const allInputs = [...this.querySelectorAll('input[name^="filtre"]')];
+    filters: {
+      const allInputs = [...this.querySelectorAll('input[name^="filter"]')];
       for (const input of allInputs) {
         if (!(input instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
         const [x, key, value] = input.getAttribute('name')!.split('-');
-        const filtre = filtres[key as keyof ListeFiltres] as Set<string>;
-        if (filtre && (filtre.size === 0 || filtre.has(value))) input.checked = true;
-        else                                                    input.checked = false;
+        if (FilterList.isKey(key) && key !== 'order' && key !== 'orderReversed') {
+          const filter = filters[key];
+          if (filter && (filter.size === 0 || filter.has(Boolean(value)))) input.checked = true;
+          else                                                             input.checked = false;
+        }
       }
     }
+  }
+
+
+  filterSection(section: filtrableSection, filters: FilterList) {
+    const element = document.querySelector(`section#${section}`);
+    if (!element) return;
+    element.setAttribute('data-filter-mine', [filters.mine].map(f => String(f)).join(' '));
+    element.setAttribute('data-filter-legit', [filters.legit].map(f => String(f)).join(' '));
+    element.setAttribute('data-order', filters.order);
+    element.setAttribute('data-order-reversed', String(filters.orderReversed));
+  }
+
+
+  searchSection(section: filtrableSection, search: Search) {
+    const element = document.querySelector(`section#${section}`);
+    if (!element) return;
+
+    // Hide non-corresponding cards via CSS
+    let css = '';
+    const card = `:is(pokemon-card, hunt-card, corbeille-card)`;
+    css += `#${section} ${card}:not([data-name*="${search.name}"]) { display: none; }`;
+    const gameSelector = [...search.game].map(g => `:not([data-game="${g}"])`).join('');
+    css += `#${section} ${card}${gameSelector} { display: none; }`;
+    const speciesSelector = [...search.species].map(i => `:not([data-dexid="${i}"])`).join('');;
+    css += `#${section} ${card}${speciesSelector} { display: none; }`;
+    searchSheet.replaceSync(css);
   }
 
 
@@ -237,7 +285,7 @@ export class SearchBar extends HTMLElement {
     if (!this.ready) return;
     switch (name) {
       case 'section': {
-        if (value == null) return;
+        if (!isFiltrableSection(value ?? '')) return;
 
         const input = this.querySelector('input')!;
         let placeholder: string = 'Rechercher dans mes Pokémon';
@@ -256,9 +304,6 @@ export class SearchBar extends HTMLElement {
             placeholder = 'Rechercher dans mes amis';
             searchSection = value;
             break;
-          case 'ajouter-ami':
-            placeholder = 'Ajouter un ami';
-            break;
           case 'chromatiques-ami':
             placeholder = 'Rechercher dans les Pokémon de {pseudo}';
             searchSection = value;
@@ -269,8 +314,44 @@ export class SearchBar extends HTMLElement {
 
         if (value === 'ajouter-ami') return;
 
-        // On applique au formulaire les filtres enregistrés de la section demandée
-        this.filtresToOptions(savedFiltres.get(searchSection) ?? new ListeFiltres(searchSection));
+        let defaultFilters: FilterList;
+        switch (searchSection) {
+          case 'chasses-en-cours':
+            defaultFilters = {
+              mine: new Set([true, false]),
+              legit: new Set([true, false]),
+              order: 'lastUpdate',
+              orderReversed: false
+            };
+            break;
+          default:
+            defaultFilters = {
+              mine: new Set([true, false]),
+              legit: new Set([true, false]),
+              order: 'catchTime',
+              orderReversed: false
+            };
+        }
+
+        let savedFilters = await dataStorage.getItem('filters');
+        if (!savedFilters) {
+          savedFilters = new Map();
+          savedFilters.set(searchSection, defaultFilters);
+        }
+        const filters = savedFilters.get(searchSection) ?? defaultFilters;
+
+        // On applique au formulaire les filtres enregistrés de la section demandée.
+        // Si aucun n'est sauvegardé, on applique les filtres par défaut.
+        this.filtersToOptions(filters);
+        this.filterSection(searchSection, filters);
+
+        // Si les filtres ne sont pas sauvegardés pour les sections qui enregistrent leurs filtres,
+        // on sauvegarde les filtres par défaut.
+        const shouldSaveFilters = (searchSection === 'mes-chromatiques');
+        if (shouldSaveFilters) {
+          savedFilters.set(searchSection, filters);
+          await dataStorage.setItem('filters', savedFilters);
+        }
       } break;
     }
   }
@@ -295,20 +376,20 @@ export class SearchBar extends HTMLElement {
     }
 
     const searchBox = this.querySelector('form[name="search-bar"]')!;
-    searchBox.addEventListener('input', this.inputHandler);
-    searchBox.addEventListener('reset', this.inputHandler);
+    searchBox.addEventListener('input', this.searchInputHandler);
+    searchBox.addEventListener('reset', this.searchInputHandler);
 
     const searchOptions = this.querySelector('.search-options')!;
-    searchOptions.addEventListener('change', this.optionsChangeHandler);
+    searchOptions.addEventListener('change', this.filtersChangeHandler);
   }
 
   disconnectedCallback() {
     const searchBox = this.querySelector('form[name="search-bar"]')!;
-    searchBox.removeEventListener('input', this.inputHandler);
-    searchBox.removeEventListener('reset', this.inputHandler);
+    searchBox.removeEventListener('input', this.searchInputHandler);
+    searchBox.removeEventListener('reset', this.searchInputHandler);
 
     const searchOptions = this.querySelector('.search-options')!;
-    searchOptions.removeEventListener('change', this.optionsChangeHandler);
+    searchOptions.removeEventListener('change', this.filtersChangeHandler);
 
     this.ready = false;
   }

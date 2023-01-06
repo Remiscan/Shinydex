@@ -1,45 +1,27 @@
 import { Pokemon, Shiny } from './Pokemon.js';
-import { dataStorage } from './localForage.js';
 
 
 
-type filtreDo = 'moi' | 'autre';
-type filtreLegit = 'oui' | 'non';
 type ordre = 'catchTime' | 'shinyRate' | 'dexid' | 'species' | 'name' | 'game' | 'lastUpdate' | 'username';
+const supportedOrdres: ordre[] = ['catchTime', 'shinyRate', 'dexid', 'species', 'name', 'game', 'lastUpdate', 'username'];
+
+export function isOrdre(string: string): string is ordre {
+  return supportedOrdres.includes(string as ordre);
+}
+
 export type filtrableSection = 'mes-chromatiques' | 'chasses-en-cours' | 'corbeille' | 'partage' | 'chromatiques-ami';
 const filtrableSections: filtrableSection[] = ['mes-chromatiques', 'chasses-en-cours', 'corbeille', 'partage', 'chromatiques-ami'];
 
-type FiltresShiny = {
-  mine: Set<'true' | 'false'>,
-  legit: Set<'true' | 'false'>,
-  order: ordre,
-  orderReversed: boolean
-};
-
-const defaultFiltres: FiltresShiny = {
-  mine: new Set(['true', 'false']),
-  legit: new Set(['true', 'false']),
-  order: 'catchTime',
-  orderReversed: false
-};
-
-interface Filtres {
-  mine: any;
-  legit: any;
-  game: any;
-  species: any;
-  name: any;
-  order: ordre;
-  orderReversed: boolean;
+export function isFiltrableSection(string: string): string is filtrableSection {
+  return filtrableSections.includes(string as filtrableSection);
 }
 
+
+
 /** Liste de filtres appliqués à une section. */
-export class ListeFiltres implements Filtres {
-  mine: Set<filtreDo> = new Set();
-  legit: Set<filtreLegit> = new Set();
-  game: Set<string> = new Set();
-  species: Set<number> = new Set();
-  name: string = '';
+export class FilterList {
+  mine: Set<boolean> = new Set();
+  legit: Set<boolean> = new Set();
   order: ordre = 'catchTime';
   orderReversed: boolean = false;
 
@@ -49,7 +31,6 @@ export class ListeFiltres implements Filtres {
     let defaultOrder: ordre;
     switch (section) {
       case 'chasses-en-cours':
-      case 'corbeille':
         defaultOrder = 'lastUpdate';
         break;
       case 'partage':
@@ -59,23 +40,47 @@ export class ListeFiltres implements Filtres {
         defaultOrder = 'catchTime';
     }
 
+    const order = String(formData.get('order'));
+    this.order = isOrdre(order) ? order : defaultOrder;
+    this.orderReversed = String(formData.get('orderReversed')) === 'true';
+
     for (const [prop, value] of formData.entries()) {
-      if (prop === 'order') {
-        this.order = value as ordre ?? defaultOrder;
-      } else if (prop === 'ordre-reverse') {
-        this.orderReversed = value === 'true';
-      } else if (prop === 'chip-nickname') {
-        this.name = value as string;
-      } else if (prop.startsWith('filtre-do')) {
-        if (value !== 'false') this.mine.add(value as filtreDo);
-      } else if (prop.startsWith('filtre-legit')) {
-        if (value !== 'false') this.legit.add(value as filtreLegit);
-      } else if (prop.startsWith('chip-species')) {
-        this.species.add(parseInt(value as string));
-      } else if (prop.startsWith('chip-game')) {
-        this.game.add(value as string);
+      if (prop.startsWith('filter-mine')) {
+        if (value !== 'false') this.mine.add(value === 'true');
+      } else if (prop.startsWith('filter-legit')) {
+        if (value !== 'false') this.legit.add(value === 'false');
       }
     }
+  }
+
+  static isKey(string: string): string is keyof FilterList {
+    return (string in (new FilterList('mes-chromatiques')));
+  }
+}
+
+
+/** Liste de recherches appliquées à une section. */
+export class Search {
+  name: string = '';
+  species: Set<number> = new Set();
+  game: Set<string> = new Set();
+
+  constructor(formData?: FormData) {
+    if (!formData) return;
+
+    for (const [prop, value] of formData.entries()) {
+      if (prop === 'chip-nickname') {
+        this.name = String(value);
+      } else if (prop.startsWith('chip-species')) {
+        this.species.add(parseInt(String(value)));
+      } else if (prop.startsWith('chip-game')) {
+        this.game.add(String(value));
+      }
+    }
+  }
+
+  static isKey(string: string): string is keyof Search {
+    return (string in (new Search()));
   }
 }
 
@@ -132,19 +137,4 @@ export async function orderCards(section: filtrableSection, pokemonList: Shiny[]
               .forEach((card, ordre) => (card as HTMLElement).style.setProperty(`--${order}-order`, String(ordre)));
 
   return;
-}
-
-
-
-/////////////////////////
-// Initialise les filtres
-export async function initFiltres() {
-  // Si les filtres ne sont pas sauvegardés, on sauvegarde les filtres par défaut
-  let savedFiltresMap: Map<filtrableSection, FiltresShiny> = await dataStorage.getItem('filtres');
-  if (!savedFiltresMap) {
-    savedFiltresMap = new Map([
-      ['mes-chromatiques', {...defaultFiltres}]
-    ]);
-    await dataStorage.setItem('filtres', savedFiltresMap);
-  }
 }

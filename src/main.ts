@@ -15,7 +15,6 @@ import './components/sprite-viewer/spriteViewer.js';
 import './components/sync-line/syncLine.js';
 import './components/sync-progress/syncProgress.js';
 import { export2json, json2import } from './exportToJSON.js';
-import { ListeFiltres } from './filtres.js';
 import { dataStorage, huntStorage } from './localForage.js';
 import { navLinkBubble, navigate, sectionActuelle } from './navigate.js';
 import { Notif } from './notification.js';
@@ -264,9 +263,6 @@ interface DataUpdateEvent extends CustomEvent {
   detail: {
     sections: populatableSection[];
     ids: string[];
-    filtres?: ListeFiltres;
-    ordre?: string;
-    ordreReversed?: boolean;
   }
 }
 

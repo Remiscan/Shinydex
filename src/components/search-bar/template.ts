@@ -13,9 +13,7 @@ template.innerHTML = /*html*/`
     <button type="reset" class="reset-icon">
       <i class="material-icons">close</i>
     </button>
-  </form>
 
-  <form class="search-options" name="search-options">
     <fieldset class="search-hints" aria-label="Suggestions de recherche">
       <template id="search-hint-template">
         <input type="checkbox" name="chip-id" id="chip-id" value="value">
@@ -25,7 +23,9 @@ template.innerHTML = /*html*/`
         </label>
       </template>
     </fieldset>
+  </form>
 
+  <form class="search-options" name="search-options">
     <div class="sous-titre if-ordre">
       <span id="label-ordre">Ordonner par :</span>
 
@@ -79,21 +79,21 @@ template.innerHTML = /*html*/`
       </label>
     </fieldset>
 
-    <div class="sous-titre if-filtres">
+    <div class="sous-titre if-filters">
       <span>Afficher :</span>
     </div>
 
-    <div class="cote-a-cote if-filtres">
+    <div class="cote-a-cote if-filters">
       <fieldset class="liste-options" data-section="mes-chromatiques corbeille chromatiques-ami">
         <legend class="titre-options">Dresseur d'origine :</legend>
 
-        <input type="checkbox" name="filtre-do-moi" id="filtre-do-moi" value="moi">
-        <label for="filtre-do-moi" class="checkbox">
+        <input type="checkbox" name="filter-mine-true" id="filter-mine-true" value="true">
+        <label for="filter-mine-true" class="checkbox">
           <span>Moi</span>
         </label>
 
-        <input type="checkbox" name="filtre-do-autres" id="filtre-do-autres" value="autres">
-        <label for="filtre-do-autres" class="checkbox">
+        <input type="checkbox" name="filter-mine-false" id="filter-mine-false" value="true">
+        <label for="filter-mine-false" class="checkbox">
           <span>Autres</span>
         </label>
       </fieldset>
@@ -101,13 +101,13 @@ template.innerHTML = /*html*/`
       <fieldset class="liste-options" data-section="mes-chromatiques corbeille chromatiques-ami">
         <legend class="titre-options">Legit :</legend>
 
-        <input type="checkbox" name="filtre-legit-oui" id="filtre-legit-oui" value="oui">
-        <label for="filtre-legit-oui" class="checkbox">
+        <input type="checkbox" name="filter-legit-true" id="filter-legit-true" value="true">
+        <label for="filter-legit-true" class="checkbox">
           <span>Oui</span>
         </label>
 
-        <input type="checkbox" name="filtre-legit-non" id="filtre-legit-non" value="non">
-        <label for="filtre-legit-non" class="checkbox">
+        <input type="checkbox" name="filter-legit-false" id="filter-legit-false" value="true">
+        <label for="filter-legit-false" class="checkbox">
           <span>Non</span>
         </label>
       </fieldset>

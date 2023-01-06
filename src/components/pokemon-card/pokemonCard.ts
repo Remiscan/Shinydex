@@ -236,6 +236,7 @@ export class pokemonCard extends HTMLElement {
     this.setAttribute('data-mine', String(shiny.mine));
     this.setAttribute('data-legit', String(shiny.hacked === 0));
     this.setAttribute('data-species', noAccent(String(pokemon.name)).toLowerCase());
+    this.setAttribute('data-dexid', String(shiny.dexid));
     this.setAttribute('data-name', noAccent(shiny.name).toLowerCase());
     this.setAttribute('data-game', shiny.game);
 
