@@ -260,8 +260,8 @@ export class SearchBar extends HTMLElement {
   filterSection(section: filtrableSection, filters: FilterList) {
     const element = document.querySelector(`section#${section}`);
     if (!element) return;
-    element.setAttribute('data-filter-mine', [filters.mine].map(f => String(f)).join(' '));
-    element.setAttribute('data-filter-legit', [filters.legit].map(f => String(f)).join(' '));
+    element.setAttribute('data-filter-mine', [...filters.mine].map(f => String(f)).join(' '));
+    element.setAttribute('data-filter-legit', [...filters.legit].map(f => String(f)).join(' '));
     element.setAttribute('data-order', filters.order);
     element.setAttribute('data-order-reversed', String(filters.orderReversed));
   }
