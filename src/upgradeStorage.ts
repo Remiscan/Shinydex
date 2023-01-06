@@ -23,12 +23,6 @@ export async function upgradeStorage(): Promise<void> {
     await huntStorage.setItem(key, hunt);
   }
 
-  // Remove old filters
-  const filtres = await dataStorage.getItem('filtres');
-  if (!(filtres instanceof Map) || filtres.get('mes-chromatiques') == null) {
-    await dataStorage.removeItem('filtres');
-  }
-
   // Delete old, now obsolete stored items
   await dataStorage.removeItem('version-bdd');
   await dataStorage.removeItem('version-fichiers');
@@ -36,6 +30,7 @@ export async function upgradeStorage(): Promise<void> {
   await dataStorage.removeItem('pokemon-names-fr');
   await dataStorage.removeItem('pokemon-names-en');
   await dataStorage.removeItem('check-updates');
+  await dataStorage.removeItem('filtres');
 
   await dataStorage.setItem('last-storage-upgrade', Date.now());
   return;
