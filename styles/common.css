@@ -279,7 +279,7 @@ input:is([type=radio], [type=checkbox]):checked + label::after {
 
 /* Chip (ex : suggestions de recherche) */
 
-label.chip {
+input[type=checkbox] + label.chip {
   grid-template-columns: auto 0;
   gap: 0;
   padding: 2px 7px;
@@ -288,7 +288,12 @@ label.chip {
   overflow: hidden;
 }
 
-label.chip > span {
+input[type=checkbox] + label.chip::before,
+input[type=checkbox] + label.chip::after {
+  display: none;
+}
+
+input[type=checkbox] + label.chip > span {
   grid-column: 1;
   grid-row: 1;
   margin: auto;

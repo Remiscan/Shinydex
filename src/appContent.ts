@@ -2,7 +2,7 @@ import { Hunt } from './Hunt.js';
 import { Pokemon, Shiny } from './Pokemon.js';
 import { huntCard } from './components/hunt-card/huntCard.js';
 import { pokemonCard } from './components/pokemon-card/pokemonCard.js';
-import { computedHardOrders } from './filtres.js';
+import { computedOrders } from './filtres.js';
 import { lazyLoad } from './lazyLoading.js';
 import { friendStorage, huntStorage, localForageAPI, shinyStorage } from './localForage.js';
 import { navigate } from './navigate.js';
@@ -31,14 +31,9 @@ async function populateHandler(section: PopulatableSection, _ids?: string[]): Pr
   }
 
   const ids = _ids ?? await dataStore.keys();
-  const currentQueue = new Set([...ids]);
-
   const populated = await populateFromData(section, ids);
-  for (const result of populated) {
-    if (result.status === 'fulfilled') currentQueue.delete(result.value);
-  }
 
-  computedHardOrders(section);
+  computedOrders(section, ids);
 
   return populated;
 }

@@ -235,11 +235,6 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
     sp.removeAttribute('finished');
   });
 
-  // Mise à jour de la searchBar
-  const searchBar = document.querySelector(`search-bar`);
-  if (!(searchBar instanceof SearchBar)) throw new TypeError(`Expecting SearchBar`);
-  searchBar.setAttribute('section', nouvelleSection.nom ?? ancienneSection.nom);
-
   // On affiche la nouvelle section
   sectionActuelle = sectionCible;
   const sectionsString = `${nouvelleSection.closePrevious ? '' : ancienneSection.nom} ${nouvelleSection.nom}`;
@@ -272,6 +267,9 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
       break;
     case 'obfuscator': {
       if (data.search) {
+        const searchBar = document.querySelector(`search-bar`);
+        if (!(searchBar instanceof SearchBar)) throw new TypeError(`Expecting SearchBar`);
+        searchBar.setAttribute('section', data.section ?? ancienneSection.nom);
         searchBar?.open();
       }
     } break;

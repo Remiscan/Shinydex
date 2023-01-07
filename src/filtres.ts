@@ -1,12 +1,13 @@
 import { Pokemon, Shiny } from './Pokemon.js';
-import { dataStorage } from './localForage.js';
+import { dataStorage, friendStorage, huntStorage, localForageAPI, shinyStorage } from './localForage.js';
 // @ts-expect-error
 import { queueable } from '../../_common/js/per-function-async-queue.js';
+import { Hunt } from './Hunt.js';
 
 
 
 type ordre = 'catchTime' | 'shinyRate' | 'dexid' | 'species' | 'name' | 'game' | 'lastUpdate' | 'username';
-const supportedOrdres: ordre[] = ['catchTime', 'shinyRate', 'dexid', 'species', 'name', 'game', 'lastUpdate', 'username'];
+const supportedOrdres: ordre[] = ['catchTime', 'shinyRate', 'dexid', 'species', 'name', 'game', 'lastUpdate'];
 
 export function isOrdre(string: string): string is ordre {
   return supportedOrdres.includes(string as ordre);
@@ -65,13 +66,13 @@ export class FilterList {
       if ('orderReversed' in data) this.orderReversed = Boolean(data.orderReversed);
       
       if ('mine' in data && data.mine instanceof Set) {
-        if (data.mine.has(true)) this.mine.add(true);
-        if (data.mine.has(false)) this.mine.add(false);
+        if (!(data.mine.has(true))) this.mine.delete(true);
+        if (!(data.mine.has(false))) this.mine.delete(false);
       }
 
       if ('legit' in data && data.legit instanceof Set) {
-        if (data.legit.has(true)) this.legit.add(true);
-        if (data.legit.has(false)) this.legit.add(false);
+        if (!(data.legit.has(true))) this.legit.delete(true);
+        if (!(data.legit.has(false))) this.legit.delete(false);
       }
     }
   }
@@ -92,6 +93,7 @@ export class Search {
     if (!formData) return;
 
     for (const [prop, value] of formData.entries()) {
+      if (value === 'false') continue;
       if (prop === 'chip-nickname') {
         this.name = String(value);
       } else if (prop.startsWith('chip-species')) {
@@ -139,60 +141,14 @@ export { saveFilters };
 
 
 
-////////////////////////////////////////////////////////////////////
-// Ordonner les cartes de Pokémon selon une certaine caractéristique
-export async function orderCards(section: FiltrableSection, pokemonList: Shiny[] = [], order: ordre): Promise<void> {
-  const noms = await Pokemon.names();
-  const lang = document.documentElement.getAttribute('lang') ?? 'fr';
-
-  let orderedShiny = pokemonList.sort((s1, s2) => {
-    const huntidComparison = s2.huntid > s1.huntid ? 1
-                           : s2.huntid < s1.huntid ? -1
-                           : 0;
-
-    switch (order) {
-      case 'game': {
-        const allGames = Pokemon.jeux;
-        const game1 = allGames.findIndex(g => g.uid === s1.game);
-        const game2 = allGames.findIndex(g => g.uid === s2.game);
-        return game2 - game1 || s2.catchTime - s1.catchTime || huntidComparison;
-      }
-
-      case 'name': {
-        const nom1 = s1.name || noms[s1.dexid];
-        const nom2 = s2.name || noms[s2.dexid];
-        return nom2.localeCompare(nom1, lang) || s2.catchTime - s1.catchTime || huntidComparison;
-      }
-
-      case 'species': {
-        const nom1 = noms[s1.dexid];
-        const nom2 = noms[s2.dexid];
-        return nom2.localeCompare(nom1, lang) || s2.catchTime - s1.catchTime || huntidComparison;
-      }
-
-      case 'shinyRate': {
-        return (s2.shinyRate || 0) - (s1.shinyRate || 0) || s2.catchTime - s1.catchTime || huntidComparison;
-      }
-
-      case 'dexid': {
-        return s2.dexid - s1.dexid || s2.catchTime - s1.catchTime || huntidComparison;
-      }
-
-      case 'catchTime': {
-        return s2.catchTime - s1.catchTime || huntidComparison;
-      }
-
-      default: return huntidComparison;
-    }
-  });
-  
-  orderedShiny.map(shiny => document.querySelector(`#${section} [huntid="${shiny.huntid}"]`))
-  .forEach((card, ordre) => {
-    if (!(card instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
-    card.style.setProperty(`--${order}-order`, String(ordre))
-  });
-
-  return;
+export function filterSection(section: FiltrableSection, filters: FilterList = currentFilters.get(section) ?? new FilterList(section)) {
+  const element = document.querySelector(`section#${section}`);
+  if (!element) return;
+  element.setAttribute('data-filter-mine', [...filters.mine].map(f => String(f)).join(' '));
+  element.setAttribute('data-filter-legit', [...filters.legit].map(f => String(f)).join(' '));
+  element.setAttribute('data-order', filters.order);
+  element.setAttribute('data-order-reversed', String(filters.orderReversed));
+  updateCounters(section);
 }
 
 
@@ -244,33 +200,104 @@ export function updateCounters(section: FiltrableSection): void {
 
 
 
+////////////////////////////////////////////////////////////////////
+// Ordonner les cartes de Pokémon selon une certaine caractéristique
+// et renvoie leurs huntids dans l'ordre.
+async function orderPokemon(section: FiltrableSection, pokemonList: Shiny[] | Hunt[], order: ordre): Promise<string[]> {
+  const noms = await Pokemon.names();
+  const lang = document.documentElement.getAttribute('lang') ?? 'fr';
+
+  let orderedShiny = pokemonList.sort((s1, s2) => {
+    const huntidComparison = s1.huntid > s2.huntid ? 1
+                           : s1.huntid < s2.huntid ? -1
+                           : 0;
+
+    switch (order) {
+      case 'game': {
+        const allGames = Pokemon.jeux;
+        const game1 = allGames.findIndex(g => g.uid === s1.game);
+        const game2 = allGames.findIndex(g => g.uid === s2.game);
+        return game1 - game2 || s1.catchTime - s2.catchTime || huntidComparison;
+      }
+
+      case 'name': {
+        const nom1 = s1.name || noms[s1.dexid] || '';
+        const nom2 = s2.name || noms[s2.dexid] || '';
+        return nom1.localeCompare(nom2, lang) || s1.catchTime - s2.catchTime || huntidComparison;
+      }
+
+      case 'species': {
+        const nom1 = noms[s1.dexid] || '';
+        const nom2 = noms[s2.dexid] || '';
+        return nom1.localeCompare(nom2, lang) || s1.catchTime - s2.catchTime || huntidComparison;
+      }
+
+      case 'shinyRate': {
+        return (s1.shinyRate || 0) - (s2.shinyRate || 0) || s1.catchTime - s2.catchTime || huntidComparison;
+      }
+
+      case 'dexid': {
+        return s1.dexid - s2.dexid || s1.catchTime - s2.catchTime || huntidComparison;
+      }
+
+      case 'catchTime': {
+        return s1.catchTime - s2.catchTime || huntidComparison;
+      }
+
+      case 'lastUpdate': {
+        return s1.lastUpdate - s2.lastUpdate || huntidComparison;
+      }
+
+      default: return huntidComparison;
+    }
+  });
+
+  return orderedShiny.map(shiny => shiny.huntid);
+}
+
+
+
 /** 
  * Computes the order of cards when comparing all cards is needed,
  * i.e. when knowing the properties of the card itself isn't enough to quantize its order among all cards.
  */
-export function computedHardOrders(section: FiltrableSection): void {
-  const container = document.querySelector(`#${section}`);
-  if (!container) return;
-  const allCards = [...container.querySelectorAll('[huntid]')];
-  const lang = document.documentElement.getAttribute('lang') ?? 'fr';
+export async function computedOrders(section: FiltrableSection, ids: string[]): Promise<void> {
+  let dataStore: localForageAPI;
+  let dataClass: (typeof Shiny) | (typeof Hunt);
+  switch (section) {
+    case 'mes-chromatiques':
+      dataStore = shinyStorage;
+      dataClass = Shiny;
+      break;
+    case 'chasses-en-cours':
+      dataStore = huntStorage;
+      dataClass = Hunt;
+      break;
+    case 'chromatiques-ami':
+      dataStore = friendStorage;
+      dataClass = Shiny;
+      break;
+    case 'corbeille':
+      dataStore = huntStorage;
+      dataClass = Hunt;
+      break;
+    case 'partage':
+      dataStore = dataStorage;
+      break;
+  }
 
-  // Species (alphabetical) order
-  allCards.sort((cardA, cardB) => {
-    const speciesA = cardA.getAttribute('data-species') ?? '';
-    const speciesB = cardB.getAttribute('data-species') ?? '';
-    return speciesB.localeCompare(speciesA, lang);
-  }).map((card, k) => {
-    if (!(card instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
-    card.style.setProperty('--species-order', String(k));
-  });
+  if (!dataStore || section === 'partage') return;
 
-  // Name (alphabetical) order
-  allCards.sort((cardA, cardB) => {
-    const nameA = cardA.getAttribute('data-name') ?? '';
-    const nameB = cardB.getAttribute('data-name') ?? '';
-    return nameB.localeCompare(nameA, lang);
-  }).map((card, k) => {
-    if (!(card instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
-    card.style.setProperty('--name-order', String(k));
-  });
+  const pokemonList = (await Promise.all(ids.map(id => dataStore.getItem(id)))).map(pkmn => new dataClass(pkmn));
+  const cardsMap = new Map(pokemonList.map(pkmn => [pkmn.huntid, document.querySelector(`#${section} [huntid="${pkmn.huntid}"]`)]));
+
+  await Promise.all(supportedOrdres.map(async order => {
+    const orderedHuntids = await orderPokemon(section, pokemonList, order);
+    for (let k = 0; k < orderedHuntids.length; k++) {
+      const huntid = orderedHuntids[k];
+      const card = cardsMap.get(huntid);
+      if (!(card instanceof HTMLElement)) continue;
+      card.style.setProperty(`--${order}-order`, String(k));
+    }
+  }));
 }

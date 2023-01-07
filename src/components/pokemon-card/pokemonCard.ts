@@ -1,5 +1,5 @@
 import { Params, noAccent, wait } from '../../Params.js';
-import { Pokemon, Shiny } from '../../Pokemon.js';
+import { Shiny } from '../../Pokemon.js';
 import { huntStorage, pokemonData, shinyStorage } from '../../localForage.js';
 import { Notif } from '../../notification.js';
 import template from './template.js';
@@ -239,15 +239,6 @@ export class pokemonCard extends HTMLElement {
     this.setAttribute('data-dexid', String(shiny.dexid));
     this.setAttribute('data-name', noAccent(shiny.name || pokemon.name[lang ?? 'fr'] || '').toLowerCase());
     this.setAttribute('data-game', shiny.game);
-
-    // Order
-    this.style.setProperty('--catchTime-order', String(shiny.catchTime));
-    this.style.setProperty('--shinyRate-order', String(shiny.shinyRate || 0));
-    this.style.setProperty('--dexid-order', String(shiny.dexid));
-    // --species-order - Species (alphabetical) can't be done just with CSS
-    // --name-order - Name (alphabetical) can't be done just with CSS
-    this.style.setProperty('--game-order', String(Pokemon.jeux.findIndex(jeu => jeu.uid === shiny.game)));
-    this.style.setProperty('--lastUpdate-order', String(shiny.lastUpdate));
   }
 
 

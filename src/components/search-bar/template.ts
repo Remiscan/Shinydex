@@ -41,12 +41,12 @@ template.innerHTML = /*html*/`
     <fieldset class="liste-options if-ordre" aria-labelledby="label-ordre">
       <input type="radio" name="order" id="ordre-date" value="catchTime" checked data-section="mes-chromatiques corbeille chromatiques-ami">
       <label for="ordre-date" class="radio" data-section="mes-chromatiques corbeille chromatiques-ami">
-        <span>Date de capture</span>
+        <span>Date de capture (du + au - récent)</span>
       </label>
 
       <input type="radio" name="order" id="ordre-rate" value="shinyRate" data-section="mes-chromatiques corbeille chromatiques-ami">
       <label for="ordre-rate" class="radio" data-section="mes-chromatiques corbeille chromatiques-ami">
-        <span>Taux</span>
+        <span>Taux de chromatiques (du + au - élevé)</span>
       </label>
 
       <input type="radio" name="order" id="ordre-dex" value="dexid" data-section="mes-chromatiques corbeille chromatiques-ami">
@@ -71,7 +71,7 @@ template.innerHTML = /*html*/`
 
       <input type="radio" name="order" id="ordre-added" value="lastUpdate" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours">
       <label for="ordre-added" class="radio" data-section="mes-chromatiques corbeille chromatiques-ami">
-        <span>Date de modification</span>
+        <span>Date de modification (du + au - récent)</span>
       </label>
 
       <input type="radio" name="order" id="ordre-username" value="username" class="if-partage" data-section="partage">

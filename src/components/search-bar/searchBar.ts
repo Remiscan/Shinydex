@@ -5,8 +5,7 @@ import sheet from './styles.css' assert { type: 'css' };
 import template from './template.js';
 // @ts-expect-error
 import gameNames from '../../../strings/games.json' assert { type: 'json' };
-import { FilterList, FiltrableSection, Search, currentFilters, isFiltrableSection, saveFilters, updateCounters } from '../../filtres.js';
-import { dataStorage } from '../../localForage.js';
+import { FilterList, FiltrableSection, Search, currentFilters, filterSection, isFiltrableSection, saveFilters } from '../../filtres.js';
 
 
 
@@ -46,8 +45,7 @@ export class SearchBar extends HTMLElement {
       hintsContainer.innerHTML = '';
 
       if (event.type === 'reset' && this.section) {
-        const newSearch = new Search();
-        this.searchSection(this.section, newSearch);
+        this.searchSection(this.section, null);
         return;
       }
 
@@ -66,7 +64,7 @@ export class SearchBar extends HTMLElement {
         input.setAttribute('name', 'chip-nickname');
         input.value = simplifiedValue;
         label.setAttribute('for', 'chip-nickname');
-        text.innerHTML = `Surnom contenant ${accentedValue}`;
+        text.innerHTML = `Surnom contenant "${accentedValue}"`;
         newHints.push(hint);
       }
 
@@ -174,15 +172,14 @@ export class SearchBar extends HTMLElement {
         if (!checkbox.checked) formData.append(name, 'false');
       });
 
-      const newFilters = this.optionsToFilters(formData);
-      this.filterSection(section, newFilters);
+      const newFilters = this.formToFilters(formData);
+      currentFilters.set(section, newFilters);
+      filterSection(section, newFilters);
 
       // Save filters if needed
       const shouldSaveFilters = (section === 'mes-chromatiques');
       if (shouldSaveFilters) {
-        const savedFilters = await dataStorage.getItem('filters');
-        savedFilters.set(section, newFilters);
-        await dataStorage.setItem('filters', savedFilters);
+        await saveFilters();
       }
 
       // Change l'icône de retour en ✅ si un filtre a été modifié
@@ -240,7 +237,7 @@ export class SearchBar extends HTMLElement {
 
 
   /** Builds Filters from the selected options. */
-  optionsToFilters(formData: FormData): FilterList {
+  formToFilters(formData: FormData): FilterList {
     const section = this.section ?? '';
     if (!isFiltrableSection(section)) throw new Error(`Should not be trying to filter ${section}`);
     return new FilterList(section, formData);
@@ -248,7 +245,7 @@ export class SearchBar extends HTMLElement {
 
 
   /** Checks options inputs corresponding to a list of filters. */
-  filtersToOptions(filters: FilterList) {
+  filtersToForm(filters: FilterList) {
     order: {
       const input = this.querySelector(`input[name="order"][value="${filters.order}"]`);
       if (!(input instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
@@ -268,37 +265,34 @@ export class SearchBar extends HTMLElement {
         const [x, key, value] = input.getAttribute('name')!.split('-');
         if (FilterList.isKey(key) && key !== 'order' && key !== 'orderReversed') {
           const filter = filters[key];
-          if (filter && (filter.size === 0 || filter.has(Boolean(value)))) input.checked = true;
-          else                                                             input.checked = false;
+          if (filter && filter.has(value === 'true')) input.checked = true;
+          else                                        input.checked = false;
         }
       }
     }
   }
 
 
-  filterSection(section: FiltrableSection, filters: FilterList) {
-    const element = document.querySelector(`section#${section}`);
-    if (!element) return;
-    element.setAttribute('data-filter-mine', [...filters.mine].map(f => String(f)).join(' '));
-    element.setAttribute('data-filter-legit', [...filters.legit].map(f => String(f)).join(' '));
-    element.setAttribute('data-order', filters.order);
-    element.setAttribute('data-order-reversed', String(filters.orderReversed));
-    updateCounters(section);
-  }
-
-
-  searchSection(section: FiltrableSection, search: Search) {
+  searchSection(section: FiltrableSection, search: Search | null) {
     const element = document.querySelector(`section#${section}`);
     if (!element) return;
 
     // Hide non-corresponding cards via CSS
     let css = '';
-    const card = `:is(pokemon-card, hunt-card, corbeille-card)`;
-    css += `#${section} ${card}:not([data-name*="${search.name}"]) { display: none; }`;
-    const gameSelector = [...search.game].map(g => `:not([data-game="${g}"])`).join('');
-    css += `#${section} ${card}${gameSelector} { display: none; }`;
-    const speciesSelector = [...search.species].map(i => `:not([data-dexid="${i}"])`).join('');;
-    css += `#${section} ${card}${speciesSelector} { display: none; }`;
+    if (search instanceof Search) {
+      const card = `:is(pokemon-card, hunt-card, corbeille-card)`;
+      if (search.name.length > 0) {
+        css += `#${section} ${card}:not([data-name*="${search.name}"]) { display: none; }`;
+      }
+      if (search.game.size > 0) {
+        const gameSelector = [...search.game].map(g => `:not([data-game="${g}"])`).join('');
+        css += `#${section} ${card}${gameSelector} { display: none; }`;
+      }
+      if (search.species.size > 0) {
+        const speciesSelector = [...search.species].map(i => `:not([data-dexid="${i}"])`).join('');;
+        css += `#${section} ${card}${speciesSelector} { display: none; }`;
+      }
+    }
     searchSheet.replaceSync(css);
   }
 
@@ -340,8 +334,8 @@ export class SearchBar extends HTMLElement {
 
         // On applique au formulaire les filtres enregistrés de la section demandée.
         // Si aucun n'est sauvegardé, on applique les filtres par défaut.
-        this.filtersToOptions(filters);
-        this.filterSection(searchSection, filters);
+        this.filtersToForm(filters);
+        filterSection(searchSection, filters);
 
         // Si les filtres ne sont pas sauvegardés pour les sections qui enregistrent leurs filtres,
         // on sauvegarde les filtres par défaut.
@@ -376,21 +370,28 @@ export class SearchBar extends HTMLElement {
       this.update(attr);
     }
 
-    const searchBox = this.querySelector('form[name="search-bar"]')!;
-    searchBox.addEventListener('input', this.searchInputHandler);
-    searchBox.addEventListener('reset', this.searchInputHandler);
+    const searchInput = this.querySelector('input[name="search"]');
+    searchInput?.addEventListener('input', this.searchInputHandler);
 
-    const searchOptions = this.querySelector('.search-options')!;
-    searchOptions.addEventListener('change', this.filtersChangeHandler);
+    const searchForm = this.querySelector('form[name="search-bar"]');
+    searchForm?.addEventListener('change', this.searchSuggestionsChangeHandler);
+    searchForm?.addEventListener('reset', this.searchInputHandler);
+
+    const filterForm = this.querySelector('form[name="search-options"]');
+    filterForm?.addEventListener('change', this.filtersChangeHandler);
+
   }
 
   disconnectedCallback() {
-    const searchBox = this.querySelector('form[name="search-bar"]')!;
-    searchBox.removeEventListener('input', this.searchInputHandler);
-    searchBox.removeEventListener('reset', this.searchInputHandler);
+    const searchInput = this.querySelector('input[name="search"]');
+    searchInput?.removeEventListener('input', this.searchInputHandler);
 
-    const searchOptions = this.querySelector('.search-options')!;
-    searchOptions.removeEventListener('change', this.filtersChangeHandler);
+    const searchForm = this.querySelector('form[name="search-bar"]');
+    searchForm?.removeEventListener('change', this.searchSuggestionsChangeHandler);
+    searchForm?.removeEventListener('reset', this.searchInputHandler);
+
+    const filterForm = this.querySelector('form[name="search-options"]');
+    filterForm?.removeEventListener('change', this.filtersChangeHandler);
 
     this.ready = false;
   }

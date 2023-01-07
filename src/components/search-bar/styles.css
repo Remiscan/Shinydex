@@ -95,7 +95,6 @@ form[name="search-bar"] > :is(.search-icon, .reset-icon) {
   background-color: var(--bg);
 }
 
-.search-hints,
 .search-options {
   padding: 16px;
 }

@@ -1,7 +1,7 @@
 import { Params, loadAllImages, setTheme, timestamp2date, wait } from './Params.js';
 import { Pokemon, Shiny } from './Pokemon.js';
 import { PopulatableSection, initPokedex, populator } from './appContent.js';
-import { initFilters } from './filtres.js';
+import { filterSection, initFilters } from './filtres.js';
 import { dataStorage, huntStorage, pokemonData, shinyStorage } from './localForage.js';
 import { Notif } from './notification.js';
 import { upgradeStorage } from './upgradeStorage.js';
@@ -207,6 +207,7 @@ export async function appStart() {
     const sectionsToPopulate: PopulatableSection[] = ['mes-chromatiques', 'chasses-en-cours', 'corbeille'];
     await Promise.all(sectionsToPopulate.map(async section => {
       await populator[section]();
+      filterSection(section);
       document.querySelector(`#${section}`)?.classList.remove('loading');
       if (section === 'mes-chromatiques') {
         document.querySelector(`#pokedex`)?.classList.remove('loading');
