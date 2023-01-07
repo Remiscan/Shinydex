@@ -235,9 +235,9 @@ export class pokemonCard extends HTMLElement {
     // Filters
     this.setAttribute('data-mine', String(shiny.mine));
     this.setAttribute('data-legit', String(shiny.hacked === 0));
-    this.setAttribute('data-species', noAccent(String(pokemon.name)).toLowerCase());
+    this.setAttribute('data-species', noAccent(pokemon.name[lang ?? 'fr'] || '').toLowerCase());
     this.setAttribute('data-dexid', String(shiny.dexid));
-    this.setAttribute('data-name', noAccent(shiny.name).toLowerCase());
+    this.setAttribute('data-name', noAccent(shiny.name || pokemon.name[lang ?? 'fr'] || '').toLowerCase());
     this.setAttribute('data-game', shiny.game);
 
     // Order
@@ -389,7 +389,7 @@ export class pokemonCard extends HTMLElement {
     switch (attr) {
       case 'huntid': {
         this.huntid = newValue;
-        this.dataToContent();
+        //this.dataToContent();
       } break
     }
   }

@@ -68,7 +68,7 @@ template.innerHTML = /*html*/`
         <span>Jeu (date de sortie)</span>
       </label>
 
-      <input type="radio" name="order" id="ordre-added" value="modified" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours">
+      <input type="radio" name="order" id="ordre-added" value="lastUpdate" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours">
       <label for="ordre-added" class="radio" data-section="mes-chromatiques corbeille chromatiques-ami">
         <span>Date de modification</span>
       </label>

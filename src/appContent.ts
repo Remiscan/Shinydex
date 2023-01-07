@@ -2,6 +2,7 @@ import { Hunt } from './Hunt.js';
 import { Pokemon, Shiny } from './Pokemon.js';
 import { huntCard } from './components/hunt-card/huntCard.js';
 import { pokemonCard } from './components/pokemon-card/pokemonCard.js';
+import { computedHardOrders } from './filtres.js';
 import { lazyLoad } from './lazyLoading.js';
 import { friendStorage, huntStorage, localForageAPI, shinyStorage } from './localForage.js';
 import { navigate } from './navigate.js';
@@ -9,17 +10,10 @@ import { Notif } from './notification.js';
 
 
 
-const sections = ['mes-chromatiques', 'chasses-en-cours'];
-const populating: Map<string, boolean> = new Map(sections.map(s => [s, false]));
-const lastModified: Map<string, Set<string>> = new Map(sections.map(s => [s, new Set()]));
-const queue: Map<string, Set<string>> = new Map(sections.map(section => [section, new Set()]));
-let pokedexInitialized = false;
+export type PopulatableSection = 'mes-chromatiques' | 'chasses-en-cours' | 'chromatiques-ami' | 'corbeille';
+const populatableSections: PopulatableSection[] = ['mes-chromatiques', 'chasses-en-cours', 'chromatiques-ami', 'corbeille'];
 
-
-
-export type populatableSection = 'mes-chromatiques' | 'chasses-en-cours' | 'chromatiques-ami' | 'corbeille';
-
-export async function populateHandler(section: populatableSection, _ids?: string[]): Promise<PromiseSettledResult<string>[]> {
+async function populateHandler(section: PopulatableSection, _ids?: string[]): Promise<PromiseSettledResult<string>[]> {
   let dataStore: localForageAPI; // base de données
   switch (section) {
     case 'mes-chromatiques':
@@ -37,36 +31,25 @@ export async function populateHandler(section: populatableSection, _ids?: string
   }
 
   const ids = _ids ?? await dataStore.keys();
-  const currentQueue = new Set([...(queue.get(section) || []), ...ids]);
-  //queue.set(section, new Set([...(queue.get(section) || []), ...ids]));
-
-  if (populating.get(section)) return Promise.allSettled([Promise.resolve('')]);
-  populating.set(section, true);
+  const currentQueue = new Set([...ids]);
 
   const populated = await populateFromData(section, ids);
   for (const result of populated) {
     if (result.status === 'fulfilled') currentQueue.delete(result.value);
   }
 
-  /*switch (section) {
-    case 'mes-chromatiques':
-    case 'chromatiques-ami':
-      await filterCards(section, options.filtres, ids);
-      await orderCards(section, options.filtres.ordre, options.filtres.ordreReverse, ids);
-  }*/
-
-  populating.set(section, false);
-
-  const newQueue = new Set([...(queue.get(section) || []), ...currentQueue]);
-  queue.set(section, newQueue);
-  if (newQueue.size > 0) return populateHandler(section, [...newQueue]);
+  computedHardOrders(section);
 
   return populated;
 }
 
+export const populator = Object.fromEntries(populatableSections.map(section => {
+  return [section, (ids?: string[]) => populateHandler(section, ids)];
+}));
 
 
-export async function populateFromData(section: populatableSection, ids: string[]): Promise<PromiseSettledResult<string>[]> {
+
+export async function populateFromData(section: PopulatableSection, ids: string[]): Promise<PromiseSettledResult<string>[]> {
   let elementName: string; // Nom de l'élément de carte
   let dataStore: localForageAPI; // Base de données
   let dataClass: (typeof Shiny) | (typeof Hunt);
@@ -107,21 +90,25 @@ export async function populateFromData(section: populatableSection, ids: string[
 
   const cardsToCreate: Array<pokemonCard | huntCard> = [];
   const results = await Promise.allSettled(ids.map(async huntid => {
-    const pkmn = new dataClass(await dataStore.getItem(huntid));
+    const pkmn = await dataStore.getItem(huntid);
+    const pkmnInDB = pkmn != null && typeof pkmn === 'object';
+    const pkmnObj = new dataClass(pkmnInDB ? pkmn : {});
+    const pkmnInDBButDeleted = pkmnInDB && pkmnObj.deleted;
     let card: pokemonCard | huntCard | null = document.querySelector(`${elementName}[huntid="${huntid}"]`);
 
     // ABSENT DE LA BDD = Supprimer (manuellement)
-    if (pkmn === null) {
+    if (!pkmnInDB) {
       card?.remove();
       return Promise.resolve(huntid);
     }
 
     // DANS LA BDD
     else {
-      if (card === null) {
+      if (card == null) {
         // DANS LA BDD MAIS DELETED & SANS CARTE = Ignorer
-        const ignoreCondition = section === 'corbeille' ? !(pkmn.deleted)
-                                                        : pkmn.deleted;
+        const ignoreCondition = pkmnObj.destroy || (
+          section === 'corbeille' ? !pkmnInDBButDeleted : pkmnInDBButDeleted
+        );
         if (ignoreCondition) return Promise.resolve(huntid);
         // DANS LA BDD & SANS CARTE = Créer
         else {
@@ -131,7 +118,7 @@ export async function populateFromData(section: populatableSection, ids: string[
         }
       } else {
         // DANS LA BDD & AVEC CARTE = Éditer
-        card.dataToContent();
+        await card.dataToContent();
       }
       return Promise.resolve(huntid);
     }
@@ -140,24 +127,18 @@ export async function populateFromData(section: populatableSection, ids: string[
   // Plaçons les cartes sur la page
   // (après la préparation pour optimiser le temps d'exécution)
   const conteneur = document.querySelector(`#${section} > .section-contenu`)!;
-  for (const card of cardsToCreate) {
+  await Promise.all(cardsToCreate.map(async card => {
     conteneur.appendChild(card);
+    await card.dataToContent();
     lazyLoad(card);
-  }
-
-  // Compte le nombre de cartes affichées
-  const allCards = [...conteneur.querySelectorAll(elementName)];
-  if (allCards.length > 0) conteneur.closest('section')?.classList.remove('vide');
-  else                     conteneur.closest('section')?.classList.add('vide');
-  const filteredCards = allCards.filter(card => card.classList.contains('filtered'));
-  if ((allCards.length - filteredCards.length) > 0) conteneur.closest('section')?.classList.remove('vide-filtres');
-  else                                              conteneur.closest('section')?.classList.add('vide-filtres');
+  }));
 
   return results;
 }
 
 
 /** Initialise le Pokédex. */
+let pokedexInitialized = false;
 export async function initPokedex() {
   if (pokedexInitialized) return;
 
@@ -193,11 +174,19 @@ export async function initPokedex() {
   }
 
   // Peuple le Pokédex
-  const conteneur = document.querySelector('#pokedex>.section-contenu')!;
+  const section = document.querySelector('#pokedex');
+  if (!(section instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
+  const conteneur = section.querySelector('.section-contenu');
+  if (!(conteneur instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
   for (let genConteneur of gensToPopulate) {
     conteneur.appendChild(genConteneur);
     lazyLoad(genConteneur);
   }
+
+  // Peuple le compteur total de Pokémon dans le Pokédex
+  const totalPokemon = generations[generations.length - 1].end;
+  const totalCounter = section.querySelector('.compteur > .total');
+  if (totalCounter) totalCounter.innerHTML = String(totalPokemon);
 
   pokedexInitialized = true;
   return;

@@ -1,7 +1,7 @@
 import '../../_common/components/input-switch/input-switch.js';
 import { Hunt } from './Hunt.js';
 import { setTheme } from './Params.js';
-import { populatableSection, populateHandler } from './appContent.js';
+import { PopulatableSection, populator } from './appContent.js';
 import { appStart, checkUpdate } from './appLifeCycle.js';
 import './components/corbeille-card/corbeilleCard.js';
 import './components/hunt-card/huntCard.js';
@@ -214,7 +214,7 @@ navigator.serviceWorker.addEventListener('message', async event => {
 // ÉCOUTE DE L'EVENT CUSTOM 'POPULATE'
 interface DataUpdateEvent extends CustomEvent {
   detail: {
-    sections: populatableSection[];
+    sections: PopulatableSection[];
     ids: string[];
   }
 }
@@ -238,7 +238,7 @@ window.addEventListener('dataupdate', async (event: DataUpdateEvent) => {
   }
   const { sections, ids } = event.detail;
   for (const section of sections) {
-    await populateHandler(section, ids);
+    await populator[section](ids);
   }
   if (dataUpdateNotificationCount === 1) dataUpdateNotification?.hide();
   dataUpdateNotificationCount--;

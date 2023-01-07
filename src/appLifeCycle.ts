@@ -1,6 +1,7 @@
 import { Params, loadAllImages, setTheme, timestamp2date, wait } from './Params.js';
 import { Pokemon, Shiny } from './Pokemon.js';
-import { initPokedex, populatableSection, populateHandler } from './appContent.js';
+import { PopulatableSection, initPokedex, populator } from './appContent.js';
+import { initFilters } from './filtres.js';
 import { dataStorage, huntStorage, pokemonData, shinyStorage } from './localForage.js';
 import { Notif } from './notification.js';
 import { upgradeStorage } from './upgradeStorage.js';
@@ -200,16 +201,19 @@ export async function appStart() {
     await initPokedex();
     logPerf('initPokedex');
 
-    document.querySelector('search-bar')?.setAttribute('section', 'mes-chromatiques');
+    await initFilters();
+    logPerf('initFilters');
 
-    const sectionsToPopulate: populatableSection[] = ['mes-chromatiques', 'chasses-en-cours', 'corbeille'];
+    const sectionsToPopulate: PopulatableSection[] = ['mes-chromatiques', 'chasses-en-cours', 'corbeille'];
     await Promise.all(sectionsToPopulate.map(async section => {
-      await populateHandler(section);
+      await populator[section]();
       document.querySelector(`#${section}`)?.classList.remove('loading');
       if (section === 'mes-chromatiques') {
         document.querySelector(`#pokedex`)?.classList.remove('loading');
       }
     }));
+
+    document.querySelector('search-bar')?.setAttribute('section', 'mes-chromatiques');
 
     // await initAmis();
   } catch (error) {

@@ -1,4 +1,7 @@
 import { Pokemon, Shiny } from './Pokemon.js';
+import { dataStorage } from './localForage.js';
+// @ts-expect-error
+import { queueable } from '../../_common/js/per-function-async-queue.js';
 
 
 
@@ -9,24 +12,25 @@ export function isOrdre(string: string): string is ordre {
   return supportedOrdres.includes(string as ordre);
 }
 
-export type filtrableSection = 'mes-chromatiques' | 'chasses-en-cours' | 'corbeille' | 'partage' | 'chromatiques-ami';
-const filtrableSections: filtrableSection[] = ['mes-chromatiques', 'chasses-en-cours', 'corbeille', 'partage', 'chromatiques-ami'];
+export type FiltrableSection = 'mes-chromatiques' | 'chasses-en-cours' | 'corbeille' | 'partage' | 'chromatiques-ami';
+export const filtrableSections: FiltrableSection[] = ['mes-chromatiques', 'chasses-en-cours', 'corbeille', 'partage', 'chromatiques-ami'];
+export const savedFiltersSections: FiltrableSection[] = ['mes-chromatiques'];
 
-export function isFiltrableSection(string: string): string is filtrableSection {
-  return filtrableSections.includes(string as filtrableSection);
+export function isFiltrableSection(string: string): string is FiltrableSection {
+  return filtrableSections.includes(string as FiltrableSection);
 }
 
 
 
 /** Liste de filtres appliqués à une section. */
 export class FilterList {
-  mine: Set<boolean> = new Set();
-  legit: Set<boolean> = new Set();
+  mine: Set<boolean> = new Set([true, false]);
+  legit: Set<boolean> = new Set([true, false]);
   order: ordre = 'catchTime';
   orderReversed: boolean = false;
 
-  constructor(section: filtrableSection, formData?: FormData) {
-    if (!formData) return;
+  constructor(section: FiltrableSection, data?: FormData | object) {
+    if (!data) return;
 
     let defaultOrder: ordre;
     switch (section) {
@@ -39,16 +43,35 @@ export class FilterList {
       default:
         defaultOrder = 'catchTime';
     }
+    this.order = defaultOrder;
 
-    const order = String(formData.get('order'));
-    this.order = isOrdre(order) ? order : defaultOrder;
-    this.orderReversed = String(formData.get('orderReversed')) === 'true';
+    if (data instanceof FormData) {
+      const order = String(data.get('order'));
+      this.order = isOrdre(order) ? order : defaultOrder;
+      this.orderReversed = String(data.get('orderReversed')) === 'true';
 
-    for (const [prop, value] of formData.entries()) {
-      if (prop.startsWith('filter-mine')) {
-        if (value !== 'false') this.mine.add(value === 'true');
-      } else if (prop.startsWith('filter-legit')) {
-        if (value !== 'false') this.legit.add(value === 'false');
+      for (const [prop, value] of data.entries()) {
+        if (prop.startsWith('filter-mine')) {
+          const [x, key, val] = prop.split('-');
+          if (value === 'false') this.mine.delete(val === 'true');
+        } else if (prop.startsWith('filter-legit')) {
+          const [x, key, val] = prop.split('-');
+          if (value === 'false') this.legit.delete(val === 'true');
+        }
+      }
+    } else {
+      const order = 'order' in data && String(data.order);
+      if (order) this.order = isOrdre(order) ? order : defaultOrder;
+      if ('orderReversed' in data) this.orderReversed = Boolean(data.orderReversed);
+      
+      if ('mine' in data && data.mine instanceof Set) {
+        if (data.mine.has(true)) this.mine.add(true);
+        if (data.mine.has(false)) this.mine.add(false);
+      }
+
+      if ('legit' in data && data.legit instanceof Set) {
+        if (data.legit.has(true)) this.legit.add(true);
+        if (data.legit.has(false)) this.legit.add(false);
       }
     }
   }
@@ -85,10 +108,40 @@ export class Search {
 }
 
 
+type SectionsFilterMap = Map<FiltrableSection, FilterList>;
+export const currentFilters: SectionsFilterMap = new Map();
+
+
+
+export async function initFilters() {
+  let savedFilters = await dataStorage.getItem('filters');
+  for (const section of filtrableSections) {
+    if (savedFilters && savedFilters.get(section)) {
+      currentFilters.set(section, new FilterList(section, savedFilters.get(section)));
+    } else {
+      currentFilters.set(section, new FilterList(section));
+    }
+  }
+}
+
+
+let saveFilters = async () => {
+  const savedFilters: typeof currentFilters = new Map();
+  for (const section of savedFiltersSections) {
+    const toSave = currentFilters.get(section) ?? new FilterList(section);
+    savedFilters.set(section, toSave);
+  }
+  await dataStorage.setItem('filters', savedFilters);
+};
+
+saveFilters = queueable(saveFilters);
+export { saveFilters };
+
+
 
 ////////////////////////////////////////////////////////////////////
 // Ordonner les cartes de Pokémon selon une certaine caractéristique
-export async function orderCards(section: filtrableSection, pokemonList: Shiny[] = [], order: ordre): Promise<void> {
+export async function orderCards(section: FiltrableSection, pokemonList: Shiny[] = [], order: ordre): Promise<void> {
   const noms = await Pokemon.names();
   const lang = document.documentElement.getAttribute('lang') ?? 'fr';
 
@@ -140,4 +193,84 @@ export async function orderCards(section: filtrableSection, pokemonList: Shiny[]
   });
 
   return;
+}
+
+
+
+/** Counts the number of cards that are displayed in a section. */
+function countFilteredCards(section: FiltrableSection): number[] {
+  const container = document.querySelector(`#${section}`);
+  if (!(container instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
+
+  const allCards = [...container.querySelectorAll('[huntid]')];
+  const totalCount = allCards.length;
+
+  let displayedCount = 0;
+  const dexids = new Set();
+  allCards.forEach(card => {
+    if (getComputedStyle(card).display !== 'none') displayedCount++;
+    const dexid = Number(card.getAttribute('data-dexid'));
+    if (!isNaN(dexid) && dexid > 0) dexids.add(dexid);
+  });
+  const dexidsCount = dexids.size;
+
+  return [displayedCount, totalCount, dexidsCount];
+}
+
+
+
+/**
+ * Displays or hide "list is empty" messages in a section when needed,
+ * and updates that section's counter if it has one.
+ */
+export function updateCounters(section: FiltrableSection): void {
+  const container = document.querySelector(`#${section}`);
+  if (!(container instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
+
+  const [displayedCount, totalCount, dexidsCount] = countFilteredCards(section);
+  if (totalCount > 0) container.classList.remove('vide');
+  else                container.classList.add('vide');
+  if (displayedCount > 0) container.classList.remove('vide-filtres');
+  else                    container.classList.add('vide-filtres');
+
+  const displayedCounter = container.querySelector('.compteur');
+  if (displayedCounter) displayedCounter.innerHTML = String(displayedCount);
+
+  if (section === 'mes-chromatiques') {
+    const dexidsCounter = document.querySelector('#pokedex .compteur > .caught');
+    if (dexidsCounter) dexidsCounter.innerHTML = String(dexidsCount);
+  }
+}
+
+
+
+/** 
+ * Computes the order of cards when comparing all cards is needed,
+ * i.e. when knowing the properties of the card itself isn't enough to quantize its order among all cards.
+ */
+export function computedHardOrders(section: FiltrableSection): void {
+  const container = document.querySelector(`#${section}`);
+  if (!container) return;
+  const allCards = [...container.querySelectorAll('[huntid]')];
+  const lang = document.documentElement.getAttribute('lang') ?? 'fr';
+
+  // Species (alphabetical) order
+  allCards.sort((cardA, cardB) => {
+    const speciesA = cardA.getAttribute('data-species') ?? '';
+    const speciesB = cardB.getAttribute('data-species') ?? '';
+    return speciesB.localeCompare(speciesA, lang);
+  }).map((card, k) => {
+    if (!(card instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
+    card.style.setProperty('--species-order', String(k));
+  });
+
+  // Name (alphabetical) order
+  allCards.sort((cardA, cardB) => {
+    const nameA = cardA.getAttribute('data-name') ?? '';
+    const nameB = cardB.getAttribute('data-name') ?? '';
+    return nameB.localeCompare(nameA, lang);
+  }).map((card, k) => {
+    if (!(card instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
+    card.style.setProperty('--name-order', String(k));
+  });
 }

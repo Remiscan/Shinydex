@@ -671,7 +671,7 @@ export class huntCard extends HTMLElement {
     switch (attr) {
       case 'huntid': {
         this.huntid = newValue;
-        this.huntToForm();
+        //this.huntToForm();
       } break
     }
   }

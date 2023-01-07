@@ -5,7 +5,7 @@ import sheet from './styles.css' assert { type: 'css' };
 import template from './template.js';
 // @ts-expect-error
 import gameNames from '../../../strings/games.json' assert { type: 'json' };
-import { FilterList, Search, filtrableSection, isFiltrableSection } from '../../filtres.js';
+import { FilterList, FiltrableSection, Search, currentFilters, isFiltrableSection, saveFilters, updateCounters } from '../../filtres.js';
 import { dataStorage } from '../../localForage.js';
 
 
@@ -142,7 +142,8 @@ export class SearchBar extends HTMLElement {
     // Called when filters or order are selected or unselected.
     // Filters the current section.
     this.filtersChangeHandler = async event => {
-      const section = this.getAttribute('section');
+      const section = this.getAttribute('section') ?? '';
+      if (!isFiltrableSection(section)) return;
 
       const form = this.querySelector('form[name="search-options"]');
       if (!(form instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
@@ -157,6 +158,7 @@ export class SearchBar extends HTMLElement {
       });
 
       const newFilters = this.optionsToFilters(formData);
+      this.filterSection(section, newFilters);
 
       // Save filters if needed
       const shouldSaveFilters = (section === 'mes-chromatiques');
@@ -257,17 +259,18 @@ export class SearchBar extends HTMLElement {
   }
 
 
-  filterSection(section: filtrableSection, filters: FilterList) {
+  filterSection(section: FiltrableSection, filters: FilterList) {
     const element = document.querySelector(`section#${section}`);
     if (!element) return;
     element.setAttribute('data-filter-mine', [...filters.mine].map(f => String(f)).join(' '));
     element.setAttribute('data-filter-legit', [...filters.legit].map(f => String(f)).join(' '));
     element.setAttribute('data-order', filters.order);
     element.setAttribute('data-order-reversed', String(filters.orderReversed));
+    updateCounters(section);
   }
 
 
-  searchSection(section: filtrableSection, search: Search) {
+  searchSection(section: FiltrableSection, search: Search) {
     const element = document.querySelector(`section#${section}`);
     if (!element) return;
 
@@ -283,7 +286,7 @@ export class SearchBar extends HTMLElement {
   }
 
 
-  async update(name: string, value: string | null = this.getAttribute(name)) {
+  update(name: string, value: string | null = this.getAttribute(name)) {
     if (!this.ready) return;
     switch (name) {
       case 'section': {
@@ -291,7 +294,7 @@ export class SearchBar extends HTMLElement {
 
         const input = this.querySelector('input')!;
         let placeholder: string = 'Rechercher dans mes Pokémon';
-        let searchSection: filtrableSection = 'mes-chromatiques';
+        let searchSection: FiltrableSection = 'mes-chromatiques';
 
         switch (value) {
           case 'chasses-en-cours': 
@@ -316,31 +319,7 @@ export class SearchBar extends HTMLElement {
 
         if (value === 'ajouter-ami') return;
 
-        let defaultFilters: FilterList;
-        switch (searchSection) {
-          case 'chasses-en-cours':
-            defaultFilters = {
-              mine: new Set([true, false]),
-              legit: new Set([true, false]),
-              order: 'lastUpdate',
-              orderReversed: false
-            };
-            break;
-          default:
-            defaultFilters = {
-              mine: new Set([true, false]),
-              legit: new Set([true, false]),
-              order: 'catchTime',
-              orderReversed: false
-            };
-        }
-
-        let savedFilters = await dataStorage.getItem('filters');
-        if (!savedFilters) {
-          savedFilters = new Map();
-          savedFilters.set(searchSection, defaultFilters);
-        }
-        const filters = savedFilters.get(searchSection) ?? defaultFilters;
+        const filters = currentFilters.get(searchSection) ?? new FilterList(searchSection);
 
         // On applique au formulaire les filtres enregistrés de la section demandée.
         // Si aucun n'est sauvegardé, on applique les filtres par défaut.
@@ -350,10 +329,7 @@ export class SearchBar extends HTMLElement {
         // Si les filtres ne sont pas sauvegardés pour les sections qui enregistrent leurs filtres,
         // on sauvegarde les filtres par défaut.
         const shouldSaveFilters = (searchSection === 'mes-chromatiques');
-        if (shouldSaveFilters) {
-          savedFilters.set(searchSection, filters);
-          await dataStorage.setItem('filters', savedFilters);
-        }
+        if (shouldSaveFilters) saveFilters();
       } break;
     }
   }

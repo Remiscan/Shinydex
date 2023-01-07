@@ -457,6 +457,10 @@ section:not(.vide) .message-vide {
   display: none;
 }
 
+section.vide.vide-filtres .message-vide-filtres {
+  display: none;
+}
+
 .section-loader {
   margin: auto;
 }
