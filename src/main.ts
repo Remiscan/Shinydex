@@ -26,11 +26,11 @@ import { backgroundSync } from './syncBackup.js';
 // NAVIGATION
 
 // Active les liens de navigation
-for (const link of Array.from(document.querySelectorAll('[data-section]'))) {
+for (const link of Array.from(document.querySelectorAll('[data-nav-section]'))) {
   if (!(link instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
   link.addEventListener('click', event => {
     event.preventDefault();
-    navigate(link.dataset.section || '', event, JSON.parse(link.dataset.navData || '{}'));
+    navigate(link.dataset.navSection || '', event, JSON.parse(link.dataset.navData || '{}'));
   });
 }
 

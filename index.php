@@ -75,32 +75,32 @@
 
     <!-- Barre de navigation -->
     <nav class="bottom-bar">
-      <a class="nav-link lien-section search-button" data-section="obfuscator" data-nav-data='{ "search": true }' href="#">
+      <a class="nav-link lien-section search-button" data-nav-section="obfuscator" data-nav-data='{ "search": true }' href="#">
         <i class="material-icons">search</i>
       </a>
 
-      <a class="nav-link lien-section" data-section="mes-chromatiques" href="./mes-chromatiques">
+      <a class="nav-link lien-section" data-nav-section="mes-chromatiques" href="./mes-chromatiques">
         <i class="material-icons">catching_pokemon</i>
         <span>Pokémon <shiny-stars></shiny-stars></span>
       </a>
 
-      <a class="nav-link lien-section" data-section="pokedex" href="./pokedex">
+      <a class="nav-link lien-section" data-nav-section="pokedex" href="./pokedex">
         <i class="material-icons">language</i>
         <span>Pokédex <shiny-stars></shiny-stars></span>
       </a>
 
-      <a class="nav-link lien-section" data-section="chasses-en-cours" href="./chasses-en-cours">
+      <a class="nav-link lien-section" data-nav-section="chasses-en-cours" href="./chasses-en-cours">
         <i class="material-icons">add_circle</i>
         <span>Chasses</span>
       </a>
 
-      <a class="nav-link lien-section" data-section="partage" href="./partage">
+      <a class="nav-link lien-section" data-nav-section="partage" href="./partage">
         <i class="material-icons">group</i>
         <span>Amis</span>
       </a>
 
       <!-- Seulement sur PC -->
-      <a class="nav-link lien-section only-pc" data-section="parametres" href="./parametres">
+      <a class="nav-link lien-section only-pc" data-nav-section="parametres" href="./parametres">
         <i class="material-icons">settings</i>
         <span>Paramètres</span>
       </a>

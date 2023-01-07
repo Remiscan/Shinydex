@@ -117,10 +117,10 @@ nav {
 }
 
 .on.nav-link,
-body[data-section-actuelle~="mes-chromatiques"] .nav-link[data-section="mes-chromatiques"],
-body[data-section-actuelle~="pokedex"] .nav-link[data-section="pokedex"],
-body[data-section-actuelle~="chasses-en-cours"] .nav-link[data-section="chasses-en-cours"],
-body[data-section-actuelle~="partage"] .nav-link[data-section="partage"] {
+body[data-section-actuelle~="mes-chromatiques"] .nav-link[data-nav-section="mes-chromatiques"],
+body[data-section-actuelle~="pokedex"] .nav-link[data-nav-section="pokedex"],
+body[data-section-actuelle~="chasses-en-cours"] .nav-link[data-nav-section="chasses-en-cours"],
+body[data-section-actuelle~="partage"] .nav-link[data-nav-section="partage"] {
   --nav-text-color: var(--nav-text-color-on);
 }
 
@@ -498,10 +498,6 @@ section.loading .message-vide {
   position: relative;
   margin-bottom: 16px;
 }
-
-/*body:not([data-section-actuelle="pokedex"]) .sous-titre:not(:nth-child(2)) {
-  margin-top: 16px;
-}*/
 
 .sous-titre:not(:first-child) {
   margin-top: 16px;
@@ -1435,17 +1431,13 @@ form[name="app-settings"] {
     --size: 112px;
   }
 
-  .nav-link[data-section="pokedex"] {
+  .nav-link[data-nav-section="pokedex"] {
     display: none;
   }
 
   nav > a > span {
     text-align: center;
   }
-
-  /*body[data-section-actuelle=parametres] .nav-link[data-section=parametres]::before {
-    animation: bulle-nav .3s var(--easing-decelerate);
-  }*/
 
   main {
     grid-column: 2 / 3;
@@ -1473,9 +1465,9 @@ form[name="app-settings"] {
     display: grid;
   }
 
-  body[data-section-actuelle~="pokedex"] .nav-link[data-section="mes-chromatiques"],
-  body[data-section-actuelle~="parametres"] .nav-link[data-section="parametres"],
-  body[data-section-actuelle~="a-propos"] .nav-link[data-section="parametres"] {
+  body[data-section-actuelle~="pokedex"] .nav-link[data-nav-section="mes-chromatiques"],
+  body[data-section-actuelle~="parametres"] .nav-link[data-nav-section="parametres"],
+  body[data-section-actuelle~="a-propos"] .nav-link[data-nav-section="parametres"] {
     --nav-text-color: var(--nav-text-color-on);
   }
 
