@@ -5,24 +5,25 @@ template.innerHTML = /*html*/`
       <i class="material-icons">arrow_back</i>
     </a>
 
+    <input type="text" name="search" id="search" inputmode="search" enterkeyhint="search" role="searchbox">
+
     <label for="search" class="search-icon">
       <i class="material-icons">search</i>
     </label>
-    <input type="text" name="search" id="search" inputmode="search" enterkeyhint="search" role="searchbox">
 
     <button type="reset" class="reset-icon">
       <i class="material-icons">close</i>
     </button>
 
-    <fieldset class="search-hints" aria-label="Suggestions de recherche">
-      <template id="search-hint-template">
-        <input type="checkbox" name="chip-id" id="chip-id" value="value">
-        <label class="chip" for="chip-id">
-          <span>Type : valeur</span>
-          <i class="material-icons">cancel</i>
-        </label>
-      </template>
-    </fieldset>
+    <template id="search-hint-template">
+      <input type="checkbox" name="chip-id" id="chip-id" value="value">
+      <label class="chip" for="chip-id">
+        <span>Type : valeur</span>
+        <i class="material-icons">cancel</i>
+      </label>
+    </template>
+
+    <fieldset class="search-hints" aria-label="Suggestions de recherche"></fieldset>
   </form>
 
   <form class="search-options" name="search-options">
@@ -30,10 +31,10 @@ template.innerHTML = /*html*/`
       <span id="label-ordre">Ordonner par :</span>
 
       <span class="reverse-order__container">
+        <input type="checkbox" name="orderReversed" id="orderReversed" value="true">
         <label for="orderReversed" aria-label="Inverser l'ordre">
           <i class="material-icons">vertical_align_bottom</i>
         </label>
-        <input type="checkbox" name="orderReversed" id="orderReversed" value="true">
       </span>
     </div>
 

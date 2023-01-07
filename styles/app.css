@@ -196,7 +196,6 @@ h1 {
   all: unset;
 }
 
-.search-header,
 .section-titre {
   grid-row: 1 / 2;
   grid-column: 1 / 2;
@@ -225,7 +224,6 @@ h1 {
   min-height: 48px;
 }
 
-.search-header,
 .section-titre.with-button {
   padding-left: 0;
 }
@@ -522,38 +520,6 @@ section.loading .message-vide {
   margin: 0 32px;
 }
 
-/*.menu-filtres .sous-titre>span {
-  --bg: var(--nav-bg-color);
-}*/
-
-.reverse-order__container {
-  width: 24px;
-  height: 24px;
-}
-
-.reverse-order {
-  all: unset;
-  cursor: pointer;
-  position: relative;
-  width: 24px;
-  height: 24px;
-}
-
-body[data-reversed=true] .reverse-order {
-  transform: rotate(180deg);
-}
-
-.reverse-order::before {
-  content: '';
-  display: block;
-  --size: 44px;
-  width: var(--size);
-  height: var(--size);
-  position: absolute;
-  top: calc(-.5 * (var(--size) - 24px));
-  left: calc(-.5 * (var(--size) - 24px));
-}
-
 .cote-a-cote {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -566,7 +532,6 @@ body[data-reversed=true] .reverse-order {
   gap: 6px;
 }
 
-fieldset.search-hints,
 fieldset.liste-options {
   margin: 0;
   padding: 0;

@@ -35,20 +35,27 @@ export class SearchBar extends HTMLElement {
 
       const searchBar = this.querySelector('[role="searchbox"]');
       if (!(searchBar instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
-      const value = event.type === 'reset' ? '' : noAccent(searchBar.value).toLowerCase();
+      const accentedValue = event.type === 'reset' ? '' : searchBar.value;
+      const simplifiedValue = noAccent(accentedValue).toLowerCase();
 
       // Build search hints based on user input
       const hintsContainer = this.querySelector('.search-hints')!;
-      const hintTemplate: HTMLTemplateElement = hintsContainer.querySelector('#search-hint-template')!;
+      const hintTemplate: HTMLTemplateElement = document.querySelector('#search-hint-template')!;
 
       // Remove previous hints
-      hintsContainer.querySelectorAll(':not(template, legend)').forEach(e => e.remove());
+      hintsContainer.innerHTML = '';
+
+      if (event.type === 'reset' && this.section) {
+        const newSearch = new Search();
+        this.searchSection(this.section, newSearch);
+        return;
+      }
 
       const newHints = [];
 
       // - Pokémon nickname
       nickname: {
-        if (value.length <= 0) break nickname;
+        if (accentedValue.length <= 0) break nickname;
 
         const hint = hintTemplate.content.cloneNode(true);
         if (!(hint instanceof DocumentFragment)) throw new TypeError(`Expecting DocumentFragment`);
@@ -57,19 +64,24 @@ export class SearchBar extends HTMLElement {
         const text = label?.querySelector('span')!;
         input.setAttribute('id', 'chip-nickname');
         input.setAttribute('name', 'chip-nickname');
-        input.value = value;
+        input.value = simplifiedValue;
         label.setAttribute('for', 'chip-nickname');
-        text.innerHTML = `Surnom : ${value}`;
+        text.innerHTML = `Surnom contenant ${accentedValue}`;
         newHints.push(hint);
       }
 
       // - Pokémon species
       species: {
-        if (value.length <= 2) break species;
+        if (accentedValue.length <= 2) break species;
 
         const allNames = await Pokemon.names();
         const fittingNames: Set<{ name: string, dexid: number }> = new Set();
-        allNames.forEach((name, dexid) => { if (name.includes(value)) fittingNames.add({ name, dexid }) });
+        allNames.forEach((name, dexid) => {
+          const simplifiedName = noAccent(name).toLowerCase();
+          if (simplifiedName.includes(simplifiedValue)) {
+            fittingNames.add({ name, dexid });
+          }
+        });
 
         for (const { name, dexid } of fittingNames) {
           const hint = hintTemplate.content.cloneNode(true);
@@ -88,12 +100,17 @@ export class SearchBar extends HTMLElement {
 
       // - Pokémon game
       game: {
-        if (value.length <= 2) break game;
+        if (accentedValue.length <= 2) break game;
 
         const lang = document.documentElement.getAttribute('lang');
-        const allGames: { name: string, uid: string }[] = Pokemon.jeux.map(j => { return { name: gameNames[lang][j.uid].toLowerCase(), uid: j.uid }; });
+        const allGames: { name: string, uid: string }[] = Pokemon.jeux.map(j => { return { name: gameNames[lang][j.uid], uid: j.uid }; });
         const fittingNames: Set<{ name: string, uid: string }> = new Set();
-        allGames.forEach(game => { if (game.name.includes(value)) fittingNames.add({ name: game.name, uid: game.uid }) });
+        allGames.forEach(game => {
+          const simplifiedName = noAccent(game.name).toLocaleLowerCase();
+          if (simplifiedName.includes(simplifiedValue)) {
+            fittingNames.add({ name: game.name, uid: game.uid });
+          }
+        });
 
         for (const { name, uid } of fittingNames) {
           const hint = hintTemplate.content.cloneNode(true);
@@ -105,7 +122,7 @@ export class SearchBar extends HTMLElement {
           input.setAttribute('name', `chip-game-${uid}`);
           input.value = uid;
           label.setAttribute('for', `chip-game-${uid}`);
-          text.innerHTML = `Jeu : ${name.charAt(0).toUpperCase() + name.slice(1)}`;
+          text.innerHTML = `Jeu : ${name}`;
           newHints.push(hint);
         }
       }
@@ -335,8 +352,14 @@ export class SearchBar extends HTMLElement {
   }
 
 
-  get section() { return this.getAttribute('section'); }
-  set section(value) { this.setAttribute('section', value ?? ''); }
+  get section() {
+    const value = this.getAttribute('section') ?? '';
+    if (isFiltrableSection(value)) return value;
+    else return null;
+  }
+  set section(value) {
+    this.setAttribute('section', isFiltrableSection(value ?? '') ? (value ?? '') : '');
+  }
   
 
   connectedCallback() {
