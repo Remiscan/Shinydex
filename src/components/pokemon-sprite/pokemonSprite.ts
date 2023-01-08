@@ -55,7 +55,7 @@ export default class pokemonSprite extends HTMLElement {
     starField.innerHTML = '';
 
     // On génère les étoiles sn SVG
-    const starQuantity = 40;
+    const starQuantity = 30;
     for (let i = 0; i < starQuantity; i++) {
       starField.innerHTML += `<use href="#shiny-star"/>`;
     }
@@ -96,22 +96,38 @@ export default class pokemonSprite extends HTMLElement {
       // Couleur de l'étoile
       if (Math.random() - (1/3) < 0) star.style.setProperty('filter', 'hue-rotate(150deg)');
 
-      // Animation
+      // Animation de chaque étoile
       star.style.setProperty('transform-origin', 'center center');
       const anim = star.animate([
         { opacity: 0, transform: `translate3D(${startPos.x}px, ${startPos.y}px, 0) scale(${scale}) rotate(${startRotation}deg)` },
         { opacity: 1 },
         { opacity: 1 },
-        { opacity: .8 },
+        { opacity: 1 },
+        { opacity: 1 },
+        { opacity: 1 },
+        { opacity: 1 },
+        { opacity: late ? 0 : 1 },
+        { opacity: 0 },
         { opacity: 0, transform: `translate3D(${endPos.x}px, ${endPos.y}px, 0) scale(${scale}) rotate(${endRotation}deg)` }
       ], {
-        easing: 'cubic-bezier(0, 0, 0, .7)',
+        easing: 'cubic-bezier(0, .6, .7, .6)',
         fill: 'both',
-        duration: 1000,
-        delay: 200 * Math.random() + 500 * (late ? 1 : 0)
+        duration: 800,
+        delay: 200 * Math.random() + 300 * (late ? 1 : 0)
       });
       animations.push(anim);
     }
+
+    // Rotation globale
+    const anim = starField.animate([
+      { rotate: '0deg' },
+      { rotate: '-180deg' }
+    ], {
+      easing: 'linear',
+      fill: 'both',
+      duration: 1300,
+    });
+    animations.push(anim);
 
     await Promise.all(animations.map(anim => wait(anim)));
   }

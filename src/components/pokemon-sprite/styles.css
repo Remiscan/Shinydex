@@ -16,8 +16,8 @@ img, svg {
   height: 100%;
 }
 
-.star-field > use {
-  opacity: 0;
+#star-field {
+  transform-origin: center center;
 }
 
 :host(:not([shiny="true"])) svg {
