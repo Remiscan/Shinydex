@@ -2,8 +2,8 @@
 $cacheFiles = json_decode(file_get_contents(__DIR__.'/cache.json'), true)['files'];
 
 $fileVersions = [];
+$indexVersion = 0;
 foreach ($cacheFiles as $file) {
-  $indexVersion = 0;
   if ($file === './' || str_starts_with($file, './pages')) {
     $file = './index.php';
     $indexVersion = max($indexVersion, version([$file]));
