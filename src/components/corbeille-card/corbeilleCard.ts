@@ -1,8 +1,8 @@
-import { pokemonCard } from '../pokemon-card/pokemonCard.js';
+import { shinyCard } from '../shiny-card/shinyCard.js';
 
 
 
-export class corbeilleCard extends pokemonCard {
+export class corbeilleCard extends shinyCard {
   constructor() {
     super();
   }

@@ -1,7 +1,8 @@
 import { Hunt } from './Hunt.js';
-import { Pokemon, Shiny } from './Pokemon.js';
+import { Pokemon } from './Pokemon.js';
+import { Shiny } from './Shiny.js';
 import { huntCard } from './components/hunt-card/huntCard.js';
-import { pokemonCard } from './components/pokemon-card/pokemonCard.js';
+import { shinyCard } from './components/shiny-card/shinyCard.js';
 import { computedOrders } from './filtres.js';
 import { lazyLoad } from './lazyLoading.js';
 import { friendStorage, huntStorage, localForageAPI, shinyStorage } from './localForage.js';
@@ -50,7 +51,7 @@ export async function populateFromData(section: PopulatableSection, ids: string[
   let dataClass: (typeof Shiny) | (typeof Hunt);
   switch (section) {
     case 'mes-chromatiques':
-      elementName = 'pokemon-card';
+      elementName = 'shiny-card';
       dataStore = shinyStorage;
       dataClass = Shiny;
       break;
@@ -60,7 +61,7 @@ export async function populateFromData(section: PopulatableSection, ids: string[
       dataClass = Hunt;
       break;
     case 'chromatiques-ami':
-      elementName = 'pokemon-card';
+      elementName = 'shiny-card';
       dataStore = friendStorage;
       dataClass = Shiny;
       break;
@@ -83,13 +84,12 @@ export async function populateFromData(section: PopulatableSection, ids: string[
 
   // Traitons les cartes :
 
-  const cardsToCreate: Array<pokemonCard | huntCard> = [];
+  const cardsToCreate: Array<shinyCard | huntCard> = [];
   const results = await Promise.allSettled(ids.map(async huntid => {
     const pkmn = await dataStore.getItem(huntid);
     const pkmnInDB = pkmn != null && typeof pkmn === 'object';
     const pkmnObj = new dataClass(pkmnInDB ? pkmn : {});
-    const pkmnInDBButDeleted = pkmnInDB && pkmnObj.deleted;
-    let card: pokemonCard | huntCard | null = document.querySelector(`${elementName}[huntid="${huntid}"]`);
+    let card: shinyCard | huntCard | null = document.querySelector(`${elementName}[huntid="${huntid}"]`);
 
     // ABSENT DE LA BDD = Supprimer (manuellement)
     if (!pkmnInDB) {
@@ -101,13 +101,15 @@ export async function populateFromData(section: PopulatableSection, ids: string[
     else {
       if (card == null) {
         // DANS LA BDD MAIS DELETED & SANS CARTE = Ignorer
-        const ignoreCondition = pkmnObj.destroy || (
+        const pkmnInDBButDeleted = pkmnInDB && 'deleted' in pkmnObj && pkmnObj.deleted
+        const pkmnToDestroy = 'destroy' in pkmnObj && pkmnObj.destroy;
+        const ignoreCondition = pkmnToDestroy || (
           section === 'corbeille' ? !pkmnInDBButDeleted : pkmnInDBButDeleted
         );
         if (ignoreCondition) return Promise.resolve(huntid);
         // DANS LA BDD & SANS CARTE = Créer
         else {
-          card = document.createElement(elementName) as pokemonCard | huntCard;
+          card = document.createElement(elementName) as shinyCard | huntCard;
           card.setAttribute('huntid', huntid);
           cardsToCreate.push(card);
         }

@@ -245,16 +245,6 @@ template.innerHTML = /*html*/`
         <option value="strange">Étrange Ball</option>
       </select>
     </span>
-
-    <span class="one-input" data-not-mine>
-      <label for="hacked">Légitimité :</label>
-      <select name="hacked" id="hacked">
-        <option value="0" selected>Legit</option>
-        <option value="1">Pas sûr</option>
-        <option value="2">Hacké</option>
-        <option value="3">Cloné</option>
-      </select>
-    </span>
   </fieldset>
 
 

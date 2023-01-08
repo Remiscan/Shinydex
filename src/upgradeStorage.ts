@@ -1,5 +1,5 @@
 import { Hunt } from './Hunt.js';
-import { Shiny } from './Pokemon.js';
+import { Shiny } from './Shiny.js';
 import { dataStorage, huntStorage, shinyStorage } from './localForage.js';
 // @ts-expect-error
 import gameStrings from '../strings/games.json' assert { type: 'json' };
@@ -64,7 +64,7 @@ export function updateDataFormat(shiny: { [key: string]: any }): { [key: string]
   }
 
   // Add properties that didn't exist before
-  const newProperties = new Map([
+  const newProperties: Map<string, any> = new Map([
     ['gene', '']
   ]);
 
@@ -174,6 +174,19 @@ export function updateDataFormat(shiny: { [key: string]: any }): { [key: string]
       count['encounters'] = Number(count.count) || 0;
       shiny['count'] = count;
     }
+  }
+
+  // Add creationTime if needed
+  if (!(shiny.hasOwnProperty('creationTime'))) {
+    shiny['creationTime'] = shiny['catchTime'] ?? shiny['lastUpdate'] ?? Date.now();
+  }
+
+  // Translate old hacked property to method if needed
+  if (shiny.hasOwnProperty('hacked')) {
+    if (shiny['hacked'] >= 2) {
+      shiny['method'] = 'hack';
+    }
+    delete shiny['hacked'];
   }
 
   return shiny;

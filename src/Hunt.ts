@@ -1,4 +1,4 @@
-import { Shiny, frontendShiny } from './Pokemon.js';
+import { Shiny, frontendShiny } from './Shiny.js';
 import { huntStorage, shinyStorage } from './localForage.js';
 
 
@@ -6,14 +6,20 @@ import { huntStorage, shinyStorage } from './localForage.js';
 // Structure d'un Pokémon en cours de chasse tel que stocké dans la BDD locale
 export interface huntedPokemon extends frontendShiny {
   caught: boolean,
+  deleted?: boolean,
+  destroy?: boolean,
 }
 
 export class Hunt extends Shiny implements huntedPokemon {
   caught: boolean = false;
+  deleted: boolean = false;
+  destroy: boolean = false;
   
   constructor(shiny: object = {}) {
     super(shiny);
     if ('caught' in shiny) this.caught = Boolean(shiny.caught);
+    if ('deleted' in shiny) this.deleted = Boolean(shiny.deleted);
+    if ('destroy' in shiny) this.destroy = Boolean(shiny.destroy);
   }
 
 

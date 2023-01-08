@@ -180,7 +180,7 @@ const lastPosition: Map<string, number> = new Map(sections.filter(section => sec
 const firstCard = (section: Element): HTMLElement | null | undefined => {
   let card;
   switch (section.id) {
-    case 'mes-chromatiques': card = section.querySelector('pokemon-card'); break;
+    case 'mes-chromatiques': card = section.querySelector('shiny-card'); break;
     case 'pokedex':          card = section.querySelector('.pokedex-gen'); break;
     case 'hunts':            card = section.querySelector('.hunt-card'); break;
   }

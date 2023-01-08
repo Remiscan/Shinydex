@@ -1,7 +1,8 @@
 import { DexDatalist } from '../../DexDatalist.js';
 import { Hunt, huntedPokemon } from '../../Hunt.js';
 import { warnBeforeDestruction } from '../../Params.js';
-import { Count, Forme, Pokemon, Shiny } from '../../Pokemon.js';
+import { Forme, Pokemon } from '../../Pokemon.js';
+import { Count, Shiny } from '../../Shiny.js';
 import { huntStorage, pokemonData, shinyStorage } from '../../localForage.js';
 import { Notif } from '../../notification.js';
 import pokemonSprite from '../pokemon-sprite/pokemonSprite.js';
@@ -121,7 +122,11 @@ export class huntCard extends HTMLElement {
    * Supprime la chasse.
    */
   async delete(populate = true) {
-    await huntStorage.removeItem(this.huntid);
+    // On déplace la chasse dans la corbeille
+    const hunt = await this.getHunt();
+    hunt.lastUpdate = Date.now();
+    hunt.deleted = true;
+    await huntStorage.setItem(this.huntid, hunt);
 
     if (populate) {
       window.dispatchEvent(new CustomEvent('dataupdate', {
@@ -145,18 +150,14 @@ export class huntCard extends HTMLElement {
       return;
     }
 
+    // On déplace la chasse dans la corbeille
     const hunt = await this.getHunt();
     hunt.lastUpdate = Date.now();
     hunt.deleted = true;
     await huntStorage.setItem(this.huntid, hunt);
 
-    // On marque le shiny comme supprimé (pour que la suppression se synchronise en ligne)
-    const shiny = new Shiny(storedShiny);
-    shiny.lastUpdate = hunt.lastUpdate;
-    shiny.deleted = true;
-    // Si la synchronisation en ligne est désactivée, marquer le shiny comme à 'destroy' immédiatement
-    // if (!onlineSync) shiny.destroy = true;
-    await shinyStorage.setItem(this.huntid, shiny);
+    // On supprime le shiny associé
+    await shinyStorage.removeItem(this.huntid);
 
     window.dispatchEvent(new CustomEvent('dataupdate', {
       detail: {
@@ -210,8 +211,7 @@ export class huntCard extends HTMLElement {
         } break;
 
         case 'forme':
-        case 'ball':
-        case 'hacked': {
+        case 'ball': {
           if (!(input instanceof HTMLSelectElement)) throw new TypeError(`Expecting HTMLSelectElement`);
           const value = String(hunt[prop]);
           input.value = value;
@@ -314,10 +314,6 @@ export class huntCard extends HTMLElement {
         case 'originMark':
         case 'notes': {
           Object.assign(hunt, { [prop]: String(value) });
-        } break;
-
-        case 'hacked': {
-          Object.assign(hunt, { [prop]: parseInt(String(value)) });
         } break;
 
         case 'caught':

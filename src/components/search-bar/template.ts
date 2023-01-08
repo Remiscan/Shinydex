@@ -5,7 +5,7 @@ template.innerHTML = /*html*/`
       <i class="material-icons">arrow_back</i>
     </a>
 
-    <input type="text" name="search" id="search" inputmode="search" enterkeyhint="search" role="searchbox">
+    <input type="text" name="search" id="search" inputmode="search" enterkeyhint="search" role="searchbox" autocomplete="off">
 
     <label for="search" class="search-icon">
       <i class="material-icons">search</i>
@@ -69,9 +69,9 @@ template.innerHTML = /*html*/`
         <span>Jeu (date de sortie)</span>
       </label>
 
-      <input type="radio" name="order" id="ordre-added" value="lastUpdate" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours">
-      <label for="ordre-added" class="radio" data-section="mes-chromatiques corbeille chromatiques-ami">
-        <span>Date de modification (du + au - récent)</span>
+      <input type="radio" name="order" id="ordre-added" value="creationTime" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours">
+      <label for="ordre-added" class="radio" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours">
+        <span>Date d'ajout (du + au - récent)</span>
       </label>
 
       <input type="radio" name="order" id="ordre-username" value="username" class="if-partage" data-section="partage">

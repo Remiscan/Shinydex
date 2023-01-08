@@ -23,7 +23,8 @@
     "eggtrade": "Échange (œuf)",
     "massoutbreak": "Apparition massive",
     "massivemassoutbreak": "Mégapparition",
-    "fixedencounter": "Rencontre fixe"
+    "fixedencounter": "Rencontre fixe",
+    "hack": "Hack ou méthode non légitime"
   },
 
   "en": {
@@ -50,6 +51,7 @@
     "eggtrade": "Trade (egg)",
     "massoutbreak": "Mass outbreak",
     "massivemassoutbreak": "Massive mass outbreak",
-    "fixedencounter": "Fixed encounter"
+    "fixedencounter": "Fixed encounter",
+    "hack": "Hack or illegitimate method"
   }
 }

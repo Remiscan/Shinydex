@@ -280,7 +280,7 @@ export class SearchBar extends HTMLElement {
     // Hide non-corresponding cards via CSS
     let css = '';
     if (search instanceof Search) {
-      const card = `:is(pokemon-card, hunt-card, corbeille-card)`;
+      const card = `:is(shiny-card, hunt-card, corbeille-card)`;
       if (search.name.length > 0) {
         css += `#${section} ${card}:not([data-name*="${search.name}"]) { display: none; }`;
       }

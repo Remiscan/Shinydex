@@ -1,4 +1,5 @@
-import { Pokemon, Shiny } from './Pokemon.js';
+import { Pokemon } from './Pokemon.js';
+import { Shiny } from './Shiny.js';
 import { dataStorage, friendStorage, huntStorage, localForageAPI, shinyStorage } from './localForage.js';
 // @ts-expect-error
 import { queueable } from '../../_common/js/per-function-async-queue.js';
@@ -6,8 +7,8 @@ import { Hunt } from './Hunt.js';
 
 
 
-type ordre = 'catchTime' | 'shinyRate' | 'dexid' | 'species' | 'name' | 'game' | 'lastUpdate' | 'username';
-const supportedOrdres: ordre[] = ['catchTime', 'shinyRate', 'dexid', 'species', 'name', 'game', 'lastUpdate'];
+type ordre = 'catchTime' | 'shinyRate' | 'dexid' | 'species' | 'name' | 'game' | 'creationTime' | 'username';
+const supportedOrdres: ordre[] = ['catchTime', 'shinyRate', 'dexid', 'species', 'name', 'game', 'creationTime'];
 
 export function isOrdre(string: string): string is ordre {
   return supportedOrdres.includes(string as ordre);
@@ -36,7 +37,7 @@ export class FilterList {
     let defaultOrder: ordre;
     switch (section) {
       case 'chasses-en-cours':
-        defaultOrder = 'lastUpdate';
+        defaultOrder = 'creationTime';
         break;
       case 'partage':
         defaultOrder = 'username';
@@ -244,8 +245,8 @@ async function orderPokemon(section: FiltrableSection, pokemonList: Shiny[] | Hu
         return s1.catchTime - s2.catchTime || huntidComparison;
       }
 
-      case 'lastUpdate': {
-        return s1.lastUpdate - s2.lastUpdate || huntidComparison;
+      case 'creationTime': {
+        return s1.creationTime - s2.creationTime || huntidComparison;
       }
 
       default: return huntidComparison;

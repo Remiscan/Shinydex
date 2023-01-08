@@ -1,5 +1,5 @@
 import { Params, noAccent, wait } from '../../Params.js';
-import { Shiny } from '../../Pokemon.js';
+import { Shiny } from '../../Shiny.js';
 import { huntStorage, pokemonData, shinyStorage } from '../../localForage.js';
 import { Notif } from '../../notification.js';
 import template from './template.js';
@@ -22,7 +22,7 @@ let longClic = false;
 
 
 
-export class pokemonCard extends HTMLElement {
+export class shinyCard extends HTMLElement {
   shadow: ShadowRoot;
   huntid: string = '';
   clickHandler: (e: Event) => any = () => {};
@@ -48,8 +48,6 @@ export class pokemonCard extends HTMLElement {
       console.error('Échec de création du Shiny', e);
       throw e;
     }
-
-    if (shiny.deleted) return this.remove();
 
     this.setAttribute('last-update', String(shiny.lastUpdate));
 
@@ -234,7 +232,7 @@ export class pokemonCard extends HTMLElement {
 
     // Filters
     this.setAttribute('data-mine', String(shiny.mine));
-    this.setAttribute('data-legit', String(shiny.hacked === 0));
+    this.setAttribute('data-legit', String(shiny.method === 'hack'));
     this.setAttribute('data-species', noAccent(pokemon.name[lang ?? 'fr'] || '').toLowerCase());
     this.setAttribute('data-dexid', String(shiny.dexid));
     this.setAttribute('data-name', noAccent(shiny.name || pokemon.name[lang ?? 'fr'] || '').toLowerCase());
@@ -250,7 +248,7 @@ export class pokemonCard extends HTMLElement {
 
     // On ferme la carte déjà ouverte
     if (currentCardId != null)
-      document.querySelector(`pokemon-card[huntid="${currentCardId}"]`)!.removeAttribute('open');
+      document.querySelector(`shiny-card[huntid="${currentCardId}"]`)!.removeAttribute('open');
 
     // Si la carte demandée n'est pas celle qu'on vient de fermer, on l'ouvre
     if (huntid != currentCardId) {
@@ -386,4 +384,4 @@ export class pokemonCard extends HTMLElement {
   }
 }
 
-if (!customElements.get('pokemon-card')) customElements.define('pokemon-card', pokemonCard);
+if (!customElements.get('shiny-card')) customElements.define('shiny-card', shinyCard);
