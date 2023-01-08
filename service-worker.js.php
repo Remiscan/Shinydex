@@ -1,11 +1,16 @@
 /* <?php
-require_once './backend/cache.php';
-$cache = getCacheFiles();
+$cacheFiles = json_decode(file_get_contents(__DIR__.'/cache.json'), true)['files'];
 
 $fileVersions = [];
-foreach ($cache['fichiers'] as $file) {
-  if ($file === './') $file = './index.php';
-  $fileVersions[$file] = version([$file]);
+foreach ($cacheFiles as $file) {
+  $indexVersion = 0;
+  if ($file === './' || str_starts_with($file, './pages')) {
+    $file = './index.php';
+    $indexVersion = max($indexVersion, version([$file]));
+    $fileVersions[$file] = $indexVersion;
+  } else {
+    $fileVersions[$file] = version([$file]);
+  }
 }
 
 $maxVersion = max($fileVersions);
