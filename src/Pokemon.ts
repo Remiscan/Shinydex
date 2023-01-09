@@ -255,8 +255,8 @@ export class Pokemon {
     try {
       await Promise.all([dataStorage.ready(), pokemonData.ready()]);
       const [fileVersion, dataVersion] = await Promise.all([
-        dataStorage.getItem('file-versions').then(versions => versions['./data/pokemon.json']),
-        dataStorage.getItem('pokemon-data-version'),
+        dataStorage.getItem('file-versions').then(versions => versions?.['./data/pokemon.json'] ?? []),
+        dataStorage.getItem('pokemon-data-version').then(version => Number(version) || 0),
       ]);
     
       if (fileVersion === dataVersion) return;

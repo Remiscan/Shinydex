@@ -109,14 +109,18 @@ export async function appStart() {
 
   // On vérifie si les données sont installées
   await Promise.all([dataStorage.ready(), shinyStorage.ready(), pokemonData.ready(), huntStorage.ready()]);
-  let fileVersions = {}, cacheVersion = 0, areFilesInstalled = false, isServiceWorkerReady = false;
+  const pokemonReleaseDate = new Date('1996-02-27').getTime();
+  let fileVersions = {}
+  let cacheVersion = pokemonReleaseDate;
+  let areFilesInstalled = false, isServiceWorkerReady = false;
   let lastStorageUpgrade = 0;
   try {
     [fileVersions, lastStorageUpgrade] = await Promise.all([
-      dataStorage.getItem('file-versions'),
+      dataStorage.getItem('file-versions').then(vers => vers ?? {}),
       dataStorage.getItem('last-storage-upgrade').then(ver => Number(ver))
     ]);
     cacheVersion = Math.max(...Object.values(fileVersions).map(v => Number(v)));
+    if (cacheVersion < 0) cacheVersion = pokemonReleaseDate;
 
     // On vérifie si les fichiers sont installés
     areFilesInstalled = await caches.has(`remidex-sw-${cacheVersion}`);

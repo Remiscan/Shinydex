@@ -133,7 +133,7 @@ export class shinyCard extends HTMLElement {
       const element = this.shadow.querySelector('[data-type="catchTime"]')!;
       if (time > 0) {
         const date = new Intl.DateTimeFormat('fr-FR', {day: 'numeric', month: 'short', year: 'numeric'})
-                            .format(new Date(time));
+                             .format(new Date(time));
         element.innerHTML = date;
       } else {
         element.innerHTML = '';
