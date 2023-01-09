@@ -2,7 +2,7 @@ import { Hunt } from './Hunt.js';
 import { Params, loadAllImages, timestamp2date, wait } from './Params.js';
 import { Pokemon } from './Pokemon.js';
 import { Settings, setTheme } from './Settings.js';
-import { PopulatableSection, initPokedex, populator } from './appContent.js';
+import { PopulatableSection, cleanUpRecycleBin, initPokedex, populator } from './appContent.js';
 import { filterSection, initFilters } from './filtres.js';
 import { dataStorage, huntStorage, pokemonData, shinyStorage } from './localForage.js';
 import { Notif } from './notification.js';
@@ -170,14 +170,7 @@ export async function appStart() {
   logPerf('Étape 4');
 
   // Si des shiny marqués à 'destroy' sont stockés depuis plus d'un mois, on les supprime (sans await)
-  const month = 1000 * 60 * 60 * 24 * 30;
-  huntStorage.keys()
-  .then(keys => Promise.all(keys.map(key => huntStorage.getItem(key))))
-  .then(shinyMons => Promise.all(
-    shinyMons.map(shiny => new Hunt(shiny))
-             .filter(shiny => shiny.destroy === true && shiny.lastUpdate + month < Date.now())
-             .map(shiny => huntStorage.removeItem(shiny.huntid))
-  ));
+  cleanUpRecycleBin();
 
   // On met à jour la structure de la BDD locale si nécessaire
   try {

@@ -126,6 +126,7 @@ export class huntCard extends HTMLElement {
     const hunt = await this.getHunt();
     hunt.lastUpdate = Date.now();
     hunt.deleted = true;
+    hunt.destroy = true;
     await huntStorage.setItem(this.huntid, hunt);
 
     if (populate) {
@@ -150,14 +151,13 @@ export class huntCard extends HTMLElement {
       return;
     }
 
-    // On déplace la chasse dans la corbeille
-    const hunt = await this.getHunt();
-    hunt.lastUpdate = Date.now();
-    hunt.deleted = true;
-    await huntStorage.setItem(this.huntid, hunt);
+    // On supprime la chasse
+    await huntStorage.removeItem(this.huntid);
 
-    // On supprime le shiny associé
-    await shinyStorage.removeItem(this.huntid);
+    // On déplace le shiny associé dans la corbeille
+    storedShiny.lastUpdate = Date.now();
+    storedShiny.deleted = true;
+    await shinyStorage.setItem(this.huntid, storedShiny);
 
     window.dispatchEvent(new CustomEvent('dataupdate', {
       detail: {

@@ -94,14 +94,18 @@ interface backendShiny {
   originMark: string,
 
   notes: string,
+
+  deleted: boolean,
 };
 
 /** Structure d'un Pokémon shiny tel que stocké dans la BDD locale. */
-export interface frontendShiny extends Omit<backendShiny, 'id' | 'creationTime' | 'lastUpdate' | 'count' | 'catchTime'> {
+export interface frontendShiny extends Omit<backendShiny, 'id' | 'creationTime' | 'lastUpdate' | 'count' | 'catchTime' | 'deleted'> {
   creationTime: number,
   lastUpdate: number,
   count: Count,
   catchTime: number,
+  deleted?: boolean,
+  destroy?: boolean
 }
 
 
@@ -127,6 +131,9 @@ export class Shiny implements frontendShiny {
   
   notes: string = '';
 
+  deleted?: boolean = false;
+  destroy?: boolean = false;
+
   constructor(shiny: object = {}) {
     if (typeof shiny !== 'object') throw new Error('Invalid argument');
 
@@ -150,6 +157,9 @@ export class Shiny implements frontendShiny {
     if ('originMark' in shiny) this.originMark = String(shiny.originMark);
 
     if ('notes' in shiny) this.notes = String(shiny.notes);
+
+    if ('deleted' in shiny) this.deleted = Boolean(shiny.deleted);
+    if ('destroy' in shiny) this.destroy = Boolean(shiny.destroy);
   }
 
   /**

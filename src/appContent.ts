@@ -188,3 +188,22 @@ export async function initPokedex() {
   pokedexInitialized = true;
   return;
 }
+
+
+export async function cleanUpRecycleBin() {
+  const month = 1000 * 60 * 60 * 24 * 30;
+  try {
+    await shinyStorage.ready();
+    const keys = await shinyStorage.keys();
+    await Promise.all(
+      keys.map(async key => {
+        const shiny = new Shiny(await shinyStorage.getItem(key));
+        if (shiny.destroy && shiny.lastUpdate + month < Date.now()) {
+          return await shinyStorage.removeItem(shiny.huntid);
+        }
+      })
+    );
+  } catch (error) {
+    console.error(`Erreur pendant le nettoyage de la corbeille.`, error);
+  }
+}
