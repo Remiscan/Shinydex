@@ -1085,6 +1085,7 @@ form[name="app-settings"] {
   grid-row: 2 / 3;
   opacity: .7;
   text-align: left;
+  max-width: 70%;
 }
 
 .param {
