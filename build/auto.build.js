@@ -1,4 +1,4 @@
-import { compile } from './mod.js';
+//import { compile } from './mod.js';
 
 
 const watcher = Deno.watchFs('./src');
@@ -24,10 +24,11 @@ for await (const event of watcher) {
       // If a .ts file was created, modified or deleted, compile all modules
       if (path.endsWith('.ts')) {
         try {
-          await compile();
-          console.log(`[:)] "${path}" compiled into "${compiledPath}"`);
+          //await compile();
+          //console.log(`[:)] "${path}" compiled into "${compiledPath}"`);
+          console.log('--- Compilation needed ---');
         } catch (error) {
-          console.error(`[:(] Error while compiling "${path}" into "${compiledPath}"`, error);
+          //console.error(`[:(] Error while compiling "${path}" into "${compiledPath}"`, error);
         }
       }
 

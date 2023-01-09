@@ -16,12 +16,9 @@
       "args": [
         "--allow-run", "--allow-read", "--allow-write=./modules", "build/auto.build.js"
       ],
-      "label": "[auto] compile to JS on file change",
+      "label": "[auto] TS helper (sync ./src and ./modules)",
       "runOptions": {
         "runOn": "folderOpen"
-      },
-      "presentation": {
-        "reveal": "silent"
       }
     }, {
       "type": "shell",
