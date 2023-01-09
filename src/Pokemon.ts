@@ -221,13 +221,15 @@ export class Pokemon {
     const cachedNames = Pokemon.#names[_lang];
     if (cachedNames.length > 0) return cachedNames;
 
-    const keys = (await pokemonData.keys()).sort((a, b) => Number(a) - Number(b));
-    const names: string[] = [];
-    for (const key of keys) {
-      const pkmn = await pokemonData.getItem(key);
-      const name = pkmn.name[_lang];
-      names.push(name);
-    }
+    const names: string[] = await Promise.all(
+      (await pokemonData.keys())
+      .sort((a, b) => Number(a) - Number(b))
+      .map(async (key, dexid) => {
+        const pkmn = await pokemonData.getItem(key);
+        return pkmn.name[_lang];
+      })
+    );
+
     Pokemon.#names[_lang] = names;
     return names;
   }
@@ -248,20 +250,21 @@ export class Pokemon {
 
   /** Récupère les données de tous les Pokémon et leurs formes et les stocke dans indexedDB. */
   static async initData() {
-    await dataStorage.ready();
-    const fileVersion = (await dataStorage.getItem('file-versions'))['./data/pokemon.json'];
-    const dataVersion = await dataStorage.getItem('pokemon-data-version');
-  
-    if (fileVersion === dataVersion) return;
+    
   
     try {
+      await Promise.all([dataStorage.ready(), pokemonData.ready()]);
+      const [fileVersion, dataVersion] = await Promise.all([
+        dataStorage.getItem('file-versions').then(versions => versions['./data/pokemon.json']),
+        dataStorage.getItem('pokemon-data-version'),
+      ]);
+    
+      if (fileVersion === dataVersion) return;
+
       // @ts-ignore
-      const pokemonDataModule = await import('../data/pokemon.json', { assert: { type: 'json' }});
-      // @ts-expect-error
-      const data = pokemonDataModule.default;
+      const data = await import('../data/pokemon.json', { assert: { type: 'json' }}).then(module => module.default);
   
       console.log(`[:)] Préparation des données...`);
-      await pokemonData.ready();
       await Promise.all(
         data.map((pkmn: backendPokemon) => pokemonData.setItem(String(pkmn.dexid), pkmn))
       );

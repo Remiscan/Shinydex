@@ -1,4 +1,3 @@
-import { Hunt } from './Hunt.js';
 import { Params, loadAllImages, timestamp2date, wait } from './Params.js';
 import { Pokemon } from './Pokemon.js';
 import { Settings, setTheme } from './Settings.js';
@@ -22,6 +21,7 @@ declare global {
 // On enregistre le service worker
 // et on le met à jour si la version du site a changé
 async function initServiceWorker() {
+  if (!('serviceWorker' in navigator)) return;
   try {
     const registration = await navigator.serviceWorker.register('/shinydex/service-worker.js.php');
     console.log('Le service worker a été enregistré', registration);
@@ -93,7 +93,6 @@ async function initServiceWorker() {
 /////////////////////////////////////////////////////////
 // Démarre l'application (update? => populate => display)
 export async function appStart() {
-  if (!('serviceWorker' in navigator)) throw 'Application non supportée.';
   let perfLog = true;
   const logPerf = (message: string) => {
     if (perfLog) {
@@ -110,71 +109,37 @@ export async function appStart() {
 
   // On vérifie si les données sont installées
   await Promise.all([dataStorage.ready(), shinyStorage.ready(), pokemonData.ready(), huntStorage.ready()]);
-  let installedFiles = await dataStorage.getItem('file-versions');
-  let cacheVersion = Math.max(...Object.values(installedFiles).map(v => Number(v)));
+  let fileVersions = {}, cacheVersion = 0, areFilesInstalled = false, isServiceWorkerReady = false;
+  let lastStorageUpgrade = 0;
+  try {
+    [fileVersions, lastStorageUpgrade] = await Promise.all([
+      dataStorage.getItem('file-versions'),
+      dataStorage.getItem('last-storage-upgrade').then(ver => Number(ver))
+    ]);
+    cacheVersion = Math.max(...Object.values(fileVersions).map(v => Number(v)));
 
-  // On vérifie si les fichiers sont installés
-  const filesInstalled = await caches.has(`remidex-sw-${cacheVersion}`);
+    // On vérifie si les fichiers sont installés
+    areFilesInstalled = await caches.has(`remidex-sw-${cacheVersion}`);
 
-  // On vérifie si le service worker est prêt
-  const serviceWorkerReady = navigator.serviceWorker.controller != null;
-
-  // ---
-
-  // ÉTAPE 2 : si la réponse est oui, on passe à la suite ;
-  //           si la réponse est non, on installe l'application
-
-  logPerf('Étape 2');
-
-  if (filesInstalled && serviceWorkerReady) {
-    console.log('[:)] L\'application est déjà installée localement.');
-    initServiceWorker();
-  } else {
-    console.log('[:(] L\'application n\'est pas installée localement.');
-    console.log('[:|] Préparation de l\'installation...');
-    const loadMessage = document.getElementById('load-screen-message');
-    if (loadMessage !== null) {
-      loadMessage.innerText = 'Mise à jour...';
-      loadMessage.style.display = 'block';
-    }
-    await initServiceWorker();
-
-    installedFiles = await dataStorage.getItem('file-versions');
-    cacheVersion = Math.max(...Object.values(installedFiles).map(v => Number(v)));
+    // On vérifie si le service worker est prêt
+    isServiceWorkerReady = 'serviceWorker' in navigator && navigator.serviceWorker.controller != null;
+  } catch (error) {
+    const message = `Erreur pendant la vérification des données.`;
+    console.error(error);
+    new Notif(message).prompt();
   }
 
-  document.getElementById('version-fichiers')!.innerHTML = timestamp2date(cacheVersion * 1000);
-  console.log('[:)] Chargement de l\'application...');
-
   // ---
 
-  // ÉTAPE 3 : si la sauvegarde en ligne est activée, on met à jour les données locales
+  // ÉTAPE 2 : on nettoie les données locales
 
-  logPerf('Étape 3');
-
-  /*const onlineBackup = await dataStorage.getItem('online-backup');
-  if (onlineBackup) {
-    try {
-      await immediateSync();
-    } catch (error) {
-      const message = `Erreur de synchronisation des données.`;
-      console.error(message, error);
-      new Notif(message).prompt();
-    }
-  }*/
-
-  // ---
-
-  // ÉTAPE 4 : on nettoie les données locales
-
-  logPerf('Étape 4');
+  logPerf('Étape 2');
 
   // Si des shiny marqués à 'destroy' sont stockés depuis plus d'un mois, on les supprime (sans await)
   cleanUpRecycleBin();
 
   // On met à jour la structure de la BDD locale si nécessaire
   try {
-    const lastStorageUpgrade = Number(await dataStorage.getItem('last-storage-upgrade'));
     if (lastStorageUpgrade < cacheVersion * 1000) await upgradeStorage();
   } catch (error) {
     const message = `Erreur pendant la mise à jour du format des données.`;
@@ -184,46 +149,46 @@ export async function appStart() {
 
   // ---
 
-  // ÉTAPE 5 : on peuple l'application à partir des données locales
+  // ÉTAPE 3 : on peuple l'application à partir des données locales
 
-  logPerf('Étape 5');
+  logPerf('Étape 3');
 
   try {
     await Pokemon.initData();
     await Pokemon.names(); // met en cache les noms des Pokémon
     logPerf('initPokemonData');
 
-    await initPokedex();
-    logPerf('initPokedex');
-
-    await initFilters();
-    logPerf('initFilters');
-
     const sectionsToPopulate: PopulatableSection[] = ['mes-chromatiques', 'chasses-en-cours', 'corbeille'];
-    await Promise.all(sectionsToPopulate.map(async section => {
-      await populator[section]();
-      filterSection(section);
-      document.querySelector(`#${section}`)?.classList.remove('loading');
-      if (section === 'mes-chromatiques') {
-        document.querySelector(`#pokedex`)?.classList.remove('loading');
-      }
-    }));
+    await Promise.all([
+      initPokedex(),
+      initFilters(),
+      Settings.restore(),
+      ...sectionsToPopulate.map(async section => {
+        await populator[section]();
+        filterSection(section);
+        document.querySelector(`#${section}`)?.classList.remove('loading');
+        if (section === 'mes-chromatiques') {
+          document.querySelector(`#pokedex`)?.classList.remove('loading');
+        }
+      })
+    ]);
+
+    logPerf('initEverything');
 
     document.querySelector('search-bar')?.setAttribute('section', 'mes-chromatiques');
-
-    // await initAmis();
   } catch (error) {
-    console.error(error);
+    const message = `Erreur pendant la préparation du contenu de l'application.`;
+    console.error(message, error);
+    new Notif(message).prompt();
   }
 
   // ---
 
-  // ÉTAPE 6 : on affiche l'application
+  // ÉTAPE 4 : on affiche l'application
 
-  logPerf('Étape 6');
+  logPerf('Étape 4');
 
   // Préparation du thème
-  await Settings.restore();
   try {
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => setTheme(undefined));
     window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', event => setTheme(undefined));
@@ -235,6 +200,7 @@ export async function appStart() {
   // On pré-charge les icônes
   try {
     await loadAllImages([`./images/iconsheet.webp`, `./images/pokemonsheet.webp`]);
+    logPerf('loadAllImages');
   } catch (error) {
     console.error(`Erreur de chargement d'image`, error);
   }
@@ -258,28 +224,55 @@ export async function appStart() {
 
   // ---
 
-  // ÉTAPE 7 : on vérifie si l'application peut être installée
+  // ÉTAPE 5 : si la réponse est oui, on passe à la suite ;
+  //           si la réponse est non, on installe l'application
 
-  logPerf('Étape 7');
+  logPerf('Étape 5');
+
+  if (areFilesInstalled && isServiceWorkerReady) {
+    console.log('[:)] L\'application est déjà installée localement.');
+    initServiceWorker();
+  } else {
+    console.log('[:(] L\'application n\'est pas installée localement.');
+    console.log('[:|] Préparation de l\'installation...');
+    try {
+      await initServiceWorker();
+    } catch (error) {
+      console.log('Error while loading the service worker', error);
+    }
+  }
+
+  document.getElementById('version-fichiers')!.innerHTML = timestamp2date(cacheVersion * 1000);
+  console.log('[:)] Chargement de l\'application...');
+
+  // ---
+
+  // ÉTAPE 6 : gestion de la connexion de l'utilisateur et de la synchronisation de ses données
+
+  logPerf('Étape 6');
+
+  // Si la sauvegarde en ligne est activée, on met à jour les données locales
+  /*const onlineBackup = await dataStorage.getItem('online-backup');
+  if (onlineBackup) {
+    try {
+      await immediateSync();
+    } catch (error) {
+      const message = `Erreur de synchronisation des données.`;
+      console.error(message, error);
+      new Notif(message).prompt();
+    }
+  }*/
+
+  // ---
+
+  // ÉTAPE 7 : on vérifie si l'application peut être installée
 
   checkInstall();
 
+  // ---
+
+  // TERMINÉ :)
   return;
-
-  // En cas d'erreur critique, on propose de réinstaller
-  /*catch(error) {
-    console.error(error);
-
-    async function forceUpdateNow() {
-      await Promise.all([ dataStorage.clear(), shinyStorage.clear(), pokemonData.clear() ]);
-      await caches.keys()
-            .then(keys => keys.filter(k => k.startsWith('remidex-sw')))
-            .then(keys => Promise.all(keys.map(key => caches.delete(key))))
-      manualUpdate();
-    };
-    document.getElementById('load-screen')!.remove();
-    return new Notif('Échec critique du chargement...', 'Réinitialiser', 'refresh', Notif.maxDelay, forceUpdateNow, true).prompt();
-  }*/
 }
 
 
