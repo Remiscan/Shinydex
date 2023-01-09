@@ -29,8 +29,13 @@ export async function upgradeStorage(): Promise<void> {
   await dataStorage.removeItem('pokemon-names');
   await dataStorage.removeItem('pokemon-names-fr');
   await dataStorage.removeItem('pokemon-names-en');
+  await dataStorage.removeItem('uploaded-hunts');
   await dataStorage.removeItem('check-updates');
+  await dataStorage.removeItem('online-backup');
+  await dataStorage.removeItem('theme');
   await dataStorage.removeItem('filtres');
+  await dataStorage.removeItem('ordre');
+  await dataStorage.removeItem('ordre-reverse');
 
   await dataStorage.setItem('last-storage-upgrade', Date.now());
   return;

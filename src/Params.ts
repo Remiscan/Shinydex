@@ -1,4 +1,3 @@
-import { dataStorage } from './localForage.js';
 import { Notif } from './notification.js';
 
 
@@ -91,33 +90,6 @@ export function pad(s: string, long: number): string {
   while (chaine.length < long)
     chaine = `0${chaine}`;
   return chaine;
-}
-
-
-//////////////////////
-// Définition du thème
-export async function setTheme(askedTheme?: string) {
-  let html = document.documentElement;
-  html.dataset.theme = askedTheme || '';
-
-  // Thème par défaut
-  const defaultTheme = 'dark';
-
-  // Thème préféré selon l'OS
-  let osTheme;
-  if (window.matchMedia('(prefers-color-scheme: dark)').matches) osTheme = 'dark';
-  else if (window.matchMedia('(prefers-color-scheme: light)').matches) osTheme = 'light';
-
-  // Thème appliqué (askedTheme > osTheme > defaultTheme)
-  const theme = ['light', 'dark'].includes(askedTheme || '') ? askedTheme : (osTheme || defaultTheme);
-  
-  let themeColor = (theme == 'dark') ? 'rgb(34, 34, 34)' : 'rgb(224, 224, 224)';
-  document.querySelector("meta[name=theme-color]")!.setAttribute('content', themeColor);
-
-  window.dispatchEvent(new CustomEvent('themechange', { detail: { theme } }));
-
-  await dataStorage.ready();
-  return await dataStorage.setItem('theme', askedTheme);
 }
 
 

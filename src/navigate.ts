@@ -1,4 +1,5 @@
 import { Params, loadAllImages, wait } from './Params.js';
+import { Settings } from './Settings.js';
 import { SearchBar } from './components/search-bar/searchBar.js';
 import { disableLazyLoad, enableLazyLoad } from './lazyLoading.js';
 import { Notif } from './notification.js';
@@ -202,7 +203,9 @@ const backOnEscape = (event: KeyboardEvent) => {
  */
 export async function navigate(sectionCible: string, event: Event, data?: any) {
   if (sectionActuelle === sectionCible) return Promise.resolve();
-  if (sectionCible === 'sprite-viewer' && !(navigator.onLine)) return new Notif('Pas de connexion internet.').prompt();
+  if (sectionCible === 'sprite-viewer' && !(navigator.onLine)) {
+    if (!(Settings.get('cache-all-sprites'))) return new Notif('Pas de connexion internet.').prompt();
+  }
 
   const ancienneSection = sections.find(section => section.nom === sectionActuelle)!;
   const nouvelleSection = sections.find(section => section.nom === sectionCible);
@@ -264,6 +267,7 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
       const viewer = nouvelleSection.element.querySelector('sprite-viewer')!;
       viewer.setAttribute('dexid', data.dexid || '');
       viewer.setAttribute('shiny', 'true');
+      viewer.setAttribute('size', navigator.onLine ? '512' : '112')
       break;
     case 'obfuscator': {
       if (data.search) {

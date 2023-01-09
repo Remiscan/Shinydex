@@ -1,6 +1,7 @@
 import { Hunt } from './Hunt.js';
-import { Params, loadAllImages, setTheme, timestamp2date, wait } from './Params.js';
+import { Params, loadAllImages, timestamp2date, wait } from './Params.js';
 import { Pokemon } from './Pokemon.js';
+import { Settings, setTheme } from './Settings.js';
 import { PopulatableSection, initPokedex, populator } from './appContent.js';
 import { filterSection, initFilters } from './filtres.js';
 import { dataStorage, huntStorage, pokemonData, shinyStorage } from './localForage.js';
@@ -229,8 +230,7 @@ export async function appStart() {
   logPerf('Étape 6');
 
   // Préparation du thème
-  const theme = await dataStorage.getItem('theme');
-  await setTheme(theme);
+  await Settings.restore();
   try {
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => setTheme(undefined));
     window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', event => setTheme(undefined));

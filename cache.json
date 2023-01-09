@@ -59,6 +59,7 @@
         "./modules/notification.js",
         "./modules/Params.js",
         "./modules/Pokemon.js",
+        "./modules/Settings.js",
         "./modules/Shiny.js",
         "./modules/syncBackup.js",
         "./modules/upgradeStorage.js",

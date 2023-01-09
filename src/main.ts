@@ -1,8 +1,8 @@
 import '../../_common/components/input-switch/input-switch.js';
 import { Hunt } from './Hunt.js';
-import { setTheme } from './Params.js';
+import { Settings } from './Settings.js';
 import { PopulatableSection, populator } from './appContent.js';
-import { appStart, checkUpdate } from './appLifeCycle.js';
+import { appStart } from './appLifeCycle.js';
 import './components/corbeille-card/corbeilleCard.js';
 import './components/hunt-card/huntCard.js';
 import './components/load-spinner/loadSpinner.js';
@@ -15,10 +15,9 @@ import './components/sprite-viewer/spriteViewer.js';
 import './components/sync-line/syncLine.js';
 import './components/sync-progress/syncProgress.js';
 import { export2json, json2import } from './exportToJSON.js';
-import { dataStorage, huntStorage } from './localForage.js';
+import { huntStorage } from './localForage.js';
 import { navLinkBubble, navigate, sectionActuelle } from './navigate.js';
 import { Notif } from './notification.js';
-import { backgroundSync } from './syncBackup.js';
 
 
 
@@ -92,20 +91,17 @@ document.querySelector('.fab')!.addEventListener('click', async () => {
 /////////////
 // PARAMÈTRES
 
-// Applique le paramètre sauvegardé au switch du thème
-dataStorage.getItem('theme').then((theme?: string) => {
-  const storedTheme = theme || 'system';
-  const input = document.getElementById(`theme-${storedTheme}`);
-  if (!(input instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
-  input.checked = true;
+// Détecte les changements de paramètres
+const settingsForm = document.querySelector('form[name="app-settings"]');
+if (!(settingsForm instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
+settingsForm.addEventListener('change', event => {
+  const formData = new FormData(settingsForm);
+  const settings = new Settings(formData);
+  settings.apply();
+  settings.save();
 });
 
-// Détecte le changement de paramètre de thème
-for (const input of Array.from(document.querySelectorAll('input[name=theme]'))) {
-  if (!(input instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
-  input.addEventListener('change', () => setTheme(input.value));
-}
-
+/*
 // Applique l'info sauvegardée au badge indiquant le succès / échec de la dernière synchronisation des BDD
 dataStorage.getItem('last-sync').then((value?: string) => {
   const params = document.querySelector('#parametres');
@@ -128,6 +124,7 @@ backgroundSyncTriggers.forEach(element => {
     checkUpdate(true);
   });
 }
+*/
 
 // Détecte le clic sur le bouton d'export des données
 document.querySelector('.bouton-export')!.addEventListener('click', () => {

@@ -11,6 +11,7 @@ class spriteViewer extends HTMLElement {
   ready: boolean = true;
   toggle: () => void = () => {};
   mode: 'shiny' | 'regular' = 'shiny';
+  size: number = 512;
 
   
   constructor() {
@@ -70,7 +71,7 @@ class spriteViewer extends HTMLElement {
       const htmlS = `
         <div class="dex-sprite">
           <picture ${(typeof forme.noShiny != 'undefined' && forme.noShiny) ? 'class="no-shiny"' : ''}>
-            <pokemon-sprite dexid="${pokemon.dexid}" shiny="true" forme="${forme.dbid}" size="512" lazy="false"></pokemon-sprite>
+            <pokemon-sprite dexid="${pokemon.dexid}" shiny="true" forme="${forme.dbid}" size="${this.size}" lazy="false"></pokemon-sprite>
             ${(typeof forme.noShiny != 'undefined' && forme.noShiny) ? '<span>N\'existe pas<br>en chromatique</span>' : ''}
           </picture>
           <span ${afficherNomForme ? 'class="on"' : ''}>
@@ -83,7 +84,7 @@ class spriteViewer extends HTMLElement {
       const htmlR = `
       <div class="dex-sprite">
         <picture>
-          <pokemon-sprite dexid="${pokemon.dexid}" shiny="false" forme="${forme.dbid}" size="512" lazy="false"></pokemon-sprite>
+          <pokemon-sprite dexid="${pokemon.dexid}" shiny="false" forme="${forme.dbid}" size="${this.size}" lazy="false"></pokemon-sprite>
         </picture>
         <span ${afficherNomForme ? 'class="on"' : ''}>
           ${afficherNomForme ? nomForme(forme.nom) : '&nbsp;'}
@@ -121,6 +122,9 @@ class spriteViewer extends HTMLElement {
         if (input == null || !('checked' in input)) throw new TypeError(`Expecting ShinySwitch`);
         input.checked = value === 'true';
       } break;
+      case 'size': {
+        this.size = Number(value) || 512;
+      } break;
     }
   }
   
@@ -152,7 +156,7 @@ class spriteViewer extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ['dexid', 'shiny'];
+    return ['dexid', 'shiny', 'size'];
   }
 
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {

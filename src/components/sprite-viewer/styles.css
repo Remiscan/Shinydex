@@ -190,3 +190,11 @@ picture.no-shiny>span {
     --sprite-size: calc(min(400px, 80vw));
   }
 }
+
+sprite-viewer[size="112"] :is(
+  .dex-sprite,
+  .single-sprite .dex-sprite,
+  .two-sprites .dex-sprite
+) {
+  --sprite-size: 112px;
+}

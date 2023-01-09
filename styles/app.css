@@ -1077,7 +1077,7 @@ form[name="app-settings"] {
 
 .param-nom,
 .param-nom>label {
-  color: var(--text-color-soft);
+  color: var(--text-color);
 }
 
 .param-description {

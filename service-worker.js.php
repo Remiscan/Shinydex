@@ -5,7 +5,7 @@ $fileVersions = [];
 $indexVersion = 0;
 foreach ($cacheFiles as $file) {
   if ($file === './' || str_starts_with($file, './pages')) {
-    $file = './index.php';
+    $file = './';
     $indexVersion = max($indexVersion, version([$file]));
     $fileVersions[$file] = $indexVersion;
   } else {
@@ -35,6 +35,7 @@ const dataStorage = localforage.createInstance({
 const cachePrefix = 'remidex-sw';
 const currentCacheName = `${cachePrefix}-<?=$maxVersion?>`;
 const liveFileVersions = JSON.parse(`<?=json_encode($fileVersions, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES)?>`);
+const spritesCache = 'remidex-sw-sprites-v1';
 
 
 
@@ -66,21 +67,52 @@ self.addEventListener('activate', function(event) {
 
 // FETCH
 self.addEventListener('fetch', function(event) {
-  event.respondWith(
-    caches.open(currentCacheName)
-    .then(cache => cache.match(event.request))
-    .then(matching => {
-      return matching || fetch(event.request);
-    })
-    .catch(error => console.error(error))
-  )
+  // Is it a sprite? Store small sprites in the sprites cache,
+  // and respond to big sprites with the small sprites from cache if needed.
+  const isSprite = event.request.url.match('images/pokemon-sprites/webp');
+  const isSmallSprite = event.request.url.match('images/pokemon-sprites/webp/112');
+
+  if (isSprite) {
+    if (isSmallSprite) {
+      // If it's a small sprite, respond from cache, and if not cached, from network and then cache it.
+      event.respondWith(
+        caches.open(spritesCache)
+        .then(cache => cache.match(event.request)                       // 1. Look if the small sprite is in cache
+          .then(matching => matching || fetch(event.request))           // 2. If not, fetch it online
+          .then(response => cache.put(event.request, response.clone())  // 3. Store the fetched small sprite in cache
+            .then(() => response)                                       // 4. Return the fetched small sprite
+          )
+        )
+        .catch(error => console.error(error, event.request.url))
+      )
+    } else {
+      // If it's a big sprite, respond from network, and if not available, from small sprites cache.
+      const smallSpriteUrl = event.request.url.replace(new RegExp('webp/[0-9]+?/'), 'webp/112/');
+      event.respondWith(
+        fetch(event.request)                            // 1. Fetch the big sprite online
+        .catch(error => caches.open(spritesCache)       // 2. If not found, look in the cache for the corresponding
+          .then(cache => cache.match(smallSpriteUrl))   //    small sprite and return it
+        )
+        .catch(error => console.log(error, event.request.url))
+      )
+    }
+  }
+  
+  // If it's not a sprite, respond with cache first, then network if uncached.
+  else {
+    event.respondWith(
+      caches.open(currentCacheName)
+      .then(cache => cache.match(event.request))                // 1. Look if the file is in cache
+      .then(matching => matching || fetch(event.request))       // 2. If not, fetch it online
+      .catch(error => console.error(error, event.request.url))
+    )
+  }
 });
 
 
 // MESSAGE
 self.addEventListener('message', async function(event) {
   console.log('[sw] Message reçu :', event.data);
-  const source = event.source;
   const action = event.data?.action;
 
   switch (action) {
@@ -94,6 +126,7 @@ self.addEventListener('message', async function(event) {
       );
     } break;
 
+
     case 'force-update': {
       const source = event.ports[0];
 
@@ -103,6 +136,24 @@ self.addEventListener('message', async function(event) {
       } catch (error) {
         source.postMessage({ ready: false, error });
       }
+    } break;
+
+
+    case 'cache-all-sprites': {
+      event.waitUntil(
+        cacheAllSprites()
+        .catch(error => console.error(error))
+      );
+    } break;
+
+
+    case 'delete-all-sprites': {
+      event.waitUntil(
+        caches.open(spritesCache)
+        .then(cache => cache.keys())
+        .then(keys => Promise.all(keys.map(key => cache.delete(key))))
+        .catch(error => consome.error(error))
+      )
     }
   }
 });
@@ -170,6 +221,13 @@ async function installFiles(event = null) {
     console.log(`[${action}] File installation complete!`);
     deleteOldCaches(currentCacheName, action);
     dataStorage.setItem('file-versions', liveFileVersions);
+
+    // Also initialize the sprites cache
+    await caches.open(spritesCache);
+    const shouldCacheAllSprites = await dataStorage.getItem('cache-all-sprites');
+    if (shouldCacheAllSprites === true) {
+      cacheAllSprites();
+    }
   }
 
   // If there was an error while installing the new files, delete them
@@ -181,6 +239,31 @@ async function installFiles(event = null) {
   }
 
   return;
+}
+
+
+/** Stores all sprites in the sprites cache. */
+let cachingAllSprites = false;
+async function cacheAllSprites() {
+  if (cachingAllSprites) return;
+  try {
+    cachingAllSprites = true;
+    const response = await fetch(`./backend/getAllSprites.php?date=${Date.now()}`);
+    if (!(response.status === 200)) {
+      throw new Error('Could not fetch list of sprites');
+    }
+    const allSprites = (await response.json()).map(path => `${location.origin}/shinydex/images/pokemon-sprites/webp/112/${path}`);
+    const cache = await caches.open(spritesCache);
+
+    const spritesAlreadyCached = (await cache.keys()).map(key => key.url);
+    const spritesToCache = allSprites.filter(sprite => !(spritesAlreadyCached.includes(sprite)));
+    const result = await Promise.all(spritesToCache.map(sprite => cache.add(sprite).catch(error => console.error(error, sprite))));
+    return result;
+  } catch (error) {
+    console.error(error);
+  } finally {
+    cachingAllSprites = false;
+  }
 }
 
 
@@ -197,7 +280,7 @@ async function deleteOldCaches(newCacheName, action) {
     console.log(`[${action}] Deleting old cached files`);
     await Promise.all(
       allCaches.map(cache => {
-        if (cache.startsWith(cachePrefix) && newCacheName != cache) return caches.delete(cache);
+        if (cache.startsWith(cachePrefix) && newCacheName !== cache && spritesCache !== cache) return caches.delete(cache);
         else return Promise.resolve();
       })
     );
