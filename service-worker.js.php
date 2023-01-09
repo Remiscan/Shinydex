@@ -35,7 +35,7 @@ const dataStorage = localforage.createInstance({
 const cachePrefix = 'remidex-sw';
 const currentCacheName = `${cachePrefix}-<?=$maxVersion?>`;
 const liveFileVersions = JSON.parse(`<?=json_encode($fileVersions, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES)?>`);
-const spritesCache = 'remidex-sw-sprites-v1';
+const spritesCacheName = 'remidex-sw-sprites-v1';
 
 
 
@@ -76,7 +76,7 @@ self.addEventListener('fetch', function(event) {
     if (isSmallSprite) {
       // If it's a small sprite, respond from cache, and if not cached, from network and then cache it.
       event.respondWith(
-        caches.open(spritesCache)
+        caches.open(spritesCacheName)
         .then(cache => cache.match(event.request)                       // 1. Look if the small sprite is in cache
           .then(matching => matching || fetch(event.request))           // 2. If not, fetch it online
           .then(response => cache.put(event.request, response.clone())  // 3. Store the fetched small sprite in cache
@@ -90,7 +90,7 @@ self.addEventListener('fetch', function(event) {
       const smallSpriteUrl = event.request.url.replace(new RegExp('webp/[0-9]+?/'), 'webp/112/');
       event.respondWith(
         fetch(event.request)                            // 1. Fetch the big sprite online
-        .catch(error => caches.open(spritesCache)       // 2. If not found, look in the cache for the corresponding
+        .catch(error => caches.open(spritesCacheName)       // 2. If not found, look in the cache for the corresponding
           .then(cache => cache.match(smallSpriteUrl))   //    small sprite and return it
         )
         .catch(error => console.log(error, event.request.url))
@@ -149,7 +149,7 @@ self.addEventListener('message', async function(event) {
 
     case 'delete-all-sprites': {
       event.waitUntil(
-        caches.open(spritesCache)
+        caches.open(spritesCacheName)
         .then(cache => cache.keys())
         .then(keys => Promise.all(keys.map(key => cache.delete(key))))
         .catch(error => consome.error(error))
@@ -223,7 +223,7 @@ async function installFiles(event = null) {
     dataStorage.setItem('file-versions', liveFileVersions);
 
     // Also initialize the sprites cache
-    await caches.open(spritesCache);
+    await caches.open(spritesCacheName);
     const shouldCacheAllSprites = await dataStorage.getItem('cache-all-sprites');
     if (shouldCacheAllSprites === true) {
       cacheAllSprites();
@@ -253,7 +253,7 @@ async function cacheAllSprites() {
       throw new Error('Could not fetch list of sprites');
     }
     const allSprites = (await response.json()).map(path => `${location.origin}/shinydex/images/pokemon-sprites/webp/112/${path}`);
-    const cache = await caches.open(spritesCache);
+    const cache = await caches.open(spritesCacheName);
 
     const spritesAlreadyCached = (await cache.keys()).map(key => key.url);
     const spritesToCache = allSprites.filter(sprite => !(spritesAlreadyCached.includes(sprite)));
@@ -280,7 +280,7 @@ async function deleteOldCaches(newCacheName, action) {
     console.log(`[${action}] Deleting old cached files`);
     await Promise.all(
       allCaches.map(cache => {
-        if (cache.startsWith(cachePrefix) && newCacheName !== cache && spritesCache !== cache) return caches.delete(cache);
+        if (cache.startsWith(cachePrefix) && newCacheName !== cache && spritesCacheName !== cache) return caches.delete(cache);
         else return Promise.resolve();
       })
     );
