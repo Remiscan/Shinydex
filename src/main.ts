@@ -2,7 +2,7 @@ import '../../_common/components/input-switch/input-switch.js';
 import { Hunt } from './Hunt.js';
 import { Settings } from './Settings.js';
 import { PopulatableSection, populator } from './appContent.js';
-import { appStart } from './appLifeCycle.js';
+import { appStart, checkUpdate } from './appLifeCycle.js';
 import './components/corbeille-card/corbeilleCard.js';
 import './components/hunt-card/huntCard.js';
 import './components/load-spinner/loadSpinner.js';
@@ -67,10 +67,6 @@ document.querySelector('.fab')!.addEventListener('click', async () => {
     const hunt = await Hunt.getOrMake();
     await huntStorage.setItem(hunt.huntid, hunt);
 
-    /*const container = document.querySelector('#chasses-en-cours .section-contenu')!;
-    const huntCard = document.createElement('hunt-card');
-    huntCard.setAttribute('huntid', hunt.huntid);
-    container.insertBefore(huntCard, container.firstChild);*/
     window.dispatchEvent(new CustomEvent('dataupdate', {
       detail: {
         sections: ['chasses-en-cours'],
@@ -116,15 +112,15 @@ backgroundSyncTriggers.forEach(element => {
   if (!(element instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
   element.onclick = backgroundSync;
 });
+*/
 
-// Détecte le clic (court ou long) sur le bouton de recherche de mise à jour
+// Détecte le clic sur le bouton de recherche de mise à jour
 {
   const majButton = document.querySelector('.bouton-recherche-maj')!;
   majButton.addEventListener('click', (event: Event) => {
     checkUpdate(true);
   });
 }
-*/
 
 // Détecte le clic sur le bouton d'export des données
 document.querySelector('.bouton-export')!.addEventListener('click', () => {
