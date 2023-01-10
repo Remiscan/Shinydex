@@ -154,8 +154,20 @@ export function filterSection(section: FiltrableSection, filters: FilterList = c
 
 
 
+export function filterPokedex(dexids: Set<number>) {
+  const generations = Pokemon.generations;
+  const dexidMax = generations[generations.length - 1].end;
+  for (let i = 1; i <= dexidMax; i++) {
+    const icon = document.querySelector(`#pokedex [data-dexid="${i}"]`);
+    if (dexids.has(i)) icon?.classList.add('got');
+    else               icon?.classList.remove('got');
+  }
+}
+
+
+
 /** Counts the number of cards that are displayed in a section. */
-function countFilteredCards(section: FiltrableSection): number[] {
+function countFilteredCards(section: FiltrableSection): [number, number, Set<number>] {
   const container = document.querySelector(`#${section}`);
   if (!(container instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
 
@@ -163,15 +175,16 @@ function countFilteredCards(section: FiltrableSection): number[] {
   const totalCount = allCards.length;
 
   let displayedCount = 0;
-  const dexids = new Set();
+  const dexids: Set<number> = new Set();
   allCards.forEach(card => {
-    if (getComputedStyle(card).display !== 'none') displayedCount++;
-    const dexid = Number(card.getAttribute('data-dexid'));
-    if (!isNaN(dexid) && dexid > 0) dexids.add(dexid);
+    if (getComputedStyle(card).display !== 'none') {
+      displayedCount++;
+      const dexid = Number(card.getAttribute('data-dexid'));
+      if (!isNaN(dexid) && dexid > 0) dexids.add(dexid);
+    }
   });
-  const dexidsCount = dexids.size;
 
-  return [displayedCount, totalCount, dexidsCount];
+  return [displayedCount, totalCount, dexids];
 }
 
 
@@ -184,7 +197,7 @@ export function updateCounters(section: FiltrableSection): void {
   const container = document.querySelector(`#${section}`);
   if (!(container instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
 
-  const [displayedCount, totalCount, dexidsCount] = countFilteredCards(section);
+  const [displayedCount, totalCount, dexids] = countFilteredCards(section);
   if (totalCount > 0) container.classList.remove('vide');
   else                container.classList.add('vide');
   if (displayedCount > 0) container.classList.remove('vide-filtres');
@@ -195,7 +208,8 @@ export function updateCounters(section: FiltrableSection): void {
 
   if (section === 'mes-chromatiques') {
     const dexidsCounter = document.querySelector('#pokedex .compteur > .caught');
-    if (dexidsCounter) dexidsCounter.innerHTML = String(dexidsCount);
+    if (dexidsCounter) dexidsCounter.innerHTML = String(dexids.size);
+    filterPokedex(dexids);
   }
 }
 
