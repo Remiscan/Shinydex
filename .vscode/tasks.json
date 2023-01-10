@@ -9,7 +9,10 @@
       "group": {
         "kind": "build",
         "isDefault": true
-      }
+      },
+      "dependsOn": [
+        "build cache.json"
+      ]
     }, {
       "type": "deno",
       "command": "run",
@@ -20,6 +23,10 @@
       "runOptions": {
         "runOn": "folderOpen"
       }
+    }, {
+      "type": "shell",
+      "command": "php build/cache.php",
+      "label": "build cache.json"
     }, {
       "type": "shell",
       "command": "sudo php build/webp-pokemon-sprites.php",
