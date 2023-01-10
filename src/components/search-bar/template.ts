@@ -2,24 +2,24 @@ const template = document.createElement('template');
 template.innerHTML = /*html*/`
   <form class="search-header" name="search-bar">
     <a class="icone bouton-retour">
-      <i class="material-icons">arrow_back</i>
+      <span class="material-icons">arrow_back</span>
     </a>
 
     <input type="text" name="search" id="search" inputmode="search" enterkeyhint="search" role="searchbox" autocomplete="off">
 
     <label for="search" class="search-icon">
-      <i class="material-icons">search</i>
+      <span class="material-icons">search</span>
     </label>
 
     <button type="reset" class="reset-icon">
-      <i class="material-icons">close</i>
+      <span class="material-icons">close</span>
     </button>
 
     <template id="search-hint-template">
       <input type="checkbox" name="chip-id" id="chip-id" value="value">
       <label class="chip" for="chip-id">
         <span>Type : valeur</span>
-        <i class="material-icons">cancel</i>
+        <span class="material-icons">cancel</span>
       </label>
     </template>
 
@@ -33,7 +33,7 @@ template.innerHTML = /*html*/`
       <span class="reverse-order__container">
         <input type="checkbox" name="orderReversed" id="orderReversed" value="true">
         <label for="orderReversed" aria-label="Inverser l'ordre">
-          <i class="material-icons">vertical_align_bottom</i>
+          <span class="material-icons">vertical_align_bottom</span>
         </label>
       </span>
     </div>

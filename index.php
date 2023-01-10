@@ -76,32 +76,32 @@
     <!-- Barre de navigation -->
     <nav class="bottom-bar">
       <a class="nav-link lien-section search-button" data-nav-section="obfuscator" data-nav-data='{ "search": true }' href="#">
-        <i class="material-icons">search</i>
+        <span class="material-icons">search</span>
       </a>
 
       <a class="nav-link lien-section" data-nav-section="mes-chromatiques" href="./mes-chromatiques">
-        <i class="material-icons">catching_pokemon</i>
+        <span class="material-icons">catching_pokemon</span>
         <span>Pokémon <shiny-stars></shiny-stars></span>
       </a>
 
       <a class="nav-link lien-section" data-nav-section="pokedex" href="./pokedex">
-        <i class="material-icons">language</i>
+        <span class="material-icons">language</span>
         <span>Pokédex <shiny-stars></shiny-stars></span>
       </a>
 
       <a class="nav-link lien-section" data-nav-section="chasses-en-cours" href="./chasses-en-cours">
-        <i class="material-icons">add_circle</i>
+        <span class="material-icons">add_circle</span>
         <span>Chasses</span>
       </a>
 
       <a class="nav-link lien-section" data-nav-section="partage" href="./partage">
-        <i class="material-icons">group</i>
+        <span class="material-icons">group</span>
         <span>Amis</span>
       </a>
 
       <!-- Seulement sur PC -->
       <a class="nav-link lien-section only-pc" data-nav-section="parametres" href="./parametres">
-        <i class="material-icons">settings</i>
+        <span class="material-icons">settings</span>
         <span>Paramètres</span>
       </a>
     </nav>
@@ -159,7 +159,7 @@
 
       <!-- FAB -->
       <button type="button" class="fab">
-        <i class="material-icons">add</i>
+        <span class="material-icons">add</span>
       </button>
 
     </main>
@@ -180,7 +180,7 @@
       <span class="notif-texte"></span>
       <button type="button" class="notif-bouton text">
         <span></span>
-        <i class="material-icons"></i>
+        <span class="material-icons"></span>
       </button>
 
       <div class="progression-maj"></div>

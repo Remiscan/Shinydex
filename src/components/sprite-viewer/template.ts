@@ -14,7 +14,7 @@ template.innerHTML = `
   <span class="info-nom"></span>
 </div>
 <a class="icone bouton-retour">
-  <i class="material-icons">close</i>
+  <span class="material-icons">close</span>
 </a>
 <div class="switch-shiny-regular">
   <shiny-switch hint="icon"></shiny-switch>

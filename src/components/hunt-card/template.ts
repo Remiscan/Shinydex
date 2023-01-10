@@ -47,11 +47,11 @@ template.innerHTML = /*html*/`
 
     <span class="one-input">
       <button type="button" class="counter sub">
-        <i class="material-icons">remove</i>
+        <span class="material-icons">remove</span>
       </button>
       <input type="number" name="count" id="count" min="0" max="999999" value="0">
       <button type="button" class="counter add">
-        <i class="material-icons">add</i>
+        <span class="material-icons">add</span>
       </button>
     </span>
   </fieldset>
@@ -174,12 +174,12 @@ template.innerHTML = /*html*/`
   <!-- Boutons de capture / annulation -->
   <div class="group button-group capture-button-group">
     <button type="button" class="hunt-delete danger" data-not-edit>
-      <i class="material-icons">delete</i>
+      <span class="material-icons">delete</span>
       <span>Supprimer</span>
     </button>
 
     <button type="button" class="edit-cancel ghost danger" data-edit>
-      <i class="material-icons">cancel</i>
+      <span class="material-icons">cancel</span>
       <span>Annuler</span>
     </button>
 
@@ -397,12 +397,12 @@ template.innerHTML = /*html*/`
   <!-- Boutons supprimer / enregistrer -->
   <div class="group button-group">
     <button type="button" class="full-delete danger" data-edit>
-      <i class="material-icons">delete_forever</i>
+      <span class="material-icons">delete_forever</span>
       <span>Supprimer définitivement</span>
     </button>
 
     <button type="submit" class="submit">
-      <i class="material-icons">backup</i>
+      <span class="material-icons">backup</span>
       <span>Enregistrer dans mes Pokémon <shiny-stars></shiny-stars></span>
     </button>
   </div>

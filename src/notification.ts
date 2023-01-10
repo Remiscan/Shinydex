@@ -56,7 +56,7 @@ export class Notif {
       const notifBouton = notif.querySelector('.notif-bouton');
       if (!(notifBouton instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
       const notifTexteBouton = notifBouton.querySelector('span')!;
-      const notifIcone = notifBouton.querySelector('i')!;
+      const notifIcone = notifBouton.querySelector('.material-icons')!;
 
       notifTexte.innerHTML = this.message;
       notifTexteBouton.innerHTML = this.bouton.texte;
