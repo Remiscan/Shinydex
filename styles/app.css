@@ -1080,11 +1080,10 @@ form[name="app-settings"] {
 }
 
 .param-description {
-  line-height: 1em;
   grid-row: 2 / 3;
-  opacity: .7;
   text-align: left;
   max-width: 70%;
+  color: var(--text-color-soft);
 }
 
 .param {
@@ -1210,6 +1209,7 @@ form[name="app-settings"] {
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
+  gap: .5ch;
 	text-decoration: none;
   color: var(--accent-color);
   height: 2em;
