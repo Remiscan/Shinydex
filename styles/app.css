@@ -1137,6 +1137,22 @@ form[name="app-settings"] {
   --color: var(--failure-color);
 }
 
+[data-sprites-progress] {
+  margin-left: 1ch;
+}
+
+[data-sprites-progress]:empty {
+  display: none;
+}
+
+[data-sprites-progress]:not(:empty)::before {
+  content: '(';
+}
+
+[data-sprites-progress]:not(:empty)::after {
+  content: ')';
+}
+
 #parametres[data-online-backup][data-last-sync=success] .success,
 #parametres[data-online-backup][data-last-sync=failure] .failure {
   display: inline;

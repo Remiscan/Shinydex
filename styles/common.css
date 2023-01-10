@@ -336,3 +336,8 @@ input:is([type=radio], [type=checkbox], [type=file]):focus:not(:focus-visible) +
 .off {
   display: none;
 }
+
+input-switch[disabled] {
+  opacity: .7;
+  cursor: not-allowed;
+}

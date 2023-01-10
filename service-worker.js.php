@@ -140,8 +140,10 @@ self.addEventListener('message', async function(event) {
 
 
     case 'cache-all-sprites': {
+      const source = event.ports[0];
+
       event.waitUntil(
-        cacheAllSprites()
+        cacheAllSprites(source)
         .catch(error => console.error(error))
       );
     } break;
@@ -150,9 +152,10 @@ self.addEventListener('message', async function(event) {
     case 'delete-all-sprites': {
       event.waitUntil(
         caches.open(spritesCacheName)
-        .then(cache => cache.keys())
-        .then(keys => Promise.all(keys.map(key => cache.delete(key))))
-        .catch(error => consome.error(error))
+        .then(cache => cache.keys()
+          .then(keys => Promise.all(keys.map(key => cache.delete(key))))
+        )
+        .catch(error => console.error(error))
       )
     }
   }
@@ -244,21 +247,57 @@ async function installFiles(event = null) {
 
 /** Stores all sprites in the sprites cache. */
 let cachingAllSprites = false;
-async function cacheAllSprites() {
+async function cacheAllSprites(source) {
   if (cachingAllSprites) return;
   try {
     cachingAllSprites = true;
-    const response = await fetch(`./backend/getAllSprites.php?date=${Date.now()}`);
+
+    let response = await fetch(`./backend/getAllSprites.php?date=${Date.now()}`);
     if (!(response.status === 200)) {
       throw new Error('Could not fetch list of sprites');
     }
-    const allSprites = (await response.json()).map(path => `${location.origin}/shinydex/images/pokemon-sprites/webp/112/${path}`);
-    const cache = await caches.open(spritesCacheName);
+    response = await response.json();
 
+    const allSprites = (response['files'] ?? []).map(path => `${location.origin}/shinydex/images/pokemon-sprites/webp/112/${path}`);
+    const allSpritesNumber = allSprites.length;
+    const totalSize = Number(response['size']) || 0;
+
+    const cache = await caches.open(spritesCacheName);
     const spritesAlreadyCached = (await cache.keys()).map(key => key.url);
+    const spritesAlreadyCachedNumber = spritesAlreadyCached.length;
+
+    if (spritesAlreadyCachedNumber === allSpritesNumber) {
+      source?.postMessage({ action: 'cache-all-sprites', totalSize, progress: 1, progressWithErrors: 1, error: false });
+      return;
+    }
+
     const spritesToCache = allSprites.filter(sprite => !(spritesAlreadyCached.includes(sprite)));
-    const result = await Promise.all(spritesToCache.map(sprite => cache.add(sprite).catch(error => console.error(error, sprite))));
-    return result;
+    let spritesNewlyCachedNumber = 0;
+    let spritesFailedToCache = 0;
+
+    // Fetch sprits in groups, to avoid "insufficient resources" error
+    const groupSize = 25;
+    while (spritesToCache.length > 0) {
+      const group = spritesToCache.splice(0, groupSize);
+
+      await Promise.all(group.map(async sprite => {
+        try {
+          await cache.add(sprite);
+          spritesNewlyCachedNumber++;
+          const progress = (spritesAlreadyCachedNumber + spritesNewlyCachedNumber) / allSpritesNumber;
+          const progressWithErrors = (spritesAlreadyCachedNumber + spritesNewlyCachedNumber + spritesFailedToCache) / allSpritesNumber;
+          source?.postMessage({ action: 'cache-all-sprites', totalSize, progress, progressWithErrors, error: false });
+          return sprite;
+        } catch (error) {
+          spritesFailedToCache++;
+          const progress = (spritesAlreadyCachedNumber + spritesNewlyCachedNumber) / allSpritesNumber;
+          const progressWithErrors = (spritesAlreadyCachedNumber + spritesNewlyCachedNumber + spritesFailedToCache) / allSpritesNumber;
+          source?.postMessage({ action: 'cache-all-sprites', totalSize, progress, progressWithErrors, error: true });
+        }
+      }));
+    }
+
+    return;
   } catch (error) {
     console.error(error);
   } finally {
