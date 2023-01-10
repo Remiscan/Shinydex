@@ -25,8 +25,15 @@ let longClic = false;
 export class shinyCard extends HTMLElement {
   shadow: ShadowRoot;
   huntid: string = '';
-  clickHandler: (e: Event) => any = () => {};
-  pointerdownHandler: (e: MouseEvent) => any = () => {};
+  clickHandler = (e: Event) => {
+    e.stopPropagation();
+    this.toggleNotes();
+  };
+  editHandler = (e: Event) => {
+    e.stopPropagation();
+    this.makeEdit();
+  };
+  restoreHandler = (e: Event) => {};
 
 
   constructor() {
@@ -250,11 +257,21 @@ export class shinyCard extends HTMLElement {
     if (currentCardId != null)
       document.querySelector(`shiny-card[huntid="${currentCardId}"]`)!.removeAttribute('open');
 
+    const menuButtons = [...this.shadow.querySelectorAll('.menu button')];
+
     // Si la carte demandée n'est pas celle qu'on vient de fermer, on l'ouvre
     if (huntid != currentCardId) {
       this.setAttribute('open', 'true');
+      menuButtons.forEach(button => {
+        button.removeAttribute('disabled');
+        button.setAttribute('tabindex', '0');
+      });
       currentCardId = huntid;
     } else {
+      menuButtons.forEach(button => {
+        button.setAttribute('disabled', '');
+        button.setAttribute('tabindex', '-1');
+      });
       currentCardId = null;
     }
   }
@@ -271,57 +288,7 @@ export class shinyCard extends HTMLElement {
   /**
    * Créer une chasse pour éditer un shiny au long clic sur une carte.
    */
-  async makeEdit(event: Event) {
-    let act = true;
-
-    const editIcon = this.shadow.querySelector('.edit-icon')!;
-    let appear = editIcon.animate([
-      { opacity: '0' },
-      { opacity: '1' }
-    ], {
-      easing: Params.easingStandard,
-      duration: 150,
-      fill: 'forwards'
-    });
-    appear.pause();
-    const circle = editIcon.querySelector('.edit-icon circle')!;
-    let anim = circle.animate([
-      { strokeDashoffset: '157' },
-      { strokeDashoffset: '0' }
-    ], {
-      easing: 'linear',
-      duration: 1000
-    });
-    anim.pause();
-
-    const cancelEvents = ['pointerleave', 'pointerout', 'pointercancel', 'pointerup'];
-
-    const clear = () => {
-      act = false;
-      appear.cancel(); anim.cancel();
-      setTimeout(() => { longClic = false; }, 50);
-
-      for (const eventType of cancelEvents) {
-        this.removeEventListener(eventType, clear);
-      }
-    };
-
-    for (const eventType of cancelEvents) {
-      this.addEventListener(eventType, clear);
-    }
-
-    await wait(500);
-
-    if (!act) return;
-    longClic = true;
-
-    appear.play();
-    await wait(appear);
-    anim.play();
-    await wait(anim);
-
-    if (!act) return;
-
+  async makeEdit() {
     try {
       let k = await huntStorage.getItem(this.huntid);
       if (k != null) {
@@ -339,22 +306,18 @@ export class shinyCard extends HTMLElement {
       console.error(error);
       new Notif(message).prompt();
     }
-
-    appear.cancel();
-    anim.cancel();
-    longClic = false;
   }
 
 
   connectedCallback() {
-    // Détecte le long clic pour éditer
-    this.addEventListener('click', this.clickHandler = () => {
-      if (!longClic) this.toggleNotes();
-      longClic = false;
-    });
-    this.addEventListener('pointerdown', this.pointerdownHandler = async (event) => {
-      this.makeEdit(event);
-    });
+    // Détecte le clic pour "ouvrir" la carte
+    this.addEventListener('click', this.clickHandler);
+
+    const editButton = this.shadow.querySelector('#edit-button');
+    editButton?.addEventListener('click', this.editHandler);
+
+    const restoreButton = this.shadow.querySelector('#restore-button');
+    restoreButton?.addEventListener('click', this.restoreHandler);
 
     // Peuple le contenu de la carte
     this.dataToContent();
@@ -363,7 +326,12 @@ export class shinyCard extends HTMLElement {
 
   disconnectedCallback() {
     this.removeEventListener('click', this.clickHandler);
-    this.removeEventListener('pointerdown', this.pointerdownHandler);
+
+    const editButton = this.shadow.querySelector('#edit-button');
+    editButton?.removeEventListener('click', this.editHandler);
+
+    const restoreButton = this.shadow.querySelector('#restore-button');
+    restoreButton?.removeEventListener('click', this.restoreHandler);
   }
 
 

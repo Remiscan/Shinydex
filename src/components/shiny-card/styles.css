@@ -15,7 +15,7 @@
 }
 
 pokemon-sprite,
-.edit-icon {
+.menu {
   grid-column: sprite;
   grid-row: 1 / -1;
   --size: 112px;
@@ -28,39 +28,17 @@ pokemon-sprite,
   border-radius: 10px;
 }
 
-.edit-icon {
-  display: grid;
-  background-color: var(--card-edit-bg-color);
+#menu-hint {
+  grid-column: sprite;
+  grid-row: 1;
+  align-self: start;
+  justify-self: start;
+  color: var(--text-color);
+  opacity: .5;
   position: relative;
-  opacity: 0;
-}
-
-.edit-icon > .material-icons {
-  display: grid;
-  width: 50px;
-  height: 50px;
-  place-items: center;
-  background-color: var(--card-sprite-bg-color);
-  border-radius: 50%;
-}
-
-.edit-icon svg {
-  width: 50px;
-  height: 50px;
-  position: absolute;
-  overflow: visible;
-}
-
-.edit-icon circle {
-  --diametre: 50;
-  fill: transparent;
-  stroke: var(--progress-bar-color);
-  stroke-width: 2;
-  --perimetre: calc(3.14 * var(--diametre));
-  stroke-dasharray: var(--perimetre);
-  stroke-dashoffset: var(--perimetre);
-  transform: rotate(-90deg);
-  transform-origin: center;
+  top: calc(-4px + 8px);
+  left: calc(-10px + 8px);
+  cursor: pointer;
 }
 
 .pokemon-infos__identity {
@@ -186,19 +164,40 @@ pokemon-sprite,
   background-color: var(--card-bg-color);
   padding: 10px;
   z-index: 4;
-  opacity: 0;
-  transform: translate3d(100px, 0, 0);
-  transition: transform .1s var(--easing-accelerate),
-              opacity .1s var(--easing-accelerate);
   overflow: visible;
   scrollbar-width: thin;
 }
 
-:host([open]) > .pokemon-notes {
+.pokemon-notes,
+.menu {
+  pointer-events: none;
+  opacity: 0;
+  transform: translate3d(100px, 0, 0);
+  transition: transform .1s var(--easing-accelerate),
+              opacity .1s var(--easing-accelerate);
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transform: translate3d(-50px, 0, 0);
+  background-color: var(--card-menu-bg-color);
+}
+
+:host([open]) > .pokemon-notes,
+:host([open]) > .menu {
+  pointer-events: initial;
   opacity: 1;
   transform: translate3d(0, 0, 0);
   transition: transform .1s var(--easing-decelerate),
               opacity .1s var(--easing-decelerate);
+}
+
+#restore-button {
+  display: none;
 }
 
 .pokemon-notes__texte {

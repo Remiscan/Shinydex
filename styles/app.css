@@ -44,7 +44,6 @@ body {
   grid-template-columns: 1fr;
   background-color: var(--bg-color);
   color: var(--text-color);
-  user-select: none;
   margin: 0;
   font-family: Roboto, system-ui;
 }

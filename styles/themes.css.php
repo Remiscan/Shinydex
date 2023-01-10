@@ -10,6 +10,7 @@
   --text-color-soft: rgb(0, 0, 0);
   --card-bg-color: rgb(245, 245, 245);
   --card-sprite-bg-color: white;
+  --card-menu-bg-color: rgba(255, 255, 255, .7);
   --card-infos-text-color: rgba(0, 0, 0, 0.54);
   --notif-bg-color: rgb(245, 245, 245);
   --sprite-viewer-bg-color: rgb(255, 255, 255);
@@ -40,6 +41,7 @@
   --text-color-soft: rgb(193, 193, 193);
   --card-bg-color: rgb(42, 42, 42);
   --card-sprite-bg-color: rgba(55, 55, 55);
+  --card-menu-bg-color: rgba(55, 55, 55, .7);
   --card-infos-text-color: rgb(200, 200, 200);
   --notif-bg-color: rgb(45, 45, 45);
   --sprite-viewer-bg-color: rgb(0, 0, 0);

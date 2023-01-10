@@ -19,6 +19,7 @@
         "./modules/appContent.js",
         "./modules/appLifeCycle.js",
         "./modules/components/corbeille-card/corbeilleCard.js",
+        "./modules/components/corbeille-card/styles.css",
         "./modules/components/hunt-card/huntCard.js",
         "./modules/components/hunt-card/styles.css",
         "./modules/components/hunt-card/template.js",

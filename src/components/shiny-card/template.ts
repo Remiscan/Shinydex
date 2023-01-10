@@ -6,9 +6,11 @@ const template = document.createElement('template');
 template.innerHTML = /*html*/`
   <pokemon-sprite size="112" shiny="true"></pokemon-sprite>
 
-  <div class="edit-icon">
-    <i class="material-icons">edit</i>
-    <svg><circle r="25" cx="25" cy="25"/></svg>
+  <span id="menu-hint" class="material-icons">more_vert</span>
+
+  <div class="menu">
+    <button type="button" id="edit-button" tabindex="-1" disabled><span>Éditer</span></button>
+    <button type="button" id="restore-button" tabindex="-1" disabled><span>Restaurer</span></button>
   </div>
 
   <div class="pokemon-infos__identity">
