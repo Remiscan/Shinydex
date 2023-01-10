@@ -35,7 +35,7 @@ pokemon-sprite,
   justify-self: start;
   color: var(--text-color);
   opacity: .5;
-  position: relative;
+  position: absolute;
   top: calc(-4px + 8px);
   left: calc(-10px + 8px);
   cursor: pointer;
