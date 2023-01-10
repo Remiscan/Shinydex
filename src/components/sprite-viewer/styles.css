@@ -105,28 +105,31 @@ sprite-viewer[shiny="true"] .sprite-list.regular {
   aspect-ratio: 1;
 }
 
-.dex-sprite span {
+.forme-name {
   color: var(--text-color);
-  font-size: 13px;
-  line-height: 24px;
+  font-size: .82rem;
   text-transform: capitalize;
   padding: 0 10px;
   border-radius: 20px;
+  min-width: 35px;
   max-width: calc(var(--sprite-size) - 10px);
+  height: 1.5rem;
   box-sizing: border-box;
   margin: 7px auto 0;
   position: relative;
-  min-width: 35px;
   white-space: nowrap;
+  display: flex;
+  place-items: center;
+  gap: 1ch;
 }
 
-.dex-sprite span.on {
+.forme-name.on {
   background-color: var(--bg-color);
 }
-.dex-sprite span.off {
+.forme-name.off {
   display: none;
 }
-.dex-sprite span.on::before {
+.forme-name.on::before {
   content: "";
   position: absolute;
   left: calc(50% - 7px);
@@ -135,6 +138,12 @@ sprite-viewer[shiny="true"] .sprite-list.regular {
   width: 0;
   border: 7px solid transparent;
   border-bottom: 7px solid var(--bg-color);
+}
+.forme-name.caught {
+  --bg-color: var(--soft-success-color);
+}
+.forme-name > .icon {
+  margin: -7px;
 }
 
 .dex-sprite>picture {

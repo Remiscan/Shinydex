@@ -1,6 +1,7 @@
 import { pad } from '../../Params.js';
 import { Pokemon } from '../../Pokemon.js';
-import { pokemonData } from '../../localForage.js';
+import { Shiny } from '../../Shiny.js';
+import { pokemonData, shinyStorage } from '../../localForage.js';
 // @ts-expect-error
 import sheet from './styles.css' assert { type: 'css' };
 import template from './template.js';
@@ -31,6 +32,13 @@ class spriteViewer extends HTMLElement {
   async updateSprites(dexid: string) {
     const pokemon = new Pokemon(await pokemonData.getItem(dexid));
     const nomFormeNormale = 'Normale';
+
+    const caughtFormsList: Set<string> = new Set();
+    await shinyStorage.keys().then(keys => Promise.all(keys.map(async key => {
+      const shiny = new Shiny(await shinyStorage.getItem(key));
+      if (shiny.dexid !== Number(dexid)) return;
+      caughtFormsList.add(shiny.forme);
+    })));
 
     // On réordonne les formes (normale d'abord, les autres ensuite)
     const formes = pokemon.formes.slice().sort((a, b) => {
@@ -66,7 +74,8 @@ class spriteViewer extends HTMLElement {
     };
 
     for (const forme of formes) {
-      const afficherNomForme = (forme.nom != '' || formes.length > 1);
+      const afficherNomForme = true;//(forme.nom != '' || formes.length > 1);
+      const caught = caughtFormsList.has(forme.dbid);
 
       const htmlS = `
         <div class="dex-sprite">
@@ -74,7 +83,8 @@ class spriteViewer extends HTMLElement {
             <pokemon-sprite dexid="${pokemon.dexid}" shiny="true" forme="${forme.dbid}" size="${this.size}" lazy="false"></pokemon-sprite>
             ${(typeof forme.noShiny != 'undefined' && forme.noShiny) ? '<span>N\'existe pas<br>en chromatique</span>' : ''}
           </picture>
-          <span ${afficherNomForme ? 'class="on"' : ''}>
+          <span class="forme-name ${afficherNomForme ? 'on' : ''} ${caught ? 'caught' : ''}">
+            ${caught ? '<span class="icon" data-icon="ball/poke"></span>' : ''}
             ${afficherNomForme ? nomForme(forme.nom) : '&nbsp;'}
           </span>
         </div>
@@ -86,7 +96,8 @@ class spriteViewer extends HTMLElement {
         <picture>
           <pokemon-sprite dexid="${pokemon.dexid}" shiny="false" forme="${forme.dbid}" size="${this.size}" lazy="false"></pokemon-sprite>
         </picture>
-        <span ${afficherNomForme ? 'class="on"' : ''}>
+        <span class="forme-name ${afficherNomForme ? 'on' : ''} ${caught ? 'caught' : ''}">
+          ${caught ? '<span class="icon" data-icon="ball/poke"></span>' : ''}
           ${afficherNomForme ? nomForme(forme.nom) : '&nbsp;'}
         </span>
       </div>

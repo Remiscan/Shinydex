@@ -16,6 +16,7 @@
   --sprite-viewer-bg-color: rgb(255, 255, 255);
   --danger-color: #b04041;
   --success-color: hsl(120, 73%, 40%);
+  --soft-success-color: #b2e1ae;
   --failure-color: hsl(0, 53%, 40%);
   --radio-disabled-color: rgba(100, 100, 100, .2);
   --radio-off-color: rgba(100, 100, 100, .3);
@@ -47,6 +48,7 @@
   --sprite-viewer-bg-color: rgb(0, 0, 0);
   --danger-color: #f88788;
   --success-color: hsl(120, 73%, 75%);
+  --soft-success-color: #244224;
   --failure-color: hsl(0, 53%, 75%);
   --radio-disabled-color: rgba(193, 193, 193, .3);
   --radio-off-color: rgba(193, 193, 193, .2);
