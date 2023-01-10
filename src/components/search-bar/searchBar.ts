@@ -183,7 +183,7 @@ export class SearchBar extends HTMLElement {
       }
 
       // Change l'icône de retour en ✅ si un filtre a été modifié
-      const icon = this.querySelector('.bouton-retour>i')!;
+      const icon = this.querySelector('.bouton-retour>.material-icons')!;
       if (icon.innerHTML !== 'done') {
         const anims: { start?: Animation, end?: Animation } = {};
 
@@ -217,7 +217,7 @@ export class SearchBar extends HTMLElement {
 
 
   open() {
-    this.querySelector('.bouton-retour>i')!.innerHTML = 'arrow_back';
+    this.querySelector('.bouton-retour>.material-icons')!.innerHTML = 'arrow_back';
     document.body.setAttribute('data-search', 'true');
     this.animate([
       { clipPath: 'circle(0 at top center)' },
