@@ -184,50 +184,50 @@ echo '/'.'*'; ?>*/
 .primary {
   --surface-tint: var(--primary);
   --state-tint: var(--on-primary);
-  background-color: var(--surface-tint);
-  color: var(--state-tint);
+  background-color: rgb(var(--surface-tint));
+  color: rgb(var(--state-tint));
 }
 
 .primary-container {
   --surface-tint: var(--primary-container);
   --state-tint: var(--on-primary-container);
-  background-color: var(--surface-tint);
-  color: var(--state-tint);
+  background-color: rgb(var(--surface-tint));
+  color: rgb(var(--state-tint));
 }
 
 .secondary {
   --surface-tint: var(--secondary);
   --state-tint: var(--on-secondary);
-  background-color: var(--surface-tint);
-  color: var(--state-tint);
+  background-color: rgb(var(--surface-tint));
+  color: rgb(var(--state-tint));
 }
 
 .secondary-container {
   --surface-tint: var(--secondary-container);
   --state-tint: var(--on-secondary-container);
-  background-color: var(--surface-tint);
-  color: var(--state-tint);
+  background-color: rgb(var(--surface-tint));
+  color: rgb(var(--state-tint));
 }
 
 .tertiary {
   --surface-tint: var(--tertiary);
   --state-tint: var(--on-tertiary);
-  background-color: var(--surface-tint);
-  color: var(--state-tint);
+  background-color: rgb(var(--surface-tint));
+  color: rgb(var(--state-tint));
 }
 
 .tertiary-container {
   --surface-tint: var(--tertiary-container);
   --state-tint: var(--on-tertiary-container);
-  background-color: var(--surface-tint);
-  color: var(--state-tint);
+  background-color: rgb(var(--surface-tint));
+  color: rgb(var(--state-tint));
 }
 
 .background {
   --surface-tint: var(--background);
   --state-tint: var(--on-background);
-  background-color: var(--surface-tint);
-  color: var(--state-tint);
+  background-color: rgb(var(--surface-tint));
+  color: rgb(var(--state-tint));
 }
 
 .surface {

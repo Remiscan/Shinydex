@@ -110,7 +110,7 @@
     </nav>
 
     <!-- Contenu de l'appli -->
-    <main class="primary">
+    <main class="surface primary">
 
       <!-- Mes chromatiques -->
       <section id="mes-chromatiques" class="vide loading">
