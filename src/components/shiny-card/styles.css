@@ -3,8 +3,8 @@
   height: 120px;
   min-height: 120px;
   overflow: hidden;
-  border-radius: 10px;
-  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-elevation-low);
   background-color: var(--card-bg-color);
   display: grid;
   --last-column: 0;
@@ -25,7 +25,7 @@ pokemon-sprite,
   background-color: var(--card-sprite-bg-color);
   display: grid;
   place-items: center;
-  border-radius: 10px;
+  border-radius: var(--border-radius);
 }
 
 #menu-hint {
@@ -166,6 +166,19 @@ pokemon-sprite,
   z-index: 4;
   overflow: visible;
   scrollbar-width: thin;
+  position: relative;
+}
+
+.pokemon-notes::before {
+  display: none;
+  content: "";
+  position: absolute;
+  top: calc(50% - 7px);
+  left: -13px;
+  height: 0;
+  width: 0;
+  border: 7px solid transparent;
+  border-right: 7px solid var(--card-sprite-bg-color);
 }
 
 .pokemon-notes,
@@ -330,7 +343,11 @@ pokemon-sprite,
     transform: none;
     width: calc(100cqi - 500px);
     background-color: var(--card-sprite-bg-color);
-    border-radius: 10px;
+    border-radius: var(--border-radius);
+  }
+
+  .pokemon-notes::before {
+    display: block;
   }
 
   .pokemon-notes,

@@ -14,8 +14,8 @@ search-bar {
   padding: 0;
   --bg: var(--nav-bg-color);
   background-color: var(--bg);
-  border-radius: 0 0 10px 10px;
-  box-shadow: 0 1px 3px rgb(0, 0, 0, .1);
+  border-radius: 0 0 var(--border-radius) var(--border-radius);
+  box-shadow: var(--shadow-elevation-medium);
   will-change: clip-path;
   max-height: 100%;
   overflow-x: hidden;
@@ -53,7 +53,6 @@ form[name="search-bar"] > input[type="text"] {
   box-shadow: none;
   background-color: var(--bg-color);
   color: var(--text-color);
-  box-shadow: 0 0px 2px rgb(0, 0, 0, .2);
   font-size: 1rem;
 }
 

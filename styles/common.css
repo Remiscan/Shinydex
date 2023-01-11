@@ -30,6 +30,7 @@ button {
   -webkit-appearance: none;
   appearance: none;
   background: none;
+  border: none;
   margin: 0;
 
   display: flex;
@@ -42,9 +43,8 @@ button {
 
   width: fit-content;
   padding: 5px 10px;
-  border: 1px solid var(--bg-color);
-  border-radius: 8px;
-  overflow: hidden;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-elevation-low);
 
   font-family: inherit;
   font-size: inherit;
@@ -56,6 +56,7 @@ input[type=file] + label.ghost,
 button.ghost,
 button.text {
   border: 1px solid var(--button-color);
+  box-shadow: none;
   color: var(--text-color);
 }
 
@@ -82,6 +83,7 @@ button::before {
   background-color: var(--button-color);
   opacity: 1;
   z-index: 0;
+  border-radius: var(--border-radius);
 }
 
 button.ghost::before {
