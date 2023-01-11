@@ -184,43 +184,56 @@ echo '/'.'*'; ?>*/
 .primary {
   --surface-tint: var(--primary);
   --state-tint: var(--on-primary);
+  background-color: var(--surface-tint);
+  color: var(--state-tint);
 }
 
 .primary-container {
   --surface-tint: var(--primary-container);
   --state-tint: var(--on-primary-container);
+  background-color: var(--surface-tint);
+  color: var(--state-tint);
 }
 
 .secondary {
   --surface-tint: var(--secondary);
   --state-tint: var(--on-secondary);
+  background-color: var(--surface-tint);
+  color: var(--state-tint);
 }
 
 .secondary-container {
   --surface-tint: var(--secondary-container);
   --state-tint: var(--on-secondary-container);
+  background-color: var(--surface-tint);
+  color: var(--state-tint);
 }
 
 .tertiary {
   --surface-tint: var(--tertiary);
   --state-tint: var(--on-tertiary);
+  background-color: var(--surface-tint);
+  color: var(--state-tint);
 }
 
 .tertiary-container {
   --surface-tint: var(--tertiary-container);
   --state-tint: var(--on-tertiary-container);
+  background-color: var(--surface-tint);
+  color: var(--state-tint);
 }
 
 .background {
   --surface-tint: var(--background);
   --state-tint: var(--on-background);
+  background-color: var(--surface-tint);
+  color: var(--state-tint);
 }
 
 .surface {
   background-color: rgb(var(--surface), var(--surface-opacity, 1));
   background-image: linear-gradient(to bottom, rgb(var(--state-tint, var(--on-primary)), var(--state-opacity, 0)) 0% 100%),
                     linear-gradient(to bottom, rgb(var(--surface-tint, var(--primary)), var(--elevation-opacity, 0)) 0% 100%);
-
   color: rgb(var(--on-surface));
 }
 

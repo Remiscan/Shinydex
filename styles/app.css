@@ -66,8 +66,6 @@ body {
   --nav-bar-height: 80px;
   grid-template-rows: 1fr var(--nav-bar-height);
   grid-template-columns: 1fr;
-  background-color: var(--bg-color);
-  color: var(--text-color);
   margin: 0;
   font-family: 'Roboto', system-ui;
 }
@@ -258,7 +256,6 @@ h1 {
   position: sticky;
   top: 0;
   z-index: var(--z-section-titre);
-  background-color: var(--bg-color);
 }
 
 .section-titre>* {
@@ -342,7 +339,7 @@ h1 {
   overflow-y: auto;
   height: 100%;
   box-sizing: border-box;
-  scrollbar-gutter: stable;
+  /*scrollbar-gutter: stable;*/
   container-type: inline-size;
 }
 

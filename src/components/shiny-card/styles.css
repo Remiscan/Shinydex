@@ -307,7 +307,7 @@ pokemon-sprite,
 }
 
 .shiny-rate-text {
-  color: rgb(var(--on-surface), .8);
+  color: rgb(var(--on-surface));
   font-size: 1em;
 }
 
