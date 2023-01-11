@@ -182,47 +182,44 @@ echo '/'.'*'; ?>*/
 }
 
 .primary {
-  background-color: rgb(var(--primary));
-  color: rgb(var(--on-primary));
+  --surface-tint: var(--primary);
+  --state-tint: var(--on-primary);
 }
 
 .primary-container {
-  background-color: rgb(var(--primary-container));
-  color: rgb(var(--on-primary-container));
+  --surface-tint: var(--primary-container);
+  --state-tint: var(--on-primary-container);
 }
 
 .secondary {
-  background-color: rgb(var(--secondary));
-  color: rgb(var(--on-secondary));
+  --surface-tint: var(--secondary);
+  --state-tint: var(--on-secondary);
 }
 
 .secondary-container {
-  background-color: rgb(var(--secondary-container));
-  color: rgb(var(--on-secondary-container));
+  --surface-tint: var(--secondary-container);
+  --state-tint: var(--on-secondary-container);
 }
 
 .tertiary {
-  background-color: rgb(var(--tertiary));
-  color: rgb(var(--on-tertiary));
+  --surface-tint: var(--tertiary);
+  --state-tint: var(--on-tertiary);
 }
 
 .tertiary-container {
-  background-color: rgb(var(--tertiary-container));
-  color: rgb(var(--on-tertiary-container));
+  --surface-tint: var(--tertiary-container);
+  --state-tint: var(--on-tertiary-container);
 }
 
 .background {
-  background-color: rgb(var(--background));
-  color: rgb(var(--on-background));
+  --surface-tint: var(--background);
+  --state-tint: var(--on-background);
 }
 
 .surface {
-  --surface-tint: var(--primary);
-  --state-tint: var(--on-primary);
-
   background-color: rgb(var(--surface), var(--surface-opacity, 1));
-  background-image: linear-gradient(to bottom, rgb(var(--state-tint), var(--state-opacity, 0)) 0% 100%),
-                    linear-gradient(to bottom, rgb(var(--surface-tint), var(--elevation-opacity, 0)) 0% 100%);
+  background-image: linear-gradient(to bottom, rgb(var(--state-tint, var(--on-primary)), var(--state-opacity, 0)) 0% 100%),
+                    linear-gradient(to bottom, rgb(var(--surface-tint, var(--primary)), var(--elevation-opacity, 0)) 0% 100%);
 
   color: rgb(var(--on-surface));
 }
