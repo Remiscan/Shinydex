@@ -5,7 +5,7 @@ import Palette from '../../colori/palette/palette.js';
 
 
 
-const gradient = Couleur.interpolateInSteps('oklch(70% 0.19 0)', 'oklch(70% 0.19 359)', 25, { interpolationSpace: 'oklch', hueInterpolationMethod: 'longer' });
+const gradient = Couleur.interpolateInSteps('oklch(70% 0.19 1)', 'oklch(70% 0.19 360)', 25, { interpolationSpace: 'oklch', hueInterpolationMethod: 'longer' });
 export const gradientString = `linear-gradient(to right, ${gradient.map((c: Couleur) => c.rgb).join(', ')})`;
 
 
