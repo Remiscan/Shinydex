@@ -1,17 +1,16 @@
-:host {
+.container {
   width: 100%;
   height: 120px;
   min-height: 120px;
   overflow: hidden;
   border-radius: var(--border-radius);
-  box-shadow: var(--shadow-elevation-low);
-  background-color: var(--card-bg-color);
   display: grid;
   --last-column: 0;
-  grid-template-columns: [sprite] 120px [identity] 1fr [misc] auto [note] var(--last-column);
+  grid-template-columns: [sprite] 116px [identity] 1fr [misc] auto [note] var(--last-column);
   grid-template-rows: 1fr [identity] auto 1fr [capture] auto 1fr;
   position: relative;
   order: var(--order, 0);
+  --surface: var(--surface-variant);
 }
 
 pokemon-sprite,
@@ -21,24 +20,29 @@ pokemon-sprite,
   --size: 112px;
   width: var(--size);
   height: var(--size);
-  padding: calc(.5 * (120px - var(--size)));
-  background-color: var(--card-sprite-bg-color);
+  margin: 4px;
   display: grid;
   place-items: center;
   border-radius: var(--border-radius);
 }
 
-#menu-hint {
-  grid-column: sprite;
-  grid-row: 1;
-  align-self: start;
-  justify-self: start;
-  color: var(--text-color);
-  opacity: .5;
+pokemon-sprite,
+.menu {
+  --elevation-opacity: var(--elevation-2-opacity);
+}
+
+.menu-hint {
+  color: rgb(var(--on-surface), .5);
   position: absolute;
-  top: calc(-4px + 8px);
-  left: calc(-10px + 8px);
+  top: calc(-4px + 8px + 4px);
+  left: calc(-10px + 8px + 4px);
   cursor: pointer;
+}
+
+#menu-close-hint {
+  top: calc(-4px + 8px);
+  left: calc(-4px + 8px);
+  display: none;
 }
 
 .pokemon-infos__identity {
@@ -89,7 +93,6 @@ pokemon-sprite,
   display: flex;
   justify-content: start;
   align-items: center;
-  text-shadow: 1px 1px var(--card-bg-color);
   position: relative;
   left: 0;
   top: 0;
@@ -129,7 +132,7 @@ pokemon-sprite,
 .pokemon-infos__capture {
   grid-row: capture;
   grid-column: identity;
-  color: var(--card-infos-text-color);
+  color: rgb(var(--on-surface), .8);
   font-size: .85em;
   display: grid;
   grid-template-columns: [game] 32px [info] auto;
@@ -156,12 +159,11 @@ pokemon-sprite,
   display: flex;
   width: 100%;
   height: 100%;
-  max-height: 120px;
+  margin: 4px;
+  max-height: 112px;
   font-size: 1em;
   text-align: justify;
   line-height: 20px;
-  color: var(--text-color);
-  background-color: var(--card-bg-color);
   padding: 10px;
   z-index: 4;
   overflow: visible;
@@ -169,23 +171,21 @@ pokemon-sprite,
   position: relative;
 }
 
-.pokemon-notes::before {
+.pokemon-notes__arrow {
   display: none;
-  content: "";
   position: absolute;
+  width: 7px;
+  height: 14px;
   top: calc(50% - 7px);
-  left: -13px;
-  height: 0;
-  width: 0;
-  border: 7px solid transparent;
-  border-right: 7px solid var(--card-sprite-bg-color);
+  left: -6px;
+  clip-path: polygon(0% 50%, 100% 0%, 100% 100%);
 }
 
 .pokemon-notes,
 .menu {
   pointer-events: none;
   opacity: 0;
-  transform: translate3d(100px, 0, 0);
+  transform: translate3d(50px, 0, 0);
   transition: transform .1s var(--easing-accelerate),
               opacity .1s var(--easing-accelerate);
 }
@@ -197,11 +197,11 @@ pokemon-sprite,
   justify-content: center;
   gap: 8px;
   transform: translate3d(-50px, 0, 0);
-  background-color: var(--card-menu-bg-color);
+  --surface-opacity: .5;
 }
 
-:host([open]) > .pokemon-notes,
-:host([open]) > .menu {
+:host([open]) .pokemon-notes,
+:host([open]) .menu {
   pointer-events: initial;
   opacity: 1;
   transform: translate3d(0, 0, 0);
@@ -220,8 +220,7 @@ pokemon-sprite,
 }
 
 .empty {
-  color: var(--text-color-soft);
-  opacity: .5;
+  color: rgb(var(--on-surface), .5);
 }
 
 /* Shiny rate */
@@ -272,13 +271,10 @@ pokemon-sprite,
   background: white;
 }
 
-.shiny-rate::before {
-  content: '';
-  display: block;
+.shiny-rate-background {
   position: absolute;
   width: calc(100% - 4px);
   height: calc(100% - 4px);
-  background-color: var(--card-bg-color);
   opacity: 1;
   top: 2px;
   left: 2px;
@@ -289,7 +285,7 @@ pokemon-sprite,
   grid-template-columns: auto auto;
 }
 
-.shiny-rate > div {
+.shiny-rate :is(.shiny-charm, .shiny-rate-data) {
   display: flex;
   position: relative;
   justify-content: center;
@@ -311,7 +307,7 @@ pokemon-sprite,
 }
 
 .shiny-rate-text {
-  color: var(--card_supporting_text_color);
+  color: rgb(var(--on-surface), .8);
   font-size: 1em;
 }
 
@@ -333,7 +329,7 @@ pokemon-sprite,
 }
 
 @container (min-width: 700px) {
-  :host {
+  .container {
     --last-column: auto;
   }
 
@@ -342,16 +338,16 @@ pokemon-sprite,
     opacity: 1;
     transform: none;
     width: calc(100cqi - 500px);
-    background-color: var(--card-sprite-bg-color);
+    --elevation-opacity: var(--elevation-2-opacity);
     border-radius: var(--border-radius);
   }
 
-  .pokemon-notes::before {
+  .pokemon-notes__arrow {
     display: block;
   }
 
   .pokemon-notes,
-  :host([open]) > .pokemon-notes {
+  :host([open]) .pokemon-notes {
     transition: none;
   }
 

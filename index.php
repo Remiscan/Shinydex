@@ -77,34 +77,34 @@
     </div>
 
     <!-- Barre de navigation -->
-    <nav class="bottom-bar">
-      <a class="nav-link lien-section search-button" data-nav-section="obfuscator" data-nav-data='{ "search": true }' href="#">
+    <nav class="bottom-bar surface elevation-2">
+      <a class="nav-link lien-section search-button" data-nav-section="obfuscator" data-nav-data='{ "search": true }' href="#" style="display: none">
         <span class="material-icons">search</span>
       </a>
 
-      <a class="nav-link lien-section" data-nav-section="mes-chromatiques" href="./mes-chromatiques">
-        <span class="material-icons">catching_pokemon</span>
+      <a class="nav-link lien-section surface" data-nav-section="mes-chromatiques" href="./mes-chromatiques">
+        <span class="material-icons surface">catching_pokemon</span>
         <span>Pokémon <shiny-stars></shiny-stars></span>
       </a>
 
-      <a class="nav-link lien-section" data-nav-section="pokedex" href="./pokedex">
-        <span class="material-icons">language</span>
+      <a class="nav-link lien-section surface" data-nav-section="pokedex" href="./pokedex">
+        <span class="material-icons surface">language</span>
         <span>Pokédex <shiny-stars></shiny-stars></span>
       </a>
 
-      <a class="nav-link lien-section" data-nav-section="chasses-en-cours" href="./chasses-en-cours">
-        <span class="material-icons">add_circle</span>
+      <a class="nav-link lien-section surface" data-nav-section="chasses-en-cours" href="./chasses-en-cours">
+        <span class="material-icons surface">add_circle</span>
         <span>Chasses</span>
       </a>
 
-      <a class="nav-link lien-section" data-nav-section="partage" href="./partage">
-        <span class="material-icons">group</span>
+      <a class="nav-link lien-section surface" data-nav-section="partage" href="./partage">
+        <span class="material-icons surface">group</span>
         <span>Amis</span>
       </a>
 
       <!-- Seulement sur PC -->
-      <a class="nav-link lien-section only-pc" data-nav-section="parametres" href="./parametres">
-        <span class="material-icons">settings</span>
+      <a class="nav-link lien-section surface only-pc" data-nav-section="parametres" href="./parametres">
+        <span class="material-icons surface">settings</span>
         <span>Paramètres</span>
       </a>
     </nav>
@@ -161,7 +161,7 @@
       </section>
 
       <!-- FAB -->
-      <button type="button" class="fab">
+      <button type="button" class="fab surface shadow elevation-3">
         <span class="material-icons">add</span>
       </button>
 

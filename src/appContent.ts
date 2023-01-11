@@ -145,7 +145,7 @@ export async function initPokedex() {
   for (const gen of generations) {
     let monsToPopulate = [];
     const genConteneur = document.createElement('div');
-    genConteneur.classList.add('pokedex-gen');
+    genConteneur.classList.add('pokedex-gen', 'surface', 'elevation-0');
     const allNames = await Pokemon.names();
 
     for (let i = gen.start; i <= gen.end; i++) {

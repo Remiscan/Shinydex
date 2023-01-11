@@ -17,7 +17,7 @@ let appliedSettings: Settings;
 
 export class Settings {
   'theme': Theme = 'system';
-  'theme-hue': number = 320;
+  'theme-hue': number = 255;
   'cache-all-sprites': boolean = false;
 
   constructor(data?: FormData | object) {

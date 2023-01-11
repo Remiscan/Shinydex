@@ -10,6 +10,8 @@ import materialIconsSheet from '../../../ext/material_icons.css' assert { type: 
 // @ts-expect-error
 import iconSheet from '../../../images/iconsheet.css' assert { type: 'css' };
 // @ts-expect-error
+import themesSheet from '../../../styles/themes.css.php' assert { type: 'css' };
+// @ts-expect-error
 import commonSheet from '../../../styles/common.css' assert { type: 'css' };
 // @ts-expect-error
 import sheet from './styles.css' assert { type: 'css' };
@@ -40,7 +42,7 @@ export class shinyCard extends HTMLElement {
     super();
     this.shadow = this.attachShadow({ mode: 'open' });
     this.shadow.appendChild(template.content.cloneNode(true));
-    this.shadow.adoptedStyleSheets = [materialIconsSheet, iconSheet, commonSheet, sheet];
+    this.shadow.adoptedStyleSheets = [materialIconsSheet, iconSheet, themesSheet, commonSheet, sheet];
   }
 
 
