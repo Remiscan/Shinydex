@@ -30,7 +30,8 @@
     {
       "imports": {
         "input-switch-styles": "../_common/components/input-switch/styles.css",
-        "input-switch-template": "../_common/components/input-switch/template.js"
+        "input-switch-template": "../_common/components/input-switch/template.js",
+        "colori": "../colori/lib/dist/colori.min.js"
       }
     }
     </script>
@@ -57,6 +58,8 @@
 
     <link rel="preload" as="image" href="./images/pokemonsheet.webp">
     <link rel="preload" as="image" href="./images/iconsheet.webp">
+
+    <style id="palette"></style>
 
     <link rel="stylesheet" href="./ext/material_icons.css">
     <link rel="stylesheet" href="./images/pokemonsheet.css">

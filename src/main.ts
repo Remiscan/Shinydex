@@ -1,3 +1,4 @@
+import '../../_common/components/input-slider/input-slider.js';
 import '../../_common/components/input-switch/input-switch.js';
 import { Hunt } from './Hunt.js';
 import { Settings } from './Settings.js';

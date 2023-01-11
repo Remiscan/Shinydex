@@ -1,6 +1,7 @@
 import { Params, loadAllImages, timestamp2date, wait } from './Params.js';
 import { Pokemon } from './Pokemon.js';
-import { Settings, setTheme } from './Settings.js';
+import { setTheme } from './theme.js';
+import { Settings } from './Settings.js';
 import { PopulatableSection, cleanUpRecycleBin, initPokedex, populator } from './appContent.js';
 import { filterSection, initFilters } from './filtres.js';
 import { dataStorage, huntStorage, pokemonData, shinyStorage } from './localForage.js';
@@ -117,7 +118,8 @@ export async function appStart() {
   try {
     [fileVersions, lastStorageUpgrade] = await Promise.all([
       dataStorage.getItem('file-versions').then(vers => vers ?? {}),
-      dataStorage.getItem('last-storage-upgrade').then(ver => Number(ver))
+      dataStorage.getItem('last-storage-upgrade').then(ver => Number(ver)),
+      Settings.restore(),
     ]);
     cacheVersion = Math.max(...Object.values(fileVersions).map(v => Number(v)));
     if (cacheVersion < 0) cacheVersion = pokemonReleaseDate;
@@ -166,7 +168,6 @@ export async function appStart() {
     await Promise.all([
       initPokedex(),
       initFilters(),
-      Settings.restore(),
       ...sectionsToPopulate.map(async section => {
         await populator[section]();
         filterSection(section);

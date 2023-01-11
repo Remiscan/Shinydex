@@ -336,6 +336,8 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
  * @param element - Le bouton de nav.
  */
 export function navLinkBubble(event: PointerEvent, element: HTMLElement): void {
+  if (event.button !== 0) return; // Only act on left mouse click, touch or pen contact
+  
   element.classList.remove('bubbly');
   if (element.dataset.section === document.body.dataset.sectionActuelle) return;
   if (element.classList.contains('search-button')) return;

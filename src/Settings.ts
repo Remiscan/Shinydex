@@ -1,4 +1,5 @@
 import { dataStorage } from './localForage.js';
+import { computePaletteCss, gradientString, setTheme } from './theme.js';
 
 
 
@@ -16,6 +17,7 @@ let appliedSettings: Settings;
 
 export class Settings {
   'theme': Theme = 'system';
+  'theme-hue': number = 320;
   'cache-all-sprites': boolean = false;
 
   constructor(data?: FormData | object) {
@@ -25,10 +27,16 @@ export class Settings {
       const storedTheme = String(data.get('theme'));
       if (isSupportedTheme(storedTheme)) this['theme'] = storedTheme;
 
+      this['theme-hue'] = Number(data.get('theme-hue')) || this['theme-hue'];
+
       this['cache-all-sprites'] = data.get('cache-all-sprites') === 'true';
     } else {
       if ('theme' in data && typeof data['theme'] === 'string' && isSupportedTheme(data['theme'])) {
         this['theme'] = data['theme'];
+      }
+
+      if ('theme-hue' in data && typeof data['theme-hue'] === 'number' && !isNaN(data['theme-hue'])) {
+        this['theme-hue'] = data['theme-hue'];
       }
 
       if ('cache-all-sprites' in data) {
@@ -50,6 +58,14 @@ export class Settings {
     }
 
     {
+      // Theme hue
+      const input = form.querySelector('[name="theme-hue"]');
+      if (!input || !('value' in input) || !('style' in input)) throw new TypeError('Expecting InputSlider');
+      input.value = this['theme-hue'];
+      input.setAttribute('style', `--gradient:${gradientString};`);
+    }
+
+    {
       // Cache all sprites
       const input = form.querySelector('[name="cache-all-sprites"]');
       if (!input || !('checked' in input)) throw new TypeError(`Expecting InputSwitch`);
@@ -59,22 +75,36 @@ export class Settings {
 
 
   apply() {
-    // Theme
-    if (!appliedSettings || this['theme'] !== appliedSettings['theme'])
-      setTheme(this['theme']);
+    {
+      // Theme
+      if (!appliedSettings || this['theme'] !== appliedSettings['theme'])
+        setTheme(this['theme']);
+    }
 
-    // Cache all sprites
-    if (!appliedSettings) { // On app launch
-      if (this['cache-all-sprites']) {
-        const progressContainer = document.querySelector('[data-sprites-progress]');
-        dataStorage.getItem('sprites-cache-progress')
-        .then(val => {
-          if (progressContainer && val) progressContainer.innerHTML = val;
-        });
-        // cacheAllSprites(true); // Cache all new sprites
+    {
+      // Theme hue
+      if (!appliedSettings || this['theme-hue'] !== appliedSettings['theme-hue']) {
+        const css = computePaletteCss(this['theme-hue']);
+        const container = document.querySelector('style#palette');
+        if (!(container instanceof HTMLStyleElement)) throw new TypeError(`Expecting HTMLStyleElement`);
+        container.innerHTML = `:root { ${css} }`;
       }
-    } else if (appliedSettings && this['cache-all-sprites'] !== appliedSettings['cache-all-sprites']) { // On manual settings change,
-      cacheAllSprites(this['cache-all-sprites']);                                                       // cache or delete all sprites.
+    }
+
+    {
+      // Cache all sprites
+      if (!appliedSettings) { // On app launch
+        if (this['cache-all-sprites']) {
+          const progressContainer = document.querySelector('[data-sprites-progress]');
+          dataStorage.getItem('sprites-cache-progress')
+          .then(val => {
+            if (progressContainer && val) progressContainer.innerHTML = val;
+          });
+          // cacheAllSprites(true); // Cache all new sprites
+        }
+      } else if (appliedSettings && this['cache-all-sprites'] !== appliedSettings['cache-all-sprites']) { // On manual settings change,
+        cacheAllSprites(this['cache-all-sprites']);                                                       // cache or delete all sprites.
+      }
     }
 
     appliedSettings = this;
@@ -100,31 +130,6 @@ export class Settings {
     if (id in appliedSettings) return appliedSettings[id as keyof Settings];
     else throw new Error(`${id} is not a valid setting`);
   }
-}
-
-
-
-//////////////////////
-// Définition du thème
-export async function setTheme(askedTheme?: string) {
-  let html = document.documentElement;
-  html.dataset.theme = askedTheme || '';
-
-  // Thème par défaut
-  const defaultTheme = 'dark';
-
-  // Thème préféré selon l'OS
-  let osTheme;
-  if (window.matchMedia('(prefers-color-scheme: dark)').matches) osTheme = 'dark';
-  else if (window.matchMedia('(prefers-color-scheme: light)').matches) osTheme = 'light';
-
-  // Thème appliqué (askedTheme > osTheme > defaultTheme)
-  const theme = ['light', 'dark'].includes(askedTheme || '') ? askedTheme : (osTheme || defaultTheme);
-  
-  let themeColor = (theme == 'dark') ? 'rgb(34, 34, 34)' : 'rgb(224, 224, 224)';
-  document.querySelector("meta[name=theme-color]")!.setAttribute('content', themeColor);
-
-  window.dispatchEvent(new CustomEvent('themechange', { detail: { theme } }));
 }
 
 

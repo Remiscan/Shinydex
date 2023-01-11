@@ -14,6 +14,10 @@
 
 <div class="section-contenu">
   <form name="app-settings">
+    <span class="sous-titre">
+      <span>Apparence</span>
+    </span>
+
     <p class="un-parametre theme">
       <span class="param-nom">Thème</span>
 
@@ -35,6 +39,15 @@
       </span>
     </p>
 
+    <p class="un-parametre">
+      <span class="param-nom">Teinte</span>
+      <span class="param">
+        <input-slider name="theme-hue" min="0" max="359" step="1" value="320"></input-switch>
+      </span>
+    </p>
+
+    <!---->
+
     <span class="sous-titre">
       <span>Sauvegarde des données</span>
       <sync-line></sync-line>
@@ -52,6 +65,8 @@
       <input-switch id="switch-online-backup" hint="icon"></input-switch>
     </p>
     -->
+
+    <!---->
 
     <span class="sous-titre">
       <span>Gestion des données</span>
