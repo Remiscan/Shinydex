@@ -9,6 +9,7 @@ import './components/hunt-card/huntCard.js';
 import './components/load-spinner/loadSpinner.js';
 import './components/pokemon-sprite/pokemonSprite.js';
 import './components/search-bar/searchBar.js';
+import './components/search-box/searchBox.js';
 import './components/shiny-card/shinyCard.js';
 import './components/shiny-stars/shinyStars.js';
 import './components/shiny-switch/shinySwitch.js';

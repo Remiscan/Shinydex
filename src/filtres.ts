@@ -17,10 +17,16 @@ export function isOrdre(string: string): string is ordre {
 export type FiltrableSection = 'mes-chromatiques' | 'chasses-en-cours' | 'corbeille' | 'partage' | 'chromatiques-ami';
 export const filtrableSections: FiltrableSection[] = ['mes-chromatiques', 'chasses-en-cours', 'corbeille', 'partage', 'chromatiques-ami'];
 export const savedFiltersSections: FiltrableSection[] = ['mes-chromatiques'];
-
 export function isFiltrableSection(string: string): string is FiltrableSection {
   return filtrableSections.includes(string as FiltrableSection);
 }
+
+export type SearchableSection = FiltrableSection | 'pokedex';
+export const searchableSections: SearchableSection[] = [...filtrableSections, 'pokedex'];
+export function isSearchableSection(string: string): string is SearchableSection {
+  return searchableSections.includes(string as SearchableSection);
+}
+
 
 
 

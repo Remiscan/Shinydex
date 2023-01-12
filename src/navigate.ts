@@ -257,7 +257,9 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
   if (window.innerWidth >= Params.layoutPClarge) {
     switch (sectionCible) {
       case 'mes-chromatiques': if (shouldItAnimate('pokedex')) sectionsToAnimate.push('pokedex'); break;
+      case 'chasses-en-cours': if (shouldItAnimate('corbeile')) sectionsToAnimate.push('corbeille'); break;
       case 'parametres':       if (shouldItAnimate('a-propos')) sectionsToAnimate.push('a-propos'); break;
+      case 'partage':          if (shouldItAnimate('chromatiques-ami')) sectionsToAnimate.push('chromatiques-ami');
     }
   }
 

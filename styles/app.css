@@ -241,6 +241,7 @@ body[data-section-actuelle~="obfuscator"] #obfuscator {
 
 h1 {
   all: unset;
+  white-space: nowrap;
 }
 
 .section-titre {
@@ -253,6 +254,7 @@ h1 {
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
+  gap: 8px;
   position: sticky;
   top: 0;
   z-index: var(--z-section-titre);
@@ -274,16 +276,25 @@ h1 {
   padding-left: 0;
 }
 
+.section-titre search-box {
+  display: none;
+}
+
 .titre-icones {
   display: flex;
   flex-direction: row;
   justify-content: end;
   align-items: center;
+  gap: 8px;
+  margin-left: auto;
 }
 
-.icone + .icone,
-#install-bouton + .icone {
-  margin-left: 12px;
+.titre-icones > .icone {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .icone.bouton-retour {
@@ -305,7 +316,6 @@ h1 {
 	min-width: 35px;
   height: 35px;
   box-sizing: border-box;
-  margin-left: 1ch;
   padding: 0 4px;
 	border-radius: 35px;
 	letter-spacing: 0;
@@ -1528,9 +1538,21 @@ input-slider[name="theme-hue"]::part(slider-thumb) {
 
   body[data-section-actuelle~="mes-chromatiques"] #pokedex,
   body[data-section-actuelle~="pokedex"] #mes-chromatiques,
+  body[data-section-actuelle~="chasses-en-cours"] #corbeille,
+  body[data-section-actuelle~="corbeille"] #chasses-en-cours,
+  body[data-section-actuelle~="partage"] #chromatiques-ami,
+  body[data-section-actuelle~="chromatiques-ami"] #partage,
   body[data-section-actuelle~="parametres"] #a-propos,
   body[data-section-actuelle~="a-propos"] #parametres {
     display: grid;
+  }
+
+  body[data-section-actuelle~="partage"] #chromatiques-ami:not([data-pseudo]) {
+    display: none;
+  }
+
+  .section-titre search-box {
+    display: contents;
   }
 
   .titre-icones {
