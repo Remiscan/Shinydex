@@ -96,6 +96,8 @@ pokemon-sprite,
   position: relative;
   left: 0;
   top: 0;
+  text-shadow: 1px 1px rgb(var(--surface-variant));
+  z-index: 1;
 }
 
 [data-type="name"]:empty {
