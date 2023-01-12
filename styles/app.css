@@ -9,6 +9,8 @@ html {
   --sprite-size: 112px;
   --tap-safe-size: 44px;
   --border-radius: 10px;
+  --section-title-height: 64px;
+  --nav-bar-height: 80px;
 
   /* Élévation */
   --z-sprite-viewer: 60;
@@ -61,10 +63,15 @@ body {
 body {
   display: grid;
   --nav-bar-height: 80px;
-  grid-template-rows: 1fr var(--nav-bar-height);
+  --bottom-bar-height: calc(var(--nav-bar-height) + var(--section-title-height));
+  grid-template-rows: 1fr var(--bottom-bar-height);
   grid-template-columns: 1fr;
   margin: 0;
   font-family: 'Roboto', system-ui;
+}
+
+body[data-no-search] {
+  --bottom-bar-height: var(--nav-bar-height);
 }
 
 
@@ -78,10 +85,28 @@ nav {
   grid-column: 1 / 2;
   display: grid;
   --nombre-sections: 4;
+  grid-template-rows: var(--section-title-height) 1fr;
   grid-template-columns: repeat(var(--nombre-sections), 1fr);
   align-items: center;
   background-color: var(--nav-bg-color);
   z-index: var(--z-nav);
+}
+
+nav > search-box::part(form) {
+  grid-row: 1;
+  grid-column: 1 / -1;
+  padding-inline: 8px;
+  margin: auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+body[data-no-search] nav {
+  grid-template-rows: 1fr;
+}
+
+body[data-no-search] nav > search-box {
+  display: none;
 }
 
 .nav-link.search-button {
@@ -222,7 +247,7 @@ section {
 }
 
 main > section {
-  grid-template-rows: 64px auto;
+  grid-template-rows: var(--section-title-height) auto;
 }
 
 main > section.on,
@@ -377,7 +402,7 @@ section.loading .compteur {
   height: 56px;
   position: fixed;
   z-index: var(--z-fab);
-  bottom: var(--nav-bar-height);
+  bottom: var(--bottom-bar-height);
   right: 0;
   margin: 16px;
   padding: 0;
@@ -391,7 +416,7 @@ section.loading .compteur {
 }
 
 .fab.notif {
-  --decalage: calc(-1 * var(--nav-bar-height));
+  --decalage: calc(-1 * var(--bottom-bar-height));
   transition: transform .15s var(--easing-decelerate);
 }
 
@@ -1360,7 +1385,7 @@ input-slider[name="theme-hue"]::part(slider-thumb) {
   justify-content: space-between;
   align-items: center;
   position: absolute;
-  bottom: var(--nav-bar-height);
+  bottom: var(--bottom-bar-height);
   left: 0;
   width: 100%;
   height: 56px;
@@ -1446,7 +1471,7 @@ input-slider[name="theme-hue"]::part(slider-thumb) {
   grid-column: 1 / 2;
   grid-row: 1 / 2;
   position: fixed;
-  bottom: calc(var(--nav-bar-height) + 28px);
+  bottom: calc(var(--bottom-bar-height) + 28px);
   left: 16px;
 }
 
@@ -1481,6 +1506,10 @@ input-slider[name="theme-hue"]::part(slider-thumb) {
     grid-template-columns: auto;
     --nav-bg-color: var(--bg-color);
     padding: 0;
+  }
+
+  nav > search-box::part(form) {
+    display: none;
   }
 
   nav.bottom-bar {
@@ -1617,7 +1646,7 @@ input-slider[name="theme-hue"]::part(slider-thumb) {
   }
 
   .fab.notif {
-    --decalage: calc(-1 * var(--nav-bar-height) - 16px);
+    --decalage: calc(-1 * var(--bottom-bar-height) - 16px);
   }
 
   .progression-maj {

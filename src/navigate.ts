@@ -1,6 +1,8 @@
 import { Params, loadAllImages, wait } from './Params.js';
 import { Settings } from './Settings.js';
 import { SearchBar } from './components/search-bar/searchBar.js';
+import { SearchBox } from './components/search-box/searchBox.js';
+import { isSearchableSection } from './filtres.js';
 import { disableLazyLoad, enableLazyLoad } from './lazyLoading.js';
 import { Notif } from './notification.js';
 
@@ -238,6 +240,15 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
     sp.removeAttribute('finished');
   });
 
+  // On met à jour la barre de recherche globale
+  const globalSearchBar = document.querySelector('nav > search-box');
+  if (globalSearchBar && globalSearchBar instanceof SearchBox && isSearchableSection(nouvelleSection.nom)) {
+    document.body.removeAttribute('data-no-search');
+    globalSearchBar.section = nouvelleSection.nom;
+  } else {
+    document.body.setAttribute('data-no-search', 'true');
+  }
+
   // On affiche la nouvelle section
   sectionActuelle = sectionCible;
   const sectionsString = `${nouvelleSection.closePrevious ? '' : ancienneSection.nom} ${nouvelleSection.nom}`;
@@ -259,7 +270,7 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
       case 'mes-chromatiques': if (shouldItAnimate('pokedex')) sectionsToAnimate.push('pokedex'); break;
       case 'chasses-en-cours': if (shouldItAnimate('corbeile')) sectionsToAnimate.push('corbeille'); break;
       case 'parametres':       if (shouldItAnimate('a-propos')) sectionsToAnimate.push('a-propos'); break;
-      case 'partage':          if (shouldItAnimate('chromatiques-ami')) sectionsToAnimate.push('chromatiques-ami');
+      case 'partage':          if (shouldItAnimate('chromatiques-ami')) sectionsToAnimate.push('chromatiques-ami'); break;
     }
   }
 

@@ -130,7 +130,7 @@ export class SearchBox extends HTMLElement {
     else return null;
   }
 
-  set section(value) {
+  set section(value: string | null) {
     const _value = value ?? '';
     this.setAttribute('section', isSearchableSection(_value) ? _value : '');
   }

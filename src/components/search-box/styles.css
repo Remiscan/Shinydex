@@ -36,7 +36,7 @@ input[name="search"]::placeholder {
   color: rgb(var(--on-surface-variant));
 }
 
-.search-icon, .reset-icon, .filter-icon {
+[part="search-icon"], [part="reset-icon"], [part="filter-icon"] {
   color: rgb(var(--on-surface-variant));
   display: flex;
   width: 48px;
@@ -45,18 +45,18 @@ input[name="search"]::placeholder {
   align-items: center;
 }
 
-.search-icon {
+[part="search-icon"] {
   grid-column: search-icon;
 }
 
-.reset-icon {
+[part="reset-icon"] {
   grid-column: reset-icon;
 }
 
-.filter-icon {
+[part="filter-icon"] {
   grid-column: filter-icon;
 }
 
-:host([no-filters]) .filter-icon {
+:host([no-filters]) [part="filter-icon"] {
   display: none;
 }

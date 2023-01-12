@@ -79,6 +79,8 @@
 
     <!-- Barre de navigation -->
     <nav class="bottom-bar surface primary elevation-2">
+      <search-box section="mes-chromatiques"></search-box>
+      
       <a class="nav-link lien-section search-button" data-nav-section="obfuscator" data-nav-data='{ "search": true }' href="#" style="display: none">
         <span class="material-icons">search</span>
       </a>
