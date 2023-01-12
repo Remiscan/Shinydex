@@ -341,27 +341,21 @@ h1 {
 	justify-content: center;
 	align-items: center;
   position: relative;
-	font-size: 1.25rem;
-	min-width: 35px;
-  height: 35px;
+	min-width: 36px;
+  height: 36px;
   box-sizing: border-box;
   padding: 0 4px;
-	border-radius: 35px;
+	border-radius: 18px;
 	letter-spacing: 0;
-}
-
-#pokedex .compteur {
-  font-size: .95rem;
-}
-
-#pokedex .compteur > .caught {
-  opacity: 1;
-  font-size: 1.25rem;
 }
 
 #pokedex .compteur > span {
   padding: 0 0.2em;
   opacity: .8;
+}
+
+#pokedex .compteur > .caught {
+  opacity: 1;
 }
 
 .section-contenu {
