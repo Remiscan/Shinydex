@@ -22,7 +22,7 @@ const defaultAnimation = (section: Element, event: Event) => section.animate([
   { transform: 'translate3D(0, 20px, 0)', opacity: '0' },
   { transform: 'translate3D(0, 0, 0)', opacity: '1' }
 ], {
-  easing: Params.easingDecelerate,
+  easing: Params.easingEmphasizedDecelerate,
   duration: 200,
   fill: 'both'
 });
@@ -127,7 +127,7 @@ const sections: Section[] = [
         { opacity: 0, transform: 'scale(.7) translateZ(0)' },
         { opacity: 1, transform: 'scale(1) translateZ(0)' }
       ], {
-        easing: Params.easingDecelerate,
+        easing: Params.easingEmphasizedDecelerate,
         duration: 200,
         fill: 'backwards'
       });;

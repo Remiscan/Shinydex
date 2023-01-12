@@ -224,7 +224,7 @@ export class SearchBar extends HTMLElement {
       { clipPath: 'circle(142% at top center)' }
     ], {
       duration: 500,
-      easing: Params.easingDecelerate,
+      easing: Params.easingEmphasizedDecelerate,
       fill: 'backwards'
     });
     this.querySelector('input')!.focus();
