@@ -284,17 +284,17 @@ export async function appStart() {
 
 /////////////////////////////////////////////
 // Vérifie la disponibilité d'une mise à jour
-let checkingUpdate = 0;
-let updateAvailable = 0;
+let checkingUpdate = false;
+let updateAvailable = false;
 export async function checkUpdate(checkNotification = false) {
   const notif = document.getElementById('notification');
   if (notif!.classList.contains('on') || checkingUpdate)
     return;
-  checkingUpdate = 1;
+  checkingUpdate = true;
 
   const texteSucces = 'Mise à jour disponible...';
   const notifyMaj = async () => {
-    checkingUpdate = 0;
+    checkingUpdate = false;
     const updateNotif = new Notif(texteSucces, 'Installer', 'update', 10000, () => {
       window.dispatchEvent(new Event('updatecheck'));
     });
@@ -314,21 +314,28 @@ export async function checkUpdate(checkNotification = false) {
     const cacheVersion = Math.max(...Object.values(installedFiles).map(v => Number(v)));
   
     // On lance mod_update.php pour récupérer les données les plus récentes
-    const response = await fetch(`/shinydex/backend/update.php?type=check&from=${cacheVersion}&date=${Date.now()}`);
+    const response = await fetch(`/shinydex/backend/file-versions.php?date=${Date.now()}`);
     if (response.status != 200)
       throw '[:(] Erreur ' + response.status + ' lors de la requête';
-    const data = await response.json();
+    const liveFiles = await response.json();
 
-    if ((cacheVersion != data['version-fichiers'])) {
-      updateAvailable = 1;
+    const updatedFiles = Object.entries(liveFiles).filter(file => {
+      const [path, liveVersion] = file;
+      const installedVersion = installedFiles[path];
+      return liveVersion !== installedVersion;
+    });
+
+    if (updatedFiles.length > 0) {
+      const maxVersion = Math.max(...Object.values(liveFiles).map(v => Number(v)));
+      updateAvailable = true;
       console.log('[:|] Mise à jour détectée');
       console.log('     Installé : fichiers v. ' + timestamp2date(cacheVersion * 1000));
-      console.log('   Disponible : fichiers v. ' + timestamp2date(data['version-fichiers'] * 1000));
-      console.log('     Modifiés :', data['liste-fichiers-modifies']);
+      console.log('   Disponible : fichiers v. ' + timestamp2date(maxVersion * 1000));
+      console.log('     Modifiés :', Object.fromEntries(updatedFiles));
 
       return notifyMaj();
     } else {
-      updateAvailable = 0;
+      updateAvailable = false;
       console.log('[:)] Aucune mise à jour disponible');
       console.log('     Installé : fichiers v. ' + timestamp2date(cacheVersion * 1000));
       throw 'Pas de mise à jour';
@@ -338,7 +345,7 @@ export async function checkUpdate(checkNotification = false) {
   catch(error) {
     if (checkNotification && typeof error === 'string')
       new Notif(error).prompt();
-    checkingUpdate = 0;
+    checkingUpdate = false;
   }
 }
 

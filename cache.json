@@ -1,6 +1,6 @@
 {
     "files": [
-        "./",
+        "./index.php",
         "./images/app-icons/favicon.svg",
         "./images/app-icons/icon.svg",
         "./images/iconsheet.css",
@@ -40,6 +40,9 @@
         "./modules/components/search-bar/searchBar.js",
         "./modules/components/search-bar/styles.css",
         "./modules/components/search-bar/template.js",
+        "./modules/components/search-box/searchBox.js",
+        "./modules/components/search-box/styles.css",
+        "./modules/components/search-box/template.js",
         "./modules/components/shiny-card/shinyCard.js",
         "./modules/components/shiny-card/styles.css",
         "./modules/components/shiny-card/template.js",

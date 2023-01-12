@@ -1,19 +1,12 @@
 /* <?php
-$cacheFiles = json_decode(file_get_contents(__DIR__.'/cache.json'), true)['files'];
 
-$fileVersions = [];
-$indexVersion = 0;
-foreach ($cacheFiles as $file) {
-  if ($file === './' || str_starts_with($file, './pages')) {
-    $file = './';
-    $indexVersion = max($indexVersion, version([$file]));
-    $fileVersions[$file] = $indexVersion;
-  } else {
-    $fileVersions[$file] = version([$file]);
-  }
-}
+ob_start();
+include __DIR__.'/backend/file-versions.php';
+$json = ob_get_clean();
 
+$fileVersions = json_decode($json, true);
 $maxVersion = max($fileVersions);
+
 ?> */
 
 importScripts('./ext/localforage.min.js');
@@ -204,7 +197,7 @@ async function installFiles(event = null) {
       const request = new Request(file, { cache: 'no-store' });
 
       // If the online file is more recent than the locally installed file
-      if (newVersion > oldVersion || oldVersion === 0) {
+      if (newVersion !== oldVersion || oldVersion === 0) {
         response = await fetch(request);
         console.log(`File ${file} updated (${oldVersion} => ${newVersion})`);
       }
