@@ -1,11 +1,52 @@
-import { Params } from '../../Params.js';
-// @ts-expect-error
-import sheet from './styles.css' assert { type: 'css' };
-import template from './template.js';
+import { Params } from '../Params.js';
 
 
 
-class syncLine extends HTMLElement {
+const template = document.createElement('template');
+template.innerHTML = /*html*/`
+  <svg>
+    <line class="progress-line" x1="0" x2="100%" y1="50%" y2="50%"/>
+  </svg>
+`;
+
+
+
+const sheet = new CSSStyleSheet();
+sheet.replaceSync(/*css*/`
+  :host {
+    width: 100%;
+    height: 2px;
+    position: relative;
+  }
+
+  svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    opacity: 0;
+    transition: opacity .2s var(--easing-standard);
+    position: absolute;
+  }
+
+  svg.loading,
+  svg.success,
+  svg.failure,
+  svg.lazy {
+    opacity: 1;
+  }
+
+  .progress-line {
+    stroke: var(--progress-bar-color);
+    stroke-width: 2px;
+    stroke-dasharray: var(--longueur, 0);
+    stroke-dashoffset: var(--longueur, 0);
+    transform-origin: center center;
+  }
+`);
+
+
+
+export class syncLine extends HTMLElement {
   shadow: ShadowRoot;
   longueur: number = 0;
   loadingAnim: Animation = new Animation();

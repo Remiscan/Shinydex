@@ -1,5 +1,5 @@
 import '../pokemon-sprite/pokemonSprite.js';
-import '../shiny-switch/shinySwitch.js';
+import '../shinySwitch.js';
 
 
 

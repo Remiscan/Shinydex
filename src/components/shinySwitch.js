@@ -1,9 +1,9 @@
-import InputSwitch from '../../../../_common/components/input-switch/input-switch.js';
-import '../shiny-stars/shinyStars.js';
+import InputSwitch from '../../../_common/components/input-switch/input-switch.js';
+import './shinyStars.js';
 
 
 
-class ShinySwitch extends InputSwitch {
+export class ShinySwitch extends InputSwitch {
   constructor() {
     super();
   }

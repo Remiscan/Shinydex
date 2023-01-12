@@ -5,7 +5,7 @@ import { Forme, Pokemon } from '../../Pokemon.js';
 import { Count, Shiny } from '../../Shiny.js';
 import { huntStorage, pokemonData, shinyStorage } from '../../localForage.js';
 import { Notif } from '../../notification.js';
-import pokemonSprite from '../pokemon-sprite/pokemonSprite.js';
+import { pokemonSprite } from '../pokemon-sprite/pokemonSprite.js';
 import template from './template.js';
 // @ts-expect-error
 import materialIconsSheet from '../../../ext/material_icons.css' assert { type: 'css' };

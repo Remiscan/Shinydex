@@ -1,6 +1,17 @@
 import { shinyCard } from '../shiny-card/shinyCard.js';
-// @ts-expect-error
-import sheet from './styles.css' assert { type: 'css' };
+
+
+
+const sheet = new CSSStyleSheet();
+sheet.replaceSync(/*css*/`
+  #edit-button {
+    display: none;
+  }
+
+  #restore-button {
+    display: initial;
+  }
+`);
 
 
 

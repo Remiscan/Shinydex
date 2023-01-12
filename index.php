@@ -50,9 +50,10 @@
       if (is_dir($mod)) continue;
       else if (str_ends_with($mod, '.html')) continue;
       else if (str_ends_with($mod, '.css')) continue; // can't preload css modules yet
-      else                                  { $rel = 'modulepreload'; $as = null; }
+      else { $rel = 'modulepreload'; $as = null; }
+      $path = str_replace(__DIR__, '.', $obj->getPath()) . '/' . $obj->getFilename();
       ?>
-    <link rel="<?=$rel?>" <?=($as ? 'as="'.$as.'"' : '')?> href="<?=str_replace(__DIR__, '.', $mod)?>">
+    <link rel="<?=$rel?>" <?=($as ? 'as="'.$as.'"' : '')?> href="<?=$path?>">
       <?php
     } ?>
 

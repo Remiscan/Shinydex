@@ -8,7 +8,7 @@ import template from './template.js';
 
 
 
-class spriteViewer extends HTMLElement {
+export class spriteViewer extends HTMLElement {
   ready: boolean = true;
   toggle: () => void = () => {};
   mode: 'shiny' | 'regular' = 'shiny';
