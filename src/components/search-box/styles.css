@@ -5,9 +5,9 @@ form {
   max-width: 720px;
   height: 56px;
   display: grid;
-  --icon-button-width: 48px;
+  --icon-button-width: 44px;
   --filter-icon-column: var(--icon-button-width);
-  grid-template-columns: 4px [search-icon] var(--icon-button-width) 4px 1fr 4px [reset-icon] var(--icon-button-width) [filter-icon] var(--filter-icon-column) 4px;
+  grid-template-columns: [search-icon] 56px 1fr [reset-icon] var(--icon-button-width) [filter-icon] var(--filter-icon-column) 6px;
   place-items: center;
 }
 
@@ -25,8 +25,8 @@ input[name="search"] {
   margin: 0;
   padding: 0;
   width: 100%;
-  height: calc(100% - 16px);
-  padding: 0 calc(4px + var(--icon-button-width) + var(--filter-icon-column) + 4px) 0 calc(4px + var(--icon-button-width) + 4px);
+  height: calc(100% - 8px);
+  padding: 0 calc(var(--icon-button-width) + var(--filter-icon-column) + 4px) 0 56px;
   box-sizing: border-box;
   border-radius: 28px;
   font-family: inherit;

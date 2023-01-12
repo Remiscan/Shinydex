@@ -222,7 +222,7 @@ section {
 }
 
 main > section {
-  grid-template-rows: 56px auto;
+  grid-template-rows: 64px auto;
 }
 
 main > section.on,
@@ -338,7 +338,7 @@ h1 {
 .section-contenu {
   grid-row: 2 / 3;
   grid-column: 1 / 2;
-  gap: 6px;
+  gap: 8px;
   padding: 8px;
   padding-top: 0;
   display: flex;
