@@ -245,7 +245,7 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
   if (globalSearchBar && globalSearchBar instanceof SearchBox && isSearchableSection(nouvelleSection.nom)) {
     document.body.removeAttribute('data-no-search');
     globalSearchBar.section = nouvelleSection.nom;
-  } else {
+  } else if (nouvelleSection.closePrevious) {
     document.body.setAttribute('data-no-search', 'true');
   }
 

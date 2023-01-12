@@ -101,6 +101,10 @@ nav > search-box::part(form) {
   box-sizing: border-box;
 }
 
+nav > search-box::part(input) {
+  --elevation-opacity: var(--elevation-5-opacity);
+}
+
 body[data-no-search] nav {
   grid-template-rows: 1fr;
 }
@@ -1492,12 +1496,13 @@ input-slider[name="theme-hue"]::part(slider-thumb) {
   html {
     --z-notification: 32;
   }
-
+ 
   body {
     grid-template-rows: 1fr;
     grid-template-columns: 112px 1fr;
   }
 
+  body[data-no-search] nav,
   nav {
     grid-column: 1 / 2;
     grid-row: 1 / 2;
