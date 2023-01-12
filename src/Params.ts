@@ -25,9 +25,12 @@ export const Params = {
   layoutPClarge: 1140,
   layoutPCcomplet: 1600,
   
-  easingStandard: 'cubic-bezier(0.4, 0.0, 0.2, 1)',
-  easingDecelerate: 'cubic-bezier(0.0, 0.0, 0.2, 1)',
-  easingAccelerate: 'cubic-bezier(0.4, 0.0, 1, 1)',
+  easingStandard: 'cubic-bezier(.2, 0, 0, 1)',
+  easingDecelerate: 'cubic-bezier(0, 0, 0, 1)',
+  easingAccelerate: 'cubic-bezier(.3, 0, 1, 1)',
+  easingEmphasizedStandard: 'cubic-bezier(.3, 0, 0, 1)',
+  easingEmphasizedDecelerate: 'cubic-bezier(.05, .7, .1, 1)',
+  easingEmphasizedAccelerate: 'cubic-bezier(.3, 0, .8, .15)',
 
   spriteSize: 112,
 

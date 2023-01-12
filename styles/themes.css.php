@@ -144,6 +144,12 @@ echo '/'.'*'; ?>*/
 /*<?php themeSheetEnd(closeComment: true); ?>*/
 
 :root {
+  --easing-standard: cubic-bezier(.2, 0, 0, 1);
+  --easing-decelerate: cubic-bezier(0, 0, 0, 1);
+  --easing-accelerate: cubic-bezier(.3, 0, 1, 1);
+  --easing-emphasized-standard: cubic-bezier(.3, 0, 0, 1);
+  --easing-emphasized-decelerate: cubic-bezier(.05, .7, .1, 1);
+  --easing-emphasized-accelerate: cubic-bezier(.3, 0, .8, .15);
   --elevation-1-opacity: .05;
   --elevation-2-opacity: .08;
   --elevation-3-opacity: .11;

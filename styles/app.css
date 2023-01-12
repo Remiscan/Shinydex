@@ -5,9 +5,6 @@
 html {
   --link-iconsheet: url(/shinydex/images/iconsheet.webp);
   --link-pokemonsheet: url(/shinydex/images/pokemonsheet.webp);
-  --easing-standard: cubic-bezier(0.4, 0.0, 0.2, 1);
-  --easing-decelerate: cubic-bezier(0.0, 0.0, 0.2, 1);
-  --easing-accelerate: cubic-bezier(0.4, 0.0, 1, 1);
   --drawer-width: 270px;
   --sprite-size: 112px;
   --tap-safe-size: 44px;
@@ -100,7 +97,6 @@ nav {
   align-items: center;
   flex-grow: 1;
   gap: 4px;
-  color: var(--nav-text-color);
   text-decoration: none;
   font-weight: 500;
   position: relative;
@@ -110,6 +106,7 @@ nav {
   box-sizing: border-box;
   padding-top: 12px;
   padding-bottom: 16px;
+  color: rgb(var(--on-surface-variant));
 }
 
 .nav-link>* {
@@ -156,23 +153,26 @@ nav {
   place-items: center;
   justify-content: center;
   background-color: rgb(var(--icon-surface, 0 0 0 0));
-  color: rgb(var(--icon-color));
+  color: rgb(var(--icon-color, var(--on-surface-variant)));
   --elevation-opacity: 0;
+  --state-opacity: 0;
 }
 
-.nav-link:is(:focus, :hover, :active) {
+/*.nav-link:is(:focus, :hover, :active) {
   --icon-surface: var(--secondary-container);
   --icon-color: var(--on-secondary-container);
-}
+}*/
 
-.on.nav-link,
 body[data-section-actuelle~="mes-chromatiques"] .nav-link[data-nav-section="mes-chromatiques"],
 body[data-section-actuelle~="pokedex"] .nav-link[data-nav-section="pokedex"],
 body[data-section-actuelle~="chasses-en-cours"] .nav-link[data-nav-section="chasses-en-cours"],
-body[data-section-actuelle~="partage"] .nav-link[data-nav-section="partage"] {
-  --nav-text-color: var(--nav-text-color-on);
-  --icon-surface: var(--primary-container);
-  --icon-color: var(--nav-text-color-on);
+body[data-section-actuelle~="partage"] .nav-link[data-nav-section="partage"],
+body[data-section-actuelle~="pokedex"] .nav-link[data-nav-section="mes-chromatiques"],
+body[data-section-actuelle~="parametres"] .nav-link[data-nav-section="parametres"],
+body[data-section-actuelle~="a-propos"] .nav-link[data-nav-section="parametres"] {
+  color: rgb(var(--on-surface));
+  --icon-surface: var(--secondary-container);
+  --icon-color: var(--on-secondary-container);
 }
 
 .search-button > .material-icons {
@@ -308,8 +308,6 @@ h1 {
   margin-left: 1ch;
   padding: 0 4px;
 	border-radius: 35px;
-  background: var(--accent-color);
-  color: var(--text-color-inverse);
 	letter-spacing: 0;
 }
 
@@ -1533,15 +1531,6 @@ input-slider[name="theme-hue"]::part(slider-thumb) {
   body[data-section-actuelle~="parametres"] #a-propos,
   body[data-section-actuelle~="a-propos"] #parametres {
     display: grid;
-  }
-
-  body[data-section-actuelle~="pokedex"] .nav-link[data-nav-section="mes-chromatiques"],
-  body[data-section-actuelle~="parametres"] .nav-link[data-nav-section="parametres"],
-  body[data-section-actuelle~="a-propos"] .nav-link[data-nav-section="parametres"] {
-    --nav-text-color: var(--nav-text-color-on);
-    --nav-text-color: var(--nav-text-color-on);
-    --icon-surface: var(--primary-container);
-    --icon-color: var(--on-primary-container);
   }
 
   .titre-icones {

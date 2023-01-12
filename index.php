@@ -82,30 +82,30 @@
         <span class="material-icons">search</span>
       </a>
 
-      <a class="nav-link lien-section surface" data-nav-section="mes-chromatiques" href="./mes-chromatiques">
+      <a class="nav-link lien-section surface interactive" data-nav-section="mes-chromatiques" href="./mes-chromatiques">
         <span class="material-icons surface">catching_pokemon</span>
-        <span>Pokémon <shiny-stars></shiny-stars></span>
+        <span class="label-medium">Pokémon <shiny-stars></shiny-stars></span>
       </a>
 
-      <a class="nav-link lien-section surface" data-nav-section="pokedex" href="./pokedex">
+      <a class="nav-link lien-section surface interactive" data-nav-section="pokedex" href="./pokedex">
         <span class="material-icons surface">language</span>
-        <span>Pokédex <shiny-stars></shiny-stars></span>
+        <span class="label-medium">Pokédex <shiny-stars></shiny-stars></span>
       </a>
 
-      <a class="nav-link lien-section surface" data-nav-section="chasses-en-cours" href="./chasses-en-cours">
+      <a class="nav-link lien-section surface interactive" data-nav-section="chasses-en-cours" href="./chasses-en-cours">
         <span class="material-icons surface">add_circle</span>
-        <span>Chasses</span>
+        <span class="label-medium">Chasses</span>
       </a>
 
-      <a class="nav-link lien-section surface" data-nav-section="partage" href="./partage">
+      <a class="nav-link lien-section surface interactive" data-nav-section="partage" href="./partage">
         <span class="material-icons surface">group</span>
-        <span>Amis</span>
+        <span class="label-medium">Amis</span>
       </a>
 
       <!-- Seulement sur PC -->
-      <a class="nav-link lien-section surface only-pc" data-nav-section="parametres" href="./parametres">
+      <a class="nav-link lien-section surface interactive only-pc" data-nav-section="parametres" href="./parametres">
         <span class="material-icons surface">settings</span>
-        <span>Paramètres</span>
+        <span class="label-medium">Paramètres</span>
       </a>
     </nav>
 
