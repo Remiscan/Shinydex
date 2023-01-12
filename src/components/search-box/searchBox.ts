@@ -61,7 +61,7 @@ export class SearchBox extends HTMLElement {
     if (search.length > 0) {
       if (section === 'pokedex') {
         if (!isNaN(parseFloat(search))) {
-          const speciesSelector = `:not([data-dexid="${search}"])`;
+          const speciesSelector = `:not([data-dexid="${parseFloat(search)}"])`;
           css += `#${section} ${cardSelector}${speciesSelector} { display: none; }`;
         } else {
           const names = await Pokemon.names();
@@ -76,7 +76,7 @@ export class SearchBox extends HTMLElement {
         }
       } else {
         if (!isNaN(parseFloat(search))) {
-          const speciesSelector = `:not([data-dexid="${search}"])`;
+          const speciesSelector = `:not([data-dexid="${parseFloat(search)}"])`;
           css += `#${section} ${cardSelector}${speciesSelector} { display: none; }`;
         } else {
           const selector = `:not([data-name*="${search}"]):not([data-species*="${search}"])`;
