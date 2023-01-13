@@ -1,12 +1,30 @@
 // @ts-expect-error
 import Couleur from 'colori';
 // @ts-expect-error
-import Palette from '../../colori/palette/palette.js';
+import DefPalette from '../../colori/palette/palette.js';
 
 
 
 const gradient = Couleur.interpolateInSteps('oklch(70% 0.19 1)', 'oklch(70% 0.19 360)', 25, { interpolationSpace: 'oklch', hueInterpolationMethod: 'longer' });
 export const gradientString = `linear-gradient(to right, ${gradient.map((c: Couleur) => c.rgb).join(', ')})`;
+
+
+
+class Palette extends DefPalette {
+  toCSS() {
+    let css = ``;
+    // @ts-ignore
+    for (const [label, colors] of this.colors) {
+      for (let k = 0; k < colors.length; k++) {
+        const color = colors[k];
+        // @ts-ignore
+        const lightness = this.lightnesses[k];
+        css += `--${label}-${String(100 * lightness).replace(/[^0-9]/g, '_')}:${color.rgb.slice(4, -1)};`;
+      }
+    }
+    return css;
+  }
+}
 
 
 
@@ -52,6 +70,7 @@ const materialLikeGenerator = function(hue: number) {
 
 class MaterialLikePalette extends Palette {
   constructor(hue: number) {
+    // @ts-ignore
     super(hue, materialLikeGenerator);
   }
 
