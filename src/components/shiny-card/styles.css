@@ -10,7 +10,6 @@
   grid-template-rows: 1fr [identity] auto 1fr [capture] auto 1fr;
   position: relative;
   order: var(--order, 0);
-  --surface: var(--surface-variant);
 }
 
 pokemon-sprite,

@@ -652,7 +652,6 @@ body:not([data-section-actuelle="pokedex"]) .only-pokedex {
   gap: 10px;
   justify-content: space-evenly;
   align-items: flex-start;
-  --surface: var(--surface-variant);
 }
 
 .pokedex-gen + .pokedex-gen {

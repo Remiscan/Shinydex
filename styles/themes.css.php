@@ -236,8 +236,16 @@ echo '/'.'*'; ?>*/
   color: rgb(var(--state-tint));
 }
 
+.standard {
+  --surface-color: var(--surface);
+}
+
+.variant {
+  --surface-color: var(--surface-variant);
+}
+
 .surface {
-  background-color: rgb(var(--surface), var(--surface-opacity, 1));
+  background-color: rgb(var(--surface-color, var(--surface)), var(--surface-opacity, 1));
   background-image: linear-gradient(to bottom, rgb(var(--state-tint, var(--on-primary)), var(--state-opacity, 0)) 0% 100%),
                     linear-gradient(to bottom, rgb(var(--surface-tint, var(--primary)), var(--elevation-opacity, 0)) 0% 100%);
   color: rgb(var(--on-surface));
