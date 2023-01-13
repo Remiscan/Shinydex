@@ -170,6 +170,8 @@ sheet.replaceSync(/*css*/`
   button.icon {
     width: 40px;
     height: 40px;
+    --surface-opacity: 0;
+    --state-tint: var(--on-surface);
   }
 
   button.icon::before {
@@ -197,12 +199,27 @@ sheet.replaceSync(/*css*/`
 
 export class MaterialButton extends HTMLElement {
   shadow: ShadowRoot;
+  clickHandler: (event: Event) => void;
+
+  static formAssociated = true;
+  #internals;
 
   constructor() {
     super();
     this.shadow = this.attachShadow({ mode: 'open' });
     this.shadow.appendChild(template.content.cloneNode(true));
     this.shadow.adoptedStyleSheets = [materialIconsSheet, themesSheet, sheet];
+    if ('ElementInternals' in window && 'setFormValue' in window.ElementInternals.prototype) {
+      this.#internals = this.attachInternals();
+    }
+
+    this.clickHandler = event => {
+      const type = this.buttonElement?.getAttribute('type') ?? '';
+      if (this.#internals) {
+        if (type === 'submit') this.form?.submit();
+        else if (type === 'reset') this.form?.reset();
+      }
+    };
   }
 
   get buttonElement() {
@@ -226,8 +243,17 @@ export class MaterialButton extends HTMLElement {
     return this.shadow.querySelector('.label');
   }
 
+
+  connectedCallback() {
+    this.buttonElement?.addEventListener('click', this.clickHandler);
+  }
+
+  disconnectedCallback() {
+    this.buttonElement?.removeEventListener('click', this.clickHandler);
+  }
+
   static get observedAttributes() {
-    return ['class'];
+    return ['class', 'type'];
   }
 
   attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null) {
@@ -240,6 +266,11 @@ export class MaterialButton extends HTMLElement {
     if (appliedValue) button?.setAttribute(name, appliedValue);
     else          button?.removeAttribute(name);
   }
+
+  // Useful properties and methods for form-associated elements
+  get form() { return this.#internals?.form; }
+  get name() { return this.getAttribute('name'); }
+  get type() { return this.localName; }
 }
 
 if (!customElements.get('material-button')) customElements.define('material-button', MaterialButton);
