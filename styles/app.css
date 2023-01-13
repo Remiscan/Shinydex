@@ -1277,7 +1277,7 @@ input-slider[name="theme-hue"]::part(slider-track) {
   width: 100%;
   height: 100%;
   border: none;
-  --border: 2px solid var(--text-color);
+  --border: none;
   outline: var(--border, none);
   border-radius: var(--border-radius);
 }
@@ -1286,8 +1286,8 @@ input-slider[name="theme-hue"]::part(slider-thumb) {
   background: transparent;
   border: none;
   border-radius: var(--border-radius);
-  box-shadow: inset 0 0 0 2px var(--text-color-inverse),
-              0 0 0 2px var(--text-color);
+  box-shadow: inset 0 0 0 2px rgb(var(--on-surface)),
+              0 0 0 2px rgb(var(--inverse-on-surface));
   outline-offset: 5px;
 }
 
