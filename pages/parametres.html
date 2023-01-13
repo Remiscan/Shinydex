@@ -85,7 +85,9 @@
       <span class="param-nom">Exporter mes données</span>
       <span class="param-description">au format JSON.</span>
       <span class="param">
-        <button type="button" class="bouton-export ghost">Exporter</button>
+        <material-button class="filled tonal only-text" data-action="export-json">
+          <span slot="label">Exporter</span>
+        </material-button>
       </span>
     </p>
 
@@ -95,6 +97,9 @@
       <span class="param">
         <input type="file" id="pick-import-file" accept=".json">
         <label for="pick-import-file" class="ghost">Importer</label>
+        <material-button class="filled tonal only-text" data-action="import-json" aria-hidden="true">
+          <span slot="label">Importer</span>
+        </material-button>
       </span>
     </p>
 
@@ -102,16 +107,19 @@
       <span class="param-nom">Supprimer mes données</span>
       <span class="param-description">Supprime la sauvegarde locale, mais pas la sauvegarde en ligne.</span>
       <span class="param">
-        <button type="button" class="bouton-supprimer-local ghost danger">Supprimer</button>
+        <material-button class="filled error only-text" data-action="delete-local-data">
+          <span slot="label">Supprimer</span>
+        </material-button>
       </span>
     </p>
   </form>
 
   <div class="spacer"></div>
 
-  <button type="button" class="bouton-recherche-maj ghost">
-    <span class="material-icons">update</span><span class="texte">Rechercher une mise à jour</span>
-  </button>
+  <material-button class="filled tonal" data-action="check-update">
+    <span slot="icon">update</span>
+    <span slot="label">Rechercher une mise à jour</span>
+  </material-button>
 
   <span class="version">
     <span>application : v. <span id="version-fichiers"></span></span>

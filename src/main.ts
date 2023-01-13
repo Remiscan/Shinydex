@@ -7,6 +7,7 @@ import { appStart, checkUpdate } from './appLifeCycle.js';
 import './components/corbeille-card/corbeilleCard.js';
 import './components/hunt-card/huntCard.js';
 import './components/loadSpinner.js';
+import './components/materialButton.js';
 import './components/search-bar/searchBar.js';
 import './components/search-box/searchBox.js';
 import './components/shiny-card/shinyCard.js';
@@ -116,14 +117,14 @@ backgroundSyncTriggers.forEach(element => {
 
 // Détecte le clic sur le bouton de recherche de mise à jour
 {
-  const majButton = document.querySelector('.bouton-recherche-maj')!;
+  const majButton = document.querySelector('[data-action="check-update"]')!;
   majButton.addEventListener('click', (event: Event) => {
     checkUpdate(true);
   });
 }
 
 // Détecte le clic sur le bouton d'export des données
-document.querySelector('.bouton-export')!.addEventListener('click', () => {
+document.querySelector('[data-action="export-json"]')!.addEventListener('click', () => {
   try {
     export2json();
   } catch (error) {
@@ -133,8 +134,13 @@ document.querySelector('.bouton-export')!.addEventListener('click', () => {
   }
 });
 
-// Détecte le choix d'un fichier JSON d'import de données
+// Détecte le clic sur le bouton associé à l'input d'import des données
 const importInput = document.getElementById('pick-import-file');
+document.querySelector('[data-action="import-json"]')!.addEventListener('click', () => {
+  importInput?.click();
+});
+
+// Détecte le choix d'un fichier JSON d'import de données
 if (!(importInput instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
 importInput.addEventListener('change', async event => {
   try {
@@ -146,7 +152,7 @@ importInput.addEventListener('change', async event => {
 });
 
 // Détecte le clic sur le bouton de suppression des données locales
-/*const boutonSupprimer = document.querySelector('.bouton-supprimer-local');
+/*const boutonSupprimer = document.querySelector('[data-action="delete-local-data"]');
 if (!(boutonSupprimer instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
 boutonSupprimer.addEventListener('click', async event => {
   event.preventDefault();

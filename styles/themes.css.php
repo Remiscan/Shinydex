@@ -229,6 +229,20 @@ echo '/'.'*'; ?>*/
   color: rgb(var(--state-tint));
 }
 
+.error {
+  --surface-tint: var(--error);
+  --state-tint: var(--on-error);
+  background-color: rgb(var(--surface-tint));
+  color: rgb(var(--state-tint));
+}
+
+.error-container {
+  --surface-tint: var(--error-container);
+  --state-tint: var(--on-error-container);
+  background-color: rgb(var(--surface-tint));
+  color: rgb(var(--state-tint));
+}
+
 .background {
   --surface-tint: var(--background);
   --state-tint: var(--on-background);

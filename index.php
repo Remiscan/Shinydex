@@ -176,9 +176,9 @@
       </section>
 
       <!-- FAB -->
-      <button type="button" class="fab surface shadow elevation-3">
-        <span class="material-icons">add</span>
-      </button>
+      <material-button class="fab only-icon">
+        <span slot="icon">add</span>
+      </material-button>
 
     </main>
 

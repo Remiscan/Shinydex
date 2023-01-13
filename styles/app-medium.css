@@ -82,7 +82,7 @@ main {
   padding-left: 16px;
 }
 
-.fab {
+material-button.fab::part(button) {
   bottom: 0;
   right: unset;
   left: calc(.5 * 112px - .5 * 56px);
@@ -102,7 +102,7 @@ main {
   box-shadow: var(--shadow-elevation-medium);
 }
 
-.fab.notif {
+material-button.fab.notif::part(button) {
   --decalage: calc(-1 * var(--bottom-bar-height) - 16px);
 }
 

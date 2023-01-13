@@ -389,46 +389,40 @@ section.loading .compteur {
   100% { transform: translate3D(0, var(--decalage, 0), 0) scale(1); }
 }
 
-.fab {
+material-button.fab::part(button) {
   display: none;
   grid-column: 1 / 2;
   grid-row: 1 / 2;
-  width: 56px;
-  height: 56px;
   position: fixed;
   z-index: var(--z-fab);
   bottom: var(--bottom-bar-height);
   right: 0;
-  margin: 16px;
-  padding: 0;
-  box-shadow: var(--shadow-elevation-medium);
   animation: fab-apparition .2s var(--easing-standard) .2s;
   animation-fill-mode: backwards;
   transform: translate3D(0, var(--decalage, 0), 0) scale(1);
   transition: transform .2s var(--easing-accelerate);
   --decalage: 0;
-  color: var(--text-color-inverse);
 }
 
-.fab.notif {
+material-button.fab.notif::part(button) {
   --decalage: calc(-1 * var(--bottom-bar-height));
   transition: transform .15s var(--easing-decelerate);
 }
 
 @supports (selector(:has(*))) {
-  body[data-section-actuelle~="mes-chromatiques"]:has(#mes-chromatiques:not(.loading)) .fab,
-  body[data-section-actuelle~="pokedex"]:has(#pokedex:not(.loading)) .fab,
-  body[data-section-actuelle~="chasses-en-cours"]:not([data-section-actuelle~="corbeille"]):has(#chasses-en-cours:not(.loading)) .fab,
-  body[data-section-actuelle~="partage"]:has(#partage:not(.loading)) .fab {
+  body[data-section-actuelle~="mes-chromatiques"]:has(#mes-chromatiques:not(.loading)) material-button.fab::part(button),
+  body[data-section-actuelle~="pokedex"]:has(#pokedex:not(.loading)) material-button.fab::part(button),
+  body[data-section-actuelle~="chasses-en-cours"]:not([data-section-actuelle~="corbeille"]):has(#chasses-en-cours:not(.loading)) material-button.fab::part(button),
+  body[data-section-actuelle~="partage"]:has(#partage:not(.loading)) material-button.fab::part(button) {
     display: flex;
   }
 }
 
 @supports not (selector(:has(*))) {
-  body[data-section-actuelle~="mes-chromatiques"] .fab,
-  body[data-section-actuelle~="pokedex"] .fab,
-  body[data-section-actuelle~="chasses-en-cours"]:not([data-section-actuelle~="corbeille"]) .fab,
-  body[data-section-actuelle~="partage"] .fab {
+  body[data-section-actuelle~="mes-chromatiques"] material-button.fab::part(button),
+  body[data-section-actuelle~="pokedex"] material-button.fab::part(button),
+  body[data-section-actuelle~="chasses-en-cours"]:not([data-section-actuelle~="corbeille"]) material-button.fab::part(button),
+  body[data-section-actuelle~="partage"] material-button.fab::part(button) {
     display: flex;
   }
 }
@@ -438,18 +432,6 @@ section.loading .compteur {
 #chasses-en-cours > .section-contenu,
 #partage > .section-contenu {
   padding-bottom: calc(56px + 2 * 15px);
-}
-
-.fab.mini {
-  animation: none;
-  width: 42px;
-  height: 42px;
-  grid-column: unset;
-  grid-row: unset;
-  position: relative;
-  right: unset;
-  bottom: unset;
-  margin: 0;
 }
 
 
@@ -1244,6 +1226,7 @@ form[name="app-settings"] {
   display: inline;
 }
 
+label[for="pick-import-file"],
 #pick-import-file {
   width: .1px;
 	height: .1px;
