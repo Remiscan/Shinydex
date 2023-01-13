@@ -37,7 +37,7 @@ input[name="search"]::placeholder {
   color: rgb(var(--on-surface-variant));
 }
 
-[part="search-icon"], [part="reset-icon"]::part(button), [part="filter-icon"]::part(button) {
+[part="search-icon"], [part="reset-icon"]::part(button), [part="filter-icon"] {
   display: flex;
   color: rgb(var(--on-surface-variant));
 }
@@ -50,10 +50,10 @@ input[name="search"]::placeholder {
   grid-column: reset-icon;
 }
 
-[part="filter-icon"]::part(button) {
+[part="filter-icon"] {
   grid-column: filter-icon;
 }
 
-:host([no-filters]) [part="filter-icon"]::part(button) {
+:host([no-filters]) [part="filter-icon"] {
   display: none;
 }

@@ -175,7 +175,7 @@ label {
 }
 
 :is(
-  input[type=text],
+  input[type=text]:not([inputmode="search"]),
   input[type=number],
   input[type=date],
   input[type=password],
@@ -191,7 +191,7 @@ label {
 
 @media (any-pointer: coarse) {
   :is(
-    input[type=text],
+    input[type=text]:not([inputmode="search"]),
     input[type=number],
     input[type=date],
     input[type=password],

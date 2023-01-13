@@ -26,7 +26,11 @@ import { Notif } from './notification.js';
 // NAVIGATION
 
 // Active les liens de navigation
-for (const link of Array.from(document.querySelectorAll('[data-nav-section]'))) {
+const navLinksList = [
+  ...document.querySelectorAll('[data-nav-section]'),
+  ...[...document.querySelectorAll('search-box')].map(sb => sb.shadowRoot?.querySelector('[part="filter-icon"]'))
+];
+for (const link of navLinksList) {
   if (!(link instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
   link.addEventListener('click', event => {
     event.preventDefault();

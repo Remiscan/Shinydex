@@ -6,6 +6,8 @@ import themesSheet from '../../../styles/themes.css.php' assert { type: 'css' };
 import { Pokemon } from '../../Pokemon.js';
 import { isFiltrableSection, isSearchableSection } from '../../filtres.js';
 // @ts-expect-error
+import commonSheet from '../../../styles/common.css' assert { type: 'css' };
+// @ts-expect-error
 import sheet from './styles.css' assert { type: 'css' };
 import template from './template.js';
 
@@ -19,13 +21,13 @@ document.adoptedStyleSheets = [...document.adoptedStyleSheets, searchSheet];
 export class SearchBox extends HTMLElement {
   shadow: ShadowRoot;
   searchNonce: object = {};
-  searchInputHandler: (e: Event) => void = () => {};
+  searchInputHandler: (e: Event) => void;
 
   constructor() {
     super();
     this.shadow = this.attachShadow({ mode: 'open' });
     this.shadow.appendChild(template.content.cloneNode(true));
-    this.shadow.adoptedStyleSheets = [materialIconsSheet, themesSheet, sheet];
+    this.shadow.adoptedStyleSheets = [materialIconsSheet, themesSheet, commonSheet, sheet];
 
     // Called when text is input in the search bar.
     // Creates search hints.
