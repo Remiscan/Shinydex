@@ -1,3 +1,7 @@
+import '../materialButton.js';
+
+
+
 const template = document.createElement('template');
 template.innerHTML = /*html*/`
   <form name="search-box" part="form">
@@ -7,14 +11,14 @@ template.innerHTML = /*html*/`
     <label for="search" part="search-icon">
       <span class="material-icons">search</span>
     </label>
-    
-    <button type="reset" part="reset-icon">
-      <span class="material-icons">close</span>
-    </button>
 
-    <button type="button" part="filter-icon">
-      <span class="material-icons">filter_list</span>
-    </button>
+    <material-button type="reset" class="icon only-icon" part="reset-icon">
+      <span slot="icon">close</span>
+    </material-button>
+
+    <material-button class="icon only-icon" part="filter-icon">
+      <span slot="icon">filter_list</span>
+    </material-button>
   </form>
 `;
 

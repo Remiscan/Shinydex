@@ -7,7 +7,7 @@ form {
   display: grid;
   --icon-button-width: 44px;
   --filter-icon-column: var(--icon-button-width);
-  grid-template-columns: [search-icon] 56px 1fr [reset-icon] var(--icon-button-width) [filter-icon] var(--filter-icon-column) 6px;
+  grid-template-columns: [search-icon] 56px 1fr [reset-icon] var(--icon-button-width) [filter-icon] var(--filter-icon-column) 2px;
   place-items: center;
 }
 
@@ -15,7 +15,8 @@ form {
   --filter-icon-column: 0px;
 }
 
-form > * {
+form > *,
+form > *::part(button) {
   grid-row: 1;
 }
 
@@ -36,27 +37,23 @@ input[name="search"]::placeholder {
   color: rgb(var(--on-surface-variant));
 }
 
-[part="search-icon"], [part="reset-icon"], [part="filter-icon"] {
-  color: rgb(var(--on-surface-variant));
+[part="search-icon"], [part="reset-icon"]::part(button), [part="filter-icon"]::part(button) {
   display: flex;
-  width: 48px;
-  height: 48px;
-  justify-content: center;
-  align-items: center;
+  color: rgb(var(--on-surface-variant));
 }
 
 [part="search-icon"] {
   grid-column: search-icon;
 }
 
-[part="reset-icon"] {
+[part="reset-icon"]::part(button) {
   grid-column: reset-icon;
 }
 
-[part="filter-icon"] {
+[part="filter-icon"]::part(button) {
   grid-column: filter-icon;
 }
 
-:host([no-filters]) [part="filter-icon"] {
+:host([no-filters]) [part="filter-icon"]::part(button) {
   display: none;
 }
