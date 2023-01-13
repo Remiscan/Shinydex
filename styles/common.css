@@ -23,6 +23,37 @@ shiny-stars {
   color: var(--text-color);
 }
 
+a.icon {
+  border: none;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  text-decoration: none;
+
+  border-radius: 20px;
+  display: grid;
+  place-items: center;
+  --elevation-shadow: none;
+
+  width: 40px;
+  height: 40px;
+  --surface-opacity: 0;
+  --elevation-opacity: 0;
+  --state-tint: var(--on-surface);
+}
+
+a.icon::before {
+  width: 48px;
+  height: 48px;
+  content: '';
+  position: absolute;
+}
+
+a.icon > * {
+  grid-row: 1;
+  grid-column: 1;
+}
+
 /* Buttons */
 
 /*input[type=file] + label,

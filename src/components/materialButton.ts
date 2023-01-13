@@ -171,6 +171,7 @@ sheet.replaceSync(/*css*/`
     width: 40px;
     height: 40px;
     --surface-opacity: 0;
+    --elevation-opacity: 0;
     --state-tint: var(--on-surface);
   }
 

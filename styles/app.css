@@ -294,10 +294,6 @@ h1 {
   flex-grow: 1;
 }
 
-#parametres .spacer {
-  min-height: 48px;
-}
-
 .section-titre.with-button {
   padding-left: 0;
 }
@@ -315,22 +311,8 @@ h1 {
   margin-left: auto;
 }
 
-.titre-icones > .icone {
-  width: 48px;
-  height: 48px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.icone.bouton-retour {
-  width: 56px;
-  height: 56px;
-}
-
-.bouton-retour,
-.reset-icon {
-  outline-offset: -3px;
+a.icon.bouton-retour {
+  margin: 8px;
 }
 
 .compteur {
@@ -1433,28 +1415,9 @@ input-slider[name="theme-hue"]::part(slider-thumb) {
  * Bouton installer
  */
 
-#install-bouton {
+[data-action="install-app"] {
   /*position: absolute;
   bottom: calc(0.5*(56px - 30px));
   right: 20px;*/
   display: none;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  background-color: var(--bg-color);
-  height: 30px;
-  border-radius: 30px;
-  padding: 0 8px;
-  cursor: pointer;
-  grid-column: 1 / 2;
-  grid-row: 1 / 2;
-  position: fixed;
-  bottom: calc(var(--bottom-bar-height) + 28px);
-  left: 16px;
-}
-
-#install-bouton>span {
-  text-transform: uppercase;
-  margin-left: 5px;
-  font-weight: 500;
 }

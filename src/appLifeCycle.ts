@@ -7,6 +7,7 @@ import { filterSection, initFilters } from './filtres.js';
 import { dataStorage, huntStorage, pokemonData, shinyStorage } from './localForage.js';
 import { Notif } from './notification.js';
 import { upgradeStorage } from './upgradeStorage.js';
+import { MaterialButton } from './components/materialButton.js';
 
 
 
@@ -370,15 +371,16 @@ declare global {
 
 function checkInstall() {
   let installPrompt: BeforeInstallPromptEvent | null;
-  const installBouton = document.getElementById('install-bouton')!;
+  const installBouton = document.querySelector('[data-action="install-app"]');
+  if (!(installBouton instanceof MaterialButton)) throw new TypeError(`Expecting MaterialButton`);
 
   window.addEventListener('beforeinstallprompt', (e: BeforeInstallPromptEvent) => {
     e.preventDefault();
     installPrompt = e;
-    installBouton.classList.add('on');
+    installBouton.buttonElement?.classList.remove('off');
 
-    installBouton.addEventListener('click', e => {
-      installBouton.classList.remove('on');
+    installBouton.buttonElement?.addEventListener('click', e => {
+      installBouton.buttonElement?.classList.add('off');
       if (installPrompt == null) return;
       installPrompt.prompt();
       installPrompt.userChoice
