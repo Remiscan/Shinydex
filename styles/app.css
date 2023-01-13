@@ -400,7 +400,8 @@ material-button.fab::part(button) {
   animation: fab-apparition .2s var(--easing-standard) .2s;
   animation-fill-mode: backwards;
   transform: translate3D(0, var(--decalage, 0), 0) scale(1);
-  transition: transform .2s var(--easing-accelerate);
+  transition: transform .2s var(--easing-accelerate),
+              box-shadow .3s var(--easing-standard);
   --decalage: 0;
 }
 

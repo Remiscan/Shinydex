@@ -176,7 +176,7 @@
       </section>
 
       <!-- FAB -->
-      <material-button class="fab only-icon">
+      <material-button class="fab shadow only-icon">
         <span slot="icon">add</span>
       </material-button>
 

@@ -128,8 +128,8 @@ sheet.replaceSync(/*css*/`
 
   button.fab {
     --surface-color: var(--primary-container);
-    --elevation-opacity: var(--elevation-3-opacity);
-    --elevation-shadow: var(--elevation-3-shadow);
+    --elevation-opacity: var(--elevation-1-opacity);
+    --elevation-shadow: var(--elevation-1-shadow);
     color: rgb(var(--on-primary-container));
     --state-tint: var(--on-primary-container);
     min-width: 56px;
@@ -151,18 +151,18 @@ sheet.replaceSync(/*css*/`
   }
 
   button.fab:focus {
-    --elevation-opacity: var(--elevation-3-opacity);
-    --elevation-shadow: var(--elevation-3-shadow);
+    --elevation-opacity: var(--elevation-1-opacity);
+    --elevation-shadow: var(--elevation-1-shadow);
   }
 
   button.fab:hover {
-    --elevation-opacity: var(--elevation-4-opacity);
-    --elevation-shadow: var(--elevation-4-shadow);
+    --elevation-opacity: var(--elevation-2-opacity);
+    --elevation-shadow: var(--elevation-2-shadow);
   }
 
   button.fab:active {
-    --elevation-opacity: var(--elevation-3-opacity);
-    --elevation-shadow: var(--elevation-3-shadow);
+    --elevation-opacity: var(--elevation-1-opacity);
+    --elevation-shadow: var(--elevation-1-shadow);
   }
 
   /* Icon button */
@@ -234,7 +234,7 @@ export class MaterialButton extends HTMLElement {
     const button = this.buttonElement;
     let appliedValue = newValue;
     if (name === 'class') {
-      appliedValue = `surface interactive shadow ${newValue}`;
+      appliedValue = `surface interactive ${newValue}`;
     }
 
     if (appliedValue) button?.setAttribute(name, appliedValue);
