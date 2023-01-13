@@ -340,6 +340,7 @@ pokemon-sprite,
     transform: none;
     width: calc(100cqi - 500px);
     --elevation-opacity: var(--elevation-2-opacity);
+    --surface-color: var(--surface);
     border-radius: calc(1.12 * (var(--border-radius) - 4px)); /* 12% optical adjustment */
   }
 

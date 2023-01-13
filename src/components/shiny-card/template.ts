@@ -45,7 +45,7 @@ template.innerHTML = /*html*/`
       </div>
     </div>
 
-    <div class="pokemon-notes surface standard">
+    <div class="pokemon-notes surface">
       <div class="pokemon-notes__arrow surface"></div>
       <span class="pokemon-notes__texte"></span>
     </div>
