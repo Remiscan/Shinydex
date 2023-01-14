@@ -178,12 +178,12 @@ template.innerHTML = /*html*/`
   <!-- Boutons de capture / annulation -->
   <div class="group button-group capture-button-group">
     <button type="button" class="hunt-delete danger" data-not-edit>
-      <span class="material-icons">delete</span>
+      <span class="material-icons" aria-hidden="true">delete</span>
       <span>Supprimer</span>
     </button>
 
     <button type="button" class="edit-cancel ghost danger" data-edit>
-      <span class="material-icons">cancel</span>
+      <span class="material-icons" aria-hidden="true">cancel</span>
       <span>Annuler</span>
     </button>
 
@@ -401,12 +401,12 @@ template.innerHTML = /*html*/`
   <!-- Boutons supprimer / enregistrer -->
   <div class="group button-group">
     <button type="button" class="full-delete danger" data-edit>
-      <span class="material-icons">delete_forever</span>
+      <span class="material-icons" aria-hidden="true">delete_forever</span>
       <span>Supprimer définitivement</span>
     </button>
 
     <button type="submit" class="submit">
-      <span class="material-icons">backup</span>
+      <span class="material-icons" aria-hidden="true">backup</span>
       <span>Enregistrer dans mes Pokémon <shiny-stars></shiny-stars></span>
     </button>
   </div>

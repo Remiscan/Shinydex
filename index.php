@@ -89,37 +89,37 @@
       </a>
 
       <a class="nav-link lien-section surface interactive" data-nav-section="mes-chromatiques" href="./mes-chromatiques">
-        <span class="material-icons surface">catching_pokemon</span>
+        <span class="material-icons surface" aria-hidden="true">catching_pokemon</span>
         <span class="label-medium">Pokémon <shiny-stars></shiny-stars></span>
       </a>
 
       <a class="nav-link lien-section surface interactive" data-nav-section="pokedex" href="./pokedex">
-        <span class="material-icons surface">language</span>
+        <span class="material-icons surface" aria-hidden="true">apps</span>
         <span class="label-medium">Pokédex <shiny-stars></shiny-stars></span>
       </a>
 
       <a class="nav-link lien-section surface interactive" data-nav-section="chasses-en-cours" href="./chasses-en-cours">
-        <span class="material-icons surface">add_circle</span>
+        <span class="material-icons surface" aria-hidden="true">add_circle</span>
         <span class="label-medium">Chasses</span>
       </a>
 
       <a class="nav-link lien-section surface interactive only-pc" data-nav-section="corbeille" href="./corbeille">
-        <span class="material-icons surface">auto_delete</span>
+        <span class="material-icons surface" aria-hidden="true">auto_delete</span>
         <span class="label-medium">Corbeille</span>
       </a>
 
       <a class="nav-link lien-section surface interactive" data-nav-section="partage" href="./partage">
-        <span class="material-icons surface">group</span>
+        <span class="material-icons surface" aria-hidden="true">group</span>
         <span class="label-medium">Amis</span>
       </a>
 
       <a class="nav-link lien-section surface interactive only-pc" data-nav-section="parametres" href="./parametres">
-        <span class="material-icons surface">settings</span>
+        <span class="material-icons surface" aria-hidden="true">settings</span>
         <span class="label-medium">Paramètres</span>
       </a>
 
       <a class="nav-link lien-section surface interactive only-pc" data-nav-section="a-propos" href="./a-propos">
-        <span class="material-icons surface">info</span>
+        <span class="material-icons surface" aria-hidden="true">info</span>
         <span class="label-medium">À propos</span>
       </a>
     </nav>
