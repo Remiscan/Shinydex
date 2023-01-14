@@ -142,14 +142,21 @@ button.filled.danger {
 /* Outlined */
 
 button.outlined {
-  --surface-opacity: 0;
   color: rgb(var(--primary));
-  outline: 1px solid rgb(var(--outline));
+  border: 1px solid rgb(var(--outline));
   --state-tint: var(--primary);
 }
 
 button.outlined:focus {
-  outline: 1px solid rgb(var(--primary));
+  border: 1px solid rgb(var(--primary));
+}
+
+button.outlined:focus:not(:focus-visible) {
+  border: 1px solid rgb(var(--outline));
+}
+
+button.outlined:not(.filled) {
+  --surface-opacity: 0;
 }
 
 /* Text */
@@ -221,14 +228,15 @@ button.icon-button::before {
 /* Disabled */
 
 button:disabled {
-  --surface-color: var(--on-surface);
-  --elevation-opacity: 0;
-  --surface-opacity: .12;
-  color: rgb(var(--on-surface), .38);
+  --surface-color: var(--on-surface) !important;
+  --elevation-opacity: 0 !important;
+  --surface-opacity: .12 !important;
+  --state-opacity: 0 !important;
+  color: rgb(var(--on-surface), .38) !important;
 }
 
 button.outlined:disabled {
-  outline: 1px solid rgb(var(--on-surface));
+  outline: 1px solid rgb(var(--on-surface), .12);
 }
 
 /*input[type=file] + label,
