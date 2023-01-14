@@ -119,7 +119,7 @@ sheet.replaceSync(/*css*/`
 
   /* Text */
 
-  button.text {
+  button.text-button {
     --surface-opacity: 0;
     color: rgb(var(--primary));
     --state-tint: var(--primary);
@@ -168,7 +168,7 @@ sheet.replaceSync(/*css*/`
 
   /* Icon button */
 
-  button.icon {
+  button.icon-button {
     width: 40px;
     height: 40px;
     --surface-opacity: 0;
@@ -176,7 +176,7 @@ sheet.replaceSync(/*css*/`
     --state-tint: var(--on-surface);
   }
 
-  button.icon::before {
+  button.icon-button::before {
     width: 48px;
     height: 48px;
     content: '';
@@ -255,7 +255,7 @@ export class MaterialButton extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ['class', 'type'];
+    return ['class', 'type', 'tabindex', 'disabled'];
   }
 
   attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null) {

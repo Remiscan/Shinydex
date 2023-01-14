@@ -15,6 +15,7 @@ import themesSheet from '../../../styles/themes.css.php' assert { type: 'css' };
 import commonSheet from '../../../styles/common.css' assert { type: 'css' };
 // @ts-expect-error
 import sheet from './styles.css' assert { type: 'css' };
+import { MaterialButton } from '../materialButton.js';
 
 
 
@@ -27,7 +28,8 @@ let longClic = false;
 export class shinyCard extends HTMLElement {
   shadow: ShadowRoot;
   huntid: string = '';
-  clickHandler = (e: Event) => {
+  clickHandler: (e: Event) => void = () => {};
+  openHandler = (e: Event) => {
     e.stopPropagation();
     this.toggleNotes();
   };
@@ -265,12 +267,14 @@ export class shinyCard extends HTMLElement {
     if (huntid != currentCardId) {
       this.setAttribute('open', 'true');
       menuButtons.forEach(button => {
+        //if (!(button instanceof MaterialButton)) throw new TypeError(`Expecting MaterialButton`);
         button.removeAttribute('disabled');
         button.setAttribute('tabindex', '0');
       });
       currentCardId = huntid;
     } else {
       menuButtons.forEach(button => {
+        //if (!(button instanceof MaterialButton)) throw new TypeError(`Expecting MaterialButton`);
         button.setAttribute('disabled', '');
         button.setAttribute('tabindex', '-1');
       });
@@ -313,13 +317,18 @@ export class shinyCard extends HTMLElement {
 
   connectedCallback() {
     // Détecte le clic pour "ouvrir" la carte
-    this.addEventListener('click', this.clickHandler);
+    const openButton = this.shadow.querySelector('[data-action="open"]');
+    if (!(openButton instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
+    openButton.addEventListener('click', this.openHandler);
+    this.addEventListener('click', this.clickHandler = event => openButton.click());
 
-    const editButton = this.shadow.querySelector('#edit-button');
-    editButton?.addEventListener('click', this.editHandler);
+    const editButton = this.shadow.querySelector('[data-action="edit"]');
+    if (!(editButton instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
+    editButton.addEventListener('click', this.editHandler);
 
-    const restoreButton = this.shadow.querySelector('#restore-button');
-    restoreButton?.addEventListener('click', this.restoreHandler);
+    const restoreButton = this.shadow.querySelector('[data-action="restore"]');
+    if (!(restoreButton instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
+    restoreButton.addEventListener('click', this.restoreHandler);
 
     // Peuple le contenu de la carte
     this.dataToContent();
@@ -327,13 +336,19 @@ export class shinyCard extends HTMLElement {
 
 
   disconnectedCallback() {
+    const openButton = this.shadow.querySelector('[data-action="open"]');
+    if (!(openButton instanceof MaterialButton)) throw new TypeError(`Expecting MaterialButton`);
+    openButton.buttonElement?.removeEventListener('click', this.openHandler);
+
     this.removeEventListener('click', this.clickHandler);
 
-    const editButton = this.shadow.querySelector('#edit-button');
-    editButton?.removeEventListener('click', this.editHandler);
+    const editButton = this.shadow.querySelector('[data-action="edit"]');
+    if (!(editButton instanceof MaterialButton)) throw new TypeError(`Expecting MaterialButton`);
+    editButton.buttonElement?.removeEventListener('click', this.editHandler);
 
-    const restoreButton = this.shadow.querySelector('#restore-button');
-    restoreButton?.removeEventListener('click', this.restoreHandler);
+    const restoreButton = this.shadow.querySelector('[data-action="restore"]');
+    if (!(restoreButton instanceof MaterialButton)) throw new TypeError(`Expecting MaterialButton`);
+    restoreButton.buttonElement?.removeEventListener('click', this.restoreHandler);
   }
 
 

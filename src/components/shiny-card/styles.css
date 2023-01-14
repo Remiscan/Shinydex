@@ -28,19 +28,23 @@ pokemon-sprite,
 pokemon-sprite,
 .menu {
   --elevation-opacity: var(--elevation-2-opacity);
+  --state-opacity: 0;
 }
 
 .menu-hint {
-  color: rgb(var(--on-surface), .5);
-  position: absolute;
-  top: calc(-4px + 8px + 4px);
-  left: calc(-10px + 8px + 4px);
-  cursor: pointer;
+  grid-row: 1;
+  grid-column: 1;
+  margin: -20px;
+  transform: translate(calc(20px + -6px), 20px);
+  --state-opacity: 0 !important;
+  color: rgb(var(--on-surface-variant));
 }
 
-#menu-close-hint {
-  top: calc(-4px + 8px);
-  left: calc(-4px + 8px);
+.menu > button {
+  margin: 0;
+}
+
+[data-action="restore"] {
   display: none;
 }
 

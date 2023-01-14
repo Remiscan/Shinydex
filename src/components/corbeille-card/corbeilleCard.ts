@@ -4,12 +4,12 @@ import { shinyCard } from '../shiny-card/shinyCard.js';
 
 const sheet = new CSSStyleSheet();
 sheet.replaceSync(/*css*/`
-  #edit-button {
+  [data-action="edit"] {
     display: none;
   }
 
-  #restore-button {
-    display: initial;
+  [data-action="restore"] {
+    display: flex;
   }
 `);
 

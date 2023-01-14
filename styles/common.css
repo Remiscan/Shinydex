@@ -23,7 +23,7 @@ shiny-stars {
   color: var(--text-color);
 }
 
-a.icon {
+a.icon-button {
   border: none;
   margin: 0;
   padding: 0;
@@ -42,19 +42,194 @@ a.icon {
   --state-tint: var(--on-surface);
 }
 
-a.icon::before {
+a.icon-button::before {
   width: 48px;
   height: 48px;
   content: '';
   position: absolute;
 }
 
-a.icon > * {
+a.icon-button > * {
   grid-row: 1;
   grid-column: 1;
 }
 
 /* Buttons */
+
+button {
+  -webkit-appearance: none;
+  appearance: none;
+  background: none;
+  border: none;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+
+  height: 40px;
+  min-height: 40px;
+  width: fit-content;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 24px 0 16px;
+  margin: auto;
+  --elevation-shadow: none;
+}
+
+button.only-icon .label,
+button.only-text .icon {
+  display: none;
+}
+
+button.only-icon {
+  padding: 0 16px;
+}
+
+button.only-text {
+  padding: 0 24px;
+}
+
+/* Elevated */
+
+button.elevated {
+  --surface-color: var(--surface);
+  --elevation-opacity: var(--elevation-1-opacity);
+  --elevation-shadow: var(--elevation-1-shadow);
+  color: rgb(var(--primary));
+  --state-tint: var(--primary);
+}
+
+button.elevated:focus {
+  --elevation-opacity: var(--elevation-1-opacity);
+  --elevation-shadow: var(--elevation-1-shadow);
+}
+
+button.elevated:hover {
+  --elevation-opacity: var(--elevation-2-opacity);
+  --elevation-shadow: var(--elevation-2-shadow);
+}
+
+button.elevated:active {
+  --elevation-opacity: var(--elevation-1-opacity);
+  --elevation-shadow: var(--elevation-1-shadow);
+}
+
+/* Filled */
+
+button.filled {
+  --surface-color: var(--primary);
+  --surface-opacity: 1;
+  color: rgb(var(--on-primary));
+  --state-tint: var(--on-primary);
+}
+
+/* Filled tonal */
+
+button.filled.tonal {
+  --surface-color: var(--secondary-container);
+  color: rgb(var(--on-secondary-container));
+  --state-tint: var(--on-secondary-container);
+}
+
+button.filled.error {
+  --surface-color: var(--error-container);
+  color: rgb(var(--on-error-container));
+  --state-tint: var(--on-error-container);
+}
+
+/* Outlined */
+
+button.outlined {
+  --surface-opacity: 0;
+  color: rgb(var(--primary));
+  outline: 1px solid rgb(var(--outline));
+  --state-tint: var(--primary);
+}
+
+button.outlined:focus {
+  outline: 1px solid rgb(var(--primary));
+}
+
+/* Text */
+
+button.text-button {
+  --surface-opacity: 0;
+  color: rgb(var(--primary));
+  --state-tint: var(--primary);
+}
+
+/* Fab */
+
+button.fab {
+  --surface-color: var(--primary-container);
+  --elevation-opacity: var(--elevation-1-opacity);
+  --elevation-shadow: var(--elevation-1-shadow);
+  color: rgb(var(--on-primary-container));
+  --state-tint: var(--on-primary-container);
+  min-width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  margin: 16px;
+}
+
+button.fab.small {
+  min-width: 40px;
+  height: 40px;
+  border-radius: 12px;
+}
+
+button.fab.large {
+  min-width: 96px;
+  height: 96px;
+  border-radius: 28px;
+}
+
+button.fab:focus {
+  --elevation-opacity: var(--elevation-1-opacity);
+  --elevation-shadow: var(--elevation-1-shadow);
+}
+
+button.fab:hover {
+  --elevation-opacity: var(--elevation-2-opacity);
+  --elevation-shadow: var(--elevation-2-shadow);
+}
+
+button.fab:active {
+  --elevation-opacity: var(--elevation-1-opacity);
+  --elevation-shadow: var(--elevation-1-shadow);
+}
+
+/* Icon button */
+
+button.icon-button {
+  width: 40px;
+  height: 40px;
+  --surface-opacity: 0;
+  --elevation-opacity: 0;
+  --state-tint: var(--on-surface);
+}
+
+button.icon-button::before {
+  width: 48px;
+  height: 48px;
+  content: '';
+  position: absolute;
+}
+
+/* Disabled */
+
+button:disabled {
+  --surface-color: var(--on-surface);
+  --elevation-opacity: 0;
+  --surface-opacity: .12;
+  color: rgb(var(--on-surface), .38);
+}
+
+button.outlined:disabled {
+  outline: 1px solid rgb(var(--on-surface));
+}
 
 /*input[type=file] + label,
 button {
