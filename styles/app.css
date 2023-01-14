@@ -648,11 +648,6 @@ body:not([data-section-actuelle="pokedex"]) .only-pokedex {
 
 .pkmnicon:not(.got) {
   filter: grayscale(.95);
-  opacity: calc(1 - var(--pkmnicon-opacity));
-}
-
-.pkmnicon:not(.got):hover {
-  opacity: .9;
 }
 
 .pkmnicon.got {
@@ -667,22 +662,6 @@ body:not([data-section-actuelle="pokedex"]) .only-pokedex {
 .pokedex-gen > .got.pkmnicon {
   z-index: 1;
 }
-
-/*.pokedex-gen > :not(.got).pkmnicon::after {
-  content: '';
-  display: block;
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  opacity: var(--pkmnicon-opacity);
-  background-color: var(--card-bg-color);
-}
-
-.pokedex-gen > :not(.got).pkmnicon:hover::after {
-  opacity: .1;
-}*/
 
 .pkmnicon:is(:hover, :focus) {
   background-color: var(--button-hover-color);
