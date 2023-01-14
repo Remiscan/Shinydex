@@ -10,6 +10,7 @@ body[data-section-actuelle~="a-propos"] .nav-link[data-nav-section="parametres"]
   color: rgb(var(--on-surface));
   --icon-surface: var(--secondary-container);
   --icon-color: var(--on-secondary-container);
+  --indicator-elevation-opacity: var(--elevation-2-opacity);
 }
 
 body[data-no-search] nav,
