@@ -12,11 +12,11 @@ template.innerHTML = /*html*/`
     </button>
 
     <div class="menu surface standard">
-      <button type="button" class="surface interactive filled tonal only-text" data-action="edit" disabled tabindex="-1">
+      <button type="button" class="surface interactive filled tonal outlined only-text" data-action="edit" disabled tabindex="-1">
         <span class="label-large">Éditer</span>
       </button>
 
-      <button type="button" class="surface interactive filled tonal only-text" data-action="restore" disabled tabindex="-1">
+      <button type="button" class="surface interactive filled tonal outlined only-text" data-action="restore" disabled tabindex="-1">
         <span class="label-large">Restaurer</span>
       </button>
     </div>
