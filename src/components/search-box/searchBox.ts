@@ -32,11 +32,13 @@ export class SearchBox extends HTMLElement {
     // Called when text is input in the search bar.
     // Creates search hints.
     this.searchInputHandler = async event => {
+      event.preventDefault();
       const searchBar = this.shadow.querySelector('[role="searchbox"]');
       if (!(searchBar instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
       const accentedValue = event.type === 'reset' ? '' : searchBar.value;
       const simplifiedValue = noAccent(accentedValue).toLowerCase();
 
+      if (event.type === 'reset') searchBar.value = '';
       this.applySearch(simplifiedValue);
     };
   }
@@ -142,12 +144,14 @@ export class SearchBox extends HTMLElement {
     const form = this.shadow.querySelector('form');
     form?.addEventListener('input', this.searchInputHandler);
     form?.addEventListener('reset', this.searchInputHandler);
+    form?.addEventListener('submit', this.searchInputHandler);
   }
 
   disconnectedCallback() {
     const form = this.shadow.querySelector('form');
     form?.removeEventListener('input', this.searchInputHandler);
     form?.removeEventListener('reset', this.searchInputHandler);
+    form?.removeEventListener('submit', this.searchInputHandler);
   }
 
   static get observedAttributes() {
