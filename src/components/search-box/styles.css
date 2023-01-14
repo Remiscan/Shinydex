@@ -52,6 +52,7 @@ input[name="search"]::placeholder {
 
 [part="filter-icon"] {
   grid-column: filter-icon;
+  cursor: auto;
 }
 
 :host([no-filters]) [part="filter-icon"] {

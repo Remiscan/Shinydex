@@ -31,6 +31,7 @@ sheet.replaceSync(/*css*/`
     font: inherit;
 
     height: 40px;
+    min-height: 40px;
     width: fit-content;
     border-radius: 20px;
     display: flex;
