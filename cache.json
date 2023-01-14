@@ -30,7 +30,6 @@
         "./modules/components/hunt-card/styles.css",
         "./modules/components/hunt-card/template.js",
         "./modules/components/loadSpinner.js",
-        "./modules/components/materialButton.js",
         "./modules/components/pokemon-sprite/index.html",
         "./modules/components/pokemon-sprite/pokemonSprite.js",
         "./modules/components/search-bar/searchBar.js",

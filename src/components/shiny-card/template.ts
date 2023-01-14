@@ -1,4 +1,3 @@
-import '../materialButton.js';
 import '../pokemon-sprite/pokemonSprite.js';
 
 
@@ -8,16 +7,16 @@ template.innerHTML = /*html*/`
   <div class="container surface variant elevation-0 interactive">
     <pokemon-sprite size="112" shiny="true" class="surface standard"></pokemon-sprite>
 
-    <button class="surface interactive icon-button only-icon menu-hint" data-action="open">
+    <button type="button" class="surface interactive icon-button only-icon menu-hint" data-action="open">
       <span class="material-icons">more_vert</span>
     </button>
 
     <div class="menu surface standard">
-      <button class="surface interactive filled tonal only-text" data-action="edit" disabled>
+      <button type="button" class="surface interactive filled tonal only-text" data-action="edit" disabled tabindex="-1">
         <span class="label-large">Éditer</span>
       </button>
 
-      <button class="surface interactive filled tonal only-text" data-action="restore" disabled>
+      <button type="button" class="surface interactive filled tonal only-text" data-action="restore" disabled tabindex="-1">
         <span class="label-large">Restaurer</span>
       </button>
     </div>

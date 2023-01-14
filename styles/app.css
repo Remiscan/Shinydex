@@ -320,8 +320,9 @@ h1 {
   margin-left: auto;
 }
 
-a.icon.bouton-retour {
+a.icon-button.bouton-retour {
   margin: 8px;
+  margin-right: 0;
 }
 
 .compteur {
@@ -380,7 +381,7 @@ section.loading .compteur {
   100% { transform: translate3D(0, var(--decalage, 0), 0) scale(1); }
 }
 
-material-button.fab::part(button) {
+.fab {
   display: none;
   grid-column: 1 / 2;
   grid-row: 1 / 2;
@@ -396,25 +397,25 @@ material-button.fab::part(button) {
   --decalage: 0;
 }
 
-material-button.fab.notif::part(button) {
+.fab.notif {
   --decalage: calc(-1 * var(--bottom-bar-height));
   transition: transform .15s var(--easing-decelerate);
 }
 
 @supports (selector(:has(*))) {
-  body[data-section-actuelle~="mes-chromatiques"]:has(#mes-chromatiques:not(.loading)) material-button.fab::part(button),
-  body[data-section-actuelle~="pokedex"]:has(#pokedex:not(.loading)) material-button.fab::part(button),
-  body[data-section-actuelle~="chasses-en-cours"]:not([data-section-actuelle~="corbeille"]):has(#chasses-en-cours:not(.loading)) material-button.fab::part(button),
-  body[data-section-actuelle~="partage"]:has(#partage:not(.loading)) material-button.fab::part(button) {
+  body[data-section-actuelle~="mes-chromatiques"]:has(#mes-chromatiques:not(.loading)) .fab,
+  body[data-section-actuelle~="pokedex"]:has(#pokedex:not(.loading)) .fab,
+  body[data-section-actuelle~="chasses-en-cours"]:not([data-section-actuelle~="corbeille"]):has(#chasses-en-cours:not(.loading)) .fab,
+  body[data-section-actuelle~="partage"]:has(#partage:not(.loading)) .fab {
     display: flex;
   }
 }
 
 @supports not (selector(:has(*))) {
-  body[data-section-actuelle~="mes-chromatiques"] material-button.fab::part(button),
-  body[data-section-actuelle~="pokedex"] material-button.fab::part(button),
-  body[data-section-actuelle~="chasses-en-cours"]:not([data-section-actuelle~="corbeille"]) material-button.fab::part(button),
-  body[data-section-actuelle~="partage"] material-button.fab::part(button) {
+  body[data-section-actuelle~="mes-chromatiques"] .fab,
+  body[data-section-actuelle~="pokedex"] .fab,
+  body[data-section-actuelle~="chasses-en-cours"]:not([data-section-actuelle~="corbeille"]) .fab,
+  body[data-section-actuelle~="partage"] .fab {
     display: flex;
   }
 }

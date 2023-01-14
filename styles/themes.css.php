@@ -491,13 +491,3 @@ echo '/'.'*'; ?>*/
   letter-spacing: .003333rem;
   font-weight: 400;
 }
-
-button {
-  -webkit-appearance: none;
-  appearance: none;
-  background: none;
-  border: none;
-  margin: 0;
-  padding: 0;
-  font: inherit;
-}

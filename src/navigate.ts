@@ -5,7 +5,6 @@ import { SearchBox } from './components/search-box/searchBox.js';
 import { isSearchableSection } from './filtres.js';
 import { disableLazyLoad, enableLazyLoad } from './lazyLoading.js';
 import { Notif } from './notification.js';
-import { MaterialButton } from './components/materialButton.js';
 
 
 
@@ -375,8 +374,9 @@ export function navLinkBubble(event: PointerEvent, element: HTMLElement): void {
  */
 async function animateFabIcon(ancienneSection: Section, nouvelleSection: Section) {
   const fab = document.querySelector('.fab');
-  if (!(fab instanceof MaterialButton)) throw new TypeError(`Expecting MaterialButton`);
-  const fabIcon = fab.iconElement;
+  if (!(fab instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
+  const fabIcon = fab.querySelector('.material-icons');
+  if (!(fabIcon instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
   type startendAnimations = { start: Animation | null, end: Animation | null };
   const animFabIcon: startendAnimations = { start: null, end: null };
   const animate = ancienneSection.fab && nouvelleSection.fab && ancienneSection.fab != nouvelleSection.fab;
@@ -398,7 +398,7 @@ async function animateFabIcon(ancienneSection: Section, nouvelleSection: Section
     await wait(animFabIcon.start);
   }
 
-  if (nouvelleSection.fab) fab.icon = nouvelleSection.fab || '';
+  if (nouvelleSection.fab) fabIcon.innerHTML = nouvelleSection.fab || '';
   
   if (fabIcon && animate) {
     const deg = (k2 >= k1) ? '-90deg' : '+90deg';

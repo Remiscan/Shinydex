@@ -1,13 +1,12 @@
 import { Params, loadAllImages, timestamp2date, wait } from './Params.js';
 import { Pokemon } from './Pokemon.js';
-import { setTheme } from './theme.js';
 import { Settings } from './Settings.js';
 import { PopulatableSection, cleanUpRecycleBin, initPokedex, populator } from './appContent.js';
 import { filterSection, initFilters } from './filtres.js';
 import { dataStorage, huntStorage, pokemonData, shinyStorage } from './localForage.js';
 import { Notif } from './notification.js';
+import { setTheme } from './theme.js';
 import { upgradeStorage } from './upgradeStorage.js';
-import { MaterialButton } from './components/materialButton.js';
 
 
 
@@ -372,15 +371,15 @@ declare global {
 function checkInstall() {
   let installPrompt: BeforeInstallPromptEvent | null;
   const installBouton = document.querySelector('[data-action="install-app"]');
-  if (!(installBouton instanceof MaterialButton)) throw new TypeError(`Expecting MaterialButton`);
+  if (!(installBouton instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
 
   window.addEventListener('beforeinstallprompt', (e: BeforeInstallPromptEvent) => {
     e.preventDefault();
     installPrompt = e;
-    installBouton.buttonElement?.classList.remove('off');
+    installBouton.classList.remove('off');
 
-    installBouton.buttonElement?.addEventListener('click', e => {
-      installBouton.buttonElement?.classList.add('off');
+    installBouton.addEventListener('click', e => {
+      installBouton.classList.add('off');
       if (installPrompt == null) return;
       installPrompt.prompt();
       installPrompt.userChoice

@@ -3,7 +3,7 @@
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 } 
 *:focus:not(:focus-visible) {
-	outline-style: none;
+  outline-style: none;
 }
 
 shiny-stars {
@@ -133,7 +133,7 @@ button.filled.tonal {
   --state-tint: var(--on-secondary-container);
 }
 
-button.filled.error {
+button.filled.danger {
   --surface-color: var(--error-container);
   color: rgb(var(--on-error-container));
   --state-tint: var(--on-error-container);
@@ -402,7 +402,7 @@ input-switch[disabled] {
 
 input[type=radio],
 input[type=checkbox] {
-	height: 0;
+  height: 0;
   width: 0;
   margin: 0;
   opacity: 0;
@@ -439,12 +439,12 @@ input:is([type=radio], [type=checkbox]) + label > span {
 }
 
 input:is([type=radio], [type=checkbox]) + label::before {
-	content: '';
+  content: '';
   display: flex;
   grid-column: 1 / 2;
   grid-row: 1 / 2;
-	width: 20px;
-	height: 20px;
+  width: 20px;
+  height: 20px;
   background-color: var(--input-bg-color);
   border-radius: 4px;
   margin: auto;
@@ -466,8 +466,8 @@ input:is([type=radio], [type=checkbox]) + label::after {
 
 input[type=radio] + label::after {
   width: 10px;
-	height: 10px;
-	background-color: var(--radio-check-color);
+  height: 10px;
+  background-color: var(--radio-check-color);
   border-radius: 6px;
 }
 

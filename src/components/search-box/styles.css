@@ -15,8 +15,7 @@ form {
   --filter-icon-column: 0px;
 }
 
-form > *,
-form > *::part(button) {
+form > * {
   grid-row: 1;
 }
 
@@ -37,16 +36,16 @@ input[name="search"]::placeholder {
   color: rgb(var(--on-surface-variant));
 }
 
-[part="search-icon"], [part="reset-icon"]::part(button), [part="filter-icon"] {
-  display: flex;
+[part="search-icon"], [part="reset-icon"], [part="filter-icon"] {
   color: rgb(var(--on-surface-variant));
 }
 
 [part="search-icon"] {
   grid-column: search-icon;
+  display: flex;
 }
 
-[part="reset-icon"]::part(button) {
+[part="reset-icon"] {
   grid-column: reset-icon;
 }
 
