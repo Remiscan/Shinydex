@@ -13,7 +13,7 @@ template.innerHTML = `
   <span class="info-dexid"></span>
   <span class="info-nom"></span>
 </div>
-<a class="icone bouton-retour">
+<a class="icon-button surface interactive bouton-retour">
   <span class="material-icons">close</span>
 </a>
 <div class="switch-shiny-regular">
