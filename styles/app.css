@@ -644,6 +644,8 @@ body:not([data-section-actuelle="pokedex"]) .only-pokedex {
   box-shadow: none;
   position: relative;
   margin: 0;
+  content-visibility: auto;
+  contain-intrinsic-size: 44px 44px;
 }
 
 .pkmnicon:not(.got) {

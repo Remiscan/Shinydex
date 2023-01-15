@@ -177,7 +177,6 @@ export async function initPokedex() {
   if (!(conteneur instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
   for (let genConteneur of gensToPopulate) {
     conteneur.appendChild(genConteneur);
-    lazyLoad(genConteneur);
   }
 
   // Peuple le compteur total de Pokémon dans le Pokédex
