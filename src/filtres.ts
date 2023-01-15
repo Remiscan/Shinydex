@@ -224,7 +224,7 @@ export function updateCounters(section: FiltrableSection): void {
 ////////////////////////////////////////////////////////////////////
 // Ordonner les cartes de Pokémon selon une certaine caractéristique
 // et renvoie leurs huntids dans l'ordre.
-async function orderPokemon(section: FiltrableSection, pokemonList: Shiny[] | Hunt[], order: ordre): Promise<string[]> {
+async function orderPokemon(pokemonList: Shiny[] | Hunt[], order: ordre): Promise<string[]> {
   const noms = await Pokemon.names();
   const lang = document.documentElement.getAttribute('lang') ?? 'fr';
 
@@ -313,7 +313,7 @@ export async function computedOrders(section: FiltrableSection, ids: string[]): 
   const cardsMap = new Map(pokemonList.map(pkmn => [pkmn.huntid, document.querySelector(`#${section} [huntid="${pkmn.huntid}"]`)]));
 
   await Promise.all(supportedOrdres.map(async order => {
-    const orderedHuntids = await orderPokemon(section, pokemonList, order);
+    const orderedHuntids = await orderPokemon(pokemonList, order);
     for (let k = 0; k < orderedHuntids.length; k++) {
       const huntid = orderedHuntids[k];
       const card = cardsMap.get(huntid);

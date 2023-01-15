@@ -222,13 +222,17 @@ export class Shiny implements frontendShiny {
   }
 
   get appliedOriginMark(): string {
-    if (this.method === 'hack') return ''; // Hacked Pokémon don't deserve an origin mark
-    if (!this.mine) return this.originMark; // Traded Pokémon can have been born on earlier games
+    try {
+      if (this.method === 'hack') return ''; // Hacked Pokémon don't deserve an origin mark
+      if (!this.mine) return this.originMark; // Traded Pokémon can have been born on earlier games
 
-    const jeu = this.jeuObj;
-    if (jeu.gen === 1 || jeu.gen === 2) return this.originMark; // gen 1 & 2 games could come from 3DS Virtual Console
-    else if (jeu.originMark) return jeu.originMark;
-    else return 'old';
+      const jeu = this.jeuObj;
+      if (jeu.gen === 1 || jeu.gen === 2) return this.originMark; // gen 1 & 2 games could come from 3DS Virtual Console
+      else if (jeu.originMark) return jeu.originMark;
+      else return 'old';
+    } catch (error) {
+      return '';
+    }
   }
 
   /**
@@ -270,182 +274,186 @@ export class Shiny implements frontendShiny {
    * @returns Les chances que le Pokémon avait d'être chromatique.
    */
   get shinyRate(): number | null {
-    // Taux de base
-    const game = this.jeuObj;
-    const baseRate = (game.gen === 0) ? 450
-                   : (game.gen <= 5) ? 8192
-                   : 4096;
+    try {
+      // Taux de base
+      const game = this.jeuObj;
+      const baseRate = (game.gen === 0) ? 450
+                    : (game.gen <= 5) ? 8192
+                    : 4096;
 
-    const methodes = Shiny.methodes();
+      const methodes = Shiny.methodes();
 
-    let k = methodes.findIndex(p => p.id == this.method);
-    if (k == -1) throw `Méthode invalide (${this.method})`;
+      let k = methodes.findIndex(p => p.id == this.method);
+      if (k == -1) throw `Méthode invalide (${this.method})`;
 
-    const methode = methodes[k];
-    let rolls = 1;
-    let bonusRolls = 0;
-    let charmRolls = Number(game.gen >= 5) * Number(this.charm) * 2;
+      const methode = methodes[k];
+      let rolls = 1;
+      let bonusRolls = 0;
+      let charmRolls = Number(game.gen >= 5) * Number(this.charm) * 2;
 
-    switch (methode.id) {
-      case 'wild': {
-        if (game.id === 'lgpe') {
-          const lureRolls = this.count['lgpe-lure'] ? 1 : 0;
-          const combo = this.count['lgpe-catchCombo'] || 0;
-          const chainRolls = (combo >= 31) ? 11
-                          : (combo >= 21) ? 7
-                          : (combo >= 11) ? 3
-                          : 0
-          bonusRolls = lureRolls + chainRolls;
+      switch (methode.id) {
+        case 'wild': {
+          if (game.id === 'lgpe') {
+            const lureRolls = this.count['lgpe-lure'] ? 1 : 0;
+            const combo = this.count['lgpe-catchCombo'] || 0;
+            const chainRolls = (combo >= 31) ? 11
+                            : (combo >= 21) ? 7
+                            : (combo >= 11) ? 3
+                            : 0
+            bonusRolls = lureRolls + chainRolls;
+          }
+
+          else if (game.id === 'swsh') {
+            const dexKo = this.count['swsh-dexKo'] || 0;
+            if (!dexKo) break;
+
+            const chainRolls = (dexKo >= 500) ? 5
+                            : (dexKo >= 300) ? 4
+                            : (dexKo >= 200) ? 3
+                            : (dexKo >= 100) ? 2
+                            : (dexKo >= 50) ? 1
+                            : 0;
+            const brilliantChance = (dexKo >= 500) ? 3
+                                  : (dexKo >= 300) ? 3
+                                  : (dexKo >= 200) ? 2.5
+                                  : (dexKo >= 100) ? 2
+                                  : (dexKo >= 50) ? 1.5
+                                  : 0;
+            const rolls = 1 + charmRolls + chainRolls;
+            let rate = Math.round(baseRate / rolls);
+            rate = (brilliantChance / 100) * rate + ((100 - brilliantChance) / 100) * baseRate;
+            rate = Math.round(rate);
+            return rate;
+          }
+
+          break;
         }
 
-        else if (game.id === 'swsh') {
-          const dexKo = this.count['swsh-dexKo'] || 0;
-          if (!dexKo) break;
+        case 'glitch':
+        case 'wildalwaysshiny':
+        case 'event':
+          return 1;
+        
+        case 'masuda': {
+          bonusRolls = (game.gen >= 8) ? 6 : (game.gen >= 5) ? 5 : 4;
+          break;
+        }
+        
+        case 'pokeradar': {
+          const chain = Math.min(40, Math.max(0, this.count.encounters));
+          let odds = 0;
+          switch (game.id) {
+            case 'dp':
+            case 'platinum':
+            case 'xy': 
+              odds = Math.ceil(65535 / (8200 - chain * 200));
+              break;
 
-          const chainRolls = (dexKo >= 500) ? 5
-                           : (dexKo >= 300) ? 4
-                           : (dexKo >= 200) ? 3
-                           : (dexKo >= 100) ? 2
-                           : (dexKo >= 50) ? 1
-                           : 0;
-          const brilliantChance = (dexKo >= 500) ? 3
-                                : (dexKo >= 300) ? 3
-                                : (dexKo >= 200) ? 2.5
-                                : (dexKo >= 100) ? 2
-                                : (dexKo >= 50) ? 1.5
-                                : 0;
-          const rolls = 1 + charmRolls + chainRolls;
-          let rate = Math.round(baseRate / rolls);
-          rate = (brilliantChance / 100) * rate + ((100 - brilliantChance) / 100) * baseRate;
-          rate = Math.round(rate);
+            case 'bdsp':
+              odds = chain < 30 ? 16 + chain
+                  : chain < 36 ? 20 + chain
+                  : chain === 36 ? 30 + chain
+                  : 82 << (chain - 37);
+              break;
+            
+          }
+          const rate = 65536 / odds;
+          return Math.round(rate);
+        }
+        
+        case 'chainfishing': {
+          const chain = Math.min(20, this.count.encounters);
+          bonusRolls = 2 * chain;
+          break;
+        }
+        
+        case 'dexnavchain': {
+          // compliqué...
+          break;
+        }
+
+        case 'friendsafari': {
+          bonusRolls = 4;
+          break;
+        }
+
+        case 'soschain': {
+          const compteur = this.count.encounters;
+          const chainCoeff = (compteur >= 31) ? 3
+                          : (compteur >= 21) ? 2
+                          : (compteur >= 11) ? 1
+                          : 0;
+          bonusRolls = 4 * chainCoeff;
+          break;
+        }
+
+        case 'ultrawormhole': {
+          // this.compteur == au format { "distance": 30, "rings": 2 }
+          let d = Math.min(9, Math.floor(this.count['usum-distance'] || 0) / 500 - 1);
+          const rings = this.count['usum-rings'] || 0;
+          const odds = (rings == 3) ? (4 * d)
+                    : (rings == 2) ? ((1 + 2 * d))
+                    : (rings == 1) ? ((1 + d))
+                    : 1;
+          const rate = Math.round(100 / odds);
           return rate;
         }
 
-        break;
-      }
-
-      case 'glitch':
-      case 'wildalwaysshiny':
-      case 'event':
-        return 1;
-      
-      case 'masuda': {
-        bonusRolls = (game.gen >= 8) ? 6 : (game.gen >= 5) ? 5 : 4;
-        break;
-      }
-      
-      case 'pokeradar': {
-        const chain = Math.min(40, Math.max(0, this.count.encounters));
-        let odds = 0;
-        switch (game.id) {
-          case 'dp':
-          case 'platinum':
-          case 'xy': 
-            odds = Math.ceil(65535 / (8200 - chain * 200));
-            break;
-
-          case 'bdsp':
-            odds = chain < 30 ? 16 + chain
-                 : chain < 36 ? 20 + chain
-                 : chain === 36 ? 30 + chain
-                 : 82 << (chain - 37);
-            break;
-          
+        case 'wildevent': {
+          // ???
+          return null;
         }
-        const rate = 65536 / odds;
-        return Math.round(rate);
-      }
-      
-      case 'chainfishing': {
-        const chain = Math.min(20, this.count.encounters);
-        bonusRolls = 2 * chain;
-        break;
-      }
-      
-      case 'dexnavchain': {
-        // compliqué...
-        break;
+
+        case 'raid': {
+          if (game.id === 'swsh') return null;
+          else if (game.id === 'sv') return Math.round(4103.05);
+        }
+
+        case 'dynamaxadventure': {
+          const rate = (charmRolls > 0) ? 100 : 300;
+          return rate;
+        }
+
+        case 'massoutbreak': {
+          if (game.id === 'pla') bonusRolls = 25;
+          else if (game.id === 'sv') bonusRolls = this.count['sv-outbreakCleared'] || 0;
+          break;
+        }
+
+        case 'massivemassoutbreak': {
+          bonusRolls = 12;
+          break;
+        }
+
+        case 'fixedencounter': {
+          return baseRate;
+        }
       }
 
-      case 'friendsafari': {
-        bonusRolls = 4;
-        break;
+      switch (game.id) {
+        case 'pla': {
+          charmRolls = Number(this.charm) * 3;
+          const dexResearch = this.count['pla-dexResearch'] || 0;
+          bonusRolls += dexResearch === 2 ? 3 : dexResearch;
+          break;
+        }
+
+        case 'sv': {
+          const sparklingPower = this.count['sv-sparklingPower'] || 0;
+          bonusRolls += sparklingPower;
+        } break;
       }
 
-      case 'soschain': {
-        const compteur = this.count.encounters;
-        const chainCoeff = (compteur >= 31) ? 3
-                         : (compteur >= 21) ? 2
-                         : (compteur >= 11) ? 1
-                         : 0;
-        bonusRolls = 4 * chainCoeff;
-        break;
+      if (game.gen >= 8 && ['egg', 'masuda'].includes(methode.id)) {
+        // If any other bonus is applied, skip the first shiny roll
+        if (charmRolls || bonusRolls) bonusRolls--;
       }
 
-      case 'ultrawormhole': {
-        // this.compteur == au format { "distance": 30, "rings": 2 }
-        let d = Math.min(9, Math.floor(this.count['usum-distance'] || 0) / 500 - 1);
-        const rings = this.count['usum-rings'] || 0;
-        const odds = (rings == 3) ? (4 * d)
-                   : (rings == 2) ? ((1 + 2 * d))
-                   : (rings == 1) ? ((1 + d))
-                   : 1;
-        const rate = Math.round(100 / odds);
-        return rate;
-      }
-
-      case 'wildevent': {
-        // ???
-        return null;
-      }
-
-      case 'raid': {
-        if (game.id === 'swsh') return null;
-        else if (game.id === 'sv') return Math.round(4103.05);
-      }
-
-      case 'dynamaxadventure': {
-        const rate = (charmRolls > 0) ? 100 : 300;
-        return rate;
-      }
-
-      case 'massoutbreak': {
-        if (game.id === 'pla') bonusRolls = 25;
-        else if (game.id === 'sv') bonusRolls = this.count['sv-outbreakCleared'] || 0;
-        break;
-      }
-
-      case 'massivemassoutbreak': {
-        bonusRolls = 12;
-        break;
-      }
-
-      case 'fixedencounter': {
-        return baseRate;
-      }
+      rolls += (charmRolls || 0) + (bonusRolls || 0);
+      const rate = Math.round(baseRate / rolls);
+      return rate;
+    } catch (error) {
+      return null;
     }
-
-    switch (game.id) {
-      case 'pla': {
-        charmRolls = Number(this.charm) * 3;
-        const dexResearch = this.count['pla-dexResearch'] || 0;
-        bonusRolls += dexResearch === 2 ? 3 : dexResearch;
-        break;
-      }
-
-      case 'sv': {
-        const sparklingPower = this.count['sv-sparklingPower'] || 0;
-        bonusRolls += sparklingPower;
-      } break;
-    }
-
-    if (game.gen >= 8 && ['egg', 'masuda'].includes(methode.id)) {
-      // If any other bonus is applied, skip the first shiny roll
-      if (charmRolls || bonusRolls) bonusRolls--;
-    }
-
-    rolls += (charmRolls || 0) + (bonusRolls || 0);
-    const rate = Math.round(baseRate / rolls);
-    return rate;
   }
 }

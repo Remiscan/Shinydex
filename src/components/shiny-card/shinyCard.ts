@@ -1,6 +1,6 @@
-import { Params, noAccent, wait } from '../../Params.js';
+import { noAccent } from '../../Params.js';
 import { Shiny } from '../../Shiny.js';
-import { huntStorage, pokemonData, shinyStorage } from '../../localForage.js';
+import { huntStorage, localForageAPI, pokemonData, shinyStorage } from '../../localForage.js';
 import { Notif } from '../../notification.js';
 import template from './template.js';
 // @ts-expect-error
@@ -27,6 +27,7 @@ let longClic = false;
 export class shinyCard extends HTMLElement {
   shadow: ShadowRoot;
   huntid: string = '';
+  dataStore: localForageAPI = shinyStorage;
   clickHandler: (e: Event) => void = () => {};
   openHandler = (e: Event) => {
     e.stopPropagation();
@@ -53,7 +54,7 @@ export class shinyCard extends HTMLElement {
   async dataToContent() {
     let shiny: Shiny;
     try {
-      shiny = new Shiny(await shinyStorage.getItem(this.huntid));
+      shiny = new Shiny(await this.dataStore.getItem(this.huntid));
     } catch (e) {
       console.error('Échec de création du Shiny', e);
       throw e;
@@ -67,7 +68,7 @@ export class shinyCard extends HTMLElement {
     // Espèce
     {
       const element = this.shadow.querySelector('[data-type="species"]')!;
-      const name = pokemon.name[lang ?? 'fr'];
+      const name = pokemon.name?.[lang ?? 'fr'] ?? '';
       element.innerHTML = name;
 
       const sprite = this.shadow.querySelector('pokemon-sprite')!;
@@ -223,21 +224,23 @@ export class shinyCard extends HTMLElement {
       element.innerHTML = String(shinyRate || '???');
 
       // Couleur du shiny rate
-      const game = shiny.jeuObj;
       srContainer.classList.remove('full-odds', 'charm-ods', 'one-odds');
-      if (
-        (game.gen <= 5 && shinyRate >= 8192 - 1) ||
-        (game.gen > 5 && shinyRate >= 4096 - 1)
-      ) {
-        srContainer.classList.add('full-odds');
-      } else if (
-        (game.gen <= 5 && shinyRate >= 2731 - 1) ||
-        (game.gen > 5 && shinyRate >= 1365 - 1)
-      ) {
-        srContainer.classList.add('charm-odds');
-      } else if (shinyRate <= 1) {
-        srContainer.classList.add('one-odds');
-      }
+      try {
+        const game = shiny.jeuObj;
+        if (
+          (game.gen <= 5 && shinyRate >= 8192 - 1) ||
+          (game.gen > 5 && shinyRate >= 4096 - 1)
+        ) {
+          srContainer.classList.add('full-odds');
+        } else if (
+          (game.gen <= 5 && shinyRate >= 2731 - 1) ||
+          (game.gen > 5 && shinyRate >= 1365 - 1)
+        ) {
+          srContainer.classList.add('charm-odds');
+        } else if (shinyRate <= 1) {
+          srContainer.classList.add('one-odds');
+        }
+      } catch (error) {}
     }
 
     // Filters
@@ -258,7 +261,7 @@ export class shinyCard extends HTMLElement {
 
     // On ferme la carte déjà ouverte
     if (currentCardId != null)
-      document.querySelector(`shiny-card[huntid="${currentCardId}"]`)!.removeAttribute('open');
+      document.querySelector(`[huntid="${currentCardId}"]`)!.removeAttribute('open');
 
     const menuButtons = [...this.shadow.querySelectorAll('.menu button')];
 

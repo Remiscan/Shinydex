@@ -1,3 +1,4 @@
+import { huntStorage, localForageAPI } from '../../localForage.js';
 import { shinyCard } from '../shiny-card/shinyCard.js';
 
 
@@ -16,6 +17,8 @@ sheet.replaceSync(/*css*/`
 
 
 export class corbeilleCard extends shinyCard {
+  dataStore: localForageAPI = huntStorage;
+  
   constructor() {
     super();
     this.shadow.adoptedStyleSheets = [...this.shadow.adoptedStyleSheets, sheet];

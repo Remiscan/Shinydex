@@ -102,10 +102,8 @@ export async function populateFromData(section: PopulatableSection, ids: string[
       if (card == null) {
         // DANS LA BDD MAIS DELETED & SANS CARTE = Ignorer
         const pkmnInDBButDeleted = pkmnInDB && 'deleted' in pkmnObj && pkmnObj.deleted
-        const pkmnToDestroy = 'destroy' in pkmnObj && pkmnObj.destroy;
-        const ignoreCondition = pkmnToDestroy || (
-          section === 'corbeille' ? !pkmnInDBButDeleted : pkmnInDBButDeleted
-        );
+        //const pkmnToDestroy = 'destroy' in pkmnObj && pkmnObj.destroy;
+        const ignoreCondition = section === 'corbeille' ? !pkmnInDBButDeleted : pkmnInDBButDeleted;
         if (ignoreCondition) return Promise.resolve(huntid);
         // DANS LA BDD & SANS CARTE = Créer
         else {
