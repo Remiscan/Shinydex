@@ -7,12 +7,17 @@ form {
   display: grid;
   --icon-button-width: 44px;
   --filter-icon-column: var(--icon-button-width);
-  grid-template-columns: [search-icon] 56px 1fr [reset-icon] var(--icon-button-width) [filter-icon] var(--filter-icon-column) 2px;
+  --reset-icon-column: var(--icon-button-width);
+  grid-template-columns: [search-icon] 56px 1fr [reset-icon] var(--reset-icon-column) [filter-icon] var(--filter-icon-column) 2px;
   place-items: center;
 }
 
 :host([no-filters]) form {
   --filter-icon-column: 0px;
+}
+
+:host(:not([resetable])) form {
+  --reset-icon-column: 0px;
 }
 
 form > * {
@@ -26,7 +31,7 @@ input[name="search"] {
   padding: 0;
   width: 100%;
   height: calc(100% - 8px);
-  padding: 0 calc(var(--icon-button-width) + var(--filter-icon-column) + 4px) 0 56px;
+  padding: 0 calc(var(--reset-icon-column) + var(--filter-icon-column) + 4px) 0 56px;
   box-sizing: border-box;
   border-radius: 28px;
   font-family: inherit;
@@ -54,6 +59,7 @@ input[name="search"]::placeholder {
   cursor: auto;
 }
 
+:host(:not([resetable])) [part="reset-icon"],
 :host([no-filters]) [part="filter-icon"] {
   display: none;
 }

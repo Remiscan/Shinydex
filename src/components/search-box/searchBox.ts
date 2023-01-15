@@ -38,6 +38,8 @@ export class SearchBox extends HTMLElement {
       const accentedValue = event.type === 'reset' ? '' : searchBar.value;
       const simplifiedValue = noAccent(accentedValue).toLowerCase();
 
+      if (simplifiedValue.length > 0) this.setAttribute('resetable', '');
+      else                            this.removeAttribute('resetable');
       if (event.type === 'reset') searchBar.value = '';
       this.applySearch(simplifiedValue);
     };
