@@ -647,7 +647,7 @@ body:not([data-section-actuelle="pokedex"]) .only-pokedex {
 }
 
 .pkmnicon:not(.got) {
-  filter: grayscale(.95);
+  filter: grayscale(.95) brightness(var(--pkmnicon-brightness));
 }
 
 .pkmnicon.got {

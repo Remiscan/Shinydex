@@ -28,7 +28,7 @@ echo '/'.'*'; ?>*/
   --progress-bar-color: var(--accent-color);
   --card-edit-bg-color: rgba(240, 240, 240, .7);
   --dark-coeff: 0;
-  --pkmnicon-opacity: .3;
+  --pkmnicon-brightness: .9;
 
   --primary: var(--primary-40);
   --on-primary: var(--primary-100);
@@ -97,7 +97,7 @@ echo '/'.'*'; ?>*/
   --progress-bar-color: white;
   --card-edit-bg-color: hsla(0, 0%, 7%, .7);
   --dark-coeff: 1;
-  --pkmnicon-opacity: .5;
+  --pkmnicon-brightness: .5;
 
   --primary: var(--primary-80);
   --on-primary: var(--primary-20);
