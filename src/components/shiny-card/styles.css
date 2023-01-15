@@ -203,6 +203,7 @@ pokemon-sprite,
   gap: 8px;
   transform: translate3d(-50px, 0, 0);
   --surface-opacity: .5;
+  --elevation-opacity: calc(var(--surface-opacity) * var(--elevation-2-opacity));
 }
 
 :host([open]) .pokemon-notes,
