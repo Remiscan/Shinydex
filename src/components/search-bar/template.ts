@@ -1,38 +1,12 @@
 const template = document.createElement('template');
 template.innerHTML = /*html*/`
-  <form class="search-header" name="search-bar">
-    <a class="icone bouton-retour">
-      <span class="material-icons">arrow_back</span>
-    </a>
-
-    <input type="text" name="search" id="search" inputmode="search" enterkeyhint="search" role="searchbox" autocomplete="off">
-
-    <label for="search" class="search-icon">
-      <span class="material-icons">search</span>
-    </label>
-
-    <button type="reset" class="reset-icon">
-      <span class="material-icons">close</span>
-    </button>
-
-    <template id="search-hint-template">
-      <input type="checkbox" name="chip-id" id="chip-id" value="value">
-      <label class="chip" for="chip-id">
-        <span>Type : valeur</span>
-        <span class="material-icons">cancel</span>
-      </label>
-    </template>
-
-    <fieldset class="search-hints" aria-label="Suggestions de recherche"></fieldset>
-  </form>
-
-  <form class="search-options" name="search-options">
+  <form class="search-options surface variant elevation-3" name="search-options">
     <div class="sous-titre if-ordre">
       <span id="label-ordre">Ordonner par :</span>
 
       <span class="reverse-order__container">
         <input type="checkbox" name="orderReversed" id="orderReversed" value="true">
-        <label for="orderReversed" aria-label="Inverser l'ordre">
+        <label for="orderReversed" aria-label="Inverser l'ordre" class="surface interactive">
           <span class="material-icons">vertical_align_bottom</span>
         </label>
       </span>
@@ -40,43 +14,51 @@ template.innerHTML = /*html*/`
 
     <fieldset class="liste-options if-ordre" aria-labelledby="label-ordre">
       <input type="radio" name="order" id="ordre-date" value="catchTime" checked data-section="mes-chromatiques corbeille chromatiques-ami">
-      <label for="ordre-date" class="radio" data-section="mes-chromatiques corbeille chromatiques-ami">
-        <span>Date de capture (du + au - récent)</span>
+      <label for="ordre-date" class="radio surface interactive" data-section="mes-chromatiques corbeille chromatiques-ami">
+        <span class="material-icons"></span>
+        <span class="label-large">Date de capture</span>
       </label>
 
       <input type="radio" name="order" id="ordre-rate" value="shinyRate" data-section="mes-chromatiques corbeille chromatiques-ami">
-      <label for="ordre-rate" class="radio" data-section="mes-chromatiques corbeille chromatiques-ami">
-        <span>Taux de chromatiques (du + au - élevé)</span>
+      <label for="ordre-rate" class="radio surface interactive" data-section="mes-chromatiques corbeille chromatiques-ami">
+        <span class="material-icons"></span>
+        <span class="label-large">Taux de chromatiques</span>
       </label>
 
       <input type="radio" name="order" id="ordre-dex" value="dexid" data-section="mes-chromatiques corbeille chromatiques-ami">
-      <label for="ordre-dex" class="radio" data-section="mes-chromatiques corbeille chromatiques-ami">
-        <span>N° du Pokédex</span>
+      <label for="ordre-dex" class="radio surface interactive" data-section="mes-chromatiques corbeille chromatiques-ami">
+        <span class="material-icons"></span>
+        <span class="label-large">N° du Pokédex</span>
       </label>
 
       <input type="radio" name="order" id="ordre-species" value="species" data-section="mes-chromatiques corbeille chromatiques-ami">
-      <label for="ordre-species" class="radio" data-section="mes-chromatiques corbeille chromatiques-ami">
-        <span>Espèce (alphabétique)</span>
+      <label for="ordre-species" class="radio surface interactive" data-section="mes-chromatiques corbeille chromatiques-ami">
+        <span class="material-icons"></span>
+        <span class="label-large">Espèce (alphabétique)</span>
       </label>
 
       <input type="radio" name="order" id="ordre-name" value="name" data-section="mes-chromatiques corbeille chromatiques-ami">
-      <label for="ordre-name" class="radio" data-section="mes-chromatiques corbeille chromatiques-ami">
-        <span>Surnom (alphabétique)</span>
+      <label for="ordre-name" class="radio surface interactive" data-section="mes-chromatiques corbeille chromatiques-ami">
+        <span class="material-icons"></span>
+        <span class="label-large">Surnom (alphabétique)</span>
       </label>
 
       <input type="radio" name="order" id="ordre-game" value="game" data-section="mes-chromatiques corbeille chromatiques-ami">
-      <label for="ordre-game" class="radio" data-section="mes-chromatiques corbeille chromatiques-ami">
-        <span>Jeu (date de sortie)</span>
+      <label for="ordre-game" class="radio surface interactive" data-section="mes-chromatiques corbeille chromatiques-ami">
+        <span class="material-icons"></span>
+        <span class="label-large">Jeu (date de sortie)</span>
       </label>
 
       <input type="radio" name="order" id="ordre-added" value="creationTime" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours">
-      <label for="ordre-added" class="radio" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours">
-        <span>Date d'ajout (du + au - récent)</span>
+      <label for="ordre-added" class="radio surface interactive" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours">
+        <span class="material-icons"></span>
+        <span class="label-large">Date d'ajout</span>
       </label>
 
       <input type="radio" name="order" id="ordre-username" value="username" class="if-partage" data-section="partage">
-      <label for="ordre-username" class="radio if-partage" data-section="partage">
-        <span>Pseudo (alphabétique)</span>
+      <label for="ordre-username" class="radio surface interactive if-partage" data-section="partage">
+        <span class="material-icons"></span>
+        <span class="label-large">Pseudo (alphabétique)</span>
       </label>
     </fieldset>
 
@@ -89,13 +71,15 @@ template.innerHTML = /*html*/`
         <legend class="titre-options">Dresseur d'origine :</legend>
 
         <input type="checkbox" name="filter-mine-true" id="filter-mine-true" value="true">
-        <label for="filter-mine-true" class="checkbox">
-          <span>Moi</span>
+        <label for="filter-mine-true" class="checkbox surface interactive">
+          <span class="material-icons"></span>
+          <span class="label-large">Moi</span>
         </label>
 
         <input type="checkbox" name="filter-mine-false" id="filter-mine-false" value="true">
-        <label for="filter-mine-false" class="checkbox">
-          <span>Autres</span>
+        <label for="filter-mine-false" class="checkbox surface interactive">
+          <span class="material-icons"></span>
+          <span class="label-large">Autres</span>
         </label>
       </fieldset>
 
@@ -103,13 +87,15 @@ template.innerHTML = /*html*/`
         <legend class="titre-options">Legit :</legend>
 
         <input type="checkbox" name="filter-legit-true" id="filter-legit-true" value="true">
-        <label for="filter-legit-true" class="checkbox">
-          <span>Oui</span>
+        <label for="filter-legit-true" class="checkbox surface interactive">
+          <span class="material-icons"></span>
+          <span class="label-large">Oui</span>
         </label>
 
         <input type="checkbox" name="filter-legit-false" id="filter-legit-false" value="true">
-        <label for="filter-legit-false" class="checkbox">
-          <span>Non</span>
+        <label for="filter-legit-false" class="checkbox surface interactive">
+          <span class="material-icons"></span>
+          <span class="label-large">Non</span>
         </label>
       </fieldset>
     </div>
