@@ -112,14 +112,6 @@ nav > search-box::part(input) {
   --elevation-opacity: var(--elevation-5-opacity);
 }
 
-body[data-no-search] nav {
-  grid-template-rows: 1fr;
-}
-
-body[data-no-search] nav > search-box {
-  display: none;
-}
-
 .nav-link.search-button {
   display: none;
   grid-column: 3;
@@ -219,13 +211,24 @@ body[data-section-actuelle~="a-propos"] .nav-link[data-nav-section="a-propos"] {
   --indicator-elevation-opacity: var(--elevation-2-opacity);
 }
 
-body[data-section-actuelle~="mes-chromatiques"] nav search-box:not([section="mes-chromatiques"])::part(form),
-body[data-section-actuelle~="pokedex"] nav search-box:not([section="pokedex"])::part(form),
-body[data-section-actuelle~="chasses-en-cours"] nav search-box:not([section="chasses-en-cours"])::part(form),
-body[data-section-actuelle~="corbeille"] nav search-box:not([section="corbeille"])::part(form),
-body[data-section-actuelle~="partage"] nav search-box:not([section="partage"])::part(form),
-body[data-section-actuelle~="chromatiques-ami"] nav search-box:not([section="chromatiques-ami"])::part(form) {
+body:not([data-section-actuelle~="mes-chromatiques"]) nav search-box[section="mes-chromatiques"]::part(form),
+body:not([data-section-actuelle~="pokedex"]) nav search-box[section="pokedex"]::part(form),
+body:not([data-section-actuelle~="chasses-en-cours"]) nav search-box[section="chasses-en-cours"]::part(form),
+body:not([data-section-actuelle~="corbeille"]) nav search-box[section="corbeille"]::part(form),
+body:not([data-section-actuelle~="partage"]) nav search-box[section="partage"]::part(form),
+body:not([data-section-actuelle~="chromatiques-ami"]) nav search-box[section="chromatiques-ami"]::part(form) {
   display: none;
+}
+
+body:not(
+  [data-section-actuelle~="mes-chromatiques"],
+  [data-section-actuelle~="pokedex"],
+  [data-section-actuelle~="chasses-en-cours"],
+  [data-section-actuelle~="corbeille"],
+  [data-section-actuelle~="partage"],
+  [data-section-actuelle~="chromatiques-ami"]
+) nav {
+  grid-template-rows: 1fr;
 }
 
 .search-button > .material-icons {
