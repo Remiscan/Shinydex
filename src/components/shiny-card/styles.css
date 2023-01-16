@@ -32,10 +32,7 @@ pokemon-sprite,
 }
 
 .menu-hint {
-  grid-row: 1;
-  grid-column: 1;
-  margin: -20px;
-  transform: translate(calc(20px + -6px), 20px);
+  margin: -4px;
   --state-opacity: 0 !important;
   color: rgb(var(--on-surface-variant));
 }
@@ -121,8 +118,8 @@ pokemon-sprite,
 .pokemon-infos__misc {
   grid-row: 1 / span 2;
   grid-column: misc;
-  display: grid;
-  grid-template-columns: auto auto;
+  display: flex;
+  flex-direction: column;
   position: relative;
   align-items: center;
   align-self: start;

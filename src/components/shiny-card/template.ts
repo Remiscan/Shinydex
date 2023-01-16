@@ -7,10 +7,6 @@ template.innerHTML = /*html*/`
   <div class="container surface variant elevation-0 interactive">
     <pokemon-sprite size="112" shiny="true" class="surface standard"></pokemon-sprite>
 
-    <button type="button" class="surface interactive icon-button only-icon menu-hint" data-action="open">
-      <span class="material-icons">more_vert</span>
-    </button>
-
     <div class="menu surface standard">
       <button type="button" class="surface interactive filled tonal outlined only-text" data-action="edit" disabled tabindex="-1">
         <span class="label-large">Éditer</span>
@@ -30,6 +26,9 @@ template.innerHTML = /*html*/`
 
     <div class="pokemon-infos__misc">
       <span data-type="originMark" class="icon"></span>
+      <button type="button" class="surface interactive icon-button only-icon menu-hint" data-action="open">
+        <span class="material-icons">more_vert</span>
+      </button>
     </div>
 
     <div class="pokemon-infos__capture">
