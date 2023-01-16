@@ -33,8 +33,11 @@ pokemon-sprite,
 
 .menu-hint {
   margin: -4px;
-  --state-opacity: 0 !important;
   color: rgb(var(--on-surface-variant));
+}
+
+.menu-hint:not(:hover, :active) {
+  --state-opacity: 0 !important;
 }
 
 .menu > button {
