@@ -384,9 +384,9 @@ a.icon-button.bouton-retour {
   container-type: inline-size;
 }
 
-body[data-section-actuelle~="obfuscator"] .section-contenu {
+/*body[data-section-actuelle~="obfuscator"] .section-contenu {
   overflow-y: hidden;
-}
+}*/
 
 section.loading .compteur {
   display: none;
