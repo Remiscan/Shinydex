@@ -1144,6 +1144,7 @@ form[name="app-settings"] {
 
 .param {
   display: grid;
+  align-self: start;
 }
 
 .un-parametre>label,
