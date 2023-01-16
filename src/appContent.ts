@@ -147,7 +147,7 @@ export async function initPokedex() {
       const pkmn = document.createElement('button');
       pkmn.setAttribute('type', 'button');
       pkmn.setAttribute('aria-label', allNames[i]);
-      pkmn.classList.add('pkmnicon');
+      pkmn.classList.add('pkmnicon', 'surface', 'interactive');
       pkmn.dataset.dexid = String(i);
       pkmn.addEventListener('click', event => {
         try {

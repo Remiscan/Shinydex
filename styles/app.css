@@ -649,7 +649,6 @@ body:not([data-section-actuelle="pokedex"]) .only-pokedex {
 }
 
 .pkmnicon {
-  background-color: transparent;
   border: none;
   border-radius: 4px;
   padding: 0;
@@ -658,31 +657,27 @@ body:not([data-section-actuelle="pokedex"]) .only-pokedex {
   margin: 0;
   content-visibility: auto;
   contain-intrinsic-size: 44px 44px;
+
+  background-image: var(--link-pokemonsheet),
+                    linear-gradient(to bottom, rgb(var(--state-tint, var(--on-primary)), var(--state-opacity, 0)) 0% 100%),
+                    linear-gradient(to bottom, rgb(var(--surface-tint, var(--primary)), var(--elevation-opacity, 0)) 0% 100%);
+  background-repeat: no-repeat, repeat, repeat;
+  --state-tint: var(--on-surface-variant);
 }
 
 .pkmnicon:not(.got) {
   filter: grayscale(.95) brightness(var(--pkmnicon-brightness));
+  --surface-opacity: 0;
 }
 
 .pkmnicon.got {
-  background-color: var(--soft-success-color);
-}
-
-.pkmnicon::before {
-  display: none;
+  --surface-color: var(--success-container);
+  --surface-opacity: 1;
 }
 
 .pokedex-gen > .pkmnicon:focus,
 .pokedex-gen > .got.pkmnicon {
   z-index: 1;
-}
-
-.pkmnicon:is(:hover, :focus) {
-  background-color: var(--button-hover-color);
-}
-
-.pkmnicon:is(:active) {
-  background-color: var(--button-active-color);
 }
 
 .section-titre>load-spinner {
