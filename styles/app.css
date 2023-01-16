@@ -451,9 +451,10 @@ section.loading .compteur {
 !!!!! CARTE D'UN POKÉMON !!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
+corbeille-card + corbeille-card,
 shiny-card + shiny-card {
   content-visibility: auto;
-  contain-intrinsic-size: 10px 126px;
+  contain-intrinsic-size: 100px 120px;
 }
 
 .defer-loader {
@@ -647,11 +648,6 @@ body:not([data-section-actuelle="pokedex"]) .only-pokedex {
   align-items: flex-start;
 }
 
-.pokedex-gen + .pokedex-gen {
-  content-visibility: auto;
-  contain-intrinsic-size: 10px 1000px;
-}
-
 .pkmnicon {
   background-color: transparent;
   border: none;
@@ -714,7 +710,7 @@ nav.disabled {
 
 hunt-card + hunt-card {
   content-visibility: auto;
-  contain-intrinsic-size: 10px 126px;
+  contain-intrinsic-size: 100px 120px;
 }
 
 .form-element {
