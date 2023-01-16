@@ -39,6 +39,14 @@ export class Hunt extends Shiny implements huntedPokemon {
   }
 
 
+  isEmpty(): boolean {
+    return !(
+      this.dexid > 0
+      && this.game != ''
+    );
+  }
+
+
   get orderedKeys(): Set<keyof Hunt> {
     return new Set(['dexid', 'forme', 'game', 'method', 'count', ...(Object.keys(this) as Array<keyof Hunt>)]);
   }

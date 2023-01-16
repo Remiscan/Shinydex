@@ -227,23 +227,14 @@ declare global {
   }
 }
 
-let dataUpdateNotification: Notif | null = null;
-let dataUpdateNotificationCount = 0;
 window.addEventListener('dataupdate', async (event: DataUpdateEvent) => {
   console.log(event);
 
   // On peuple l'application avec les nouvelles données
-  if (dataUpdateNotificationCount === 0) {
-    dataUpdateNotificationCount++;
-    dataUpdateNotification = new Notif('Mise à jour des données...', '', 'loading', Notif.maxDelay, () => {}, true);
-    dataUpdateNotification.prompt();
-  }
   const { sections, ids } = event.detail;
   for (const section of sections) {
     await populator[section](ids);
   }
-  if (dataUpdateNotificationCount === 1) dataUpdateNotification?.hide();
-  dataUpdateNotificationCount--;
 
   // On demande une synchronisation des données
   //await backgroundSync();

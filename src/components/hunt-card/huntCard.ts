@@ -122,20 +122,32 @@ export class huntCard extends HTMLElement {
    * Supprime la chasse.
    */
   async delete(populate = true) {
-    // On déplace la chasse dans la corbeille
     const hunt = await this.getHunt();
-    hunt.lastUpdate = Date.now();
-    hunt.deleted = true;
-    hunt.destroy = true;
-    await huntStorage.setItem(this.huntid, hunt);
 
-    if (populate) {
-      window.dispatchEvent(new CustomEvent('dataupdate', {
-        detail: {
-          sections: ['chasses-en-cours'],
-          ids: [this.huntid],
-        }
-      }));
+    try {
+      // Si la chasse n'a pas été modifiée, on la supprime complètement
+      if (hunt.isEmpty()) {
+        await huntStorage.removeItem(this.huntid);
+      }
+
+      // Sinon, on déplace la chasse dans la corbeille
+      else {
+        hunt.lastUpdate = Date.now();
+        hunt.deleted = true;
+        hunt.destroy = true;
+        await huntStorage.setItem(this.huntid, hunt);
+      }
+
+      if (populate) {
+        window.dispatchEvent(new CustomEvent('dataupdate', {
+          detail: {
+            sections: ['chasses-en-cours', 'corbeille'],
+            ids: [this.huntid],
+          }
+        }));
+      }
+    } catch (error) {
+      console.error(error);
     }
   }
 
@@ -151,7 +163,7 @@ export class huntCard extends HTMLElement {
       return;
     }
 
-    // On supprime la chasse
+    // On déplace la chasse dans la corbeille
     await huntStorage.removeItem(this.huntid);
 
     // On déplace le shiny associé dans la corbeille
@@ -161,7 +173,7 @@ export class huntCard extends HTMLElement {
 
     window.dispatchEvent(new CustomEvent('dataupdate', {
       detail: {
-        sections: ['mes-chromatiques', 'chasses-en-cours'],
+        sections: ['mes-chromatiques', 'chasses-en-cours', 'corbeille'],
         ids: [this.huntid],
       }
     }));
@@ -233,8 +245,10 @@ export class huntCard extends HTMLElement {
         case 'originMark': {
           const value = hunt[prop];
           const input = this.shadow.querySelector(`input[name="${prop}"][value="${value}"]`);
-          if (!(input instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
-          input.checked = true;
+          // If no corresponding input exists, don't throw and simply don't select any option.
+          if (input instanceof HTMLInputElement) {
+            input.checked = true;
+          }
         } break;
 
         case 'charm': {

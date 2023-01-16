@@ -73,13 +73,14 @@ export async function populateFromData(section: PopulatableSection, ids: string[
   }
 
   /* Que faire selon l'état des données du Pokémon ?
-  |------------|-------------|--------------------------|--------------------------|
-  |            | DANS LA BDD | DANS LA BDD MAIS DELETED | ABSENT DE LA BDD         |
-  |------------|-------------|--------------------------|--------------------------|
-  | AVEC CARTE |           Éditer                       | Supprimer (manuellement) |
-  |------------|-------------|--------------------------|--------------------------|
-  | SANS CARTE |    Créer    |          Ignorer         |            N/A           |
-  |------------|-------------|--------------------------|--------------------------|
+   * (à ignorer = "à supprimer" si section != corbeille, inverse sinon)
+  |------------|-------------|----------------------------|--------------------------|
+  |            | DANS LA BDD | DANS LA BDD MAIS À IGNORER | ABSENT DE LA BDD         |
+  |------------|-------------|----------------------------|--------------------------|
+  | AVEC CARTE |    Éditer   |         Supprimer          |         Supprimer        |
+  |------------|-------------|----------------------------|--------------------------|
+  | SANS CARTE |    Créer    |          Ignorer           |            N/A           |
+  |------------|-------------|----------------------------|--------------------------|
   */
 
   // Traitons les cartes :
@@ -89,34 +90,30 @@ export async function populateFromData(section: PopulatableSection, ids: string[
     const pkmn = await dataStore.getItem(huntid);
     const pkmnInDB = pkmn != null && typeof pkmn === 'object';
     const pkmnObj = new dataClass(pkmnInDB ? pkmn : {});
+    const pkmnInDBButDeleted = pkmnInDB && 'deleted' in pkmnObj && pkmnObj.deleted
+    const ignoreCondition = section === 'corbeille' ? !pkmnInDBButDeleted : pkmnInDBButDeleted;
+
     let card: shinyCard | huntCard | null = document.querySelector(`${elementName}[huntid="${huntid}"]`);
 
-    // ABSENT DE LA BDD = Supprimer (manuellement)
-    if (!pkmnInDB) {
+    // ABSENT DE LA BDD ou PRÉSENT MAIS À IGNORER = Supprimer (manuellement)
+    if (!pkmnInDB || ignoreCondition) {
       card?.remove();
-      return Promise.resolve(huntid);
     }
 
-    // DANS LA BDD
+    // DANS LA BDD et À NE PAS IGNORER
     else {
       if (card == null) {
-        // DANS LA BDD MAIS DELETED & SANS CARTE = Ignorer
-        const pkmnInDBButDeleted = pkmnInDB && 'deleted' in pkmnObj && pkmnObj.deleted
-        //const pkmnToDestroy = 'destroy' in pkmnObj && pkmnObj.destroy;
-        const ignoreCondition = section === 'corbeille' ? !pkmnInDBButDeleted : pkmnInDBButDeleted;
-        if (ignoreCondition) return Promise.resolve(huntid);
         // DANS LA BDD & SANS CARTE = Créer
-        else {
-          card = document.createElement(elementName) as shinyCard | huntCard;
-          card.setAttribute('huntid', huntid);
-          cardsToCreate.push(card);
-        }
+        card = document.createElement(elementName) as shinyCard | huntCard;
+        card.setAttribute('huntid', huntid);
+        cardsToCreate.push(card);
       } else {
         // DANS LA BDD & AVEC CARTE = Éditer
         await card.dataToContent();
       }
-      return Promise.resolve(huntid);
     }
+
+    return Promise.resolve(huntid);
   }));
 
   // Plaçons les cartes sur la page
