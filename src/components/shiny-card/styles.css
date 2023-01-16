@@ -32,7 +32,6 @@ pokemon-sprite,
 }
 
 .menu-hint {
-  margin: -4px;
   color: rgb(var(--on-surface-variant), .8);
 }
 
