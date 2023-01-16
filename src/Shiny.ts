@@ -223,6 +223,7 @@ export class Shiny implements frontendShiny {
 
   get appliedOriginMark(): string {
     try {
+      if (!this.game || !this.method) return ''; // If game or method wasn't set, we can't compute an origin mark
       if (this.method === 'hack') return ''; // Hacked Pokémon don't deserve an origin mark
       if (!this.mine) return this.originMark; // Traded Pokémon can have been born on earlier games
 
