@@ -40,7 +40,7 @@ template.innerHTML = /*html*/`
     </div>
 
     <div class="shiny-rate">
-      <div class="shiny-rate-background surface elevation-2"></div>
+      <div class="shiny-rate-background surface"></div>
       <div class="shiny-charm">
         <span class="icon" data-icon="key/shiny-charm"></span>
       </div>
