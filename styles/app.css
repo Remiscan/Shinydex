@@ -70,7 +70,14 @@ body {
   font-family: 'Roboto', system-ui;
 }
 
-body[data-no-search] {
+body:not(
+  [data-section-actuelle~="mes-chromatiques"],
+  [data-section-actuelle~="pokedex"],
+  [data-section-actuelle~="chasses-en-cours"],
+  [data-section-actuelle~="corbeille"],
+  [data-section-actuelle~="partage"],
+  [data-section-actuelle~="chromatiques-ami"]
+) {
   --bottom-bar-height: var(--nav-bar-height);
 }
 
@@ -210,6 +217,15 @@ body[data-section-actuelle~="a-propos"] .nav-link[data-nav-section="a-propos"] {
   --icon-surface: var(--secondary-container);
   --icon-color: var(--on-secondary-container);
   --indicator-elevation-opacity: var(--elevation-2-opacity);
+}
+
+body[data-section-actuelle~="mes-chromatiques"] nav search-box:not([section="mes-chromatiques"])::part(form),
+body[data-section-actuelle~="pokedex"] nav search-box:not([section="pokedex"])::part(form),
+body[data-section-actuelle~="chasses-en-cours"] nav search-box:not([section="chasses-en-cours"])::part(form),
+body[data-section-actuelle~="corbeille"] nav search-box:not([section="corbeille"])::part(form),
+body[data-section-actuelle~="partage"] nav search-box:not([section="partage"])::part(form),
+body[data-section-actuelle~="chromatiques-ami"] nav search-box:not([section="chromatiques-ami"])::part(form) {
+  display: none;
 }
 
 .search-button > .material-icons {

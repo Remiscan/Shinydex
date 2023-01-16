@@ -1,8 +1,6 @@
 import { Params, loadAllImages, wait } from './Params.js';
 import { Settings } from './Settings.js';
 import { SearchBar } from './components/search-bar/searchBar.js';
-import { SearchBox } from './components/search-box/searchBox.js';
-import { isSearchableSection } from './filtres.js';
 import { disableLazyLoad, enableLazyLoad } from './lazyLoading.js';
 import { Notif } from './notification.js';
 
@@ -239,15 +237,6 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
     sp.removeAttribute('state');
     sp.removeAttribute('finished');
   });
-
-  // On met à jour la barre de recherche globale
-  const globalSearchBar = document.querySelector('nav > search-box');
-  if (globalSearchBar && globalSearchBar instanceof SearchBox && isSearchableSection(nouvelleSection.nom)) {
-    document.body.removeAttribute('data-no-search');
-    globalSearchBar.section = nouvelleSection.nom;
-  } else if (nouvelleSection.closePrevious) {
-    document.body.setAttribute('data-no-search', 'true');
-  }
 
   // On affiche la nouvelle section
   sectionActuelle = sectionCible;
