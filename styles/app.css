@@ -1090,21 +1090,17 @@ section[data-order="lastUpdate"] :is(shiny-card, hunt-card, corbeille-card, frie
   min-height: 100%;
 }
 
-form[name="app-settings"] {
-  text-align: justify;
+form[name="app-settings"],
+#a-propos>.section-contenu {
   box-sizing: border-box;
   width: 100%;
   max-width: 65ch;
-  margin: auto;
+  margin-inline: auto;
 }
 
-#a-propos>.section-contenu {
-  margin: 0 auto 8px auto;
-  padding: 15px 30px 8px;
-  text-align: justify;
-  box-sizing: border-box;
-  width: 100%;
-  max-width: 65ch;
+#parametres > .section-contenu,
+#a-propos > .section-contenu {
+  padding-inline: 16px;
 }
 
 h2:not(:first-child) {
@@ -1117,7 +1113,7 @@ h2:not(:first-child) {
   grid-template-rows: auto;
   column-gap: 16px;
   min-height: 32px;
-  padding: 8px 24px 8px 16px;
+  padding-block: 8px;
   text-align: left;
   align-items: center;
   container-type: inline-size;
@@ -1134,6 +1130,7 @@ h2:not(:first-child) {
 
 .un-parametre + .un-parametre {
   margin-top: 0;
+  border-top: 1px solid rgb(var(--outline-variant));
 }
 
 .param-nom {
