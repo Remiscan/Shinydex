@@ -103,7 +103,7 @@ export async function warnBeforeDestruction(bouton: Element, message: string = '
   const warning = `Êtes-vous sûr ? ${message}`;
 
   const action = () => window.dispatchEvent(new Event('destructionconfirmed'));
-  const notification = new Notif(warning, 'Confirmer', icon, 5000, action);
+  const notification = new Notif(warning, undefined, 'Confirmer', action, true);
 
   const userResponse = await notification.prompt();
   bouton.removeAttribute('disabled');

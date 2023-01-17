@@ -301,6 +301,7 @@ h3 {
   all: unset;
   white-space: nowrap;
   display: flex;
+  gap: .5ch;
 }
 
 .section-titre {
@@ -415,8 +416,8 @@ section.loading .compteur {
   right: 0;
   animation: fab-apparition .2s var(--easing-standard) .2s;
   animation-fill-mode: backwards;
-  transform: translate3D(0, var(--decalage, 0), 0) scale(1);
-  transition: transform .2s var(--easing-accelerate),
+  transform: translate3D(0, calc(-1px * var(--notification-container-height, 0)), 0) scale(1);
+  transition: transform .3s var(--easing-standard),
               box-shadow .3s var(--easing-standard);
   --decalage: 0;
 }
@@ -1344,6 +1345,26 @@ input-slider[name="theme-hue"]::part(slider-thumb) {
 
 .bottom-bar {
   box-shadow: var(--shadow-elevation-medium);
+}
+
+.notification-container {
+  width: 100%;
+  height: auto;
+  max-height: calc(50vh - var(--bottom-bar-height));
+  overflow-y: auto;
+  position: fixed;
+  z-index: var(--z-notification);
+  top: calc(100% - var(--bottom-bar-height));
+  transform: translateY(calc(-1px * var(--notification-container-height, 0)));
+  transition: transform .3s var(--easing-standard);
+}
+
+.notification-container.no-animation {
+  transition: none;
+}
+
+.notification-container > .snackbar:first-child {
+  margin-top: 0;
 }
 
 .notification {

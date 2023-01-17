@@ -1,40 +1,106 @@
-const queue: Notif[] = [];
+import { Params } from './Params.js';
+
+
+
+const template = document.createElement('template');
+template.innerHTML = /*html*/`
+  <div class="snackbar shadow elevation-3">
+    <span class="snackbar-message body-medium"></span>
+    <button type="button" class="snackbar-action surface interactive text-button only-text">
+      <span class="label-large"></span>
+    </button>
+    <button type="button" class="snackbar-dismiss surface interactive icon-button only-icon">
+      <span class="material-icons">close</span>
+    </button>
+    <load-spinner></load-spinner>
+  </div>
+`;
+
+
+
+const observer = new ResizeObserver((entries) => {
+  for (const entry of entries) {
+    document.body.style.setProperty('--notification-container-height', String(entry.contentRect.height));
+  }
+});
+
+const notificationContainer = document.querySelector('.notification-container');
+if (notificationContainer) observer.observe(notificationContainer);
 
 
 
 export class Notif {
   message: string;
-  bouton: {
-    texte: string,
-    icone: string
-  };
-  action: () => any;
-  duree: number;
-  priorite: boolean = false;
+  duration: number;
+  actionText: string;
+  action?: () => any;
+  dismissable: boolean;
 
-  visible: boolean = false;
-  handler: () => any = () => {};
-  countdown?: number;
+  timer?: number;
+  element?: Element;
 
 
-  /**
-   * Crée une notification à afficher en bas de l'écran.
-   * @param texteDesc - Texte de la notification.
-   * @param texteBouton - Texte du bouton d'action.
-   * @param iconeBouton - Icône du bouton d'action.
-   * @param action - Fonction exécutée au clic sur le bouton d'action.
-   * @param duree - Durée de présence de la notification à l'écran.
-   * @param priorite - Si la notification doit rester affichée à l'écran, même si une autre notif arrive.
-   * @returns Si la fonction d'action a été exécutée ou non.
-   */
-  constructor(message: string, texteBouton: string = '', iconeBouton: string = 'close', duree: number = 5000, action?: () => any, priorite = false) {
+  constructor(message: string, duration: number = 5000, actionText: string = '', action?: () => any, dismissable: boolean = true) {
     this.message = message;
-    this.bouton = {
-      texte: texteBouton,
-      icone: iconeBouton
-    };
-    this.duree = duree;
-    this.action = action ?? this.hide;
+    this.duration = duration;
+    this.actionText = actionText;
+    this.action = action;
+    this.dismissable = dismissable ?? true;
+  }
+
+
+  /** Makes the HTML content of the notification. */
+  toHtml(): Element {
+    const html = template.content.cloneNode(true) as DocumentFragment;
+
+    const snackbar = html.querySelector('.snackbar');
+
+    const messageContainer = html.querySelector('.snackbar-message');
+    if (messageContainer) messageContainer.innerHTML = this.message;
+
+    const actionButton = html.querySelector('.snackbar-action');
+    const actionTextContainer = actionButton?.querySelector('span');
+    if (actionTextContainer) actionTextContainer.innerHTML = this.actionText;
+
+    if (this.action) {
+      actionButton?.addEventListener('click', () => this.action?.(), { once: true });
+    } else {
+      snackbar?.classList.add('no-action');
+    }
+
+    const dismissButton = html.querySelector('.snackbar-dismiss');
+    if (this.dismissable) {
+      dismissButton?.addEventListener('click', () => this.remove(), { once: true });
+    } else {
+      snackbar?.classList.add('no-dismiss');
+    }
+
+    if (snackbar) {
+      this.element = snackbar;
+      return this.element;
+    } else {
+      throw new TypeError('Expecting Element');
+    }
+  }
+
+
+  /** Deletes the notification. */
+  remove() {
+    if (this.element && this.dismissable) {
+      const closingAnimation = this.element.animate([
+        { opacity: 1 },
+        { opacity: 0 }
+      ], {
+        duration: 200,
+        easing: Params.easingStandard,
+        fill: 'forwards'
+      });
+      closingAnimation?.addEventListener('finish', () => {
+        notificationContainer?.classList.add('no-animation');
+        this.element?.remove();
+        requestAnimationFrame(() => requestAnimationFrame(() => notificationContainer?.classList.remove('no-animation')));
+      });
+    }
   }
 
 
@@ -43,99 +109,26 @@ export class Notif {
    * @returns Si l'utilisateur a cliqué sur le bouton d'action de la notification ou non.
    */
   async prompt(): Promise<boolean> {
-    if (!(queue.includes(this))) queue.push(this);
+    const html = this.toHtml();
+    notificationContainer?.appendChild(html);
 
-    if (queue[0] === this) {
-      this.visible = true;
-      const notif = document.getElementById('notification')!;
+    const actionButton = html.querySelector('.snackbar-action');
+    const dismissButton = html.querySelector('.snackbar-dismiss');
 
-      notif.classList.remove('off');
-      if (notif.classList.contains('on')) return false;
+    const userResponse: boolean = await new Promise(resolve => {
+      if (this.action)      actionButton?.addEventListener('click', event => resolve(true));
+      if (this.dismissable) dismissButton?.addEventListener('click', event => resolve(false));
+      if (this.duration)    this.timer = setTimeout(() => this.remove(), this.duration);
+    });
 
-      const notifTexte = notif.querySelector('.notif-texte')!;
-      const notifBouton = notif.querySelector('.notif-bouton');
-      if (!(notifBouton instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
-      const notifTexteBouton = notifBouton.querySelector('span')!;
-      const notifIcone = notifBouton.querySelector('.material-icons')!;
-
-      notifTexte.innerHTML = this.message;
-      notifTexteBouton.innerHTML = this.bouton.texte;
-      notifIcone.innerHTML = this.bouton.icone;
-
-      return new Promise(resolve => {
-        // Détecte le clic sur le bouton d'action
-        notifBouton.addEventListener('click', this.handler = () => {
-          resolve(true);
-          this.hide();
-          this.action();
-        });
+    if (!this.action) return Promise.resolve(true);
     
-        // Fait apparaître la notification à l'écran
-        const fab = document.querySelector('.fab')!;
-        notif.classList.add('on');
-        fab.classList.add('notif');
-        this.visible = true;
-        if (this.bouton.icone === 'loading') notif.classList.add('loading');
-        else                                 notif.classList.remove('loading');
-    
-        // Fait disparaître la notification de l'écran
-        // après avoir vérifié que le délai n'a pas changé.
-        // Ainsi, on peut augmenter this.duree pendant le countdown.
-        let dernierDelai: number = 0;
-        const cacheOuProlonge = () => {
-          if (dernierDelai < this.duree) {
-            const tempsRestant = Math.max(0, this.duree - dernierDelai);
-            dernierDelai = this.duree;
-            setTimeout(cacheOuProlonge, tempsRestant)
-          } else {
-            if (this.visible) this.hide();
-            resolve(false);
-          }
-        };
-        cacheOuProlonge();
-      });
-    } else {
-      const visibleNotif = queue[0];
-      const maxWaitTime = 5000;
-      if (visibleNotif instanceof Notif) {
-        await new Promise(resolve => {
-          window.addEventListener('notifqueueshift', resolve, { once: true });
-          if (!(visibleNotif?.priorite)) setTimeout(resolve, maxWaitTime);
-        });
-        visibleNotif.hide();
-      }
-      return this.prompt();
-    }
+    clearTimeout(this.timer);
+    return userResponse;
   }
 
 
-  /**
-   * Masque la notification et désactive son bouton d'action.
-   */
-  hide() {
-    if (queue[0] !== this || !this.visible) return;
-
-    const notif = document.getElementById('notification')!;
-    const fab = document.querySelector('.fab')!;
-
-    clearTimeout(this.countdown);
-    notif.classList.remove('on');
-    fab.classList.remove('notif');
-
-    // Désactive le bouton d'action de la notification.
-    const notifBouton = notif.querySelector('.notif-bouton');
-    if (!(notifBouton instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
-    notifBouton.removeEventListener('click', this.handler);
-
-    queue.shift();
-    window.dispatchEvent(new Event('notifqueueshift'));
-    this.visible = false;
-  }
-
-
-  /**
-   * Délai de notification maximum.
-   */
+  /** Délai de notification maximum. */
   static get maxDelay() {
     return 2147483000;
   }

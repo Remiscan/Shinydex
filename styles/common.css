@@ -124,6 +124,7 @@ button.outlined:not(.filled) {
 
 button.text-button {
   --surface-opacity: 0;
+  --elevation-opacity: 0;
   color: rgb(var(--primary));
   --state-tint: var(--primary);
 }
@@ -358,6 +359,85 @@ button:focus:not(:focus-visible),
 input:is([type=radio], [type=checkbox], [type=file]):focus:not(:focus-visible) + label {
   outline: none;
 }
+
+
+
+/*
+ * Snackbar
+ */
+
+.snackbar {
+  --surface-color: var(--inverse-surface);
+  background-color: rgb(var(--inverse-surface));
+  border-radius: 4px;
+  min-height: 48px;
+  padding-left: 16px;
+  margin: 16px;
+  box-sizing: border-box;
+  display: grid;
+  --action-column: auto;
+  --dismiss-column: 48px;
+  grid-template-columns: 1fr var(--action-column) var(--dismiss-column);
+  align-items: center;
+}
+
+.snackbar.no-action {
+  --action-column: 0px;
+}
+
+.snackbar.no-dismiss {
+  --dismiss-column: 0px;
+  padding-right: 8px;
+}
+
+.snackbar.no-action.no-dismiss {
+  padding-right: 16px;
+}
+
+.snackbar.loading {
+  padding-right: 0;
+  --action-column: 0px;
+  --dismiss-column: 48px;
+}
+
+.snackbar load-spinner {
+  --size: 40px;
+  --bg-color: rgb(var(--inverse-surface));
+  --accent-color: rgb(var(--inverse-primary));
+  --text-color: rgb(var(--inverse-on-surface));
+}
+
+.snackbar:not(.loading) load-spinner {
+  display: none;
+}
+
+.snackbar.no-action .snackbar-action,
+.snackbar.loading .snackbar-action,
+.snackbar.no-dismiss .snackbar-dismiss,
+.snackbar.loading .snackbar-dismiss {
+  display: none;
+}
+
+.snackbar-message {
+  color: rgb(var(--inverse-on-surface));
+  padding-block: 8px;
+  padding-right: 8px;
+}
+
+button.snackbar-action {
+  color: rgb(var(--inverse-primary));
+  --state-tint: var(--inverse-on-surface);
+}
+
+button.snackbar-dismiss {
+  color: rgb(var(--inverse-on-surface));
+  --state-tint: var(--inverse-on-surface);
+}
+
+
+
+
+
 
 .filtered,
 .off {

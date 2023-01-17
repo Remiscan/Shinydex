@@ -198,17 +198,7 @@
     <!-- Barre de recherches -->
     <search-bar></search-bar>
 
-    <!-- Notification -->
-    <div class="notification bottom-bar" id="notification">
-      <span class="notif-texte"></span>
-      <button type="button" class="notif-bouton text">
-        <span></span>
-        <span class="material-icons"></span>
-      </button>
-
-      <div class="progression-maj"></div>
-
-      <load-spinner></load-spinner>
-    </div>
+    <!-- Notifications -->
+    <div class="notification-container"></div>
   </body>
 </html>

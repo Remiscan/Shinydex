@@ -81,6 +81,18 @@ main {
   left: calc(.5 * 112px - .5 * 56px - 16px);
   margin: 16px 0;
   --z-fab: 30;
+  --notification-container-height: 0;
+}
+
+.notification-container {
+  width: calc(.5 * (100% - 112px));
+  max-height: 50vh;
+  top: 100%;
+  left: 112px;
+}
+
+.snackbar {
+  width: fit-content;
 }
 
 .notification {

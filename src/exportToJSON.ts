@@ -19,8 +19,10 @@ export async function json2import(file: File | Blob | undefined): Promise<string
       if (!('shiny' in importedData) || !('hunts' in importedData))
         return reject(`Le fichier importé n'est pas structuré correctement.`);
 
-      const notification = new Notif('Mise à jour des données...', '', 'loading', Notif.maxDelay, () => {});
+      const notification = new Notif('Mise à jour des données...', Notif.maxDelay, undefined, undefined, false);
       notification.prompt();
+      notification.element?.classList.add('loading');
+      notification.dismissable = false;
       const startTime = performance.now();
 
       await shinyStorage.ready();
@@ -48,7 +50,8 @@ export async function json2import(file: File | Blob | undefined): Promise<string
 
       const duration = performance.now() - startTime;
       await wait(Math.max(0, 1000 - duration));
-      notification.hide();
+      notification.dismissable = true;
+      notification.remove();
 
       return resolve(`Fichier correctement importé !`);
     });

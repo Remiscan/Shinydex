@@ -65,15 +65,11 @@ async function initServiceWorker() {
 
         if (newWorker.state == 'installed') {
           console.log('[sw] Service worker mis à jour');
-          document.getElementById('notification')!.classList.remove('installing');
           
-          const updateNotif = new Notif('Mise à jour installée !', 'Actualiser', 'update', Notif.maxDelay, updateHandler);
+          const updateNotif = new Notif('Mise à jour installée !', Notif.maxDelay, 'Actualiser', updateHandler, false);
+          window.dispatchEvent(new Event('updateinstalled'));
           const userActed = await updateNotif.prompt();
-          if (userActed) {
-            updateNotif.priorite = true;
-            updateNotif.duree = Notif.maxDelay;
-            document.getElementById('notification')!.classList.add('installing');
-          }
+          if (userActed) updateNotif.element?.classList.add('loading');
         }
 
         else if (newWorker.state == 'activated') {
@@ -287,22 +283,24 @@ export async function appStart() {
 let checkingUpdate = false;
 let updateAvailable = false;
 export async function checkUpdate(checkNotification = false) {
-  const notif = document.getElementById('notification');
-  if (notif!.classList.contains('on') || checkingUpdate)
-    return;
+  if (checkingUpdate) return;
   checkingUpdate = true;
 
   const texteSucces = 'Mise à jour disponible...';
   const notifyMaj = async () => {
     checkingUpdate = false;
-    const updateNotif = new Notif(texteSucces, 'Installer', 'update', 10000, () => {
+    const updateNotif = new Notif(texteSucces, undefined, 'Installer', () => {
       window.dispatchEvent(new Event('updatecheck'));
     });
     const userActed = await updateNotif.prompt();
     if (userActed) {
-      updateNotif.priorite = true;
-      updateNotif.duree = Notif.maxDelay;
-      document.getElementById('notification')!.classList.add('installing');
+      updateNotif.element?.classList.add('loading');
+      updateNotif.dismissable = false;
+
+      window.addEventListener('updateinstalled', event => {
+        updateNotif.dismissable = true;
+        updateNotif.remove();
+      });
     }
   };
 
