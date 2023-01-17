@@ -132,6 +132,11 @@
     <!-- Contenu de l'appli -->
     <main class="surface primary">
 
+      <!-- FAB -->
+      <button type="button" class="surface interactive fab shadow only-icon">
+        <span class="material-icons">add</span>
+      </button>
+
       <!-- Mes chromatiques -->
       <section id="mes-chromatiques" class="vide loading">
         <?php include './pages/mes-chromatiques.html'; ?>
@@ -179,11 +184,6 @@
         echo str_replace('{{polconf}}', $politique, $apropos);
         ?>
       </section>
-
-      <!-- FAB -->
-      <button type="button" class="surface interactive fab shadow only-icon">
-        <span class="material-icons">add</span>
-      </button>
 
     </main>
 
