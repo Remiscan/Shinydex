@@ -295,9 +295,12 @@ body[data-section-actuelle~="obfuscator"] #obfuscator {
   display: grid;
 }
 
-h1 {
+h1,
+h2,
+h3 {
   all: unset;
   white-space: nowrap;
+  display: flex;
 }
 
 .section-titre {
@@ -1101,78 +1104,63 @@ form[name="app-settings"] {
   box-sizing: border-box;
   width: 100%;
   max-width: 65ch;
-  color: var(--text-color-soft);
 }
 
-#parametres .sous-titre,
-#a-propos .sous-titre {
-  font-size: 1rem;
-}
-
-#parametres p + .sous-titre,
-#a-propos p + .sous-titre {
-  margin-top: 48px;
+h2:not(:first-child) {
+  margin-top: 16px;
 }
 
 .un-parametre {
   display: grid;
   grid-template-columns: 1fr auto;
-  grid-template-rows: 1fr auto;
-  gap: 5%;
-  align-items: center;
-  width: 100%;
+  grid-template-rows: auto;
+  column-gap: 16px;
   min-height: 32px;
-  margin: 0 auto;
+  padding: 8px 24px 8px 16px;
+  text-align: left;
+  align-items: center;
   container-type: inline-size;
 }
 
-.un-parametre.theme>.param {
+.un-parametre.with-description {
+  grid-template-rows: auto auto;
+}
+
+.un-parametre.theme > .param {
   grid-template-columns: auto auto auto;
   gap: 10px;
 }
 
 .un-parametre + .un-parametre {
-  margin-top: 15px;
+  margin-top: 0;
 }
 
 .param-nom {
-  font-weight: 500;
-  line-height: 1em;
   display: block;
-  text-align: left;
-  box-sizing: border-box;
-  grid-row: 1 / 2;
-  grid-column: 1 / 2;
-}
-
-.param-nom,
-.param-nom>label {
-  color: var(--text-color);
+  grid-row: 1;
+  grid-column: 1;
+  color: rgb(var(--on-surface));
 }
 
 .param-description {
-  grid-row: 2 / 3;
-  text-align: left;
-  max-width: 80%;
-  color: var(--text-color-soft);
+  grid-row: 2;
+  grid-column: 1;
+  color: rgb(var(--on-surface-variant));
 }
 
 .param {
   display: grid;
   align-self: start;
+  justify-content: end;
+  min-width: 150px;
 }
 
-.un-parametre>label,
-.un-parametre>input,
-.un-parametre>input-switch,
-.un-parametre>.param {
-  grid-row: 1 / 3;
-  grid-column: 2 / 3;
-}
-
-.param button,
-.param label.ghost {
-  margin: 0;
+.un-parametre > label,
+.un-parametre > input,
+.un-parametre > input-switch,
+.un-parametre > .param {
+  grid-row: 1 / -1;
+  grid-column: 2;
 }
 
 .bouton-recherche-maj {

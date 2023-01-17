@@ -1,16 +1,15 @@
 const template = document.createElement('template');
 template.innerHTML = /*html*/`
   <form class="search-options surface primary elevation-3" name="search-options">
-    <div class="sous-titre if-ordre">
-      <span id="label-ordre">Ordonner par :</span>
 
-      <span class="reverse-order__container">
-        <input type="checkbox" name="orderReversed" id="orderReversed" value="true">
-        <label for="orderReversed" aria-label="Inverser l'ordre" class="surface interactive">
-          <span class="material-icons">vertical_align_bottom</span>
-        </label>
-      </span>
-    </div>
+    <h2 class="title-medium if-ordre">Ordonner par :</h2>
+
+    <span class="reverse-order__container">
+      <input type="checkbox" name="orderReversed" id="orderReversed" value="true">
+      <label for="orderReversed" aria-label="Inverser l'ordre" class="surface interactive">
+        <span class="material-icons">vertical_align_bottom</span>
+      </label>
+    </span>
 
     <fieldset class="liste-options if-ordre" aria-labelledby="label-ordre">
       <input type="radio" name="order" id="ordre-date" value="catchTime" checked data-section="mes-chromatiques corbeille chromatiques-ami">
@@ -62,9 +61,7 @@ template.innerHTML = /*html*/`
       </label>
     </fieldset>
 
-    <div class="sous-titre if-filters">
-      <span>Afficher :</span>
-    </div>
+    <h2 class="title-medium if-ordre">Afficher :</h2>
 
     <div class="cote-a-cote if-filters">
       <fieldset class="liste-options" data-section="mes-chromatiques corbeille chromatiques-ami">
