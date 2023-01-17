@@ -653,7 +653,7 @@ body:not([data-section-actuelle="pokedex"]) .only-pokedex {
 
 .pkmnicon {
   border: none;
-  border-radius: 4px;
+  border-radius: calc(.5 * var(--border-radius));
   padding: 0;
   box-shadow: none;
   position: relative;
