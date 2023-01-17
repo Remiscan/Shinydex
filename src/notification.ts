@@ -118,7 +118,7 @@ export class Notif {
     const userResponse: boolean = await new Promise(resolve => {
       if (this.action)      actionButton?.addEventListener('click', event => resolve(true));
       if (this.dismissable) dismissButton?.addEventListener('click', event => resolve(false));
-      if (this.duration)    this.timer = setTimeout(() => this.remove(), this.duration);
+      if (this.duration)    this.timer = setTimeout(() => { this.remove(); resolve(false); }, this.duration);
     });
 
     if (!this.action) return Promise.resolve(true);

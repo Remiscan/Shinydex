@@ -282,6 +282,7 @@ export async function appStart() {
 // Vérifie la disponibilité d'une mise à jour
 let checkingUpdate = false;
 let updateAvailable = false;
+let updateNotification: Notif;
 export async function checkUpdate(checkNotification = false) {
   if (checkingUpdate) return;
   checkingUpdate = true;
@@ -289,17 +290,18 @@ export async function checkUpdate(checkNotification = false) {
   const texteSucces = 'Mise à jour disponible...';
   const notifyMaj = async () => {
     checkingUpdate = false;
-    const updateNotif = new Notif(texteSucces, undefined, 'Installer', () => {
+    if (updateNotification) updateNotification.remove();
+    updateNotification = new Notif(texteSucces, undefined, 'Installer', () => {
       window.dispatchEvent(new Event('updatecheck'));
     });
-    const userActed = await updateNotif.prompt();
+    const userActed = await updateNotification.prompt();
     if (userActed) {
-      updateNotif.element?.classList.add('loading');
-      updateNotif.dismissable = false;
+      updateNotification.element?.classList.add('loading');
+      updateNotification.dismissable = false;
 
       window.addEventListener('updateinstalled', event => {
-        updateNotif.dismissable = true;
-        updateNotif.remove();
+        updateNotification.dismissable = true;
+        updateNotification.remove();
       });
     }
   };
@@ -341,8 +343,11 @@ export async function checkUpdate(checkNotification = false) {
   }
   
   catch(error) {
-    if (checkNotification && typeof error === 'string')
-      new Notif(error).prompt();
+    if (checkNotification && typeof error === 'string') {
+      if (updateNotification) updateNotification.remove();
+      updateNotification = new Notif(error);
+      updateNotification.prompt();
+    }
     checkingUpdate = false;
   }
 }
