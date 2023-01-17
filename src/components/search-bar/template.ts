@@ -1,6 +1,6 @@
 const template = document.createElement('template');
 template.innerHTML = /*html*/`
-  <form class="search-options surface variant elevation-3" name="search-options">
+  <form class="search-options surface primary elevation-3" name="search-options">
     <div class="sous-titre if-ordre">
       <span id="label-ordre">Ordonner par :</span>
 

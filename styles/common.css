@@ -269,6 +269,7 @@ input:is([type="radio"], [type="checkbox"]) + label > .material-icons {
 input:is([type="radio"], [type="checkbox"]):checked + label,
 input:is([type="radio"], [type="checkbox"]):checked + label > .material-icons {
   color: rgb(var(--primary));
+  --elevation-opacity: var(--elevation-2-opacity);
 }
 
 input[type="radio"] + label > .material-icons::before {
