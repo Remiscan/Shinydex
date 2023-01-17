@@ -669,13 +669,16 @@ body:not([data-section-actuelle="pokedex"]) .only-pokedex {
 }
 
 .pkmnicon:not(.got) {
+  /* setting opacity on .pkmnicon makes the pokedex section lag, particularly when opening it on mobile */
   filter: grayscale(.95) brightness(var(--pkmnicon-brightness));
   --surface-opacity: 0;
 }
 
 .pkmnicon.got {
-  --surface-color: var(--success-container);
+  --surface-color: var(--surface);
   --surface-opacity: 1;
+  --elevation-opacity: var(--elevation-2-opacity);
+  --state-tint: var(--on-primary);
 }
 
 .pokedex-gen > .pkmnicon:focus,
