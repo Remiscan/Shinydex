@@ -20,7 +20,7 @@ import sheet from './styles.css' assert { type: 'css' };
 
 let currentCardId: string | null;
 let charmlessMethods: string[];
-let longClic = false;
+let previousEditNotification: Notif;
 
 
 
@@ -310,7 +310,9 @@ export class shinyCard extends HTMLElement {
     } catch (error) {
       const message = (typeof error === 'string') ? error : `Erreur : impossible de modifier ce Pokémon.`;
       console.error(error);
-      new Notif(message).prompt();
+      if (previousEditNotification) previousEditNotification.remove();
+      previousEditNotification = new Notif(message);
+      previousEditNotification.prompt();
     }
   }
 
