@@ -1129,7 +1129,7 @@ h2:not(:first-child) {
 
 .un-parametre.theme > .param {
   grid-template-columns: auto auto auto;
-  gap: 10px;
+  gap: 8px;
 }
 
 .un-parametre + .un-parametre {
