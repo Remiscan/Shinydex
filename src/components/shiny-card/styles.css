@@ -28,7 +28,6 @@ pokemon-sprite,
 pokemon-sprite,
 .menu {
   --elevation-opacity: var(--elevation-2-opacity);
-  --state-opacity: 0;
 }
 
 .menu-hint {
@@ -47,6 +46,10 @@ button.icon-button.menu-hint {
 
 .menu > button {
   margin: 0;
+}
+
+.menu > button:not(:focus, :hover, :active) {
+  --state-opacity: 0;
 }
 
 [data-action="restore"] {
