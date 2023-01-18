@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="51.2 51.2 409.6 409.6" width="512" height="512">
   <style>
     svg {
-      --background-top: #4051B3;
+      --background-top: #586cd3;
       --background-bottom: white;
       --unown-color: #292929;
       --shiny-stars-color: white;
@@ -30,11 +30,11 @@
       fill: var(--shiny-stars-color);
     }
 
-  /*@media (prefers-color-scheme: dark) {
-    stop.bottom {
-      stop-color: #DECDF6;
+  @media (prefers-color-scheme: dark) {
+    svg {
+      --background-bottom: #e2e2e2;
     }
-  }*/
+  }
   </style>
   <defs>
     <linearGradient id="fond" x1="0" y1="0" x2="0.4609" y2="1.2060">
