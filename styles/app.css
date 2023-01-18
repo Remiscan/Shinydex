@@ -1267,6 +1267,7 @@ input-slider[name="theme-hue"]::part(slider-thumb) {
   display: flex;
   width: 120px;
   height: 120px;
+  min-height: 120px;
   border-radius: 50%;
   overflow: hidden;
   margin: 0 auto;
