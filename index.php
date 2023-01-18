@@ -178,10 +178,18 @@
         ob_start();
         include './pages/politique-confidentialite.html';
         $politique = ob_get_clean();
+
+        ob_start();
+        include './images/app-icons/icon.svg';
+        $icon = ob_get_clean();
+
         ob_start();
         include './pages/a-propos.html';
         $apropos = ob_get_clean();
-        echo str_replace('{{polconf}}', $politique, $apropos);
+
+        $apropos = str_replace('{{polconf}}', $politique, $apropos);
+        $apropos = str_replace('{{app-icon}}', $icon, $apropos);
+        echo $apropos;
         ?>
       </section>
 

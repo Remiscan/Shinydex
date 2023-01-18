@@ -85,7 +85,8 @@ main {
 }
 
 .notification-container {
-  width: calc(.5 * (100% - 112px));
+  width: fit-content;
+  max-width: calc(.5 * (100% - 112px));
   max-height: 50vh;
   top: 100%;
   left: 112px;
