@@ -1,9 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="51.2 51.2 409.6 409.6" width="512" height="512">
   <style>
     svg {
-      --background-top: #586cd3;
+      --background-top: #5d70c3;
       --background-bottom: white;
       --unown-color: #292929;
+      --ball-center-color: white;
       --shiny-stars-color: white;
     }
 
@@ -13,6 +14,10 @@
 
     stop.bottom {
       stop-color: var(--background-bottom);
+    }
+
+    .ball-center {
+      fill: var(--ball-center-color);
     }
 
     #unown-arm > *,
@@ -33,6 +38,7 @@
   @media (prefers-color-scheme: dark) {
     svg {
       --background-bottom: #e2e2e2;
+      --ball-center-color: #e2e2e2;
     }
   }
   </style>
@@ -64,8 +70,8 @@
 
     <line class="ball-line" x1="-60" y1="256" x2="572" y2="256" stroke-width="40" transform="rotate(-20 256 256)"/>
     <g id="unown">
-      <circle class="body-circle ball-center" cx="256" cy="256" r="89" fill="white" stroke-width="25"/>
-      <circle class="eye-shadow" cx="256" cy="256" r="52" fill-opacity="0.066"/>
+      <circle class="body-circle ball-center" cx="256" cy="256" r="89" stroke-width="25"/>
+      <circle class="eye-shadow" cx="256" cy="256" r="52" fill-opacity="0.12"/>
       <circle class="eye" cx="256" cy="256" r="24"/>
       <circle class="eye-light" cx="251" cy="251" r="8" fill="white"/>
       <use href="#unown-arm" transform="rotate(-20 256 256)"/>

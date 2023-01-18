@@ -1277,10 +1277,7 @@ input-slider[name="theme-hue"]::part(slider-thumb) {
 .app-icon > svg {
   width: 120px;
   height: 120px;
-  /*--background-top: rgb(var(--surface-variant));
-  --background-bottom: rgb(var(--surface-variant));
-  --shiny-stars-color: rgb(var(--primary));
-  --unown-color: #3772BC;*/
+  --background-top: rgb(var(--primary-50));
 }
 
 .lien-source {
