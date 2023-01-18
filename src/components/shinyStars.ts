@@ -1,4 +1,4 @@
-const template = document.createElement('template');
+export const template = document.createElement('template');
 template.innerHTML = /*html*/`
   <svg viewBox="0 0 24 24" role="img" aria-labelledby="title">
     <title id="title">chromatique</title>
