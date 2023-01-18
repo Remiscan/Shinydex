@@ -322,17 +322,17 @@ input[type="checkbox"]:checked + label > .material-icons::before {
 
 input-switch,
 shiny-switch {
-  --off-bg-color: rgb(var(--secondary));
-  --on-bg-color: rgb(var(--primary));
-  --handle-color: rgb(var(--on-primary));
-  --handle-hover-color: var(--handle-color);
-  --handle-active-color: var(--handle-color);
-  --off-text-color: rgb(var(--on-primary));
-  --on-text-color: rgb(var(--on-primary));
+  --off-track-color: rgb(var(--surface-variant));
+  --on-track-color: rgb(var(--primary));
+  --off-thumb-color: rgb(var(--outline));
+  --on-thumb-color: rgb(var(--on-primary));
 }
 
-shiny-switch {
-  --color: currentColor;
+shiny-switch::part(icon-on) {
+  display: grid;
+  place-items: center;
+  stroke: none;
+  fill: var(--on-track-color);
 }
 
 input-switch[disabled] {

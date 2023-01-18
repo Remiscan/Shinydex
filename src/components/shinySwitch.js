@@ -6,25 +6,8 @@ import './shinyStars.js';
 export class ShinySwitch extends InputSwitch {
   constructor() {
     super();
-  }
-
-  update(attr, newValue) {
-    switch (attr) {
-      case 'hint': {
-        const hints = (newValue || '').split(' ');
-        const type = hints[0];
-        switch (type) {
-          case 'icon': {
-            const iconOn = `<shiny-stars></shiny-stars>`;
-            const iconOff = ``;
-            this.shadowRoot.querySelector('[data-state="on"]').innerHTML = iconOn;
-            this.shadowRoot.querySelector('[data-state="off"]').innerHTML = iconOff;
-          } break;
-          default: super.update(attr, newValue);
-        }
-      } break;
-      default: super.update(attr, newValue);
-    }
+    const iconOn = this.shadow.querySelector('[part~="icon-on"]');
+    iconOn.outerHTML = `<shiny-stars part="icon icon-on"></shiny-stars>`;
   }
 }
 
