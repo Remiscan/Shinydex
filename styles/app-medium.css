@@ -84,6 +84,10 @@ main {
   --notification-container-height: 0;
 }
 
+.app-icon {
+  margin: 0;
+}
+
 .notification-container {
   width: fit-content;
   max-width: calc(.5 * (100% - 112px));
