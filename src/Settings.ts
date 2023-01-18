@@ -166,7 +166,7 @@ export async function cacheAllSprites(bool: boolean): Promise<boolean> {
           unit = unitPower === 6 ? 'Mo' : unitPower === 3 ? 'ko' : 'octets';
           const displayedSize = (size / (10 ** unitPower)).toFixed(2);
 
-          progressContainer.innerHTML = `${progress}% : ${displayedSize} ${unit}`;
+          progressContainer.innerHTML = `${progress}% : ${displayedSize} ${unit}`;
 
           if (progress === 100) resolve(true);
           else if (progressWithErrors === 100) resolve(false);
@@ -180,7 +180,7 @@ export async function cacheAllSprites(bool: boolean): Promise<boolean> {
       worker.postMessage({ 'action': `cache-all-sprites` }, [channel.port2]);
     });
 
-    await dataStorage.setItem('sprites-cache-progress', `${progress}% : ${(size / (10 ** unitPower)).toFixed(2)} ${unit}`);
+    await dataStorage.setItem('sprites-cache-progress', `${progress}% : ${(size / (10 ** unitPower)).toFixed(2)} ${unit}`);
     return true;
   } catch (error) {
     console.error(error);

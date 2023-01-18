@@ -1108,7 +1108,7 @@ h2:not(:first-child) {
 
 .un-parametre {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: auto 1fr;
   grid-template-rows: auto;
   column-gap: 16px;
   min-height: 32px;
@@ -1132,6 +1132,11 @@ h2:not(:first-child) {
   border-top: 1px solid rgb(var(--outline-variant));
 }
 
+.param-nom,
+.param-description {
+  max-width: 40ch;
+}
+
 .param-nom {
   display: block;
   grid-row: 1;
@@ -1147,9 +1152,13 @@ h2:not(:first-child) {
 
 .param {
   display: grid;
-  align-self: start;
+  align-self: center;
   justify-content: end;
   min-width: 150px;
+}
+
+.un-parametre.long .param {
+  align-self: start;
 }
 
 .un-parametre > label,
