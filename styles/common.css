@@ -328,6 +328,11 @@ shiny-switch {
   --on-thumb-color: rgb(var(--on-primary));
 }
 
+input-switch::part(button),
+shiny-switch::part(button) {
+  --interaction-ring-color: rgb(var(--on-surface));
+}
+
 shiny-switch::part(icon-on) {
   display: grid;
   place-items: center;
