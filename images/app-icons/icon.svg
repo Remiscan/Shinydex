@@ -1,5 +1,35 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="51.2 51.2 409.6 409.6" width="512" height="512">
   <style>
+    svg {
+      --background-top: #4051B3;
+      --background-bottom: white;
+      --unown-color: #292929;
+      --shiny-stars-color: white;
+    }
+
+    stop.top {
+      stop-color: var(--background-top);
+    }
+
+    stop.bottom {
+      stop-color: var(--background-bottom);
+    }
+
+    #unown-arm > *,
+    .ball-line,
+    .ball-center {
+      stroke: var(--unown-color);
+    }
+
+    .eye-shadow,
+    .eye {
+      fill: var(--unown-color);
+    }
+
+    use[href="#shiny-star"] {
+      fill: var(--shiny-stars-color);
+    }
+
   /*@media (prefers-color-scheme: dark) {
     stop.bottom {
       stop-color: #DECDF6;
@@ -8,15 +38,15 @@
   </style>
   <defs>
     <linearGradient id="fond" x1="0" y1="0" x2="0.4609" y2="1.2060">
-      <stop offset="0%" stop-color="#4051B3" class="top"/>
-      <stop offset="50%" stop-color="#4051B3" class="top"/>
-      <stop offset="50%" stop-color="white" class="bottom"/>
-      <stop offset="100%" stop-color="white" class="bottom"/>
+      <stop offset="0%" class="top"/>
+      <stop offset="50%" class="top"/>
+      <stop offset="50%" class="bottom"/>
+      <stop offset="100%" class="bottom"/>
     </linearGradient>
     <g id="unown-arm">
-      <line x1="256" y1="256" x2="256" y2="336" stroke="#292929" stroke-width="25" stroke-linecap="round" transform="translate(0 89)"/>
-      <path d="M 256,425 A 160,160 0 0,1 117.75,353.175" stroke="#292929" stroke-width="25" stroke-linecap="round" fill="transparent"/>
-      <line x1="117.75" y1="353.175" x2="117.75" y2="328" stroke="#292929" stroke-width="25" stroke-linecap="round" transform="rotate(55 135.6 353.175) translate(0 33)"/>
+      <line x1="256" y1="256" x2="256" y2="336" stroke-width="25" stroke-linecap="round" transform="translate(0 89)"/>
+      <path d="M 256,425 A 160,160 0 0,1 117.75,353.175" stroke-width="25" stroke-linecap="round" fill="transparent"/>
+      <line x1="117.75" y1="353.175" x2="117.75" y2="328" stroke-width="25" stroke-linecap="round" transform="rotate(55 135.6 353.175) translate(0 33)"/>
     </g>
     <g id="shiny-star">
       <svg viewBox="0 0 30 30" width="30" height="30">
@@ -28,15 +58,15 @@
   <rect x="0" y="0" width="512" height="512" fill="url(#fond)"/>
   <g transform="scale(.9)" transform-origin="256 256">
     <g transform="translate(-100 100) rotate(-20 256 256)">
-      <use href="#shiny-star" x="256" y="83" transform-origin="256 83" transform="scale(3) translate(-15 -15)" fill="white"/>
-      <use href="#shiny-star" x="256" y="83" transform-origin="256 83" transform="scale(1) translate(25 -50)" fill="white"/>
+      <use href="#shiny-star" x="256" y="83" transform-origin="256 83" transform="scale(3) translate(-15 -15)"/>
+      <use href="#shiny-star" x="256" y="83" transform-origin="256 83" transform="scale(1) translate(25 -50)"/>
     </g>
 
-    <line class="ball-line" x1="-60" y1="256" x2="572" y2="256" stroke="#292929" stroke-width="40" transform="rotate(-20 256 256)"/>
+    <line class="ball-line" x1="-60" y1="256" x2="572" y2="256" stroke-width="40" transform="rotate(-20 256 256)"/>
     <g id="unown">
-      <circle class="body-circle ball-center" cx="256" cy="256" r="89" fill="white" stroke="#292929" stroke-width="25"/>
-      <circle class="eye-shadow" cx="256" cy="256" r="52" fill="#292929" fill-opacity="0.066"/>
-      <circle class="eye" cx="256" cy="256" r="24" fill="#292929"/>
+      <circle class="body-circle ball-center" cx="256" cy="256" r="89" fill="white" stroke-width="25"/>
+      <circle class="eye-shadow" cx="256" cy="256" r="52" fill-opacity="0.066"/>
+      <circle class="eye" cx="256" cy="256" r="24"/>
       <circle class="eye-light" cx="251" cy="251" r="8" fill="white"/>
       <use href="#unown-arm" transform="rotate(-20 256 256)"/>
       <use href="#unown-arm" transform="rotate(160 256 256)"/>
