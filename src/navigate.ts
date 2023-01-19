@@ -248,9 +248,10 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
   if (nouvelleSection.rememberPosition) mainElement.scroll(0, lastPosition.get(sectionCible) || 0); // scrolle vers la position précédemment enregistrée
 
   // On détermine quelles sections animer (sur PC, certaines sections apparaissent en couple)
-  const shouldItAnimate = (section: string): boolean => {
-    if (ancienneSection.closePrevious) return true;
-    else                               return false;
+  const shouldItAnimate = (sectionID: string): boolean => {
+    const section = sections.find(s => s.nom === sectionID);
+    if (section?.closePrevious) return true;
+    else                        return false;
   };
 
   const sectionsToAnimate: string[] = [];
@@ -258,9 +259,13 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
   if (window.innerWidth >= Params.layoutPClarge) {
     switch (sectionCible) {
       case 'mes-chromatiques': if (shouldItAnimate('pokedex')) sectionsToAnimate.push('pokedex'); break;
-      case 'chasses-en-cours': if (shouldItAnimate('corbeile')) sectionsToAnimate.push('corbeille'); break;
+      case 'pokedex':          if (shouldItAnimate('mes-chromatiques')) sectionsToAnimate.push('mes-chromatiques'); break;
+      case 'chasses-en-cours': if (shouldItAnimate('corbeille')) sectionsToAnimate.push('corbeille'); break;
+      case 'corbeille':        if (shouldItAnimate('chasses-en-cours')) sectionsToAnimate.push('chasses-en-cours'); break;
       case 'parametres':       if (shouldItAnimate('a-propos')) sectionsToAnimate.push('a-propos'); break;
+      case 'a-propos':         if (shouldItAnimate('parametres')) sectionsToAnimate.push('parametres'); break;
       case 'partage':          if (shouldItAnimate('chromatiques-ami')) sectionsToAnimate.push('chromatiques-ami'); break;
+      case 'chromatiques-ami': if (shouldItAnimate('partage')) sectionsToAnimate.push('partage'); break;
     }
   }
 
