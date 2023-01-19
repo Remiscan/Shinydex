@@ -1,0 +1,139 @@
+:host {
+  grid-row: 1 / -1;
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-rows: auto auto;
+  grid-template-columns: 1fr;
+  height: fit-content;
+  box-sizing: border-box;
+  position: sticky;
+  z-index: var(--z-filter-menu);
+  width: min(100% - 16px, 800px);
+  margin: auto;
+  max-height: 100%;
+}
+
+form {
+  width: 100%;
+  max-height: 100%;
+  padding: 16px;
+  box-sizing: border-box;
+  border-radius: var(--border-radius);
+  max-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+input + label[for="orderReversed"] > .material-icons::before {
+  display: inline-block;
+  content: 'vertical_align_bottom';
+}
+
+input:checked + label[for="orderReversed"] > .material-icons::before {
+  content: 'vertical_align_bottom';
+  transform: scaleY(-1);
+}
+
+label[for="orderReversed"] > .label-large {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+input:checked + label[for="orderReversed"] > .label-large > .material-icons {
+  transform: scaleY(-1);
+}
+
+.cote-a-cote {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  column-gap: 32px;
+  row-gap: 8px;
+}
+
+/*.reverse-order__container {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+}
+
+.reverse-order__container > * {
+  grid-row: 1;
+  grid-column: 1;
+}
+
+input[name="orderReversed"]:checked + label > i {
+  transform: scaleY(-1);
+}
+
+input[type="checkbox"] + label[for="orderReversed"] {
+  display: grid;
+  place-items: center;
+  border: none;
+  padding: 0px;
+  margin: 0px;
+  overflow: visible;
+}
+
+input[type="checkbox"] + label[for="orderReversed"] > * {
+  grid-row: 1;
+  grid-column: 1;
+}
+
+input[type="checkbox"] + label[for="orderReversed"]::after {
+  display: none;
+}
+
+input[type="checkbox"] + label[for="orderReversed"]::before {
+  grid-row: 1;
+  grid-column: 1;
+  content: '';
+  display: block;
+  width: var(--tap-safe-size);
+  height: var(--tap-safe-size);
+  background: none;
+  margin: 0;
+  box-shadow: none;
+}*/
+
+:host([section="pokedex"]) .if-ordre,
+:host([section="chasses-en-cours"]) .menu-filtres,
+:host([section="corbeille"]) .menu-filtres,
+:host([section="partage"]) .if-filtres,
+:host([section="partage"]) input[type="radio"],
+:host([section="partage"]) label[for^="ordre"],
+:host(:not([section="partage"])) .if-partage,
+:host([section="ajouter-ami"]) .search-options {
+  display: none;
+}
+
+:host([section="partage"]) input[type="radio"].if-partage,
+:host([section="partage"]) label[for^="ordre"].if-partage,
+:host([section="partage"]) input[type="radio"]#ordre-date-ajout,
+:host([section="partage"]) label[for="ordre-date-ajout"] {
+  display: grid;
+}
+
+:host([section="mes-chromatiques"]) [data-section]:not([data-section~="mes-chromatiques"]),
+:host([section="chromatiques-ami"]) [data-section]:not([data-section~="chromatiques-ami"]),
+:host([section="corbeille"]) [data-section]:not([data-section~="corbeille"]),
+:host([section="chasses-en-cours"]) [data-section]:not([data-section~="chasses-en-cours"]),
+:host([section="partage"]) [data-section]:not([data-section~="partage"]) {
+  display: none;
+}

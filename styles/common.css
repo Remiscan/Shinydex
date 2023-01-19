@@ -11,6 +11,15 @@ shiny-stars {
   --color: currentColor;
 }
 
+h1,
+h2,
+h3 {
+  all: unset;
+  white-space: nowrap;
+  display: flex;
+  gap: .5ch;
+}
+
 
 
 /*

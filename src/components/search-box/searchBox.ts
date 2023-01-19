@@ -123,8 +123,15 @@ export class SearchBox extends HTMLElement {
         }
         
         input.setAttribute('placeholder', placeholder);
-        if (isFiltrableSection(value ?? '')) this.removeAttribute('no-filters');
-        else                                 this.setAttribute('no-filters', '');
+
+        const filterMenuLink = this.shadow.querySelector('[data-nav-section="obfuscator"]');
+        if (isFiltrableSection(value ?? '')) {
+          this.removeAttribute('no-filters');
+          filterMenuLink?.setAttribute('data-nav-data', JSON.stringify({ filters: true, section: value, opacity: .5 }));
+        } else {
+          this.setAttribute('no-filters', '');
+          filterMenuLink?.removeAttribute('data-nav-data');
+        }
       } break;
     }
   }

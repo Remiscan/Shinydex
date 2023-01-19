@@ -2,7 +2,8 @@ import { Params, loadAllImages, timestamp2date, wait } from './Params.js';
 import { Pokemon } from './Pokemon.js';
 import { Settings } from './Settings.js';
 import { PopulatableSection, cleanUpRecycleBin, initPokedex, populator } from './appContent.js';
-import { filterSection, initFilters } from './filtres.js';
+import { FilterMenu } from './components/filter-menu/filterMenu.js';
+import { filterSection } from './filtres.js';
 import { dataStorage, huntStorage, pokemonData, shinyStorage } from './localForage.js';
 import { Notif } from './notification.js';
 import { setTheme } from './theme.js';
@@ -158,25 +159,30 @@ export async function appStart() {
   try {
     await Pokemon.initData();
     await Pokemon.names(); // met en cache les noms des Pokémon
-    logPerf('initPokemonData');
+    logPerf('init Pokémon data');
 
     const sectionsToPopulate: PopulatableSection[] = ['mes-chromatiques', 'chasses-en-cours', 'corbeille'];
     await Promise.all([
       initPokedex(),
-      initFilters(),
       ...sectionsToPopulate.map(async section => {
         await populator[section]();
-        filterSection(section);
         document.querySelector(`#${section}`)?.classList.remove('loading');
         if (section === 'mes-chromatiques') {
           document.querySelector(`#pokedex`)?.classList.remove('loading');
         }
       })
     ]);
+    logPerf('populate');
 
-    logPerf('initEverything');
-
-    document.querySelector('search-bar')?.setAttribute('section', 'mes-chromatiques');
+    const filterMenus = document.querySelectorAll('filter-menu');
+    await Promise.all([...filterMenus].map(menu => {
+      if (!(menu instanceof FilterMenu)) throw new TypeError(`Expecting FilterMenu`);
+      const section = menu.getAttribute('data-section') ?? '';
+      menu.setAttribute('section', section);
+      menu.removeAttribute('data-section');
+      return menu.init();
+    }));
+    logPerf('init filters');
   } catch (error) {
     const message = `Erreur pendant la préparation du contenu de l'application.`;
     console.error(message, error);

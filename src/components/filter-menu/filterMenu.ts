@@ -1,5 +1,11 @@
-import { Params, wait } from '../../Params.js';
-import { FilterList, FiltrableSection, currentFilters, filterSection, isFiltrableSection, saveFilters } from '../../filtres.js';
+import { FilterList, filterSection, isFiltrableSection, saveFilters } from '../../filtres.js';
+import { dataStorage } from '../../localForage.js';
+// @ts-expect-error
+import materialIconsSheet from '../../../ext/material_icons.css' assert { type: 'css' };
+// @ts-expect-error
+import themesSheet from '../../../styles/themes.css.php' assert { type: 'css' };
+// @ts-expect-error
+import commonSheet from '../../../styles/common.css' assert { type: 'css' };
 // @ts-expect-error
 import sheet from './styles.css' assert { type: 'css' };
 import template from './template.js';
@@ -11,15 +17,16 @@ document.adoptedStyleSheets = [...document.adoptedStyleSheets, searchSheet];
 
 
 
-export class SearchBar extends HTMLElement {
-  ready: boolean = false;
-  htmlready: boolean = false;
-  inputNonce: object = {};
-  changeNonce: object = {};
+export class FilterMenu extends HTMLElement {
+  shadow: ShadowRoot;
+  #initialized: Boolean = false;
   filtersChangeHandler: (e: Event) => void = () => {};
 
   constructor() {
     super();
+    this.shadow = this.attachShadow({ mode: 'open' });
+    this.shadow.appendChild(template.content.cloneNode(true));
+    this.shadow.adoptedStyleSheets = [materialIconsSheet, themesSheet, commonSheet, sheet];
 
     // Called when filters or order are selected or unselected.
     // Filters the current section.
@@ -27,7 +34,7 @@ export class SearchBar extends HTMLElement {
       const section = this.section;
       if (!section) return;
 
-      const form = this.querySelector('form[name="search-options"]');
+      const form = this.shadow.querySelector('form[name="search-options"]');
       if (!(form instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
       const formData = new FormData(form);
     
@@ -40,26 +47,20 @@ export class SearchBar extends HTMLElement {
       });
 
       const newFilters = this.formToFilters(formData);
-      currentFilters.set(section, newFilters);
       filterSection(section, newFilters);
-
-      // Save filters if needed
-      const shouldSaveFilters = (section === 'mes-chromatiques');
-      if (shouldSaveFilters) {
-        await saveFilters();
-      }
+      await this.saveFilters(newFilters);
     };
   }
 
 
   open() {
-    document.body.setAttribute('data-search', 'true');
-    this.querySelector('input')!.focus();
+    document.body.setAttribute('data-filters', this.section ?? '');
+    this.shadow.querySelector('input')!.focus();
   }
 
 
   close() {
-    document.body.removeAttribute('data-search');
+    document.body.removeAttribute('data-filters');
   }
 
 
@@ -74,19 +75,19 @@ export class SearchBar extends HTMLElement {
   /** Checks options inputs corresponding to a list of filters. */
   filtersToForm(filters: FilterList) {
     order: {
-      const input = this.querySelector(`input[name="order"][value="${filters.order}"]`);
+      const input = this.shadow.querySelector(`input[name="order"][value="${filters.order}"]`);
       if (!(input instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
       input.checked = true;
     }
   
     orderReverse: {
-      const input = this.querySelector(`input[name="orderReversed"]`);
+      const input = this.shadow.querySelector(`input[name="orderReversed"]`);
       if (!(input instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
       input.checked = filters.orderReversed;
     }
   
     filters: {
-      const allInputs = [...this.querySelectorAll('input[name^="filter"]')];
+      const allInputs = [...this.shadow.querySelectorAll('input[name^="filter"]')];
       for (const input of allInputs) {
         if (!(input instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
         const [x, key, value] = input.getAttribute('name')!.split('-');
@@ -100,42 +101,29 @@ export class SearchBar extends HTMLElement {
   }
 
 
-  update(name: string, value: string | null = this.getAttribute(name)) {
-    if (!this.ready) return;
+  async saveFilters(filters: FilterList) {
+    if (!this.section) return;
+    await saveFilters(this.section, filters);
+  }
+
+
+  async update(name: string, value: string | null = this.getAttribute(name)) {
     switch (name) {
       case 'section': {
-        if (!isFiltrableSection(value ?? '')) return;
+        const section = this.section ?? '';
+        if (!isFiltrableSection(section)) return;
 
-        let searchSection: FiltrableSection = 'mes-chromatiques';
-
-        switch (value) {
-          case 'chasses-en-cours': 
-            searchSection = value;
-            break;
-          case 'corbeille':
-            searchSection = value;
-            break;
-          case 'partage':
-            searchSection = value;
-            break;
-          case 'chromatiques-ami':
-            searchSection = value;
-            break;
-        }
-
-        if (value === 'ajouter-ami') return;
-
-        const filters = currentFilters.get(searchSection) ?? new FilterList(searchSection);
+        const savedFilters = await dataStorage.getItem('filters');
+        const filters: FilterList = savedFilters?.get(section) ?? new FilterList(section);
 
         // On applique au formulaire les filtres enregistrés de la section demandée.
         // Si aucun n'est sauvegardé, on applique les filtres par défaut.
         this.filtersToForm(filters);
-        filterSection(searchSection, filters);
+        filterSection(section, filters);
+        this.saveFilters(filters);
 
-        // Si les filtres ne sont pas sauvegardés pour les sections qui enregistrent leurs filtres,
-        // on sauvegarde les filtres par défaut.
-        const shouldSaveFilters = (searchSection === 'mes-chromatiques');
-        if (shouldSaveFilters) saveFilters();
+        this.#initialized = true;
+        this.dispatchEvent(new Event('initialized'));
       } break;
     }
   }
@@ -149,32 +137,25 @@ export class SearchBar extends HTMLElement {
   set section(value) {
     this.setAttribute('section', isFiltrableSection(value ?? '') ? (value ?? '') : '');
   }
+
+
+  async init() {
+    if (this.#initialized) return;
+    else return new Promise(resolve => {
+      this.addEventListener('initialized', resolve);
+    });
+  }
   
 
   connectedCallback() {
-    if (!this.htmlready) {
-      this.appendChild(template.content.cloneNode(true));
-      this.htmlready = true
-    }
-    if (!(document.adoptedStyleSheets.includes(sheet))) {
-      document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
-    }
-    this.ready = true;
-
-    for (const attr of SearchBar.observedAttributes) {
-      this.update(attr);
-    }
-
-    const filterForm = this.querySelector('form[name="search-options"]');
+    const filterForm = this.shadow.querySelector('form[name="search-options"]');
     filterForm?.addEventListener('change', this.filtersChangeHandler);
 
   }
 
   disconnectedCallback() {
-    const filterForm = this.querySelector('form[name="search-options"]');
+    const filterForm = this.shadow.querySelector('form[name="search-options"]');
     filterForm?.removeEventListener('change', this.filtersChangeHandler);
-
-    this.ready = false;
   }
 
   static get observedAttributes() {
@@ -187,4 +168,4 @@ export class SearchBar extends HTMLElement {
   }
 }
 
-if (!customElements.get('search-bar')) customElements.define('search-bar', SearchBar);
+if (!customElements.get('filter-menu')) customElements.define('filter-menu', FilterMenu);

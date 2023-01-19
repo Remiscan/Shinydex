@@ -1,6 +1,6 @@
 import { Params, loadAllImages, wait } from './Params.js';
 import { Settings } from './Settings.js';
-import { SearchBar } from './components/search-bar/searchBar.js';
+import { FilterMenu } from './components/filter-menu/filterMenu.js';
 import { disableLazyLoad, enableLazyLoad } from './lazyLoading.js';
 import { Notif } from './notification.js';
 
@@ -272,21 +272,20 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
       viewer.setAttribute('size', navigator.onLine ? '512' : '112')
       break;
     case 'obfuscator': {
-      if (data.search) {
-        const searchBar = document.querySelector(`search-bar`);
-        if (!(searchBar instanceof SearchBar)) throw new TypeError(`Expecting SearchBar`);
-        searchBar.setAttribute('section', data.section ?? ancienneSection.nom);
-        searchBar?.open();
+      if (data.filters) {
+        const menu = document.querySelector(`filter-menu[section="${data.section ?? ancienneSection.nom}"]`);
+        if (!(menu instanceof FilterMenu)) throw new TypeError(`Expecting FilterMenu`);
+        menu.open();
       }
     } break;
     default: {
-      document.body.removeAttribute('data-search');
+      document.body.removeAttribute('data-filters');
     }
   }
 
   // On prépare les liens de retour de la nouvelle section s'il y en a
   if (event.type !== 'popstate') {
-    const container = (sectionCible === 'obfuscator' && data.search) ? document.querySelector(`search-bar`)! : nouvelleSection.element;
+    const container = (sectionCible === 'obfuscator' && data.filters) ? document.querySelector(`filter-menu`)! : nouvelleSection.element;
     for (const a of [...container.querySelectorAll('a.bouton-retour')]) {
       if (!(a instanceof HTMLAnchorElement)) throw new TypeError(`Expecting HTMLAnchorElement`);
       a.href = `./${ancienneSection.nom}`;
@@ -342,7 +341,6 @@ export function navLinkBubble(event: PointerEvent, element: HTMLElement): void {
   
   element.classList.remove('bubbly');
   if (element.dataset.section === document.body.dataset.sectionActuelle) return;
-  if (element.classList.contains('search-button')) return;
 
   let transformOrigin = 'center center';
   const rect = element.getBoundingClientRect();

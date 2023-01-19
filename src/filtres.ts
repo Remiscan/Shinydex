@@ -38,8 +38,6 @@ export class FilterList {
   orderReversed: boolean = false;
 
   constructor(section: FiltrableSection, data?: FormData | object) {
-    if (!data) return;
-
     let defaultOrder: ordre;
     switch (section) {
       case 'chasses-en-cours':
@@ -52,6 +50,8 @@ export class FilterList {
         defaultOrder = 'catchTime';
     }
     this.order = defaultOrder;
+
+    if (!data) return;
 
     if (data instanceof FormData) {
       const order = String(data.get('order'));
@@ -90,57 +90,14 @@ export class FilterList {
 }
 
 
-/** Liste de recherches appliquées à une section. */
-export class Search {
-  name: string = '';
-  species: Set<number> = new Set();
-  game: Set<string> = new Set();
+let saveFilters = async (section: FiltrableSection, filters: FilterList) => {
+  const shouldSaveFilters = savedFiltersSections.includes(section);
+  if (!shouldSaveFilters) return;
 
-  constructor(formData?: FormData) {
-    if (!formData) return;
-
-    for (const [prop, value] of formData.entries()) {
-      if (value === 'false') continue;
-      if (prop === 'chip-nickname') {
-        this.name = String(value);
-      } else if (prop.startsWith('chip-species')) {
-        this.species.add(parseInt(String(value)));
-      } else if (prop.startsWith('chip-game')) {
-        this.game.add(String(value));
-      }
-    }
-  }
-
-  static isKey(string: string): string is keyof Search {
-    return (string in (new Search()));
-  }
-}
-
-
-type SectionsFilterMap = Map<FiltrableSection, FilterList>;
-export const currentFilters: SectionsFilterMap = new Map();
-
-
-
-export async function initFilters() {
-  let savedFilters = await dataStorage.getItem('filters');
-  for (const section of filtrableSections) {
-    if (savedFilters && savedFilters.get(section)) {
-      currentFilters.set(section, new FilterList(section, savedFilters.get(section)));
-    } else {
-      currentFilters.set(section, new FilterList(section));
-    }
-  }
-}
-
-
-let saveFilters = async () => {
-  const savedFilters: typeof currentFilters = new Map();
-  for (const section of savedFiltersSections) {
-    const toSave = currentFilters.get(section) ?? new FilterList(section);
-    savedFilters.set(section, toSave);
-  }
-  await dataStorage.setItem('filters', savedFilters);
+  const savedFilters = await dataStorage.getItem('filters');
+  const filtersToSave = saveFilters instanceof Map ? savedFilters : new Map();
+  filtersToSave.set(section, filters);
+  await dataStorage.setItem('filters', filtersToSave);
 };
 
 saveFilters = queueable(saveFilters);
@@ -148,7 +105,7 @@ export { saveFilters };
 
 
 
-export function filterSection(section: FiltrableSection, filters: FilterList = currentFilters.get(section) ?? new FilterList(section)) {
+export function filterSection(section: FiltrableSection, filters: FilterList = new FilterList(section)) {
   const element = document.querySelector(`section#${section}`);
   if (!element) return;
   element.setAttribute('data-filter-mine', [...filters.mine].map(f => String(f)).join(' '));

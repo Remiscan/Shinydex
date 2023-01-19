@@ -203,8 +203,12 @@
     <!-- Obfuscator -->
     <section id="obfuscator"></section>
 
-    <!-- Barre de recherches -->
-    <search-bar></search-bar>
+    <!-- Menu de filtres -->
+    <filter-menu data-section="mes-chromatiques"></filter-menu>
+    <filter-menu data-section="chasses-en-cours"></filter-menu>
+    <filter-menu data-section="corbeille"></filter-menu>
+    <filter-menu data-section="partage"></filter-menu>
+    <filter-menu data-section="chromatiques-ami"></filter-menu>
 
     <!-- Notifications -->
     <div class="notification-container"></div>
