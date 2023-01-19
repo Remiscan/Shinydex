@@ -129,7 +129,7 @@ const sections: Section[] = [
       ], {
         easing: Params.easingDecelerate,
         duration: 200,
-        fill: 'backwards'
+        fill: 'both'
       });;
     },
     closeAnimation: (section: Element, event: Event) => {
@@ -138,7 +138,8 @@ const sections: Section[] = [
         { opacity: 0, transform: 'scale(.7) translateZ(0)' }
       ], {
         easing: Params.easingAccelerate,
-        duration: 150
+        duration: 150,
+        fill: 'both'
       });
     },
     historique: true,
