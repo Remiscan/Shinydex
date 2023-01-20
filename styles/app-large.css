@@ -80,3 +80,7 @@ body[data-section-actuelle~="parametres"] main {
   grid-column: 2;
   grid-row: 1 / 2;
 }
+
+.notification-container {
+  max-width: calc(.5 * (100% - 112px));
+}
