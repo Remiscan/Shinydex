@@ -342,7 +342,7 @@ shiny-switch::part(button) {
   --interaction-ring-color: rgb(var(--on-surface));
 }
 
-shiny-switch::part(icon-on) {
+shiny-switch::part(icon-checked) {
   display: grid;
   place-items: center;
   stroke: none;

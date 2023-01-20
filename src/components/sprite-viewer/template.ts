@@ -17,7 +17,7 @@ template.innerHTML = `
   <span class="material-icons">close</span>
 </a>
 <div class="switch-shiny-regular">
-  <shiny-switch hint="icon"></shiny-switch>
+  <shiny-switch icons="checked"></shiny-switch>
 </div>
 `;
 
