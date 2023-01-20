@@ -9,7 +9,7 @@
   border-radius: var(--border-radius);
   position: sticky;
   z-index: var(--z-filter-menu);
-  width: min(100% - 16px, 600px);
+  max-width: min(100% - 16px, 600px);
   max-height: calc(100% - 16px);
   margin: auto;
   overflow-x: hidden;
@@ -125,7 +125,7 @@ input[type="checkbox"] + label[for="orderReversed"]::before {
 :host([section="partage"]) label[for^="ordre"].if-partage,
 :host([section="partage"]) input[type="radio"]#ordre-date-ajout,
 :host([section="partage"]) label[for="ordre-date-ajout"] {
-  display: grid;
+  display: flex;
 }
 
 :host([section="mes-chromatiques"]) [data-section]:not([data-section~="mes-chromatiques"]),

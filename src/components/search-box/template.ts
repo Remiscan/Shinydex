@@ -12,7 +12,7 @@ template.innerHTML = /*html*/`
       <span class="material-icons">close</span>
     </button>
 
-    <a class="icon-button surface interactive" data-nav-section="obfuscator" data-nav-data='{ "search": true }' href="#" part="filter-icon">
+    <a class="icon-button surface interactive" data-nav-section="filter-menu" href="#" part="filter-icon">
       <span class="material-icons">filter_list</span>
     </a>
   </form>

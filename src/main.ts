@@ -54,6 +54,15 @@ for (const bouton of Array.from(document.querySelectorAll('.bouton-retour'))) {
 // L'obfuscator ramène en arrière quand on clique dessus
 document.getElementById('obfuscator')!.addEventListener('click', () => history.back());
 
+// Ferme le menu des filtres si on clique en-dehors
+{
+  const section = document.getElementById('filter-menu');
+  section?.addEventListener('click', event => {
+    if (event.target !== section) return;
+    history.back();
+  });
+}
+
 
 
 ///////////////////////////////////

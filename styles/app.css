@@ -290,6 +290,7 @@ body[data-section-actuelle~="chromatiques-ami"] #chromatiques-ami,
 body[data-section-actuelle~="parametres"] #parametres,
 body[data-section-actuelle~="a-propos"] #a-propos,
 body[data-section-actuelle~="sprite-viewer"] #sprite-viewer,
+body[data-section-actuelle~="filter-menu"] #filter-menu,
 body[data-section-actuelle~="obfuscator"] #obfuscator {
   display: grid;
 }
@@ -1063,7 +1064,7 @@ section[data-order="name"] :is(shiny-card, hunt-card, corbeille-card, friend-car
 }
 
 section[data-order="game"] :is(shiny-card, hunt-card, corbeille-card, friend-card) {
-  order: calc(var(--order-reversed) * var(--game-order, 0));
+  order: calc(-1 * var(--order-reversed) * var(--game-order, 0));
 }
 
 section[data-order="lastUpdate"] :is(shiny-card, hunt-card, corbeille-card, friend-card) {
@@ -1080,6 +1081,14 @@ body:not([data-filters~="corbeille"]) filter-menu[section="corbeille"],
 body:not([data-filters~="partage"]) filter-menu[section="partage"],
 body:not([data-filters~="chromatiques-ami"]) filter-menu[section="chromatiques-ami"] {
   display: none;
+}
+
+#filter-menu {
+  --from: 1rem;
+}
+
+filter-menu {
+  margin-bottom: calc(var(--bottom-bar-height) + 8px);
 }
 
 
@@ -1306,6 +1315,7 @@ input-slider[name="theme-hue"]::part(slider-thumb) {
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
 #sprite-viewer,
+#filter-menu,
 #obfuscator {
   grid-column: 1 / -1;
   grid-row: 1 / -1;
@@ -1317,7 +1327,12 @@ input-slider[name="theme-hue"]::part(slider-thumb) {
 }
 
 #obfuscator {
-  background-color: var(--bg-color);
+  background-color: rgb(var(--background));
+  z-index: var(--z-obfuscator);
+}
+
+#filter-menu {
+  background-color: rgb(var(--background), 0);
   z-index: var(--z-obfuscator);
 }
 

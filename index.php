@@ -204,11 +204,13 @@
     <section id="obfuscator"></section>
 
     <!-- Menu de filtres -->
-    <filter-menu data-section="mes-chromatiques"></filter-menu>
-    <filter-menu data-section="chasses-en-cours"></filter-menu>
-    <filter-menu data-section="corbeille"></filter-menu>
-    <filter-menu data-section="partage"></filter-menu>
-    <filter-menu data-section="chromatiques-ami"></filter-menu>
+    <section id="filter-menu">
+      <filter-menu data-section="mes-chromatiques" class="surface primary shadow elevation-3"></filter-menu>
+      <filter-menu data-section="chasses-en-cours" class="surface primary shadow elevation-3"></filter-menu>
+      <filter-menu data-section="corbeille" class="surface primary shadow elevation-3"></filter-menu>
+      <filter-menu data-section="partage" class="surface primary shadow elevation-3"></filter-menu>
+      <filter-menu data-section="chromatiques-ami" class="surface primary shadow elevation-3"></filter-menu>
+    </section>
 
     <!-- Notifications -->
     <div class="notification-container"></div>

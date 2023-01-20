@@ -1,6 +1,6 @@
 const template = document.createElement('template');
 template.innerHTML = /*html*/`
-  <form class="search-options surface primary elevation-3" name="search-options">
+  <form class="search-options" name="search-options">
 
     <div class="orders" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours partage">
       <h2 class="title-medium if-ordre">Ordonner par :</h2>

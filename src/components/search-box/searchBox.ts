@@ -124,10 +124,10 @@ export class SearchBox extends HTMLElement {
         
         input.setAttribute('placeholder', placeholder);
 
-        const filterMenuLink = this.shadow.querySelector('[data-nav-section="obfuscator"]');
+        const filterMenuLink = this.shadow.querySelector('[data-nav-section="filter-menu"]');
         if (isFiltrableSection(value ?? '')) {
           this.removeAttribute('no-filters');
-          filterMenuLink?.setAttribute('data-nav-data', JSON.stringify({ filters: true, section: value, opacity: .5 }));
+          filterMenuLink?.setAttribute('data-nav-data', JSON.stringify({ section: value }));
         } else {
           this.setAttribute('no-filters', '');
           filterMenuLink?.removeAttribute('data-nav-data');

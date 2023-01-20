@@ -148,6 +148,36 @@ const sections: Section[] = [
     fab: null,
     element: document.getElementById('sprite-viewer')!
   }, {
+    nom: 'filter-menu',
+    rememberPosition: false,
+    openAnimation: (section: Element, event: Event) => {
+      const from = getComputedStyle(section).getPropertyValue('--from');
+      return section.animate([
+        { opacity: 0, transform: `translate3D(0, ${from}, 0)` },
+        { opacity: 1, transform: 'translate3D(0, 0, 0)' }
+      ], {
+        easing: Params.easingDecelerate,
+        duration: 200,
+        fill: 'both'
+      });
+    },
+    closeAnimation: (section: Element, event: Event) => {
+      const from = getComputedStyle(section).getPropertyValue('--from');
+      return section.animate([
+        { opacity: 1, transform: 'translate3D(0, 0, 0)' },
+        { opacity: 0, transform: `translate3D(0, ${from}, 0)` }
+      ], {
+        easing: Params.easingAccelerate,
+        duration: 150,
+        fill: 'both'
+      });
+    },
+    historique: true,
+    closePrevious: false,
+    preload: [],
+    fab: null,
+    element: document.getElementById('filter-menu')!
+  }, {
     nom: 'obfuscator',
     rememberPosition: false,
     openAnimation: (section: Element, event: Event, data: any) => {
@@ -275,12 +305,10 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
       viewer.setAttribute('shiny', 'true');
       viewer.setAttribute('size', navigator.onLine ? '512' : '112')
       break;
-    case 'obfuscator': {
-      if (data.filters) {
-        const menu = document.querySelector(`filter-menu[section="${data.section ?? ancienneSection.nom}"]`);
-        if (!(menu instanceof FilterMenu)) throw new TypeError(`Expecting FilterMenu`);
-        menu.open();
-      }
+    case 'filter-menu': {
+      const menu = document.querySelector(`filter-menu[section="${data.section ?? ancienneSection.nom}"]`);
+      if (!(menu instanceof FilterMenu)) throw new TypeError(`Expecting FilterMenu`);
+      menu.open();
     } break;
     default: {
       document.body.removeAttribute('data-filters');

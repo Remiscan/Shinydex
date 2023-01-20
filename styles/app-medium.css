@@ -119,3 +119,12 @@ main {
 .progression-maj {
   top: 0;
 }
+
+#filter-menu {
+  --from: -1rem;
+}
+
+filter-menu {
+  margin-top: var(--section-title-height);
+  margin-bottom: auto;
+}
