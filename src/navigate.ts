@@ -247,25 +247,23 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
   if (nouvelleSection.historique && event.type !== 'popstate') history.pushState({ section: sectionCible, data: data }, '');
   if (nouvelleSection.rememberPosition) mainElement.scroll(0, lastPosition.get(sectionCible) || 0); // scrolle vers la position précédemment enregistrée
 
-  // On détermine quelles sections animer (sur PC, certaines sections apparaissent en couple)
-  const shouldItAnimate = (sectionID: string): boolean => {
-    const section = sections.find(s => s.nom === sectionID);
-    if (section?.closePrevious) return true;
-    else                        return false;
-  };
-
+  // Only animate new section(s) if the one we're closing was NOT displayed over it,
+  // i.e. if it closed its previous section.
+  const animateNewSection = ancienneSection.closePrevious;
   const sectionsToAnimate: string[] = [];
-  if (shouldItAnimate(nouvelleSection.nom)) sectionsToAnimate.push(nouvelleSection.nom);
-  if (window.innerWidth >= Params.layoutPClarge) {
-    switch (sectionCible) {
-      case 'mes-chromatiques': if (shouldItAnimate('pokedex')) sectionsToAnimate.push('pokedex'); break;
-      case 'pokedex':          if (shouldItAnimate('mes-chromatiques')) sectionsToAnimate.push('mes-chromatiques'); break;
-      case 'chasses-en-cours': if (shouldItAnimate('corbeille')) sectionsToAnimate.push('corbeille'); break;
-      case 'corbeille':        if (shouldItAnimate('chasses-en-cours')) sectionsToAnimate.push('chasses-en-cours'); break;
-      case 'parametres':       if (shouldItAnimate('a-propos')) sectionsToAnimate.push('a-propos'); break;
-      case 'a-propos':         if (shouldItAnimate('parametres')) sectionsToAnimate.push('parametres'); break;
-      case 'partage':          if (shouldItAnimate('chromatiques-ami')) sectionsToAnimate.push('chromatiques-ami'); break;
-      case 'chromatiques-ami': if (shouldItAnimate('partage')) sectionsToAnimate.push('partage'); break;
+  if (animateNewSection) {
+    sectionsToAnimate.push(nouvelleSection.nom);
+    if (window.innerWidth >= Params.layoutPClarge) {
+      switch (sectionCible) {
+        case 'mes-chromatiques': sectionsToAnimate.push('pokedex'); break;
+        case 'pokedex':          sectionsToAnimate.push('mes-chromatiques'); break;
+        case 'chasses-en-cours': sectionsToAnimate.push('corbeille'); break;
+        case 'corbeille':        sectionsToAnimate.push('chasses-en-cours'); break;
+        case 'parametres':       sectionsToAnimate.push('a-propos'); break;
+        case 'a-propos':         sectionsToAnimate.push('parametres'); break;
+        case 'partage':          sectionsToAnimate.push('chromatiques-ami'); break;
+        case 'chromatiques-ami': sectionsToAnimate.push('partage'); break;
+      }
     }
   }
 
@@ -330,7 +328,7 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
   switch (ancienneSection.nom) {
     case 'sprite-viewer': {
       ancienneSection.element.querySelector('sprite-viewer')?.removeAttribute('dexid');
-    }
+    } break;
   }
 
   return;
