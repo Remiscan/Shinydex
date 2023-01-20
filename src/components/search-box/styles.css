@@ -2,7 +2,6 @@
 
 form {
   flex-grow: 1;
-  max-width: 720px;
   height: 56px;
   display: grid;
   --icon-button-width: 44px;
