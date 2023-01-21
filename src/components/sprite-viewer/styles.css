@@ -115,7 +115,8 @@ sprite-viewer a.icon-button.bouton-retour {
   border-radius: 20px;
   min-width: 35px;
   max-width: calc(var(--sprite-size) - 10px);
-  height: 1.5rem;
+  --height: 1.5rem;
+  height: var(--height);
   box-sizing: border-box;
   margin: 7px auto 0;
   position: relative;
@@ -130,8 +131,9 @@ sprite-viewer a.icon-button.bouton-retour {
 }
 
 .forme-name.caught {
-  --surface-color: var(--success-container);
-  --text-color: var(--on-success-container);
+  --surface-color: var(--primary-container);
+  --text-color: var(--on-primary-container);
+  padding-left: calc(.5 * (var(--height) - (32px - 2 * 7px)));
 }
 .forme-name > .icon {
   margin: -7px;
