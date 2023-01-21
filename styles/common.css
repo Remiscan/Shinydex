@@ -246,6 +246,8 @@ button.outlined:disabled {
  * Inputs
  */
 
+/* Radio, checkbox */
+
 input[type=radio],
 input[type=checkbox] {
   height: 0;
