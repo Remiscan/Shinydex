@@ -477,53 +477,38 @@ section.loading .message-vide {
   align-items: flex-start;
 }
 
-.pkmnicon {
-  border: none;
+.dex-icon {
+  display: grid;
+  place-items: center;
   border-radius: calc(.5 * var(--border-radius));
-  padding: 0;
-  box-shadow: none;
   position: relative;
-  margin: 0;
   content-visibility: auto;
   contain-intrinsic-size: 44px 44px;
 
-  background-repeat: repeat, repeat; /* background-position from .pkmnicon cancels surface tints otherwise */
-
   --surface-color: var(--surface);
-  --surface-opacity: 1;
   --elevation-opacity: var(--elevation-2-opacity);
   --state-tint: var(--on-primary);
 }
 
-.pkmnicon::before {
-  content: '';
-  display: block;
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  background-image: var(--link-pokemonsheet); /* move this to ::before to preserve state tints on .pkmnicon button */
-  background-position: inherit;
-}
-
-.pkmnicon:not(.got) {
+.dex-icon:not(.got) {
   /* setting opacity on .pkmnicon makes the pokedex section lag, particularly when opening it on mobile */
   --surface-opacity: 1;
 }
 
-.pkmnicon:not(.got)::before {
-  filter: grayscale(.95) brightness(var(--pkmnicon-brightness));
-}
-
-.pkmnicon.got {
+.dex-icon.got {
   --surface-color: var(--primary-container);
   --state-tint: var(--on-primary-container);
 }
 
-.pokedex-gen > .pkmnicon:focus,
-.pokedex-gen > .got.pkmnicon {
-  z-index: 1;
+.dex-icon:not(.got) .pkmnicon {
+  filter: grayscale(.95) brightness(var(--pkmnicon-brightness));
+}
+
+.pkmnicon {
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  margin: 0;
 }
 
 

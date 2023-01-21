@@ -122,8 +122,8 @@ export function filterPokedex(dexids: Set<number>) {
   const dexidMax = generations[generations.length - 1].end;
   for (let i = 1; i <= dexidMax; i++) {
     const icon = document.querySelector(`#pokedex [data-dexid="${i}"]`);
-    if (dexids.has(i)) icon?.classList.add('got');
-    else               icon?.classList.remove('got');
+    if (dexids.has(i)) icon?.parentElement?.classList.add('got');
+    else               icon?.parentElement?.classList.remove('got');
   }
 }
 
