@@ -106,6 +106,7 @@ export async function warnBeforeDestruction(bouton: Element, message: string = '
   const notification = new Notif(warning, undefined, 'Confirmer', action, true);
 
   const userResponse = await notification.prompt();
+  notification.remove();
   bouton.removeAttribute('disabled');
 
   return userResponse;
