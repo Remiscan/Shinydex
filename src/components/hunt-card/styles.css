@@ -1,7 +1,6 @@
 :host {
   width: 100%;
   border-radius: var(--border-radius);
-  box-shadow: var(--shadow-elevation-low);
   background-color: var(--card-bg-color);
   display: grid;
   order: var(--order, 0);

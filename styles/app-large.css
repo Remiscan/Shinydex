@@ -27,16 +27,6 @@ main {
   grid-template-columns: 1fr 1fr;
 }
 
-#mes-chromatiques {
-  grid-column: 1 / 2;
-  grid-row: 1 / 2;
-}
-
-#pokedex {
-  grid-column: 2 / 3;
-  grid-row: 1 / 2;
-}
-
 body[data-section-actuelle~="mes-chromatiques"] #pokedex,
 body[data-section-actuelle~="pokedex"] #mes-chromatiques,
 body[data-section-actuelle~="chasses-en-cours"] #corbeille,
@@ -52,10 +42,6 @@ body[data-section-actuelle~="partage"] #chromatiques-ami:not([data-pseudo]) {
   display: none;
 }
 
-#pokedex .defer {
-  display: flex;
-}
-
 #mes-chromatiques > .section-contenu,
 #pokedex > .section-contenu,
 #chasses-en-cours > .section-contenu,
@@ -63,22 +49,8 @@ body[data-section-actuelle~="partage"] #chromatiques-ami:not([data-pseudo]) {
   padding-bottom: 8px;
 }
 
-#pokedex .defer-loader {
-  display: none;
-}
-
 body[data-section-actuelle~="parametres"] main {
   grid-template-columns: 1fr 1fr;
-}
-
-#parametres {
-  grid-column: 1;
-  grid-row: 1 / 2;
-}
-
-#a-propos {
-  grid-column: 2;
-  grid-row: 1 / 2;
 }
 
 .notification-container {

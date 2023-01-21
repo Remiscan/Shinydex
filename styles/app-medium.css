@@ -25,13 +25,8 @@ nav > search-box::part(form) {
   display: none;
 }
 
-nav.bottom-bar {
-  box-shadow: none;
-}
-
 .nav-link {
   align-items: center;
-  /*overflow: visible;*/
 }
 
 .nav-link.only-pc {
@@ -98,26 +93,6 @@ main {
 
 .snackbar {
   width: fit-content;
-}
-
-.notification {
-  grid-column: 2 / 3;
-  grid-row: 1 / 2;
-  left: 16px;
-  bottom: 16px;
-  width: 50%;
-  max-width: 500px;
-  border-radius: var(--border-radius);
-  overflow: hidden;
-  box-shadow: var(--shadow-elevation-medium);
-}
-
-.fab.notif {
-  --decalage: calc(-1 * var(--bottom-bar-height) - 16px);
-}
-
-.progression-maj {
-  top: 0;
 }
 
 #filter-menu {
