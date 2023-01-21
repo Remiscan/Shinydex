@@ -24,14 +24,14 @@ template.innerHTML = /*html*/`
           <span class="label-large">Taux de chromatiques</span>
         </label>
 
-        <input type="radio" name="order" id="ordre-dex" value="dexid" data-section="mes-chromatiques corbeille chromatiques-ami">
-        <label for="ordre-dex" class="radio surface interactive" data-section="mes-chromatiques corbeille chromatiques-ami">
+        <input type="radio" name="order" id="ordre-dex" value="dexid" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours">
+        <label for="ordre-dex" class="radio surface interactive" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours">
           <span class="material-icons"></span>
           <span class="label-large">N° du Pokédex</span>
         </label>
 
-        <input type="radio" name="order" id="ordre-species" value="species" data-section="mes-chromatiques corbeille chromatiques-ami">
-        <label for="ordre-species" class="radio surface interactive" data-section="mes-chromatiques corbeille chromatiques-ami">
+        <input type="radio" name="order" id="ordre-species" value="species" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours">
+        <label for="ordre-species" class="radio surface interactive" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours">
           <span class="material-icons"></span>
           <span class="label-large">Espèce (alphabétique)</span>
         </label>
@@ -42,8 +42,8 @@ template.innerHTML = /*html*/`
           <span class="label-large">Surnom (alphabétique)</span>
         </label>
 
-        <input type="radio" name="order" id="ordre-game" value="game" data-section="mes-chromatiques corbeille chromatiques-ami">
-        <label for="ordre-game" class="radio surface interactive" data-section="mes-chromatiques corbeille chromatiques-ami">
+        <input type="radio" name="order" id="ordre-game" value="game" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours">
+        <label for="ordre-game" class="radio surface interactive" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours">
           <span class="material-icons"></span>
           <span class="label-large">Jeu (date de sortie)</span>
         </label>
