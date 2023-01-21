@@ -343,8 +343,8 @@ section.loading .compteur {
  */
 
 @keyframes fab-apparition {
-  0% { transform: translate3D(0, var(--decalage, 0), 0) scale(0); }
-  100% { transform: translate3D(0, var(--decalage, 0), 0) scale(1); }
+  0% { transform: translate3D(0, calc(-1px * var(--notification-container-height, 0)), 0) scale(0); }
+  100% { transform: translate3D(0, calc(-1px * var(--notification-container-height, 0)), 0) scale(1); }
 }
 
 .fab {
