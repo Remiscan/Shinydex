@@ -45,11 +45,9 @@ sprite-viewer[shiny="true"] .sprite-list.regular {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: var(--bg-color);
   border-radius: 26px;
   height: 26px;
   padding: 0 8px;
-  font-size: 13px;
 }
 
 .sprite-viewer-dex-info span + span {
@@ -57,7 +55,7 @@ sprite-viewer[shiny="true"] .sprite-list.regular {
 }
 
 .info-dexid {
-  opacity: .5;
+  opacity: .7;
 }
 
 .info-dexid::before {
@@ -112,8 +110,6 @@ sprite-viewer a.icon-button.bouton-retour {
 }
 
 .forme-name {
-  color: var(--text-color);
-  font-size: .82rem;
   text-transform: capitalize;
   padding: 0 10px;
   border-radius: 20px;
@@ -129,27 +125,27 @@ sprite-viewer a.icon-button.bouton-retour {
   gap: 1ch;
 }
 
-.forme-name.on {
-  background-color: var(--bg-color);
-}
 .forme-name.off {
   display: none;
 }
-.forme-name.on::before {
-  content: "";
-  position: absolute;
-  left: calc(50% - 7px);
-  top: -13px;
-  height: 0;
-  width: 0;
-  border: 7px solid transparent;
-  border-bottom: 7px solid var(--bg-color);
-}
+
 .forme-name.caught {
-  --bg-color: var(--soft-success-color);
+  --surface-color: var(--success-container);
+  --text-color: var(--on-success-container);
 }
 .forme-name > .icon {
   margin: -7px;
+}
+
+.forme-name-arrow {
+  position: absolute;
+  left: calc(50% - 7px);
+  top: -6px;
+  height: 7px;
+  width: 14px;
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+  --surface-color: inherit;
+  --text-color: inherit;
 }
 
 .dex-sprite>picture {

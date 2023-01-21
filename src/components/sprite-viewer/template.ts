@@ -9,7 +9,7 @@ template.innerHTML = `
   <div class="sprite-list shiny"></div>
   <div class="sprite-list regular"></div>
 </div>
-<div class="sprite-viewer-dex-info">
+<div class="sprite-viewer-dex-info surface variant elevation-0 label-medium">
   <span class="info-dexid"></span>
   <span class="info-nom"></span>
 </div>
