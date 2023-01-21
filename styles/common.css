@@ -426,6 +426,19 @@ input:is([type=radio], [type=checkbox], [type=file]):focus:not(:focus-visible) +
 
 
 /*
+ * Load spinner
+ */
+
+load-spinner {
+  --size: 40px;
+  --bg-color: rgb(var(--surface));
+  --accent-color: rgb(var(--primary));
+  --text-color: rgb(var(--on-surface));
+}
+
+
+
+/*
  * Snackbar
  */
 
