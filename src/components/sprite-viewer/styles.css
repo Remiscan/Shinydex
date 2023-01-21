@@ -45,9 +45,11 @@ sprite-viewer[shiny="true"] .sprite-list.regular {
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 26px;
+  border-radius: 13px;
   height: 26px;
-  padding: 0 8px;
+  --padding-inline: 4px;
+  padding: var(--padding-inline) calc(3 * var(--padding-inline));
+  box-sizing: border-box;
 }
 
 .sprite-viewer-dex-info span + span {
@@ -111,19 +113,19 @@ sprite-viewer a.icon-button.bouton-retour {
 
 .forme-name {
   text-transform: capitalize;
-  padding: 0 10px;
-  border-radius: 20px;
+  --padding-inline: 4px;
+  padding: var(--padding-inline) calc(3 * var(--padding-inline));
+  border-radius: calc(.5 * var(--height));
   min-width: 35px;
   max-width: calc(var(--sprite-size) - 10px);
-  --height: 1.5rem;
-  height: var(--height);
+  --height: 26px;
+  min-height: var(--height);
   box-sizing: border-box;
   margin: 7px auto 0;
   position: relative;
-  white-space: nowrap;
   display: flex;
   place-items: center;
-  gap: 1ch;
+  gap: calc(2.5 * var(--padding-inline));
 }
 
 .forme-name.off {
@@ -133,7 +135,7 @@ sprite-viewer a.icon-button.bouton-retour {
 .forme-name.caught {
   --surface-color: var(--primary-container);
   --text-color: var(--on-primary-container);
-  padding-left: calc(.5 * (var(--height) - (32px - 2 * 7px)));
+  padding-left: var(--padding-inline);
 }
 .forme-name > .icon {
   margin: -7px;
