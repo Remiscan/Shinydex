@@ -49,6 +49,7 @@ button {
   gap: 8px;
   padding: 0 24px 0 16px;
   margin: auto;
+  position: relative;
   --elevation-shadow: none;
 }
 
@@ -277,6 +278,7 @@ input:is([type="radio"], [type="checkbox"]) + label {
   --state-tint: var(--on-surface);
 }
 
+button:not(.pkmnicon)::before,
 input:is([type="radio"], [type="checkbox"]) + label::before {
   content: '';
   display: flex;
