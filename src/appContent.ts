@@ -122,7 +122,7 @@ export async function populateFromData(section: PopulatableSection, ids: string[
   await Promise.all(cardsToCreate.map(async card => {
     conteneur.appendChild(card);
     await card.dataToContent();
-    lazyLoad(card);
+    if (section === 'chasses-en-cours') lazyLoad(card);
   }));
 
   return results;

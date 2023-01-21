@@ -31,6 +31,7 @@ const resizor = new ResizeObserver((entries: ResizeObserverEntry[]) => {
   }
 });
 
+/** Computes an element's size whenever it changes, and set it as its contain-intrinsic-size. */
 export function lazyLoad(element: HTMLElement) {
   intersector.observe(element);
   resizor.observe(element);
