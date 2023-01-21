@@ -179,12 +179,12 @@ template.innerHTML = /*html*/`
   <div class="group button-group capture-button-group">
     <button type="button" class="hunt-delete danger" data-not-edit>
       <span class="material-icons" aria-hidden="true">delete</span>
-      <span>Supprimer</span>
+      <span>Supprimer cette chasse</span>
     </button>
 
     <button type="button" class="edit-cancel ghost danger" data-edit>
       <span class="material-icons" aria-hidden="true">cancel</span>
-      <span>Annuler</span>
+      <span>Annuler les modifications</span>
     </button>
 
     <input type="checkbox" name="caught" id="caught">
