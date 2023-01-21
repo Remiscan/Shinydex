@@ -469,10 +469,10 @@ section.loading .message-vide {
   width: 100%;
   box-sizing: border-box;
   border-radius: var(--border-radius);
-  padding: 10px;
+  padding: 8px;
   display: grid;
   grid-template-columns: repeat(auto-fill, 44px);
-  gap: 10px;
+  gap: 8px;
   justify-content: space-evenly;
   align-items: flex-start;
 }
@@ -488,7 +488,11 @@ section.loading .message-vide {
   contain-intrinsic-size: 44px 44px;
 
   background-repeat: repeat, repeat; /* background-position from .pkmnicon cancels surface tints otherwise */
-  --state-tint: var(--on-surface-variant);
+
+  --surface-color: var(--surface);
+  --surface-opacity: 1;
+  --elevation-opacity: var(--elevation-2-opacity);
+  --state-tint: var(--on-primary);
 }
 
 .pkmnicon::before {
@@ -505,7 +509,7 @@ section.loading .message-vide {
 
 .pkmnicon:not(.got) {
   /* setting opacity on .pkmnicon makes the pokedex section lag, particularly when opening it on mobile */
-  --surface-opacity: 0;
+  --surface-opacity: 1;
 }
 
 .pkmnicon:not(.got)::before {
@@ -513,10 +517,8 @@ section.loading .message-vide {
 }
 
 .pkmnicon.got {
-  --surface-color: var(--surface);
-  --surface-opacity: 1;
-  --elevation-opacity: var(--elevation-2-opacity);
-  --state-tint: var(--on-primary);
+  --surface-color: var(--primary-container);
+  --state-tint: var(--on-primary-container);
 }
 
 .pokedex-gen > .pkmnicon:focus,
