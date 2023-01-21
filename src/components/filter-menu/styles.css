@@ -64,52 +64,6 @@ input:checked + label[for="orderReversed"] > .label-large > .material-icons {
   row-gap: 8px;
 }
 
-/*.reverse-order__container {
-  width: 24px;
-  height: 24px;
-  display: grid;
-  place-items: center;
-}
-
-.reverse-order__container > * {
-  grid-row: 1;
-  grid-column: 1;
-}
-
-input[name="orderReversed"]:checked + label > i {
-  transform: scaleY(-1);
-}
-
-input[type="checkbox"] + label[for="orderReversed"] {
-  display: grid;
-  place-items: center;
-  border: none;
-  padding: 0px;
-  margin: 0px;
-  overflow: visible;
-}
-
-input[type="checkbox"] + label[for="orderReversed"] > * {
-  grid-row: 1;
-  grid-column: 1;
-}
-
-input[type="checkbox"] + label[for="orderReversed"]::after {
-  display: none;
-}
-
-input[type="checkbox"] + label[for="orderReversed"]::before {
-  grid-row: 1;
-  grid-column: 1;
-  content: '';
-  display: block;
-  width: var(--tap-safe-size);
-  height: var(--tap-safe-size);
-  background: none;
-  margin: 0;
-  box-shadow: none;
-}*/
-
 :host([section="pokedex"]) .if-ordre,
 :host([section="chasses-en-cours"]) .menu-filtres,
 :host([section="corbeille"]) .menu-filtres,

@@ -23,6 +23,8 @@ sprite-viewer {
   justify-self: end;
   align-self: center;
   margin-right: 16px;
+  display: grid;
+  place-items: center;
 }
 
 [for=switch-shy-reg] > shiny-stars {
@@ -65,6 +67,10 @@ sprite-viewer[shiny="true"] .sprite-list.regular {
 
 .info-nom {
   text-transform: capitalize;
+}
+
+sprite-viewer a.icon-button.bouton-retour {
+  margin: 0;
 }
 
 .sprite-scroller {

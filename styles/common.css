@@ -6,6 +6,10 @@
   outline-style: none;
 }
 
+:root {
+  --tap-safe-size: 48px;
+}
+
 shiny-stars {
   display: inline-grid;
   --color: currentColor;
@@ -266,10 +270,24 @@ input:is([type="radio"], [type="checkbox"]) + label {
   justify-content: center;
   gap: 8px;
   padding: 0 12px 0 8px;
+  position: relative;
   --elevation-shadow: none;
   --surface-opacity: 0;
   --elevation-opacity: 0;
   --state-tint: var(--on-surface);
+}
+
+input:is([type="radio"], [type="checkbox"]) + label::before {
+  content: '';
+  display: flex;
+  width: 100%;
+  min-width: var(--tap-safe-size);
+  height: 100%;
+  min-height: var(--tap-safe-size);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 input:is([type="radio"], [type="checkbox"]) + label > .material-icons {
@@ -327,6 +345,10 @@ input[type="checkbox"]:checked + label > .material-icons::before {
   }
 }
 
+input-slider {
+  --tap-safe-size: inherit;
+}
+
 /* Switch */
 
 input-switch,
@@ -352,6 +374,31 @@ shiny-switch::part(icon-checked) {
 input-switch[disabled] {
   opacity: .7;
   cursor: not-allowed;
+}
+
+label:has(> input-switch),
+label:has(> shiny-switch) {
+  min-height: var(--tap-safe-size);
+  min-width: var(--tap-safe-size);
+  justify-content: center;
+  display: grid;
+  place-items: center;
+}
+
+@supports not selector(label:has(a)) {
+  label > input-switch::before,
+  label > shiny-switch::before {
+    content: '';
+    display: flex;
+    width: 100%;
+    min-width: var(--tap-safe-size);
+    height: 100%;
+    min-height: var(--tap-safe-size);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
 }
 
 
