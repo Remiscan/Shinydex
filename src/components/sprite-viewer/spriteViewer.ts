@@ -81,7 +81,7 @@ export class spriteViewer extends HTMLElement {
         <div class="dex-sprite">
           <picture ${(typeof forme.noShiny != 'undefined' && forme.noShiny) ? 'class="no-shiny"' : ''}>
             <pokemon-sprite dexid="${pokemon.dexid}" shiny="true" forme="${forme.dbid}" size="${this.size}" lazy="false"></pokemon-sprite>
-            ${(typeof forme.noShiny != 'undefined' && forme.noShiny) ? '<span>N\'existe pas<br>en chromatique</span>' : ''}
+            ${(typeof forme.noShiny != 'undefined' && forme.noShiny) ? '<span class="label-large">N\'existe pas<br>en chromatique</span>' : ''}
           </picture>
           <span class="forme-name surface variant label-medium ${afficherNomForme ? '' : 'off'} ${caught ? 'caught' : ''}">
             <span class="forme-name-arrow surface variant"></span>

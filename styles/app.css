@@ -825,17 +825,15 @@ input-slider[name="theme-hue"]::part(slider-thumb) {
 }
 
 #sprite-viewer {
-  background-color: var(--sprite-viewer-bg-color);
   z-index: var(--z-sprite-viewer);
 }
 
 #obfuscator {
-  background-color: rgb(var(--background));
   z-index: var(--z-obfuscator);
 }
 
 #filter-menu {
-  background-color: rgb(var(--background), 0);
+  background-color: transparent;
   z-index: var(--z-obfuscator);
 }
 

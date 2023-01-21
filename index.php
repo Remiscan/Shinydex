@@ -196,12 +196,12 @@
     </main>
 
     <!-- Sprite viewer -->
-    <section id="sprite-viewer">
+    <section id="sprite-viewer" class="background">
       <sprite-viewer></sprite-viewer>
     </section>
 
     <!-- Obfuscator -->
-    <section id="obfuscator"></section>
+    <section id="obfuscator" class="background"></section>
 
     <!-- Menu de filtres -->
     <section id="filter-menu">

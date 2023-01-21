@@ -148,32 +148,13 @@ sprite-viewer a.icon-button.bouton-retour {
   --text-color: inherit;
 }
 
-.dex-sprite>picture {
+.dex-sprite > picture {
   position: relative;
   width: 100%;
   overflow: hidden;
 }
 
-@keyframes sprite-loading {
-  0% { background-color: rgba(255, 255, 255, .06); }
-  50% { background-color: rgba(255, 255, 255, .06); }
-  75% { background-color: rgba(255, 255, 255, .1); }
-  100% { background-color: rgba(255, 255, 255, .06); }
-}
-
-.dex-sprite>picture.loading {
-  animation: sprite-loading 2s ease-out infinite;
-  -webkit-mask-image: var(--mask);
-  mask-image: var(--mask);
-  -webkit-mask-size: cover;
-  mask-size: cover;
-}
-
-picture.loading>img {
-  opacity: 0;
-}
-
-picture.no-shiny>span {
+picture.no-shiny > span {
   grid-row: 1;
   grid-column: 1;
   display: flex;
@@ -188,10 +169,9 @@ picture.no-shiny>span {
   top: 0;
   left: 0;
   z-index: 2;
-  background-color: hsla(0, 50%, 0%, .8);
+  background-color: rgb(var(--background), .8);
   text-transform: none;
   text-align: center;
-  line-height: 1.4em;
 }
 
 @media (min-width: 1140px) {
