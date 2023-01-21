@@ -40,6 +40,10 @@ button.icon-button.menu-hint {
   min-height: 30px;
 }
 
+button.icon-button.menu-hint::before {
+  display: none; /* not needed since the whole card is clickable */
+}
+
 .menu-hint:not(:hover, :active) {
   --state-opacity: 0 !important;
 }
