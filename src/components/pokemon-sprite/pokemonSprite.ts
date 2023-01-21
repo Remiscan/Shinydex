@@ -168,7 +168,7 @@ export class pokemonSprite extends HTMLElement {
       ], {
         easing: 'cubic-bezier(0, .6, .7, .6)',
         fill: 'both',
-        duration: 800,
+        duration: 600,
         delay: 200 * Math.random() + 300 * (late ? 1 : 0)
       });
       animations.push(anim);
@@ -181,7 +181,7 @@ export class pokemonSprite extends HTMLElement {
     ], {
       easing: 'linear',
       fill: 'both',
-      duration: 1300,
+      duration: 1100,
     });
     animations.push(anim);
 
