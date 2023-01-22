@@ -21,23 +21,11 @@
       <span class="param-nom body-large">Thème</span>
 
       <span class="param">
-        <input type="radio" name="theme" id="theme-system" value="system" checked>
-        <label for="theme-system" class="surface interactive">
-          <span class="material-icons"></span>
-          <span class="label-large">Système</span>
-        </label>
-
-        <input type="radio" name="theme" id="theme-light" value="light">
-        <label for="theme-light" class="surface interactive">
-          <span class="material-icons"></span>
-          <span class="label-large">Clair</span>
-        </label>
-
-        <input type="radio" name="theme" id="theme-dark" value="dark">
-        <label for="theme-dark" class="surface interactive">
-          <span class="material-icons"></span>
-          <span class="label-large">Sombre</span>
-        </label>
+        <radio-group name="theme">
+          <option value="system">Système</option>
+          <option value="light">Clair</option>
+          <option value="dark">Sombre</option>
+        </radio-group>
       </span>
     </p>
 

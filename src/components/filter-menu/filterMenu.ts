@@ -9,6 +9,8 @@ import commonSheet from '../../../styles/common.css' assert { type: 'css' };
 // @ts-expect-error
 import sheet from './styles.css' assert { type: 'css' };
 import template from './template.js';
+import { CheckBox } from '../checkBox.js';
+import { RadioGroup } from '../radioGroup.js';
 
 
 
@@ -55,7 +57,6 @@ export class FilterMenu extends HTMLElement {
 
   open() {
     document.body.setAttribute('data-filters', this.section ?? '');
-    this.shadow.querySelector('input')!.focus();
   }
 
 
@@ -75,21 +76,21 @@ export class FilterMenu extends HTMLElement {
   /** Checks options inputs corresponding to a list of filters. */
   filtersToForm(filters: FilterList) {
     order: {
-      const input = this.shadow.querySelector(`input[name="order"][value="${filters.order}"]`);
-      if (!(input instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
-      input.checked = true;
+      const input = this.shadow.querySelector(`[name="order"]`);
+      if (!(input instanceof RadioGroup)) throw new TypeError(`Expecting RadioGroup`);
+      input.value = filters.order;
     }
   
     orderReverse: {
-      const input = this.shadow.querySelector(`input[name="orderReversed"]`);
-      if (!(input instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
+      const input = this.shadow.querySelector(`[name="orderReversed"]`);
+      if (!(input instanceof CheckBox)) throw new TypeError(`Expecting CheckBox`);
       input.checked = filters.orderReversed;
     }
   
     filters: {
-      const allInputs = [...this.shadow.querySelectorAll('input[name^="filter"]')];
+      const allInputs = [...this.shadow.querySelectorAll('[name^="filter"]')];
       for (const input of allInputs) {
-        if (!(input instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
+        if (!(input instanceof CheckBox)) throw new TypeError(`Expecting CheckBox`);
         const [x, key, value] = input.getAttribute('name')!.split('-');
         if (FilterList.isKey(key) && key !== 'order' && key !== 'orderReversed') {
           const filter = filters[key];
@@ -115,6 +116,13 @@ export class FilterMenu extends HTMLElement {
 
         const savedFilters = await dataStorage.getItem('filters');
         const filters: FilterList = savedFilters?.get(section) ?? new FilterList(section);
+
+        // On supprime les options des radio-group qui ne correspondent pas à la section
+        this.shadow.querySelectorAll('radio-group').forEach(radioGroup => {
+          radioGroup.querySelectorAll('option').forEach(option => {
+            if (!(option.matches(`[data-section~="${section}"]`))) option.remove();
+          });
+        });
 
         // On applique au formulaire les filtres enregistrés de la section demandée.
         // Si aucun n'est sauvegardé, on applique les filtres par défaut.

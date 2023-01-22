@@ -51,6 +51,8 @@ sheet.replaceSync(/*css*/`
 
 export class InputSelect extends TextField {
   static template = template;
+  static sheets = [...TextField.sheets, sheet];
+  static attributes = ['autocomplete', 'disabled', 'multiple', 'name', 'required', 'size'];
 
   slotchangeHandler = (event: Event) => {
     const slot = event.target;
@@ -73,13 +75,8 @@ export class InputSelect extends TextField {
     }
   };
 
-  constructor() {
-    super();
-    this.shadow.adoptedStyleSheets = [...this.shadow.adoptedStyleSheets, sheet];
-  }
 
-
-  override get input(): HTMLSelectElement | undefined {
+  get input(): HTMLSelectElement | undefined {
     const input = this.shadow.querySelector('select');
     if (input instanceof HTMLSelectElement) return input;
   }
@@ -92,19 +89,14 @@ export class InputSelect extends TextField {
         source.dispatchEvent(new Event('slotchange'));
       }
     }
-
     super.connectedCallback();
   }
 
   disconnectedCallback(): void {
     const source = this.shadow.querySelector('span[hidden] > slot');
     source?.removeEventListener('slotchange', this.slotchangeHandler);
-
     super.disconnectedCallback();
   }
-
-
-  static get observedAttributes() { return [...TextField.globalAttributes, 'autocomplete', 'disabled', 'multiple', 'name', 'required', 'size']; }
 }
 
 if (!customElements.get('input-select')) customElements.define('input-select', InputSelect);

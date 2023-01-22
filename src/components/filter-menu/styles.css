@@ -16,7 +16,7 @@
   overflow-y: auto;
 }
 
-form {
+form[name="search-options"] {
   padding: 16px;
   box-sizing: border-box;
   border-radius: var(--border-radius);
@@ -36,26 +36,6 @@ fieldset {
   margin-top: 8px;
 }
 
-input + label[for="orderReversed"] > .material-icons::before {
-  display: inline-block;
-  content: 'vertical_align_bottom';
-}
-
-input:checked + label[for="orderReversed"] > .material-icons::before {
-  content: 'vertical_align_bottom';
-  transform: scaleY(-1);
-}
-
-label[for="orderReversed"] > .label-large {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-input:checked + label[for="orderReversed"] > .label-large > .material-icons {
-  transform: scaleY(-1);
-}
-
 .cote-a-cote {
   display: flex;
   flex-direction: row;
@@ -64,28 +44,18 @@ input:checked + label[for="orderReversed"] > .label-large > .material-icons {
   row-gap: 8px;
 }
 
-:host([section="pokedex"]) .if-ordre,
-:host([section="chasses-en-cours"]) .menu-filtres,
-:host([section="corbeille"]) .menu-filtres,
-:host([section="partage"]) .if-filtres,
-:host([section="partage"]) input[type="radio"],
-:host([section="partage"]) label[for^="ordre"],
-:host(:not([section="partage"])) .if-partage,
-:host([section="ajouter-ami"]) .search-options {
-  display: none;
-}
-
-:host([section="partage"]) input[type="radio"].if-partage,
-:host([section="partage"]) label[for^="ordre"].if-partage,
-:host([section="partage"]) input[type="radio"]#ordre-date-ajout,
-:host([section="partage"]) label[for="ordre-date-ajout"] {
-  display: flex;
-}
-
 :host([section="mes-chromatiques"]) [data-section]:not([data-section~="mes-chromatiques"]),
 :host([section="chromatiques-ami"]) [data-section]:not([data-section~="chromatiques-ami"]),
 :host([section="corbeille"]) [data-section]:not([data-section~="corbeille"]),
 :host([section="chasses-en-cours"]) [data-section]:not([data-section~="chasses-en-cours"]),
 :host([section="partage"]) [data-section]:not([data-section~="partage"]) {
+  display: none;
+}
+
+:host([section="mes-chromatiques"]) radio-group::part(option):not([data-section~="mes-chromatiques"]),
+:host([section="chromatiques-ami"]) radio-group::part(option):not([data-section~="chromatiques-ami"]),
+:host([section="corbeille"]) radio-group::part(option):not([data-section~="corbeille"]),
+:host([section="chasses-en-cours"]) radio-group::part(option):not([data-section~="chasses-en-cours"]),
+:host([section="partage"]) radio-group::part(option):not([data-section~="partage"]) {
   display: none;
 }

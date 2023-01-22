@@ -248,40 +248,7 @@ button.outlined:disabled {
 
 /* Radio, checkbox */
 
-input[type=radio],
-input[type=checkbox] {
-  height: 0;
-  width: 0;
-  margin: 0;
-  opacity: 0;
-  pointer-events: none;
-  position: absolute;
-}
-
-input:is([type="radio"], [type="checkbox"]) + label {
-  border: none;
-  margin: 0;
-  padding: 0;
-  font: inherit;
-
-  height: 40px;
-  min-height: 40px;
-  width: fit-content;
-  border-radius: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 0 12px 0 8px;
-  position: relative;
-  --elevation-shadow: none;
-  --surface-opacity: 0;
-  --elevation-opacity: 0;
-  --state-tint: var(--on-surface);
-}
-
-button:not(.pkmnicon)::before,
-input:is([type="radio"], [type="checkbox"]) + label::before {
+button:not(.pkmnicon)::before {
   content: '';
   display: flex;
   width: 100%;
@@ -292,32 +259,6 @@ input:is([type="radio"], [type="checkbox"]) + label::before {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-}
-
-input:is([type="radio"], [type="checkbox"]) + label > .material-icons {
-  color: rgb(var(--on-surface-variant));
-}
-
-input:is([type="radio"], [type="checkbox"]):checked + label,
-input:is([type="radio"], [type="checkbox"]):checked + label > .material-icons {
-  color: rgb(var(--primary));
-  --elevation-opacity: var(--elevation-2-opacity);
-}
-
-input[type="radio"] + label > .material-icons::before {
-  content: 'radio_button_unchecked';
-}
-
-input[type="radio"]:checked + label > .material-icons::before {
-  content: 'radio_button_checked';
-}
-
-input[type="checkbox"] + label > .material-icons::before {
-  content: 'check_box_outline_blank';
-}
-
-input[type="checkbox"]:checked + label > .material-icons::before {
-  content: 'check_box';
 }
 
 :is(
@@ -406,14 +347,14 @@ label:has(> shiny-switch) {
 }
 
 
-input:is([type=radio], [type=checkbox], [type=file]):disabled + label {
+input:is([type=file]):disabled + label {
   opacity: .5;
   filter: grayscale(1);
   cursor: not-allowed;
 }
 
 button:focus,
-input:is([type=radio], [type=checkbox], [type=file]):focus + label {
+input:is([type=file]):focus + label {
   outline: 2px solid currentColor;
   outline: 5px auto Highlight;
   outline: 5px auto -webkit-focus-ring-color;
@@ -421,7 +362,7 @@ input:is([type=radio], [type=checkbox], [type=file]):focus + label {
 }
 
 button:focus:not(:focus-visible),
-input:is([type=radio], [type=checkbox], [type=file]):focus:not(:focus-visible) + label {
+input:is([type=file]):focus:not(:focus-visible) + label {
   outline: none;
 }
 

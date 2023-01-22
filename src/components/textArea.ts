@@ -34,20 +34,8 @@ sheet.replaceSync(/*css*/`
 
 export class TextArea extends TextField {
   static template = template;
-
-  constructor() {
-    super();
-    this.shadow.adoptedStyleSheets = [...this.shadow.adoptedStyleSheets, sheet];
-  }
-
-
-  override get input(): HTMLTextAreaElement | undefined {
-    const input = this.shadow.querySelector('textarea');
-    if (input instanceof HTMLTextAreaElement) return input;
-  }
-
-
-  static get observedAttributes() { return [...TextField.globalAttributes, 'autocomplete', 'autocorrect', 'cols', 'disabled', 'maxlength', 'minlength', 'name', 'placeholder', 'readonly', 'required', 'rows', 'spellcheck', 'wrap']; }
+  static sheets = [...TextField.sheets, sheet];
+  static attributes = ['autocomplete', 'autocorrect', 'cols', 'disabled', 'maxlength', 'minlength', 'name', 'placeholder', 'readonly', 'required', 'rows', 'spellcheck', 'wrap'];
 }
 
 if (!customElements.get('text-area')) customElements.define('text-area', TextArea);

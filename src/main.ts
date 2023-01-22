@@ -8,6 +8,7 @@ import './components/corbeille-card/corbeilleCard.js';
 import './components/filter-menu/filterMenu.js';
 import './components/hunt-card/huntCard.js';
 import './components/loadSpinner.js';
+import './components/radioGroup.js';
 import './components/search-box/searchBox.js';
 import './components/shiny-card/shinyCard.js';
 import './components/shinyStars.js';

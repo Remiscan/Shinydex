@@ -1,3 +1,4 @@
+import { RadioGroup } from './components/radioGroup.js';
 import { dataStorage } from './localForage.js';
 import { computePaletteCss, gradientString, setTheme } from './theme.js';
 
@@ -52,9 +53,9 @@ export class Settings {
 
     {
       // Theme
-      const input = form.querySelector(`[name="theme"][value="${this.theme}"]`);
-      if (!(input instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
-      input.checked = true;
+      const input = form.querySelector(`[name="theme"]`);
+      if (!(input instanceof RadioGroup)) throw new TypeError(`Expecting RadioGroup`);
+      input.value = this.theme;
     }
 
     {

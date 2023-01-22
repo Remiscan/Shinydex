@@ -1,3 +1,8 @@
+import '../checkBox.js';
+import '../radioGroup.js';
+
+
+
 const template = document.createElement('template');
 template.innerHTML = /*html*/`
   <form class="search-options" name="search-options">
@@ -6,59 +11,22 @@ template.innerHTML = /*html*/`
       <h2 class="title-medium if-ordre">Ordonner par :</h2>
 
       <fieldset class="liste-options if-ordre" aria-labelledby="label-ordre">
-        <input type="checkbox" name="orderReversed" id="orderReversed" value="true">
-        <label for="orderReversed" aria-label="Inverser l'ordre" class="surface interactive">
-          <span class="material-icons"></span>
-          <span class="label-large">Inverser l'ordre</span>
-        </label>
+        <check-box name="orderReversed">
+          <span slot="icon-unchecked">vertical_align_bottom</span>
+          <span slot="icon-checked">vertical_align_top</span>
+          <span>Inverser l'ordre</span>
+        </check-box>
 
-        <input type="radio" name="order" id="ordre-date" value="catchTime" checked data-section="mes-chromatiques corbeille chromatiques-ami">
-        <label for="ordre-date" class="radio surface interactive" data-section="mes-chromatiques corbeille chromatiques-ami">
-          <span class="material-icons"></span>
-          <span class="label-large">Date de capture</span>
-        </label>
-
-        <input type="radio" name="order" id="ordre-rate" value="shinyRate" data-section="mes-chromatiques corbeille chromatiques-ami">
-        <label for="ordre-rate" class="radio surface interactive" data-section="mes-chromatiques corbeille chromatiques-ami">
-          <span class="material-icons"></span>
-          <span class="label-large">Taux de chromatiques</span>
-        </label>
-
-        <input type="radio" name="order" id="ordre-dex" value="dexid" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours">
-        <label for="ordre-dex" class="radio surface interactive" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours">
-          <span class="material-icons"></span>
-          <span class="label-large">N° du Pokédex</span>
-        </label>
-
-        <input type="radio" name="order" id="ordre-species" value="species" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours">
-        <label for="ordre-species" class="radio surface interactive" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours">
-          <span class="material-icons"></span>
-          <span class="label-large">Espèce (alphabétique)</span>
-        </label>
-
-        <input type="radio" name="order" id="ordre-name" value="name" data-section="mes-chromatiques corbeille chromatiques-ami">
-        <label for="ordre-name" class="radio surface interactive" data-section="mes-chromatiques corbeille chromatiques-ami">
-          <span class="material-icons"></span>
-          <span class="label-large">Surnom (alphabétique)</span>
-        </label>
-
-        <input type="radio" name="order" id="ordre-game" value="game" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours">
-        <label for="ordre-game" class="radio surface interactive" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours">
-          <span class="material-icons"></span>
-          <span class="label-large">Jeu (date de sortie)</span>
-        </label>
-
-        <input type="radio" name="order" id="ordre-added" value="creationTime" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours">
-        <label for="ordre-added" class="radio surface interactive" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours">
-          <span class="material-icons"></span>
-          <span class="label-large">Date d'ajout</span>
-        </label>
-
-        <input type="radio" name="order" id="ordre-username" value="username" class="if-partage" data-section="partage">
-        <label for="ordre-username" class="radio surface interactive if-partage" data-section="partage">
-          <span class="material-icons"></span>
-          <span class="label-large">Pseudo (alphabétique)</span>
-        </label>
+        <radio-group name="order">
+          <option value="catchTime" data-section="mes-chromatiques corbeille chromatiques-ami">Date de capture</option>
+          <option value="shinyRate" data-section="mes-chromatiques corbeille chromatiques-ami">Taux de chromatiques</option>
+          <option value="dexid" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours">N° du Pokédex</option>
+          <option value="species" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours">Espèce (alphabétique)</option>
+          <option value="name" data-section="mes-chromatiques corbeille chromatiques-ami">Surnom (alphabétique)</option>
+          <option value="game" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours">Jeu (date de sortie)</option>
+          <option value="creationTime" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours">Date d'ajout</option>
+          <option value="username" data-section="partage">Pseudo (alphabétique)</option>
+        </radio-group>
       </fieldset>
     </div>
 
@@ -69,33 +37,15 @@ template.innerHTML = /*html*/`
         <fieldset class="liste-options" data-section="mes-chromatiques corbeille chromatiques-ami">
           <legend class="titre-options title-small">Pokémon dont le dresseur d'origine est :</legend>
 
-          <input type="checkbox" name="filter-mine-true" id="filter-mine-true" value="true">
-          <label for="filter-mine-true" class="checkbox surface interactive">
-            <span class="material-icons"></span>
-            <span class="label-large">Moi</span>
-          </label>
-
-          <input type="checkbox" name="filter-mine-false" id="filter-mine-false" value="true">
-          <label for="filter-mine-false" class="checkbox surface interactive">
-            <span class="material-icons"></span>
-            <span class="label-large">Quelqu'un d'autre</span>
-          </label>
+          <check-box name="filter-mine-true">Moi</check-box>
+          <check-box name="filter-mine-false">Quelqu'un d'autre</check-box>
         </fieldset>
 
         <fieldset class="liste-options" data-section="mes-chromatiques corbeille chromatiques-ami">
           <legend class="titre-options title-small">Pokémon dont la légitimité est :</legend>
 
-          <input type="checkbox" name="filter-legit-true" id="filter-legit-true" value="true">
-          <label for="filter-legit-true" class="checkbox surface interactive">
-            <span class="material-icons"></span>
-            <span class="label-large">Confirmée</span>
-          </label>
-
-          <input type="checkbox" name="filter-legit-false" id="filter-legit-false" value="true">
-          <label for="filter-legit-false" class="checkbox surface interactive">
-            <span class="material-icons"></span>
-            <span class="label-large">Non confirmée</span>
-          </label>
+          <check-box name="filter-legit-true">Confirmée</check-box>
+          <check-box name="filter-legit-false">Non confirmée</check-box>
         </fieldset>
       </div>
     </div>
