@@ -4,21 +4,23 @@ import { TextField } from './textField.js';
 
 const template = document.createElement('template');
 template.innerHTML = /*html*/`
-  <label class="text-field surface variant interactive">
-    <span class="leading-icon">
-      <slot name="leading-icon"></slot>
-    </span>
-    <span class="label body-medium" id="label">
-      <slot name="label"></slot>
-    </span>
-    <select class="body-large"></select>
-    <span class="arrow material-icons">expand_more</span>
-    <span class="material-icons trailing-icon" aria-hidden="true">
-      <slot name="trailing-icon"></slot>
-      <span class="error-icon">error</span>
-    </span>
-    <span hidden><slot></slot></span>
-  </label>
+  <form>
+    <label class="text-field surface variant interactive">
+      <span class="leading-icon">
+        <slot name="leading-icon"></slot>
+      </span>
+      <span class="label body-medium">
+        <slot name="label"></slot>
+      </span>
+      <select class="body-large"></select>
+      <span class="arrow material-icons">expand_more</span>
+      <span class="material-icons trailing-icon" aria-hidden="true">
+        <slot name="trailing-icon"></slot>
+        <span class="error-icon">error</span>
+      </span>
+      <span hidden><slot></slot></span>
+    </label>
+  </form>
 `;
 
 
@@ -26,9 +28,6 @@ template.innerHTML = /*html*/`
 const sheet = new CSSStyleSheet();
 sheet.replaceSync(/*css*/`
   select {
-    grid-row: 2;
-    grid-column: text;
-    color: rgb(var(--on-surface));
     background: inherit;
     appearance: none;
     padding-right: 24px;
@@ -103,6 +102,9 @@ export class InputSelect extends TextField {
 
     super.disconnectedCallback();
   }
+
+
+  static get observedAttributes() { return [...TextField.globalAttributes, 'autocomplete', 'disabled', 'multiple', 'name', 'required', 'size']; }
 }
 
 if (!customElements.get('input-select')) customElements.define('input-select', InputSelect);

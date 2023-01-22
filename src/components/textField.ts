@@ -10,19 +10,21 @@ import commonSheet from '../../styles/common.css' assert { type: 'css' };
 
 const template = document.createElement('template');
 template.innerHTML = /*html*/`
-  <label class="text-field surface variant interactive">
-    <span class="leading-icon">
-      <slot name="leading-icon"></slot>
-    </span>
-    <span class="label body-medium" id="label">
-      <slot name="label"></slot>
-    </span>
-    <input type="text" aria-labelledby="label" class="body-large">
-    <span class="material-icons trailing-icon" aria-hidden="true">
-      <slot name="trailing-icon"></slot>
-      <span class="error-icon">error</span>
-    </span>
-  </label>
+  <form>
+    <label class="text-field surface variant interactive">
+      <span class="leading-icon" aria-hidden="true">
+        <slot name="leading-icon"></slot>
+      </span>
+      <span class="label body-medium">
+        <slot name="label"></slot>
+      </span>
+      <input type="text" class="body-large">
+      <span class="material-icons trailing-icon" aria-hidden="true">
+        <slot name="trailing-icon"></slot>
+        <span class="error-icon">error</span>
+      </span>
+    </label>
+  </form>
 `;
 
 
@@ -57,6 +59,10 @@ sheet.replaceSync(/*css*/`
     --text-color: rgb(var(--error));
     --label-color: rgb(var(--error));
     --trailing-icon-color: rgb(var(--error));
+  }
+
+  form {
+    display: contents;
   }
 
   label {
@@ -98,9 +104,7 @@ sheet.replaceSync(/*css*/`
 
   /* Reset input styles */
 
-  input,
-  select,
-  textarea {
+  :is(input, select, textarea) {
     margin: 0;
     padding: 0;
     border: none;
@@ -112,6 +116,10 @@ sheet.replaceSync(/*css*/`
     line-height: inherit;
     font: inherit;
     color: inherit;
+    grid-row: 2;
+    grid-column: text;
+    caret-color: var(--caret-color);
+    color: rgb(var(--on-surface));
   }
 
   :is(input, select, textarea):focus,
@@ -127,7 +135,7 @@ sheet.replaceSync(/*css*/`
     color: rgb(var(--on-surface));
   }
 
-  input::placeholder {
+  :is(input, textarea)::placeholder {
     color: rgb(var(--on-surface-variant));
   }
   
@@ -158,9 +166,6 @@ sheet.replaceSync(/*css*/`
   label:focus-within {
     border-bottom: 2px solid var(--indicator-color);
     padding-bottom: 8px;
-  }
-
-  label:focus-within {
     --state-opacity: var(--state-focus-opacity);
   }
 `);
@@ -226,22 +231,24 @@ export class TextField extends HTMLElement {
 
   connectedCallback() {
     const initialValue = this.getAttribute('value');
-    if (initialValue) this.value = initialValue;
-    const input = this.input;
-    this.#internals?.setValidity(input?.validity, input?.validationMessage);
+    this.value = initialValue ?? '';
 
-    this.input?.addEventListener('input', this.inputHandler);
-    this.input?.addEventListener('change', this.inputHandler);
+    const input = this.input;
+    input?.addEventListener('input', this.inputHandler);
+    input?.addEventListener('change', this.inputHandler);
   }
 
 
   disconnectedCallback() {
-    this.input?.removeEventListener('input', this.inputHandler);
-    this.input?.removeEventListener('change', this.inputHandler);
+    const input = this.input;
+    input?.removeEventListener('input', this.inputHandler);
+    input?.removeEventListener('change', this.inputHandler);
   }
 
 
-  static get observedAttributes() { return ['autocomplete', 'dirname', 'disabled', 'form', 'list', 'maxlength', 'minlength', 'name', 'pattern', 'placeholder', 'readonly', 'required', 'size', 'spellcheck', 'value', 'autocorrect', 'type']; }
+  static get globalAttributes() { return ['accesskey', 'autocapitalize', 'autofocus', 'contextmenu', 'dir', 'enterhintkey', 'inputmode', 'spellcheck', 'tabindex', 'title', 'translate', 'virtualkeyboardpolicy']; }
+
+  static get observedAttributes() { return [...TextField.globalAttributes, 'autocomplete', 'dirname', 'disabled', 'list', 'maxlength', 'minlength', 'name', 'pattern', 'placeholder', 'readonly', 'required', 'size', 'spellcheck', 'value', 'autocorrect', 'type']; }
   
 
   attributeChangedCallback(attr: string, oldValue: string | null, newValue: string | null) {
