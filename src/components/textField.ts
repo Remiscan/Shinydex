@@ -17,7 +17,7 @@ template.innerHTML = /*html*/`
     <span class="label body-medium" id="label">
       <slot name="label"></slot>
     </span>
-    <input type="text" name="test" aria-labelledby="label" class="body-large">
+    <input type="text" aria-labelledby="label" class="body-large">
     <span class="material-icons trailing-icon" aria-hidden="true">
       <slot name="trailing-icon"></slot>
       <span class="error-icon">error</span>
@@ -93,9 +93,31 @@ sheet.replaceSync(/*css*/`
     grid-column: text;
     color: var(--label-color);
   }
+
+  /* Reset input styles */
+
+  input,
+  select,
+  textarea {
+    margin: 0;
+    padding: 0;
+    border: none;
+    box-sizing: content-box;
+    display: inline-block;
+    vertical-align: middle;
+    white-space: normal;
+    background: transparent;
+    line-height: inherit;
+    font: inherit;
+    color: inherit;
+  }
+
+  :is(input, select, textarea):focus,
+  :is(input, select, textarea):focus-visible {
+    outline: none;
+  }
   
   input {
-    all: unset;
     grid-row: 2;
     grid-column: text;
     cursor: text;
@@ -144,28 +166,29 @@ sheet.replaceSync(/*css*/`
 
 
 export class TextField extends HTMLElement {
+  static template = template;
+  static sheet = sheet;
+
   static formAssociated = true;
   #internals;
   shadow: ShadowRoot;
 
-  inputHandler: (e: Event) => void;
+  inputHandler = (event: Event) => {
+    this.value = this.input?.value ?? '';
+    if (event.type === 'change') {
+      const cloneEvent = new Event(event.type, event);
+      this.dispatchEvent(cloneEvent);
+    }
+  };
 
   constructor() {
     super();
     this.shadow = this.attachShadow({ mode: 'open' });
-    this.shadow.appendChild(template.content.cloneNode(true));
-    this.shadow.adoptedStyleSheets = [materialIconsSheet, themesSheet, commonSheet, sheet];
+    this.shadow.appendChild((this.constructor as typeof TextField).template.content.cloneNode(true));
+    this.shadow.adoptedStyleSheets = [materialIconsSheet, themesSheet, commonSheet, (this.constructor as typeof TextField).sheet];
     if ('ElementInternals' in window && 'setFormValue' in window.ElementInternals.prototype) {
       this.#internals = this.attachInternals();
     }
-
-    this.inputHandler = (event: Event) => {
-      this.value = this.input?.value ?? '';
-      if (event.type === 'change') {
-        const cloneEvent = new Event(event.type, event);
-        this.dispatchEvent(cloneEvent);
-      }
-    };
   }
 
 
@@ -180,7 +203,7 @@ export class TextField extends HTMLElement {
   reportValidity() {return this.#internals?.reportValidity(); }
 
 
-  get input(): HTMLInputElement | undefined {
+  get input(): HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | undefined {
     const input = this.shadow.querySelector('input');
     if (input instanceof HTMLInputElement) return input;
   }
