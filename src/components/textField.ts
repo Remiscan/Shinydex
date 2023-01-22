@@ -39,15 +39,6 @@ sheet.replaceSync(/*css*/`
     --label-color: rgb(var(--primary));
   }
 
-  :host(:invalid),
-  :host([internals-invalid]) {
-    --indicator-color: rgb(var(--error));
-    --caret-color: rgb(var(--error));
-    --text-color: rgb(var(--error));
-    --label-color: rgb(var(--error));
-    --trailing-icon-color: rgb(var(--error));
-  }
-
   :host(:hover:invalid),
   :host([internals-invalid]:hover) {
     --indicator-color: rgb(var(--on-error-container));
@@ -55,6 +46,17 @@ sheet.replaceSync(/*css*/`
     --text-color: rgb(var(--on-error-container));
     --label-color: rgb(var(--on-error-container));
     --trailing-icon-color: rgb(var(--on-error-container));
+  }
+
+  :host(:invalid),
+  :host([internals-invalid]),
+  :host(:focus-within:invalid),
+  :host(:focus-within[internals-invalid]) {
+    --indicator-color: rgb(var(--error));
+    --caret-color: rgb(var(--error));
+    --text-color: rgb(var(--error));
+    --label-color: rgb(var(--error));
+    --trailing-icon-color: rgb(var(--error));
   }
 
   label {
