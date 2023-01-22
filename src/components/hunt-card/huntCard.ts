@@ -128,6 +128,7 @@ export class huntCard extends HTMLElement {
       // Si la chasse n'a pas été modifiée, on la supprime complètement
       if (hunt.isEmpty()) {
         await huntStorage.removeItem(this.huntid);
+        this.remove();
       }
 
       // Sinon, on déplace la chasse dans la corbeille
@@ -136,15 +137,15 @@ export class huntCard extends HTMLElement {
         hunt.deleted = true;
         hunt.destroy = true;
         await huntStorage.setItem(this.huntid, hunt);
-      }
 
-      if (populate) {
-        window.dispatchEvent(new CustomEvent('dataupdate', {
-          detail: {
-            sections: ['chasses-en-cours', 'corbeille'],
-            ids: [this.huntid],
-          }
-        }));
+        if (populate) {
+          window.dispatchEvent(new CustomEvent('dataupdate', {
+            detail: {
+              sections: ['chasses-en-cours', 'corbeille'],
+              ids: [this.huntid],
+            }
+          }));
+        }
       }
     } catch (error) {
       console.error(error);
