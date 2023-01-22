@@ -410,6 +410,7 @@ corbeille-card + corbeille-card {
   height: 100%;
 }
 
+.message-vide-recherche,
 .message-vide-filtres,
 .message-vide {
   display: grid;
@@ -426,22 +427,27 @@ corbeille-card + corbeille-card {
   justify-self: center;
 }
 
+.message-vide-recherche > .material-icons,
 .message-vide-filtres > .material-icons,
 .message-vide > .material-icons {
   font-size: 2.625rem;
   grid-row: 2 / 3;
 }
 
+.message-vide-recherche > span,
 .message-vide-filtres > span,
 .message-vide > span {
   grid-row: 3 / 4;
 }
 
+section:not(.vide-recherche) .message-vide-recherche,
 section:not(.vide-filtres) .message-vide-filtres,
 section:not(.vide) .message-vide {
   display: none;
 }
 
+section.vide-filtres.vide-recherche .message-vide-recherche,
+section.vide.vide-recherche .message-vide-recherche,
 section.vide.vide-filtres .message-vide-filtres {
   display: none;
 }

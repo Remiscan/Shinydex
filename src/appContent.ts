@@ -146,12 +146,13 @@ export async function initPokedex() {
     for (let i = gen.start; i <= gen.end; i++) {
       const pkmnContainer = document.createElement('span');
       pkmnContainer.classList.add('dex-icon', 'surface', 'interactive');
+      pkmnContainer.setAttribute('data-dexid', String(i));
 
       const pkmn = document.createElement('button');
       pkmn.setAttribute('type', 'button');
       pkmn.setAttribute('aria-label', allNames[i]);
       pkmn.classList.add('pkmnicon');
-      pkmn.dataset.dexid = String(i);
+      pkmn.setAttribute('data-dexid', String(i));
       pkmn.addEventListener('click', event => {
         try {
           navigate('sprite-viewer', event, { dexid: String(i) });

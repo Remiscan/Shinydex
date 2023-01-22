@@ -51,12 +51,12 @@ export class SearchBox extends HTMLElement {
     this.searchNonce = searchNonce;
 
     const section = this.section;
-    const element = document.querySelector(`section#${section}`);
-    if (!element) return;
+    const sectionElement = document.querySelector(`section#${section}`);
+    if (!sectionElement) return;
 
     let cardSelector = 'shiny-card';
     switch (section) {
-      case 'pokedex': cardSelector = '.pkmnicon'; break;
+      case 'pokedex': cardSelector = '.dex-icon'; break;
       case 'chasses-en-cours': cardSelector = 'hunt-card'; break;
       case 'corbeille': cardSelector = 'corbeille-card'; break;
       case 'partage': cardSelector = 'friend-card'; break;
@@ -64,11 +64,12 @@ export class SearchBox extends HTMLElement {
 
     // Hide non-corresponding cards via CSS
     let css = '';
+    let selector = '';
     if (search.length > 0) {
       if (section === 'pokedex') {
         if (!isNaN(parseFloat(search))) {
-          const speciesSelector = `:not([data-dexid="${parseFloat(search)}"])`;
-          css += `#${section} ${cardSelector}${speciesSelector} { display: none; }`;
+          selector = `:not([data-dexid="${parseFloat(search)}"])`;
+          css += `#${section} ${cardSelector}${selector} { display: none; }`;
         } else {
           const names = await Pokemon.names();
           const dexids: number[] = [];
@@ -77,18 +78,26 @@ export class SearchBox extends HTMLElement {
             const simplifiedName = noAccent(name).toLowerCase();
             if (simplifiedName.includes(search)) dexids.push(dexid);
           });
-          const speciesSelector = dexids.map(dexid => `:not([data-dexid="${dexid}"])`).join('');
-          css += `#${section} ${cardSelector}${speciesSelector} { display: none; }`;
+          selector = dexids.map(dexid => `:not([data-dexid="${dexid}"])`).join('');
+          css += `#${section} ${cardSelector}${selector} { display: none; }`;
         }
       } else {
         if (!isNaN(parseFloat(search))) {
-          const speciesSelector = `:not([data-dexid="${parseFloat(search)}"])`;
-          css += `#${section} ${cardSelector}${speciesSelector} { display: none; }`;
+          selector = `:not([data-dexid="${parseFloat(search)}"])`;
+          css += `#${section} ${cardSelector}${selector} { display: none; }`;
         } else {
-          const selector = `:not([data-name*="${search}"]):not([data-species*="${search}"])`;
+          selector = `:not([data-name*="${search}"]):not([data-species*="${search}"])`;
           css += `#${section} ${cardSelector}${selector} { display: none; }`;
         }
       }
+
+      const cardsInSection = sectionElement.querySelectorAll(`${cardSelector}`);
+      const hiddenCards = sectionElement.querySelectorAll(`${cardSelector}${selector}`);
+      const displayedCardsCount = cardsInSection.length - hiddenCards.length;
+      if (displayedCardsCount === 0) sectionElement.classList.add('vide-recherche');
+      else                           sectionElement.classList.remove('vide-recherche');
+    } else {
+      sectionElement.classList.remove('vide-recherche');
     }
 
     if (searchNonce !== this.searchNonce) return;
