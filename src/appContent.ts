@@ -123,6 +123,7 @@ export async function populateFromData(section: PopulatableSection, ids: string[
     conteneur.appendChild(card);
     await card.dataToContent();
     if (section === 'chasses-en-cours') lazyLoad(card);
+    //lazyLoad(card, 'manual', { fixedSize: section !== 'chasses-en-cours' });
   }));
 
   return results;
@@ -165,6 +166,7 @@ export async function initPokedex() {
 
       pkmnContainer.appendChild(pkmn);
       monsToPopulate.push(pkmnContainer);
+      //lazyLoad(pkmnContainer, 'manual', { fixedSize: true });
     }
 
     for (let pkmn of monsToPopulate) { genConteneur.appendChild(pkmn); }
@@ -178,6 +180,7 @@ export async function initPokedex() {
   if (!(conteneur instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
   for (let genConteneur of gensToPopulate) {
     conteneur.appendChild(genConteneur);
+    //lazyLoad(genConteneur);
   }
 
   // Peuple le compteur total de Pokémon dans le Pokédex

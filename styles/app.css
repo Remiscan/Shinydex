@@ -406,6 +406,26 @@ corbeille-card + corbeille-card {
   contain-intrinsic-size: 100px 120px;
 }
 
+[data-rendered="hidden"] {
+  content-visibility: hidden;
+  contain: style layout paint;
+}
+
+[data-rendered="visible"] {
+  content-visibility: visible;
+  contain: style layout paint;
+}
+
+@supports not (content-visibility: hidden) {
+  [data-rendered="hidden"] {
+    visibility: hidden;
+  }
+  
+  [data-rendered="visible"] {
+    visibility: visible;
+  }
+}
+
 .vide {
   height: 100%;
 }
@@ -482,6 +502,10 @@ section.loading .message-vide {
   justify-content: space-evenly;
   align-items: flex-start;
 }
+
+/*.pokedex-gen + .pokedex-gen {
+  content-visibility: auto;
+}*/
 
 .dex-icon {
   display: grid;
