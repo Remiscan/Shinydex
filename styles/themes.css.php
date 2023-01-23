@@ -252,6 +252,7 @@ echo '/'.'*'; ?>*/
 
 .standard {
   --surface-color: var(--surface);
+  --text-color: var(--on-surface);
 }
 
 .variant {
