@@ -601,6 +601,7 @@ export class huntCard extends HTMLElement {
     // Génère la liste des formes au choix d'un Pokémon
     // et génère la liste des Pokémon correspondants quand on commence à écrire un nom
     const inputEspece = this.shadow.querySelector('[name="dexid"]');
+    let previousSpeciesString = '';
     this.handlers.listeFormes = {
       element: inputEspece,
       type: 'focus',
@@ -608,8 +609,21 @@ export class huntCard extends HTMLElement {
         if (!(inputEspece instanceof TextField)) throw new TypeError(`Expecting TextField`);
 
         const inputHandler = (inputEvent: Event) => {
-          DexDatalist.build(inputEspece.value, this.shadow.querySelector('datalist#datalist-pokedex')!);
-          this.genereFormes(inputEspece.value);
+          const string = inputEspece.value;
+          this.genereFormes(string);
+
+          // Generate datalist
+          // - Si on revient aux mêmes 2 caractères qu'au départ, on garde la même liste
+          if (string.length == 2 && previousSpeciesString.length == 3) return;
+          previousSpeciesString = string;
+          const datalist = new DexDatalist(string);
+
+          const element = datalist.toElement();
+          element.setAttribute('id', 'datalist-pokedex');
+
+          const previousDatalist = inputEspece.shadow.querySelector('datalist#datalist-pokedex');
+          if (previousDatalist) previousDatalist.remove();
+          inputEspece.shadow.appendChild(element);
         };
 
         const blurHandler = (blurEvent: Event) => {
