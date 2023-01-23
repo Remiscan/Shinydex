@@ -119,6 +119,12 @@ export class FilterMenu extends HTMLElement {
 
         // On supprime les options des radio-group qui ne correspondent pas à la section
         this.shadow.querySelectorAll('radio-group').forEach(radioGroup => {
+          // On choisit la valeur par défaut
+          if (radioGroup.getAttribute('name') === 'order') {
+            radioGroup.setAttribute('value', filters.order);
+          }
+
+          // On supprime les options inutiles
           radioGroup.querySelectorAll('option').forEach(option => {
             if (!(option.matches(`[data-section~="${section}"]`))) option.remove();
           });

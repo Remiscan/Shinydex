@@ -39,7 +39,7 @@ sheet.replaceSync(/*css*/`
 export class RadioGroup extends CustomInput {
   static template = template;
   static sheets = [materialIconsSheet, themesSheet, commonSheet, checkboxSheet, sheet];
-  static attributes = ['name'];
+  static attributes = ['name', 'value'];
 
   slotchangeHandler = (event: Event) => {
     const slot = event.target;
@@ -48,19 +48,16 @@ export class RadioGroup extends CustomInput {
     const form = this.shadow.querySelector('form');
     if (!form) return;
 
-    const oldValue = this.value;
-    let selectedValue = oldValue;
-
     form.innerHTML = '';
     const assignedNodes = slot.assignedNodes();
+    let currentValue: string = this.value;
     for (let k = 0; k < assignedNodes.length; k++) {
       const node = assignedNodes[k];
       if (!(node instanceof HTMLOptionElement)) continue;
 
-      const label = node.innerHTML;
+      const label = node.innerHTML || node.getAttribute('value') || `Option ${k}`;
       const value = node.getAttribute('value') ?? label;
-      if (node.getAttribute('selected')) selectedValue = value;
-
+      if (k === 0) currentValue = value;
       const name = this.name ?? 'group';
 
       const containerAttributes = [];
@@ -88,7 +85,9 @@ export class RadioGroup extends CustomInput {
       `;
     }
 
-    this.value = selectedValue ?? oldValue;
+    const value = currentValue || this.initialValue || this.defaultValue;
+    this.value = value;
+    this.dispatchEvent(new CustomEvent('optionsparsed', { detail: { value }}));
   };
 
 
@@ -99,18 +98,26 @@ export class RadioGroup extends CustomInput {
 
 
   get value(): string {
-    return this.input?.value ?? '';
+    return this.input?.value ?? this.defaultValue;
   }
 
   set value(val: string) {
     const input = this.shadow.querySelector(`input[value="${val}"]`);
-    if (!input || !('checked' in input)) return;
-    input.checked = true;
-    super.updateFormValue(val);
+    if (input instanceof HTMLInputElement) {
+      input.checked = true;
+      super.updateFormValue(val);
+    } else {
+      const checkedInput = this.input;
+      if (checkedInput) checkedInput.checked = false;
+      super.updateFormValue('');
+    }
   }
 
-  get initialValue() {
-    return String(this.getAttribute('checked') != null);
+  get valueLabel(): string {
+    const input = this.input;
+    if (!input) return '';
+    const label = this.shadow.querySelector(`label[for="${input?.getAttribute('id')}"] > [part="label"]`);
+    return label?.innerHTML ?? '';
   }
 
 
@@ -126,6 +133,11 @@ export class RadioGroup extends CustomInput {
     const form = this.shadow.querySelector('form');
     form?.addEventListener('input', this.inputHandler);
     form?.addEventListener('change', this.inputHandler);
+
+    setTimeout(() => {
+      this.ready = true;
+      this.dispatchEvent(new Event('ready'));
+    });
   }
 
   disconnectedCallback(): void {
@@ -140,13 +152,16 @@ export class RadioGroup extends CustomInput {
   attributeChangedCallback(attr: string, oldValue: string | null, newValue: string | null) {
     if (oldValue === newValue) return;
 
-    if (attr === 'name') {
-      const source = this.shadow.querySelector('datalist > slot');
-      if (source instanceof HTMLSlotElement) {
-        if (source.assignedNodes().length > 0) {
-          source.dispatchEvent(new Event('slotchange'));
+    switch (attr) {
+      case 'value':
+      case 'name': {
+        const source = this.shadow.querySelector('datalist > slot');
+        if (source instanceof HTMLSlotElement) {
+          if (source.assignedNodes().length > 0) {
+            source.dispatchEvent(new Event('slotchange'));
+          }
         }
-      }
+      } break;
     }
   }
 }

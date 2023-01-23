@@ -262,12 +262,9 @@ button:not(.pkmnicon)::before {
 }
 
 :is(
-  input[type=text]:not([inputmode="search"]),
   input[type=number],
   input[type=date],
-  input[type=password],
-  textarea,
-  select
+  input[type=password]
 ) {
   min-width: calc(.6 * var(--tap-safe-size));
   min-height: calc(.6 * var(--tap-safe-size));
@@ -278,12 +275,9 @@ button:not(.pkmnicon)::before {
 
 @media (any-pointer: coarse) {
   :is(
-    input[type=text]:not([inputmode="search"]),
     input[type=number],
     input[type=date],
-    input[type=password],
-    textarea,
-    select
+    input[type=password]
   ) {
     min-width: var(--tap-safe-size);
     min-height: var(--tap-safe-size);

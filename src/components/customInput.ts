@@ -5,18 +5,18 @@ import '../../../_common/polyfills/element-internals.js';
 export default class CustomInput extends HTMLElement {
   static template: HTMLTemplateElement = document.createElement('template');
   static sheets: CSSStyleSheet[] = [];
-  static defaultValue: string = '';
+  static defaultValue: any = '';
   static attributes: string[] = [];
 
   static formAssociated = true;
   #internals;
   shadow: ShadowRoot;
+  ready = false;
 
   inputHandler = (event: Event) => {
     this.value = this.input?.value ?? this.defaultValue;
     if (event.type === 'change') {
-      const cloneEvent = new Event(event.type, event);
-      this.dispatchEvent(cloneEvent);
+      this.propagateEvent(event);
     }
   };
 
@@ -42,24 +42,30 @@ export default class CustomInput extends HTMLElement {
   reportValidity() {return this.#internals?.reportValidity(); }
 
 
-  get input(): HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | undefined {
-    const input = this.shadow.querySelector('input');
-    if (input instanceof HTMLInputElement) return input;
+  propagateEvent(event: Event) {
+    const cloneEvent = new Event(event.type, event);
+    this.dispatchEvent(cloneEvent);
   }
 
 
-  get value(): string {
+  get input(): any {
+    const input = this.shadow.querySelector('input');
+    return input;
+  }
+
+
+  get value(): any {
     return this.input?.value ?? this.defaultValue;
   }
 
-  set value(val: string) {
+  set value(val: any) {
     const input = this.input;
     if (!input) return;
     input.value = val;
     this.updateFormValue(val);
   }
 
-  updateFormValue(val: string) {
+  updateFormValue(val: any) {
     this.#internals?.setFormValue(String(val));
     const input = this.input;
     if (!input) return;
@@ -77,11 +83,16 @@ export default class CustomInput extends HTMLElement {
 
   connectedCallback() {
     const initialValue = this.initialValue;
-    this.value = initialValue ?? this.defaultValue;
+    if (initialValue) this.value = initialValue;
 
     const input = this.input;
     input?.addEventListener('input', this.inputHandler);
     input?.addEventListener('change', this.inputHandler);
+
+    setTimeout(() => {
+      this.ready = true;
+      this.dispatchEvent(new Event('ready'));
+    });
   }
 
 

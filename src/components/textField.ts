@@ -31,36 +31,6 @@ template.innerHTML = /*html*/`
 
 const sheet = new CSSStyleSheet();
 sheet.replaceSync(/*css*/`
-  :host {
-    --indicator-color: rgb(var(--on-surface-variant));
-    --caret-color: rgb(var(--primary));
-  }
-
-  :host(:focus-within) {
-    --indicator-color: rgb(var(--primary));
-    --label-color: rgb(var(--primary));
-  }
-
-  :host(:hover:invalid),
-  :host([internals-invalid]:hover) {
-    --indicator-color: rgb(var(--on-error-container));
-    --caret-color: rgb(var(--on-error-container));
-    --text-color: rgb(var(--on-error-container));
-    --label-color: rgb(var(--on-error-container));
-    --trailing-icon-color: rgb(var(--on-error-container));
-  }
-
-  :host(:invalid),
-  :host([internals-invalid]),
-  :host(:focus-within:invalid),
-  :host(:focus-within[internals-invalid]) {
-    --indicator-color: rgb(var(--error));
-    --caret-color: rgb(var(--error));
-    --text-color: rgb(var(--error));
-    --label-color: rgb(var(--error));
-    --trailing-icon-color: rgb(var(--error));
-  }
-
   form {
     display: contents;
   }
@@ -74,7 +44,7 @@ sheet.replaceSync(/*css*/`
       [text] 1fr
       [trailing-icon] auto
       ;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: auto auto;
     align-items: center;
     padding: 8px 16px;
     padding-bottom: 9px;
@@ -82,6 +52,36 @@ sheet.replaceSync(/*css*/`
     min-height: 56px;
     box-sizing: border-box;
     border-radius: 4px 4px 0 0;
+    position: relative;
+
+    --indicator-color: rgb(var(--on-surface-variant));
+    --caret-color: rgb(var(--primary));
+  }
+
+  label:focus-within,
+  label.focused {
+    --indicator-color: rgb(var(--primary));
+    --label-color: rgb(var(--primary));
+  }
+
+  :host(:invalid) label:hover,
+  :host([internals-invalid]) label:hover {
+    --indicator-color: rgb(var(--on-error-container));
+    --caret-color: rgb(var(--on-error-container));
+    --text-color: rgb(var(--on-error-container));
+    --label-color: rgb(var(--on-error-container));
+    --trailing-icon-color: rgb(var(--on-error-container));
+  }
+
+  :host(:invalid) label,
+  :host([internals-invalid]) label,
+  :host(:invalid) label:is(:focus-within, .focused),
+  :host([internals-invalid]) label:is(:focus-within, .focused) {
+    --indicator-color: rgb(var(--error));
+    --caret-color: rgb(var(--error));
+    --text-color: rgb(var(--error));
+    --label-color: rgb(var(--error));
+    --trailing-icon-color: rgb(var(--error));
   }
 
   .leading-icon,
@@ -100,6 +100,11 @@ sheet.replaceSync(/*css*/`
     grid-row: 1;
     grid-column: text;
     color: var(--label-color);
+  }
+
+  .label,
+  .body-large {
+    line-height: normal;
   }
 
   /* Reset input styles */
@@ -163,7 +168,7 @@ sheet.replaceSync(/*css*/`
     display: inline-flex;
   }
 
-  label:focus-within {
+  label:is(:focus-within, .focused) {
     border-bottom: 2px solid var(--indicator-color);
     padding-bottom: 8px;
     --state-opacity: var(--state-focus-opacity);

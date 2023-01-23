@@ -51,11 +51,10 @@ sheet.replaceSync(/*css*/`
 
     height: 40px;
     min-height: 40px;
-    width: fit-content;
     border-radius: 20px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: start;
     gap: 8px;
     padding: 0 12px 0 8px;
     position: relative;
@@ -119,6 +118,7 @@ export class CheckBox extends CustomInput {
   static template = template;
   static sheets = [materialIconsSheet, themesSheet, commonSheet, sheet];
   static attributes = ['checked', 'disabled', 'readonly', 'required', 'value'];
+  static defaultValue = 'false';
 
 
   inputHandler = (event: Event) => {
