@@ -11,6 +11,7 @@ html {
   --nav-bar-height: 80px;
 
   /* Élévation */
+  --z-top-layer: 60;
   --z-sprite-viewer: 60;
   --z-filter-menu: 50; /* Material elevation 3 */
   --z-obfuscator: 40;
@@ -859,6 +860,10 @@ input-slider[name="theme-hue"]::part(slider-thumb) {
 
 body[data-section-actuelle~="top-layer"] #top-layer {
   display: contents;
+}
+
+#top-layer > * {
+  z-index: var(--z-top-layer);
 }
 
 
