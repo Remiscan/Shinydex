@@ -1,4 +1,4 @@
-import { backFromTopLayer, toTopLayer } from '../navigate.js';
+import { backFromTopLayer, closeTopLayer, isTopLayerOpen, openTopLayer, toTopLayer } from '../topLayer.js';
 import { RadioGroup } from './radioGroup.js';
 import { TextField } from './textField.js';
 
@@ -81,6 +81,7 @@ export class InputSelect extends TextField {
   static defaultValue = null;
   #input: HTMLElement | undefined;
 
+  // Updates the radio-group options when the slotted options in input-select change.
   slotchangeHandler = (event: Event) => {
     const slot = event.target;
     if (!(slot instanceof HTMLSlotElement)) return;
@@ -98,10 +99,12 @@ export class InputSelect extends TextField {
     }
   };
 
+  // Opens the radio-group in the top layer, and listens for its changes.
   buttonClickHandler = async (event: Event) => {
     const selector = this.input;
     if (!selector) return;
 
+    // Compute fixed position
     const rect = this.getBoundingClientRect();
     const viewport = {
       width: window.innerWidth,
@@ -143,22 +146,36 @@ export class InputSelect extends TextField {
       selector.style.setProperty('border-top-right-radius', 'var(--border-radius)');
     }
 
-    const topLayer = document.querySelector('#top-layer');
-    if (!(topLayer instanceof HTMLElement)) throw new Error('Expecting HTMLElement');
+    event.stopPropagation(); // Prevent the button click from immediately closing the top layer.
+    if (isTopLayerOpen()) window.dispatchEvent(new Event('click', event)); // If another element is present in the top layer, close it first.
 
-    const changeHandler = (event: Event) => {
-      if (topLayer instanceof HTMLElement) topLayer.click();
+    // Close the top layer on clicking anywhere in the window, except on the promoted element.
+    const topLayerCloseHandler = (clickEvent: Event) => {
+      const topLayer = document.querySelector('#top-layer');
+      const target = clickEvent.target;
+      if (topLayer && target instanceof Node && topLayer.contains(target)) return;
+      closeTopLayer();
+      window.removeEventListener('click', topLayerCloseHandler);
     };
+    window.addEventListener('click', topLayerCloseHandler);
 
-    topLayer.addEventListener('sectionclose', event => {
-      this.shadow.querySelector('label')?.classList.remove('focused');
-      backFromTopLayer(selector, false);
-      selector.removeEventListener('change', changeHandler);
-    }, { once: true });
+    // Also close the top layer on selecting an option in the radio-group.
+    const changeHandler = (event: Event) => {
+      closeTopLayer();
+    };
     selector.addEventListener('change', changeHandler);
 
+    // Bring the radio-group back from the top layer when it closes.
+    window.addEventListener('toplayerclose', event => {
+      this.shadow.querySelector('label')?.classList.remove('focused');
+      backFromTopLayer(selector);
+      selector.removeEventListener('change', changeHandler);
+    }, { once: true });
     this.shadow.querySelector('label')?.classList.add('focused');
+
+    // Promote the radio-group to the top layer and open it.
     toTopLayer(selector);
+    openTopLayer();
   };
 
   inputHandler = (event: Event) => {

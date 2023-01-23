@@ -13,6 +13,7 @@ interface Section {
   closeAnimation: (el: HTMLElement, ev: Event, data?: any) => (Animation | null);
   historique: boolean;
   closePrevious: boolean;
+  makePreviousInert: boolean;
   preload: string[];
   fab: string | null;
   element: HTMLElement;
@@ -35,6 +36,7 @@ const sections: Section[] = [
     closeAnimation: () => null,
     historique: true,
     closePrevious: true,
+    makePreviousInert: false,
     preload: [`./images/iconsheet.webp`, `./images/pokemonsheet.webp`],
     fab: 'add',
     element: document.getElementById('mes-chromatiques')!
@@ -45,6 +47,7 @@ const sections: Section[] = [
     closeAnimation: () => null,
     historique: true,
     closePrevious: true,
+    makePreviousInert: false,
     preload: [`./images/pokemonsheet.webp`],
     fab: 'add',
     element: document.getElementById('pokedex')!
@@ -55,6 +58,7 @@ const sections: Section[] = [
     closeAnimation: () => null,
     historique: true,
     closePrevious: true,
+    makePreviousInert: false,
     preload: [`./images/iconsheet.webp`],
     fab: 'add',
     element: document.getElementById('chasses-en-cours')!
@@ -65,6 +69,7 @@ const sections: Section[] = [
     closeAnimation: () => null,
     historique: true,
     closePrevious: true,
+    makePreviousInert: false,
     preload: [`./images/iconsheet.webp`],
     fab: null,
     element: document.getElementById('corbeille')!
@@ -75,6 +80,7 @@ const sections: Section[] = [
     closeAnimation: () => null,
     historique: true,
     closePrevious: true,
+    makePreviousInert: false,
     preload: [`./images/iconsheet.webp`],
     fab: 'person_add',
     element: document.getElementById('partage')!
@@ -85,6 +91,7 @@ const sections: Section[] = [
     closeAnimation: () => null,
     historique: true,
     closePrevious: true,
+    makePreviousInert: false,
     preload: [`./images/iconsheet.webp`],
     fab: null,
     element: document.getElementById('chromatiques-ami')!
@@ -95,6 +102,7 @@ const sections: Section[] = [
     closeAnimation: () => null,
     historique: true,
     closePrevious: true,
+    makePreviousInert: false,
     preload: [],
     fab: null,
     element: document.getElementById('parametres')!
@@ -105,6 +113,7 @@ const sections: Section[] = [
     closeAnimation: () => null,
     historique: true,
     closePrevious: true,
+    makePreviousInert: false,
     preload: ['./images/app-icons/icon.svg'],
     fab: null,
     element: document.getElementById('a-propos')!
@@ -144,6 +153,7 @@ const sections: Section[] = [
     },
     historique: true,
     closePrevious: false,
+    makePreviousInert: true,
     preload: [],
     fab: null,
     element: document.getElementById('sprite-viewer')!
@@ -174,6 +184,7 @@ const sections: Section[] = [
     },
     historique: true,
     closePrevious: false,
+    makePreviousInert: true,
     preload: [],
     fab: null,
     element: document.getElementById('filter-menu')!
@@ -195,24 +206,11 @@ const sections: Section[] = [
     },
     historique: true,
     closePrevious: false,
+    makePreviousInert: true,
     preload: [],
     fab: null,
     element: document.getElementById('obfuscator')!
-  }, {
-    nom: 'top-layer',
-    rememberPosition: false,
-    openAnimation: (section: Element, event: Event) => {
-      return null;
-    },
-    closeAnimation: (section: Element, event: Event) => {
-      return null;
-    },
-    historique: true,
-    closePrevious: false,
-    preload: [],
-    fab: null,
-    element: document.getElementById('top-layer')!
-  }, 
+  }
 ];
 export let sectionActuelle = 'mes-chromatiques';
 const lastPosition: Map<string, number> = new Map(sections.filter(section => section.rememberPosition).map(section => [section.nom, 0]));
@@ -346,8 +344,10 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
   const main = document.querySelector('main');
   const bottomBar = document.querySelector('nav.bottom-bar');
   if (!nouvelleSection.closePrevious) {
-    main?.setAttribute('inert', '');
-    bottomBar?.setAttribute('inert', '');
+    if (nouvelleSection.makePreviousInert) {
+      main?.setAttribute('inert', '');
+      bottomBar?.setAttribute('inert', '');
+    }
     window.addEventListener('keydown', backOnEscape); // On ferme la section en appuyant sur Échap
   } else {
     main?.removeAttribute('inert');
@@ -371,10 +371,6 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
   switch (ancienneSection.nom) {
     case 'sprite-viewer': {
       ancienneSection.element.querySelector('sprite-viewer')?.removeAttribute('dexid');
-    } break;
-
-    case 'top-layer': {
-      ancienneSection.element.dispatchEvent(new Event('sectionclose'));
     } break;
   }
 
@@ -454,34 +450,6 @@ async function animateFabIcon(ancienneSection: Section, nouvelleSection: Section
     animFabIcon.end?.cancel();
   }
   return;
-}
-
-
-type TopLayerNodeOrigin = { parent: Node | null, following: Node | null };
-const topLayerNodes: Map<Node, TopLayerNodeOrigin> = new Map();
-
-/** Promotes a node to the top-layer section. */
-export function toTopLayer(element: Node, navigateNow: boolean = true) {
-  const topLayer = document.querySelector('#top-layer');
-  if (!(topLayer instanceof HTMLElement)) throw new Error('Expecting HTMLElement');
-  const origin: TopLayerNodeOrigin = {
-    parent: element.parentNode,
-    following: element.nextSibling
-  };
-  topLayerNodes.set(element, origin);
-  topLayer.appendChild(element);
-  if (navigateNow) navigate('top-layer', new Event('manualnavigation'));
-}
-
-/** Brings a node back from the top-layer section. */
-export function backFromTopLayer(element: Node, navigateNow: boolean = true) {
-  const topLayer = document.querySelector('#top-layer');
-  if (!(topLayer instanceof HTMLElement)) throw new Error('Expecting HTMLElement');
-  if (navigateNow) topLayer.click();
-  const origin = topLayerNodes.get(element);
-  if (origin && origin.parent) {
-    origin.parent.insertBefore(element, origin.following);
-  }
 }
 
 

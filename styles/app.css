@@ -857,6 +857,10 @@ input-slider[name="theme-hue"]::part(slider-thumb) {
   z-index: var(--z-obfuscator);
 }
 
+body[data-section-actuelle~="top-layer"] #top-layer {
+  display: contents;
+}
+
 
 
 /*
