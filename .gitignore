@@ -1,5 +1,5 @@
 # Ignore generated files
-modules
+dist
 images/out/
 images/pokemon-sprites/webp/
 data/out/

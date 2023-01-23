@@ -3,23 +3,30 @@
   "tasks": [
     {
       "type": "shell",
-      "command": "tsc --incremental",
-      "problemMatcher": ["$tsc"],
-      "label": "compile to JS",
+      "command": "php build/cache.php",
+      "label": "compile to JS and build cache.json",
       "group": {
         "kind": "build",
         "isDefault": true
       },
       "dependsOn": [
-        "build cache.json"
+        "compile to JS"
       ]
+    }, {
+      "type": "shell",
+      "command": "tsc --incremental",
+      "problemMatcher": ["$tsc"],
+      "label": "compile to JS",
+      "group": {
+        "kind": "build"
+      }
     }, {
       "type": "deno",
       "command": "run",
       "args": [
-        "--allow-run", "--allow-read", "--allow-write=./modules", "build/auto.build.js"
+        "--allow-run", "--allow-read", "--allow-write=./dist", "build/auto.build.js"
       ],
-      "label": "[auto] TS helper (sync ./src and ./modules)",
+      "label": "[auto] TS helper (sync ./src and ./dist)",
       "runOptions": {
         "runOn": "folderOpen"
       }

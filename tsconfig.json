@@ -1,12 +1,13 @@
 {
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "modules",
+    "outDir": "dist",
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "strict": true
+    "strict": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": ["src/**/*"]
 }

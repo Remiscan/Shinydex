@@ -36,12 +36,12 @@
     }
     </script>
     <script defer src="./ext/localforage.min.js"></script>
-    <script type="module" src="./modules/main.js"></script>
+    <script type="module" src="./dist/modules/main.js"></script>
 
     <?php
     $modules = new RecursiveIteratorIterator(
       new RecursiveDirectoryIterator(
-        __DIR__.'/modules',
+        __DIR__.'/dist/modules',
         RecursiveDirectoryIterator::SKIP_DOTS
       ),
       RecursiveIteratorIterator::SELF_FIRST

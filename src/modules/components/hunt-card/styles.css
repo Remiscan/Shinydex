@@ -1,0 +1,116 @@
+:host {
+  width: 100%;
+  display: grid;
+  order: var(--order, 0);
+  position: relative;
+}
+
+form {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 1ch;
+  border-radius: var(--border-radius);
+}
+
+.edit-notice {
+  display: inline-block;
+  grid-column: 2;
+  grid-row: 1;
+  padding: .2em;
+  height: fit-content;
+  text-align: center;
+}
+
+input[name="dexid"],
+input[name="game"] {
+  text-transform: capitalize;
+}
+
+[data-icon^="origin-mark"] {
+  filter: invert(var(--dark-coeff));
+}
+
+form:has(:invalid) label[for="caught"] {
+  cursor: not-allowed;
+}
+
+fieldset {
+  grid-column: 1 / -1;
+  flex-grow: 1;
+  --display: flex;
+  display: var(--display);
+  flex-direction: row;
+  align-items: center;
+  column-gap: 2ch;
+  row-gap: 1ch;
+  padding: 1ch;
+  flex-wrap: wrap;
+  border: none;
+  background: transparent;
+}
+
+fieldset.single {
+  column-gap: 1ch;
+}
+
+fieldset > legend {
+  font-size: 0;
+  padding: 0;
+}
+
+.group {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  column-gap: 2ch;
+  row-gap: 1ch;
+  margin: 10px;
+}
+
+fieldset:first-of-type {
+  grid-column: unset;
+}
+
+legend {
+  color: var(--text-color-soft);
+  font-variant: small-caps;
+}
+
+.one-input {
+  --display: flex;
+  display: var(--display);
+  flex-direction: row;
+  align-items: center;
+  gap: 1ch;
+  flex-wrap: nowrap;
+}
+
+.button-group {
+  width: fit-content;
+  margin-inline: auto;
+  border: none;
+  background: none;
+  flex-basis: 100%;
+  justify-content: center;
+}
+
+form:not([data-edit]) [data-edit],
+form[data-edit] [data-not-edit],
+form:not(.caught) .capture-button-group ~ * {
+  display: none !important;
+}
+
+:host(:not([data-gen-vc="true"]):not([data-method-mine="false"])) [data-checkmark-unsure],
+:host(:not([data-method-mine="false"])) [data-not-mine],
+:host(:not([data-charm-available="true"])) :is([name="charm"], [for="charm"]) {
+  display: none;
+}
+
+fieldset:empty,
+.one-input:empty,
+select:empty,
+label:has(+ select:empty) {
+  display: none;
+}

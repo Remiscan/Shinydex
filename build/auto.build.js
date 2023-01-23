@@ -8,7 +8,7 @@ for await (const event of watcher) {
   
   for (const path of event.paths) {
     try {
-      const compiledPath = path.replace('./src', './modules')
+      const compiledPath = path.replace('./src', './dist')
                                .replace('.ts', '.js');
 
       // If a file was deleted in ./src, delete the compiled or copied version in ./modules too
