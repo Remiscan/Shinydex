@@ -7,10 +7,19 @@
 
 form {
   display: flex;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 4px;
+  border-radius: var(--border-radius);
+}
+
+.container {
+  display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   gap: 1ch;
-  border-radius: var(--border-radius);
+  border-radius: calc(1.12 * (var(--border-radius) - 4px)); /* 12% optical adjustment */
 }
 
 .edit-notice {
@@ -22,8 +31,7 @@ form {
   text-align: center;
 }
 
-input[name="dexid"],
-input[name="game"] {
+text-field[name="dexid"]::part(input) {
   text-transform: capitalize;
 }
 

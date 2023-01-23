@@ -5,6 +5,10 @@ import '../../../../_common/polyfills/element-internals.js';
 export default class CustomInput extends HTMLElement {
   static template: HTMLTemplateElement = document.createElement('template');
   static sheets: CSSStyleSheet[] = [];
+  // Difference between initial value and default value:
+  // - initial value, set with the "value" attribute, is the value taken by the input on load.
+  // - default value, set with the "default-value" attribute, is the value taken by the input when no value is selected
+  // (they differ, for example, in an input where selecting no value is a valid input, but a specific value is selected on load)
   static defaultValue: any = '';
   static attributes: string[] = [];
 
@@ -54,7 +58,7 @@ export default class CustomInput extends HTMLElement {
 
 
   get value(): any {
-    return this.input?.value ?? this.defaultValue;
+    return this.input?.value ?? this.initialValue ?? this.defaultValue;
   }
 
   set value(val: any) {
@@ -73,7 +77,7 @@ export default class CustomInput extends HTMLElement {
   }
 
   get defaultValue() {
-    return (this.constructor as typeof CustomInput).defaultValue;
+    return this.getAttribute('default-value') ?? (this.constructor as typeof CustomInput).defaultValue;
   }
 
   get initialValue() {

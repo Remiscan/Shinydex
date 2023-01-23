@@ -45,20 +45,20 @@ export class RadioGroup extends CustomInput {
 
   labels: Map<string, string> = new Map();
 
-  slotchangeHandler = (event: Event) => {
-    const slot = event.target;
-    if (!(slot instanceof HTMLSlotElement)) return;
-
-    const form = this.shadow.querySelector('form');
-    if (!form) return;
-
-    form.innerHTML = '';
-    this.labels = new Map();
+  /** Builds a list of option nodes from the options passed to the slot. */
+  makeOptionsFromSlot = (slot: HTMLSlotElement) => {
     const assignedNodes = slot.assignedNodes();
-    const currentValue = this.value;
+    const options: Node[] = [];
     
     for (let k = 0; k < assignedNodes.length; k++) {
       const node = assignedNodes[k];
+
+      // If the node itself is a slot, look inside it.
+      if (node instanceof HTMLSlotElement) {
+        options.push(...this.makeOptionsFromSlot(node));
+        continue;
+      }
+
       if (!(node instanceof HTMLOptionElement)) continue;
 
       const label = node.innerHTML || node.getAttribute('value') || `Option ${k}`;
@@ -74,11 +74,12 @@ export class RadioGroup extends CustomInput {
         else if (['value', 'selected'].includes(attr.name)) { /* Do nothing */ }
         else containerAttributes.push(attr);
       }
-      
-      form.innerHTML += /*html*/`
+
+      const template = document.createElement('template');
+      template.innerHTML = /*html*/`
         <span part="option" ${containerAttributes.map(attr => `${attr.name}="${attr.value}"`).join(' ')}>
           <input type="radio" name="${name}" id="${name}-${k}" value="${value}"
-                 ${inputAttributes.map(attr => `${attr.name}="${attr.value}"`).join(' ')}>
+                ${inputAttributes.map(attr => `${attr.name}="${attr.value}"`).join(' ')}>
           <label for="${name}-${k}" class="surface interactive">
             <span class="material-icons" part="icon icon-unchecked">
               <slot name="icon-unchecked">radio_button_unchecked</slot>
@@ -90,6 +91,28 @@ export class RadioGroup extends CustomInput {
           </label>
         </span>
       `;
+      
+      options.push(template.content.cloneNode(true));
+    }
+
+    return options;
+  }
+
+  /** Remakes the list of options when the slot's contents change. */
+  slotchangeHandler = (event: Event) => {
+    const slot = event.target;
+    if (!(slot instanceof HTMLSlotElement)) return;
+
+    const form = this.shadow.querySelector('form');
+    if (!form) return;
+
+    form.innerHTML = '';
+    this.labels = new Map();
+    const currentValue = this.value;
+    
+    const options = this.makeOptionsFromSlot(slot);
+    for (const option of options) {
+      form.appendChild(option);
     }
 
     this.value = currentValue ?? this.initialValue;
@@ -105,7 +128,7 @@ export class RadioGroup extends CustomInput {
 
 
   get value(): string | null {
-    return this.input?.value ?? this.defaultValue;
+    return this.input?.value ?? this.initialValue ?? this.defaultValue;
   }
 
   set value(val: string | null) {
@@ -141,10 +164,11 @@ export class RadioGroup extends CustomInput {
 
 
   connectedCallback(): void {
+    const source = this.shadow.querySelector('datalist > slot');
+    source?.addEventListener('slotchange', this.slotchangeHandler);
+
     if (!this.#initialSlotsAssigned) {
-      const source = this.shadow.querySelector('datalist > slot');
       if (source instanceof HTMLSlotElement) {
-        source.addEventListener('slotchange', this.slotchangeHandler);
         if (source.assignedNodes().length > 0) {
           source.dispatchEvent(new Event('slotchange'));
         }

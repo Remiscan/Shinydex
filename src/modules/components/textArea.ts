@@ -5,14 +5,14 @@ import { TextField } from './textField.js';
 const template = document.createElement('template');
 template.innerHTML = /*html*/`
   <form>
-    <label class="text-field surface variant interactive">
+    <label class="text-field surface variant interactive" part="container">
       <span class="leading-icon">
         <slot name="leading-icon"></slot>
       </span>
       <span class="label body-medium">
         <slot name="label"></slot>
       </span>
-      <textarea class="body-large"></textarea>
+      <textarea class="body-large" part="input"></textarea>
       <span class="material-icons trailing-icon" aria-hidden="true">
         <slot name="trailing-icon"></slot>
         <span class="error-icon">error</span>

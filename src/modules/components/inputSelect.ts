@@ -7,14 +7,14 @@ import { TextField } from './textField.js';
 const template = document.createElement('template');
 template.innerHTML = /*html*/`
   <form>
-    <label class="text-field surface variant interactive">
+    <label class="text-field surface variant interactive" part="container">
       <span class="leading-icon">
         <slot name="leading-icon"></slot>
       </span>
       <span class="label body-medium">
         <slot name="label"></slot>
       </span>
-      <button type="button"></button>
+      <button type="button" part="button"></button>
       <span class="material-icons trailing-icon" aria-hidden="true">
         <slot name="trailing-icon"></slot>
         <span class="error-icon">error</span>
@@ -245,10 +245,15 @@ export class InputSelect extends TextField {
   attributeChangedCallback(attr: string, oldValue: string | null, newValue: string | null) {
     if (oldValue === newValue) return;
 
-    if (attr === 'value') {
-      this.input?.setAttribute(attr, newValue ?? this.defaultValue);
+    switch (attr) {
+      case 'value':
+      case 'default-value':
+        this.input?.setAttribute(attr, newValue ?? this.defaultValue);
+        break;
+
+      default:
+        super.attributeChangedCallback(attr, oldValue, newValue);
     }
-    else super.attributeChangedCallback(attr, oldValue, newValue);
   }
 }
 

@@ -327,10 +327,14 @@ export class huntCard extends HTMLElement {
           const allNames = Pokemon.names();
           const dexid = allNames.findIndex(s => s === String(value).toLowerCase());
           hunt.dexid = dexid > 0 ? dexid : 0;
-          hunt.forme = '';
         } break;
 
-        case 'forme':
+        case 'forme': {
+          const formes = pokemonData[hunt.dexid].formes;
+          const k = formes.findIndex(form => form.dbid === value);
+          hunt.forme = k >= 0 ? String(value) : '';
+        } break;
+
         case 'gene':
         case 'name':
         case 'method':
@@ -392,6 +396,8 @@ export class huntCard extends HTMLElement {
 
       const hunt = await this.formToHunt(formData);
       
+      this.genereFormes(Pokemon.names()[hunt.dexid], hunt.forme);
+      this.genereMethodes(hunt.game, hunt.method)
       this.updateAttribute('method', hunt.method);
       this.updateAttribute('game', hunt.game);
 
@@ -604,35 +610,25 @@ export class huntCard extends HTMLElement {
     let previousSpeciesString = '';
     this.handlers.listeFormes = {
       element: inputEspece,
-      type: 'focus',
+      type: 'input',
       function: event => {
         if (!(inputEspece instanceof TextField)) throw new TypeError(`Expecting TextField`);
 
-        const inputHandler = (inputEvent: Event) => {
-          const string = inputEspece.value;
-          this.genereFormes(string);
+        const string = inputEspece.value;
+        //this.genereFormes(string);
 
-          // Generate datalist
-          // - Si on revient aux mêmes 2 caractères qu'au départ, on garde la même liste
-          if (string.length == 2 && previousSpeciesString.length == 3) return;
-          previousSpeciesString = string;
-          const datalist = new DexDatalist(string);
+        // Generate datalist
+        // - Si on revient aux mêmes 2 caractères qu'au départ, on garde la même liste
+        if (string.length == 2 && previousSpeciesString.length == 3) return;
+        previousSpeciesString = string;
+        const datalist = new DexDatalist(string);
 
-          const element = datalist.toElement();
-          element.setAttribute('id', 'datalist-pokedex');
+        const element = datalist.toElement();
+        element.setAttribute('id', 'datalist-pokedex');
 
-          const previousDatalist = inputEspece.shadow.querySelector('datalist#datalist-pokedex');
-          if (previousDatalist) previousDatalist.remove();
-          inputEspece.shadow.appendChild(element);
-        };
-
-        const blurHandler = (blurEvent: Event) => {
-          inputEspece.removeEventListener('input', inputHandler);
-          inputEspece.removeEventListener('blur', blurHandler);
-        };
-
-        inputEspece.addEventListener('input', inputHandler);
-        inputEspece.addEventListener('blur', blurHandler);
+        const previousDatalist = inputEspece.shadow.querySelector('datalist#datalist-pokedex');
+        if (previousDatalist) previousDatalist.remove();
+        inputEspece.shadow.appendChild(element);
       }
     }
     handle(this.handlers.listeFormes);
@@ -648,9 +644,10 @@ export class huntCard extends HTMLElement {
    */
   genereFormes(value: string, formeToSelect?: string) {
     const select = this.shadow.querySelector('input-select[name="forme"]');
-    if (!select) throw new TypeError(`Expecting InputSelect`);
+    if (!(select instanceof InputSelect)) throw new TypeError(`Expecting InputSelect`);
 
     select.querySelectorAll('option').forEach(option => option.remove());
+    select.setAttribute('value', formeToSelect ?? '');
 
     const allNames = Pokemon.names();
     const k = allNames.findIndex(p => p == value.toLowerCase());
@@ -662,7 +659,6 @@ export class huntCard extends HTMLElement {
         if ('noShiny' in forme && forme.noShiny == true) continue;
         select.innerHTML += `<option value="${forme.dbid}">${forme.nom || 'Forme normale'}</option>`;
       }
-      select.setAttribute('value', formeToSelect ?? '');
     }
   }
 
@@ -673,23 +669,23 @@ export class huntCard extends HTMLElement {
    */
   genereMethodes(game: string, methodToSelect?: string) {
     const select = this.shadow.querySelector('input-select[name="method"]');
-    if (!select) throw new TypeError(`Expecting InputSelect`);
+    if (!(select instanceof InputSelect)) throw new TypeError(`Expecting InputSelect`);
 
     select.querySelectorAll('option').forEach(option => option.remove());
+    select.setAttribute('value', methodToSelect ?? 'wild');
+    const gameid = Pokemon.jeux.find(jeu => jeu.uid === game)?.id;
+    if (!gameid) return;
 
     const lang = document.documentElement.getAttribute('lang') ?? Params.defaultLang;
-    let toSelect = 'wild';
     for (const methode of Shiny.allMethodes) {
       const gameIds = new Set(methode.jeux.map(jeu => jeu.id));
-      if (!(gameIds.has(game))) continue;
-      if (methode.id === methodToSelect) toSelect = methode.id;
+      if (!(gameIds.has(gameid))) continue;
       let nom = '';
       if (isSupportedLang(lang) && isSupportedMethodID(methode.id)) {
         nom = methodStrings[lang][methode.id];
       }
       select.innerHTML += `<option value="${methode.id}">${nom}</option>`;
     }
-    select.setAttribute('value', toSelect);
   }
 
 
