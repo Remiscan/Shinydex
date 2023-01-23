@@ -64,6 +64,15 @@ document.getElementById('obfuscator')!.addEventListener('click', () => history.b
   });
 }
 
+// Ferme le top layer si on clique en-dehors
+{
+  const section = document.getElementById('top-layer');
+  section?.addEventListener('click', event => {
+    if (event.target !== section) return;
+    history.back();
+  });
+}
+
 
 
 ///////////////////////////////////

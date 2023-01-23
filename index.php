@@ -212,6 +212,9 @@
       <filter-menu data-section="chromatiques-ami" class="surface primary shadow elevation-3"></filter-menu>
     </section>
 
+    <!-- Misc top layer -->
+    <section id="top-layer"></section>
+
     <!-- Notifications -->
     <div class="notification-container"></div>
   </body>

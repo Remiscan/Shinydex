@@ -245,6 +245,7 @@ body[data-section-actuelle~="parametres"] #parametres,
 body[data-section-actuelle~="a-propos"] #a-propos,
 body[data-section-actuelle~="sprite-viewer"] #sprite-viewer,
 body[data-section-actuelle~="filter-menu"] #filter-menu,
+body[data-section-actuelle~="top-layer"] #top-layer,
 body[data-section-actuelle~="obfuscator"] #obfuscator {
   display: grid;
 }
@@ -836,6 +837,7 @@ input-slider[name="theme-hue"]::part(slider-thumb) {
 
 #sprite-viewer,
 #filter-menu,
+#top-layer,
 #obfuscator {
   grid-column: 1 / -1;
   grid-row: 1 / -1;
@@ -849,6 +851,7 @@ input-slider[name="theme-hue"]::part(slider-thumb) {
   z-index: var(--z-obfuscator);
 }
 
+#top-layer,
 #filter-menu {
   background-color: transparent;
   z-index: var(--z-obfuscator);

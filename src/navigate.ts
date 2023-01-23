@@ -198,6 +198,20 @@ const sections: Section[] = [
     preload: [],
     fab: null,
     element: document.getElementById('obfuscator')!
+  }, {
+    nom: 'top-layer',
+    rememberPosition: false,
+    openAnimation: (section: Element, event: Event) => {
+      return null;
+    },
+    closeAnimation: (section: Element, event: Event) => {
+      return null;
+    },
+    historique: true,
+    closePrevious: false,
+    preload: [],
+    fab: null,
+    element: document.getElementById('top-layer')!
   }, 
 ];
 export let sectionActuelle = 'mes-chromatiques';
@@ -358,6 +372,10 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
     case 'sprite-viewer': {
       ancienneSection.element.querySelector('sprite-viewer')?.removeAttribute('dexid');
     } break;
+
+    case 'top-layer': {
+      ancienneSection.element.dispatchEvent(new Event('sectionclose'));
+    } break;
   }
 
   return;
@@ -436,6 +454,16 @@ async function animateFabIcon(ancienneSection: Section, nouvelleSection: Section
     animFabIcon.end?.cancel();
   }
   return;
+}
+
+
+/** Promotes an element to the top-layer section. */
+export function toTopLayer(element: Node, event: Event) {
+  const topLayer = document.querySelector('#top-layer');
+  if (!topLayer) return;
+  topLayer.innerHTML = '';
+  topLayer.appendChild(element);
+  navigate('top-layer', event);
 }
 
 
