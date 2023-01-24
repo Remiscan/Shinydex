@@ -866,6 +866,18 @@ body[data-section-actuelle~="top-layer"] #top-layer {
   z-index: var(--z-top-layer);
 }
 
+@media (max-width: 719px) {
+  #top-layer > .mobile-centered {
+    max-width: calc(100vw - 16px) !important;
+    max-height: calc(100vh - 16px) !important;
+    min-width: unset !important;
+    margin: 8px;
+    top: 50vh !important;
+    left: 50vw !important;
+    transform: translate(-50%, -50%);
+  }
+}
+
 
 
 /*

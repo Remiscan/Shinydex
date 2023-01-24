@@ -29,6 +29,10 @@ sheet.replaceSync(/*css*/`
     position: relative;
   }
 
+  :host(.select-menu) [part="option-label-element"] {
+    border-radius: 4px;
+  }
+
   [hidden] {
     display: none;
   }
@@ -80,14 +84,14 @@ export class RadioGroup extends CustomInput {
         <span part="option" ${containerAttributes.map(attr => `${attr.name}="${attr.value}"`).join(' ')}>
           <input type="radio" name="${name}" id="${name}-${k}" value="${value}"
                 ${inputAttributes.map(attr => `${attr.name}="${attr.value}"`).join(' ')}>
-          <label for="${name}-${k}" class="surface interactive">
+          <label for="${name}-${k}" class="surface interactive" part="option-label-element">
             <span class="material-icons" part="icon icon-unchecked">
               <slot name="icon-unchecked">radio_button_unchecked</slot>
             </span>
             <span class="material-icons" part="icon icon-checked">
               <slot name="icon-checked">radio_button_checked</slot>
             </span>
-            <span part="label" class="label-large">${label}</span>
+            <span part="option-label" class="label-large">${label}</span>
           </label>
         </span>
       `;

@@ -19,7 +19,7 @@ template.innerHTML = /*html*/`
         <slot name="trailing-icon"></slot>
         <span class="error-icon">error</span>
       </span>
-      <radio-group hidden class="surface primary shadow elevation-3" style="
+      <radio-group hidden class="surface primary shadow elevation-3 mobile-centered select-menu" style="
         padding: 4px;
         display: flex;
         flex-direction: column;
@@ -114,8 +114,8 @@ export class InputSelect extends TextField {
     const available = {
       top: rect.top,
       bottom: viewport.height - rect.bottom,
-      left: rect.left,
-      right: viewport.width - rect.right
+      left: rect.left + rect.width,
+      right: viewport.width - rect.left
     };
 
     const selectorStyles = {
@@ -134,16 +134,16 @@ export class InputSelect extends TextField {
     }
 
     if (selectorStyles.top) {
-      if (selectorStyles.left) selector.style.setProperty('border-top-right-radius', 'var(--border-radius)');
-      else if (selectorStyles.right) selector.style.setProperty('border-top-left-radius', 'var(--border-radius)');
-      selector.style.setProperty('border-bottom-left-radius', 'var(--border-radius)');
-      selector.style.setProperty('border-bottom-right-radius', 'var(--border-radius)');
+      if (selectorStyles.left) selector.style.setProperty('border-top-right-radius', '4px');
+      else if (selectorStyles.right) selector.style.setProperty('border-top-left-radius', '4px');
+      selector.style.setProperty('border-bottom-left-radius', '4px');
+      selector.style.setProperty('border-bottom-right-radius', '4px');
     }
     else if (selectorStyles.bottom) {
-      if (selectorStyles.left) selector.style.setProperty('border-bottom-right-radius', 'var(--border-radius)');
-      else if (selectorStyles.right) selector.style.setProperty('border-bottom-left-radius', 'var(--border-radius)');
-      selector.style.setProperty('border-top-left-radius', 'var(--border-radius)');
-      selector.style.setProperty('border-top-right-radius', 'var(--border-radius)');
+      if (selectorStyles.left) selector.style.setProperty('border-bottom-right-radius', '4px');
+      else if (selectorStyles.right) selector.style.setProperty('border-bottom-left-radius', '4px');
+      selector.style.setProperty('border-top-left-radius', '4px');
+      selector.style.setProperty('border-top-right-radius', '4px');
     }
 
     event.stopPropagation(); // Prevent the button click from immediately closing the top layer.
