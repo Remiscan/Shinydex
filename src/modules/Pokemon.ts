@@ -11,12 +11,12 @@ export type Jeu = {
 };
 
 const allGames: Jeu[] = [
-  { uid: 'blue', gen: 1, id: 'rb' },
-  { uid: 'red', gen: 1, id: 'rb' },
-  { uid: 'yellow', gen: 1, id: 'yellow' },
-  { uid: 'gold', gen: 2, id: 'gs' },
-  { uid: 'silver', gen: 2, id: 'gs' },
-  { uid: 'crystal', gen: 2, id: 'crystal' },
+  { uid: 'blue', gen: 1, id: 'rb', originMark: 'game-boy' },
+  { uid: 'red', gen: 1, id: 'rb', originMark: 'game-boy' },
+  { uid: 'yellow', gen: 1, id: 'yellow', originMark: 'game-boy' },
+  { uid: 'gold', gen: 2, id: 'gs', originMark: 'game-boy' },
+  { uid: 'silver', gen: 2, id: 'gs', originMark: 'game-boy' },
+  { uid: 'crystal', gen: 2, id: 'crystal', originMark: 'game-boy' },
   { uid: 'sapphire', gen: 3, id: 'rs' },
   { uid: 'ruby', gen: 3, id: 'rs' },
   { uid: 'emerald', gen: 3, id: 'emerald' },

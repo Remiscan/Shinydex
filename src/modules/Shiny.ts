@@ -92,7 +92,6 @@ interface backendShiny {
   name: string,
   ball: string,
   gene: string,
-  originMark: string,
 
   notes: string,
 
@@ -128,7 +127,6 @@ export class Shiny implements frontendShiny {
   name: string = '';
   ball: string = '';
   gene: string = '';
-  originMark: string = '';
   
   notes: string = '';
 
@@ -155,7 +153,6 @@ export class Shiny implements frontendShiny {
     if ('name' in shiny) this.name = String(shiny.name);
     if ('ball' in shiny) this.ball = String(shiny.ball);
     if ('gene' in shiny) this.gene = String(shiny.gene);
-    if ('originMark' in shiny) this.originMark = String(shiny.originMark);
 
     if ('notes' in shiny) this.notes = String(shiny.notes);
 
@@ -225,11 +222,9 @@ export class Shiny implements frontendShiny {
     try {
       if (!this.game || !this.method) return ''; // If game or method wasn't set, we can't compute an origin mark
       if (this.method === 'hack') return ''; // Hacked Pokémon don't deserve an origin mark
-      if (!this.mine) return this.originMark; // Traded Pokémon can have been born on earlier games
 
       const jeu = this.jeuObj;
-      if (jeu.gen === 1 || jeu.gen === 2) return this.originMark; // gen 1 & 2 games could come from 3DS Virtual Console
-      else if (jeu.originMark) return jeu.originMark;
+      if (jeu.originMark) return jeu.originMark;
       else return 'old';
     } catch (error) {
       return '';
