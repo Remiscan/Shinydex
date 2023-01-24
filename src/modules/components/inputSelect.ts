@@ -438,7 +438,7 @@ export class InputSelect extends TextField {
       'max-height': available.bottom >= available.top ? available.bottom - 9 : available.top - 9,
       'left': available.right >= available.left ? rect.left + 1 : null,
       'right': available.left > available.right ? viewport.width - rect.right + 1 : null,
-      'max-width': available.right >= available.left ? available.right : available.left,
+      'max-width': available.right >= available.left ? available.right + rect.width : available.left + rect.width,
       'min-width': rect.width,
     };
 
