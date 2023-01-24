@@ -34,7 +34,7 @@ template.innerHTML = /*html*/`
 
         <pokemon-sprite size="112"></pokemon-sprite>
 
-        <text-field name="dexid" required list="datalist-pokedex" autocomplete="off" spellcheck="off" placeholder="Bulbizarre">
+        <text-field name="dexid" required list="datalist-pokedex" autocomplete="off" spellcheck="false" placeholder="Bulbizarre">
           <span slot="label">Espèce</span>
           <datalist id="datalist-pokedex"></datalist>
         </text-field>
@@ -178,7 +178,7 @@ template.innerHTML = /*html*/`
       <fieldset class="capture-data">
         <legend>Données de la capture</legend>
 
-        <text-field name="name">
+        <text-field name="name" autocomplete="off" spellcheck="false">
           <span slot="label">Surnom</span>
         </text-field>
 
@@ -187,7 +187,7 @@ template.innerHTML = /*html*/`
           <input type="date" name="catchTime" id="catchTime">
         </span>
 
-        <input-select name="ball" icons="leading" required>
+        <input-select name="ball" default-value="poke" icons="leading" required>
           <span slot="leading-icon" data-icon="ball"></span>
           <span slot="label">Capturé dans une</span>
           <option value="lure">Appât Ball</option>

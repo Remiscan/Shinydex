@@ -7,8 +7,8 @@ import { huntStorage, shinyStorage } from '../../localForage.js';
 import { Notif } from '../../notification.js';
 import { InputSelect } from '../inputSelect.js';
 import { pokemonSprite } from '../pokemon-sprite/pokemonSprite.js';
-import { TextField } from '../textField.js';
 import { TextArea } from '../textArea.js';
+import { TextField } from '../textField.js';
 import template from './template.js';
 // @ts-expect-error
 import materialIconsSheet from '../../../../ext/material_icons.css' assert { type: 'css' };
@@ -19,9 +19,9 @@ import iconSheet from '../../../../images/iconsheet.css' assert { type: 'css' };
 // @ts-expect-error
 import commonSheet from '../../../../styles/common.css' assert { type: 'css' };
 import { gameStrings, isSupportedGameID, isSupportedLang, isSupportedMethodID, methodStrings, pokemonData } from '../../jsonData.js';
+import { CheckBox } from '../checkBox.js';
 // @ts-expect-error
 import sheet from './styles.css' assert { type: 'css' };
-import { CheckBox } from '../checkBox.js';
 
 
 
@@ -686,6 +686,7 @@ export class huntCard extends HTMLElement {
 
     select.querySelectorAll('option').forEach(option => option.remove());
     select.setAttribute('value', methodToSelect ?? 'wild');
+
     const gameid = Pokemon.jeux.find(jeu => jeu.uid === game)?.id;
     if (!gameid) return;
 
