@@ -21,6 +21,12 @@ export function backFromTopLayer(element: Node) {
   if (origin && origin.parent) {
     origin.parent.insertBefore(element, origin.following);
   }
+  topLayerNodes.delete(element);
+}
+
+/** Checks if an element is currently in the top layer. */
+export function isInTopLayer(element: Node) {
+  return topLayerNodes.has(element);
 }
 
 function topLayerCloseHandler(event: Event) {
@@ -33,12 +39,12 @@ export function openTopLayer() {
   const sectionsActuelles = (document.body.getAttribute('data-section-actuelle') ?? '').split(' ');
   sectionsActuelles.push('top-layer');
   document.body.setAttribute('data-section-actuelle', sectionsActuelles.join(' '));
-  window.addEventListener('click', topLayerCloseHandler);
+  //window.addEventListener('click', topLayerCloseHandler);
   window.dispatchEvent(new Event('toplayeropen'));
 }
 
 export function closeTopLayer() {
-  window.removeEventListener('click', topLayerCloseHandler);
+  //window.removeEventListener('click', topLayerCloseHandler);
   const sectionsActuelles = (document.body.getAttribute('data-section-actuelle') ?? '').replace('top-layer', '').split(' ');
   document.body.setAttribute('data-section-actuelle', sectionsActuelles.join(' '));
   window.dispatchEvent(new Event('toplayerclose'));

@@ -29,10 +29,6 @@ sheet.replaceSync(/*css*/`
     position: relative;
   }
 
-  :host(.select-menu) [part="option-label-element"] {
-    border-radius: 4px;
-  }
-
   [hidden] {
     display: none;
   }
