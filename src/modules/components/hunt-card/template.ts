@@ -1,3 +1,4 @@
+import '../checkBox.js';
 import '../inputSelect.js';
 import '../pokemon-sprite/pokemonSprite.js';
 import '../textArea.js';
@@ -73,15 +74,7 @@ template.innerHTML = /*html*/`
       <fieldset>
         <legend>Bonus globaux</legend>
 
-        <span class="one-input">
-          <input type="checkbox" name="charm" id="charm">
-          <label for="charm">
-            <span>
-              Charme chroma possédé
-              <span class="icon" data-icon="key/shiny-charm"></span>
-            </span>
-          </label>
-        </span>
+        <check-box name="charm">Charme chroma possédé</check-box>
       </fieldset>
 
 
@@ -89,24 +82,20 @@ template.innerHTML = /*html*/`
       <fieldset data-game="sv">
         <legend>Bonus de Pokémon Écarlate et Violet</legend>
 
-        <span class="one-input" data-method="massoutbreak">
-          <label for="sv-outbreakCleared">Nombre de Pokémon battus dans cette apparition massive :</label>
-          <select name="sv-outbreakCleared" id="sv-outbreakCleared">
-            <option value="0" selected>Entre 0 et 29</option>
-            <option value="1">Entre 30 et 59</option>
-            <option value="2">Plus de 60</option>
-          </select>
-        </span>
+        <input-select name="sv-outbreakCleared" default-value="0" data-method="massoutbreak">
+          <span slot="label">Nombre de Pokémon battus dans cette apparition massive</span>
+          <option value="0">Entre 0 et 29</option>
+          <option value="1">Entre 30 et 59</option>
+          <option value="2">Plus de 60</option>
+        </input-select>
 
-        <span class="one-input">
-          <label for="sv-sparklingPower">Niveau de Rencontre brillante du sandwich actif :</label>
-          <select name="sv-sparklingPower" id="sv-sparklingPower">
-            <option value="0" selected>Aucun</option>
-            <option value="1">Niveau 1</option>
-            <option value="2">Niveau 2</option>
-            <option value="3">Niveau 3</option>
-          </select>
-        </span>
+        <input-select name="sv-sparklingPower" default-value="0">
+          <span slot="label">Niveau de Rencontre brillante du sandwich actif</span>
+          <option value="0">Aucun</option>
+          <option value="1">Niveau 1</option>
+          <option value="2">Niveau 2</option>
+          <option value="3">Niveau 3</option>
+        </input-select>
       </fieldset>
 
 
@@ -114,14 +103,12 @@ template.innerHTML = /*html*/`
       <fieldset data-game="pla">
         <legend>Bonus de Légendes Pokémon: Arceus</legend>
 
-        <span class="one-input">
-          <label for="pla-dexResearch">Niveau de recherche de la page du Pokédex :</label>
-          <select name="pla-dexResearch" id="pla-dexResearch">
-            <option value="0" selected>Page incomplète (niv &lt;9)</option>
-            <option value="1">Page complétée (niv 10)</option>
-            <option value="2">Page complétée à 100%</option>
-          </select>
-        </span>
+        <input-select name="pla-dexResearch" default-value="0">
+          <span slot="label">Niveau de recherche de la page du Pokédex</span>
+          <option value="0">Page incomplète (niv &lt;9)</option>
+          <option value="1">Page complétée (niv 10)</option>
+          <option value="2">Page complétée à 100%</option>
+        </input-select>
       </fieldset>
 
 
@@ -129,10 +116,9 @@ template.innerHTML = /*html*/`
       <fieldset data-game="swsh">
         <legend>Bonus de Pokémon Épée et Bouclier</legend>
 
-        <span class="one-input">
-          <label for="swsh-dexKo">Compteur de KO du Pokédex :</label>
-          <input type="text" name="swsh-dexKo" id="swsh-dexKo" inputmode="numeric" pattern="[0-9]*" value="0">
-        </span>
+        <text-field name="swsh-dexKo" inputmode="numeric" pattern="[0-9]*" default-value="0">
+          <span slot="label">Compteur de KO du Pokédex</span>
+        </text-field>
       </fieldset>
 
 
@@ -140,25 +126,16 @@ template.innerHTML = /*html*/`
       <fieldset data-game="lgpe">
         <legend>Bonus de Pokémon Let's Go Pikachu et Évoli</legend>
 
-        <span class="one-input" data-method="wild">
-          <label for="lgpe-catchCombo">Combo Capture :</label>
-          <select name="lgpe-catchCombo" id="lgpe-catchCombo">
-            <option value="0" selected>Entre 0 et 10</option>
-            <option value="1">Entre 11 et 20</option>
-            <option value="2">Entre 21 et 30</option>
-            <option value="3">Plus de 31</option>
-          </select>
-        </span>
+        <input-select name="lgpe-catchCombo" default-value="0" data-method="wild">
+          <span slot="label">Combo Capture</span>
+          <option value="0">Entre 0 et 10</option>
+          <option value="1">Entre 11 et 20</option>
+          <option value="2">Entre 21 et 30</option>
+          <option value="3">Plus de 31</option>
+        </input-select>
 
-        <span class="one-input">
-          <input type="checkbox" name="lgpe-lure" id="lgpe-lure" value="1">
-          <label for="lgpe-lure">Parfum utilisé</label>
-        </span>
-
-        <span class="one-input" data-method="wild">
-          <input type="checkbox" name="lgpe-nextSpawn" id="lgpe-nextSpawn" value="1">
-          <label for="lgpe-nextSpawn">Le chromatique est apparu immédiatement après avoir augmenté le Combo Capture</label>
-        </span>
+        <check-box name="lgpe-lure">Parfum utilisé</check-box>
+        <check-box name="lgpe-nextSpawn" data-method="wild">Le chromatique est apparu immédiatement après avoir augmenté le Combo Capture</check-box>
       </fieldset>
 
 
@@ -166,20 +143,17 @@ template.innerHTML = /*html*/`
       <fieldset data-game="usum">
         <legend>Bonus de Pokémon Ultra-Soleil et Ultra-Lune</legend>
 
-        <span class="one-input" data-method="ultrawormhole">
-          <label for="usum-distance">Distance :</label>
-          <input type="text" name="usum-distance" id="usum-distance" inputmode="numeric" pattern="[0-9]*" value="0">
-        </span>
+        <text-field name="usum-distance" inputmode="numeric" pattern="[0-9]*" default-value="0" data-method="ultra-wormhole">
+          <span slot="label">Distance</span>
+        </text-field>
 
-        <span class="one-input" data-method="ultrawormhole">
-          <label for="usum-rings">Anneaux :</label>
-          <select name="usum-rings" id="usum-rings">
-            <option selected>0</option>
-            <option>1</option>
-            <option>2</option>
-            <option>3</option>
-          </select>
-        </span>
+        <input-select name="usum-rings" default-value="0" data-method="ultrawormhole">
+          <span slot="label">Anneaux</span>
+          <option>0</option>
+          <option>1</option>
+          <option>2</option>
+          <option>3</option>
+        </input-select>
       </fieldset>
 
 
@@ -204,10 +178,9 @@ template.innerHTML = /*html*/`
       <fieldset class="capture-data">
         <legend>Données de la capture</legend>
 
-        <span class="one-input">
-          <label for="name">Surnom :</label>
-          <input type="text" name="name" id="name">
-        </span>
+        <text-field name="name">
+          <span slot="label">Surnom</span>
+        </text-field>
 
         <span class="one-input">
           <label for="catchTime">Date de capture :</label>
@@ -397,10 +370,7 @@ template.innerHTML = /*html*/`
       <fieldset>
         <legend>Informations additionnelles</legend>
 
-        <span class="one-input">
-          <label for="notes">Notes :</label>
-          <textarea name="notes" id="notes" rows="4" cols="40"></textarea>
-        </span>
+        <text-area name="notes">Notes</text-area>
       </fieldset>
 
 

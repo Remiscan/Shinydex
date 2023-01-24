@@ -8,6 +8,7 @@ import { Notif } from '../../notification.js';
 import { InputSelect } from '../inputSelect.js';
 import { pokemonSprite } from '../pokemon-sprite/pokemonSprite.js';
 import { TextField } from '../textField.js';
+import { TextArea } from '../textArea.js';
 import template from './template.js';
 // @ts-expect-error
 import materialIconsSheet from '../../../../ext/material_icons.css' assert { type: 'css' };
@@ -20,6 +21,7 @@ import commonSheet from '../../../../styles/common.css' assert { type: 'css' };
 import { gameStrings, isSupportedGameID, isSupportedLang, isSupportedMethodID, methodStrings, pokemonData } from '../../jsonData.js';
 // @ts-expect-error
 import sheet from './styles.css' assert { type: 'css' };
+import { CheckBox } from '../checkBox.js';
 
 
 
@@ -244,13 +246,19 @@ export class huntCard extends HTMLElement {
         } break;
 
         case 'name': {
-          if (!(input instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
+          if (!(input instanceof TextField)) {
+            console.error(new TypeError(`Expecting TextField`));
+            continue;
+          }
           const value = String(hunt[prop]);
           input.value = value;
         } break;
 
         case 'notes': {
-          if (!(input instanceof HTMLTextAreaElement)) throw new TypeError(`Expecting HTMLTextAreaElement`);
+          if (!(input instanceof TextArea)) {
+            console.error(new TypeError(`Expecting TextArea`));
+            continue;
+          }
           const value = String(hunt[prop]);
           input.value = value;
         } break;
@@ -266,7 +274,10 @@ export class huntCard extends HTMLElement {
         } break;
 
         case 'charm': {
-          if (!(input instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
+          if (!(input instanceof CheckBox)) {
+            console.error(new TypeError(`Expecting Checkbox`));
+            continue;
+          }
           const value = hunt[prop];
           input.checked = value;
         } break;
@@ -277,10 +288,12 @@ export class huntCard extends HTMLElement {
           input.value = String(value['encounters'] || 0);
 
           for (const compteurProp of compteurProps) {
-            const input = this.shadow.querySelector(`input[name="${compteurProp}"], select[name="${compteurProp}"]`);
-            if (!(input instanceof HTMLInputElement) && !(input instanceof HTMLSelectElement)) throw new TypeError(`Expecting HTMLInputElement or HTMLSelectElement`);
+            const input = this.shadow.querySelector(`[name="${compteurProp}"]`);
+            if (!(input instanceof TextField) && !(input instanceof InputSelect) && !(input instanceof CheckBox)) {
+              throw new TypeError(`Expecting TextField, InputSelect or CheckBox`);
+            }
             const propValue = String(value[compteurProp] || 0);
-            if (input instanceof HTMLInputElement && input.type === 'checkbox') input.checked = input.value === propValue;
+            if (input instanceof CheckBox) input.checked = input.value === propValue;
             else input.value = propValue;
           }
         } break;
