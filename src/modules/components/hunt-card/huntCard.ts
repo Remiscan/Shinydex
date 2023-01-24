@@ -236,7 +236,8 @@ export class huntCard extends HTMLElement {
         } break;
 
         case 'forme':
-        case 'ball': {
+        case 'ball':
+        case 'gene': {
           if (!(input instanceof InputSelect)) {
             console.error(new TypeError(`Expecting InputSelect`));
             continue;
@@ -263,16 +264,6 @@ export class huntCard extends HTMLElement {
           input.value = value;
         } break;
 
-        case 'gene':
-        case 'originMark': {
-          const value = hunt[prop];
-          const input = this.shadow.querySelector(`input[name="${prop}"][value="${value}"]`);
-          // If no corresponding input exists, don't throw and simply don't select any option.
-          if (input instanceof HTMLInputElement) {
-            input.checked = true;
-          }
-        } break;
-
         case 'charm': {
           if (!(input instanceof CheckBox)) {
             console.error(new TypeError(`Expecting Checkbox`));
@@ -283,7 +274,7 @@ export class huntCard extends HTMLElement {
         } break;
 
         case 'count': {
-          if (!(input instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
+          if (!(input instanceof TextField)) throw new TypeError(`Expecting TextField`);
           const value = hunt.count;
           input.value = String(value['encounters'] || 0);
 
@@ -299,14 +290,14 @@ export class huntCard extends HTMLElement {
         } break;
 
         case 'catchTime': {
-          if (!(input instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
+          if (!(input instanceof TextField)) throw new TypeError(`Expecting TextField`);
           const value = hunt.catchTime || 0;
           const date = (new Date(value)).toISOString().split('T')[0];
           input.value = date;
         } break;
 
         case 'caught': {
-          if (!(input instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
+          if (!(input instanceof CheckBox)) throw new TypeError(`Expecting CheckBox`);
           const value = hunt.caught;
           input.checked = value;
           const form = this.shadow.querySelector('form');
@@ -366,11 +357,11 @@ export class huntCard extends HTMLElement {
 
         case 'count': {
           const compteur: Shiny['count'] = new Count({
-            encounters: Number(value) || 0
+            encounters: Math.max(0, Math.min(Number(value) || 0, 999999))
           });
 
           for (const compteurProp of compteurProps) {
-            const val = parseInt(String(formData.get(compteurProp))) || 0;
+            const val = Math.max(0, Math.min(parseInt(String(formData.get(compteurProp))) || 0, 999999));
             if (val > 0) compteur[compteurProp] = val;
           }
 
@@ -428,20 +419,23 @@ export class huntCard extends HTMLElement {
     
     const gameIcon = this.shadow.querySelector(`[data-icon^="game"]`)!;
     if (hunt.game) {
-      gameIcon.classList.add('icon');
       gameIcon.setAttribute('data-icon', `game/${hunt.game}`);
     } else {
-      gameIcon.classList.remove('icon');
       gameIcon.setAttribute('data-icon', 'game');
     }
 
     const ballIcon = this.shadow.querySelector(`[data-icon^="ball"]`)!;
     if (hunt.ball) {
-      ballIcon.classList.add('icon');
       ballIcon.setAttribute('data-icon', `ball/${hunt.ball}`);
     } else {
-      ballIcon.classList.remove('icon');
       ballIcon.setAttribute('data-icon', 'ball');
+    }
+
+    const geneIcon = this.shadow.querySelector('[data-icon^="gene"]')!;
+    if (hunt.gene) {
+      geneIcon.setAttribute('data-icon', `gene/${hunt.gene}`);
+    } else {
+      geneIcon.setAttribute('data-icon', 'gene');
     }
 
     const sprite = this.shadow.querySelector('pokemon-sprite')!;
@@ -478,13 +472,13 @@ export class huntCard extends HTMLElement {
     if (!(form instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
 
     // Active les boutons d'incrémentation du compteur
-    const inputCompteur = this.shadow.querySelector('input[name="count"]');
-    if (!(inputCompteur instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
+    const inputCompteur = this.shadow.querySelector('[name="count"]');
 
     this.handlers.counterAdd = {
       element: this.shadow.querySelector('button.counter.add'),
       type: 'click',
       function: event => {
+        if (!(inputCompteur instanceof TextField)) throw new TypeError(`Expecting TextField`);
         const value = Number(inputCompteur.value);
         const newValue = Math.min(value + 1, 999999);
         inputCompteur.value = String(newValue);
@@ -497,6 +491,7 @@ export class huntCard extends HTMLElement {
       element: this.shadow.querySelector('button.counter.sub'),
       type: 'click',
       function: event => {
+        if (!(inputCompteur instanceof TextField)) throw new TypeError(`Expecting TextField`);
         const value = Number(inputCompteur.value);
         const newValue = Math.max(value - 1, 0);
         inputCompteur.value = String(newValue);
@@ -507,19 +502,19 @@ export class huntCard extends HTMLElement {
 
     // Active le bouton "capturé"
     this.handlers.caught = {
-      element: this.shadow.querySelector('input[name="caught"]'),
+      element: this.shadow.querySelector('[name="caught"]'),
       type: 'change',
       function: async event => {
         if (!form.checkValidity()) {
-          if (!(event.currentTarget instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
+          if (!(event.currentTarget instanceof CheckBox)) throw new TypeError(`Expecting CheckBox`);
           event.currentTarget.checked = false;
           form.dispatchEvent(new Event('change'));
           return;
         }
 
         form.classList.toggle('caught');
-        const inputDate = this.shadow.querySelector('input[name="catchTime"]');
-        if (!(inputDate instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
+        const inputDate = this.shadow.querySelector('[name="catchTime"]');
+        if (!(inputDate instanceof TextField)) throw new TypeError(`Expecting TextField`);
         const sprite: pokemonSprite | null = this.shadow.querySelector('pokemon-sprite');
   
         if (form.classList.contains('caught')) {

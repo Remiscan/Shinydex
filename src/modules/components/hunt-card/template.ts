@@ -44,7 +44,7 @@ template.innerHTML = /*html*/`
         </input-select>
 
         <input-select name="game" icons="leading" required>
-          <span slot="leading-icon" data-icon="game"></span>
+          <span slot="leading-icon" class="icon" data-icon="game"></span>
           <span slot="label">Jeu</span>
         </input-select>
 
@@ -62,7 +62,9 @@ template.innerHTML = /*html*/`
           <button type="button" class="counter sub">
             <span class="material-icons">remove</span>
           </button>
-          <input type="number" name="count" id="count" min="0" max="999999" value="0">
+          <text-field name="count" inputmode="numeric" pattern="[0-9]*" default-value="0">
+            <span slot="label">Rencontres</span>
+          </text-field>
           <button type="button" class="counter add">
             <span class="material-icons">add</span>
           </button>
@@ -169,8 +171,7 @@ template.innerHTML = /*html*/`
           <span>Annuler les modifications</span>
         </button>
 
-        <input type="checkbox" name="caught" id="caught">
-        <label for="caught">Capturé</label>
+        <check-box name="caught">Capturé</check-box>
       </div>
 
 
@@ -182,13 +183,12 @@ template.innerHTML = /*html*/`
           <span slot="label">Surnom</span>
         </text-field>
 
-        <span class="one-input">
-          <label for="catchTime">Date de capture :</label>
-          <input type="date" name="catchTime" id="catchTime">
-        </span>
+        <text-field name="catchTime" type="date">
+          <span slot="label">Date de capture</span>
+        </text-field>
 
-        <input-select name="ball" default-value="poke" icons="leading" required>
-          <span slot="leading-icon" data-icon="ball"></span>
+        <input-select name="ball" default-value="poke" icons="leading">
+          <span slot="leading-icon" class="icon" data-icon="ball"></span>
           <span slot="label">Capturé dans une</span>
           <option value="lure">Appât Ball</option>
           <option value="repeat">Bis Ball</option>
@@ -230,140 +230,13 @@ template.innerHTML = /*html*/`
         </input-select>
       </fieldset>
 
-
-      <!-- Origine -->
-      <fieldset data-checkmark-unsure class="single">
-        <legend>Marque d'origine</legend>
-
-        <span class="one-input">
-          <input type="radio" name="originMark" id="checkmark-none" value="old" checked>
-          <label for="checkmark-none">
-            <span>
-              Autre
-              <span class="icon" data-icon="origin-mark/old"></span>
-            </span>
-          </label>
-        </span>
-
-        <span class="one-input" data-game="sv">
-          <input type="radio" name="originMark" id="checkmark-paldea" value="paldea">
-          <label for="checkmark-paldea">
-            <span>
-              Paldea
-              <span class="icon" data-icon="origin-mark/paldea"></span>
-            </span>
-          </label>
-        </span>
-
-        <span class="one-input" data-game="pla">
-          <input type="radio" name="originMark" id="checkmark-hisui" value="hisui">
-          <label for="checkmark-hisui">
-            <span>
-              Hisui
-              <span class="icon" data-icon="origin-mark/hisui"></span>
-            </span>
-          </label>
-        </span>
-
-        <span class="one-input" data-game="bdsp">
-          <input type="radio" name="originMark" id="checkmark-bdsp" value="sinnoh-gen8">
-          <label for="checkmark-bdsp">
-            <span>
-              Sinnoh (DÉ/PS)
-              <span class="icon" data-icon="origin-mark/sinnoh-gen8"></span>
-            </span>
-          </label>
-        </span>
-
-        <span class="one-input" data-game="swsh">
-          <input type="radio" name="originMark" id="checkmark-galar" value="galar">
-          <label for="checkmark-galar">
-            <span>
-              Galar
-              <span class="icon" data-icon="origin-mark/galar"></span>
-            </span>
-          </label>
-        </span>
-
-        <span class="one-input" data-game="lgpe">
-          <input type="radio" name="originMark" id="checkmark-letsgo" value="lets-go">
-          <label for="checkmark-letsgo">
-            <span>
-              Kanto (Let's Go)
-              <span class="icon" data-icon="origin-mark/lets-go"></span>
-            </span>
-          </label>
-        </span>
-
-        <span class="one-input" data-game="sm usum">
-          <input type="radio" name="originMark" id="checkmark-alola" value="alola">
-          <label for="checkmark-alola">
-            <span>
-              Alola
-              <span class="icon" data-icon="origin-mark/alola"></span>
-            </span>
-          </label>
-        </span>
-
-        <span class="one-input" data-game="xy oras">
-          <input type="radio" name="originMark" id="checkmark-kalos" value="gen6">
-          <label for="checkmark-kalos">
-            <span>
-              Kalos
-              <span class="icon" data-icon="origin-mark/gen6"></span>
-            </span>
-          </label>
-        </span>
-
-        <span class="one-input" data-game="rb yellow gs crystal">
-          <input type="radio" name="originMark" id="checkmark-vc" value="game-boy">
-          <label for="checkmark-vc">
-            <span>
-              Console Virtuelle
-              <span class="icon" data-icon="origin-mark/game-boy"></span>
-            </span>
-          </label>
-        </span>
-
-        <span class="one-input" data-game="go">
-          <input type="radio" name="originMark" id="checkmark-go" value="go">
-          <label for="checkmark-go">
-            <span>
-              Pokémon GO
-              <span class="icon" data-icon="origin-mark/go"></span>
-            </span>
-          </label>
-        </span>
-      </fieldset>
-
-      <fieldset data-game="swsh pla" class="single">
-        <legend>Gène</legend>
-
-        <span class="one-input">
-          <input type="radio" name="gene" id="gene-none" value="" checked>
-          <label for="gene-none">Aucun</label>
-        </span>
-
-        <span class="one-input" data-game="swsh">
-          <input type="radio" name="gene" id="gene-gigamax" value="gigamax">
-          <label for="gene-gigamax">
-            <span>
-              Gigamax
-              <span class="icon" data-icon="gene/gigantamax"></span>
-            </span>
-          </label>
-        </span>
-
-        <span class="one-input" data-game="pla">
-          <input type="radio" name="gene" id="gene-alpha" value="alpha">
-          <label for="gene-alpha">
-            <span>
-              Baron
-              <span class="icon" data-icon="gene/alpha"></span>
-            </span>
-          </label>
-        </span>
-      </fieldset>
+      <input-select name="gene" default-value="" icons="leading" data-game="swsh pla">
+        <span slot="leading-icon" class="icon" data-icon="gene"></span>
+        <span slot="label">Gène</span>
+        <option value="">Aucun</option>
+        <option value="gigantamax">Gigamax</option>
+        <option value="alpha">Baron</option>
+      </input-select>
 
 
       <!-- Notes -->
