@@ -205,11 +205,11 @@
 
     <!-- Menu de filtres -->
     <section id="filter-menu">
-      <filter-menu data-section="mes-chromatiques" class="surface primary shadow elevation-3"></filter-menu>
-      <filter-menu data-section="chasses-en-cours" class="surface primary shadow elevation-3"></filter-menu>
-      <filter-menu data-section="corbeille" class="surface primary shadow elevation-3"></filter-menu>
-      <filter-menu data-section="partage" class="surface primary shadow elevation-3"></filter-menu>
-      <filter-menu data-section="chromatiques-ami" class="surface primary shadow elevation-3"></filter-menu>
+      <filter-menu data-section="mes-chromatiques" class="surface variant primary shadow elevation-2"></filter-menu>
+      <filter-menu data-section="chasses-en-cours" class="surface variant primary shadow elevation-2"></filter-menu>
+      <filter-menu data-section="corbeille" class="surface variant primary shadow elevation-2"></filter-menu>
+      <filter-menu data-section="partage" class="surface variant primary shadow elevation-2"></filter-menu>
+      <filter-menu data-section="chromatiques-ami" class="surface variant primary shadow elevation-2"></filter-menu>
     </section>
 
     <!-- Misc top layer -->

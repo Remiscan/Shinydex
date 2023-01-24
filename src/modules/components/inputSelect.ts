@@ -35,7 +35,7 @@ template.innerHTML = /*html*/`
       <div
         role="listbox"
         id="options-list"
-        class="surface primary shadow elevation-3 mobile-centered select-menu"
+        class="surface variant primary shadow elevation-2 select-menu"
         style="
           padding: 4px;
           display: flex;
