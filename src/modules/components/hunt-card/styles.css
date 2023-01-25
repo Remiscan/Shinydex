@@ -65,10 +65,14 @@ legend.invisible {
 
 pokemon-sprite {
   grid-column: 1;
-  grid-row: 2;
+  grid-row: 1 / -1;
   --distance-to-parent-border: 8px;
   border-radius: var(--sub-border-radius);
   padding: 4px;
+}
+
+form[data-edit] pokemon-sprite {
+  grid-row: 2;
 }
 
 .intro > fieldset {
