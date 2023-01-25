@@ -88,7 +88,7 @@ form[data-edit] pokemon-sprite {
 
 [name="dexid"] {
   flex-grow: 1;
-  flex-basis: calc(2 * 16px + 12ch);
+  flex-basis: 12ch;
 }
 
 [name="dexid"]::part(input) {
@@ -97,30 +97,22 @@ form[data-edit] pokemon-sprite {
 
 [name="forme"] {
   flex-grow: 1;
-  flex-basis: calc(2 * 16px + 20ch);
+  flex-basis: 12ch;
 }
 
 [name="game"] {
-  flex-grow: 2;
-  flex-basis: calc(2 * 16px + 32px + 25ch);
+  flex-grow: 3;
+  flex-basis: 20ch;
 }
 
 [name="method"] {
-  flex-grow: 2;
-  flex-basis: calc(2 * 16px + 30ch);
-}
-
-/* Encounters */
-
-fieldset[name="encounters"] {
-  flex-grow: 1;
-  flex-basis: calc(2 * 40px + 2 * 8px + 2 * 16px + 10ch);
-  margin: auto;
-  flex-wrap: nowrap;
+  flex-grow: 3;
+  flex-basis: 20ch;
 }
 
 [name="count"] {
-  flex-basis: 100%;
+  flex-grow: 1;
+  flex-basis: 5ch;
 }
 
 text-field > button {
