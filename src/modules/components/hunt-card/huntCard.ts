@@ -662,20 +662,23 @@ export class huntCard extends HTMLElement {
     if (!(select instanceof InputSelect)) throw new TypeError(`Expecting InputSelect`);
 
     select.querySelectorAll('option').forEach(option => option.remove());
+    select.removeAttribute('default-label');
 
     const allNames = Pokemon.names();
     const k = allNames.findIndex(p => p == value.toLowerCase());
     if (k == -1) return 'Pokémon inexistant';
 
     select.setAttribute('value', formeToSelect ?? ''); // set initial value before regenerating the options
-    //select.setAttribute('default-label', 'Choisir une forme');
 
     const pkmn = pokemonData[k];
     const formes = pkmn.formes.slice().sort((a: Forme, b: Forme) => { if (a.nom == '') return -1; else return 0;});
+    let availableChoices = 0;
     for (const forme of formes) {
       if ('noShiny' in forme && forme.noShiny == true) continue;
       select.innerHTML += `<option value="${forme.dbid}">${forme.nom || 'Forme normale'}</option>`;
+      availableChoices++;
     }
+    if (availableChoices > 0) select.setAttribute('default-label', 'Choisir une forme');
   }
 
 
@@ -688,14 +691,15 @@ export class huntCard extends HTMLElement {
     if (!(select instanceof InputSelect)) throw new TypeError(`Expecting InputSelect`);
 
     select.querySelectorAll('option').forEach(option => option.remove());
+    select.removeAttribute('default-label');
 
     const gameid = Pokemon.jeux.find(jeu => jeu.uid === game)?.id;
     if (!gameid) return;
     
     select.setAttribute('value', methodToSelect ?? 'wild'); // set initial value before regenerating the options
-    //select.setAttribute('default-label', 'Choisir une méthode');
 
     const lang = document.documentElement.getAttribute('lang') ?? Params.defaultLang;
+    let availableChoices = 0;
     for (const methode of Shiny.allMethodes) {
       const gameIds = new Set(methode.jeux.map(jeu => jeu.id));
       if (!(gameIds.has(gameid))) continue;
@@ -704,7 +708,9 @@ export class huntCard extends HTMLElement {
         nom = methodStrings[lang][methode.id];
       }
       select.innerHTML += `<option value="${methode.id}">${nom}</option>`;
+      availableChoices++;
     }
+    if (availableChoices > 0) select.setAttribute('default-label', 'Choisir une méthode');
   }
 
 
