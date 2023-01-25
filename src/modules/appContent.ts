@@ -3,7 +3,7 @@ import { Pokemon } from './Pokemon.js';
 import { Shiny } from './Shiny.js';
 import { huntCard } from './components/hunt-card/huntCard.js';
 import { shinyCard } from './components/shiny-card/shinyCard.js';
-import { computedOrders } from './filtres.js';
+import { computeOrders, updateCounters } from './filtres.js';
 import { lazyLoad } from './lazyLoading.js';
 import { friendStorage, huntStorage, localForageAPI, shinyStorage } from './localForage.js';
 import { navigate } from './navigate.js';
@@ -34,7 +34,8 @@ async function populateHandler(section: PopulatableSection, _ids?: string[]): Pr
   const ids = _ids ?? await dataStore.keys();
   const populated = await populateFromData(section, ids);
 
-  computedOrders(section, ids);
+  computeOrders(section, ids);
+  updateCounters(section);
 
   return populated;
 }
@@ -119,6 +120,12 @@ export async function populateFromData(section: PopulatableSection, ids: string[
   // Plaçons les cartes sur la page
   // (après la préparation pour optimiser le temps d'exécution)
   const conteneur = document.querySelector(`#${section} > .section-contenu`)!;
+
+  // Évite un bref moment où une carte est affichée en même temps que le message de section vide
+  if (conteneur.parentElement?.classList.contains('vide') && cardsToCreate.length > 0) {
+    conteneur.parentElement.classList.remove('vide');
+  }
+
   await Promise.all(cardsToCreate.map(async card => {
     conteneur.appendChild(card);
     await card.dataToContent();

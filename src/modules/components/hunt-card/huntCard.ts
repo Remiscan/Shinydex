@@ -131,6 +131,13 @@ export class huntCard extends HTMLElement {
       if (hunt.isEmpty()) {
         await huntStorage.removeItem(this.huntid);
         this.remove();
+
+        window.dispatchEvent(new CustomEvent('dataupdate', {
+          detail: {
+            sections: ['chasses-en-cours'],
+            ids: [],
+          }
+        }));
       }
 
       // Sinon, on déplace la chasse dans la corbeille

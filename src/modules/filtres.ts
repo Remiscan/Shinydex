@@ -239,7 +239,7 @@ async function orderPokemon(pokemonList: Shiny[] | Hunt[], order: ordre): Promis
  * Computes the order of cards when comparing all cards is needed,
  * i.e. when knowing the properties of the card itself isn't enough to quantize its order among all cards.
  */
-export async function computedOrders(section: FiltrableSection, ids: string[]): Promise<void> {
+export async function computeOrders(section: FiltrableSection, ids: string[]): Promise<void> {
   let dataStore: localForageAPI;
   let dataClass: (typeof Shiny) | (typeof Hunt);
   switch (section) {
