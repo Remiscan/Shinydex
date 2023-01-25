@@ -39,16 +39,16 @@ template.innerHTML = /*html*/`
           <datalist id="datalist-pokedex"></datalist>
         </text-field>
 
-        <input-select name="forme" default-value="">
+        <input-select name="forme" default-value="" default-label="Choisir une forme">
           <span slot="label">Forme</span>
         </input-select>
 
-        <input-select name="game" icons="leading" required>
+        <input-select name="game" icons="leading" default-label="Choisir un jeu" required>
           <span slot="leading-icon" class="icon" data-icon="game"></span>
           <span slot="label">Jeu</span>
         </input-select>
 
-        <input-select name="method" default-value="wild">
+        <input-select name="method" default-value="wild" default-label="Choisir une méthode">
           <span slot="label">Méthode</span>
         </input-select>
       </fieldset>

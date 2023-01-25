@@ -219,6 +219,7 @@ export class InputSelect extends TextField {
   static sheets = [...TextField.sheets, sheet];
   static attributes = ['disabled', 'multiple', 'name', 'required', 'size', 'value'];
   static defaultValue = 'null';
+  static defaultLabel = '⋯'; // label displayed on the button when no option is selected
   #initialSlotsAssigned = false; // to check if options need to be generated from slot in connectedCallback
   #optionsList: HTMLElement | undefined; // to retain control over the options list when it's promoted to the top layer
   #button: HTMLElement | undefined;
@@ -310,10 +311,7 @@ export class InputSelect extends TextField {
   // Opens the options list in the top layer, and listens for its changes.
   buttonClickHandler = (event: Event) => {
     if (!this.isOpen) this.open(false);
-    else {
-      //this.focusedIndex = this.valueIndex;
-      this.close(false);
-    }
+    else this.close(false);
   };
 
 
@@ -397,17 +395,6 @@ export class InputSelect extends TextField {
     this.#searchTimeout = setTimeout(() => this.#searchString = '', 500);
     this.#searchString += char;
     return this.#searchString;
-  }
-
-
-  // Opens or closes the select menu
-  toggleMenu(open: boolean, restoreFocus = true) {
-    if (this.isOpen === open) return;
-
-    if (open) this.open();
-    else      this.close();
-
-    if (restoreFocus) this.button?.focus();
   }
 
 
@@ -553,8 +540,6 @@ export class InputSelect extends TextField {
       const option = allOptions[k];
       if (!(option instanceof HTMLElement)) continue;
       if (k === key) {
-        /*option.tabIndex = 0;
-        option.focus();*/
         option.classList.add('focused');
         const button = this.button;
         button?.setAttribute('aria-activedescendant', `option-${k}`);
@@ -564,7 +549,6 @@ export class InputSelect extends TextField {
         if (!isElementInView(option)) option.scrollIntoView( { behavior: 'smooth', block: 'nearest' });
       }
       else {
-        //option.tabIndex = -1;
         option.classList.remove('focused');
       }
     }
@@ -646,12 +630,16 @@ export class InputSelect extends TextField {
     return this.getLabel(this.value);
   }
 
+  get defaultLabel(): string {
+    return this.getAttribute('default-label') ?? (this.constructor as typeof InputSelect).defaultLabel;
+  }
+
   get valueIndex(): number {
     return this.indexOf(this.value);
   }
 
   getLabel(val: string | null): string {
-    let label = '⋯';
+    let label = this.defaultLabel;
     if (val !== null) label = this.labels.get(val) ?? label;
     return label;
   }

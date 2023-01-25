@@ -655,7 +655,7 @@ export class huntCard extends HTMLElement {
     if (!(select instanceof InputSelect)) throw new TypeError(`Expecting InputSelect`);
 
     select.querySelectorAll('option').forEach(option => option.remove());
-    select.setAttribute('value', formeToSelect ?? '');
+    select.setAttribute('value', formeToSelect ?? ''); // set initial value before regenerating the options
 
     const allNames = Pokemon.names();
     const k = allNames.findIndex(p => p == value.toLowerCase());
@@ -680,7 +680,7 @@ export class huntCard extends HTMLElement {
     if (!(select instanceof InputSelect)) throw new TypeError(`Expecting InputSelect`);
 
     select.querySelectorAll('option').forEach(option => option.remove());
-    select.setAttribute('value', methodToSelect ?? 'wild');
+    select.setAttribute('value', methodToSelect ?? 'wild'); // set initial value before regenerating the options
 
     const gameid = Pokemon.jeux.find(jeu => jeu.uid === game)?.id;
     if (!gameid) return;
