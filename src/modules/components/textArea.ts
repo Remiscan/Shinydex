@@ -5,7 +5,7 @@ import { TextField } from './textField.js';
 const template = document.createElement('template');
 template.innerHTML = /*html*/`
   <form>
-    <label class="text-field surface variant interactive" part="container">
+    <label class="text-field surface standard elevation-2 interactive" part="container">
       <span class="leading-icon">
         <slot name="leading-icon"></slot>
       </span>
@@ -36,6 +36,12 @@ export class TextArea extends TextField {
   static template = template;
   static sheets = [...TextField.sheets, sheet];
   static attributes = ['autocomplete', 'autocorrect', 'cols', 'disabled', 'maxlength', 'minlength', 'name', 'placeholder', 'readonly', 'required', 'rows', 'spellcheck', 'wrap'];
+
+
+  get input(): any {
+    const input = this.shadow.querySelector('textarea');
+    return input;
+  }
 }
 
 if (!customElements.get('text-area')) customElements.define('text-area', TextArea);

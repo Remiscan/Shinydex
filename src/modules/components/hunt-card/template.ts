@@ -9,37 +9,21 @@ import '../textField.js';
 const template = document.createElement('template');
 template.innerHTML = /*html*/`
   <form class="surface variant">
-    <div class="container surface standard elevation-2">
-      <datalist id="datalist-pokedex"></datalist>
+    <div class="intro">
+      <span data-edit class="edit-notice label-big surface standard elevation-2">Modification</span>
 
-      <span data-edit class="edit-notice">Modification</span>
-
-      <!--
-      <input type="text" name="Test0" required>
-
-      <text-field name="Test1" icons="leading trailing" required>
-        <span slot="leading-icon" class="material-icons">search</span>
-        <span slot="label">Label</span>
-      </text-field>
-
-      <text-area name="Test6">
-        <span slot="label">Text area</span>
-      </text-area>
-      -->
-
+      <pokemon-sprite size="112" class="surface standard elevation-2"></pokemon-sprite>
 
       <!-- Espèce, forme -->
-      <fieldset class="intro">
-        <legend>Pokémon, jeu et méthode</legend>
-
-        <pokemon-sprite size="112"></pokemon-sprite>
+      <fieldset name="which-pokemon">
+        <legend class="invisible">Pokémon, jeu et méthode</legend>
 
         <text-field name="dexid" required list="datalist-pokedex" autocomplete="off" spellcheck="false" placeholder="Bulbizarre">
           <span slot="label">Espèce</span>
           <datalist id="datalist-pokedex"></datalist>
         </text-field>
 
-        <input-select name="forme" default-value="" default-label="Choisir une forme">
+        <input-select name="forme" default-value="">
           <span slot="label">Forme</span>
         </input-select>
 
@@ -48,33 +32,41 @@ template.innerHTML = /*html*/`
           <span slot="label">Jeu</span>
         </input-select>
 
-        <input-select name="method" default-value="wild" default-label="Choisir une méthode">
-          <span slot="label">Méthode</span>
+        <input-select name="method" default-value="wild">
+          <span slot="label">Méthode de chasse</span>
         </input-select>
-      </fieldset>
 
+        <!-- Compteur de rencontres -->
+        <fieldset name="encounters">
+          <legend class="invisible">Compteur de rencontres</legend>
 
-      <!-- Compteur de rencontres -->
-      <fieldset>
-        <legend>Compteur de rencontres</legend>
-
-        <span class="one-input">
-          <button type="button" class="counter sub">
-            <span class="material-icons">remove</span>
-          </button>
-          <text-field name="count" inputmode="numeric" pattern="[0-9]*" default-value="0">
+          <text-field name="count" inputmode="numeric" pattern="[0-9]*" default-value="0" icons="leading trailing">
             <span slot="label">Rencontres</span>
+            
+            <button slot="leading-icon" type="button" class="surface interactive icon-button only-icon" data-action="count-sub">
+              <span class="material-icons">remove</span>
+            </button>
+
+            <button slot="trailing-icon" type="button" class="surface interactive icon-button only-icon" data-action="count-add">
+              <span class="material-icons">add</span>
+            </button>
           </text-field>
-          <button type="button" class="counter add">
-            <span class="material-icons">add</span>
-          </button>
-        </span>
+        </fieldset>
       </fieldset>
+    </div>
+
+
+    <fieldset name="bonus">
+      <legend>
+        <span class="title-medium">Bonus affectant les chances de rencontrer un Pokémon chromatique</span>
+      </legend>
 
 
       <!-- Bonus globaux -->
       <fieldset>
-        <legend>Bonus globaux</legend>
+        <legend>
+          <span class="title-small">Bonus globaux</span>
+        </legend>
 
         <check-box name="charm">Charme chroma possédé</check-box>
       </fieldset>
@@ -82,7 +74,9 @@ template.innerHTML = /*html*/`
 
       <!-- Bonus de Écarlate / Violet (SV) -->
       <fieldset data-game="sv">
-        <legend>Bonus de Pokémon Écarlate et Violet</legend>
+        <legend>
+          <span class="title-small">Bonus de Pokémon Écarlate et Violet</span>
+        </legend>
 
         <input-select name="sv-outbreakCleared" default-value="0" data-method="massoutbreak">
           <span slot="label">Nombre de Pokémon battus dans cette apparition massive</span>
@@ -103,7 +97,9 @@ template.innerHTML = /*html*/`
 
       <!-- Bonus de Legends Arceus (PLA) -->
       <fieldset data-game="pla">
-        <legend>Bonus de Légendes Pokémon: Arceus</legend>
+        <legend>
+          <span class="title-small">Bonus de Légendes Pokémon: Arceus</span>
+        </legend>
 
         <input-select name="pla-dexResearch" default-value="0">
           <span slot="label">Niveau de recherche de la page du Pokédex</span>
@@ -116,7 +112,9 @@ template.innerHTML = /*html*/`
 
       <!-- Bonus de Épée / Bouclier (SWSH) -->
       <fieldset data-game="swsh">
-        <legend>Bonus de Pokémon Épée et Bouclier</legend>
+        <legend>
+          <span class="title-small">Bonus de Pokémon Épée et Bouclier</span>
+        </legend>
 
         <text-field name="swsh-dexKo" inputmode="numeric" pattern="[0-9]*" default-value="0">
           <span slot="label">Compteur de KO du Pokédex</span>
@@ -126,7 +124,9 @@ template.innerHTML = /*html*/`
 
       <!-- Bonus de Let's Go Pikachu / Évoli (LGPE) -->
       <fieldset data-game="lgpe">
-        <legend>Bonus de Pokémon Let's Go Pikachu et Évoli</legend>
+        <legend>
+          <span class="title-small">Bonus de Pokémon Let's Go Pikachu et Évoli</span>
+        </legend>
 
         <input-select name="lgpe-catchCombo" default-value="0" data-method="wild">
           <span slot="label">Combo Capture</span>
@@ -143,7 +143,9 @@ template.innerHTML = /*html*/`
 
       <!-- Bonus de Ultra Soleil / Lune (USUM) -->
       <fieldset data-game="usum">
-        <legend>Bonus de Pokémon Ultra-Soleil et Ultra-Lune</legend>
+        <legend>
+          <span class="title-small">Bonus de Pokémon Ultra-Soleil et Ultra-Lune</span>
+        </legend>
 
         <text-field name="usum-distance" inputmode="numeric" pattern="[0-9]*" default-value="0" data-method="ultra-wormhole">
           <span slot="label">Distance</span>
@@ -157,18 +159,17 @@ template.innerHTML = /*html*/`
           <option>3</option>
         </input-select>
       </fieldset>
+    </fieldset>
 
 
       <!-- Boutons de capture / annulation -->
       <div class="group button-group capture-button-group">
-        <button type="button" class="hunt-delete danger" data-not-edit>
-          <span class="material-icons" aria-hidden="true">delete</span>
-          <span>Supprimer cette chasse</span>
+        <button type="button" class="surface interactive filled danger only-text elevation-2" data-action="delete-hunt" data-not-edit>
+          <span class="label-large">Supprimer cette chasse</span>
         </button>
 
-        <button type="button" class="edit-cancel ghost danger" data-edit>
-          <span class="material-icons" aria-hidden="true">cancel</span>
-          <span>Annuler les modifications</span>
+        <button type="button" class="surface interactive filled danger only-text elevation-2" data-action="cancel-edit" data-edit>
+          <span class="label-large">Annuler les modifications</span>
         </button>
 
         <check-box name="caught">Capturé</check-box>
@@ -177,11 +178,21 @@ template.innerHTML = /*html*/`
 
       <!-- Surnom, date, ball -->
       <fieldset class="capture-data">
-        <legend>Données de la capture</legend>
+        <legend>
+          <span class="title-medium">Données de la capture</span>
+        </legend>
 
         <text-field name="name" autocomplete="off" spellcheck="false">
           <span slot="label">Surnom</span>
         </text-field>
+
+        <input-select name="gene" default-value="" icons="leading" data-game="swsh pla">
+          <span slot="leading-icon" class="icon" data-icon="gene"></span>
+          <span slot="label">Gène</span>
+          <option value="">Aucun</option>
+          <option value="gigantamax">Gigamax</option>
+          <option value="alpha">Baron</option>
+        </input-select>
 
         <text-field name="catchTime" type="date">
           <span slot="label">Date de capture</span>
@@ -230,36 +241,30 @@ template.innerHTML = /*html*/`
         </input-select>
       </fieldset>
 
-      <input-select name="gene" default-value="" icons="leading" data-game="swsh pla">
-        <span slot="leading-icon" class="icon" data-icon="gene"></span>
-        <span slot="label">Gène</span>
-        <option value="">Aucun</option>
-        <option value="gigantamax">Gigamax</option>
-        <option value="alpha">Baron</option>
-      </input-select>
-
 
       <!-- Notes -->
       <fieldset>
-        <legend>Informations additionnelles</legend>
+        <legend>
+          <span class="title-medium">Informations additionnelles</span>
+        </legend>
 
-        <text-area name="notes">Notes</text-area>
+        <text-area name="notes" rows="3">
+          <span slot="label">Notes</span>
+        </text-area>
       </fieldset>
 
 
       <!-- Boutons supprimer / enregistrer -->
       <div class="group button-group">
-        <button type="button" class="full-delete danger" data-edit>
-          <span class="material-icons" aria-hidden="true">delete_forever</span>
-          <span>Supprimer définitivement</span>
+        <button type="button" class="surface interactive filled danger elevation-2" data-action="delete-shiny" data-edit>
+          <span class="material-icons">delete_forever</span>
+          <span class="label-large">Supprimer ce Pokémon <shiny-stars></shiny-stars></span>
         </button>
 
-        <button type="submit" class="submit">
-          <span class="material-icons" aria-hidden="true">backup</span>
-          <span>Enregistrer dans mes Pokémon <shiny-stars></shiny-stars></span>
+        <button type="button" class="surface interactive filled elevation-2 only-text" data-action="save-shiny">
+          <span class="label-large">Enregistrer dans mes Pokémon <shiny-stars></shiny-stars></span>
         </button>
       </div>
-    </div>
   </form>
 `;
 

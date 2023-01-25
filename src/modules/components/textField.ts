@@ -11,7 +11,7 @@ import commonSheet from '../../../styles/common.css' assert { type: 'css' };
 const template = document.createElement('template');
 template.innerHTML = /*html*/`
   <form>
-    <label class="text-field surface variant interactive" part="container">
+    <label class="text-field surface standard elevation-2 interactive" part="container">
       <span class="leading-icon" aria-hidden="true">
         <slot name="leading-icon"></slot>
       </span>

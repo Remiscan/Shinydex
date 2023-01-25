@@ -29,8 +29,8 @@ const gameIds: Set<string> = new Set(Pokemon.jeux.map(jeu => jeu.id));
 const gameSpecificSheet = new CSSStyleSheet();
 gameSpecificSheet.replaceSync(`
   :host [data-game],:host [data-method] { display: none; }
-  ${[...gameIds].map(id => `:host([data-game="${id}"]) [data-game~="${id}"] { display: var(--display, revert); }`).join('')}
-  ${Shiny.allMethodes.map(m => `:host([data-method="${m.id}"]) [data-method~="${m.id}"] { display: var(--display, revert); }`).join('')}
+  ${[...gameIds].map(id => `:host([data-game="${id}"]) [data-game~="${id}"] { display: flex; }`).join('')}
+  ${Shiny.allMethodes.map(m => `:host([data-method="${m.id}"]) [data-method~="${m.id}"] { display: flex; }`).join('')}
 `);
 
 
@@ -475,7 +475,7 @@ export class huntCard extends HTMLElement {
     const inputCompteur = this.shadow.querySelector('[name="count"]');
 
     this.handlers.counterAdd = {
-      element: this.shadow.querySelector('button.counter.add'),
+      element: this.shadow.querySelector('[data-action="count-add"]'),
       type: 'click',
       function: event => {
         if (!(inputCompteur instanceof TextField)) throw new TypeError(`Expecting TextField`);
@@ -488,7 +488,7 @@ export class huntCard extends HTMLElement {
     handle(this.handlers.counterAdd);
 
     this.handlers.counterSub = {
-      element: this.shadow.querySelector('button.counter.sub'),
+      element: this.shadow.querySelector('[data-action="count-sub"]'),
       type: 'click',
       function: event => {
         if (!(inputCompteur instanceof TextField)) throw new TypeError(`Expecting TextField`);
@@ -533,10 +533,10 @@ export class huntCard extends HTMLElement {
 
     // Active le bouton "annuler"
     this.handlers.cancel = {
-      element: this.shadow.querySelector('button.edit-cancel'),
+      element: this.shadow.querySelector('[data-action="cancel-edit"]'),
       type: 'click',
       function: async event => {
-        const cancelMessage = 'Cette chasse sera supprimée.';
+        const cancelMessage = 'Les modifications seront annulées et cette chasse sera supprimée.';
         if (!(event.currentTarget instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
         const userResponse = await warnBeforeDestruction(event.currentTarget, cancelMessage);
         if (userResponse)  await this.delete();
@@ -546,7 +546,7 @@ export class huntCard extends HTMLElement {
 
     // Active le bouton "supprimer"
     this.handlers.delete = {
-      element: this.shadow.querySelector('button.hunt-delete'),
+      element: this.shadow.querySelector('[data-action="delete-hunt"]'),
       type: 'click',
       function: async event => {
         const cancelMessage = 'Cette chasse sera supprimée.';
@@ -580,7 +580,7 @@ export class huntCard extends HTMLElement {
           new Notif(message).prompt();
           return;
         } else {
-          const boutonSubmit = this.shadow.querySelector('button.submit');
+          const boutonSubmit = this.shadow.querySelector('[data-action="save-shiny"]');
           if (!(boutonSubmit instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
           const userResponse = await warnBeforeDestruction(boutonSubmit, 'Ajouter ce Pokémon à vos chromatiques ?', 'done');
           if (userResponse) await this.submit();
@@ -591,7 +591,7 @@ export class huntCard extends HTMLElement {
 
     // Active le bouton "supprimer"
     this.handlers.deleteShiny = {
-      element: this.shadow.querySelector('button.full-delete'),
+      element: this.shadow.querySelector('[data-action="delete-shiny"]'),
       type: 'click',
       function: async event => {
         const deleteMessage = 'Ce Pokémon chromatique sera supprimé et déplacé dans la corbeille.';
@@ -655,18 +655,19 @@ export class huntCard extends HTMLElement {
     if (!(select instanceof InputSelect)) throw new TypeError(`Expecting InputSelect`);
 
     select.querySelectorAll('option').forEach(option => option.remove());
-    select.setAttribute('value', formeToSelect ?? ''); // set initial value before regenerating the options
 
     const allNames = Pokemon.names();
     const k = allNames.findIndex(p => p == value.toLowerCase());
     if (k == -1) return 'Pokémon inexistant';
-    else {
-      const pkmn = pokemonData[k];
-      const formes = pkmn.formes.slice().sort((a: Forme, b: Forme) => { if (a.nom == '') return -1; else return 0;});
-      for (const forme of formes) {
-        if ('noShiny' in forme && forme.noShiny == true) continue;
-        select.innerHTML += `<option value="${forme.dbid}">${forme.nom || 'Forme normale'}</option>`;
-      }
+
+    select.setAttribute('value', formeToSelect ?? ''); // set initial value before regenerating the options
+    //select.setAttribute('default-label', 'Choisir une forme');
+
+    const pkmn = pokemonData[k];
+    const formes = pkmn.formes.slice().sort((a: Forme, b: Forme) => { if (a.nom == '') return -1; else return 0;});
+    for (const forme of formes) {
+      if ('noShiny' in forme && forme.noShiny == true) continue;
+      select.innerHTML += `<option value="${forme.dbid}">${forme.nom || 'Forme normale'}</option>`;
     }
   }
 
@@ -680,10 +681,12 @@ export class huntCard extends HTMLElement {
     if (!(select instanceof InputSelect)) throw new TypeError(`Expecting InputSelect`);
 
     select.querySelectorAll('option').forEach(option => option.remove());
-    select.setAttribute('value', methodToSelect ?? 'wild'); // set initial value before regenerating the options
 
     const gameid = Pokemon.jeux.find(jeu => jeu.uid === game)?.id;
     if (!gameid) return;
+    
+    select.setAttribute('value', methodToSelect ?? 'wild'); // set initial value before regenerating the options
+    //select.setAttribute('default-label', 'Choisir une méthode');
 
     const lang = document.documentElement.getAttribute('lang') ?? Params.defaultLang;
     for (const methode of Shiny.allMethodes) {

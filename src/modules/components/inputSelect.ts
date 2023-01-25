@@ -13,7 +13,7 @@ import { TextField } from './textField.js';
 const template = document.createElement('template');
 template.innerHTML = /*html*/`
   <form>
-    <label class="text-field surface variant interactive" part="container">
+    <label class="text-field surface standard elevation-2 interactive" part="container">
       <span class="leading-icon">
         <slot name="leading-icon"></slot>
       </span>
@@ -35,7 +35,7 @@ template.innerHTML = /*html*/`
       <div
         role="listbox"
         id="options-list"
-        class="surface variant primary shadow elevation-2 select-menu"
+        class="surface standard primary shadow elevation-3 select-menu"
         style="
           padding: 4px;
           display: flex;
@@ -86,6 +86,7 @@ sheet.replaceSync(/*css*/`
     grid-template-columns: 1fr 24px;
     align-items: center;
     color: rgb(var(--on-surface));
+    white-space: nowrap;
   }
 
   [role="combobox"]::before {
@@ -556,7 +557,7 @@ export class InputSelect extends TextField {
 
   // Value of the currently focused option.
   get focusedValue(): string | null {
-    return this.allOptions[this.focusedIndex].getAttribute('data-value');
+    return this.allOptions[this.focusedIndex]?.getAttribute('data-value') ?? this.defaultValue;
   }
 
 

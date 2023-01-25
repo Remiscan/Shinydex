@@ -6,103 +6,176 @@
 }
 
 form {
-  display: flex;
+  display: grid;
+  grid-template-columns: 100%;
+  gap: 16px;
   width: 100%;
   height: 100%;
   box-sizing: border-box;
-  padding: 4px;
+  padding: 8px;
   border-radius: var(--border-radius);
 }
 
-.container {
+fieldset {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  gap: 1ch;
-  border-radius: calc(1.12 * (var(--border-radius) - 4px)); /* 12% optical adjustment */
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+}
+
+legend {
+  margin-bottom: 8px;
+}
+
+legend.invisible {
+  font-size: 0;
+  padding: 0;
+  margin: 0;
+}
+
+/* Pokemon sprite, species, forme, game and method */
+
+.intro {
+  flex-basis: 100%;
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  grid-template-rows: auto 1fr;
+  row-gap: 8px;
+  column-gap: 8px;
+  position: relative;
 }
 
 .edit-notice {
   display: inline-block;
-  grid-column: 2;
+  grid-column: 1;
   grid-row: 1;
-  padding: .2em;
-  height: fit-content;
+  height: 26px;
+  --padding-inline: 4px;
+  padding: var(--padding-inline) calc(3 * var(--padding-inline));
+  box-sizing: border-box;
   text-align: center;
+  --distance-to-parent-border: 8px;
+  border-radius: var(--sub-border-radius);
 }
 
-text-field[name="dexid"]::part(input) {
+pokemon-sprite {
+  grid-column: 1;
+  grid-row: 2;
+  --distance-to-parent-border: 8px;
+  border-radius: var(--sub-border-radius);
+  padding: 4px;
+}
+
+.intro > fieldset {
+  grid-row: 1 / -1;
+  grid-column: 2;
+  align-content: end;
+}
+
+[name="dexid"] {
+  flex-grow: 1;
+  flex-basis: calc(2 * 16px + 12ch);
+}
+
+[name="dexid"]::part(input) {
   text-transform: capitalize;
 }
 
-[data-icon^="origin-mark"] {
-  filter: invert(var(--dark-coeff));
+[name="forme"] {
+  flex-grow: 1;
+  flex-basis: calc(2 * 16px + 20ch);
 }
+
+[name="game"] {
+  flex-grow: 2;
+  flex-basis: calc(2 * 16px + 32px + 25ch);
+}
+
+[name="method"] {
+  flex-grow: 2;
+  flex-basis: calc(2 * 16px + 30ch);
+}
+
+/* Encounters */
+
+fieldset[name="encounters"] {
+  flex-grow: 1;
+  flex-basis: calc(2 * 40px + 2 * 8px + 2 * 16px + 10ch);
+  margin: auto;
+  flex-wrap: nowrap;
+}
+
+[name="count"] {
+  flex-basis: 100%;
+}
+
+text-field > button {
+  margin-block: -3px;
+}
+
+text-field > button:not(:focus, :hover, :active) {
+  --state-opacity: 0;
+}
+
+/* Bonus */
+
+fieldset[name="bonus"] {
+  align-items: start;
+}
+
+fieldset[name="bonus"] > fieldset[data-game] {
+  flex-grow: 1;
+}
+
+/* Données de la capture */
+
+[name="name"] {
+  flex-grow: 1;
+  flex-basis: calc(2 * 16px + 12ch);
+}
+
+[name="gene"] {
+  flex-grow: 1;
+  flex-basis: calc(2 * 16px + 10ch);
+}
+
+[name="catchTime"] {
+  flex-grow: 1;
+  flex-basis: calc(2 * 16px + 15ch);
+}
+
+[name="ball"] {
+  flex-grow: 2;
+  flex-basis: calc(2 * 16px + 24ch);
+}
+
+/* Données additionnelles */
+
+[name="notes"] {
+  flex-grow: 1;
+}
+
+/* Boutons */
 
 form:has(:invalid) label[for="caught"] {
   cursor: not-allowed;
 }
 
-fieldset {
-  grid-column: 1 / -1;
-  flex-grow: 1;
-  --display: flex;
-  display: var(--display);
-  flex-direction: row;
-  align-items: center;
-  column-gap: 2ch;
-  row-gap: 1ch;
-  padding: 1ch;
-  flex-wrap: wrap;
-  border: none;
-  background: transparent;
-}
-
-fieldset.single {
-  column-gap: 1ch;
-}
-
-fieldset > legend {
-  font-size: 0;
-  padding: 0;
-}
-
-.group {
-  grid-column: 1 / -1;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  column-gap: 2ch;
-  row-gap: 1ch;
-  margin: 10px;
-}
-
-fieldset:first-of-type {
-  grid-column: unset;
-}
-
-legend {
-  color: var(--text-color-soft);
-  font-variant: small-caps;
-}
-
-.one-input {
-  --display: flex;
-  display: var(--display);
-  flex-direction: row;
-  align-items: center;
-  gap: 1ch;
-  flex-wrap: nowrap;
-}
-
 .button-group {
+  display: flex;
+  gap: 16px;
   width: fit-content;
   margin-inline: auto;
-  border: none;
-  background: none;
   flex-basis: 100%;
   justify-content: center;
 }
+
+/* Éléments cachés */
 
 form:not([data-edit]) [data-edit],
 form[data-edit] [data-not-edit],
@@ -110,15 +183,7 @@ form:not(.caught) .capture-button-group ~ * {
   display: none !important;
 }
 
-:host(:not([data-gen-vc="true"]):not([data-method-mine="false"])) [data-checkmark-unsure],
 :host(:not([data-method-mine="false"])) [data-not-mine],
-:host(:not([data-charm-available="true"])) :is([name="charm"], [for="charm"]) {
-  display: none;
-}
-
-fieldset:empty,
-.one-input:empty,
-select:empty,
-label:has(+ select:empty) {
+:host(:not([data-charm-available="true"])) [name="charm"] {
   display: none;
 }
