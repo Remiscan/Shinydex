@@ -10,7 +10,7 @@ const template = document.createElement('template');
 template.innerHTML = /*html*/`
   <form class="surface variant">
     <div class="intro">
-      <span data-edit class="edit-notice label-big surface standard elevation-2">Modification</span>
+      <span data-edit class="edit-notice label-large secondary elevation-2">Modification</span>
 
       <pokemon-sprite size="112" class="surface standard elevation-2"></pokemon-sprite>
 
