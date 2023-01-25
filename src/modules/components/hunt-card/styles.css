@@ -171,7 +171,7 @@ fieldset[name="bonus"] > fieldset[data-game] {
 
 /* Boutons */
 
-form:has(:invalid) label[for="caught"] {
+form:has(:invalid) [name="caught"] {
   cursor: not-allowed;
 }
 
@@ -193,6 +193,9 @@ form:not(.caught) .capture-button-group ~ * {
 }
 
 :host(:not([data-method-mine="false"])) [data-not-mine],
-:host(:not([data-charm-available="true"])) [name="charm"] {
+:host(:not([data-charm-available="true"])) [name="charm"],
+:host(:not([data-charm-available="true"])) fieldset[name="common-bonus"],
+:host([data-game="usum"]:not([data-method="ultrawormhole"])) fieldset[name="bonus"] fieldset[data-game="usum"],
+:host(:not([data-charm-available="true"]):not([data-game="sv"]):not([data-game="pla"]):not([data-game="swsh"]):not([data-game="lgpe"]):not([data-game="usum"])) fieldset[name="bonus"] {
   display: none;
 }

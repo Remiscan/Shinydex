@@ -59,9 +59,9 @@ template.innerHTML = /*html*/`
 
 
       <!-- Bonus globaux -->
-      <fieldset>
+      <fieldset name="common-bonus">
         <legend>
-          <span class="title-small">Bonus globaux</span>
+          <span class="title-small">Bonus communs</span>
         </legend>
 
         <check-box name="charm">Charme chroma possédé</check-box>
@@ -143,7 +143,7 @@ template.innerHTML = /*html*/`
           <span class="title-small">Bonus de Pokémon Ultra-Soleil et Ultra-Lune</span>
         </legend>
 
-        <text-field name="usum-distance" inputmode="numeric" pattern="[0-9]*" default-value="0" data-method="ultra-wormhole">
+        <text-field name="usum-distance" inputmode="numeric" pattern="[0-9]*" default-value="0" data-method="ultrawormhole">
           <span slot="label">Distance</span>
         </text-field>
 
