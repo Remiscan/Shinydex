@@ -22,7 +22,8 @@ pokemon-sprite,
   margin: 4px;
   display: grid;
   place-items: center;
-  border-radius: calc(1.12 * (var(--border-radius) - 4px)); /* 12% optical adjustment */
+  --distance-to-parent-border: 4px;
+  border-radius: var(--sub-border-radius);
 }
 
 pokemon-sprite,
@@ -362,7 +363,8 @@ button.icon-button.menu-hint::before {
     margin-left: 0;
     --elevation-opacity: var(--elevation-2-opacity);
     --surface-color: var(--surface);
-    border-radius: calc(1.12 * (var(--border-radius) - 4px)); /* 12% optical adjustment */
+    --distance-to-parent-border: 4px;
+  border-radius: var(--sub-border-radius);
   }
 
   .pokemon-notes__arrow {

@@ -53,6 +53,19 @@ button {
   --elevation-shadow: none;
 }
 
+button:not(.pkmnicon)::before {
+  content: '';
+  display: flex;
+  width: 100%;
+  min-width: var(--tap-safe-size);
+  height: 100%;
+  min-height: var(--tap-safe-size);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 button.only-icon .label,
 button.only-text .icon {
   display: none;
@@ -245,44 +258,6 @@ button.outlined:disabled {
 /*
  * Inputs
  */
-
-/* Radio, checkbox */
-
-button:not(.pkmnicon)::before {
-  content: '';
-  display: flex;
-  width: 100%;
-  min-width: var(--tap-safe-size);
-  height: 100%;
-  min-height: var(--tap-safe-size);
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-:is(
-  input[type=number],
-  input[type=date],
-  input[type=password]
-) {
-  min-width: calc(.6 * var(--tap-safe-size));
-  min-height: calc(.6 * var(--tap-safe-size));
-  box-sizing: border-box;
-  font-family: inherit;
-  font-size: inherit;
-}
-
-@media (any-pointer: coarse) {
-  :is(
-    input[type=number],
-    input[type=date],
-    input[type=password]
-  ) {
-    min-width: var(--tap-safe-size);
-    min-height: var(--tap-safe-size);
-  }
-}
 
 input-slider {
   --tap-safe-size: inherit;
