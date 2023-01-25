@@ -100,6 +100,7 @@ sheet.replaceSync(/*css*/`
     grid-row: 1;
     grid-column: text;
     color: var(--label-color);
+    white-space: nowrap;
   }
 
   .label,

@@ -10,9 +10,10 @@ const template = document.createElement('template');
 template.innerHTML = /*html*/`
   <form class="surface variant">
     <div class="intro">
-      <span data-edit class="edit-notice label-large secondary elevation-2">Modification</span>
-
-      <pokemon-sprite size="112" class="surface standard elevation-2"></pokemon-sprite>
+      <div class="sprite-container">
+        <span data-edit class="edit-notice label-large secondary elevation-2">Modification</span>
+        <pokemon-sprite size="112" class="surface standard elevation-2"></pokemon-sprite>
+      </div>
 
       <!-- Espèce, forme -->
       <fieldset name="which-pokemon">
@@ -36,22 +37,17 @@ template.innerHTML = /*html*/`
           <span slot="label">Méthode de chasse</span>
         </input-select>
 
-        <!-- Compteur de rencontres -->
-        <fieldset name="encounters">
-          <legend class="invisible">Compteur de rencontres</legend>
+        <text-field name="count" inputmode="numeric" pattern="[0-9]*" default-value="0" icons="leading trailing">
+          <span slot="label">Rencontres</span>
+          
+          <button slot="leading-icon" type="button" class="surface interactive icon-button only-icon" data-action="count-sub">
+            <span class="material-icons">remove</span>
+          </button>
 
-          <text-field name="count" inputmode="numeric" pattern="[0-9]*" default-value="0" icons="leading trailing">
-            <span slot="label">Rencontres</span>
-            
-            <button slot="leading-icon" type="button" class="surface interactive icon-button only-icon" data-action="count-sub">
-              <span class="material-icons">remove</span>
-            </button>
-
-            <button slot="trailing-icon" type="button" class="surface interactive icon-button only-icon" data-action="count-add">
-              <span class="material-icons">add</span>
-            </button>
-          </text-field>
-        </fieldset>
+          <button slot="trailing-icon" type="button" class="surface interactive icon-button only-icon" data-action="count-add">
+            <span class="material-icons">add</span>
+          </button>
+        </text-field>
       </fieldset>
     </div>
 

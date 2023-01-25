@@ -6,14 +6,13 @@
 }
 
 form {
-  display: grid;
-  grid-template-columns: 100%;
+  display: flex;
+  flex-direction: column;
   gap: 16px;
-  width: 100%;
-  height: 100%;
-  box-sizing: border-box;
   padding: 8px;
   border-radius: var(--border-radius);
+  max-width: 100%;
+  overflow: auto;
 }
 
 fieldset {
@@ -41,13 +40,17 @@ legend.invisible {
 /* Pokemon sprite, species, forme, game and method */
 
 .intro {
-  flex-basis: 100%;
-  display: grid;
-  grid-template-columns: 120px 1fr;
-  grid-template-rows: auto 1fr;
-  row-gap: 8px;
-  column-gap: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   position: relative;
+}
+
+.sprite-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-basis: 120px;
 }
 
 .edit-notice {
@@ -79,6 +82,8 @@ form[data-edit] pokemon-sprite {
   grid-row: 1 / -1;
   grid-column: 2;
   align-content: end;
+  flex-basis: 120px;
+  flex-grow: 1;
 }
 
 [name="dexid"] {
@@ -119,7 +124,7 @@ fieldset[name="encounters"] {
 }
 
 text-field > button {
-  margin-block: -3px;
+  margin: -4px;
 }
 
 text-field > button:not(:focus, :hover, :active) {
