@@ -168,7 +168,7 @@ template.innerHTML = /*html*/`
           <span class="label-large">Annuler les modifications</span>
         </button>
 
-        <check-box name="caught">Capturé</check-box>
+        <check-box name="caught" disabled>Capturé</check-box>
       </div>
 
 
@@ -257,7 +257,7 @@ template.innerHTML = /*html*/`
           <span class="label-large">Supprimer ce Pokémon <shiny-stars></shiny-stars></span>
         </button>
 
-        <button type="button" class="surface interactive filled elevation-2 only-text" data-action="save-shiny">
+        <button type="submit" class="surface interactive filled elevation-2 only-text" data-action="save-shiny">
           <span class="label-large">Enregistrer dans mes Pokémon <shiny-stars></shiny-stars></span>
         </button>
       </div>

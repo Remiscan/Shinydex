@@ -31,10 +31,11 @@ async function populateHandler(section: PopulatableSection, _ids?: string[]): Pr
       break;
   }
 
-  const ids = _ids ?? await dataStore.keys();
+  const allIds = await dataStore.keys();
+  const ids = _ids ?? allIds;
   const populated = await populateFromData(section, ids);
 
-  computeOrders(section, ids);
+  computeOrders(section, allIds);
   updateCounters(section);
 
   return populated;

@@ -266,7 +266,9 @@ export async function computeOrders(section: FiltrableSection, ids: string[]): P
 
   if (!dataStore || section === 'partage') return;
 
-  const pokemonList = (await Promise.all(ids.map(id => dataStore.getItem(id)))).map(pkmn => new dataClass(pkmn));
+  const pokemonList = (await Promise.all(ids.map(id => dataStore.getItem(id))))
+    .filter(pkmn => pkmn != null)
+    .map(pkmn => new dataClass(pkmn));
   const cardsMap = new Map(pokemonList.map(pkmn => [pkmn.huntid, document.querySelector(`#${section} [huntid="${pkmn.huntid}"]`)]));
 
   await Promise.all(supportedOrdres.map(async order => {

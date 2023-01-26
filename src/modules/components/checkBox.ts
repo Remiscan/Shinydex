@@ -110,6 +110,14 @@ sheet.replaceSync(/*css*/`
   input:focus:not(:focus-visible) + label::after {
     outline: none;
   }
+
+  input:disabled + label {
+    opacity: .38;
+    --state-opacity: 0;
+    --text-color: var(--on-surface);
+    cursor: not-allowed;
+    pointer-events: none;
+  }
 `);
 
 

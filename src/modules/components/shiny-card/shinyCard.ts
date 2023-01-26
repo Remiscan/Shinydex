@@ -1,3 +1,4 @@
+import { Hunt } from '../../Hunt.js';
 import { Params, noAccent } from '../../Params.js';
 import { Shiny } from '../../Shiny.js';
 import { isSupportedLang, isSupportedMethodID, isSupportedPokemonLang, methodStrings, pokemonData } from '../../jsonData.js';
@@ -312,7 +313,19 @@ export class shinyCard extends HTMLElement {
       const card = document.createElement('hunt-card');
       card.setAttribute('huntid', this.huntid);
 
-      const navLink = document.querySelector('.nav-link[data-section="chasses-en-cours"]');
+      const hunt = await Hunt.getOrMake(this.huntid);
+      if (!(hunt instanceof Hunt)) throw new Error('Erreur lors de la création de la chasse à éditer');
+      hunt.caught = true;
+      await huntStorage.setItem(hunt.huntid, hunt);
+
+      window.dispatchEvent(new CustomEvent('dataupdate', {
+        detail: {
+          sections: ['chasses-en-cours'],
+          ids: [this.huntid],
+        }
+      }));
+
+      const navLink = document.querySelector('.nav-link[data-nav-section="chasses-en-cours"]');
       if (!(navLink instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
       navLink.click();
     } catch (error) {

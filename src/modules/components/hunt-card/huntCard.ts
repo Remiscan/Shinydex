@@ -105,7 +105,7 @@ export class huntCard extends HTMLElement {
     try {
       const shiny = new Shiny(hunt);
       await shinyStorage.setItem(this.huntid, shiny);
-      await this.delete(false);
+      await huntStorage.removeItem(this.huntid);
 
       window.dispatchEvent(new CustomEvent('dataupdate', {
         detail: {
@@ -130,12 +130,11 @@ export class huntCard extends HTMLElement {
       // Si la chasse n'a pas été modifiée, on la supprime complètement
       if (hunt.isEmpty()) {
         await huntStorage.removeItem(this.huntid);
-        this.remove();
 
         window.dispatchEvent(new CustomEvent('dataupdate', {
           detail: {
             sections: ['chasses-en-cours'],
-            ids: [],
+            ids: [this.huntid],
           }
         }));
       }
@@ -161,6 +160,29 @@ export class huntCard extends HTMLElement {
     }
   }
 
+
+  /**
+   * Annule l'édition d'un Pokémon shiny, en supprimant les modifications pour toujours.
+   */
+  async cancelEdit() {
+    const storedShiny = await shinyStorage.getItem(this.huntid);
+    const edit = storedShiny != null;
+    if (!edit) {
+      new Notif(`Impossible d'annuler les modifications : aucun Pokémon chromatique ne correspond à cette chasse.`).prompt();
+      return;
+    }
+
+    // On supprime la chasse, sans toucher au shiny associé
+    await huntStorage.removeItem(this.huntid);
+
+    window.dispatchEvent(new CustomEvent('dataupdate', {
+      detail: {
+        sections: ['chasses-en-cours'],
+        ids: [this.huntid],
+      }
+    }));
+  }
+
   
   /**
    * Supprime la chasse et le shiny qu'elle éditait, et déplace ce dernier dans la corbeille.
@@ -169,17 +191,17 @@ export class huntCard extends HTMLElement {
     const storedShiny = await shinyStorage.getItem(this.huntid);
     const edit = storedShiny != null;
     if (!edit) {
-      new Notif('Cette chasse n\'est pas dans la base de données').prompt();
+      new Notif(`Impossible de supprimer : aucun Pokémon chromatique ne correspond à cette chasse.`).prompt();
       return;
     }
 
-    // On déplace la chasse dans la corbeille
-    await huntStorage.removeItem(this.huntid);
+    const hunt = await this.getHunt();
+    hunt.lastUpdate = Date.now();
+    hunt.deleted = true;
+    await huntStorage.setItem(this.huntid, hunt);
 
-    // On déplace le shiny associé dans la corbeille
-    storedShiny.lastUpdate = Date.now();
-    storedShiny.deleted = true;
-    await shinyStorage.setItem(this.huntid, storedShiny);
+    // On supprime le shiny associé
+    await shinyStorage.removeItem(this.huntid);
 
     window.dispatchEvent(new CustomEvent('dataupdate', {
       detail: {
@@ -308,8 +330,14 @@ export class huntCard extends HTMLElement {
           const value = hunt.caught;
           input.checked = value;
           const form = this.shadow.querySelector('form');
-          if (value) form?.classList.add('caught');
-          else       form?.classList.remove('caught');
+          if (value) {
+            form?.classList.add('caught');
+            input.removeAttribute('disabled');
+          } else {
+            form?.classList.remove('caught');
+            if (!this.checkFormUncaughtPartValidity()) input.setAttribute('disabled', '');
+            else                                       input.removeAttribute('disabled');
+          }
         } break;
 
         case 'huntid': {
@@ -412,11 +440,28 @@ export class huntCard extends HTMLElement {
       this.updateAttribute('method', hunt.method);
       this.updateAttribute('game', hunt.game);
 
+      const caughtCheckBox = this.shadow.querySelector('[name="caught"]');
+      if (!this.checkFormUncaughtPartValidity()) caughtCheckBox?.setAttribute('disabled', '');
+      else                                       caughtCheckBox?.removeAttribute('disabled');
+
       if (this.changeNonce !== nonce) return;
       await huntStorage.setItem(hunt.huntid, hunt);
 
       // Update some visuals with changes from the form
       await this.updateVisuals(hunt);
+    }
+  }
+
+
+  /** Checks whether the part of the form displayed when the "caught" checkbox isn't checked is valid. */
+  checkFormUncaughtPartValidity(): boolean {
+    const form = this.shadow.querySelector('form');
+    if (form) {
+      const inputs = [...form.querySelectorAll('text-field, input-select, check-box')]
+        .filter(input => !input.matches('.capture-button-group ~ *'));
+      return inputs.every(input => 'checkValidity' in input && typeof input.checkValidity === 'function' && input.checkValidity());
+    } else {
+      return false;
     }
   }
 
@@ -543,10 +588,10 @@ export class huntCard extends HTMLElement {
       element: this.shadow.querySelector('[data-action="cancel-edit"]'),
       type: 'click',
       function: async event => {
-        const cancelMessage = 'Les modifications seront annulées et cette chasse sera supprimée.';
+        const cancelMessage = 'Les modifications seront perdues et cette chasse sera supprimée.';
         if (!(event.currentTarget instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
         const userResponse = await warnBeforeDestruction(event.currentTarget, cancelMessage);
-        if (userResponse)  await this.delete();
+        if (userResponse)  await this.cancelEdit();
       }
     };
     handle(this.handlers.cancel);

@@ -163,10 +163,6 @@ fieldset[name="bonus"] > fieldset[data-game] {
 
 /* Boutons */
 
-form:has(:invalid) [name="caught"] {
-  cursor: not-allowed;
-}
-
 .button-group {
   display: flex;
   gap: 16px;
