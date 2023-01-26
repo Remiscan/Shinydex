@@ -24,7 +24,7 @@ template.innerHTML = /*html*/`
           <datalist id="datalist-pokedex"></datalist>
         </text-field>
 
-        <input-select name="forme" default-value="">
+        <input-select name="forme" default-value="" required>
           <span slot="label">Forme</span>
         </input-select>
 
@@ -33,7 +33,7 @@ template.innerHTML = /*html*/`
           <span slot="label">Jeu</span>
         </input-select>
 
-        <input-select name="method" default-value="wild">
+        <input-select name="method" default-value="wild" required>
           <span slot="label">Méthode de chasse</span>
         </input-select>
 

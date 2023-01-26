@@ -459,7 +459,7 @@ export class InputSelect extends TextField {
     // Focus the selected option
     const selectedOption = optionsList.querySelector('[role="option"][aria-selected="true"]');
     if (selectedOption instanceof HTMLElement) {
-      const selectedIndex = this.indexOf(selectedOption?.getAttribute('data-value'));
+      const selectedIndex = this.indexOf(selectedOption?.getAttribute('data-value') ?? 'null');
       this.focusedIndex = selectedIndex;
     }
 
@@ -556,7 +556,7 @@ export class InputSelect extends TextField {
   }
 
   // Value of the currently focused option.
-  get focusedValue(): string | null {
+  get focusedValue(): string {
     return this.allOptions[this.focusedIndex]?.getAttribute('data-value') ?? this.defaultValue;
   }
 
@@ -568,7 +568,7 @@ export class InputSelect extends TextField {
 
 
   // Gets the index of an option from its value.
-  indexOf(val: string | null) {
+  indexOf(val: string) {
     const allOptions = this.allOptions;
     for (let k = 0; k < allOptions.length; k++) {
       const option = allOptions[k];
@@ -601,11 +601,11 @@ export class InputSelect extends TextField {
   }
 
 
-  get value(): string | null {
+  get value(): string {
     return this.optionsList?.querySelector('[role="option"][aria-selected="true"]')?.getAttribute('data-value') ?? this.initialValue ?? this.defaultValue;
   }
 
-  set value(val: string | null) {
+  set value(val: string) {
     // If the requested value is an existing option, select it.
     const allOptions = this.allOptions;
     let optionExists = false;
@@ -625,6 +625,14 @@ export class InputSelect extends TextField {
     this.dispatchEvent(new CustomEvent('valuechange', { detail: { value: appliedValue }}));
     const button = this.button;
     if (button) button.innerHTML = this.getLabel(appliedValue);
+  }
+
+  updateFormValue(val: any) {
+    const isRequired = this.getAttribute('required') !== null;
+    const validity = {
+      valueMissing: isRequired ? (val == null || val === 'null') : false
+    };
+    super.updateFormValue(val, validity, `Aucune valeur n'est sélectionnée`);
   }
 
   get valueLabel() {

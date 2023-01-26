@@ -69,11 +69,9 @@ export default class CustomInput extends HTMLElement {
     this.dispatchEvent(new CustomEvent('valuechange', { detail: { value: val }}));
   }
 
-  updateFormValue(val: any) {
+  updateFormValue(val: any, validity?: Partial<ValidityState>, validationMessage?: string, anchor?: HTMLElement) {
     this.#internals?.setFormValue(String(val));
-    const input = this.input;
-    if (!input) return;
-    this.#internals?.setValidity(input.validity, input.validationMessage);
+    this.#internals?.setValidity(validity ?? this.input?.validity, validationMessage ?? this.input?.validationMessage, anchor);
   }
 
   get defaultValue() {
