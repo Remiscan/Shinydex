@@ -19,7 +19,7 @@ template.innerHTML = /*html*/`
       <fieldset name="which-pokemon">
         <legend class="invisible">Pokémon, jeu et méthode</legend>
 
-        <text-field name="dexid" required list="datalist-pokedex" autocomplete="off" spellcheck="false" placeholder="Bulbizarre">
+        <text-field name="dexid" required list="datalist-pokedex" autocomplete="off" spellcheck="false" placeholder="ex : Bulbizarre">
           <span slot="label">Espèce</span>
           <datalist id="datalist-pokedex"></datalist>
         </text-field>
