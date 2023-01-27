@@ -65,39 +65,53 @@ self.addEventListener('fetch', function(event) {
   const isSprite = event.request.url.match('images/pokemon-sprites/webp');
   const isSmallSprite = event.request.url.match('images/pokemon-sprites/webp/112');
 
-  if (isSprite) {
-    if (isSmallSprite) {
-      // If it's a small sprite, respond from cache, and if not cached, from network and then cache it.
-      event.respondWith(
-        caches.open(spritesCacheName)
-        .then(cache => cache.match(event.request)                       // 1. Look if the small sprite is in cache
-          .then(matching => matching || fetch(event.request))           // 2. If not, fetch it online
-          .then(response => cache.put(event.request, response.clone())  // 3. Store the fetched small sprite in cache
-            .then(() => response)                                       // 4. Return the fetched small sprite
+  const swOrigin = location.origin;
+  const requestOrigin = new URL(event.request.url).origin;
+
+  // Shinydex files are cached
+  if (swOrigin === requestOrigin) {
+    if (isSprite) {
+      if (isSmallSprite) {
+        // If it's a small sprite, respond from cache, and if not cached, from network and then cache it.
+        event.respondWith(
+          caches.open(spritesCacheName)
+          .then(cache => cache.match(event.request)                       // 1. Look if the small sprite is in cache
+            .then(matching => matching || fetch(event.request))           // 2. If not, fetch it online
+            .then(response => cache.put(event.request, response.clone())  // 3. Store the fetched small sprite in cache
+              .then(() => response)                                       // 4. Return the fetched small sprite
+            )
           )
+          .catch(error => console.error(error, event.request))
         )
-        .catch(error => console.error(error, event.request.url))
-      )
-    } else {
-      // If it's a big sprite, respond from network, and if not available, from small sprites cache.
-      const smallSpriteUrl = event.request.url.replace(new RegExp('webp/[0-9]+?/'), 'webp/112/');
+      } else {
+        // If it's a big sprite, respond from network, and if not available, from small sprites cache.
+        const smallSpriteUrl = event.request.url.replace(new RegExp('webp/[0-9]+?/'), 'webp/112/');
+        event.respondWith(
+          fetch(event.request)                            // 1. Fetch the big sprite online
+          .catch(error => caches.open(spritesCacheName)       // 2. If not found, look in the cache for the corresponding
+            .then(cache => cache.match(smallSpriteUrl))   //    small sprite and return it
+          )
+          .catch(error => console.log(error, event.request))
+        )
+      }
+    }
+    
+    // If it's not a sprite, respond with cache first, then network if uncached.
+    else {
       event.respondWith(
-        fetch(event.request)                            // 1. Fetch the big sprite online
-        .catch(error => caches.open(spritesCacheName)       // 2. If not found, look in the cache for the corresponding
-          .then(cache => cache.match(smallSpriteUrl))   //    small sprite and return it
-        )
-        .catch(error => console.log(error, event.request.url))
+        caches.open(currentCacheName)
+        .then(cache => cache.match(event.request))                // 1. Look if the file is in cache
+        .then(matching => matching || fetch(event.request))       // 2. If not, fetch it online
+        .catch(error => console.error(error, event.request))
       )
     }
   }
-  
-  // If it's not a sprite, respond with cache first, then network if uncached.
+
+  // External files are not cached
   else {
     event.respondWith(
-      caches.open(currentCacheName)
-      .then(cache => cache.match(event.request))                // 1. Look if the file is in cache
-      .then(matching => matching || fetch(event.request))       // 2. If not, fetch it online
-      .catch(error => console.error(error, event.request.url))
+      fetch(event.request)
+      .catch(error => console.error(error, event.request))
     )
   }
 });

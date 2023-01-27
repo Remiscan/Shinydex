@@ -95,6 +95,20 @@ export function pad(s: string, long: number): string {
 }
 
 
+////////////////////////////
+// Récupère tous les cookies
+export function getCookies(): { [key: string]: string } {
+  return Object.fromEntries(document.cookie.split(';').map(e => e.trim().split('=')));
+}
+
+/////////////////////////////////
+// Récupère un cookie particulier
+export function getCookie(name: string): string {
+  const cookies = getCookies();
+  return cookies[name];
+}
+
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Envoie une notification et attend confirmation de l'utilisateur avant de réaliser une action destructrice.
 export async function warnBeforeDestruction(bouton: Element, message: string = 'Supprimer définitivement ces données ?', icon: string = 'delete') {

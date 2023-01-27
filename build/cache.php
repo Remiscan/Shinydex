@@ -42,9 +42,7 @@ $addDirToCache = function(string $dirPath, array $exclude = []) use (&$cache) {
 $addDirToCache(dirname(__DIR__, 1).'/ext', exclude: ['README.md']);
 $addDirToCache(dirname(__DIR__, 1).'/pages');
 $addDirToCache(dirname(__DIR__, 1).'/styles');
-$addDirToCache(dirname(__DIR__, 1).'/dist/data');
-$addDirToCache(dirname(__DIR__, 1).'/dist/strings');
-$addDirToCache(dirname(__DIR__, 1).'/dist/modules');
+$addDirToCache(dirname(__DIR__, 1).'/dist');
 
 file_put_contents(__DIR__.'/../cache.json', json_encode($cache, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
 echo date('Y-m-d H:i:s') . " cache.json built!\n";

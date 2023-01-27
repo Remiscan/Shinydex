@@ -2,6 +2,7 @@ import { Params, loadAllImages, timestamp2date, wait } from './Params.js';
 import { Pokemon } from './Pokemon.js';
 import { Settings } from './Settings.js';
 import { PopulatableSection, cleanUpRecycleBin, initPokedex, populator } from './appContent.js';
+import * as Auth from './auth.js';
 import { FilterMenu } from './components/filter-menu/filterMenu.js';
 import { dataStorage, huntStorage, shinyStorage } from './localForage.js';
 import { Notif } from './notification.js';
@@ -255,6 +256,7 @@ export async function appStart() {
   // ÉTAPE 6 : gestion de la connexion de l'utilisateur et de la synchronisation de ses données
 
   logPerf('Étape 6');
+  Auth.init();
 
   // Si la sauvegarde en ligne est activée, on met à jour les données locales
   /*const onlineBackup = await dataStorage.getItem('online-backup');

@@ -38,10 +38,9 @@
         "./styles/common.css",
         "./styles/themes.css.php",
         "./dist/data/pokemon.json",
-        "./dist/strings/games.json",
-        "./dist/strings/methods.json",
         "./dist/modules/appContent.js",
         "./dist/modules/appLifeCycle.js",
+        "./dist/modules/auth.js",
         "./dist/modules/components/checkBox.js",
         "./dist/modules/components/corbeille-card/corbeilleCard.js",
         "./dist/modules/components/customInput.js",
@@ -88,6 +87,8 @@
         "./dist/modules/syncBackup.js",
         "./dist/modules/theme.js",
         "./dist/modules/topLayer.js",
-        "./dist/modules/upgradeStorage.js"
+        "./dist/modules/upgradeStorage.js",
+        "./dist/strings/games.json",
+        "./dist/strings/methods.json"
     ]
 }

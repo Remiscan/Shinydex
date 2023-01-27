@@ -1,4 +1,6 @@
 # Ignore generated files
+backend/composer/vendor
+backend/composer/src
 dist
 images/out/
 images/pokemon-sprites/webp/

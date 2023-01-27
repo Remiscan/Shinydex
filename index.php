@@ -36,6 +36,7 @@
     }
     </script>
     <script defer src="./ext/localforage.min.js"></script>
+    <script defer src="https://accounts.google.com/gsi/client"></script>
     <script type="module" src="./dist/modules/main.js"></script>
 
     <?php
@@ -216,6 +217,8 @@
     <section id="top-layer"></section>
 
     <!-- Notifications -->
-    <div class="notification-container"></div>
+    <div class="notification-container">
+      <div id="google-one-tap-container"></div>
+    </div>
   </body>
 </html>
