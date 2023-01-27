@@ -10,10 +10,14 @@ export interface huntedPokemon extends frontendShiny {
 
 export class Hunt extends Shiny implements huntedPokemon {
   caught: boolean = false;
+  deleted?: boolean = false;
+  destroy?: boolean = false;
   
   constructor(shiny: object = {}) {
     super(shiny);
     if ('caught' in shiny) this.caught = Boolean(shiny.caught);
+    if ('deleted' in shiny) this.deleted = Boolean(shiny.deleted);
+    if ('destroy' in shiny) this.destroy = Boolean(shiny.destroy);
   }
 
 

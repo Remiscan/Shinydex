@@ -204,11 +204,11 @@ export function initPokedex() {
 export async function cleanUpRecycleBin() {
   const month = 1000 * 60 * 60 * 24 * 30;
   try {
-    await shinyStorage.ready();
-    const keys = await shinyStorage.keys();
+    await huntStorage.ready();
+    const keys = await huntStorage.keys();
     await Promise.all(
       keys.map(async key => {
-        const shiny = new Shiny(await shinyStorage.getItem(key));
+        const shiny = new Hunt(await huntStorage.getItem(key));
         if (shiny.destroy && shiny.lastUpdate + month < Date.now()) {
           return await shinyStorage.removeItem(shiny.huntid);
         }
