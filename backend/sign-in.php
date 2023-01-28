@@ -42,7 +42,10 @@ if ($payload) {
     'httponly' => true
   ]);
 
-  setcookie('user', 'google:'.$payload['sub'], [
+  setcookie('user', json_encode([
+    'provider' => 'google',
+    'id' => $payload['sub']
+  ]), [
     ...$cookieOptions,
     'httponly' => true
   ]);
@@ -59,8 +62,16 @@ if ($payload) {
     'path' => '/shinydex/'
   ];
 
-  setcookie('jwt', '', $cookieOptions);
-  setcookie('user', '', $cookieOptions);
+  setcookie('jwt', '', [
+    ...$cookieOptions,
+    'httponly' => true
+  ]);
+
+  setcookie('user', '', [
+    ...$cookieOptions,
+    'httponly' => true
+  ]);
+  
   setcookie('loggedin', '', $cookieOptions);
 
   $response['error'] = 'Invalid ID token';

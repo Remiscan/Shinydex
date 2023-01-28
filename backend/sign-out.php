@@ -15,7 +15,16 @@ $cookieOptions = [
   'path' => '/shinydex/'
 ];
 
-setcookie('jwt', '', $cookieOptions);
+setcookie('jwt', '', [
+  ...$cookieOptions,
+  'httponly' => true
+]);
+
+setcookie('user', '', [
+  ...$cookieOptions,
+  'httponly' => true
+]);
+
 setcookie('loggedin', '', $cookieOptions);
 
 $response['success'] = 'signed out';

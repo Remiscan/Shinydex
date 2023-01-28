@@ -41,14 +41,14 @@ if (!isset($_COOKIE['user'])) {
   exit;
 }
 
-$cookie = explode(':', $_COOKIE['user']);
+$cookie = json_decode($_COOKIE['user'], true);
 
 if (count($cookie) !== 2) {
   respondError('User cookie '.$_COOKIE['user'].'is not valid');
 }
 
-$provider = $cookie[0];
-$provideruserid = $cookie[1];
+$provider = $cookie['provider'];
+$provideruserid = $cookie['id'];
 
 if ($provider !== 'google') {
   respondError("Sign-in provider $provider is not supported");
