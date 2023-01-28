@@ -1,7 +1,7 @@
 import '../../../_common/components/input-slider/input-slider.js';
 import '../../../_common/components/input-switch/input-switch.js';
 import { Hunt } from './Hunt.js';
-import { getCookie, warnBeforeDestruction } from './Params.js';
+import { getCookie } from './Params.js';
 import { Settings } from './Settings.js';
 import { PopulatableSection, populator } from './appContent.js';
 import { appStart, checkUpdate } from './appLifeCycle.js';
@@ -19,7 +19,7 @@ import './components/syncProgress.js';
 import { export2json, json2import } from './exportToJSON.js';
 import { huntStorage, shinyStorage } from './localForage.js';
 import { navLinkBubble, navigate, sectionActuelle } from './navigate.js';
-import { Notif } from './notification.js';
+import { Notif, warnBeforeDestruction } from './notification.js';
 import { backgroundSync } from './syncBackup.js';
 
 

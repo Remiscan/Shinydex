@@ -1,10 +1,10 @@
 import { DexDatalist } from '../../DexDatalist.js';
 import { Hunt, huntedPokemon } from '../../Hunt.js';
-import { Params, warnBeforeDestruction } from '../../Params.js';
+import { Params } from '../../Params.js';
 import { Forme, Pokemon } from '../../Pokemon.js';
 import { Count, Shiny } from '../../Shiny.js';
 import { huntStorage, shinyStorage } from '../../localForage.js';
-import { Notif } from '../../notification.js';
+import { Notif, warnBeforeDestruction } from '../../notification.js';
 import { InputSelect } from '../inputSelect.js';
 import { pokemonSprite } from '../pokemon-sprite/pokemonSprite.js';
 import { TextArea } from '../textArea.js';
