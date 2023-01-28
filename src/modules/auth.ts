@@ -29,6 +29,7 @@ declare var google: {
 /** Handles the response from Google's One-Tap sign-in. */
 async function signinCallback(body: any) {
   // Send the token to the backend for verification
+  body.provider = 'google';
   const response = await fetch('/shinydex/backend/sign-in.php', {
     method: 'POST',
     body: JSON.stringify(body)

@@ -32,27 +32,24 @@ $local_deleted_data = json_decode($_POST['deleted-local-data'], true);
 
 
 /**
- * Step 2: Get user data from cookies
+ * Step 2: Get user data
  */
 
-if (!isset($_COOKIE['user'])) {
+if (!isset($_COOKIE['user']) || !isset($_COOKIE['id-provider'])) {
   $response['error'] = 'User is not logged in';
   respond($response);
   exit;
 }
 
-$cookie = json_decode($_COOKIE['user'], true);
+require_once __DIR__.'/verify-id-token.php';
+$user = verifyIdToken($_COOKIE['id-provider'], $_COOKIE['user']);
 
-if (count($cookie) !== 2) {
-  respondError('User cookie '.$_COOKIE['user'].'is not valid');
+if (!$user) {
+  respondError('User token is not valid');
 }
 
-$provider = $cookie['provider'];
-$provideruserid = $cookie['id'];
-
-if ($provider !== 'google') {
-  respondError("Sign-in provider $provider is not supported");
-}
+$provider = $_COOKIE['id-provider'];
+$provideruserid = $_COOKIE['user']['sub'];
 
 
 
