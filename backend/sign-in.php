@@ -42,10 +42,7 @@ if ($payload) {
     'httponly' => true
   ]);
 
-  setcookie('user', json_encode([
-    'provider' => 'google',
-    'id' => $payload['sub']
-  ]), [
+  setcookie('user', 'google:'.$payload['sub'], [
     ...$cookieOptions,
     'httponly' => true
   ]);

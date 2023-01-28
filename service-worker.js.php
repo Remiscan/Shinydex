@@ -18,6 +18,12 @@ const shinyStorage = localforage.createInstance({
   storeName: 'shiny-list',
   driver: localforage.INDEXEDDB
 });
+//// Hunts
+const huntStorage = localforage.createInstance({
+  name: 'remidex',
+  storeName: 'hunts',
+  driver: localforage.INDEXEDDB
+});
 //// Miscellaneous data
 const dataStorage = localforage.createInstance({
   name: 'remidex',
@@ -347,36 +353,37 @@ async function deleteOldCaches(newCacheName, action) {
  * @returns {boolean} Whether the data sync was successful.
  */
 async function syncBackup(message = true) {
-  return;
   try {
-    // On récupère les données locales
-    await shinyStorage.ready();
-    const keys = await shinyStorage.keys();
-    const localData = await Promise.all(keys.map(key => shinyStorage.getItem(key)));
+    // Get local data
+    await Promise.all([shinyStorage.ready(), huntStorage.ready()]);
+    const localData = await Promise.all(
+      (await shinyStorage.keys())
+      .map(key => shinyStorage.getItem(key))
+    );
+    const deletedLocalData = (await Promise.all(
+      (await huntStorage.keys())
+      .map(key => huntStorage.get(key))
+    ))
+    .filter(pkmn => pkmn.deleted);
 
-    await dataStorage.ready();
-    const userUUID = await dataStorage.getItem('user-uuid');
-
-    // On envoie les données locales au serveur
+    // Send local data to the backend
     const formData = new FormData();
-    formData.append('local-data', JSON.stringify(localData.filter(shiny => !shiny.deleted)));
-    formData.append('deleted-local-data', JSON.stringify(localData.filter(shiny => shiny.deleted)));
-    formData.append('user-uuid', userUUID);
-    formData.append('mdp', await dataStorage.getItem('mdp-bdd'));
+    formData.append('local-data', JSON.stringify(localData));
+    formData.append('deleted-local-data', JSON.stringify(deletedLocalData));
 
-    const response = await fetch('/remidex/backend/syncBackup.php?date=' + Date.now(), {
+    const response = await fetch('/remidex/backend/sync-backup.php?date=' + Date.now(), {
       method: 'POST',
       body: formData
     });
     if (response.status != 200)
-      throw '[:(] Erreur ' + response.status + ' lors de la requête';
-    const data = await response.json();
+      throw new Error('[:(] Erreur ' + response.status + ' lors de la requête');
 
-    if (data['mdp'] == false)
-      throw '[:(] Mauvais mot de passe...';
+    const data = await response.json();
     
-    // Vérifier si le serveur a réussi sa mission
-    console.log('[sync-backup] Réponse reçue du serveur :', data);
+    console.log('[sync-backup] Response from server:', data);
+
+    // -- j'en suis là --
+    return;
 
     if (data['error'] == true) throw data['response'];
 
