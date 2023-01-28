@@ -69,6 +69,11 @@ $user_data = $user_data->fetch(PDO::FETCH_ASSOC);
 
 // If user does not exist, create it
 if (!$user_data) {
+  // If there is no local data to back up, no need to create a user, just stop here
+  if (count($local_data) === 0) {
+    respondError('Canceled user creation: no data to back up');
+  }
+
   $create_user = $db->prepare("INSERT INTO shinydex_users (
     $provider
   ) VALUES (
