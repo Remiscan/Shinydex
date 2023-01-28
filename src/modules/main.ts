@@ -19,6 +19,8 @@ import { export2json, json2import } from './exportToJSON.js';
 import { huntStorage } from './localForage.js';
 import { navLinkBubble, navigate, sectionActuelle } from './navigate.js';
 import { Notif } from './notification.js';
+import { backgroundSync } from './syncBackup.js';
+import { getCookie } from './Params.js';
 
 
 
@@ -255,7 +257,8 @@ window.addEventListener('dataupdate', async (event: DataUpdateEvent) => {
   }
 
   // On demande une synchronisation des données
-  //await backgroundSync();
+  const loggedIn = getCookie('loggedin') === 'true';
+  if (loggedIn) await backgroundSync();
 });
 
 

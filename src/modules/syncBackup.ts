@@ -26,11 +26,14 @@ declare global {
  */
 export async function backgroundSync(): Promise<void> {
   const reg = await navigator.serviceWorker.ready;
-  await reg.sync.register('SYNC-BACKUP');
+  try {
+    await reg.sync.register('SYNC-BACKUP');
 
-  const loaders = Array.from(document.querySelectorAll('sync-progress, sync-line'));
-  loaders.forEach(loader => loader.setAttribute('state', 'loading'));
-  return;
+    const loaders = Array.from(document.querySelectorAll('sync-progress, sync-line'));
+    loaders.forEach(loader => loader.setAttribute('state', 'loading'));
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 

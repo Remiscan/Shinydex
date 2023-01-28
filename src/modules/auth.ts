@@ -1,4 +1,5 @@
 import { getCookie } from './Params.js';
+import { backgroundSync } from './syncBackup.js';
 
 
 
@@ -40,6 +41,7 @@ async function signinCallback(body: any) {
 
   if ('success' in responseBody) {
     document.body.setAttribute('data-logged-in', 'true');
+    await backgroundSync();
   }
 }
 
