@@ -1,5 +1,5 @@
 import { getCookie } from './Params.js';
-import { backgroundSync } from './syncBackup.js';
+import { backgroundSync, periodicSync } from './syncBackup.js';
 
 
 
@@ -40,7 +40,9 @@ async function signinCallback(body: any) {
   const responseBody = await response.json();
 
   if ('success' in responseBody) {
+    console.log('User successfully signed in');
     document.body.setAttribute('data-logged-in', 'true');
+    await periodicSync(true);
     await backgroundSync();
   }
 }
@@ -60,6 +62,7 @@ async function signOut() {
     google?.accounts?.id?.disableAutoSelect();
     console.log('User successfully signed out');
     document.body.setAttribute('data-logged-in', 'false');
+    await periodicSync(false);
   }
 }
 

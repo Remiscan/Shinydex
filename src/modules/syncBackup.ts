@@ -26,11 +26,48 @@ declare global {
  */
 export async function backgroundSync(): Promise<void> {
   const reg = await navigator.serviceWorker.ready;
+
+  const status = await navigator.permissions.query({
+    // @ts-expect-error
+    name: 'background-sync',
+  });
+  if (status.state !== 'granted') return;
+
   try {
     await reg.sync.register('SYNC-BACKUP');
 
     const loaders = Array.from(document.querySelectorAll('sync-progress, sync-line'));
     loaders.forEach(loader => loader.setAttribute('state', 'loading'));
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+
+/**
+ * Envoie une demande de synchronisation périodique au service worker,
+ * qui sera effectuée dans le background.
+ * @param enabled - `true` pour activer la synchronisation périodique, `false` pour la désactiver.
+ */
+export async function periodicSync(enabled: boolean) {
+  const reg = await navigator.serviceWorker.ready;
+
+  const status = await navigator.permissions.query({
+    // @ts-expect-error
+    name: 'periodic-background-sync',
+  });
+  if (status.state !== 'granted') return;
+
+  try {
+    if ('periodicSync' in reg && reg.periodicSync && typeof reg.periodicSync === 'object') {
+      if (enabled && 'register' in reg.periodicSync && typeof reg.periodicSync.register === 'function') {
+        await reg.periodicSync.register('SYNC-BACKUP', {
+          minInterval: 24 * 60 * 60 * 1000 // 1 jour
+        });
+      } else if (!enabled && 'unregister' in reg.periodicSync && typeof reg.periodicSync.unregister === 'function') {
+        await reg.periodicSync.unregister('SYNC-BACKUP');
+      }
+    }
   } catch (error) {
     console.error(error);
   }
@@ -53,8 +90,8 @@ export async function immediateSync(): Promise<true | string> {
         reject('[:(] Erreur de contact du service worker.');
       }
 
-      if ('successfulBackupComparison' in event.data) {
-        if (event.data.successfulBackupComparison === true) resolve(true);
+      if ('successfulBackupSync' in event.data) {
+        if (event.data.successfulBackupSync === true) resolve(true);
         else reject('[:(] Échec de la synchronisation des BDD.');
       } else {
         reject('[:(] Message invalide reçu du service worker.');

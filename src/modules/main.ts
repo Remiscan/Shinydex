@@ -1,6 +1,7 @@
 import '../../../_common/components/input-slider/input-slider.js';
 import '../../../_common/components/input-switch/input-switch.js';
 import { Hunt } from './Hunt.js';
+import { getCookie } from './Params.js';
 import { Settings } from './Settings.js';
 import { PopulatableSection, populator } from './appContent.js';
 import { appStart, checkUpdate } from './appLifeCycle.js';
@@ -20,7 +21,6 @@ import { huntStorage } from './localForage.js';
 import { navLinkBubble, navigate, sectionActuelle } from './navigate.js';
 import { Notif } from './notification.js';
 import { backgroundSync } from './syncBackup.js';
-import { getCookie } from './Params.js';
 
 
 
@@ -204,11 +204,16 @@ boutonSupprimer.addEventListener('click', async event => {
 ///////////////////////////////////////
 // COMMUNICATION AVEC LE SERVICE WORKER
 navigator.serviceWorker.addEventListener('message', async event => {
-  // --- Réponse à COMPARE-BACKUP ---
-  if ('successfulBackupComparison' in event.data) {
-    const loaders = Array.from(document.querySelectorAll('sync-progress'));
+  if (event.data === 'startBackupSync') {
+    const loaders = Array.from(document.querySelectorAll('sync-progress, sync-line'));
+    loaders.forEach(loader => loader.setAttribute('state', 'loading'));
+  }
+  
+  // --- Réponse à SYNC-BACKUP ---
+  else if ('successfulBackupSync' in event.data) {
+    const loaders = Array.from(document.querySelectorAll('sync-progress, sync-line'));
 
-    if (event.data.successfulBackupComparison === true) {
+    if (event.data.successfulBackupSync === true) {
       // Toutes les chasses locales plus récentes que celles de la BDD ont été ajoutées / éditées
       loaders.forEach(loader => loader.setAttribute('state', 'success'));
       document.body.setAttribute('data-last-sync', 'success');

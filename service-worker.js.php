@@ -134,8 +134,8 @@ self.addEventListener('message', async function(event) {
 
       event.waitUntil(
         syncBackup(false)
-        .then(() => source.postMessage({ successfulBackupComparison: true, noresponse: true }))
-        .catch(() => source.postMessage({ successfulBackupComparison: false, noresponse: true }))
+        .then(() => source.postMessage({ successfulBackupSync: true, noresponse: true }))
+        .catch(() => source.postMessage({ successfulBackupSync: false, noresponse: true }))
       );
     } break;
 
@@ -178,6 +178,20 @@ self.addEventListener('message', async function(event) {
 // SYNC
 self.addEventListener('sync', function(event) {
   console.log('[sw] Requête SYNC reçue :', event.tag);
+
+  switch (event.tag) {
+    case 'SYNC-BACKUP': {
+      event.waitUntil(
+        syncBackup()
+      );
+    } break;
+  }
+});
+
+
+// PERIODIC SYNC
+self.addEventListener('periodicsync', function(event) {
+  console.log('[sw] Requête PERIODIC SYNC reçue :', event.tag);
 
   switch (event.tag) {
     case 'SYNC-BACKUP': {
@@ -354,6 +368,12 @@ async function deleteOldCaches(newCacheName, action) {
  */
 async function syncBackup(message = true) {
   try {
+    // Tell the app a data sync is starting
+    if (message) {
+      const clients = await self.clients.matchAll();
+      clients.map(client => client.postMessage('startBackupSync'));
+    }
+
     // Get local data
     await Promise.all([shinyStorage.ready(), huntStorage.ready()]);
     const localData = await Promise.all(
@@ -423,23 +443,29 @@ async function syncBackup(message = true) {
 
     // Send data back to the app
     await dataStorage.setItem('last-sync', 'success');
-    if (!message) return true;
-    const clients = await self.clients.matchAll();
-    clients.map(client => client.postMessage({
-      successfulBackupComparison: true,
-      quantity: data['results'].length,
-      modified: modifiedHuntids,
-      error: !(data['results'].every(r => r === true))
-    }));
+
+    if (message) {
+      const clients = await self.clients.matchAll();
+      clients.map(client => client.postMessage({
+        successfulBackupSync: true,
+        quantity: data['results'].length,
+        modified: modifiedHuntids,
+        error: !(data['results'].every(r => r === true))
+      }));
+    }
+
     return true;
   }
 
   catch(error) {
     console.error(error);
     await dataStorage.setItem('last-sync', 'failure');
-    if (!message) throw false;
-    const clients = await self.clients.matchAll();
-    clients.map(client => client.postMessage({ successfulBackupComparison: false, error }));
+
+    if (message) {
+      const clients = await self.clients.matchAll();
+      clients.map(client => client.postMessage({ successfulBackupSync: false, error }));
+    }
+    
     return false;
   }
 }
