@@ -382,47 +382,54 @@ async function syncBackup(message = true) {
     
     console.log('[sync-backup] Response from server:', data);
 
-    // -- j'en suis là --
-    return;
-
-    if (data['error'] == true) throw data['response'];
-
-    // Mettons à jour les données locales obsolètes
-    const toSet = [...data['inserts-local'], ...data['updates-local']];
+    // Update local data with newer online data
+    const toSet = [...data['to_insert_local'], ...data['to_update_local']];
     await Promise.all(
       toSet.map(shiny => shinyStorage.setItem(String(shiny.huntid), shiny))
     );
-    const toDelete = [...data['deletions-local']];
-    const prepareForDeletion = async huntid => {
-      // Au lieu d'effacer directement les shiny de la base de données locale,
-      // on les marque "à détruire" au prochain démarrage de l'appli,
-      // pour ne pas rendre obsolète le spritesheet en pleine utilisation de l'appli
-      const shiny = await shinyStorage.getItem(String(huntid));
-      shiny.destroy = true;
-      await shinyStorage.setItem(String(huntid), shiny);
-      return;
-    };
-     await Promise.all(
-      toDelete.map(huntid => prepareForDeletion(huntid))
+
+    const toDelete = [...data['to_delete_local']];
+    await Promise.all(
+      toDelete.map(async shiny => {
+        const storedShiny = await shinyStorage.getItem(shiny.huntid);
+        if (storedShiny) {
+          storedShiny.lastUpdate = shiny.lastUpdate;
+          storedShiny.deleted = true;
+          storedShiny.destroy = true;
+          await huntStorage.setItem(shiny.huntid, storedShiny);
+          return shinyStorage.removeItem(shiny.huntid);
+        } else {
+          const storedHunt = await huntStorage.getItem(shiny.huntid);
+          if (storedHunt) {
+            storedHunt.destroy = true;
+            return huntStorage.setItem(shiny.huntid, storedHunt);
+          }
+        }
+      })
     );
 
-    // Récupérons la liste des huntid créés / modifiés / supprimés
-    const modified = [
-      ...data['inserts-local'].map(shiny => String(shiny.huntid)),
-      ...data['updates-local'].map(shiny => String(shiny.huntid)),
-      ...data['deletions-local'].map(huntid => String(huntid)),
-      ...data['inserts'].map(shiny => String(shiny.huntid)),
-      ...data['updates'].map(shiny => String(shiny.huntid))
-    ];
+    const toRestore = [...data['to_restore_local']];
+    await Promise.all(
+      toRestore.map(shiny => huntStorage.removeItem(shiny.huntid))
+    );
 
-    // Transmettons les informations à l'application
+    // List of inserted / updated / deleted huntids
+    const modifiedHuntids = new Set([
+      ...data['to_insert_local'].map(shiny => String(shiny.huntid)),
+      ...data['to_update_local'].map(shiny => String(shiny.huntid)),
+      ...data['to_delete_local'].map(shiny => String(shiny.huntid)),
+      ...data['to_restore_local'].map(shiny => String(shiny.huntid)),
+    ]);
+
+    // Send data back to the app
     await dataStorage.setItem('last-sync', 'success');
     if (!message) return true;
     const clients = await self.clients.matchAll();
     clients.map(client => client.postMessage({
       successfulBackupComparison: true,
       quantity: data['results'].length,
-      modified
+      modified: modifiedHuntids,
+      error: !(data['results'].every(r => r === true))
     }));
     return true;
   }

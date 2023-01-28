@@ -204,27 +204,26 @@ boutonSupprimer.addEventListener('click', async event => {
 navigator.serviceWorker.addEventListener('message', async event => {
   // --- Réponse à COMPARE-BACKUP ---
   if ('successfulBackupComparison' in event.data) {
-    if ('noresponse' in event.data) return;
-
-    const loaders = Array.from(document.querySelectorAll('sync-progress, sync-line'));
-    const params = document.querySelector('#parametres');
-    if (!(params instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
+    const loaders = Array.from(document.querySelectorAll('sync-progress'));
 
     if (event.data.successfulBackupComparison === true) {
       // Toutes les chasses locales plus récentes que celles de la BDD ont été ajoutées / éditées
       loaders.forEach(loader => loader.setAttribute('state', 'success'));
-      params.dataset.lastSync = 'success';
+      document.body.setAttribute('data-last-sync', 'success');
 
-      window.dispatchEvent(new CustomEvent('populate', { detail: {
-        modified: event.data.modified
-      } }));
+      window.dispatchEvent(new CustomEvent('dataupdate', {
+        detail: {
+          sections: ['mes-chromatiques', 'chasses-en-cours', 'corbeille'],
+          ids: event.data.modified,
+        }
+      }));
     }
     else {
       // Au moins une chasse n'a pas pu être ajoutée / éditée
       if (event.data.error !== true) new Notif(event.data.error).prompt();
       else new Notif('Erreur. Réessayez plus tard.').prompt();
       loaders.forEach(loader => loader.setAttribute('state', 'failure'));
-      params.dataset.lastSync = 'failure';
+      document.body.setAttribute('data-last-sync', 'failure');
     }
   }
 });
