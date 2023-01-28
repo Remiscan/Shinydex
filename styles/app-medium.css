@@ -103,3 +103,7 @@ filter-menu {
   margin-top: var(--section-title-height);
   margin-bottom: auto;
 }
+
+#google-one-tap-container {
+  margin: 16px;
+}

@@ -927,6 +927,7 @@ body[data-section-actuelle~="top-layer"] #top-layer {
  */
 
 #google-signin-button-container {
+  color-scheme: light;
   width: fit-content;
   height: fit-content;
   margin: 8px auto;
@@ -935,12 +936,17 @@ body[data-section-actuelle~="top-layer"] #top-layer {
 }
 
 #google-one-tap-container {
+  color-scheme: light;
   display: flex;
   justify-content: center;
   width: fit-content;
   height: fit-content;
   overflow: hidden;
-  margin: 16px;
+  margin: auto;
+}
+
+iframe[src^="https://accounts.google.com"] {
+  color-scheme: light;
 }
 
 body:not([data-logged-in="true"]) [data-logged-in],
