@@ -1,4 +1,5 @@
 import { getCookie } from './Params.js';
+import { Notif } from './notification.js';
 import { backgroundSync, periodicSync } from './syncBackup.js';
 
 
@@ -42,9 +43,12 @@ async function signinCallback(body: any) {
 
   if ('success' in responseBody) {
     console.log('User successfully signed in');
+    new Notif('Vous êtes connecté.').prompt();
     document.body.setAttribute('data-logged-in', 'true');
     await periodicSync(true);
     await backgroundSync();
+  } else {
+    new Notif('Connexion impossible.').prompt();
   }
 }
 
@@ -62,8 +66,11 @@ async function signOut() {
   if ('success' in responseBody) {
     google?.accounts?.id?.disableAutoSelect();
     console.log('User successfully signed out');
+    new Notif(`Vous n'êtes plus connecté.`).prompt();
     document.body.setAttribute('data-logged-in', 'false');
     await periodicSync(false);
+  } else {
+    new Notif('Déconnexion impossible.').prompt();
   }
 }
 

@@ -10,7 +10,7 @@ export interface localForageAPI {
   length(callback?: () => any): Promise<number>;
   key(index: number, callback?: () => any): Promise<any>;
   keys(callback?: () => any): Promise<string[]>;
-  iterate(iteratorCallback: () => any, callback?: () => any): Promise<any[]>;
+  iterate(iteratorCallback: (value: any, key: string, iterationNumber: number) => any, callback?: () => any): Promise<any[]>;
 
   setDriver(names: string | string[]): void;
   config(options: object): void;

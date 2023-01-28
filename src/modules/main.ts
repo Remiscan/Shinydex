@@ -187,6 +187,8 @@ boutonSupprimer.addEventListener('click', async event => {
     const ids = [...(await shinyStorage.keys()), ...(await huntStorage.keys())];
     await Promise.all([shinyStorage.clear(), huntStorage.clear()]);
 
+    new Notif('Données supprimées.').prompt();
+
     window.dispatchEvent(new CustomEvent('dataupdate', {
       detail: {
         sections: ['mes-chromatiques', 'chasses-en-cours', 'corbeille'],
