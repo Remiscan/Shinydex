@@ -123,7 +123,7 @@ export async function appStart() {
     if (cacheVersion < 0) cacheVersion = pokemonReleaseDate;
 
     // On vérifie si les fichiers sont installés
-    areFilesInstalled = await caches.has(`remidex-sw-${cacheVersion}`);
+    areFilesInstalled = await caches.has(`shinydex-sw-${cacheVersion}`);
 
     // On vérifie si le service worker est prêt
     isServiceWorkerReady = 'serviceWorker' in navigator && navigator.serviceWorker.controller != null;

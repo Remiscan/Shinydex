@@ -40,7 +40,7 @@ export async function upgradeStorage(): Promise<void> {
 
   // Delete old unused databases
   localforage.dropInstance({
-    name: 'remidex',
+    name: 'shinydex',
     storeName: 'pokemon-data'
   });
 

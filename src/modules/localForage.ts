@@ -28,28 +28,28 @@ declare const localforage: localForageAPI;
 
 // Liste de shiny
 const shinyStorage = localforage.createInstance({
-  name: 'remidex',
+  name: 'shinydex',
   storeName: 'shiny-list',
   driver: localforage.INDEXEDDB
 });
 
 // Données diverses
 const dataStorage = localforage.createInstance({
-  name: 'remidex',
+  name: 'shinydex',
   storeName: 'misc',
   driver: localforage.INDEXEDDB
 });
 
 // Chasses en cours
 const huntStorage = localforage.createInstance({
-  name: 'remidex',
+  name: 'shinydex',
   storeName: 'hunts',
   driver: localforage.INDEXEDDB
 });
 
 // Liste de shiny d'un ami
 const friendStorage = localforage.createInstance({
-  name: 'remidex',
+  name: 'shinydex',
   storeName: 'friend-shiny-list',
   driver: localforage.INDEXEDDB
 });

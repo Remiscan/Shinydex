@@ -14,27 +14,27 @@ importScripts('./ext/localforage.min.js');
 // Data storage
 //// Shiny Pokémon
 const shinyStorage = localforage.createInstance({
-  name: 'remidex',
+  name: 'shinydex',
   storeName: 'shiny-list',
   driver: localforage.INDEXEDDB
 });
 //// Hunts
 const huntStorage = localforage.createInstance({
-  name: 'remidex',
+  name: 'shinydex',
   storeName: 'hunts',
   driver: localforage.INDEXEDDB
 });
 //// Miscellaneous data
 const dataStorage = localforage.createInstance({
-  name: 'remidex',
+  name: 'shinydex',
   storeName: 'misc',
   driver: localforage.INDEXEDDB
 });
 
-const cachePrefix = 'remidex-sw';
+const cachePrefix = 'shinydex-sw';
 const currentCacheName = `${cachePrefix}-<?=$maxVersion?>`;
 const liveFileVersions = JSON.parse(`<?=json_encode($fileVersions, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES)?>`);
-const spritesCacheName = 'remidex-sw-sprites-v1';
+const spritesCacheName = 'shinydex-sw-sprites-v1';
 
 
 
