@@ -31,16 +31,9 @@ export async function backgroundSync(): Promise<void> {
     // @ts-expect-error
     name: 'background-sync',
   });
-  if (status.state !== 'granted') return;
+  if (status.state !== 'granted') throw new Error('Background sync permission not granted');
 
-  try {
-    await reg.sync.register('SYNC-BACKUP');
-
-    const loaders = Array.from(document.querySelectorAll('sync-progress, sync-line'));
-    loaders.forEach(loader => loader.setAttribute('state', 'loading'));
-  } catch (error) {
-    console.error(error);
-  }
+  await reg.sync.register('SYNC-BACKUP');
 }
 
 
@@ -108,4 +101,34 @@ export async function immediateSync(): Promise<true | string> {
       worker.postMessage({ 'action': 'sync-backup' }, [chan.port2]);
     }
   });
+}
+
+
+/**
+ * Demande une synchronisation des données,
+ * en background si possible, immédiate sinon.
+ */
+export async function requestSync() {
+  const loaders = Array.from(document.querySelectorAll('sync-progress, sync-line'));
+  loaders.forEach(loader => loader.setAttribute('state', 'loading'));
+
+  try {
+    if ('SyncManager' in window) {
+      try {
+        console.log('Requesting background data sync');
+        return backgroundSync();
+      } catch (error) {
+        console.log('Background sync failed', error);
+        console.log('Trying immediate data sync instead');
+        return immediateSync();
+      }
+    } else {
+      console.log('Requesting immediate data sync');
+      return immediateSync();
+    }
+  } catch (error) {
+    console.error(error);
+    loaders.forEach(loader => loader.setAttribute('state', 'failure'));
+    document.body.setAttribute('data-last-sync', 'failure');
+  }
 }

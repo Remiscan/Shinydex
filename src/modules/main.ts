@@ -20,7 +20,7 @@ import { export2json, json2import } from './exportToJSON.js';
 import { huntStorage, shinyStorage } from './localForage.js';
 import { navLinkBubble, navigate, sectionActuelle } from './navigate.js';
 import { Notif, warnBeforeDestruction } from './notification.js';
-import { backgroundSync } from './syncBackup.js';
+import { requestSync } from './syncBackup.js';
 
 
 
@@ -132,10 +132,10 @@ dataStorage.getItem('last-sync').then((value?: string) => {
 });
 
 // Détecte le clic sur l'état du dernier backup pour en lancer un nouveau
-const backgroundSyncTriggers = [document.querySelector('.info-backup.failure'), document.querySelector('.info-backup.success')];
-backgroundSyncTriggers.forEach(element => {
+const syncTriggers = [document.querySelector('.info-backup.failure'), document.querySelector('.info-backup.success')];
+syncTriggers.forEach(element => {
   if (!(element instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
-  element.onclick = backgroundSync;
+  element.onclick = requestSync;
 });
 */
 
@@ -226,8 +226,7 @@ navigator.serviceWorker.addEventListener('message', async event => {
           ids: event.data.modified,
         }
       }));
-    }
-    else {
+    } else {
       // Au moins une chasse n'a pas pu être ajoutée / éditée
       if (event.data.error !== true) new Notif(event.data.error).prompt();
       else new Notif('Erreur. Réessayez plus tard.').prompt();
@@ -265,7 +264,7 @@ window.addEventListener('dataupdate', async (event: DataUpdateEvent) => {
 
   // On demande une synchronisation des données
   const loggedIn = getCookie('loggedin') === 'true';
-  if (loggedIn) await backgroundSync();
+  if (loggedIn) await requestSync();
 });
 
 

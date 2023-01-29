@@ -131,12 +131,8 @@ self.addEventListener('message', async function(event) {
 
   switch (action) {
     case 'sync-backup': {
-      const source = event.ports[0];
-
       event.waitUntil(
         syncBackup(false)
-        .then(() => source.postMessage({ successfulBackupSync: true, noresponse: true }))
-        .catch(() => source.postMessage({ successfulBackupSync: false, noresponse: true }))
       );
     } break;
 
