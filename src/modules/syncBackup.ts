@@ -24,7 +24,7 @@ declare global {
  * Envoie une demande de synchronication au service worker,
  * qui sera effectuée dans le background.
  */
-export async function backgroundSync(): Promise<void> {
+async function backgroundSync(): Promise<void> {
   const reg = await navigator.serviceWorker.ready;
 
   const status = await navigator.permissions.query({
@@ -33,7 +33,7 @@ export async function backgroundSync(): Promise<void> {
   });
   if (status.state !== 'granted') throw new Error('Background sync permission not granted');
 
-  await reg.sync.register('SYNC-BACKUP');
+  return reg.sync.register('SYNC-BACKUP');
 }
 
 
@@ -42,7 +42,7 @@ export async function backgroundSync(): Promise<void> {
  * qui sera effectuée dans le background.
  * @param enabled - `true` pour activer la synchronisation périodique, `false` pour la désactiver.
  */
-export async function periodicSync(enabled: boolean) {
+async function periodicSync(enabled: boolean): Promise<void> {
   const reg = await navigator.serviceWorker.ready;
 
   const status = await navigator.permissions.query({
@@ -54,11 +54,11 @@ export async function periodicSync(enabled: boolean) {
   try {
     if ('periodicSync' in reg && reg.periodicSync && typeof reg.periodicSync === 'object') {
       if (enabled && 'register' in reg.periodicSync && typeof reg.periodicSync.register === 'function') {
-        await reg.periodicSync.register('SYNC-BACKUP', {
+        return reg.periodicSync.register('SYNC-BACKUP', {
           minInterval: 24 * 60 * 60 * 1000 // 1 jour
         });
       } else if (!enabled && 'unregister' in reg.periodicSync && typeof reg.periodicSync.unregister === 'function') {
-        await reg.periodicSync.unregister('SYNC-BACKUP');
+        return reg.periodicSync.unregister('SYNC-BACKUP');
       }
     }
   } catch (error) {
@@ -116,15 +116,15 @@ export async function requestSync() {
     if ('SyncManager' in window) {
       try {
         console.log('Requesting background data sync');
-        return backgroundSync();
+        return await backgroundSync();
       } catch (error) {
         console.log('Background sync failed', error);
         console.log('Trying immediate data sync instead');
-        return immediateSync();
+        return await immediateSync();
       }
     } else {
       console.log('Requesting immediate data sync');
-      return immediateSync();
+      return await immediateSync();
     }
   } catch (error) {
     console.error(error);

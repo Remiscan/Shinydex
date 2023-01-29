@@ -415,6 +415,8 @@ async function syncBackup(message = true) {
     
     console.log('[sync-backup] Response from server:', data);
 
+    if ('error' in data) return;
+
     // Update local data with newer online data
     const toSet = [...data['to_insert_local'], ...data['to_update_local']];
     await Promise.all(
