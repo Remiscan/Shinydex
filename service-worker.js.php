@@ -10,6 +10,7 @@ $maxVersion = max($fileVersions);
 ?> */
 
 importScripts('./ext/localforage.min.js');
+importScripts('./dist/modules/ShinyBackend.nomodule.php');
 
 // Data storage
 //// Shiny Pokémon
@@ -283,7 +284,14 @@ async function cacheAllSprites(source) {
     if (!(response.status === 200)) {
       throw new Error('Could not fetch list of sprites');
     }
-    response = await response.json();
+
+    let response2 = response.clone();
+    try {
+      response = await response.json();
+    } catch {
+      response = await response2.text();
+      throw new Error('Invalid json:', response);
+    }
 
     const allSprites = (response['files'] ?? []).map(path => `${location.origin}/shinydex/images/pokemon-sprites/webp/112/${path}`);
     const allSpritesNumber = allSprites.length;
@@ -379,10 +387,12 @@ async function syncBackup(message = true) {
     const localData = await Promise.all(
       (await shinyStorage.keys())
       .map(key => shinyStorage.getItem(key))
+      .map(shiny => (new FrontendShiny(shiny)).toBackend())
     );
     const deletedLocalData = (await Promise.all(
       (await huntStorage.keys())
-      .map(key => huntStorage.get(key))
+      .map(key => huntStorage.getItem(key))
+      .map(hunt => (new FrontendShiny(hunt)).toBackend())
     ))
     .filter(pkmn => pkmn.deleted);
 
@@ -391,21 +401,31 @@ async function syncBackup(message = true) {
     formData.append('local-data', JSON.stringify(localData));
     formData.append('deleted-local-data', JSON.stringify(deletedLocalData));
 
-    const response = await fetch('/remidex/backend/sync-backup.php?date=' + Date.now(), {
+    const response = await fetch('/shinydex/backend/sync-backup.php?date=' + Date.now(), {
       method: 'POST',
       body: formData
     });
     if (response.status != 200)
       throw new Error('[:(] Erreur ' + response.status + ' lors de la requête');
 
-    const data = await response.json();
+    let data;
+    let response2 = response.clone();
+    try {
+      data = await response.json();
+    } catch {
+      data = await response2.text();
+      throw new Error('Invalid json:', data);
+    }
     
     console.log('[sync-backup] Response from server:', data);
 
     // Update local data with newer online data
     const toSet = [...data['to_insert_local'], ...data['to_update_local']];
     await Promise.all(
-      toSet.map(shiny => shinyStorage.setItem(String(shiny.huntid), shiny))
+      toSet.map(shiny => {
+        const feShiny = new FrontendShiny(shiny);
+        return shinyStorage.setItem(String(shiny.huntid), feShiny);
+      })
     );
 
     const toDelete = [...data['to_delete_local']];
@@ -449,7 +469,7 @@ async function syncBackup(message = true) {
       clients.map(client => client.postMessage({
         successfulBackupSync: true,
         quantity: data['results'].length,
-        modified: modifiedHuntids,
+        modified: [...modifiedHuntids],
         error: !(data['results'].every(r => r === true))
       }));
     }

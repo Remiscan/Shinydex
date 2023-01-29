@@ -36,20 +36,11 @@ $local_deleted_data = json_decode($_POST['deleted-local-data'], true);
  */
 
 if (!isset($_COOKIE['user']) || !isset($_COOKIE['id-provider'])) {
-  $response['error'] = 'User is not logged in';
-  respond($response);
-  exit;
-}
-
-require_once __DIR__.'/verify-id-token.php';
-$user = verifyIdToken($_COOKIE['id-provider'], $_COOKIE['user']);
-
-if (!$user) {
-  respondError('User token is not valid');
+  respondError('User is not logged in');
 }
 
 $provider = $_COOKIE['id-provider'];
-$provideruserid = $_COOKIE['user']['sub'];
+$provideruserid = $_COOKIE['user'];
 
 
 
@@ -94,7 +85,7 @@ if (!$user_data) {
   }
 }
 
-$userid = $user_data['userid'];
+$userid = $user_data['uuid'];
 
 if (!is_string($userid) || strlen($userid) !== 36) {
   respondError('Invalid user id');
@@ -107,13 +98,13 @@ if (!is_string($userid) || strlen($userid) !== 36) {
  * including his deleted Pokémon.
  */
 
-$online_data = $link->prepare('SELECT * FROM shinydex_pokemon WHERE userid = :userid ORDER BY id DESC');
-$online_data->bindParam(':userid', $userUUID, PDO::PARAM_STR, 36);
+$online_data = $db->prepare('SELECT * FROM `shinydex_pokemon` WHERE `userid` = :userid ORDER BY id DESC');
+$online_data->bindParam(':userid', $userid, PDO::PARAM_STR, 36);
 $online_data->execute();
 $online_data = $online_data->fetchAll(PDO::FETCH_ASSOC);
 
-$online_deleted_data = $link->prepare('SELECT * FROM shinydex_deleted_pokemon WHERE userid = :userid ORDER BY id DESC');
-$online_deleted_data->bindParam(':userid', $userUUID, PDO::PARAM_STR, 36);
+$online_deleted_data = $db->prepare('SELECT * FROM `shinydex_deleted_pokemon` WHERE `userid` = :userid ORDER BY id DESC');
+$online_deleted_data->bindParam(':userid', $userid, PDO::PARAM_STR, 36);
 $online_deleted_data->execute();
 $online_deleted_data = $online_deleted_data->fetchAll(PDO::FETCH_ASSOC);
 
@@ -158,11 +149,11 @@ foreach($local_data as $key => $local_shiny) {
   $is_online_deleted_key = array_search($local_shiny['huntid'], array_column($online_deleted_data, 'huntid'));
 
   // 1-:
-  if (!$is_online_key && !$is_online_deleted_key) {
+  if ($is_online_key === false && $is_online_deleted_key === false) {
     $to_insert_online[] = $local_shiny;
   }
   // 1A:
-  else if ($is_online_key) {
+  else if ($is_online_key !== false) {
     $online_shiny = $online_data[$is_online_key];
     if ($local_shiny['lastUpdate'] > $online_shiny['lastUpdate']) {
       $to_update_online[] = $local_shiny;
@@ -171,7 +162,7 @@ foreach($local_data as $key => $local_shiny) {
     }
   }
   // 1B:
-  else if ($is_online_deleted_key) {
+  else if ($is_online_deleted_key !== false) {
     $online_deleted_shiny = $online_deleted_data[$is_online_deleted_key];
     if ($local_shiny['lastUpdate'] > $online_deleted_shiny['lastUpdate']) {
       $to_insert_online[] = $local_shiny;
@@ -185,13 +176,13 @@ foreach($local_data as $key => $local_shiny) {
 
 // 2:
 foreach($local_deleted_data as $key => $local_deleted_shiny) {
-  $is_online_key = array_search($local_shiny['huntid'], array_column($online_data, 'huntid'));
-  $is_online_deleted_key = array_search($local_shiny['huntid'], array_column($online_deleted_data, 'huntid'));
+  $is_online_key = array_search($local_deleted_shiny['huntid'], array_column($online_data, 'huntid'));
+  $is_online_deleted_key = array_search($local_deleted_shiny['huntid'], array_column($online_deleted_data, 'huntid'));
 
   // 2-:
-  if (!$is_online_key && !$is_online_deleted_key) {}
+  if ($is_online_key === false && $is_online_deleted_key === false) {}
   // 2A:
-  else if ($is_online_key) {
+  else if ($is_online_key !== false) {
     $online_shiny = $online_data[$is_online_key];
     if ($local_deleted_shiny['lastUpdate'] > $online_shiny['lastUpdate']) {
       $to_delete_online[] = $local_deleted_shiny;
@@ -201,7 +192,7 @@ foreach($local_deleted_data as $key => $local_deleted_shiny) {
     }
   }
   // 2B:
-  else if ($is_online_deleted_key) {
+  else if ($is_online_deleted_key !== false) {
     $online_deleted_shiny = $online_deleted_data[$is_online_deleted_key];
     $to_delete_local[] = $online_deleted_shiny;
   }
@@ -214,7 +205,7 @@ foreach($online_data as $key => $online_shiny) {
   $is_local_deleted_key = array_search($online_shiny['huntid'], array_column($local_deleted_data, 'huntid'));
 
   // A-:
-  if (!$is_local_key && !$is_local_deleted_key) {
+  if ($is_local_key === false && $is_local_deleted_key === false) {
     $to_insert_local[] = $online_shiny;
   }
 }
@@ -228,25 +219,25 @@ foreach($online_data as $key => $online_shiny) {
 $results = [];
 
 foreach($to_insert_online as $key => $shiny) {
-  $insert = $db->prepare("INSERT INTO shinydex_pokemon (
-    huntid,
-    userid,
-    creationTime,
-    lastUpdate,
+  $insert = $db->prepare("INSERT INTO `shinydex_pokemon` (
+    `huntid`,
+    `userid`,
+    `creationTime`,
+    `lastUpdate`,
 
-    dexid,
-    forme,
-    game,
-    method,
-    count,
-    charm,
+    `dexid`,
+    `forme`,
+    `game`,
+    `method`,
+    `count`,
+    `charm`,
 
-    catchTime,
-    name,
-    ball,
-    gene,
+    `catchTime`,
+    `name`,
+    `ball`,
+    `gene`,
 
-    notes
+    `notes`
   ) VALUES (
     :huntid,
     :userid,
@@ -261,7 +252,7 @@ foreach($to_insert_online as $key => $shiny) {
     :charm,
 
     :catchTime,
-    :name,
+    :nickname,
     :ball,
     :gene,
 
@@ -281,7 +272,7 @@ foreach($to_insert_online as $key => $shiny) {
   $insert->bindParam(':charm', $shiny['charm'], PDO::PARAM_INT, 1);
 
   $insert->bindParam(':catchTime', $shiny['catchTime'], PDO::PARAM_STR, 13);
-  $insert->bindParam(':name', $shiny['name'], PDO::PARAM_STR, 50);
+  $insert->bindParam(':nickname', $shiny['name'], PDO::PARAM_STR, 50);
   $insert->bindParam(':ball', $shiny['ball'], PDO::PARAM_STR, 50);
   $insert->bindParam(':gene', $shiny['gene'], PDO::PARAM_STR, 50);
 
@@ -292,23 +283,23 @@ foreach($to_insert_online as $key => $shiny) {
 
 
 foreach($to_update_online as $key => $shiny) {
-  $update = $db->prepare('UPDATE shinydex_pokemon SET 
-    lastUpdate = :lastUpdate,
+  $update = $db->prepare('UPDATE `shinydex_pokemon` SET 
+    `lastUpdate` = :lastUpdate,
 
-    dexid = :dexid,
-    forme = :forme,
-    game = :game,
-    method = :method,
-    count = :count,
-    charm = :charm,
+    `dexid` = :dexid,
+    `forme` = :forme,
+    `game` = :game,
+    `method` = :method,
+    `count` = :count,
+    `charm` = :charm,
 
-    catchTime = :catchTime,
-    name = :name,
-    ball = :ball,
-    gene = :gene,
+    `catchTime` = :catchTime,
+    `name` = :nickname,
+    `ball` = :ball,
+    `gene` = :gene,
 
-    notes = :notes
-  WHERE huntid = :huntid AND userid = :userid');
+    `notes` = :notes
+  WHERE `huntid` = :huntid AND `userid` = :userid');
 
   $update->bindParam(':huntid', $shiny['huntid'], PDO::PARAM_STR, 36);
   $update->bindParam(':userid', $userid, PDO::PARAM_STR, 36);
@@ -323,7 +314,7 @@ foreach($to_update_online as $key => $shiny) {
   $update->bindParam(':charm', $shiny['charm'], PDO::PARAM_INT, 1);
 
   $update->bindParam(':catchTime', $shiny['catchTime'], PDO::PARAM_STR, 13);
-  $update->bindParam(':name', $shiny['name'], PDO::PARAM_STR, 50);
+  $update->bindParam(':nickname', $shiny['name'], PDO::PARAM_STR, 50);
   $update->bindParam(':ball', $shiny['ball'], PDO::PARAM_STR, 50);
   $update->bindParam(':gene', $shiny['gene'], PDO::PARAM_STR, 50);
 
@@ -334,10 +325,10 @@ foreach($to_update_online as $key => $shiny) {
 
 
 foreach($to_delete_online as $key => $shiny) {
-  $insert = $db->prepare("INSERT INTO shinydex_deleted_pokemon (
-    huntid,
-    userid,
-    lastUpdate
+  $insert = $db->prepare("INSERT INTO `shinydex_deleted_pokemon` (
+    `huntid`,
+    `userid`,
+    `lastUpdate`
   ) VALUES (
     :huntid,
     :userid,

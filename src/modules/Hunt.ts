@@ -1,10 +1,10 @@
-import { Shiny, frontendShiny } from './Shiny.js';
+import { Shiny } from './Shiny.js';
 import { huntStorage, shinyStorage } from './localForage.js';
 
 
 
 // Structure d'un Pokémon en cours de chasse tel que stocké dans la BDD locale
-export interface huntedPokemon extends frontendShiny {
+export interface huntedPokemon extends Shiny {
   caught: boolean,
 }
 

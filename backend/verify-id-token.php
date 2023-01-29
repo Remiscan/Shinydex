@@ -1,5 +1,5 @@
 <?php
-function verifyIdToken(string $provider, string|null $token = null): array {
+function verifyIdToken(string $provider, string|null $token = null) {
   switch ($provider) {
     case 'google':
       require_once __DIR__.'/composer/vendor/autoload.php';

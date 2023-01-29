@@ -15,12 +15,17 @@ $cookieOptions = [
   'path' => '/shinydex/'
 ];
 
-setcookie('user', '', [
+setcookie('id-jwt', '', [
   ...$cookieOptions,
   'httponly' => true
 ]);
 
 setcookie('id-provider', '', [
+  ...$cookieOptions,
+  'httponly' => true
+]);
+
+setcookie('user', '', [
   ...$cookieOptions,
   'httponly' => true
 ]);

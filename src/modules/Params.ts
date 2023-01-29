@@ -106,3 +106,10 @@ export function getCookie(name: string): string {
   const cookies = getCookies();
   return cookies[name];
 }
+
+
+//////////////////////////////////////////////////////////
+// Promise résolue quand l'appli est prête à être affichée
+export const appIsReady = new Promise(resolve => {
+  window.addEventListener('appready', resolve);
+});

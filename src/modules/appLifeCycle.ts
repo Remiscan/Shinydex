@@ -250,7 +250,8 @@ export async function appStart() {
   }
 
   document.getElementById('version-fichiers')!.innerHTML = timestamp2date(cacheVersion * 1000);
-  console.log('[:)] Chargement de l\'application...');
+  window.dispatchEvent(new Event('appready'));
+
 
   // ---
 

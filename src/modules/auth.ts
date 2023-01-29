@@ -1,6 +1,6 @@
 import { getCookie } from './Params.js';
 import { Notif } from './notification.js';
-import { backgroundSync, periodicSync } from './syncBackup.js';
+import { periodicSync } from './syncBackup.js';
 
 
 
@@ -46,7 +46,7 @@ async function signinCallback(body: any) {
     new Notif('Vous êtes connecté.').prompt();
     document.body.setAttribute('data-logged-in', 'true');
     await periodicSync(true);
-    await backgroundSync();
+    //await backgroundSync();
   } else {
     new Notif('Connexion impossible.').prompt();
   }

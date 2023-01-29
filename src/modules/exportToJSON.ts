@@ -1,6 +1,6 @@
-import { Hunt, huntedPokemon } from "./Hunt.js";
+import { Hunt } from "./Hunt.js";
 import { timestamp2date, wait } from "./Params.js";
-import { Shiny, frontendShiny } from "./Shiny.js";
+import { Shiny } from "./Shiny.js";
 import { dataStorage, huntStorage, localForageAPI, shinyStorage } from "./localForage.js";
 import { Notif } from "./notification.js";
 import { updateDataFormat, upgradeStorage } from "./upgradeStorage.js";
@@ -25,15 +25,22 @@ export async function json2import(file: File | Blob | undefined): Promise<string
       notification.dismissable = false;
       const startTime = performance.now();
 
+      let modifiedIds = new Set();
       await shinyStorage.ready();
       await Promise.all(
         importedData.shiny.map((shiny: any) => updateDataFormat(shiny))
-                          .map((shiny: any) => shinyStorage.setItem(shiny.huntid, new Shiny(shiny)))
+                          .map((shiny: any) => {
+                            modifiedIds.add(shiny.huntid);
+                            return shinyStorage.setItem(shiny.huntid, new Shiny(shiny))
+                          })
       );
       await huntStorage.ready();
       await Promise.all(
         importedData.hunts.map((hunt: any) => updateDataFormat(hunt))
-                          .map((hunt: any) => huntStorage.setItem(hunt.huntid, new Hunt(hunt)))
+                          .map((hunt: any) => {
+                            modifiedIds.add(hunt.huntid);
+                            return huntStorage.setItem(hunt.huntid, new Hunt(hunt))
+                          })
       );
 
       await upgradeStorage();
@@ -41,10 +48,7 @@ export async function json2import(file: File | Blob | undefined): Promise<string
       window.dispatchEvent(new CustomEvent('dataupdate', {
         detail: {
           sections: ['mes-chromatiques', 'chasses-en-cours', 'corbeille'],
-          ids: [
-            ...importedData.shiny.map((shiny: frontendShiny) => shiny.huntid),
-            ...importedData.hunts.map((hunt: huntedPokemon) => hunt.huntid)
-          ]
+          ids: [...modifiedIds]
         }
       }));
 

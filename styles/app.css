@@ -932,7 +932,6 @@ body[data-section-actuelle~="top-layer"] #top-layer {
   height: fit-content;
   margin: 8px auto;
   overflow: hidden;
-  border-radius: 40px;
 }
 
 #google-one-tap-container {

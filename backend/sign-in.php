@@ -29,18 +29,23 @@ $payload = verifyIdToken($body['provider'], $body['credential']);
 
 if ($payload) {
   $cookieOptions = [
-    'expires' => time() + 31 * 60 * 3600, // 1 month
+    'expires' => time() + 60 * 55, // 55 minutes
     'secure' => true,
     'samesite' => 'Strict',
     'path' => '/shinydex/'
   ];
 
-  setcookie('user', $body['credential'], [
+  setcookie('id-jwt', $body['credential'], [
     ...$cookieOptions,
     'httponly' => true
   ]);
 
   setcookie('id-provider', $body['provider'], [
+    ...$cookieOptions,
+    'httponly' => true
+  ]);
+
+  setcookie('user', $payload['sub'], [
     ...$cookieOptions,
     'httponly' => true
   ]);
@@ -57,12 +62,17 @@ if ($payload) {
     'path' => '/shinydex/'
   ];
 
-  setcookie('user', '', [
+  setcookie('id-jwt', '', [
     ...$cookieOptions,
     'httponly' => true
   ]);
 
   setcookie('id-provider', '', [
+    ...$cookieOptions,
+    'httponly' => true
+  ]);
+
+  setcookie('user', '', [
     ...$cookieOptions,
     'httponly' => true
   ]);
