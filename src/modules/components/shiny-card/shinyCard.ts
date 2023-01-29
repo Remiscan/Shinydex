@@ -322,6 +322,7 @@ export class shinyCard extends HTMLElement {
         detail: {
           sections: ['chasses-en-cours'],
           ids: [this.huntid],
+          sync: false
         }
       }));
 

@@ -48,7 +48,8 @@ export async function json2import(file: File | Blob | undefined): Promise<string
       window.dispatchEvent(new CustomEvent('dataupdate', {
         detail: {
           sections: ['mes-chromatiques', 'chasses-en-cours', 'corbeille'],
-          ids: [...modifiedIds]
+          ids: [...modifiedIds],
+          sync: true
         }
       }));
 

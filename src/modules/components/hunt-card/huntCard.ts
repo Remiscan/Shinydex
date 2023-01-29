@@ -111,6 +111,7 @@ export class huntCard extends HTMLElement {
         detail: {
           sections: ['mes-chromatiques', 'chasses-en-cours'],
           ids: [this.huntid],
+          sync: true
         }
       }));
     }
@@ -135,6 +136,7 @@ export class huntCard extends HTMLElement {
           detail: {
             sections: ['chasses-en-cours'],
             ids: [this.huntid],
+            sync: false
           }
         }));
       }
@@ -151,6 +153,7 @@ export class huntCard extends HTMLElement {
             detail: {
               sections: ['chasses-en-cours', 'corbeille'],
               ids: [this.huntid],
+              sync: false
             }
           }));
         }
@@ -179,6 +182,7 @@ export class huntCard extends HTMLElement {
       detail: {
         sections: ['chasses-en-cours'],
         ids: [this.huntid],
+        sync: false
       }
     }));
   }
@@ -207,6 +211,7 @@ export class huntCard extends HTMLElement {
       detail: {
         sections: ['mes-chromatiques', 'chasses-en-cours', 'corbeille'],
         ids: [this.huntid],
+        sync: true
       }
     }));
   }

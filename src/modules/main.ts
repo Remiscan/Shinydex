@@ -96,6 +96,7 @@ document.querySelector('.fab')!.addEventListener('click', async () => {
       detail: {
         sections: ['chasses-en-cours'],
         ids: [hunt.huntid],
+        sync: false
       }
     }));
   }
@@ -193,6 +194,7 @@ boutonSupprimer.addEventListener('click', async event => {
       detail: {
         sections: ['mes-chromatiques', 'chasses-en-cours', 'corbeille'],
         ids: ids,
+        sync: false
       }
     }));
 
@@ -224,6 +226,7 @@ navigator.serviceWorker.addEventListener('message', async event => {
         detail: {
           sections: ['mes-chromatiques', 'chasses-en-cours', 'corbeille'],
           ids: event.data.modified,
+          sync: false
         }
       }));
     } else {
@@ -244,6 +247,7 @@ interface DataUpdateEvent extends CustomEvent {
   detail: {
     sections: PopulatableSection[];
     ids: string[];
+    sync?: boolean;
   }
 }
 
@@ -257,14 +261,14 @@ window.addEventListener('dataupdate', async (event: DataUpdateEvent) => {
   console.log(event);
 
   // On peuple l'application avec les nouvelles données
-  const { sections, ids } = event.detail;
+  const { sections, ids, sync } = event.detail;
   for (const section of sections) {
     await populator[section](ids);
   }
 
   // On demande une synchronisation des données
   const loggedIn = getCookie('loggedin') === 'true';
-  if (loggedIn) await requestSync();
+  if (loggedIn && sync) await requestSync();
 });
 
 

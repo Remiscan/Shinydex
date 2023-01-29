@@ -382,15 +382,20 @@ async function syncBackup(message = true) {
     await Promise.all([shinyStorage.ready(), huntStorage.ready()]);
     const localData = await Promise.all(
       (await shinyStorage.keys())
-      .map(key => shinyStorage.getItem(key))
-      .map(shiny => (new FrontendShiny(shiny)).toBackend())
+      .map(async key => {
+        const shiny = await shinyStorage.getItem(key);
+        return (new FrontendShiny(shiny)).toBackend();
+      })
     );
     const deletedLocalData = (await Promise.all(
       (await huntStorage.keys())
-      .map(key => huntStorage.getItem(key))
-      .map(hunt => (new FrontendShiny(hunt)).toBackend())
+      .map(async key => {
+        const hunt = await huntStorage.getItem(key);
+        if ('deleted' in hunt && hunt.deleted && !hunt.destroy) return (new FrontendShiny(hunt)).toBackend();
+        else return null;
+      })
     ))
-    .filter(pkmn => pkmn.deleted);
+    .filter(pkmn => pkmn != null);
 
     // Send local data to the backend
     const formData = new FormData();

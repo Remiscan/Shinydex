@@ -67,6 +67,7 @@ export class corbeilleCard extends shinyCard {
           detail: {
             sections: ['chasses-en-cours', 'corbeille'],
             ids: [this.huntid],
+            sync: false
           }
         }));
       }
