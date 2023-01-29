@@ -35,12 +35,19 @@ $local_deleted_data = json_decode($_POST['deleted-local-data'], true);
  * Step 2: Get user data
  */
 
-if (!isset($_COOKIE['user']) || !isset($_COOKIE['id-provider'])) {
+if (!isset($_COOKIE['id-jwt']) || !isset($_COOKIE['id-provider'])) {
   respondError('User is not logged in');
 }
 
+require_once __DIR__.'/verify-id-token.php';
+$user = verifyIdToken($_COOKIE['id-provider'], $_COOKIE['id-jwt']);
+
+if (!$user) {
+  respondError('User token is not valid');
+}
+
 $provider = $_COOKIE['id-provider'];
-$provideruserid = $_COOKIE['user'];
+$provideruserid = $user['sub'];
 
 
 

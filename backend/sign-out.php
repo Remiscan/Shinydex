@@ -25,11 +25,6 @@ setcookie('id-provider', '', [
   'httponly' => true
 ]);
 
-setcookie('user', '', [
-  ...$cookieOptions,
-  'httponly' => true
-]);
-
 setcookie('loggedin', '', $cookieOptions);
 
 $response['success'] = 'signed out';

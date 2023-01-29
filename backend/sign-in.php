@@ -45,11 +45,6 @@ if ($payload) {
     'httponly' => true
   ]);
 
-  setcookie('user', $payload['sub'], [
-    ...$cookieOptions,
-    'httponly' => true
-  ]);
-
   setcookie('loggedin', 'true', $cookieOptions);
 
   $response['success'] = 'Connection successful';
@@ -68,11 +63,6 @@ if ($payload) {
   ]);
 
   setcookie('id-provider', '', [
-    ...$cookieOptions,
-    'httponly' => true
-  ]);
-
-  setcookie('user', '', [
     ...$cookieOptions,
     'httponly' => true
   ]);
