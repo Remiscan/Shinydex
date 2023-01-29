@@ -140,8 +140,8 @@ export function updateDataFormat(shiny: { [key: string]: any }): { [key: string]
       ['Raid Dynamax', 'Raid'],
       ['Sauvage (garanti)', 'Sauvage (chromatique garanti)'],
       ['Échangé', 'Échange'],
-      ['Échangé (GTS)', 'Échange (GTS)'],
-      ['Échangé (œuf)', 'Échange (œuf)'],
+      ['Échangé (GTS)', 'Échange'],
+      ['Échangé (œuf)', 'Échange'],
     ]);
     const newName = renames.get(shiny['method']);
     if (newName) shiny['method'] = newName;

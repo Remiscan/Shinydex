@@ -41,9 +41,6 @@ const allMethodes: Methode[] = [
   { id: 'event', jeux: allGames, mine: false, charm: false },
 
   { id: 'trade', jeux: allGames, mine: false, charm: false },
-  { id: 'gtstrade', jeux: allGames.filter(g => g.gen >= 4 && g.gen != 7.1), mine: false, charm: false },
-  { id: 'wondertrade', jeux: allGames.filter(g => g.gen >= 6 && g.gen != 7.1), mine: false, charm: false },
-  { id: 'eggtrade', jeux: allGames.filter(g => g.gen >= 2 && g.gen != 7.1), mine: false, charm: false },
 
   { id: 'glitch', jeux: allGames.filter(g => [1, 2].includes(g.gen)), mine: true, charm: false },
   { id: 'hack', jeux: allGames, mine: false, charm: false },
