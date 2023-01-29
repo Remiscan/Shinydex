@@ -66,11 +66,6 @@ button:not(.pkmnicon)::before {
   transform: translate(-50%, -50%);
 }
 
-button.only-icon .label,
-button.only-text .icon {
-  display: none;
-}
-
 button.only-icon {
   padding: 0 16px;
 }
@@ -127,6 +122,12 @@ button.filled.danger {
   --state-tint: var(--on-error-container);
 }
 
+button.filled.success {
+  --surface-color: var(--success-container);
+  color: rgb(var(--on-success-container));
+  --state-tint: var(--on-success-container);
+}
+
 /* Outlined */
 
 button.outlined {
@@ -154,6 +155,16 @@ button.text-button {
   --elevation-opacity: 0;
   color: rgb(var(--primary));
   --state-tint: var(--primary);
+}
+
+button.text-button.danger {
+  color: rgb(var(--on-error-container));
+  --state-tint: var(--error-container);
+}
+
+button.text-button.success {
+  color: rgb(var(--on-success-container));
+  --state-tint: var(--success-container);
 }
 
 /* Fab */

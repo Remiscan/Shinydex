@@ -710,32 +710,10 @@ h2:not(:first-child) {
   margin: 0;
 }
 
-#parametres:not([data-online-backup]) .if-backup,
-#parametres:not([data-online-sharing]) .if-sharing {
+body:not([data-last-sync]) #parametres [data-last-sync],
+body[data-last-sync="success"] #parametres [data-last-sync="failure"],
+body[data-last-sync="failure"] #parametres [data-last-sync="success"] {
   display: none;
-}
-
-#parametres[data-online-backup] .no-backup,
-#parametres[data-online-sharing] .no-sharing {
-  display: none;
-}
-
-.info-backup {
-  display: none;
-  font-size: .8rem;
-  color: var(--bg-color);
-  background-color: var(--color);
-  padding: .2em .5em;
-  margin-left: .2em;
-  border-radius: 20px;
-}
-
-.info-backup.success {
-  --color: var(--success-color);
-}
-
-.info-backup.failure {
-  --color: var(--failure-color);
 }
 
 [data-sprites-progress]:empty {

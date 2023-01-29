@@ -17,7 +17,7 @@ import './components/sprite-viewer/spriteViewer.js';
 import './components/syncLine.js';
 import './components/syncProgress.js';
 import { export2json, json2import } from './exportToJSON.js';
-import { huntStorage, shinyStorage } from './localForage.js';
+import { dataStorage, huntStorage, shinyStorage } from './localForage.js';
 import { navLinkBubble, navigate, sectionActuelle } from './navigate.js';
 import { Notif, warnBeforeDestruction } from './notification.js';
 import { requestSync } from './syncBackup.js';
@@ -123,22 +123,14 @@ settingsForm.addEventListener('change', event => {
   settings.save();
 });
 
-/*
-// Applique l'info sauvegardée au badge indiquant le succès / échec de la dernière synchronisation des BDD
-dataStorage.getItem('last-sync').then((value?: string) => {
-  const params = document.querySelector('#parametres');
-  if (!(params instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
-  if (value === 'success') params.dataset.lastSync = 'success';
-  else                     params.dataset.lastSync = 'failure';
-});
-
 // Détecte le clic sur l'état du dernier backup pour en lancer un nouveau
-const syncTriggers = [document.querySelector('.info-backup.failure'), document.querySelector('.info-backup.success')];
+const syncTriggers = [...document.querySelectorAll('[data-action="sync-now"]')];
 syncTriggers.forEach(element => {
-  if (!(element instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
-  element.onclick = requestSync;
+  if (!(element instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
+  element.addEventListener('click', event => {
+    requestSync();
+  });
 });
-*/
 
 // Détecte le clic sur le bouton de recherche de mise à jour
 {
@@ -211,6 +203,14 @@ navigator.serviceWorker.addEventListener('message', async event => {
   if (event.data === 'startBackupSync') {
     const loaders = Array.from(document.querySelectorAll('sync-progress, sync-line'));
     loaders.forEach(loader => loader.setAttribute('state', 'loading'));
+
+    const syncTime = Date.now();
+    await dataStorage.setItem('last-sync-time', syncTime);
+    const syncTimeContainer = document.querySelector('[data-sync-time-container]');
+    if (syncTimeContainer instanceof HTMLElement) {
+      const date = new Date(syncTime);
+      syncTimeContainer.innerHTML = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+    };
   }
   
   // --- Réponse à SYNC-BACKUP ---
@@ -218,7 +218,6 @@ navigator.serviceWorker.addEventListener('message', async event => {
     const loaders = Array.from(document.querySelectorAll('sync-progress, sync-line'));
 
     if (event.data.successfulBackupSync === true) {
-      // Toutes les chasses locales plus récentes que celles de la BDD ont été ajoutées / éditées
       loaders.forEach(loader => loader.setAttribute('state', 'success'));
       document.body.setAttribute('data-last-sync', 'success');
 
@@ -230,9 +229,6 @@ navigator.serviceWorker.addEventListener('message', async event => {
         }
       }));
     } else {
-      // Au moins une chasse n'a pas pu être ajoutée / éditée
-      if (event.data.error !== true) new Notif(event.data.error).prompt();
-      else new Notif('Erreur. Réessayez plus tard.').prompt();
       loaders.forEach(loader => loader.setAttribute('state', 'failure'));
       document.body.setAttribute('data-last-sync', 'failure');
     }

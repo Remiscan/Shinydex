@@ -1,6 +1,4 @@
 import { Params } from '../Params.js';
-// @ts-expect-error
-import sheet from './styles.css' assert { type: 'css' };
 
 
 
@@ -47,7 +45,7 @@ sheet.replaceSync(/*css*/`
   }
 
   .progress-dots {
-    stroke: var(--text-color-soft);
+    stroke: rgb(var(--surface-variant));
     stroke-width: 1px;
     stroke-dasharray: 2px 3px;
     stroke-dashoffset: 0;
@@ -55,13 +53,13 @@ sheet.replaceSync(/*css*/`
   }
 
   .failure>.progress-dots {
-    stroke: var(--failure-color);
+    stroke: rgb(var(--error));
     transition: stroke 0 linear;
     transition-delay: .5s;
   }
 
   .lazy>.progress-dots {
-    stroke: var(--success-color);
+    stroke: rgb(var(--success));
     transition: stroke .1s linear;
     transition-delay: .5s;
   }
@@ -82,7 +80,7 @@ sheet.replaceSync(/*css*/`
   }
 
   .progress-line {
-    stroke: var(--progress-bar-color);
+    stroke: rgb(var(--primary));
     stroke-width: 2px;
     stroke-dasharray: 101px;
     stroke-dashoffset: 101px;
@@ -157,7 +155,7 @@ export class syncProgress extends HTMLElement {
 
         const offset = ((this.loadingAnim.currentTime || 0) % loadingDuration < .5 * loadingDuration) ? '0' : '-202px';
         this.successAnim = progressLine.animate([
-          { strokeDashoffset: offset, stroke: 'var(--success-color)' }
+          { strokeDashoffset: offset, stroke: 'rgb(var(--success))' }
         ], {
           duration: successDuration,
           iterations: 1,
@@ -174,7 +172,7 @@ export class syncProgress extends HTMLElement {
 
         const offset = ((this.loadingAnim.currentTime || 0) % loadingDuration < .5 * loadingDuration) ? '0' : '-202px';
         this.failureAnim = progressLine.animate([
-          { strokeDashoffset: offset, stroke: 'var(--failure-color)' }
+          { strokeDashoffset: offset, stroke: 'rgb(var(--error))' }
         ], {
           duration: successDuration,
           iterations: 1,

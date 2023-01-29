@@ -109,9 +109,6 @@ export async function immediateSync(): Promise<true | string> {
  * en background si possible, immédiate sinon.
  */
 export async function requestSync() {
-  const loaders = Array.from(document.querySelectorAll('sync-progress, sync-line'));
-  loaders.forEach(loader => loader.setAttribute('state', 'loading'));
-
   try {
     if ('SyncManager' in window) {
       try {
@@ -128,7 +125,5 @@ export async function requestSync() {
     }
   } catch (error) {
     console.error(error);
-    loaders.forEach(loader => loader.setAttribute('state', 'failure'));
-    document.body.setAttribute('data-last-sync', 'failure');
   }
 }

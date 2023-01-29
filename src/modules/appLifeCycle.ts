@@ -258,21 +258,22 @@ export async function appStart() {
   // ÉTAPE 6 : gestion de la connexion de l'utilisateur et de la synchronisation de ses données
 
   logPerf('Étape 6');
+
   Auth.init();
+
+  // Affiche l'état de la dernière synchronisation dans les paramètres
+  const lastSyncState = await dataStorage.getItem('last-sync-state');
+  const lastSyncTime = await dataStorage.getItem('last-sync-time');
+  if (['success', 'failure'].includes(lastSyncState)) document.body.setAttribute('data-last-sync', lastSyncState);
+  const syncTimeContainer = document.querySelector('[data-sync-time-container]');
+  if (typeof lastSyncTime === 'number' && lastSyncTime > 0 && syncTimeContainer instanceof HTMLElement) {
+    const date = new Date(lastSyncTime);
+    syncTimeContainer.innerHTML = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+  }
+
+  // Demande une synchronisation des données au démarrrage
   const loggedIn = getCookie('loggedin') === 'true';
   if (loggedIn) await requestSync();
-
-  // Si la sauvegarde en ligne est activée, on met à jour les données locales
-  /*const onlineBackup = await dataStorage.getItem('online-backup');
-  if (onlineBackup) {
-    try {
-      await immediateSync();
-    } catch (error) {
-      const message = `Erreur de synchronisation des données.`;
-      console.error(message, error);
-      new Notif(message).prompt();
-    }
-  }*/
 
   // ---
 

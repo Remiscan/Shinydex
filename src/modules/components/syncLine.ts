@@ -5,6 +5,7 @@ import { Params } from '../Params.js';
 const template = document.createElement('template');
 template.innerHTML = /*html*/`
   <svg>
+    <line class="background" x1="0" x2="100%" y1="50%" y2="50%"/>
     <line class="progress-line" x1="0" x2="100%" y1="50%" y2="50%"/>
   </svg>
 `;
@@ -17,6 +18,7 @@ sheet.replaceSync(/*css*/`
     width: 100%;
     height: 2px;
     position: relative;
+
   }
 
   svg {
@@ -35,12 +37,18 @@ sheet.replaceSync(/*css*/`
     opacity: 1;
   }
 
-  .progress-line {
-    stroke: var(--progress-bar-color);
+  .background {
+    stroke: rgb(var(--surface-variant));
     stroke-width: 2px;
-    stroke-dasharray: var(--longueur, 0);
-    stroke-dashoffset: var(--longueur, 0);
+  }
+
+  .progress-line {
+    stroke: rgb(var(--primary));
+    stroke-width: 2px;
+    stroke-dasharray: 0;
+    stroke-dashoffset: 0;
     transform-origin: center center;
+    transition: stroke 
   }
 `);
 
@@ -89,17 +97,14 @@ export class syncLine extends HTMLElement {
           return;
         }
 
-        this.longueur = this.getBoundingClientRect().width;
-        svg.style.setProperty('--longueur', String(this.longueur));
-
         this.loadingAnim = progressLine.animate([
-          { strokeDashoffset: `${this.longueur}px` },
+          { strokeDashoffset: `100%` },
           { strokeDashoffset: '0' },
-          { strokeDashoffset: `-${this.longueur}px` }
+          { strokeDashoffset: `-100%` }
         ], {
           duration: loadingDuration,
           iterations: Infinity,
-          easing: 'cubic-bezier(.445, .050, .55, .95)'
+          easing: 'cubic-bezier(.445, .050, .55, .95)',
         });
       }
 
@@ -109,7 +114,7 @@ export class syncLine extends HTMLElement {
 
         const offset = ((this.loadingAnim.currentTime || 0) % loadingDuration < .5 * loadingDuration) ? '0' : `-${2 * this.longueur}px`;
         this.successAnim = progressLine.animate([
-          { strokeDashoffset: offset, stroke: 'var(--success-color)' }
+          { strokeDashoffset: offset, stroke: 'rgb(var(--success))' }
         ], {
           duration: successDuration,
           iterations: 1,
@@ -126,7 +131,7 @@ export class syncLine extends HTMLElement {
 
         const offset = ((this.loadingAnim.currentTime || 0) % loadingDuration < .5 * loadingDuration) ? '0' : `-${2 * this.longueur}px`;
         this.failureAnim = progressLine.animate([
-          { strokeDashoffset: offset, stroke: 'var(--failure-color)' }
+          { strokeDashoffset: offset, stroke: 'rgb(var(--error))' }
         ], {
           duration: successDuration,
           iterations: 1,

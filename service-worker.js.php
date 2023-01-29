@@ -132,7 +132,7 @@ self.addEventListener('message', async function(event) {
   switch (action) {
     case 'sync-backup': {
       event.waitUntil(
-        syncBackup(false)
+        syncBackup()
       );
     } break;
 
@@ -420,7 +420,7 @@ async function syncBackup(message = true) {
     
     console.log('[sync-backup] Response from server:', data);
 
-    if ('error' in data) return;
+    if ('error' in data) throw new Error(data.error);
 
     // Update local data with newer online data
     const toSet = [...data['to_insert_local'], ...data['to_update_local']];
@@ -465,7 +465,7 @@ async function syncBackup(message = true) {
     ]);
 
     // Send data back to the app
-    await dataStorage.setItem('last-sync', 'success');
+    await dataStorage.setItem('last-sync-state', 'success');
 
     if (message) {
       const clients = await self.clients.matchAll();
@@ -482,7 +482,7 @@ async function syncBackup(message = true) {
 
   catch(error) {
     console.error(error);
-    await dataStorage.setItem('last-sync', 'failure');
+    await dataStorage.setItem('last-sync-state', 'failure');
 
     if (message) {
       const clients = await self.clients.matchAll();
