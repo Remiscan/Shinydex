@@ -211,6 +211,7 @@ navigator.serviceWorker.addEventListener('message', async event => {
       const date = new Date(syncTime);
       syncTimeContainer.innerHTML = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
     };
+    document.body.setAttribute('data-last-sync', 'loading');
   }
   
   // --- Réponse à SYNC-BACKUP ---

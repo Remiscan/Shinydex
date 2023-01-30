@@ -711,9 +711,14 @@ h2:not(:first-child) {
 }
 
 body:not([data-last-sync]) #parametres [data-last-sync],
-body[data-last-sync="success"] #parametres [data-last-sync="failure"],
-body[data-last-sync="failure"] #parametres [data-last-sync="success"] {
+body:not([data-last-sync="failure"]) #parametres [data-last-sync="failure"],
+body:not([data-last-sync="success"]) #parametres [data-last-sync="success"],
+body:not([data-last-sync="loading"]) #parametres [data-last-sync="loading"] {
   display: none;
+}
+
+button > load-spinner {
+  --size: 24px;
 }
 
 [data-sprites-progress]:empty {
