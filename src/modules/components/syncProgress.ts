@@ -45,7 +45,7 @@ sheet.replaceSync(/*css*/`
   }
 
   .progress-dots {
-    stroke: rgb(var(--surface-variant));
+    stroke: rgb(var(--on-surface-variant));
     stroke-width: 1px;
     stroke-dasharray: 2px 3px;
     stroke-dashoffset: 0;
