@@ -159,12 +159,12 @@ button.text-button {
 
 button.text-button.danger {
   color: rgb(var(--on-error-container));
-  --state-tint: var(--error-container);
+  --state-tint: var(--on-error-container);
 }
 
 button.text-button.success {
   color: rgb(var(--on-success-container));
-  --state-tint: var(--success-container);
+  --state-tint: var(--on-success-container);
 }
 
 /* Fab */
