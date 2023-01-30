@@ -1,5 +1,7 @@
 /* <?php
 
+// Get file versions to install
+
 ob_start();
 include __DIR__.'/backend/file-versions.php';
 $json = ob_get_clean();
@@ -7,10 +9,19 @@ $json = ob_get_clean();
 $fileVersions = json_decode($json, true);
 $maxVersion = max($fileVersions);
 
+
+// Include FrontendShiny class and its toBackend() method
+
+echo '*'.'/';
+ob_start();
+require_once $_SERVER['DOCUMENT_ROOT'].'/shinydex/dist/modules/ShinyBackend.js';
+$body = ob_get_clean();
+echo preg_replace('/^export /m', '', $body);
+echo '/'.'*';
+
 ?> */
 
 importScripts('./ext/localforage.min.js');
-importScripts('./dist/modules/ShinyBackend.nomodule.php');
 
 // Data storage
 //// Shiny Pokémon
