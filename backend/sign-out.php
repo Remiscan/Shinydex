@@ -1,4 +1,7 @@
 <?php
+require_once $_SERVER['DOCUMENT_ROOT'].'/shinydex/backend/class_User.php';
+
+
 
 header('Content-Type: application/json');
 
@@ -8,24 +11,8 @@ function respond($data) {
 
 $response = [];
 
-$cookieOptions = [
-  'expires' => time() - 3600,
-  'secure' => true,
-  'samesite' => 'Strict',
-  'path' => '/shinydex/'
-];
 
-setcookie('id-jwt', '', [
-  ...$cookieOptions,
-  'httponly' => true
-]);
 
-setcookie('id-provider', '', [
-  ...$cookieOptions,
-  'httponly' => true
-]);
-
-setcookie('loggedin', '', $cookieOptions);
-
+User::signOut();
 $response['success'] = 'signed out';
 respond($response);

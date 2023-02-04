@@ -1,4 +1,7 @@
 <?php
+require_once $_SERVER['DOCUMENT_ROOT'].'/shinydex/backend/class_User.php';
+
+
 
 header('Content-Type: application/json');
 
@@ -9,8 +12,6 @@ function respond($data) {
 $response = [];
 
 
-
-require_once __DIR__.'/verify-id-token.php';
 
 $body = json_decode(
   file_get_contents('php://input'),
@@ -23,52 +24,12 @@ if (!isset($body['credential'])) {
   exit;
 }
 
-$payload = verifyIdToken($body['provider'], $body['credential']);
-
-
-
-if ($payload) {
-  $cookieOptions = [
-    'expires' => time() + 60 * 55, // 55 minutes
-    'secure' => true,
-    'samesite' => 'Strict',
-    'path' => '/shinydex/'
-  ];
-
-  setcookie('id-jwt', $body['credential'], [
-    ...$cookieOptions,
-    'httponly' => true
-  ]);
-
-  setcookie('id-provider', $body['provider'], [
-    ...$cookieOptions,
-    'httponly' => true
-  ]);
-
-  setcookie('loggedin', 'true', $cookieOptions);
-
+try {
+  $user = new User($body['provider'], $body['credential']);
+  $user->signIn();
   $response['success'] = 'Connection successful';
   respond($response);
-} else {
-  $cookieOptions = [
-    'expires' => time() - 3600,
-    'secure' => true,
-    'samesite' => 'Strict',
-    'path' => '/shinydex/'
-  ];
-
-  setcookie('id-jwt', '', [
-    ...$cookieOptions,
-    'httponly' => true
-  ]);
-
-  setcookie('id-provider', '', [
-    ...$cookieOptions,
-    'httponly' => true
-  ]);
-
-  setcookie('loggedin', '', $cookieOptions);
-
-  $response['error'] = 'Invalid ID token';
+} catch (\Throwable $error) {
+  $response['error'] = $error->getMessage();
   respond($response);
 }

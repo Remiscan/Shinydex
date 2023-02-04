@@ -1,5 +1,6 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'].'/shinydex/backend/class_BDD.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/shinydex/backend/class_User.php';
 
 
 
@@ -35,19 +36,19 @@ $local_deleted_data = json_decode($_POST['deleted-local-data'], true);
  * Step 2: Get user data
  */
 
-if (!isset($_COOKIE['id-jwt']) || !isset($_COOKIE['id-provider'])) {
+if (!User::isLoggedIn()) {
   respondError('User is not logged in');
 }
 
-require_once __DIR__.'/verify-id-token.php';
-$user = verifyIdToken($_COOKIE['id-provider'], $_COOKIE['id-jwt']);
-
-if (!$user) {
-  respondError('User token is not valid');
+try {
+  $user = User::getFromCookies();
+} catch (\Throwable $error) {
+  respondError($error->getMessage());
 }
 
-$provider = $_COOKIE['id-provider'];
-$provideruserid = $user['sub'];
+
+$provider = $user->getProvider();
+$provideruserid = $user->getProviderUserId();
 
 
 
@@ -57,45 +58,21 @@ $provideruserid = $user['sub'];
 
 $db = new BDD();
 
-$user_data = $db->prepare("SELECT * FROM shinydex_users WHERE $provider = :provideruserid LIMIT 1");
-$user_data->bindParam(':provideruserid', $provideruserid, PDO::PARAM_STR, 36);
-$user_data->execute();
-$user_data = $user_data->fetch(PDO::FETCH_ASSOC);
-
-// If user does not exist, create it
-if (!$user_data) {
+try {
+  $userid = $user->getDBUserId($db);
+} catch (\Throwable $error) {
   // If there is no local data to back up, no need to create a user, just stop here
   if (count($local_data) === 0) {
     respondError('Canceled user creation: no data to back up');
   }
 
-  $create_user = $db->prepare("INSERT INTO shinydex_users (
-    $provider
-  ) VALUES (
-    :provideruserid
-  )");
-  $create_user->bindParam(':provideruserid', $provideruserid, PDO::PARAM_STR, 36);
-  $result = $create_user->execute();
-
-  if (!$result) {
-    respondError('Error while creating new user');
+  // Create new user and get its assigned db user id
+  try {
+    $user->createDBEntry($db);
+    $userid = $user->getDBUserId($db);
+  } catch (\Throwable $error) {
+    respondError($error->getMessage());
   }
-
-  // Get the newly created user data back
-  $user_data = $db->prepare("SELECT * FROM shinydex_users WHERE $provider = :provideruserid LIMIT 1");
-  $user_data->bindParam(':provideruserid', $provideruserid, PDO::PARAM_STR, 36);
-  $user_data->execute();
-  $user_data = $user_data->fetch(PDO::FETCH_ASSOC);
-
-  if (!$user_data) {
-    respondError('Error while fetching newly created user');
-  }
-}
-
-$userid = $user_data['uuid'];
-
-if (!is_string($userid) || strlen($userid) !== 36) {
-  respondError('Invalid user id');
 }
 
 
