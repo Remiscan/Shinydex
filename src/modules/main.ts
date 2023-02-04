@@ -5,6 +5,7 @@ import { getCookie } from './Params.js';
 import { Settings } from './Settings.js';
 import { PopulatableSection, populator } from './appContent.js';
 import { appStart, checkUpdate } from './appLifeCycle.js';
+import * as Auth from './auth.js';
 import './components/corbeille-card/corbeilleCard.js';
 import './components/filter-menu/filterMenu.js';
 import './components/hunt-card/huntCard.js';
@@ -169,13 +170,15 @@ importInput.addEventListener('change', async event => {
 });
 
 // Détecte le clic sur le bouton de suppression des données locales
-const boutonSupprimer = document.querySelector('[data-action="delete-local-data"]');
-if (!(boutonSupprimer instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
-boutonSupprimer.addEventListener('click', async event => {
-  const userResponse = await warnBeforeDestruction(boutonSupprimer, 'Êtes-vous sûr ? Toutes vos données seront supprimées.');
-  if (userResponse) {
-    boutonSupprimer.disabled = true;
-    boutonSupprimer.tabIndex = -1;
+{
+  const button = document.querySelector('[data-action="delete-local-data"]');
+  if (!(button instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
+  button.addEventListener('click', async event => {
+    const userResponse = await warnBeforeDestruction(button, 'Êtes-vous sûr ? Toutes vos données seront supprimées de cet appareil.');
+    if (!userResponse) return;
+
+    button.disabled = true;
+    button.tabIndex = -1;
 
     const ids = [...(await shinyStorage.keys()), ...(await huntStorage.keys())];
     await Promise.all([shinyStorage.clear(), huntStorage.clear()]);
@@ -190,10 +193,50 @@ boutonSupprimer.addEventListener('click', async event => {
       }
     }));
 
-    boutonSupprimer.disabled = false;
-    boutonSupprimer.tabIndex = 0;
-  }
-});
+    button.disabled = false;
+    button.tabIndex = 0;
+  });
+}
+
+// Détecte le clic sur le bouton de suppression des données en ligne
+{
+  const button = document.querySelector('[data-action="delete-backup"]');
+  if (!(button instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
+  button.addEventListener('click', async event => {
+    const userResponse = await warnBeforeDestruction(button, 'Êtes-vous sûr ? Toutes vos données en ligne seront supprimées.');
+    if (!userResponse) return;
+
+    button.disabled = true;
+    button.tabIndex = -1;
+
+    try {
+      let response = await fetch(`./backend/delete-user-data.php?date=${Date.now()}`);
+      if (!(response.status === 200)) {
+        throw new Error('Could not fetch list of sprites');
+      }
+
+      let data;
+      let response2 = response.clone();
+      try {
+        data = await response.json();
+      } catch {
+        data = await response2.text();
+        throw new Error(`Invalid json: ${data}`);
+      }
+      if ('error' in data) throw new Error(data.error);
+
+      await Auth.signOut();
+
+      new Notif('Données en ligne supprimées.').prompt();
+    } catch (error) {
+      console.error(error);
+      new Notif('Erreur pendant la suppression des données en ligne.').prompt();
+    }
+
+    button.disabled = false;
+    button.tabIndex = 0;
+  });
+}
 
 
 

@@ -67,14 +67,15 @@ class User {
   }
 
 
-  public function createDBEntry(PDO $db): bool {
+  public function createDBEntry(PDO $db) {
     $provider = $this->getProvider();
+    $provideruserid = $this->getProviderUserId();
     $create_user = $db->prepare("INSERT INTO shinydex_users (
       $provider
     ) VALUES (
       :provideruserid
     )");
-    $create_user->bindParam(':provideruserid', $user->getProviderUserId(), PDO::PARAM_STR, 36);
+    $create_user->bindParam(':provideruserid', $provideruserid, PDO::PARAM_STR, 36);
     $result = $create_user->execute();
 
     if (!$result) throw new \Exception('Error while creating user DB entry');
@@ -96,8 +97,9 @@ class User {
 
   public function deleteDBEntry(PDO $db): bool {
     $provider = $this->getProvider();
+    $provideruserid = $this->getProviderUserId();
     $delete_user = $db->prepare("DELETE FROM shinydex_users WHERE $provider = :provideruserid");
-    $delete_user->bindParam(':provideruserid', $user->getProviderUserId(), PDO::PARAM_STR, 36);
+    $delete_user->bindParam(':provideruserid', $provideruserid, PDO::PARAM_STR, 36);
     return $delete_user->execute();
   }
 

@@ -55,7 +55,7 @@ async function signinCallback(body: any) {
 
 
 /** Signs a user out. */
-async function signOut() {
+export async function signOut() {
   // Ask the backend to sign the user out
   const response = await fetch('/shinydex/backend/sign-out.php');
   if (response.status != 200)
