@@ -85,7 +85,6 @@
         "./dist/modules/Settings.js",
         "./dist/modules/Shiny.js",
         "./dist/modules/ShinyBackend.js",
-        "./dist/modules/ShinyBackend.nomodule.php",
         "./dist/modules/syncBackup.js",
         "./dist/modules/theme.js",
         "./dist/modules/topLayer.js",
