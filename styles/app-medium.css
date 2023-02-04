@@ -110,5 +110,5 @@ filter-menu {
 }
 
 #google-one-tap-container {
-  margin: 16px;
+  margin: 10px 8px 6px 8px; /* 16px - (6px 8px 10px 8px) */
 }
