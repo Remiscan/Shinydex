@@ -426,7 +426,7 @@ async function syncBackup(message = true) {
       data = await response.json();
     } catch {
       data = await response2.text();
-      throw new Error('Invalid json:', data);
+      throw new Error(`Invalid json: ${data}`);
     }
     
     console.log('[sync-backup] Response from server:', data);
