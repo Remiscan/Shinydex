@@ -45,6 +45,11 @@ nav > a > span {
   text-align: center;
 }
 
+nav sync-progress {
+  /* top: padding-top + (total-height - padding-bottom - padding-top - icon-height - text-height - gap) / 2 */
+  top: calc(12px + (84px - 12px - 16px - 32px - 16px - 4px) / 2);
+}
+
 main {
   grid-column: 2 / 3;
   display: grid;

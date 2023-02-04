@@ -121,6 +121,7 @@
 
       <a class="nav-link lien-section surface interactive only-pc" data-nav-section="parametres" href="./parametres">
         <span class="material-icons surface" aria-hidden="true">settings</span>
+        <sync-progress></sync-progress>
         <span class="label-medium">Paramètres</span>
       </a>
 
