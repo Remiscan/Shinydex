@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="51.2 51.2 409.6 409.6" width="512" height="512">
   <style>
     svg {
-      --background-top: #5d70c3;
+      --background-top: rgb(86.36, 146.81, 222.81);
       --background-bottom: white;
       --unown-color: #292929;
       --ball-center-color: white;
