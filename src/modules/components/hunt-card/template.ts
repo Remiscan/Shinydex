@@ -178,7 +178,7 @@ template.innerHTML = /*html*/`
           <span class="title-medium">Données de la capture</span>
         </legend>
 
-        <text-field name="name" autocomplete="off" spellcheck="false">
+        <text-field name="name" autocomplete="off" spellcheck="false" maxlength="50">
           <span slot="label">Surnom</span>
         </text-field>
 
@@ -244,7 +244,7 @@ template.innerHTML = /*html*/`
           <span class="title-medium">Informations additionnelles</span>
         </legend>
 
-        <text-area name="notes" rows="3">
+        <text-area name="notes" rows="3" maxlength="65535">
           <span slot="label">Notes</span>
         </text-area>
       </fieldset>
