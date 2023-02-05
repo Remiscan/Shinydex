@@ -1,1 +1,2 @@
-deploy-to-prod "remiscanfr" "." "$basepath_prod/www/shinydex"
+source ~/web/deploy-to-prod.sh
+deploy-to-prod "remiscanfr" "." "www/shinydex"
