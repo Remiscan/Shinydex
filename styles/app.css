@@ -306,13 +306,13 @@ a.icon-button.bouton-retour {
 	min-width: 36px;
   height: 36px;
   box-sizing: border-box;
-  padding: 0 4px;
+  padding: 8px;
 	border-radius: 18px;
 	letter-spacing: 0;
+  gap: 2px;
 }
 
 #pokedex .compteur > span {
-  padding: 0 0.2em;
   opacity: .8;
 }
 
