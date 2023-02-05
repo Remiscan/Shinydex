@@ -227,7 +227,7 @@ export class syncProgress extends HTMLElement {
           { transform: 'rotate(-90deg)', strokeDashoffset: '0' },
           { transform: 'rotate(-90deg)', strokeDashoffset: '-101px' }
         ], {
-          duration: 500,
+          duration: 300,
           easing: Params.easingAccelerate,
           fill: 'forwards'
         });
