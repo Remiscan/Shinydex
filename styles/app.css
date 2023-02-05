@@ -537,6 +537,10 @@ section.loading .message-vide {
   --state-tint: var(--on-primary-container);
 }
 
+.dex-icon .pkmnicon {
+  outline-offset: -1px;
+}
+
 .dex-icon:not(.got) .pkmnicon {
   filter: grayscale(.95) brightness(var(--pkmnicon-brightness));
 }
