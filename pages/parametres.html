@@ -72,7 +72,7 @@
       </span>
     </p>
 
-    <p class="un-parametre with-description long" data-logged-in>
+    <p class="un-parametre with-description" data-logged-in>
       <span class="param-nom body-large">Supprimer la sauvegarde en ligne</span>
       <span class="param-description body-medium">Vous ne pourrez plus accéder à vos données depuis un autre appareil.</span>
       <span class="param">
@@ -82,30 +82,11 @@
       </span>
     </p>
 
-    <!--
-    <span class="sous-titre">
-      <span>Sauvegarde des données</span>
-      <sync-line></sync-line>
-    </span>
-
-    
-    <p class="un-parametre">
-      <span class="param-nom">
-        Sauvegarde en ligne
-        <span class="param-description info-backup success if-backup">dernière : réussie</span>
-        <span class="param-description info-backup failure if-backup">dernière : échec</span>
-      </span>
-      <span class="param-description no-backup">Si désactivé, vos données seront perdues si vous désinstallez l'application ou nettoyez son stockage.</span>
-      <span class="param-description if-backup">Vos données sont sauvegardées en ligne.</span>
-      <input-switch id="switch-online-backup" icons="checked"></input-switch>
-    </p>
-    -->
-
     <!---->
 
     <h2 class="title-medium">Gestion des données sur votre appareil</h2>
 
-    <p class="un-parametre with-description long">
+    <p class="un-parametre with-description">
       <span class="param-nom body-large">Télécharger les icônes</span>
       <span class="param-description body-medium">pour pouvoir observer les Pokémon dans le Pokédex sans connexion internet. <span data-sprites-progress></span></span>
       <span class="param">
@@ -129,7 +110,7 @@
       <span class="param-nom body-large">Importer des données</span>
       <span class="param-description body-medium">depuis un fichier JSON.</span>
       <span class="param">
-        <input type="file" id="pick-import-file" accept=".json">
+        <input type="file" id="pick-import-file" accept=".json" tabindex="-1">
         <label for="pick-import-file" class="ghost">Importer</label>
         <button type="button" class="surface interactive filled tonal only-text" data-action="import-json" aria-hidden="true">
           <span class="label-large">Importer</span>
@@ -137,7 +118,7 @@
       </span>
     </p>
 
-    <p class="un-parametre with-description long no-backup">
+    <p class="un-parametre with-description no-backup">
       <span class="param-nom body-large">Supprimer mes données</span>
       <span class="param-description body-medium">Supprime la sauvegarde locale, mais n'affecte pas la sauvegarde en ligne.</span>
       <span class="param">

@@ -53,7 +53,7 @@ button {
   --elevation-shadow: none;
 }
 
-button:not(.pkmnicon)::before {
+/*button:not(.pkmnicon)::before {
   content: '';
   display: flex;
   width: 100%;
@@ -64,7 +64,7 @@ button:not(.pkmnicon)::before {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-}
+}*/
 
 button.only-icon {
   padding: 0 16px;

@@ -688,14 +688,12 @@ h2:not(:first-child) {
 }
 
 .param {
+  align-self: start;
   display: grid;
-  align-self: center;
+  align-items: center;
   justify-content: end;
   min-width: 150px;
-}
-
-.un-parametre.long .param {
-  align-self: start;
+  min-height: calc(1.5rem + 1.25rem);
 }
 
 .un-parametre > label,
