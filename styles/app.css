@@ -76,7 +76,6 @@ nav {
   grid-template-rows: var(--section-title-height) 1fr;
   grid-template-columns: repeat(var(--nombre-sections), 1fr);
   align-items: center;
-  background-color: var(--nav-bg-color);
   z-index: var(--z-nav);
 }
 

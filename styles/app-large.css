@@ -18,11 +18,6 @@ body[data-section-actuelle~="partage"] .nav-link[data-nav-section="chromatiques-
   --indicator-elevation-opacity: var(--elevation-2-opacity);
 }
 
-body[data-no-search] nav,
-nav {
-  --nombre-sections: 4;
-}
-
 main {
   grid-template-columns: 1fr 1fr;
 }
