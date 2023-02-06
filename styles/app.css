@@ -648,8 +648,9 @@ h2:not(:first-child) {
 
 .un-parametre {
   display: grid;
-  grid-template-columns: auto 1fr;
-  grid-template-rows: auto;
+  grid-template-columns: minmax(auto, 40ch) auto;
+  grid-template-rows: 1fr [title] auto [description] var(--description-row) 1fr;
+  --description-row: 0;
   column-gap: 16px;
   min-height: 32px;
   padding-block: 8px;
@@ -659,7 +660,7 @@ h2:not(:first-child) {
 }
 
 .un-parametre.with-description {
-  grid-template-rows: auto auto;
+  --description-row: auto;
 }
 
 .un-parametre.theme > .param {
@@ -679,13 +680,13 @@ h2:not(:first-child) {
 
 .param-nom {
   display: block;
-  grid-row: 1;
+  grid-row: title;
   grid-column: 1;
   color: rgb(var(--on-surface));
 }
 
 .param-description {
-  grid-row: 2;
+  grid-row: description;
   grid-column: 1;
   color: rgb(var(--on-surface-variant));
 }
@@ -714,7 +715,8 @@ h2:not(:first-child) {
 body:not([data-last-sync]) #parametres [data-last-sync],
 body:not([data-last-sync="failure"]) #parametres [data-last-sync="failure"],
 body:not([data-last-sync="success"]) #parametres [data-last-sync="success"],
-body:not([data-last-sync="loading"]) #parametres [data-last-sync="loading"] {
+body:not([data-last-sync="loading"]) #parametres [data-last-sync="loading"],
+form[name="app-settings"]:not([data-public-profile="true"]) [data-public-profile] {
   display: none;
 }
 
@@ -817,6 +819,18 @@ input-slider[name="theme-hue"]::part(slider-thumb) {
 .lien-source .material-icons {
   vertical-align: middle;
   margin-right: 4px;
+}
+
+
+
+/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!! PARTAGE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+
+form[name="user-profile"] {
+  display: flex;
+  padding: 8px;
+  border-radius: var(--border-radius);
 }
 
 

@@ -20,6 +20,8 @@ export class Settings {
   'theme': Theme = 'system';
   'theme-hue': number = 255;
   'cache-all-sprites': boolean = false;
+  'public': boolean = false;
+  'username': string = '';
 
   constructor(data?: FormData | object) {
     if (!data) return;
@@ -27,10 +29,10 @@ export class Settings {
     if (data instanceof FormData) {
       const storedTheme = String(data.get('theme'));
       if (isSupportedTheme(storedTheme)) this['theme'] = storedTheme;
-
       this['theme-hue'] = Number(data.get('theme-hue')) || this['theme-hue'];
-
       this['cache-all-sprites'] = data.get('cache-all-sprites') === 'true';
+      this['public'] = data.get('public') === 'true';
+      this['username'] = String(data.get('username')).substring(0, 30);
     } else {
       if ('theme' in data && typeof data['theme'] === 'string' && isSupportedTheme(data['theme'])) {
         this['theme'] = data['theme'];
@@ -42,6 +44,14 @@ export class Settings {
 
       if ('cache-all-sprites' in data) {
         this['cache-all-sprites'] = Boolean(data['cache-all-sprites']);
+      }
+
+      if ('public' in data) {
+        this['public'] = Boolean(data['public']);
+      }
+
+      if ('username' in data) {
+        this['username'] = String(data['username']).substring(0, 30);
       }
     }
   }
@@ -71,6 +81,20 @@ export class Settings {
       const input = form.querySelector('[name="cache-all-sprites"]');
       if (!input || !('checked' in input)) throw new TypeError(`Expecting InputSwitch`);
       input.checked = this['cache-all-sprites'];
+    }
+
+    {
+      // Public
+      const input = form.querySelector('[name="public"]');
+      if (!input || !('checked' in input)) throw new TypeError(`Expecting InputSwitch`);
+      input.checked = this['public'];
+    }
+
+    {
+      // Username
+      const input = form.querySelector('[name="username"]');
+      if (!input || !('value' in input)) throw new TypeError('Expecting TextField');
+      input.value = this['username'];
     }
   }
 
@@ -105,6 +129,22 @@ export class Settings {
         }
       } else if (appliedSettings && this['cache-all-sprites'] !== appliedSettings['cache-all-sprites']) { // On manual settings change,
         cacheAllSprites(this['cache-all-sprites']);                                                       // cache or delete all sprites.
+      }
+    }
+
+    {
+      // Public visibility
+      if (!appliedSettings || this['public'] !== appliedSettings['public']) {
+        const form = document.querySelector('form[name="app-settings"]');
+        if (!(form instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
+        form.setAttribute('data-public-profile', String(this['public']));
+      }
+    }
+
+    {
+      // Username OR public visibility
+      if (appliedSettings && (this['public'] !== appliedSettings['public'] || this['username'] !== appliedSettings['username'])) {
+        // updateProfile should be a queueableAsync
       }
     }
 

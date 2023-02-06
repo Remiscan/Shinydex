@@ -38,7 +38,7 @@
 
     <!---->
 
-    <h2 class="title-medium">Sauvegarde des données en ligne</h2>
+    <h2 class="title-medium">Sauvegarde et partage des données en ligne</h2>
 
     <p class="body-large param-nom" data-logged-out>Connectez-vous avec Google pour sauvegarder vos données en ligne.</p>
     <div id="google-signin-button-container" data-logged-out></div>
@@ -59,6 +59,26 @@
           <load-spinner></load-spinner>
           <span class="label-large">En cours</span>
         </button>
+      </span>
+    </p>
+
+    <p class="un-parametre with-description" data-logged-in>
+      <span class="param-nom body-large">Rendre votre profil public</span>
+      <span class="param-description body-medium">pour partager votre liste de Pokémon&nbsp;<shiny-stars></shiny-stars>.</span>
+      <span class="param">
+        <label for="public-profile">
+          <input-switch name="public" id="public-profile" icons="checked"></input-switch>
+        </label>
+      </span>
+    </p>
+
+    <p class="un-parametre with-description" data-logged-in data-public-profile>
+      <span class="param-nom body-large">Choisir un pseudo</span>
+      <span class="param-description body-medium">pour pouvoir être ajouté comme ami.</span>
+      <span class="param">
+        <text-field name="username" autocomplete="off" spellcheck="false" maxlength="30">
+          <span slot="label">Pseudo</span>
+        </text-field>
       </span>
     </p>
 
@@ -97,7 +117,7 @@
     </p>
 
     <p class="un-parametre with-description">
-      <span class="param-nom body-large">Exporter mes données</span>
+      <span class="param-nom body-large">Exporter les données</span>
       <span class="param-description body-medium">au format JSON.</span>
       <span class="param">
         <button type="button" class="surface interactive filled tonal only-text" data-action="export-json">
@@ -119,7 +139,7 @@
     </p>
 
     <p class="un-parametre with-description no-backup">
-      <span class="param-nom body-large">Supprimer mes données</span>
+      <span class="param-nom body-large">Supprimer les données</span>
       <span class="param-description body-medium">Supprime la sauvegarde locale, mais n'affecte pas la sauvegarde en ligne.</span>
       <span class="param">
         <button type="button" class="surface interactive filled danger only-text" data-action="delete-local-data">

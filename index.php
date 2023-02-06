@@ -116,7 +116,7 @@
 
       <a class="nav-link lien-section surface interactive" data-nav-section="partage" href="./partage">
         <span class="material-icons surface" aria-hidden="true">group</span>
-        <span class="label-medium">Partage</span>
+        <span class="label-medium">Amis</span>
       </a>
 
       <a class="nav-link lien-section surface interactive only-pc" data-nav-section="parametres" href="./parametres">
