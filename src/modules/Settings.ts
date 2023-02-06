@@ -58,19 +58,19 @@ export class Settings {
 
 
   toForm() {
-    const form = document.querySelector('form[name="app-settings"]');
-    if (!(form instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
+    const settingsForm = document.querySelector('form[name="app-settings"]')
+    if (!(settingsForm instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
 
     {
       // Theme
-      const input = form.querySelector(`[name="theme"]`);
+      const input = settingsForm.querySelector(`[name="theme"]`);
       if (!(input instanceof RadioGroup)) throw new TypeError(`Expecting RadioGroup`);
       input.value = this.theme;
     }
 
     {
       // Theme hue
-      const input = form.querySelector('[name="theme-hue"]');
+      const input = settingsForm.querySelector('[name="theme-hue"]');
       if (!input || !('value' in input) || !('style' in input)) throw new TypeError('Expecting InputSlider');
       input.value = this['theme-hue'];
       input.setAttribute('style', `--gradient:${gradientString};`);
@@ -78,21 +78,21 @@ export class Settings {
 
     {
       // Cache all sprites
-      const input = form.querySelector('[name="cache-all-sprites"]');
+      const input = settingsForm.querySelector('[name="cache-all-sprites"]');
       if (!input || !('checked' in input)) throw new TypeError(`Expecting InputSwitch`);
       input.checked = this['cache-all-sprites'];
     }
 
     {
       // Public
-      const input = form.querySelector('[name="public"]');
+      const input = settingsForm.querySelector('[name="public"]');
       if (!input || !('checked' in input)) throw new TypeError(`Expecting InputSwitch`);
       input.checked = this['public'];
     }
 
     {
       // Username
-      const input = form.querySelector('[name="username"]');
+      const input = settingsForm.querySelector('[name="username"]');
       if (!input || !('value' in input)) throw new TypeError('Expecting TextField');
       input.value = this['username'];
     }
@@ -135,9 +135,9 @@ export class Settings {
     {
       // Public visibility
       if (!appliedSettings || this['public'] !== appliedSettings['public']) {
-        const form = document.querySelector('form[name="app-settings"]');
-        if (!(form instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
-        form.setAttribute('data-public-profile', String(this['public']));
+        const settingsForm = document.querySelector('form[name="app-settings"]')
+        if (!(settingsForm instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
+        settingsForm.setAttribute('data-public-profile', String(this['public']));
       }
     }
 
@@ -170,6 +170,18 @@ export class Settings {
   static get(id: string): any {
     if (id in appliedSettings) return appliedSettings[id as keyof Settings];
     else throw new Error(`${id} is not a valid setting`);
+  }
+
+
+  static set(id: string, value: any, { apply = true, toForm = true }: { apply?: boolean, toForm?: boolean } = {}) {
+    const settingsForm = document.querySelector('form[name="app-settings"]')
+    if (!(settingsForm instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
+    const formData = new FormData(settingsForm);
+    formData.set(id, String(value));
+    const settings = new Settings(formData);
+    if (toForm) settings.toForm();
+    if (apply)  settings.apply();
+    settings.save();
   }
 }
 

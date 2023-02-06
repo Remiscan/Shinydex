@@ -1,4 +1,5 @@
 import { getCookie } from './Params.js';
+import { Settings } from './Settings.js';
 import { Notif } from './notification.js';
 import { requestSync } from './syncBackup.js';
 
@@ -45,6 +46,19 @@ async function signinCallback(body: any) {
     console.log('User successfully signed in');
     new Notif('Vous êtes connecté.').prompt();
     document.body.setAttribute('data-logged-in', 'true');
+
+    if ('username' in responseBody) {
+      try {
+        Settings.set('username', String(responseBody.username), { toForm: true, apply: false });
+      } catch (error) {}
+    }
+
+    if ('public' in responseBody) {
+      try {
+        Settings.set('public', Boolean(responseBody.public), { toForm: true, apply: false });
+      } catch (error) {}
+    }
+
     //await periodicSync(true);
     await requestSync();
   } else {

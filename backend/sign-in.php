@@ -28,8 +28,14 @@ try {
   $user = new User($body['provider'], $body['credential']);
   $user->signIn();
   $response['success'] = 'Connection successful';
-  respond($response);
 } catch (\Throwable $error) {
   $response['error'] = $error->getMessage();
-  respond($response);
 }
+
+try {
+  $dbEntry = $user->getDBEntry();
+  $response['username'] = $dbEntry['username'];
+  $response['public'] = $dbEntry['public'];
+} catch (\Throwable $error) {}
+
+respond($response);
