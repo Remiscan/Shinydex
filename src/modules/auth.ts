@@ -49,13 +49,13 @@ async function signinCallback(body: any) {
 
     if ('username' in responseBody) {
       try {
-        Settings.set('username', String(responseBody.username), { toForm: true, apply: false });
+        Settings.set('username', String(responseBody.username ?? ''), { toForm: true, apply: false });
       } catch (error) {}
     }
 
     if ('public' in responseBody) {
       try {
-        Settings.set('public', Boolean(responseBody.public), { toForm: true, apply: false });
+        Settings.set('public', Boolean(responseBody.public ?? false), { toForm: true, apply: false });
       } catch (error) {}
     }
 

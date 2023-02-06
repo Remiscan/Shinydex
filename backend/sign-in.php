@@ -1,4 +1,5 @@
 <?php
+require_once $_SERVER['DOCUMENT_ROOT'].'/shinydex/backend/class_BDD.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/shinydex/backend/class_User.php';
 
 
@@ -33,9 +34,11 @@ try {
 }
 
 try {
-  $dbEntry = $user->getDBEntry();
-  $response['username'] = $dbEntry['username'];
-  $response['public'] = $dbEntry['public'];
-} catch (\Throwable $error) {}
+  $dbEntry = $user->getDBEntry(new BDD());
+  $response['username'] = $dbEntry['username'] ?? '';
+  $response['public'] = $dbEntry['public'] ?? false;
+} catch (\Throwable $error) {
+  $response['error'] = $error->getMessage();
+}
 
 respond($response);
