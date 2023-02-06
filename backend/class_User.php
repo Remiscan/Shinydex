@@ -104,6 +104,22 @@ class User {
   }
 
 
+  public function updateDBprofile(PDO $db, string $username, bool $public) {
+    $provider = $this->getProvider();
+    $provideruserid = $this->getProviderUserId();
+    $update = $db->prepare("UPDATE `shinydex_users` SET
+      `username` = :username,
+      `public` = :public
+    WHERE $provider = :provideruserid");
+    $update->bindParam(':provideruserid', $provideruserid, PDO::PARAM_STR, 36);
+    $update->bindParam(':username', $username, PDO::PARAM_STR, 30);
+    $update->bindParam(':public', $public, PDO::PARAM_BOOL);
+    $result = $update->execute();
+
+    if (!$result) throw new \Exception('Error while updating user DB profile');
+  }
+
+
   public static function verifyIdToken(string $provider, string|null $token = null): array {
     switch ($provider) {
       case 'google':
