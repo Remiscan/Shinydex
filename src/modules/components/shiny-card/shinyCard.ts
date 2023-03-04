@@ -207,7 +207,7 @@ export class shinyCard extends HTMLElement {
 
     // Charme chroma et shiny rate
     {
-      const srContainer = this.shadow.querySelector('.shiny-rate')!;
+      const srContainer = this.shadow.querySelector('.shiny-rate') as HTMLElement;
       const charm = shiny.charm;
       const shinyRate = shiny.shinyRate ?? 0;
       const methode = shiny.method || '';
@@ -247,6 +247,12 @@ export class shinyCard extends HTMLElement {
         } else if (shinyRate <= 1) {
           srContainer.classList.add('one-odds');
         }
+
+        // Couleur de la bordure (0 = high shiny denominator / hard, 1 = low shiny denominator / easy)
+        const hardestRate = (game.gen <= 5 ? 2731 : 1365);
+        const easiestRate = 512;
+        const hueCoeff = (hardestRate - Math.min(Math.max(easiestRate, shinyRate), hardestRate)) / (hardestRate - easiestRate);
+        srContainer.style.setProperty('--hue-coeff', String(hueCoeff));
       } catch (error) {}
     }
 

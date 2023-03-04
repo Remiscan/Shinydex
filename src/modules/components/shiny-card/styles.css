@@ -261,7 +261,7 @@ button.icon-button.menu-hint::before {
   position: relative;
   --hue-min: 30;
   --hue-max: 170;
-  background: hsl(calc(var(--hue-min) + var(--coeff) * (var(--hue-max) - var(--hue-min))), 50%, 50%);
+  background: hsl(calc(var(--hue-min) + var(--hue-coeff) * (var(--hue-max) - var(--hue-min))), 50%, 50%);
 }
 
 .full-odds {
