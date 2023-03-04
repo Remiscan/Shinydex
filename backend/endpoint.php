@@ -17,25 +17,6 @@ function respondError($message) {
 
 
 
-// Check if last call was recent enough for this new call to be ignored
-$minDelay = 1; // minimum number of seconds allowed between calls to backend
-$lastCall = $_COOKIE['last-call'] ?? 0;
-
-$now = time();
-if ($lastCall + $minDelay >= $now) {
-  respondError('Too soon, try again later');
-} else {
-  setcookie('last-call', $now, [
-    'expires' => $now + $minDelay,
-    'secure' => true,
-    'samesite' => 'Strict',
-    'path' => '/shinydex/',
-    'httponly' => true
-  ]);
-}
-
-
-
 $request = $_GET['request'] ?? 'null';
 switch ($request) {
   case 'get-file-versions':
@@ -45,6 +26,24 @@ switch ($request) {
   case 'sync-backup':
   case 'delete-user-data':
   case 'update-user-profile':
+    // Check if last call was recent enough for this new call to be ignored
+    $cookieName = "last-call-$request";
+    $minDelay = 1; // minimum number of seconds allowed between calls to backend
+    $lastCall = $_COOKIE[$cookieName] ?? 0;
+    $now = time();
+    
+    if ($lastCall + $minDelay >= $now) {
+      respondError('Too soon, try again later');
+    } else {
+      setcookie($cookieName, $now, [
+        'expires' => $now + $minDelay,
+        'secure' => true,
+        'samesite' => 'Strict',
+        'path' => '/shinydex/',
+        'httponly' => true
+      ]);
+    }
+
     require $_SERVER['DOCUMENT_ROOT']."/shinydex/backend/actions/$request.php";
     break;
 
