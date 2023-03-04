@@ -3,7 +3,7 @@
 // Get file versions to install
 
 ob_start();
-include __DIR__.'/backend/file-versions.php';
+include __DIR__.'/backend/actions/get-file-versions.php';
 $json = ob_get_clean();
 
 $fileVersions = json_decode($json, true);
@@ -287,7 +287,7 @@ async function cacheAllSprites(source) {
   try {
     cachingAllSprites = true;
 
-    let response = await fetch(`./backend/getAllSprites.php?date=${Date.now()}`);
+    let response = await fetch(`./backend/endpoint.php?request=get-all-sprites&date=${Date.now()}`);
     if (!(response.status === 200)) {
       throw new Error('Could not fetch list of sprites');
     }
@@ -413,7 +413,7 @@ async function syncBackup(message = true) {
     formData.append('local-data', JSON.stringify(localData));
     formData.append('deleted-local-data', JSON.stringify(deletedLocalData));
 
-    const response = await fetch('/shinydex/backend/sync-backup.php?date=' + Date.now(), {
+    const response = await fetch('/shinydex/backend/endpoint.php?request=sync-backup&date=' + Date.now(), {
       method: 'POST',
       body: formData
     });

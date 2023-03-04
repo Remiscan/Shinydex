@@ -325,7 +325,7 @@ export async function checkUpdate(checkNotification = false) {
     const cacheVersion = Math.max(...Object.values(installedFiles).map(v => Number(v)));
   
     // On lance mod_update.php pour récupérer les données les plus récentes
-    const response = await fetch(`/shinydex/backend/file-versions.php?date=${Date.now()}`);
+    const response = await fetch(`/shinydex/backend/endpoint.php?request=get-file-versions&date=${Date.now()}`);
     if (response.status != 200)
       throw '[:(] Erreur ' + response.status + ' lors de la requête';
     const liveFiles = await response.json();

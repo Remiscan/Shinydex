@@ -210,7 +210,7 @@ importInput.addEventListener('change', async event => {
     button.tabIndex = -1;
 
     try {
-      let response = await fetch(`./backend/delete-user-data.php?date=${Date.now()}`);
+      let response = await fetch(`./backend/endpoint.php?request=delete-user-data&date=${Date.now()}`);
       if (!(response.status === 200)) {
         throw new Error('Could not fetch list of sprites');
       }

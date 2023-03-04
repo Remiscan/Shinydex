@@ -30,6 +30,4 @@ function getFilesVersion(): array {
 // Transmission des données à JavaScript
 
 $fileVersions = getFilesVersion();
-
-header('Content-Type: application/json');
 echo json_encode($fileVersions, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);

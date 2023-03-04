@@ -32,7 +32,7 @@ declare var google: {
 async function signinCallback(body: any) {
   // Send the token to the backend for verification
   body.provider = 'google';
-  const response = await fetch('/shinydex/backend/sign-in.php', {
+  const response = await fetch('/shinydex/backend/endpoint.php?request=sign-in', {
     method: 'POST',
     body: JSON.stringify(body)
   });
@@ -71,7 +71,7 @@ async function signinCallback(body: any) {
 /** Signs a user out. */
 export async function signOut() {
   // Ask the backend to sign the user out
-  const response = await fetch('/shinydex/backend/sign-out.php');
+  const response = await fetch('/shinydex/backend/endpoint.php?request=sign-out');
   if (response.status != 200)
     throw '[:(] Erreur ' + response.status + ' lors de la requête';
 
