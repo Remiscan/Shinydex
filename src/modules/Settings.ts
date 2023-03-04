@@ -1,6 +1,6 @@
 import { RadioGroup } from './components/radioGroup.js';
 import { dataStorage } from './localForage.js';
-import { computePaletteCss, gradientString, setTheme } from './theme.js';
+import { computePaletteCss, gradientString, setTheme, updateMetaThemeColorTag } from './theme.js';
 
 
 
@@ -113,6 +113,7 @@ export class Settings {
         const container = document.querySelector('style#palette');
         if (!(container instanceof HTMLStyleElement)) throw new TypeError(`Expecting HTMLStyleElement`);
         container.innerHTML = `:root { ${css} }`;
+        updateMetaThemeColorTag();
       }
     }
 
