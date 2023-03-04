@@ -1,0 +1,189 @@
+:host {
+  width: 100%;
+  display: grid;
+  order: var(--order, 0);
+  position: relative;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 8px;
+  border-radius: var(--border-radius);
+  max-width: 100%;
+  overflow: auto;
+}
+
+fieldset {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+}
+
+legend {
+  margin-bottom: 8px;
+}
+
+legend.invisible {
+  font-size: 0;
+  padding: 0;
+  margin: 0;
+}
+
+/* Pokemon sprite, species, forme, game and method */
+
+.intro {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  position: relative;
+}
+
+.sprite-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-basis: 120px;
+}
+
+.edit-notice {
+  display: inline-block;
+  grid-column: 1;
+  grid-row: 1;
+  height: 26px;
+  --padding-inline: 4px;
+  padding: var(--padding-inline) calc(3 * var(--padding-inline));
+  box-sizing: border-box;
+  text-align: center;
+  --distance-to-parent-border: 8px;
+  border-radius: var(--sub-border-radius);
+}
+
+pokemon-sprite {
+  grid-column: 1;
+  grid-row: 1 / -1;
+  --distance-to-parent-border: 8px;
+  border-radius: var(--sub-border-radius);
+  padding: 4px;
+}
+
+form[data-edit] pokemon-sprite {
+  grid-row: 2;
+}
+
+.intro > fieldset {
+  grid-row: 1 / -1;
+  grid-column: 2;
+  align-content: end;
+  flex-basis: 120px;
+  flex-grow: 1;
+}
+
+[name="dexid"] {
+  flex-grow: 1;
+  flex-basis: 12ch;
+}
+
+[name="dexid"]::part(input) {
+  text-transform: capitalize;
+}
+
+[name="forme"] {
+  flex-grow: 1;
+  flex-basis: 12ch;
+}
+
+[name="game"] {
+  flex-grow: 3;
+  flex-basis: 20ch;
+}
+
+[name="method"] {
+  flex-grow: 3;
+  flex-basis: 20ch;
+}
+
+[name="count"] {
+  flex-grow: 1;
+  flex-basis: 5ch;
+}
+
+text-field > button {
+  margin: -4px;
+}
+
+text-field > button:not(:focus, :hover, :active) {
+  --state-opacity: 0;
+}
+
+/* Bonus */
+
+fieldset[name="bonus"] {
+  align-items: start;
+}
+
+fieldset[name="bonus"] > fieldset[data-game] {
+  flex-grow: 1;
+}
+
+/* Données de la capture */
+
+[name="name"] {
+  flex-grow: 1;
+  flex-basis: calc(2 * 16px + 12ch);
+}
+
+[name="gene"] {
+  flex-grow: 1;
+  flex-basis: calc(2 * 16px + 10ch);
+}
+
+[name="catchTime"] {
+  flex-grow: 1;
+  flex-basis: calc(2 * 16px + 15ch);
+}
+
+[name="ball"] {
+  flex-grow: 2;
+  flex-basis: calc(2 * 16px + 24ch);
+}
+
+/* Données additionnelles */
+
+[name="notes"] {
+  flex-grow: 1;
+}
+
+/* Boutons */
+
+.button-group {
+  display: flex;
+  gap: 16px;
+  width: fit-content;
+  margin-inline: auto;
+  flex-basis: 100%;
+  justify-content: center;
+}
+
+/* Éléments cachés */
+
+form:not([data-edit]) [data-edit],
+form[data-edit] [data-not-edit],
+form:not(.caught) .capture-button-group ~ * {
+  display: none !important;
+}
+
+:host(:not([data-method-mine="false"])) [data-not-mine],
+:host(:not([data-charm-available="true"])) [name="charm"],
+:host(:not([data-charm-available="true"])) fieldset[name="common-bonus"],
+:host([data-game="usum"]:not([data-method="ultrawormhole"])) fieldset[name="bonus"] fieldset[data-game="usum"],
+:host(:not([data-charm-available="true"]):not([data-game="sv"]):not([data-game="pla"]):not([data-game="swsh"]):not([data-game="lgpe"]):not([data-game="usum"])) fieldset[name="bonus"] {
+  display: none;
+}

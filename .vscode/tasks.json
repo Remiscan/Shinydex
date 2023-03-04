@@ -1,0 +1,59 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "shell",
+      "command": "php build/cache.php",
+      "label": "compile to JS and build cache.json",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "dependsOn": [
+        "compile to JS"
+      ]
+    }, {
+      "type": "shell",
+      "command": "tsc --incremental",
+      "problemMatcher": ["$tsc"],
+      "label": "compile to JS",
+      "group": {
+        "kind": "build"
+      }
+    }, {
+      "type": "deno",
+      "command": "run",
+      "args": [
+        "--allow-run", "--allow-read", "--allow-write=./dist", "build/auto.build.js"
+      ],
+      "label": "[auto] TS helper (sync ./src and ./dist)",
+      "runOptions": {
+        "runOn": "folderOpen"
+      }
+    }, {
+      "type": "shell",
+      "command": "php build/cache.php",
+      "label": "build cache.json"
+    }, {
+      "type": "shell",
+      "command": "sudo php build/webp-pokemon-sprites.php",
+      "label": "build .webp Pokémon sprites"
+    }, {
+      "type": "shell",
+      "command": "sudo php build/pokemonsheet.php",
+      "label": "build Pokémon sprite sheet"
+    }, {
+      "type": "shell",
+      "command": "sudo php build/iconsheet.php",
+      "label": "build icon sheet"
+    }, {
+      "type": "shell",
+      "command": "sudo php build/pokemon-data.php",
+      "label": "build Pokémon data JSON"
+    }, {
+      "type": "shell",
+      "command": "bash -ic deno --version",
+      "label": "test deno in task"
+    }
+  ]
+}

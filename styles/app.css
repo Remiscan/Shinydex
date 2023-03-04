@@ -1,0 +1,952 @@
+/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!! ÉLÉMENTS GLOBAUX !!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+
+html {
+  --link-iconsheet: url(/shinydex/images/iconsheet.webp);
+  --link-pokemonsheet: url(/shinydex/images/pokemonsheet.webp);
+  --tap-safe-size: 48px;
+  --border-radius: 12px;
+  --sub-border-radius: calc(1.12 * (var(--border-radius) - var(--distance-to-parent-border, 4px))); /* 12% optical adjustment */
+  --section-title-height: 64px;
+  --nav-bar-height: 80px;
+
+  /* Élévation */
+  --z-top-layer: 60;
+  --z-sprite-viewer: 60;
+  --z-filter-menu: 50; /* Material elevation 3 */
+  --z-obfuscator: 40;
+  --z-section-titre: 35;
+  --z-fab: 30; /* Material elevation 3 */
+  --z-nav: 25; /* Material elevation 2 */
+  --z-notification: 20; /* Material elevation 2 */
+}
+
+p {
+  margin: 0;
+}
+p + p {
+  margin-top: 16px;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+
+body {
+  display: grid;
+  --nav-bar-height: 80px;
+  --bottom-bar-height: calc(var(--nav-bar-height) + var(--section-title-height));
+  grid-template-rows: 1fr var(--bottom-bar-height);
+  grid-template-columns: 1fr;
+  margin: 0;
+  font-family: 'Roboto', system-ui;
+}
+
+body:not(
+  [data-section-actuelle~="mes-chromatiques"],
+  [data-section-actuelle~="pokedex"],
+  [data-section-actuelle~="chasses-en-cours"],
+  [data-section-actuelle~="corbeille"],
+  [data-section-actuelle~="partage"],
+  [data-section-actuelle~="chromatiques-ami"]
+) {
+  --bottom-bar-height: var(--nav-bar-height);
+}
+
+[hidden] {
+  display: none !important;
+}
+
+
+
+/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!! BARRE DE NAVIGATION !!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+
+nav {
+  grid-row: 2 / 3;
+  grid-column: 1 / 2;
+  display: grid;
+  --nombre-sections: 4;
+  grid-template-rows: var(--section-title-height) 1fr;
+  grid-template-columns: repeat(var(--nombre-sections), 1fr);
+  align-items: center;
+  z-index: var(--z-nav);
+}
+
+nav > search-box::part(form) {
+  grid-row: 1;
+  grid-column: 1 / -1;
+  padding-inline: 8px;
+  margin: auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+nav > search-box::part(input) {
+  --elevation-opacity: var(--elevation-5-opacity);
+}
+
+.nav-link {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
+  gap: 4px;
+  text-decoration: none;
+  font-weight: 500;
+  position: relative;
+  overflow: hidden;
+  outline-offset: -3px;
+  height: 100%;
+  box-sizing: border-box;
+  padding-top: 12px;
+  padding-bottom: 16px;
+  color: rgb(var(--on-surface-variant));
+  --indicator-elevation-opacity: 0;
+}
+
+@media (hover: none) {
+  .nav-link:is(:focus, :hover) {
+    --state-opacity: 0;
+  }
+}
+
+@keyframes bulle-nav {
+  0% { opacity: calc(1 * .16); transform: scale(0); }
+  90% { opacity: calc(.4 * .16); }
+  100% { opacity: 0; transform: scale(1); }
+}
+
+.nav-link::before {
+  content: '';
+  display: block;
+  position: absolute;
+  transform: scale(0);
+  transform-origin: var(--transform-origin, center center);
+  --size: calc(90vw / var(--nombre-sections));
+  width: var(--size);
+  height: var(--size);
+  background-color: var(--nav-bubble-color);
+  border-radius: 50%;
+  z-index: 0;
+}
+
+.nav-link.only-pc {
+  display: none;
+}
+
+.nav-link.bubbly::before {
+  animation: bulle-nav .3s var(--easing-decelerate);
+}
+
+.nav-link shiny-stars {
+  --size: 1.2em;
+}
+
+.nav-link .material-icons {
+  height: 32px;
+  width: 64px;
+  border-radius: 16px;
+  display: flex;
+  place-items: center;
+  justify-content: center;
+  background-color: rgb(var(--icon-surface, 0 0 0 0));
+  color: rgb(var(--icon-color, var(--on-surface-variant)));
+  --elevation-opacity: var(--indicator-elevation-opacity);
+  --state-opacity: 0;
+}
+
+body[data-section-actuelle~="mes-chromatiques"] .nav-link[data-nav-section="mes-chromatiques"],
+body[data-section-actuelle~="pokedex"] .nav-link[data-nav-section="pokedex"],
+body[data-section-actuelle~="chasses-en-cours"] .nav-link[data-nav-section="chasses-en-cours"],
+body[data-section-actuelle~="partage"] .nav-link[data-nav-section="partage"],
+body[data-section-actuelle~="corbeille"] .nav-link[data-nav-section="corbeille"],
+body[data-section-actuelle~="parametres"] .nav-link[data-nav-section="parametres"],
+body[data-section-actuelle~="a-propos"] .nav-link[data-nav-section="a-propos"] {
+  color: rgb(var(--on-surface));
+  --icon-surface: var(--secondary-container);
+  --icon-color: var(--on-secondary-container);
+  --indicator-elevation-opacity: var(--elevation-2-opacity);
+}
+
+body:not([data-section-actuelle~="mes-chromatiques"]) nav search-box[section="mes-chromatiques"]::part(form),
+body:not([data-section-actuelle~="pokedex"]) nav search-box[section="pokedex"]::part(form),
+body:not([data-section-actuelle~="chasses-en-cours"]) nav search-box[section="chasses-en-cours"]::part(form),
+body:not([data-section-actuelle~="corbeille"]) nav search-box[section="corbeille"]::part(form),
+body:not([data-section-actuelle~="partage"]) nav search-box[section="partage"]::part(form),
+body:not([data-section-actuelle~="chromatiques-ami"]) nav search-box[section="chromatiques-ami"]::part(form) {
+  display: none;
+}
+
+body:not(
+  [data-section-actuelle~="mes-chromatiques"],
+  [data-section-actuelle~="pokedex"],
+  [data-section-actuelle~="chasses-en-cours"],
+  [data-section-actuelle~="corbeille"],
+  [data-section-actuelle~="partage"],
+  [data-section-actuelle~="chromatiques-ami"]
+) nav {
+  grid-template-rows: 1fr;
+}
+
+.lien-section,
+.bouton-retour {
+  cursor: pointer;
+}
+
+.lien-section > sync-progress,
+.sous-titre > sync-line {
+  position: absolute;
+}
+
+nav > a > span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 90%;
+}
+
+
+
+/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!! SECTIONS PRINCIPALES !!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+
+main {
+  grid-row: 1 / 2;
+  grid-column: 1 / 2;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  position: relative;
+  height: 100%;
+}
+
+section {
+  display: none;
+  overflow-anchor: none;
+  height: 100%;
+  overflow: hidden;
+}
+
+main > section {
+  grid-template-rows: var(--section-title-height) auto;
+}
+
+main > section.on,
+body[data-section-actuelle~="mes-chromatiques"] #mes-chromatiques,
+body[data-section-actuelle~="pokedex"] #pokedex,
+body[data-section-actuelle~="chasses-en-cours"] #chasses-en-cours,
+body[data-section-actuelle~="corbeille"] #corbeille,
+body[data-section-actuelle~="partage"] #partage,
+body[data-section-actuelle~="chromatiques-ami"] #chromatiques-ami,
+body[data-section-actuelle~="parametres"] #parametres,
+body[data-section-actuelle~="a-propos"] #a-propos,
+body[data-section-actuelle~="sprite-viewer"] #sprite-viewer,
+body[data-section-actuelle~="filter-menu"] #filter-menu,
+body[data-section-actuelle~="top-layer"] #top-layer,
+body[data-section-actuelle~="obfuscator"] #obfuscator {
+  display: grid;
+}
+
+.section-titre {
+  grid-row: 1 / 2;
+  grid-column: 1 / 2;
+  font-size: 1.5rem;
+  font-weight: 400;
+  padding: 8px 16px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 8px;
+  position: sticky;
+  top: 0;
+  z-index: var(--z-section-titre);
+}
+
+.spacer {
+  flex-grow: 1;
+}
+
+.section-titre.with-button {
+  padding-left: 0;
+}
+
+.section-titre search-box {
+  display: none;
+}
+
+.titre-icones {
+  display: flex;
+  flex-direction: row;
+  justify-content: end;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+a.icon-button.bouton-retour {
+  margin: 8px;
+  margin-right: 0;
+}
+
+.compteur {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+  position: relative;
+	min-width: 36px;
+  height: 36px;
+  box-sizing: border-box;
+  padding: 8px;
+	border-radius: 18px;
+	letter-spacing: 0;
+  gap: 2px;
+}
+
+#pokedex .compteur > span {
+  opacity: .8;
+}
+
+#pokedex .compteur > .caught {
+  opacity: 1;
+}
+
+.section-contenu {
+  grid-row: 2 / 3;
+  grid-column: 1 / 2;
+  gap: 8px;
+  padding: 8px;
+  padding-top: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: 100%;
+  box-sizing: border-box;
+  /*scrollbar-gutter: stable;*/
+  container-type: inline-size;
+}
+
+/*body[data-section-actuelle~="obfuscator"] .section-contenu {
+  overflow-y: hidden;
+}*/
+
+section.loading .compteur {
+  display: none;
+}
+
+
+/*
+ * FAB
+ */
+
+@keyframes fab-apparition {
+  0% { transform: translate3D(0, calc(-1px * var(--notification-container-height, 0)), 0) scale(0); }
+  100% { transform: translate3D(0, calc(-1px * var(--notification-container-height, 0)), 0) scale(1); }
+}
+
+.fab {
+  display: none;
+  grid-column: 1 / 2;
+  grid-row: 1 / 2;
+  position: fixed;
+  z-index: var(--z-fab);
+  bottom: var(--bottom-bar-height);
+  right: 0;
+  animation: fab-apparition .2s var(--easing-standard) .2s;
+  animation-fill-mode: backwards;
+  transform: translate3D(0, calc(-1px * var(--notification-container-height, 0)), 0) scale(1);
+  transition: transform .3s var(--easing-standard),
+              box-shadow .3s var(--easing-standard);
+  --decalage: 0;
+}
+
+.fab.notif {
+  --decalage: calc(-1 * var(--bottom-bar-height));
+  transition: transform .15s var(--easing-decelerate);
+}
+
+@supports (selector(:has(*))) {
+  body[data-section-actuelle~="mes-chromatiques"]:has(#mes-chromatiques:not(.loading)) .fab,
+  body[data-section-actuelle~="pokedex"]:has(#pokedex:not(.loading)) .fab,
+  body[data-section-actuelle~="chasses-en-cours"]:not([data-section-actuelle~="corbeille"]):has(#chasses-en-cours:not(.loading)) .fab,
+  body[data-section-actuelle~="partage"]:has(#partage:not(.loading)) .fab {
+    display: flex;
+  }
+}
+
+@supports not (selector(:has(*))) {
+  body[data-section-actuelle~="mes-chromatiques"] .fab,
+  body[data-section-actuelle~="pokedex"] .fab,
+  body[data-section-actuelle~="chasses-en-cours"]:not([data-section-actuelle~="corbeille"]) .fab,
+  body[data-section-actuelle~="partage"] .fab {
+    display: flex;
+  }
+}
+
+#mes-chromatiques > .section-contenu,
+#pokedex > .section-contenu,
+#chasses-en-cours > .section-contenu,
+#partage > .section-contenu {
+  padding-bottom: calc(56px + 2 * 15px);
+}
+
+
+
+/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!! CARTE D'UN POKÉMON !!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+
+shiny-card + shiny-card,
+hunt-card + hunt-card,
+corbeille-card + corbeille-card {
+  content-visibility: auto;
+  contain-intrinsic-size: 100px 120px;
+}
+
+[data-rendered="hidden"] {
+  content-visibility: hidden;
+  contain: style layout paint;
+}
+
+[data-rendered="visible"] {
+  content-visibility: visible;
+  contain: style layout paint;
+}
+
+@supports not (content-visibility: hidden) {
+  [data-rendered="hidden"] {
+    visibility: hidden;
+  }
+  
+  [data-rendered="visible"] {
+    visibility: visible;
+  }
+}
+
+.vide {
+  height: 100%;
+}
+
+.message-vide-recherche,
+.message-vide-filtres,
+.message-vide {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr min-content min-content 1fr;
+  font-size: 1.125rem;
+  color: var(--text-color-soft);
+  opacity: .5;
+  flex-grow: 1;
+  text-align: center;
+  width: 60%;
+  gap: 8px;
+  align-self: center;
+  justify-self: center;
+}
+
+.message-vide-recherche > .material-icons,
+.message-vide-filtres > .material-icons,
+.message-vide > .material-icons {
+  font-size: 2.625rem;
+  grid-row: 2 / 3;
+}
+
+.message-vide-recherche > span,
+.message-vide-filtres > span,
+.message-vide > span {
+  grid-row: 3 / 4;
+}
+
+section:not(.vide-recherche) .message-vide-recherche,
+section:not(.vide-filtres) .message-vide-filtres,
+section:not(.vide) .message-vide {
+  display: none;
+}
+
+section.vide-filtres.vide-recherche .message-vide-recherche,
+section.vide.vide-recherche .message-vide-recherche,
+section.vide.vide-filtres .message-vide-filtres {
+  display: none;
+}
+
+.section-loader {
+  margin: auto;
+}
+
+section:not(.loading) .section-loader {
+  display: none;
+}
+
+section.loading .message-vide-filtres,
+section.loading .message-vide {
+  display: none;
+}
+
+
+
+/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!! POKÉDEX !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+
+.pokedex-gen {
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: var(--border-radius);
+  padding: 8px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 44px);
+  gap: 8px;
+  justify-content: space-evenly;
+  align-items: flex-start;
+}
+
+/*.pokedex-gen + .pokedex-gen {
+  content-visibility: auto;
+}*/
+
+.dex-icon {
+  display: grid;
+  place-items: center;
+  border-radius: calc(.5 * var(--border-radius));
+  position: relative;
+  content-visibility: auto;
+  contain-intrinsic-size: 44px 44px;
+
+  --surface-color: var(--surface);
+  --elevation-opacity: var(--elevation-2-opacity);
+  --state-tint: var(--on-primary);
+}
+
+.dex-icon:not(.got) {
+  /* setting opacity on .pkmnicon makes the pokedex section lag, particularly when opening it on mobile */
+  --surface-opacity: 1;
+}
+
+.dex-icon.got {
+  --surface-color: var(--primary-container);
+  --state-tint: var(--on-primary-container);
+}
+
+.dex-icon .pkmnicon {
+  outline-offset: -1px;
+}
+
+.dex-icon:not(.got) .pkmnicon {
+  filter: grayscale(.95) brightness(var(--pkmnicon-brightness));
+}
+
+.pkmnicon {
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  margin: 0;
+}
+
+
+
+/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!! FILTERS & ORDER !!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+
+section:not([data-filter-mine~="true"]) [data-mine="true"],
+section:not([data-filter-mine~="false"]) [data-mine="false"],
+section:not([data-filter-legit~="true"]) [data-legit="true"],
+section:not([data-filter-legit~="false"]) [data-legit="false"] {
+  display: none;
+}
+
+:is(shiny-card, hunt-card, corbeille-card, friend-card) {
+  --order-reversed: 1;
+}
+
+section[data-order-reversed="true"] :is(shiny-card, hunt-card, corbeille-card, friend-card) {
+  --order-reversed: -1;
+}
+
+section[data-order="catchTime"] :is(shiny-card, hunt-card, corbeille-card, friend-card) {
+  order: calc(-1 * var(--order-reversed) * var(--catchTime-order, 0));
+}
+
+section[data-order="shinyRate"] :is(shiny-card, hunt-card, corbeille-card, friend-card) {
+  order: calc(-1 * var(--order-reversed) * var(--shinyRate-order, 0));
+}
+
+section[data-order="dexid"] :is(shiny-card, hunt-card, corbeille-card, friend-card) {
+  order: calc(var(--order-reversed) * var(--dexid-order, 0));
+}
+
+section[data-order="species"] :is(shiny-card, hunt-card, corbeille-card, friend-card) {
+  order: calc(var(--order-reversed) * var(--species-order, 0));
+}
+
+section[data-order="name"] :is(shiny-card, hunt-card, corbeille-card, friend-card) {
+  order: calc(var(--order-reversed) * var(--name-order, 0));
+}
+
+section[data-order="game"] :is(shiny-card, hunt-card, corbeille-card, friend-card) {
+  order: calc(-1 * var(--order-reversed) * var(--game-order, 0));
+}
+
+section[data-order="lastUpdate"] :is(shiny-card, hunt-card, corbeille-card, friend-card) {
+  order: calc(-1 * var(--order-reversed) * var(--lastUpdate-order, 0));
+}
+
+section[data-order="creationTime"] :is(shiny-card, hunt-card, corbeille-card, friend-card) {
+  order: calc(-1 * var(--order-reversed) * var(--creationTime-order, 0));
+}
+
+body:not([data-filters~="mes-chromatiques"]) filter-menu[section="mes-chromatiques"],
+body:not([data-filters~="chasses-en-cours"]) filter-menu[section="chasses-en-cours"],
+body:not([data-filters~="corbeille"]) filter-menu[section="corbeille"],
+body:not([data-filters~="partage"]) filter-menu[section="partage"],
+body:not([data-filters~="chromatiques-ami"]) filter-menu[section="chromatiques-ami"] {
+  display: none;
+}
+
+#filter-menu {
+  --from: 1rem;
+}
+
+filter-menu {
+  margin-bottom: calc(var(--bottom-bar-height) + 8px);
+}
+
+
+
+/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!! PARAMÈTRES !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+
+#parametres {
+  min-height: 100%;
+}
+
+form[name="app-settings"],
+#a-propos > .section-contenu {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 65ch;
+}
+
+#parametres > .section-contenu,
+#a-propos > .section-contenu {
+  padding-inline: 16px;
+}
+
+h2:not(:first-child) {
+  margin-top: 16px;
+}
+
+.un-parametre {
+  display: grid;
+  grid-template-columns: minmax(auto, 40ch) auto;
+  grid-template-rows: 1fr [title] auto [description] var(--description-row) 1fr;
+  --description-row: 0;
+  column-gap: 16px;
+  min-height: 32px;
+  padding-block: 8px;
+  text-align: left;
+  align-items: center;
+  container-type: inline-size;
+}
+
+.un-parametre.with-description {
+  --description-row: auto;
+}
+
+.un-parametre.theme > .param {
+  grid-template-columns: auto auto auto;
+  gap: 8px;
+}
+
+.un-parametre + .un-parametre {
+  margin-top: 0;
+  border-top: 1px solid rgb(var(--outline-variant));
+}
+
+.un-parametre .param-nom,
+.un-parametre .param-description {
+  max-width: 40ch;
+}
+
+.param-nom {
+  display: block;
+  grid-row: title;
+  grid-column: 1;
+  color: rgb(var(--on-surface));
+}
+
+.param-description {
+  grid-row: description;
+  grid-column: 1;
+  color: rgb(var(--on-surface-variant));
+}
+
+.param {
+  align-self: start;
+  display: grid;
+  align-items: center;
+  justify-content: end;
+  min-width: 150px;
+  min-height: calc(1.5rem + 1.25rem);
+}
+
+.un-parametre > label,
+.un-parametre > input,
+.un-parametre > input-switch,
+.un-parametre > .param {
+  grid-row: 1 / -1;
+  grid-column: 2;
+}
+
+[data-action="check-update"] {
+  margin: 0;
+}
+
+body:not([data-last-sync]) #parametres [data-last-sync],
+body:not([data-last-sync="failure"]) #parametres [data-last-sync="failure"],
+body:not([data-last-sync="success"]) #parametres [data-last-sync="success"],
+body:not([data-last-sync="loading"]) #parametres [data-last-sync="loading"],
+form[name="app-settings"]:not([data-public-profile="true"]) [data-public-profile] {
+  display: none;
+}
+
+button > load-spinner {
+  --size: 24px;
+}
+
+[data-sprites-progress]:empty {
+  display: none;
+}
+
+[data-sprites-progress]:not(:empty)::before {
+  content: '(';
+}
+
+[data-sprites-progress]:not(:empty)::after {
+  content: ')';
+}
+
+#parametres[data-online-backup][data-last-sync=success] .success,
+#parametres[data-online-backup][data-last-sync=failure] .failure {
+  display: inline;
+}
+
+label[for="pick-import-file"],
+#pick-import-file {
+  width: .1px;
+	height: .1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
+}
+
+.account-warning {
+  border: 1px solid var(--success-color);
+  border-radius: var(--border-radius);
+  padding: 8px;
+  grid-template-columns: auto;
+  box-sizing: border-box;
+}
+
+.un-parametre.theme input[type="radio"] + label {
+  margin: 0;
+}
+
+input-slider[name="theme-hue"] {
+  --block-size: var(--tap-safe-size);
+  --inline-size: 80cqw;
+  --thumb-width: 14px;
+}
+
+input-slider[name="theme-hue"]::part(slider-track) {
+  --couleurs: white 0%, black 100%;
+  background: var(--gradient, transparent);
+  width: 100%;
+  height: 100%;
+  border: none;
+  --border: none;
+  outline: var(--border, none);
+  border-radius: var(--border-radius);
+}
+
+input-slider[name="theme-hue"]::part(slider-thumb) {
+  background: transparent;
+  border: none;
+  border-radius: var(--border-radius);
+  box-shadow: inset 0 0 0 2px rgb(var(--on-surface)),
+              0 0 0 2px rgb(var(--inverse-on-surface));
+  outline-offset: 5px;
+}
+
+
+
+/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!! À PROPOS DU SHINYDEX !!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+
+.app-icon {
+  display: flex;
+  width: 120px;
+  height: 120px;
+  min-height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 0 auto;
+  border: 1px solid rgb(var(--outline-variant));
+}
+
+.app-icon > svg {
+  width: 120px;
+  height: 120px;
+  --background-top: rgb(var(--primary-60));
+}
+
+.lien-source {
+  color: var(--accent-color);
+}
+
+.lien-source .material-icons {
+  vertical-align: middle;
+  margin-right: 4px;
+}
+
+
+
+/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!! PARTAGE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+
+form[name="user-profile"] {
+  display: flex;
+  padding: 8px;
+  border-radius: var(--border-radius);
+}
+
+
+
+/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!! SPRITE VIEWER, FILTER MENU & OBFUSCATOR !!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+
+#sprite-viewer,
+#filter-menu,
+#top-layer,
+#obfuscator {
+  grid-column: 1 / -1;
+  grid-row: 1 / -1;
+}
+
+#sprite-viewer {
+  z-index: var(--z-sprite-viewer);
+}
+
+#obfuscator {
+  z-index: var(--z-obfuscator);
+}
+
+#top-layer,
+#filter-menu {
+  background-color: transparent;
+  z-index: var(--z-obfuscator);
+}
+
+body[data-section-actuelle~="top-layer"] #top-layer {
+  display: contents;
+}
+
+#top-layer > * {
+  z-index: var(--z-top-layer);
+}
+
+/*@media (max-width: 719px) {
+  #top-layer > .mobile-centered {
+    max-width: calc(100vw - 16px) !important;
+    max-height: calc(100vh - 16px) !important;
+    min-width: unset !important;
+    margin: 8px;
+    top: 50vh !important;
+    left: 50vw !important;
+    transform: translate(-50%, -50%);
+  }
+}*/
+
+
+
+/*
+ * Notification
+ */
+
+.notification-container {
+  width: 100%;
+  height: auto;
+  max-height: calc(50vh - var(--bottom-bar-height));
+  overflow-y: auto;
+  position: fixed;
+  z-index: var(--z-notification);
+  top: calc(100% - var(--bottom-bar-height));
+  transform: translateY(calc(-1px * var(--notification-container-height, 0)));
+  transition: transform .3s var(--easing-standard);
+}
+
+.notification-container.no-animation {
+  transition: none;
+}
+
+.notification-container > .snackbar:first-child {
+  margin-top: 0;
+}
+
+
+/*
+ * Bouton installer
+ */
+
+[data-action="install-app"] {
+  /*position: absolute;
+  bottom: calc(0.5*(56px - 30px));
+  right: 20px;*/
+  display: none;
+}
+
+
+/*
+ * Sign-in with Google
+ */
+
+#google-signin-button-container {
+  color-scheme: light;
+  width: fit-content;
+  height: fit-content;
+  margin: 8px auto;
+  overflow: hidden;
+}
+
+#google-one-tap-container {
+  color-scheme: light;
+  display: flex;
+  justify-content: center;
+  width: fit-content;
+  height: fit-content;
+  overflow: hidden;
+  margin: auto;
+}
+
+iframe[src^="https://accounts.google.com"] {
+  color-scheme: light;
+}
+
+body:not([data-logged-in="true"]) [data-logged-in],
+body[data-logged-in="true"] [data-logged-out] {
+  display: none;
+}

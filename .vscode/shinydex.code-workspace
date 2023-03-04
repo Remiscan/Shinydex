@@ -1,0 +1,11 @@
+{
+  "folders": [
+    {
+			"name": "Shinydex",
+			"path": ".."
+		}
+	],
+	"settings": {
+		"task.allowAutomaticTasks": "on"
+	}
+}

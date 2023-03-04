@@ -2,105 +2,79 @@
 <html lang="fr">
 
   <head>
-    <title>Rémidex</title>
-    <meta name="description" content="Pokédex recensant les Pokémon chromatiques possédés par Rémi.">
-    <meta property="og:title" content="Rémidex">
-    <meta property="og:description" content="Pokédex recensant les Pokémon chromatiques possédés par Rémi.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://remiscan.fr/remidex/">
-    <meta property="og:image" content="https://remiscan.fr/remidex/preview.png">
-
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, user-scalable=no">
     <meta name="theme-color" content="#222222">
+
+    <title>Shinydex</title>
+    <meta name="description" content="Pokédex recensant les Pokémon chromatiques possédés par Rémi.">
+    <meta property="og:title" content="Shinydex">
+    <meta property="og:description" content="Pokédex recensant les Pokémon chromatiques possédés par Rémi.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://remiscan.fr/shinydex/">
+    <meta property="og:image" content="https://remiscan.fr/shinydex/images/preview.png">
     
-    <link rel="icon" type="image/png" href="./icons/icon-192.png">
-    <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+    <link rel="icon" type="image/svg+xml" href="./images/app-icons/favicon.svg">
+    <link rel="apple-touch-icon" href="./images/app-icons/apple-touch-icon.png">
     <link rel="manifest" href="./manifest.json">
 
     <link rel="preconnect" href="https://remiscan.fr">
 
-    <script src="./ext/localforage.min.js"></script>
-    <script>
-      window.tempsDebut = Date.now();
-
-      // Stockage de données
-      //// Pokédex
-      const pokemonData = localforage.createInstance({
-        name: 'remidex',
-        storeName: 'pokemon-data',
-        driver: localforage.INDEXEDDB
-      });
-      //// Liste de shiny
-      const shinyStorage = localforage.createInstance({
-        name: 'remidex',
-        storeName: 'shiny-list',
-        driver: localforage.INDEXEDDB
-      });
-      //// Données diverses
-      const dataStorage = localforage.createInstance({
-        name: 'remidex',
-        storeName: 'misc',
-        driver: localforage.INDEXEDDB
-      });
-      // Chasses en cours
-      const huntStorage = localforage.createInstance({
-        name: 'remidex',
-        storeName: 'hunts',
-        driver: localforage.INDEXEDDB
-      });
-
-      // Définition du thème
-      async function setTheme(askedTheme = false)
-      {
-        // Thème sélectionné par l'utilisateur
-        await dataStorage.ready();
-        const userTheme = await dataStorage.getItem('theme');
-
-        // Thème préféré selon l'OS
-        let osTheme;
-        if (window.matchMedia('(prefers-color-scheme: dark)').matches) osTheme = 'dark';
-        else if (window.matchMedia('(prefers-color-scheme: light)').matches) osTheme = 'light';
-
-        // Thème exigé par la fonction
-        const forcedTheme = (askedTheme == 'system') ? osTheme : askedTheme;
-
-        // Thème par défaut
-        const defaultTheme = 'dark';
-
-        // On applique le thème (forcedTheme > userTheme > osTheme > defaultTheme)
-        const theme = forcedTheme || userTheme || osTheme || defaultTheme;
-        const storedTheme = (askedTheme == 'system') ? null : (forcedTheme || userTheme);
-
-        let html = document.documentElement;
-        html.classList.remove('light', 'dark');
-        html.classList.add(theme);
-        
-        let themeColor = (theme == 'dark') ? 'rgb(34, 34, 34)' : 'rgb(224, 224, 224)';
-        document.querySelector("meta[name=theme-color]").setAttribute('content', themeColor);
-
-        window.dispatchEvent(new CustomEvent('themechange', { detail: { theme } }));
-
-        return await dataStorage.setItem('theme', storedTheme);
+    <script>window.tempsChargementDebut = performance.now();</script>
+    <script defer src="../_common/polyfills/inert.min.js"></script>
+    <script defer src="../_common/polyfills/adoptedStyleSheets.min.js"></script>
+    <script>window.esmsInitOptions = { polyfillEnable: ['css-modules', 'json-modules'] }</script>
+    <script defer src="../_common/polyfills/es-module-shims.js"></script>
+    <script type="importmap">
+    {
+      "imports": {
+        "input-switch-styles": "../_common/components/input-switch/styles.css",
+        "input-switch-template": "../_common/components/input-switch/template.js",
+        "colori": "../colori/lib/dist/colori.min.js"
       }
-
-      Promise.all([dataStorage.ready(), shinyStorage.ready(), pokemonData.ready()])
-      .then(() => setTheme());
-
-      window.matchMedia('(prefers-color-scheme: dark)').addListener(event => setTheme());
-      window.matchMedia('(prefers-color-scheme: light)').addListener(event => setTheme());
+    }
     </script>
+    <script defer src="./ext/localforage.min.js"></script>
+    <script defer src="https://accounts.google.com/gsi/client"></script>
+    <script type="module" src="./dist/modules/main.js"></script>
 
-    <?php $mods = preg_filter('/(.+).js/', '$1', scandir(__DIR__.'/modules'));
-    foreach($mods as $mod) { ?>
-    <link rel="modulepreload" href="./modules/<?=$mod?>.js">
-    <?php } ?>
+    <?php
+    $modules = new RecursiveIteratorIterator(
+      new RecursiveDirectoryIterator(
+        __DIR__.'/dist/modules',
+        RecursiveDirectoryIterator::SKIP_DOTS
+      ),
+      RecursiveIteratorIterator::SELF_FIRST
+    );
+    foreach($modules as $mod => $obj) {
+      if (is_dir($mod)) continue;
+      else if (str_ends_with($mod, '.html')) continue;
+      else if (str_ends_with($mod, '.css')) continue; // can't preload css modules yet
+      else { $rel = 'modulepreload'; $as = null; }
+      $path = str_replace(__DIR__, '.', $obj->getPath()) . '/' . $obj->getFilename();
+      ?>
+    <link rel="<?=$rel?>" <?=($as ? 'as="'.$as.'"' : '')?> href="<?=$path?>">
+      <?php
+    } ?>
 
-    <link rel="stylesheet" href="./styles.css">
+    <link rel="preload" as="image" href="./images/pokemonsheet.webp">
+    <link rel="preload" as="image" href="./images/iconsheet.webp">
+
+    <style id="palette"></style>
+
+    <link rel="stylesheet" href="./ext/material_icons.css">
+    <link rel="stylesheet" href="./images/pokemonsheet.css">
+    <link rel="stylesheet" href="./images/iconsheet.css">
+    <link rel="stylesheet" href="./styles/themes.css.php">
+    <link rel="stylesheet" href="./styles/common.css">
+
+    <link rel="stylesheet" href="./styles/app.css">
+    <link rel="stylesheet" href="./styles/app-medium.css" media="screen and (min-width: 720px)">
+    <link rel="stylesheet" href="./styles/app-large.css" media="screen and (min-width: 1140px)">
   </head>
 
-  <body data-section-actuelle="mes-chromatiques">
+  <body data-section-actuelle="mes-chromatiques" class="background">
     <!-- Écran de chargement -->
     <div id="load-screen" style="grid-row: 1 / 3; grid-column: 1 / 2; position: absolute; z-index: 1000;width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: var(--bg-color, rgb(34, 34, 34));">
       <load-spinner id="spinner" style="--size: 3em;"></load-spinner>
@@ -108,64 +82,91 @@
     </div>
 
     <!-- Barre de navigation -->
-    <nav class="bottom-bar">
-      <a class="nav-link lien-section" data-section="mes-chromatiques">
-        <i class="material-icons">storage</i>
-        <span>Chromatiques</span>
+    <nav class="bottom-bar surface primary elevation-2">
+      <search-box section="mes-chromatiques"></search-box>
+      <search-box section="pokedex"></search-box>
+      <search-box section="chasses-en-cours"></search-box>
+      <search-box section="corbeille"></search-box>
+      <search-box section="partage"></search-box>
+      <search-box section="chromatiques-ami"></search-box>
+      
+      <a class="nav-link lien-section search-button" data-nav-section="obfuscator" data-nav-data='{ "search": true }' href="#" style="display: none">
+        <span class="material-icons">search</span>
       </a>
 
-      <a class="nav-link lien-section" data-section="pokedex">
-        <i class="material-icons">language</i>
-        <span>Pokédex<svg class="shinystars"><use xlink:href="./images/shinystars.svg#stars"></use></svg></span>
+      <a class="nav-link lien-section surface interactive" data-nav-section="mes-chromatiques" href="./mes-chromatiques">
+        <span class="material-icons surface" aria-hidden="true">catching_pokemon</span>
+        <span class="label-medium">Pokémon <shiny-stars></shiny-stars></span>
       </a>
 
-      <a class="nav-link lien-section" data-section="chasses-en-cours">
-        <i class="material-icons">add_circle</i>
-        <span>Chasses</span>
+      <a class="nav-link lien-section surface interactive" data-nav-section="pokedex" href="./pokedex">
+        <span class="material-icons surface" aria-hidden="true">apps</span>
+        <span class="label-medium">Pokédex <shiny-stars></shiny-stars></span>
       </a>
 
-      <!-- Seulement sur PC -->
-      <a class="nav-link lien-section only-pc" data-section="parametres">
-        <i class="material-icons">settings</i>
-        <span>Paramètres</span>
+      <a class="nav-link lien-section surface interactive" data-nav-section="chasses-en-cours" href="./chasses-en-cours">
+        <span class="material-icons surface" aria-hidden="true">add_circle</span>
+        <span class="label-medium">Chasses</span>
+      </a>
+
+      <a class="nav-link lien-section surface interactive only-pc" data-nav-section="corbeille" href="./corbeille">
+        <span class="material-icons surface" aria-hidden="true">auto_delete</span>
+        <span class="label-medium">Corbeille</span>
+      </a>
+
+      <a class="nav-link lien-section surface interactive" data-nav-section="partage" href="./partage">
+        <span class="material-icons surface" aria-hidden="true">group</span>
+        <span class="label-medium">Amis</span>
+      </a>
+
+      <a class="nav-link lien-section surface interactive only-pc" data-nav-section="parametres" href="./parametres">
+        <span class="material-icons surface" aria-hidden="true">settings</span>
+        <sync-progress></sync-progress>
+        <span class="label-medium">Paramètres</span>
+      </a>
+
+      <a class="nav-link lien-section surface interactive only-pc" data-nav-section="a-propos" href="./a-propos">
+        <span class="material-icons surface" aria-hidden="true">info</span>
+        <span class="label-medium">À propos</span>
       </a>
     </nav>
 
-    <!-- Barre de chargement (superposé à nav) -->
-    <div class="loading-bar">
-      <load-spinner></load-spinner>
-      <a class="icone bouton-retour">
-        <i class="material-icons">close</i>
-      </a>
-    </div>
-
     <!-- Contenu de l'appli -->
-    <main>
+    <main class="surface primary">
+
+      <!-- FAB -->
+      <button type="button" class="surface interactive fab shadow only-icon">
+        <span class="material-icons">add</span>
+      </button>
 
       <!-- Mes chromatiques -->
-      <section id="mes-chromatiques">
+      <section id="mes-chromatiques" class="vide loading">
         <?php include './pages/mes-chromatiques.html'; ?>
       </section>
 
       <!-- Pokédex chromatique -->
-      <section id="pokedex">
+      <section id="pokedex" class="loading">
         <?php include './pages/pokedex.html'; ?>
       </section>
 
-      <!-- FAB des filtres -->
-      <button class="fab">
-        <i class="material-icons"></i>
-      </button>
-
-      <!-- Bouton installer -->
-      <div id="install-bouton">
-        <i class="material-icons">get_app</i>
-        <span>Installer</span>
-      </div>
-
       <!-- Chasses en cours -->
-      <section id="chasses-en-cours">
+      <section id="chasses-en-cours" class="vide loading">
         <?php include './pages/chasses-en-cours.html'; ?>
+      </section>
+
+      <!-- Corbeille -->
+      <section id="corbeille" class="vide loading">
+        <?php include './pages/corbeille.html'; ?>
+      </section>
+
+      <!-- Liste d'amis -->
+      <section id="partage" class="vide">
+        <?php include './pages/partage.html'; ?>
+      </section>
+
+      <!-- Chromatiques d'un ami -->
+      <section id="chromatiques-ami" class="vide">
+        <?php include './pages/chromatiques-ami.html'; ?>
       </section>
 
       <!-- Paramètres -->
@@ -175,41 +176,50 @@
 
       <!-- À propos -->
       <section id="a-propos">
-        <?php include './pages/a-propos.html'; ?>
+        <?php
+        ob_start();
+        include './pages/politique-confidentialite.html';
+        $politique = ob_get_clean();
+
+        ob_start();
+        include './images/app-icons/icon.svg';
+        $icon = ob_get_clean();
+
+        ob_start();
+        include './pages/a-propos.html';
+        $apropos = ob_get_clean();
+
+        $apropos = str_replace('{{polconf}}', $politique, $apropos);
+        $apropos = str_replace('{{app-icon}}', $icon, $apropos);
+        echo $apropos;
+        ?>
       </section>
 
     </main>
 
-    <!-- Notification -->
-    <div class="notification bottom-bar off" id="notification">
-      <span class="notif-texte">Mise à jour disponible...</span>
-      <div class="notif-bouton">
-        <span>Installer</span>
-        <i class="material-icons">update</i>
-      </div>
-
-      <div class="progression-maj"></div>
-
-      <load-spinner></load-spinner>
-    </div>
-
-    <!-- Menu des filtres -->
-    <?php include './pages/menu-filtres.html'; ?>
-
-    <!-- Obfuscator -->
-    <div class="obfuscator off"></div>
-
     <!-- Sprite viewer -->
-    <section id="sprite-viewer">
-      <?php include './pages/sprite-viewer.html'; ?>
+    <section id="sprite-viewer" class="background">
+      <sprite-viewer></sprite-viewer>
     </section>
 
-    <!-- Mesure de la fenêtre -->
-    <div id="hauteur-fenetre" style="width: 0; height: 100vh; position: absolute;"></div>
-    <div id="largeur-fenetre" style="width: 100vw; height: 0; position: absolute;"></div>
+    <!-- Obfuscator -->
+    <section id="obfuscator" class="background"></section>
 
-    <!-- Scripts -->
-    <script type="module" src="./scripts.js"></script>
+    <!-- Menu de filtres -->
+    <section id="filter-menu">
+      <filter-menu data-section="mes-chromatiques" class="surface standard primary shadow elevation-3"></filter-menu>
+      <filter-menu data-section="chasses-en-cours" class="surface standard primary shadow elevation-3"></filter-menu>
+      <filter-menu data-section="corbeille" class="surface standard primary shadow elevation-3"></filter-menu>
+      <filter-menu data-section="partage" class="surface standard primary shadow elevation-3"></filter-menu>
+      <filter-menu data-section="chromatiques-ami" class="surface standard primary shadow elevation-3"></filter-menu>
+    </section>
 
+    <!-- Misc top layer -->
+    <section id="top-layer"></section>
+
+    <!-- Notifications -->
+    <div class="notification-container">
+      <div id="google-one-tap-container"></div>
+    </div>
   </body>
 </html>

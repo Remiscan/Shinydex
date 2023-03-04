@@ -1,0 +1,507 @@
+/* Empêcher le contour bizarre que Chrome ajoute autour d'éléments en focus */
+* {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+} 
+*:focus:not(:focus-visible) {
+  outline-style: none;
+}
+
+:root {
+  --tap-safe-size: 48px;
+}
+
+shiny-stars {
+  display: inline-grid;
+  --color: currentColor;
+}
+
+h1,
+h2,
+h3 {
+  all: unset;
+  white-space: nowrap;
+  display: flex;
+  gap: .5ch;
+}
+
+
+
+/*
+ * Buttons
+ */
+
+button {
+  -webkit-appearance: none;
+  appearance: none;
+  background: none;
+  border: none;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+
+  height: 40px;
+  min-height: 40px;
+  width: fit-content;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 24px 0 16px;
+  margin: auto;
+  position: relative;
+  --elevation-shadow: none;
+}
+
+/*button:not(.pkmnicon)::before {
+  content: '';
+  display: flex;
+  width: 100%;
+  min-width: var(--tap-safe-size);
+  height: 100%;
+  min-height: var(--tap-safe-size);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}*/
+
+button.only-icon {
+  padding: 0 16px;
+}
+
+button.only-text {
+  padding: 0 24px;
+}
+
+/* Elevated */
+
+button.elevated {
+  --surface-color: var(--surface);
+  --elevation-opacity: var(--elevation-1-opacity);
+  --elevation-shadow: var(--elevation-1-shadow);
+  color: rgb(var(--primary));
+  --state-tint: var(--primary);
+}
+
+button.elevated:focus {
+  --elevation-opacity: var(--elevation-1-opacity);
+  --elevation-shadow: var(--elevation-1-shadow);
+}
+
+button.elevated:hover {
+  --elevation-opacity: var(--elevation-2-opacity);
+  --elevation-shadow: var(--elevation-2-shadow);
+}
+
+button.elevated:active {
+  --elevation-opacity: var(--elevation-1-opacity);
+  --elevation-shadow: var(--elevation-1-shadow);
+}
+
+/* Filled */
+
+button.filled {
+  --surface-color: var(--primary);
+  --surface-opacity: 1;
+  color: rgb(var(--on-primary));
+  --state-tint: var(--on-primary);
+}
+
+/* Filled tonal */
+
+button.filled.tonal {
+  --surface-color: var(--secondary-container);
+  color: rgb(var(--on-secondary-container));
+  --state-tint: var(--on-secondary-container);
+}
+
+button.filled.danger {
+  --surface-color: var(--error-container);
+  color: rgb(var(--on-error-container));
+  --state-tint: var(--on-error-container);
+}
+
+button.filled.success {
+  --surface-color: var(--success-container);
+  color: rgb(var(--on-success-container));
+  --state-tint: var(--on-success-container);
+}
+
+/* Outlined */
+
+button.outlined {
+  color: rgb(var(--primary));
+  border: 1px solid rgb(var(--outline));
+  --state-tint: var(--primary);
+}
+
+button.outlined:focus {
+  border: 1px solid rgb(var(--primary));
+}
+
+button.outlined:focus:not(:focus-visible) {
+  border: 1px solid rgb(var(--outline));
+}
+
+button.outlined:not(.filled) {
+  --surface-opacity: 0;
+}
+
+/* Text */
+
+button.text-button {
+  --surface-opacity: 0;
+  --elevation-opacity: 0;
+  color: rgb(var(--primary));
+  --state-tint: var(--primary);
+}
+
+button.text-button.danger {
+  color: rgb(var(--on-error-container));
+  --state-tint: var(--on-error-container);
+}
+
+button.text-button.success {
+  color: rgb(var(--on-success-container));
+  --state-tint: var(--on-success-container);
+}
+
+/* Fab */
+
+button.fab {
+  --surface-color: var(--primary-container);
+  --elevation-opacity: var(--elevation-1-opacity);
+  --elevation-shadow: var(--elevation-1-shadow);
+  color: rgb(var(--on-primary-container));
+  --state-tint: var(--on-primary-container);
+  min-width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  margin: 16px;
+}
+
+button.fab.small {
+  min-width: 40px;
+  height: 40px;
+  border-radius: 12px;
+}
+
+button.fab.large {
+  min-width: 96px;
+  height: 96px;
+  border-radius: 28px;
+}
+
+button.fab:focus {
+  --elevation-opacity: var(--elevation-1-opacity);
+  --elevation-shadow: var(--elevation-1-shadow);
+}
+
+button.fab:hover {
+  --elevation-opacity: var(--elevation-2-opacity);
+  --elevation-shadow: var(--elevation-2-shadow);
+}
+
+button.fab:active {
+  --elevation-opacity: var(--elevation-1-opacity);
+  --elevation-shadow: var(--elevation-1-shadow);
+}
+
+/* Icon button */
+
+button.icon-button {
+  width: 40px;
+  height: 40px;
+  --surface-opacity: 0;
+  --elevation-opacity: 0;
+  --state-tint: var(--on-surface);
+}
+
+a.icon-button::before,
+button.icon-button::before {
+  width: 48px;
+  height: 48px;
+  content: '';
+  position: absolute;
+}
+
+a.icon-button {
+  border: none;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  text-decoration: none;
+
+  border-radius: 20px;
+  display: grid;
+  place-items: center;
+  --elevation-shadow: none;
+
+  width: 40px;
+  height: 40px;
+  --surface-opacity: 0;
+  --elevation-opacity: 0;
+  --state-tint: var(--on-surface);
+}
+
+a.icon-button > * {
+  grid-row: 1;
+  grid-column: 1;
+}
+
+/* Disabled */
+
+button:disabled {
+  --surface-color: var(--on-surface) !important;
+  --elevation-opacity: 0 !important;
+  --surface-opacity: .12 !important;
+  --state-opacity: 0 !important;
+  color: rgb(var(--on-surface), .38) !important;
+}
+
+button.outlined:disabled {
+  outline: 1px solid rgb(var(--on-surface), .12);
+}
+
+
+
+/*
+ * Inputs
+ */
+
+input-slider {
+  --tap-safe-size: inherit;
+}
+
+/* Switch */
+
+input-switch,
+shiny-switch {
+  --off-track-color: rgb(var(--surface-variant));
+  --on-track-color: rgb(var(--primary));
+  --off-thumb-color: rgb(var(--outline));
+  --on-thumb-color: rgb(var(--on-primary));
+}
+
+input-switch::part(button),
+shiny-switch::part(button) {
+  --interaction-ring-color: rgb(var(--on-surface));
+}
+
+shiny-switch::part(icon-checked) {
+  display: grid;
+  place-items: center;
+  stroke: none;
+  fill: var(--on-track-color);
+}
+
+input-switch[disabled] {
+  opacity: .7;
+  cursor: not-allowed;
+}
+
+label:has(> input-switch),
+label:has(> shiny-switch) {
+  min-height: var(--tap-safe-size);
+  min-width: var(--tap-safe-size);
+  justify-content: center;
+  display: grid;
+  place-items: center;
+}
+
+@supports not selector(label:has(a)) {
+  label > input-switch::before,
+  label > shiny-switch::before {
+    content: '';
+    display: flex;
+    width: 100%;
+    min-width: var(--tap-safe-size);
+    height: 100%;
+    min-height: var(--tap-safe-size);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* Select */
+
+[role="listbox"] [role="option"] {
+  border: none;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+
+  width: 100%;
+  height: 40px;
+  min-height: 40px;
+  box-sizing: border-box;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  gap: 8px;
+  padding: 0 12px 0 8px;
+  position: relative;
+  --elevation-shadow: none;
+  --surface-opacity: 0;
+  --elevation-opacity: 0;
+  --state-tint: var(--on-surface);
+}
+
+[role="listbox"] [role="option"]::before {
+  content: '';
+  display: none;
+  width: 100%;
+  min-width: var(--tap-safe-size);
+  height: 100%;
+  min-height: var(--tap-safe-size);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+[role="listbox"] [role="option"] > .material-icons {
+  color: rgb(var(--on-surface-variant));
+}
+
+[role="listbox"] [role="option"][aria-selected="true"],
+[role="listbox"] [role="option"][aria-selected="true"] > .material-icons {
+  color: rgb(var(--primary));
+  --elevation-opacity: var(--elevation-2-opacity);
+}
+
+[role="listbox"] [role="option"] [part~="icon-unchecked"] {
+  opacity: 0;
+}
+
+[role="listbox"] [role="option"][aria-selected="true"] [part~="icon-unchecked"],
+[role="listbox"] [role="option"]:not([aria-selected="true"]) [part~="icon-checked"] {
+  display: none;
+}
+
+[role="listbox"] [role="option"].focused {
+  outline: 2px solid currentColor;
+  outline: 5px auto Highlight;
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: 1px;
+}
+
+/* Other */
+
+input:is([type=file]):disabled + label {
+  opacity: .5;
+  filter: grayscale(1);
+  cursor: not-allowed;
+}
+
+input:is([type=file]):focus + label {
+  outline: 2px solid currentColor;
+  outline: 5px auto Highlight;
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: 1px;
+}
+
+input:is([type=file]):focus:not(:focus-visible) + label {
+  outline: none;
+}
+
+
+
+/*
+ * Load spinner
+ */
+
+load-spinner {
+  --size: 40px;
+  --bg-color: rgb(var(--surface));
+  --accent-color: rgb(var(--primary));
+  --text-color: rgb(var(--on-surface));
+}
+
+
+
+/*
+ * Snackbar
+ */
+
+.snackbar {
+  --surface-color: var(--inverse-surface);
+  background-color: rgb(var(--inverse-surface));
+  border-radius: 4px;
+  min-height: 48px;
+  padding-left: 16px;
+  margin: 16px;
+  box-sizing: border-box;
+  display: grid;
+  --action-column: auto;
+  --dismiss-column: 48px;
+  grid-template-columns: 1fr var(--action-column) var(--dismiss-column);
+  align-items: center;
+}
+
+.snackbar.no-action {
+  --action-column: 0px;
+}
+
+.snackbar.no-dismiss {
+  --dismiss-column: 0px;
+  padding-right: 8px;
+}
+
+.snackbar.no-action.no-dismiss {
+  padding-right: 16px;
+}
+
+.snackbar.loading {
+  padding-right: 0;
+  --action-column: 0px;
+  --dismiss-column: 48px;
+}
+
+.snackbar load-spinner {
+  --size: 40px;
+  --bg-color: rgb(var(--inverse-surface));
+  --accent-color: rgb(var(--inverse-primary));
+  --text-color: rgb(var(--inverse-on-surface));
+}
+
+.snackbar:not(.loading) load-spinner {
+  display: none;
+}
+
+.snackbar.no-action .snackbar-action,
+.snackbar.loading .snackbar-action,
+.snackbar.no-dismiss .snackbar-dismiss,
+.snackbar.loading .snackbar-dismiss {
+  display: none;
+}
+
+.snackbar-message {
+  color: rgb(var(--inverse-on-surface));
+  padding-block: 8px;
+  padding-right: 8px;
+}
+
+button.snackbar-action {
+  color: rgb(var(--inverse-primary));
+  --state-tint: var(--inverse-on-surface);
+}
+
+button.snackbar-dismiss {
+  color: rgb(var(--inverse-on-surface));
+  --state-tint: var(--inverse-on-surface);
+}
+
+
+
+
+
+
+.filtered,
+.off {
+  display: none;
+}

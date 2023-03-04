@@ -1,0 +1,24 @@
+<style>
+  html {
+    color-scheme: light dark;
+  }
+</style>
+
+<script defer src="../../../ext/localforage.min.js"></script>
+
+<script defer src="../../../../_common/polyfills/adoptedStyleSheets.min.js"></script>
+<script>window.esmsInitOptions = { polyfillEnable: ['css-modules', 'json-modules'] }</script>
+<script defer src="../../../../_common/polyfills/es-module-shims.js"></script>
+
+<script type="module">
+  import './pokemonSprite.js';
+</script>
+
+<pokemon-sprite dexid="186" shiny="true" size="512"></pokemon-sprite>
+<pokemon-sprite dexid="186" shiny="true" size="112"></pokemon-sprite>
+
+<script>
+  for (const el of [...document.querySelectorAll('pokemon-sprite')]) {
+    el.addEventListener('click', event => event.currentTarget.sparkle()/*event.currentTarget.dispatchEvent(new Event('sparkle'))*/);
+  }
+</script>

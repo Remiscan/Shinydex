@@ -1,0 +1,42 @@
+<header class="section-titre with-button">
+  <a class="icon-button surface interactive bouton-retour" href="./chasses-en-cours">
+    <span class="material-icons">arrow_back</span>
+  </a>
+
+  <h1 class="title-large">Supprimés récemment</h1>
+
+  <search-box section="corbeille"></search-box>
+
+  <div class="titre-icones">
+    <!-- Bouton paramètres -->
+    <a class="icon-button surface interactive" data-nav-section="parametres" href="./parametres">
+      <span class="material-icons">settings</span>
+      <sync-progress></sync-progress>
+    </a>
+  </div>
+</header>
+
+<div class="section-contenu">
+
+  <!-- Message affiché quand liste vide -->
+  <div class="message-vide">
+    <span class="material-icons">error_outline</span>
+    <span>La corbeille est vide.</span>
+  </div>
+
+  <!-- Message affiché quand liste filtrée vide -->
+  <div class="message-vide-filtres">
+    <span class="material-icons">error_outline</span>
+    <span>Aucun Pokémon ne correspond à ces filtres.</span>
+  </div>
+
+  <!-- Message affiché quand liste filtrée par recherche vide -->
+  <div class="message-vide-recherche">
+    <span class="material-icons">error_outline</span>
+    <span>Aucun Pokémon ne correspond à cette recherche.</span>
+  </div>
+
+  <!-- Spinner de chargement -->
+  <load-spinner class="section-loader"></load-spinner>
+
+</div>

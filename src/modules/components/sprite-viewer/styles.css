@@ -1,0 +1,195 @@
+sprite-viewer {
+  grid-column: 1 / -1;
+  grid-row: 1 / -1;
+  display: grid;
+  grid-template-columns: 0 1fr 0;
+  grid-template-rows: calc(100% - 56px) 56px;
+  height: 100%;
+  overflow: hidden;
+}
+
+.bouton-retour {
+  justify-self: center;
+  align-self: center;
+  grid-row: 2;
+  grid-column: 2;
+}
+
+.switch-shiny-regular {
+  grid-row: 2;
+  grid-column: 2;
+  width: fit-content;
+  height: fit-content;
+  justify-self: end;
+  align-self: center;
+  margin-right: 16px;
+  display: grid;
+  place-items: center;
+}
+
+[for=switch-shy-reg] > shiny-stars {
+  --color: var(--sprite-viewer-bg-color);
+}
+
+sprite-viewer[shiny="false"] .sprite-list.shiny,
+sprite-viewer[shiny="true"] .sprite-list.regular {
+  display: none;
+}
+
+.sprite-viewer-dex-info {
+  grid-row: 2;
+  grid-column: 2;
+  justify-self: start;
+  align-self: center;
+  margin-left: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 13px;
+  height: 26px;
+  --padding-inline: 4px;
+  padding: var(--padding-inline) calc(3 * var(--padding-inline));
+  box-sizing: border-box;
+}
+
+.sprite-viewer-dex-info span + span {
+  margin-left: 5px;
+}
+
+.info-dexid {
+  opacity: .7;
+}
+
+.info-dexid::before {
+  content: '#';
+  opacity: .7;
+}
+
+.info-nom {
+  text-transform: capitalize;
+}
+
+sprite-viewer a.icon-button.bouton-retour {
+  margin: 0;
+}
+
+.sprite-scroller {
+  grid-row: 1;
+  grid-column: 1 / -1;
+  overflow-y: auto;
+  height: 100%;
+  width: 100%;
+  display: flex;
+}
+
+.sprite-list {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+}
+
+.dex-sprite {
+  --sprite-size: calc(min(200px, 45vw));
+  display: grid;
+  grid-template-rows: var(--sprite-size) min-content;
+  width: var(--sprite-size);
+  margin: 6px 5px;
+}
+
+.single-sprite .dex-sprite {
+  --sprite-size: calc(min(400px, 80vw));
+}
+.two-sprites .dex-sprite {
+  --sprite-size: calc(min(400px, 60vw));
+}
+
+.dex-sprite pokemon-sprite {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+}
+
+.forme-name {
+  text-transform: capitalize;
+  --padding-inline: 4px;
+  padding: var(--padding-inline) calc(3 * var(--padding-inline));
+  border-radius: calc(.5 * var(--height));
+  min-width: 35px;
+  max-width: calc(var(--sprite-size) - 10px);
+  --height: 26px;
+  min-height: var(--height);
+  box-sizing: border-box;
+  margin: 7px auto 0;
+  position: relative;
+  display: flex;
+  place-items: center;
+  gap: calc(2.5 * var(--padding-inline));
+}
+
+.forme-name.off {
+  display: none;
+}
+
+.forme-name.caught {
+  --surface-color: var(--primary-container);
+  --text-color: var(--on-primary-container);
+  padding-left: var(--padding-inline);
+}
+.forme-name > .icon {
+  margin: -7px;
+}
+
+.forme-name-arrow {
+  position: absolute;
+  left: calc(50% - 7px);
+  top: -6px;
+  height: 7px;
+  width: 14px;
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+  --surface-color: inherit;
+  --text-color: inherit;
+}
+
+.dex-sprite > picture {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+picture.no-shiny > span {
+  grid-row: 1;
+  grid-column: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding-top: 20%;
+  box-sizing: border-box;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  background-color: rgb(var(--background), .8);
+  text-transform: none;
+  text-align: center;
+}
+
+@media (min-width: 1140px) {
+  .dex-sprite,
+  .single-sprite .dex-sprite,
+  .two-sprites .dex-sprite {
+    --sprite-size: calc(min(400px, 80vw));
+  }
+}
+
+sprite-viewer[size="112"] :is(
+  .dex-sprite,
+  .single-sprite .dex-sprite,
+  .two-sprites .dex-sprite
+) {
+  --sprite-size: 112px;
+}

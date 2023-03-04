@@ -1,15 +1,24 @@
 <header class="section-titre">
-  <h1>Pokédex<svg class="shinystars"><use xlink:href="./images/shinystars.svg#stars"></use></svg> national</h1>
-  <div class="spacer"></div>
+  <h1 class="title-large">Pokédex <shiny-stars></shiny-stars></h1>
+
+  <span class="compteur secondary">
+    <span class="caught title-large"></span>
+    <span class="title-medium">/</span>
+    <span class="total title-medium"></span>
+  </span>
+
+  <search-box section="pokedex"></search-box>
+
   <div class="titre-icones">
     <!-- Bouton paramètres -->
-    <a class="icone lien-section" data-section="parametres">
-      <i class="material-icons">settings</i>
+    <a class="icon-button surface interactive" data-nav-section="parametres" href="./parametres">
+      <span class="material-icons">settings</span>
       <sync-progress></sync-progress>
     </a>
   </div>
 </header>
 
 <div class="section-contenu">
-  <div class="defer-loader"><load-spinner></load-spinner></div>
+  <!-- Spinner de chargement -->
+  <load-spinner class="section-loader"></load-spinner>
 </div>

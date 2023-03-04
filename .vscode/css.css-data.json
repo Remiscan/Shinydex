@@ -1,0 +1,24 @@
+{
+  "version": 1.1,
+  "atDirectives": [
+    {
+      "name": "@layer",
+      "description": "The @layer CSS at-rule is used to declare a cascade layer and can also be used to define the order of precedence in case of multiple cascade layers.",
+      "references": [
+        {
+          "name": "@layer",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/@layer"
+        }
+      ]
+    }, {
+      "name": "@container",
+      "description": "The @container CSS at-rule is a conditional group rule that applies styles to a containment context. Style declarations are filtered by a condition and applied to the container if the condition is true. The condition is evaluated when the container changes size.",
+      "references": [
+        {
+          "name": "@container",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/@container"
+        }
+      ]
+    }
+  ]
+}

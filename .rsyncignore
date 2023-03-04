@@ -1,0 +1,8 @@
+.git
+.gitattributes
+.gitignore
+.vscode
+.rsyncignore
+.deploy
+build
+src

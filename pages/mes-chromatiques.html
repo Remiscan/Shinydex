@@ -1,11 +1,17 @@
 <header class="section-titre">
-  <h1>Mes chromatiques</h1>
-  <span class="compteur"></span>
-  <div class="spacer"></div>
+  <h1 class="title-large">Mes Pokémon <shiny-stars></shiny-stars></h1>
+  <span class="compteur secondary title-large"></span>
+  
+  <search-box section="mes-chromatiques"></search-box>
+
   <div class="titre-icones">
+    <!-- Bouton installer -->
+    <button type="button" class="surface interactive icon-button only-icon off" data-action="install-app">
+      <span class="material-icons">get_app</span>
+    </button>
     <!-- Bouton paramètres -->
-    <a class="icone lien-section" data-section="parametres">
-      <i class="material-icons">settings</i>
+    <a class="icon-button surface interactive" data-nav-section="parametres" href="./parametres">
+      <span class="material-icons">settings</span>
       <sync-progress></sync-progress>
     </a>
   </div>
@@ -13,70 +19,25 @@
 
 <div class="section-contenu">
 
-  <!-- Carte d'un Pokémon -->
-  <template id="template-pokemon-card">
-    <div class="pokemon-card" id="pkmn-card-1">
-      <div class="pokemon-sprite"><div class="actual-sprite"></div></div>
-      <div class="edit-icon">
-        <i class="material-icons">edit</i>
-        <svg><circle r="25" cx="25" cy="25"/></svg>
-      </div>
-
-      <div class="pokemon-infos">
-        <div class="pokemon-infos__nom">
-          <span class="pkspr pokemon-ball"></span>
-          <span class="pokemon-surnom"></span>
-          <span class="pokemon-espece"></span>
-        </div>
-
-        <div class="pokemon-infos__capture">
-          <span class="icones jeu"></span>
-          <span class="capture-methode"></span>
-          <span class="capture-date"></span>
-          <span class="methode-compteur">
-            <span class="icones explain oeuf"></span>
-          </span>
-          <span class="icones explain gigamax"></span>
-        </div>
-      </div>
-      
-      <div class="pokemon-icones">
-        <span class="icones explain kalosborn"></span>
-        <span class="icones explain alolaborn"></span>
-        <span class="icones explain vcborn"></span>
-        <span class="icones explain letsgoborn"></span>
-        <span class="icones explain goborn"></span>
-        <span class="icones explain galarborn"></span>
-        <span class="icones explain mine"></span>
-        <span class="icones explain lucky"></span>
-        <span class="icones explain ptethack"></span>
-        <span class="icones explain hack"></span>
-        <span class="icones explain clone"></span>
-        <span class="spacer"></span>
-        <div class="shiny-rate">
-          <div class="shiny-charm">
-            <span class="icones explain charm"></span>
-          </div>
-          <div class="shiny-rate-data">
-            <span class="shiny-rate-text numerator">1</span>
-            <span class="shiny-rate-text separator">/</span>
-            <span class="shiny-rate-text denominator">4096</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="pokemon-notes">
-        <span class="pokemon-notes__texte"></span>
-      </div>
-    </div>
-  </template>
-
-  <div class="defer-loader"><load-spinner></load-spinner></div>
-
   <!-- Message affiché quand liste vide -->
   <div class="message-vide">
-    <i class="material-icons">error_outline</i>
-    <span>Aucun Pokémon ne correspond aux filtres choisis.</span>
+    <span class="material-icons">error_outline</span>
+    <span>Vous n'avez enregistré aucun Pokémon chromatique.</span>
   </div>
+
+  <!-- Message affiché quand liste filtrée vide -->
+  <div class="message-vide-filtres">
+    <span class="material-icons">error_outline</span>
+    <span>Aucun Pokémon ne correspond à ces filtres.</span>
+  </div>
+
+  <!-- Message affiché quand liste filtrée par recherche vide -->
+  <div class="message-vide-recherche">
+    <span class="material-icons">error_outline</span>
+    <span>Aucun Pokémon ne correspond à cette recherche.</span>
+  </div>
+
+  <!-- Spinner de chargement -->
+  <load-spinner class="section-loader"></load-spinner>
 
 </div>

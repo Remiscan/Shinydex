@@ -1,101 +1,151 @@
 <header class="section-titre with-button">
-  <a class="icone bouton-retour">
-    <i class="material-icons">arrow_back</i>
+  <a class="icon-button surface interactive bouton-retour" href="#">
+    <span class="material-icons">arrow_back</span>
   </a>
-  <h1>Paramètres</h1>
-  <div class="spacer"></div>
+
+  <h1 class="title-large">Paramètres</h1>
+
   <div class="titre-icones">
     <!-- Bouton "à propos" -->
-    <a class="icone lien-section" data-section="a-propos">
-      <i class="material-icons">info</i>
+    <a class="icon-button surface interactive" data-nav-section="a-propos" href="./a-propos">
+      <span class="material-icons">info</span>
     </a>
   </div>
 </header>
 
 <div class="section-contenu">
-  <p class="un-parametre theme">
-    <span class="param-nom">Thème</span>
+  <form name="app-settings">
+    <h2 class="title-medium">Apparence</h2>
 
-    <span class="param">
-      <input type="radio" name="theme" id="theme-system" value="system" checked>
-      <label for="theme-system" class="radio">
-        <span>Système</span>
-      </label>
+    <p class="un-parametre theme">
+      <span class="param-nom body-large">Thème</span>
 
-      <input type="radio" name="theme" id="theme-light" value="light">
-      <label for="theme-light" class="radio">
-        <span>Clair</span>
-      </label>
+      <span class="param">
+        <radio-group name="theme">
+          <option value="system">Système</option>
+          <option value="light">Clair</option>
+          <option value="dark">Sombre</option>
+        </radio-group>
+      </span>
+    </p>
 
-      <input type="radio" name="theme" id="theme-dark" value="dark">
-      <label for="theme-dark" class="radio">
-        <span>Sombre</span>
-      </label>
-    </span>
-  </p>
+    <p class="un-parametre">
+      <span class="param-nom body-large">Teinte</span>
+      <span class="param">
+        <input-slider name="theme-hue" min="1" max="360" step="1" value="320"></input-slider>
+      </span>
+    </p>
 
-  <p class="un-parametre">
-    <span class="param-nom">Recherche automatique de mise à jour</span>
-    <span class="param-description">au lancement de l'application.</span>
-    <input type="checkbox" id="switch-auto-maj"><label for="switch-auto-maj" class="switch"></label>
-  </p>
+    <!---->
 
-  <span class="sous-titre">
-    <span>Sauvegarde des données</span>
-    <sync-line></sync-line>
-  </span>
+    <h2 class="title-medium">Sauvegarde et partage des données en ligne</h2>
 
-  <p class="un-parametre">
-    <span class="param-nom">
-      Sauvegarde en ligne
-      <span class="param-description info-backup success if-backup">dernière : réussie</span>
-      <span class="param-description info-backup failure if-backup">dernière : échec</span>
-    </span>
-    <span class="param-description no-backup">Si désactivé, vos données seront perdues si vous désinstallez l'application ou nettoyez son stockage.</span>
-    <span class="param-description if-backup">Vos données sont sauvegardées en ligne.</span>
-    <input type="checkbox" id="switch-online-backup"><label for="switch-online-backup" class="switch"></label>
-  </p>
+    <p class="body-large param-nom" data-logged-out>Connectez-vous avec Google pour sauvegarder vos données en ligne.</p>
+    <div id="google-signin-button-container" data-logged-out></div>
 
-  <p class="un-parametre">
-    <span class="param-nom"><label for="mdp-bdd">Mot de passe BDD</label></span>
-    <span class="param-description">pour sauvegarder mes chromatiques en ligne.</span>
-    <input type="password" id="mdp-bdd" size="10">
-  </p>
+    <p class="un-parametre with-description" data-logged-in data-last-sync>
+      <span class="param-nom body-large">Dernière sauvegarde</span>
+      <span class="param-description body-medium" data-sync-time-container>00/00/2000 00h00</span>
+      <span class="param">
+        <button type="button" class="surface interactive text-button success" data-action="sync-now" data-last-sync="success" aria-label="Sauvegarder maintenant">
+          <span class="material-icons">done</span>
+          <span class="label-large">Succès</span>
+        </button>
+        <button type="button" class="surface interactive text-button danger" data-action="sync-now" data-last-sync="failure" aria-label="Sauvegarder maintenant">
+          <span class="material-icons">error</span>
+          <span class="label-large">Échec</span>
+        </button>
+        <button type="button" class="surface interactive text-button" data-action="sync-now" data-last-sync="loading" aria-label="Sauvegarder maintenant">
+          <load-spinner></load-spinner>
+          <span class="label-large">En cours</span>
+        </button>
+      </span>
+    </p>
 
-  <p class="un-parametre">
-    <span class="param-nom"><label for="mdp-bdd">Exporter mes données</label></span>
-    <span class="param-description">au format JSON.</span>
-    <span class="param">
-      <button class="bouton-export ghost">Exporter</button>
-    </span>
-  </p>
+    <p class="un-parametre with-description" data-logged-in>
+      <span class="param-nom body-large">Rendre votre profil public</span>
+      <span class="param-description body-medium">pour partager votre liste de Pokémon&nbsp;<shiny-stars></shiny-stars>.</span>
+      <span class="param">
+        <label for="public-profile">
+          <input-switch name="public" id="public-profile" icons="checked"></input-switch>
+        </label>
+      </span>
+    </p>
 
-  <p class="un-parametre">
-    <span class="param-nom"><label for="mdp-bdd">Importer mes données</label></span>
-    <span class="param-description">depuis un fichier JSON.</span>
-    <span class="param">
-      <input type="file" id="pick-import-file" accept=".json">
-      <label for="pick-import-file" class="ghost">Importer</label>
-    </span>
-  </p>
+    <p class="un-parametre with-description" data-logged-in data-public-profile>
+      <span class="param-nom body-large">Choisir un pseudo</span>
+      <span class="param-description body-medium">pour pouvoir être ajouté comme ami.</span>
+      <span class="param">
+        <text-field name="username" autocomplete="off" spellcheck="false" maxlength="30">
+          <span slot="label">Pseudo</span>
+        </text-field>
+      </span>
+    </p>
 
-  <p class="un-parametre no-backup">
-    <span class="param-nom"><label for="mdp-bdd">Supprimer mes données</label></span>
-    <span class="param-description">Supprime la sauvegarde locale, mais pas la sauvegarde en ligne.</span>
-    <span class="param">
-      <button class="bouton-supprimer-local ghost danger">Supprimer</button>
-    </span>
-  </p>
+    <p class="un-parametre with-description" data-logged-in>
+      <span class="param-nom body-large">Se déconnecter</span>
+      <span class="param-description body-medium">et arrêter de sauvegarder vos données en ligne.</span>
+      <span class="param">
+        <button type="button" class="surface interactive filled tonal only-text g_id_signout" data-action="sign-out">
+          <span class="label-large">Se déconnecter</span>
+        </button>
+      </span>
+    </p>
 
-  <div class="spacer"></div>
+    <p class="un-parametre with-description" data-logged-in>
+      <span class="param-nom body-large">Supprimer la sauvegarde en ligne</span>
+      <span class="param-description body-medium">Vous ne pourrez plus accéder à vos données depuis un autre appareil.</span>
+      <span class="param">
+        <button type="button" class="surface interactive filled tonal danger only-text" data-action="delete-backup">
+          <span class="label-large">Supprimer</span>
+        </button>
+      </span>
+    </p>
 
-  <button class="bouton-recherche-maj ghost">
-    <i class="material-icons">update</i><span class="texte">Rechercher une mise à jour</span>
-  </button>
+    <!---->
 
-  <span class="version">
-    <div>temps de chargement : <span id="version-tempschargement"></span> ms</div>
-    <div>application : v. <span id="version-fichiers"></span></div>
-    <div>base de données : v. <span id="version-bdd"></span></div>
-  </span>
+    <h2 class="title-medium">Gestion des données sur votre appareil</h2>
+
+    <p class="un-parametre with-description">
+      <span class="param-nom body-large">Télécharger les icônes</span>
+      <span class="param-description body-medium">pour pouvoir observer les Pokémon dans le Pokédex sans connexion internet. <span data-sprites-progress></span></span>
+      <span class="param">
+        <label for="cache-all-sprites">
+          <input-switch name="cache-all-sprites" id="cache-all-sprites" icons="checked"></input-switch>
+        </label>
+      </span>
+    </p>
+
+    <p class="un-parametre with-description">
+      <span class="param-nom body-large">Exporter les données</span>
+      <span class="param-description body-medium">au format JSON.</span>
+      <span class="param">
+        <button type="button" class="surface interactive filled tonal only-text" data-action="export-json">
+          <span class="label-large">Exporter</span>
+        </button>
+      </span>
+    </p>
+
+    <p class="un-parametre with-description">
+      <span class="param-nom body-large">Importer des données</span>
+      <span class="param-description body-medium">depuis un fichier JSON.</span>
+      <span class="param">
+        <input type="file" id="pick-import-file" accept=".json" tabindex="-1">
+        <label for="pick-import-file" class="ghost">Importer</label>
+        <button type="button" class="surface interactive filled tonal only-text" data-action="import-json" aria-hidden="true">
+          <span class="label-large">Importer</span>
+        </button>
+      </span>
+    </p>
+
+    <p class="un-parametre with-description no-backup">
+      <span class="param-nom body-large">Supprimer les données</span>
+      <span class="param-description body-medium">Supprime la sauvegarde locale, mais n'affecte pas la sauvegarde en ligne.</span>
+      <span class="param">
+        <button type="button" class="surface interactive filled danger only-text" data-action="delete-local-data">
+          <span class="label-large">Supprimer</span>
+        </button>
+      </span>
+    </p>
+  </form>
 </div>

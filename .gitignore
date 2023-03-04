@@ -1,5 +1,8 @@
-\[backups\]/
-test.php
-
-# Ignore generated icon sheet
+# Ignore generated files
+backend/composer/vendor
+backend/composer/src
+dist
 images/out/
+images/pokemon-sprites/webp/
+data/out/
+tsconfig.tsbuildinfo
