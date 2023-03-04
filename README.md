@@ -1,1 +1,1 @@
-> This app is currently being refactored (in the Typescript branch). It will be ready... someday. The version that is currently online may be a bit broken. Sorry.
+A beta version is currently online. There may be bugs, some functionality may be missing, and user data may be deleted in the future.
