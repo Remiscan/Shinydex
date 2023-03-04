@@ -8,6 +8,11 @@ import DefPalette from '../../../colori/palette/palette.js';
 const gradient = Couleur.interpolateInSteps('oklch(70% 0.19 1)', 'oklch(70% 0.19 360)', 25, { interpolationSpace: 'oklch', hueInterpolationMethod: 'longer' });
 export const gradientString = `linear-gradient(to right, ${gradient.map((c: Couleur) => c.rgb).join(', ')})`;
 
+export const metaThemeColors = {
+  light: null,
+  dark: null
+};
+
 
 
 class Palette extends DefPalette {
@@ -28,6 +33,13 @@ class Palette extends DefPalette {
 
 
 
+export function updateMetaThemeColorTag() {
+  const themeColor = `rgb(${String(getComputedStyle(document.documentElement).getPropertyValue('--background')).trim()})`;
+  document.querySelector("meta[name=theme-color]")!.setAttribute('content', themeColor);
+}
+
+
+
 /** Application du thème (clair ou sombre). */
 export function setTheme(askedTheme?: string) {
   let html = document.documentElement;
@@ -44,9 +56,7 @@ export function setTheme(askedTheme?: string) {
   // Thème appliqué (askedTheme > osTheme > defaultTheme)
   const theme = ['light', 'dark'].includes(askedTheme || '') ? askedTheme : (osTheme || defaultTheme);
   
-  let themeColor = (theme == 'dark') ? 'rgb(34, 34, 34)' : 'rgb(224, 224, 224)';
-  document.querySelector("meta[name=theme-color]")!.setAttribute('content', themeColor);
-
+  updateMetaThemeColorTag();
   window.dispatchEvent(new CustomEvent('themechange', { detail: { theme } }));
 }
 

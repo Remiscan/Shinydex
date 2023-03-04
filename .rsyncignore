@@ -6,3 +6,6 @@
 .deploy
 build
 src
+README.md
+tsconfig.json
+tsconfig.tsbuildinfo
