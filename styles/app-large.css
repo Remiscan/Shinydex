@@ -18,6 +18,10 @@ body[data-section-actuelle~="partage"] .nav-link[data-nav-section="chromatiques-
   --indicator-elevation-opacity: var(--elevation-2-opacity);
 }
 
+body[data-section-actuelle~="mes-chromatiques"] {
+  --caught-filter-display: flex; /* disables "display: none" on caught filter in filter-menu */
+}
+
 main {
   grid-template-columns: 1fr 1fr;
 }

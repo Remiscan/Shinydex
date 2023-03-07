@@ -21,8 +21,8 @@ export function isFiltrableSection(string: string): string is FiltrableSection {
   return filtrableSections.includes(string as FiltrableSection);
 }
 
-export type SearchableSection = FiltrableSection | 'pokedex';
-export const searchableSections: SearchableSection[] = [...filtrableSections, 'pokedex'];
+export type SearchableSection = 'mes-chromatiques' | 'pokedex' | 'chasses-en-cours' | 'corbeille' | 'partage' | 'chromatiques-ami';
+export const searchableSections: SearchableSection[] = ['mes-chromatiques', 'pokedex', 'chasses-en-cours', 'corbeille', 'partage', 'chromatiques-ami'];
 export function isSearchableSection(string: string): string is SearchableSection {
   return searchableSections.includes(string as SearchableSection);
 }
@@ -34,6 +34,7 @@ export function isSearchableSection(string: string): string is SearchableSection
 export class FilterList {
   mine: Set<boolean> = new Set([true, false]);
   legit: Set<boolean> = new Set([true, false]);
+  caught: Set<boolean> = new Set([true, false]);
   order: ordre = 'catchTime';
   orderReversed: boolean = false;
 
@@ -65,6 +66,9 @@ export class FilterList {
         } else if (prop.startsWith('filter-legit')) {
           const [x, key, val] = prop.split('-');
           if (value === 'false') this.legit.delete(val === 'true');
+        } else if (prop.startsWith('filter-caught')) {
+          const [x, key, val] = prop.split('-');
+          if (value === 'false') this.caught.delete(val === 'true');
         }
       }
     } else {
@@ -80,6 +84,11 @@ export class FilterList {
       if ('legit' in data && data.legit instanceof Set) {
         if (!(data.legit.has(true))) this.legit.delete(true);
         if (!(data.legit.has(false))) this.legit.delete(false);
+      }
+
+      if ('caught' in data && data.caught instanceof Set) {
+        if (!(data.caught.has(true))) this.caught.delete(true);
+        if (!(data.caught.has(false))) this.caught.delete(false);
       }
     }
   }
@@ -108,10 +117,20 @@ export { saveFilters };
 export function filterSection(section: FiltrableSection, filters: FilterList = new FilterList(section)) {
   const element = document.querySelector(`section#${section}`);
   if (!element) return;
-  element.setAttribute('data-filter-mine', [...filters.mine].map(f => String(f)).join(' '));
-  element.setAttribute('data-filter-legit', [...filters.legit].map(f => String(f)).join(' '));
-  element.setAttribute('data-order', filters.order);
-  element.setAttribute('data-order-reversed', String(filters.orderReversed));
+
+  const elements = [element];
+  if (section === 'mes-chromatiques') {
+    const pokedex = document.querySelector(`section#pokedex`);
+    if (pokedex) elements.push(pokedex);
+  }
+
+  for (const element of elements) {
+    element.setAttribute('data-filter-mine', [...filters.mine].map(f => String(f)).join(' '));
+    element.setAttribute('data-filter-legit', [...filters.legit].map(f => String(f)).join(' '));
+    element.setAttribute('data-filter-caught', [...filters.caught].map(f => String(f)).join(' '));
+    element.setAttribute('data-order', filters.order);
+    element.setAttribute('data-order-reversed', String(filters.orderReversed));
+  }
   updateCounters(section);
 }
 
@@ -242,6 +261,7 @@ async function orderPokemon(pokemonList: Shiny[] | Hunt[], order: ordre): Promis
 export async function computeOrders(section: FiltrableSection, ids: string[]): Promise<void> {
   let dataStore: localForageAPI;
   let dataClass: (typeof Shiny) | (typeof Hunt);
+
   switch (section) {
     case 'mes-chromatiques':
       dataStore = shinyStorage;

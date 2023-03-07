@@ -134,9 +134,11 @@ export class SearchBox extends HTMLElement {
         input.setAttribute('placeholder', placeholder);
 
         const filterMenuLink = this.shadow.querySelector('[data-nav-section="filter-menu"]');
-        if (isFiltrableSection(value ?? '')) {
+        let sectionToFilter = value;
+        if (value === 'pokedex') sectionToFilter = 'mes-chromatiques';
+        if (isFiltrableSection(sectionToFilter ?? '')) {
           this.removeAttribute('no-filters');
-          filterMenuLink?.setAttribute('data-nav-data', JSON.stringify({ section: value }));
+          filterMenuLink?.setAttribute('data-nav-data', JSON.stringify({ section: sectionToFilter, altSection: value }));
         } else {
           this.setAttribute('no-filters', '');
           filterMenuLink?.removeAttribute('data-nav-data');

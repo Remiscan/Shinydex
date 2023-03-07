@@ -176,6 +176,10 @@ body[data-section-actuelle~="a-propos"] .nav-link[data-nav-section="a-propos"] {
   --indicator-elevation-opacity: var(--elevation-2-opacity);
 }
 
+body[data-section-actuelle~="pokedex"] {
+  --caught-filter-display: flex; /* disables "display: none" on caught filter in filter-menu */
+}
+
 body:not([data-section-actuelle~="mes-chromatiques"]) nav search-box[section="mes-chromatiques"]::part(form),
 body:not([data-section-actuelle~="pokedex"]) nav search-box[section="pokedex"]::part(form),
 body:not([data-section-actuelle~="chasses-en-cours"]) nav search-box[section="chasses-en-cours"]::part(form),
@@ -561,6 +565,11 @@ section:not([data-filter-mine~="true"]) [data-mine="true"],
 section:not([data-filter-mine~="false"]) [data-mine="false"],
 section:not([data-filter-legit~="true"]) [data-legit="true"],
 section:not([data-filter-legit~="false"]) [data-legit="false"] {
+  display: none;
+}
+
+#pokedex:not([data-filter-caught~="true"]) .dex-icon.got,
+#pokedex:not([data-filter-caught~="false"]) .dex-icon:not(.got) {
   display: none;
 }
 

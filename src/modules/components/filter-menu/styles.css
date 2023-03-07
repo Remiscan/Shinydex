@@ -59,3 +59,7 @@ fieldset {
 :host([section="partage"]) radio-group::part(option):not([data-section~="partage"]) {
   display: none;
 }
+
+.caught-filter {
+  display: var(--caught-filter-display, none);
+}

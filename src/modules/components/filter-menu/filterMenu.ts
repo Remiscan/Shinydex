@@ -112,29 +112,29 @@ export class FilterMenu extends HTMLElement {
     switch (name) {
       case 'section': {
         const section = this.section ?? '';
-        if (!isFiltrableSection(section)) return;
+        if (isFiltrableSection(section)) {
+          const savedFilters = await dataStorage.getItem('filters');
+          const filters: FilterList = new FilterList(section, savedFilters?.get(section));
 
-        const savedFilters = await dataStorage.getItem('filters');
-        const filters: FilterList = savedFilters?.get(section) ?? new FilterList(section);
+          // On supprime les options des radio-group qui ne correspondent pas à la section
+          this.shadow.querySelectorAll('radio-group').forEach(radioGroup => {
+            // On choisit la valeur par défaut
+            if (radioGroup.getAttribute('name') === 'order') {
+              radioGroup.setAttribute('value', filters.order);
+            }
 
-        // On supprime les options des radio-group qui ne correspondent pas à la section
-        this.shadow.querySelectorAll('radio-group').forEach(radioGroup => {
-          // On choisit la valeur par défaut
-          if (radioGroup.getAttribute('name') === 'order') {
-            radioGroup.setAttribute('value', filters.order);
-          }
-
-          // On supprime les options inutiles
-          radioGroup.querySelectorAll('option').forEach(option => {
-            if (!(option.matches(`[data-section~="${section}"]`))) option.remove();
+            // On supprime les options inutiles
+            radioGroup.querySelectorAll('option').forEach(option => {
+              if (!(option.matches(`[data-section~="${section}"]`))) option.remove();
+            });
           });
-        });
 
-        // On applique au formulaire les filtres enregistrés de la section demandée.
-        // Si aucun n'est sauvegardé, on applique les filtres par défaut.
-        this.filtersToForm(filters);
-        filterSection(section, filters);
-        this.saveFilters(filters);
+          // On applique au formulaire les filtres enregistrés de la section demandée.
+          // Si aucun n'est sauvegardé, on applique les filtres par défaut.
+          this.filtersToForm(filters);
+          filterSection(section, filters);
+          this.saveFilters(filters);
+        }
 
         this.#initialized = true;
         this.dispatchEvent(new Event('initialized'));
