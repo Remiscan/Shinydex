@@ -259,7 +259,11 @@ export async function appStart() {
 
   logPerf('Étape 6');
 
-  Auth.init();
+  if (navigator.onLine) {
+    Auth.init();
+  } else {
+    window.addEventListener('online', event => Auth.init(), { once: true });
+  }
 
   // Affiche l'état de la dernière synchronisation dans les paramètres
   const lastSyncState = await dataStorage.getItem('last-sync-state');
