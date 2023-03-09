@@ -412,6 +412,7 @@ async function syncBackup(message = true) {
     const formData = new FormData();
     formData.append('local-data', JSON.stringify(localData));
     formData.append('deleted-local-data', JSON.stringify(deletedLocalData));
+    formData.append('signin-code-verifier', await dataStorage.getItem('session-code-verifier'));
 
     const response = await fetch('/shinydex/backend/endpoint.php?request=sync-backup&date=' + Date.now(), {
       method: 'POST',

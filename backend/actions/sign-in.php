@@ -13,13 +13,19 @@ $body = json_decode(
   true
 );
 
-if (!isset($body['credential'])) {
-  respondError('No ID token in POST body');
+if (!isset($body['codeChallenge'])) {
+  respondError('Missing data in POST body');
 }
 
 try {
-  $user = new User($body['provider'], $body['credential']);
-  $user->signIn();
+  if (isset($_COOKIE['session'])) {
+    $user = User::getFromCookies();
+  } else {
+    $user = new User($body);
+  }
+
+  $challenge = $body['codeChallenge'];
+  $user->signIn($challenge);
   $response['success'] = 'Connection successful';
 } catch (\Throwable $error) {
   $response['error'] = $error->getMessage();

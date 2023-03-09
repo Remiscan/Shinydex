@@ -1,122 +1,157 @@
 <?php
+require_once $_SERVER['DOCUMENT_ROOT'].'/shinydex/backend/class_BDD.php';
+
+
+
+$db = new BDD();
+
+
 
 class User {
-  private string|null $idToken = null;
-  private string|null $idProvider = null;
-  private array|null $idData = null;
+  private array $data = [];
 
-  public function __construct(string $idProvider, string|null $token = null) {
-    $payload = self::verifyIdToken($idProvider, $token);
-    if ($payload) {
-      $this->idToken = $token;
-      $this->idProvider = $idProvider;
-      $this->idData = $payload;
+  public function __construct(array $credentials = []) {
+    $provider = $credentials['provider'] ?? '';
+    if (strlen($provider) === 0) throw new \Exception('Empty ID provider');
+
+    $token = $data['credential'] ?? '';
+    if (strlen($token) === 0) throw new \Exception('Empty ID token');
+
+    // If the user is signing in from another provider, let that provider verify their token
+    // then get or create a Shinydex user account
+    if ($provider !== 'shinydex') {
+      $payload = self::verifyIdToken($provider, $token);
+      $providerUserID = $payload['sub'] ?? null;
+      if (!$providerUserID) throw new \Exception('Invalid ID token');
+
+      // Check if a user exists with that provider user ID
+      $user = self::getUserEntry($provider, $providerUserID);
+      if (!$user) {
+        self::createUserEntry($provider, $providerUserID);
+        $user = self::getUserEntry($provider, $providerUserID);
+      }
+      $this->data = $user;
+    }
+    
+    // If the user is signing in with a previous session ID, get their Shinydex user account
+    else {
+      $secret = fn() => rtrim(file_get_contents('/run/secrets/shinydex_auth_secret'));
+      $sessionID = $token;
+      $hashedSessionID = hash('sha256', $sessionID . $secret());
+
+      // Check if that session ID is associated to a user
+      $user = self::getUserEntryFromSession($hashedSessionID);
+      if (!$user) {
+        throw new \Exception('No user associated to the session ID');
+      }
+      $this->data = $user;
     }
   }
 
 
-  public function isValid(): bool {
-    return $this->idToken != null;
-  }
-
-
-  public function getProviderUserId(): string {
-    if (!$this->isValid()) throw new \Exception('User token is not valid');
-    return $this->idData['sub'];
-  }
-
-
-  public function getDBUserId(PDO $db): string {
-    if (!$this->isValid()) throw new \Exception('User token is not valid');
-    $dbEntry = $this->getDBEntry($db);
-    $userid = $dbEntry['uuid'] ?? '';
-    if (!self::verifyDBUserId($userid)) throw new \Exception('Invalid user id in database');
+  public function getUserID(): string {
+    $userid = $this->data['uuid'] ?? '';
+    if (!self::verifyUserID($userid)) throw new \Exception('Invalid user id in database');
     return $userid;
   }
 
 
-  public function getProvider(): string {
-    return $this->idProvider;
-  }
+  public function signIn(string $newChallenge) {
+    $userID = $this->data['uuid'];
+    $secret = fn() => rtrim(file_get_contents('/run/secrets/shinydex_auth_secret'));
 
+    $sessionID = hash('sha256', $newChallenge . $userID . $secret());
+    $hashedSessionID = hash('sha256', $sessionID . $secret());
+    $now = time();
 
-  public function signIn() {
-    if ($this->isValid()) {
-      $cookieOptions = [
-        'expires' => time() + 60 * 55, // 55 minutes
-        'secure' => true,
-        'samesite' => 'Strict',
-        'path' => '/shinydex/'
-      ];
-    
-      setcookie('id-jwt', $this->idToken, [
-        ...$cookieOptions,
-        'httponly' => true
-      ]);
-    
-      setcookie('id-provider', $this->idProvider, [
-        ...$cookieOptions,
-        'httponly' => true
-      ]);
-    
-      setcookie('loggedin', 'true', $cookieOptions);
-    } else {
-      $this->signOut();
-      throw new \Exception('User token is not valid');
+    // Create session in database
+    $create_session = $db->prepare("INSERT INTO shinydex_user_sessions (
+      userid,
+      challenge,
+      firstSignIn,
+      lastSignIn
+    ) VALUES (
+      :userid,
+      :challenge,
+      :firstSignIn
+      :lastSignIn
+    )");
+    $create_session->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
+    $result = $create_session->execute();
+
+    if (!$result) {
+      self::signOut();
+      throw new \Exception('Error while creating user session');
     }
+
+    // Create session in cookie
+    $cookieOptions = [
+      'expires' => time() + 60 * 60 * 24 * 7, // 1 week
+      'secure' => true,
+      'samesite' => 'Strict',
+      'path' => '/shinydex/'
+    ];
+  
+    setcookie('session', $sessionID, [
+      ...$cookieOptions,
+      'httponly' => true
+    ]);
   }
 
 
-  public function createDBEntry(PDO $db) {
-    $provider = $this->getProvider();
-    $provideruserid = $this->getProviderUserId();
+  public function deleteUserEntry(): bool {
+    $userID = $this->getUserID();
+    $delete_user = $db->prepare("DELETE FROM shinydex_users WHERE `uuid` = :userid");
+    $delete_user->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
+    return $delete_user->execute();
+  }
+
+
+  public function updateUserProfile(string $username, bool $public) {
+    $userID = $this->getUserID();
+    $update = $db->prepare("UPDATE `shinydex_users` SET
+      `username` = :username,
+      `public` = :public
+    WHERE `uuid` = :userid");
+    $update->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
+    $update->bindParam(':username', $username, PDO::PARAM_STR, 30);
+    $update->bindParam(':public', $public, PDO::PARAM_BOOL);
+    $result = $update->execute();
+
+    if (!$result) throw new \Exception('Error while updating user DB profile');
+  }
+
+
+  public static function createUserEntry(string $provider, string $providerUserID) {
     $create_user = $db->prepare("INSERT INTO shinydex_users (
       $provider
     ) VALUES (
       :provideruserid
     )");
-    $create_user->bindParam(':provideruserid', $provideruserid, PDO::PARAM_STR, 36);
+    $create_user->bindParam(':provideruserid', $providerUserID, PDO::PARAM_STR, 36);
     $result = $create_user->execute();
 
     if (!$result) throw new \Exception('Error while creating user DB entry');
   }
 
 
-  public function getDBEntry(PDO $db): array {
-    $provider = $this->getProvider();
-    $provideruserid = $this->getProviderUserId();
+  public static function getUserEntry(string $provider, string $providerUserID): array|null {
     $user_data = $db->prepare("SELECT * FROM shinydex_users WHERE $provider = :provideruserid LIMIT 1");
-    $user_data->bindParam(':provideruserid', $provideruserid, PDO::PARAM_STR, 36);
+    $user_data->bindParam(':provideruserid', $providerUserID, PDO::PARAM_STR, 36);
     $user_data->execute();
-    $user_data = $user_data->fetch(PDO::FETCH_ASSOC);
 
-    if (!$user_data) throw new \Exception('User does not exist in database');
-    return $user_data;
+    if (!$user_data) return null;
+    return $user_data->fetch(PDO::FETCH_ASSOC);
   }
 
 
-  public function deleteDBEntry(PDO $db): bool {
-    $provider = $this->getProvider();
-    $provideruserid = $this->getProviderUserId();
-    $delete_user = $db->prepare("DELETE FROM shinydex_users WHERE $provider = :provideruserid");
-    $delete_user->bindParam(':provideruserid', $provideruserid, PDO::PARAM_STR, 36);
-    return $delete_user->execute();
-  }
+  public static function getUserEntryFromSession(string $hashedSessionID): array|null {
+    $user = $db->prepare("SELECT * FROM shinydex_user_sessions WHERE `challenge` = :challenge LIMIT 1");
+    $user->bindParam(':challenge', $hashedSessionID, PDO::PARAM_STR, 128);
+    $user->execute();
 
-
-  public function updateDBprofile(PDO $db, string $username, bool $public) {
-    $provider = $this->getProvider();
-    $provideruserid = $this->getProviderUserId();
-    $update = $db->prepare("UPDATE `shinydex_users` SET
-      `username` = :username,
-      `public` = :public
-    WHERE $provider = :provideruserid");
-    $update->bindParam(':provideruserid', $provideruserid, PDO::PARAM_STR, 36);
-    $update->bindParam(':username', $username, PDO::PARAM_STR, 30);
-    $update->bindParam(':public', $public, PDO::PARAM_BOOL);
-    $result = $update->execute();
-
-    if (!$result) throw new \Exception('Error while updating user DB profile');
+    if (!$user) return null;
+    return $user->fetch(PDO::FETCH_ASSOC);
   }
 
 
@@ -128,6 +163,10 @@ class User {
         $client = new Google_Client(['client_id' => $CLIENT_ID]);
         return $client->verifyIdToken($token);
         break;
+
+      case 'shinydex':
+        return true;
+        break;
   
       default:
         throw new \Exception('ID provider not supported');
@@ -135,20 +174,18 @@ class User {
   }
 
 
-  public static function verifyDBUserId(mixed $userid): bool {
+  public static function verifyUserID(mixed $userid): bool {
     return is_string($userid) && strlen($userid) === 36;
   }
 
 
   public static function isLoggedIn() {
-    return isset($_COOKIE['id-jwt']) && isset($_COOKIE['id-provider']);
+    return isset($_COOKIE['session']);
   }
 
 
   public static function getFromCookies() {
-    $user = new User($_COOKIE['id-provider'], $_COOKIE['id-jwt']);
-    if (!$user->isValid()) throw new \Exception('User token is not valid');
-    return $user;
+    return new User(['provider' => 'shinydex', 'credential' => $_COOKIE['session']]);
   }
 
 
@@ -160,16 +197,9 @@ class User {
       'path' => '/shinydex/'
     ];
     
-    setcookie('id-jwt', '', [
+    setcookie('session', '', [
       ...$cookieOptions,
       'httponly' => true
     ]);
-    
-    setcookie('id-provider', '', [
-      ...$cookieOptions,
-      'httponly' => true
-    ]);
-    
-    setcookie('loggedin', '', $cookieOptions);
   }
 }
