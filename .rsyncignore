@@ -4,6 +4,7 @@
 .vscode
 .rsyncignore
 .deploy
+backend/composer
 build
 src
 README.md
