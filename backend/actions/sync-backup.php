@@ -24,69 +24,24 @@ $local_deleted_data = json_decode($_POST['deleted-local-data'], true);
 
 
 /**
- * Step 2: Get user data
- */
-
-if (!User::isLoggedIn()) {
-  respondError('User is not logged in');
-}
-
-try {
-  $user = User::getFromCookies();
-} catch (\Throwable $error) {
-  respondError($error->getMessage());
-}
-
-
-$provider = $user->getProvider();
-$provideruserid = $user->getProviderUserId();
-
-
-
-/**
- * Step 3: Check if user exists; create it if it does not
- */
-
-$db = new BDD();
-
-try {
-  $userid = $user->getDBUserId($db);
-} catch (\Throwable $error) {
-  // If there is no local data to back up, no need to create a user, just stop here
-  if (count($local_data) === 0) {
-    respondError('Canceled user creation: no data to back up');
-  }
-
-  // Create new user and get its assigned db user id
-  try {
-    $user->createDBEntry($db);
-    $userid = $user->getDBUserId($db);
-  } catch (\Throwable $error) {
-    respondError($error->getMessage());
-  }
-}
-
-
-
-/**
- * Step 4: Get user's Pokémon from online database,
+ * Step 2: Get user's Pokémon from online database,
  * including his deleted Pokémon.
  */
 
 $online_data = $db->prepare('SELECT * FROM `shinydex_pokemon` WHERE `userid` = :userid ORDER BY id DESC');
-$online_data->bindParam(':userid', $userid, PDO::PARAM_STR, 36);
+$online_data->bindParam(':userid', $user->userID, PDO::PARAM_STR, 36);
 $online_data->execute();
 $online_data = $online_data->fetchAll(PDO::FETCH_ASSOC);
 
 $online_deleted_data = $db->prepare('SELECT * FROM `shinydex_deleted_pokemon` WHERE `userid` = :userid ORDER BY id DESC');
-$online_deleted_data->bindParam(':userid', $userid, PDO::PARAM_STR, 36);
+$online_deleted_data->bindParam(':userid', $user->userID, PDO::PARAM_STR, 36);
 $online_deleted_data->execute();
 $online_deleted_data = $online_deleted_data->fetchAll(PDO::FETCH_ASSOC);
 
 
 
 /**
- * Step 5: Compare local data with online database data
+ * Step 3: Compare local data with online database data
  * 
  * 1: local_data       2: local_deleted_data
  * A: online_data      B: online_deleted_data
@@ -188,7 +143,7 @@ foreach($online_data as $key => $online_shiny) {
 
 
 /**
- * Step 6: Update online database with newer local data.
+ * Step 4: Update online database with newer local data.
  */
 
 $results = [];
@@ -235,7 +190,7 @@ foreach($to_insert_online as $key => $shiny) {
   )");
 
   $insert->bindParam(':huntid', $shiny['huntid'], PDO::PARAM_STR, 36);
-  $insert->bindParam(':userid', $userid, PDO::PARAM_STR, 36);
+  $insert->bindParam(':userid', $user->userID, PDO::PARAM_STR, 36);
   $insert->bindParam(':creationTime', $shiny['lastUpdate'], PDO::PARAM_STR, 13);
   $insert->bindParam(':lastUpdate', $shiny['lastUpdate'], PDO::PARAM_STR, 13);
 
@@ -277,7 +232,7 @@ foreach($to_update_online as $key => $shiny) {
   WHERE `huntid` = :huntid AND `userid` = :userid');
 
   $update->bindParam(':huntid', $shiny['huntid'], PDO::PARAM_STR, 36);
-  $update->bindParam(':userid', $userid, PDO::PARAM_STR, 36);
+  $update->bindParam(':userid', $user->userID, PDO::PARAM_STR, 36);
 
   $update->bindParam(':lastUpdate', $shiny['lastUpdate'], PDO::PARAM_STR, 13);
 
@@ -311,7 +266,7 @@ foreach($to_delete_online as $key => $shiny) {
   )");
 
   $insert->bindParam(':huntid', $shiny['huntid'], PDO::PARAM_STR, 36);
-  $insert->bindParam(':userid', $userid, PDO::PARAM_STR, 36);
+  $insert->bindParam(':userid', $user->userID, PDO::PARAM_STR, 36);
   $insert->bindParam(':lastUpdate', $shiny['lastUpdate'], PDO::PARAM_STR, 13);
 
   $results[] = $insert->execute();
@@ -319,7 +274,7 @@ foreach($to_delete_online as $key => $shiny) {
   $delete = $db->prepare('DELETE FROM shinydex_pokemon WHERE huntid = :huntid AND userid = :userid');
 
   $delete->bindParam(':huntid', $shiny['huntid'], PDO::PARAM_STR, 36);
-  $delete->bindParam(':userid', $userid, PDO::PARAM_STR, 36);
+  $delete->bindParam(':userid', $user->userID, PDO::PARAM_STR, 36);
 
   $results[] = $delete->execute();
 }
@@ -329,7 +284,7 @@ foreach($to_restore_online as $key => $shiny) {
   $delete = $db->prepare('DELETE FROM shinydex_deleted_pokemon WHERE huntid = :huntid AND userid = :userid');
 
   $delete->bindParam(':huntid', $shiny['huntid'], PDO::PARAM_STR, 36);
-  $delete->bindParam(':userid', $userid, PDO::PARAM_STR, 36);
+  $delete->bindParam(':userid', $user->userID, PDO::PARAM_STR, 36);
 
   $results[] = $delete->execute();
 }
@@ -337,7 +292,7 @@ foreach($to_restore_online as $key => $shiny) {
 
 
 /**
- * Step 7: Send data back to the frontend.
+ * Step 5: Send results to the frontend.
  */
 
 /** Removes the user id from each Pokémon in an array of Pokémon. */

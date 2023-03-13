@@ -40,48 +40,26 @@ switch ($request) {
 }
 
 if ($sessionNeeded) {
-  session_start();
+  // Get stored code challenge
+  $codeChallenge = $_COOKIE['code-challenge'];
 
   // Get code verifier sent by frontend
   if (!isset($_POST['session-code-verifier'])) {
     respondError('Missing code verifier in POST body');
   }
-
   $codeVerifier = $_POST['session-code-verifier'];
   if (strlen($codeVerifier) <= 32) {
     respondError('Invalid code verifier in POST body');
   }
 
-  $secret = fn() => rtrim(file_get_contents('/run/secrets/shinydex_auth_secret'));
-
-  // Get current session ID from cookie
-  $currentSessionID = $_COOKIE['session'] ?? '';
-  $hashedCurrentSessionID = hash('sha256', $currentSessionID . $secret());
-
-  // Get user associated to current session ID from database
-  if (isset($_SESSION['current_userID'])) {
-    $userID = $_SESSION['current_userID'];
-  } else {
-    $db = new BDD();
-    $userID = $db->prepare("SELECT * FROM shinydex_user_sessions WHERE `challenge` = :challenge LIMIT 1");
-    $userID->bindParam(':challenge', $hashedCurrentSessionID, PDO::PARAM_STR, 128);
-    $userID->execute();
-    if (!$userID) {
-      respondError('User session does not exist');
-    }
-    $userID = $userID->fetch(PDO::FETCH_ASSOC);
-    $userID = $userID['userid'] ?? '';
-    $_SESSION['current_userID'] = $userID;
-    $db = NULL;
-  }
-
   // Validate code verifier
   $potentialCodeChallenge = hash('sha256', $codeVerifier);
-  $potentialSessionID = hash('sha256', $potentialCodeChallenge . $userID . $secret());
-  $hashedPotentialSessionID = hash('sha256', $potentialSessionID . $secret());
   if ($potentialSessionID !== $currentSessionID || $hashedPotentialSessionID !== $hashedCurrentSessionID) {
     respondError('Invalid user session');
   }
+
+  // Get user associated to current session ID from database
+  $user = User::getFromAccessToken();
 }
 
 

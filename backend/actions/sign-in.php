@@ -13,19 +13,43 @@ $body = json_decode(
   true
 );
 
-if (!isset($body['codeChallenge'])) {
+if (!isset($body['challenge'])) {
   respondError('Missing data in POST body');
 }
 
 try {
-  if (isset($_COOKIE['session'])) {
-    $user = User::getFromCookies();
-  } else {
-    $user = new User($body);
+  // Save code challenge
+  $challenge = $body['challenge'];
+  setcookie('code-challenge', $challenge, [
+    'expires' => time() + 60 * 60 * 24 * 30 * 6, // 6 months
+    'secure' => true,
+    'samesite' => 'Strict',
+    'path' => '/shinydex/',
+    'httponly' => true
+  ]);
+
+  // If the user has a refresh token
+  // (it does not matter if they are already signed in, the session will be refreshed anyway)
+  if (isset($_COOKIE['refresh'])) {
+    $user = User::getFromRefreshToken();
+  }
+  
+  // If the user is not already signed in, they're signing in with an ID provider
+  else {
+    // Verify the ID token
+    $token = $body['token'] ?? '';
+    $payload = $jwt->decode($token, false);
+    $providerID = $payload['iss'] ?? '';
+    $provider = match ($providerID) {
+      'https://accounts.google.com' => 'google',
+      default => $providerID
+    };
+    $providerUserID = verifyJWT($provider, $token)['sub'];
+
+    $user = new User($provider, $providerUserID, true);
   }
 
-  $challenge = $body['codeChallenge'];
-  $user->signIn($challenge);
+  $user->signIn();
   $response['success'] = 'Connection successful';
 } catch (\Throwable $error) {
   $response['error'] = $error->getMessage();

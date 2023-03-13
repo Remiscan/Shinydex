@@ -49,7 +49,7 @@ export async function callBackend(request: string, data: any = null, signedIn: b
 
 
 type SignInProvider = 'google' | 'shinydex';
-async function signIn(provider: SignInProvider, credentials: any) {
+async function signIn(provider: SignInProvider, token: string = '') {
   // Display "signing in" notification
   const signInNotification = new Notif('Connexion en cours...');
   signInNotification.element?.classList.add('loading');
@@ -59,11 +59,13 @@ async function signIn(provider: SignInProvider, credentials: any) {
   // Generate code verifier
   codeVerifier = Uint8ArrayToHexString(crypto.getRandomValues(new Uint8Array(32)));
   const hashedCodeVerifier = await sha256(codeVerifier);
-  credentials.challenge = hashedCodeVerifier;
 
   // Send the token to the backend for verification
-  credentials.provider = provider;
-  const responseBody = await callBackend('sign-in', credentials);
+  const responseBody = await callBackend('sign-in', {
+    challenge: hashedCodeVerifier,
+    provider: provider,
+    token: token
+  });
 
   // Remove "signing in" notification
   signInNotification.dismissable = true;
@@ -132,7 +134,7 @@ export async function signOut() {
 
 /** Handles the response from Google's One-Tap sign-in. */
 async function googleSignInCallback(body: any) {
-  return signIn('google', body);
+  return signIn('google', body.credential);
 }
 
 async function initGoogleSignIn() {
@@ -162,7 +164,7 @@ async function initGoogleSignIn() {
 export async function init() {
   // If last user session ID is available, automatically sign-in
   if (getCookie('session')) {
-    await signIn('shinydex', {});
+    await signIn('shinydex');
   }
 
   // If no user session ID is available, display sign-in buttons
