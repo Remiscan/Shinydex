@@ -250,6 +250,16 @@ class User {
   }
 
 
+  /** Gets the user from the current session OR a refresh token. */
+  public static function getFromAnyToken(): self {
+    if (isset($_COOKIE['user'])) {
+      return self::getFromAccessToken();
+    } else if (isset($_COOKIE['refresh'])) {
+      return self::getFromRefreshToken();
+    }
+  }
+
+
   /** Creates a user's entry in the database. */
   public static function createDBEntry(string $provider, string $providerUserID) {
     if (!in_array($provider, $supportedProviders)) throw new \Exception('ID provider not supported');

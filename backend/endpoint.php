@@ -58,8 +58,10 @@ if ($sessionNeeded) {
     respondError('Invalid user session');
   }
 
-  // Get user associated to current session ID from database
-  $user = User::getFromAccessToken();
+  // Get user associated to current session or refresh token
+  // (from current session, so that there is no need to sign in again for a time after signing in)
+  // (from refresh token, so that if the session expires while the user is using the app, they will be signed in automatically again)
+  $user = User::getFromAnyToken();
 }
 
 
