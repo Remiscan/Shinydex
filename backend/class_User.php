@@ -4,7 +4,7 @@ $db = new BDD();
 
 
 
-$jwtDir = $_SERVER['DOCUMENT_ROOT'].'/shinydex/backend/composer/vendor/adhocore/src';
+$jwtDir = $_SERVER['DOCUMENT_ROOT'].'/shinydex/backend/composer/vendor/adhocore/jwt/src';
 require_once "$jwtDir/JWTException.php";
 require_once "$jwtDir/ValidatesJWT.php";
 require_once "$jwtDir/JWT.php";
@@ -156,6 +156,10 @@ class User {
 
   public function validateToken() {
     try {
+      // Verifies that this user is the one who is signed in
+      if (!isset($_COOKIE['user']) || $_COOKIE['user'] !== $this->token) {
+        throw new \Exception('User token does not correspond');
+      }
       $payload = $jwt->decode($this->token);
       $userID = $payload['sub'];
       if ($userID !== $this->userID) {

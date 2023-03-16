@@ -7,11 +7,11 @@ require_once $_SERVER['DOCUMENT_ROOT'].'/shinydex/backend/class_User.php';
 header('Content-Type: application/json');
 
 function respond(mixed $data) {
-  echo json_encode($data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+  echo json_encode($data, JSON_UNESCAPED_SLASHES);
 }
 
 function respondError(string $message) {
-  echo json_encode(['error' => $message], JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+  echo json_encode(['error' => $message], JSON_UNESCAPED_SLASHES);
   exit;
 }
 
@@ -41,6 +41,9 @@ switch ($request) {
 
 if ($sessionNeeded) {
   // Get stored code challenge
+  if (!isset($_COOKIE['code-challenge'])) {
+    respondError('Missing code challenge');
+  }
   $codeChallenge = $_COOKIE['code-challenge'];
 
   // Get code verifier sent by frontend
@@ -48,14 +51,11 @@ if ($sessionNeeded) {
     respondError('Missing code verifier in POST body');
   }
   $codeVerifier = $_POST['session-code-verifier'];
-  if (strlen($codeVerifier) <= 32) {
-    respondError('Invalid code verifier in POST body');
-  }
 
   // Validate code verifier
   $potentialCodeChallenge = hash('sha256', $codeVerifier);
-  if ($potentialSessionID !== $currentSessionID || $hashedPotentialSessionID !== $hashedCurrentSessionID) {
-    respondError('Invalid user session');
+  if ($potentialCodeChallenge !== $codeChallenge) {
+    respondError('Code verifier does not correspond');
   }
 
   // Get user associated to current session or refresh token
@@ -88,4 +88,3 @@ function debounce(string $request) {
 
 debounce($request);
 require $_SERVER['DOCUMENT_ROOT']."/shinydex/backend/actions/$request.php";
-break;
