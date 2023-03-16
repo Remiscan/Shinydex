@@ -760,14 +760,6 @@ label[for="pick-import-file"],
 	z-index: -1;
 }
 
-.account-warning {
-  border: 1px solid var(--success-color);
-  border-radius: var(--border-radius);
-  padding: 8px;
-  grid-template-columns: auto;
-  box-sizing: border-box;
-}
-
 .un-parametre.theme input[type="radio"] + label {
   margin: 0;
 }

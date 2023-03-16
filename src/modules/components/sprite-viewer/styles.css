@@ -27,10 +27,6 @@ sprite-viewer {
   place-items: center;
 }
 
-[for=switch-shy-reg] > shiny-stars {
-  --color: var(--sprite-viewer-bg-color);
-}
-
 sprite-viewer[shiny="false"] .sprite-list.shiny,
 sprite-viewer[shiny="true"] .sprite-list.regular {
   display: none;
