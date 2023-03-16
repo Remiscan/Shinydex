@@ -1,6 +1,5 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'].'/shinydex/backend/class_BDD.php';
-$db = new BDD();
 
 
 
@@ -10,26 +9,10 @@ require_once "$jwtDir/ValidatesJWT.php";
 require_once "$jwtDir/JWT.php";
 use Ahc\Jwt\JWT;
 use Ahc\Jwt\JWTException;
-$jwt = new JWT('/run/secrets/shinydex_private_key', 'RS256', 3600);
 
-
-
-/** Decodes and verifies a JSON web token. */
-function verifyJWT(string $provider, string $token = ''): array {
-  switch ($provider) {
-    case 'google':
-      require_once __DIR__.'/composer/vendor/autoload.php';
-      $CLIENT_ID = '255145207710-8jq1qg3o43venoa7l0un3mr5s3ep8j2n.apps.googleusercontent.com';
-      $client = new Google_Client(['client_id' => $CLIENT_ID]);
-      return $client->verifyIdToken($token);
-      break;
-
-    case 'shinydex':
-      return $jwt->decode($token, true);
-      break;
-
-    default:
-      throw new \Exception('ID provider not supported');
+class cJWT extends JWT {
+  public function sign(string $input): string {
+    return parent::sign($input);
   }
 }
 
@@ -42,26 +25,31 @@ class User {
 
   public readonly string $userID;
   private string|null $token = null;
+  private readonly BDD $db;
+  public readonly JWT $jwt;
+
+  private static function db() { return new BDD(); }
+  public static function jwt() { return new cJWT('/run/secrets/shinydex_private_key', 'RS256', 3600); }
 
 
-  public function __construct(string $provider, string $providerUserID, bool $checkIfUserExists = true) {
-    if ($checkIfUserExists) {
-      // Check if the user already exists in the database
+  public function __construct(string $provider, string $providerUserID) {
+    // Check if the user already exists in the database
+    $user = User::getDBEntry($provider, $providerUserID);
+
+    // If they don't, create an entry for them in the dabatase
+    if (!$user) {
+      User::createDBEntry($provider, $providerUserID);
       $user = User::getDBEntry($provider, $providerUserID);
+    }
 
-      // If they don't, create an entry for them in the dabatase
-      if (!$user) {
-        User::createDBEntry($provider, $providerUserID);
-        $user = User::getDBEntry($provider, $providerUserID);
-      }
-
-      if (!$user) {
-        throw new Exception('Failed to sign in with a third-party ID provider');
-      }
+    if (!$user) {
+      throw new Exception('Failed to sign in with a third-party ID provider');
     }
 
     $this->userID = $user['uuid'];
     $this->token = $_COOKIE['user'] ?? null;
+    $this->db = self::db();
+    $this->jwt = self::jwt();
   }
 
 
@@ -79,7 +67,7 @@ class User {
     
     // Create access token
     $accessTokenExpires = $now + 60 * 60; // 1 hour
-    $accessToken = $jwt->encode([
+    $accessToken = $this->jwt->encode([
       'iss' => 'shinydex',
       'sub' => $userID,
       'iat' => $now,
@@ -96,7 +84,7 @@ class User {
     // Create refresh token
     $refreshTokenExpires = $now + 60 * 60 * 24 * 30 * 6; // 6 months
     $refreshToken = bin2hex(random_bytes(64));
-    $signedRefreshToken = $jwt->sign($refreshToken);
+    $signedRefreshToken = bin2hex($this->jwt->sign($refreshToken));
 
     // Send refresh token to app
     setcookie('refresh', $refreshToken, [
@@ -105,7 +93,7 @@ class User {
     ]);
 
     // Store refresh token in database
-    $store_token = $db->prepare("INSERT INTO shinydex_user_sessions (
+    $store_token = $this->db->prepare("INSERT INTO shinydex_user_sessions (
       `userid`,
       `token`,
       `expires`
@@ -116,7 +104,7 @@ class User {
     )");
     $store_token->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
     $store_token->bindParam(':token', $signedRefreshToken, PDO::PARAM_STR, 512);
-    $store_token->bindParam(':expires', $refreshTokenExpiration, PDO::PARAM_STR, 10);
+    $store_token->bindParam(':expires', $refreshTokenExpires, PDO::PARAM_STR, 10);
     $result = $store_token->execute();
   }
 
@@ -138,8 +126,8 @@ class User {
 
     // Delete refresh token from database
     $refreshToken = $_COOKIE['refresh'] ?? 'null';
-    $signedRefreshToken = $jwt->sign($refreshToken);
-    $store_token = $db->prepare("DELETE FROM shinydex_user_sessions WHERE `userid` = :userid AND `token` = :token");
+    $signedRefreshToken = bin2hex($this->jwt->sign($refreshToken));
+    $store_token = $this->db->prepare("DELETE FROM shinydex_user_sessions WHERE `userid` = :userid AND `token` = :token");
     $store_token->bindParam(':userid', $this->userID, PDO::PARAM_STR, 36);
     $store_token->bindParam(':token', $signedRefreshToken, PDO::PARAM_STR, 512);
     $result = $store_token->execute();
@@ -160,7 +148,7 @@ class User {
       if (!isset($_COOKIE['user']) || $_COOKIE['user'] !== $this->token) {
         throw new \Exception('User token does not correspond');
       }
-      $payload = $jwt->decode($this->token);
+      $payload = $this->jwt->decode($this->token);
       $userID = $payload['sub'];
       if ($userID !== $this->userID) {
         throw new \Exception('User ID does not correspond');
@@ -176,7 +164,7 @@ class User {
   public function deleteDBEntry(): bool {
     $this->validateToken();
 
-    $delete_user = $db->prepare("DELETE FROM shinydex_users WHERE `uuid` = :userid");
+    $delete_user = $this->db->prepare("DELETE FROM shinydex_users WHERE `uuid` = :userid");
     $delete_user->bindParam(':userid', $this->userID, PDO::PARAM_STR, 36);
     return $delete_user->execute();
   }
@@ -186,7 +174,7 @@ class User {
   public function updateDBEntry(string $username, bool $public) {
     $this->validateToken();
 
-    $update = $db->prepare("UPDATE `shinydex_users` SET
+    $update = $this->db->prepare("UPDATE `shinydex_users` SET
       `username` = :username,
       `public` = :public
     WHERE `uuid` = :userid");
@@ -199,17 +187,33 @@ class User {
   }
 
 
+  /** Deletes the user and their data. */
+  public function deleteAllData() {
+    $this->validateToken();
+
+    // Remove all user data from all database tables
+    foreach(['shinydex_pokemon', 'shinydex_deleted_pokemon', 'shinydex_user_sessions'] as $table) {
+      $delete = $this->db->prepare("DELETE FROM $table WHERE `userid` = :userid");
+      $delete->bindParam(':userid', $this->userID, PDO::PARAM_STR, 36);
+      $delete->execute();
+    }
+    $this->deleteDBEntry();
+  }
+
+
   /** Gets the user from the current session. */
   public static function getFromAccessToken(): self {
     if (!isset($_COOKIE['user'])) {
       throw new \Exception('No current session');
     }
 
+    $jwt = self::jwt();
+
     $accessToken = $_COOKIE['user'];
     $payload = $jwt->decode($accessToken);
     $userID = $payload['sub'];
 
-    $user = new User('shinydex', $userID, false);
+    $user = new User('shinydex', $userID);
     return $user;
   }
 
@@ -220,25 +224,27 @@ class User {
       throw new \Exception('No refresh token');
     }
 
+    $db = self::db();
+    $jwt = self::jwt();
     $refreshToken = $_COOKIE['refresh'];
-    $signedRefreshToken = $jwt->sign($refreshToken);
+    $signedRefreshToken = bin2hex($jwt->sign($refreshToken));
 
     $session_data = $db->prepare("SELECT * FROM shinydex_user_sessions WHERE `token` = :token LIMIT 1");
     $session_data->bindParam(':token', $signedRefreshToken, PDO::PARAM_STR, 512);
     $session_data->execute();
+    $session_data = $session_data->fetch(PDO::FETCH_ASSOC);
 
     if (!$session_data) {
       throw new \Exception('Invalid refresh token');
     }
-    
-    $session_data = $session_data->fetch(PDO::FETCH_ASSOC);
+
     $expired = ((int) $session_data['expires']) <= time();
 
     if ($expired) {
       throw new \Exception('Expired refresh token');
     }
 
-    $userID = $session_data['uuid'];
+    $userID = $session_data['userid'];
 
     // Consume the refresh token
     $consume_token = $db->prepare("DELETE FROM shinydex_user_sessions WHERE `userid` = :userid AND `token` = :token");
@@ -250,7 +256,7 @@ class User {
       throw new \Exception('Failed to consume refresh token');
     }
 
-    return new User('shinydex', $userID, true);
+    return new User('shinydex', $userID);
   }
 
 
@@ -266,8 +272,9 @@ class User {
 
   /** Creates a user's entry in the database. */
   public static function createDBEntry(string $provider, string $providerUserID) {
-    if (!in_array($provider, $supportedProviders)) throw new \Exception('ID provider not supported');
+    if (!in_array($provider, self::$supportedProviders)) throw new \Exception('ID provider not supported');
 
+    $db = self::db();
     $create_user = $db->prepare("INSERT INTO shinydex_users (
       $provider
     ) VALUES (
@@ -282,12 +289,13 @@ class User {
 
   /** Gets a user's data from the database. */
   public static function getDBEntry(string $provider, string $providerUserID): array|null {
+    $db = self::db();
     $DBcolumn = $provider === 'shinydex' ? 'uuid' : $provider;
     $user_data = $db->prepare("SELECT * FROM shinydex_users WHERE $DBcolumn = :provideruserid LIMIT 1");
     $user_data->bindParam(':provideruserid', $providerUserID, PDO::PARAM_STR, 36);
     $user_data->execute();
-
+    $user_data = $user_data->fetch(PDO::FETCH_ASSOC);
     if (!$user_data) return null;
-    return $user_data->fetch(PDO::FETCH_ASSOC);
+    return $user_data;
   }
 }

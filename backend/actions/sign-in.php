@@ -4,6 +4,28 @@ require_once $_SERVER['DOCUMENT_ROOT'].'/shinydex/backend/class_User.php';
 
 
 
+/** Decodes and verifies a JSON web token. */
+$jwt = User::jwt();
+function verifyJWT(string $provider, string $token = ''): array {
+  switch ($provider) {
+    case 'google':
+      require_once __DIR__.'/../composer/vendor/autoload.php';
+      $CLIENT_ID = '255145207710-8jq1qg3o43venoa7l0un3mr5s3ep8j2n.apps.googleusercontent.com';
+      $client = new Google_Client(['client_id' => $CLIENT_ID]);
+      return $client->verifyIdToken($token);
+      break;
+
+    case 'shinydex':
+      return $jwt->decode($token, true);
+      break;
+
+    default:
+      throw new \Exception('ID provider not supported');
+  }
+}
+
+
+
 $response = [];
 
 
@@ -32,6 +54,7 @@ try {
   // (it does not matter if they are already signed in, the session will be refreshed anyway)
   if (isset($_COOKIE['refresh'])) {
     $user = User::getFromRefreshToken();
+    $accountID = null;
   }
   
   // If the user is not already signed in, they're signing in with an ID provider
@@ -45,20 +68,22 @@ try {
       default => $providerID
     };
     $providerUserID = verifyJWT($provider, $token)['sub'];
+    $accountID = match ($providerID) {
+      'https://accounts.google.com' => $payload['email'] ?? null,
+      default => null
+    };
 
-    $user = new User($provider, $providerUserID, true);
+    $user = new User($provider, $providerUserID);
+    $dbEntry = User::getDBEntry($provider, $providerUserID);
   }
 
   $user->signIn();
-  $response['success'] = 'Connection successful';
-} catch (\Throwable $error) {
-  $response['error'] = $error->getMessage();
-}
 
-try {
-  $dbEntry = $user->getDBEntry(new BDD());
+  if ($accountID) $response['account'] = $accountID;
   $response['username'] = $dbEntry['username'] ?? '';
   $response['public'] = $dbEntry['public'] ?? false;
+
+  $response['success'] = 'Connection successful';
 } catch (\Throwable $error) {
   $response['error'] = $error->getMessage();
 }

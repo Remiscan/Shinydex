@@ -1,10 +1,9 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'].'/shinydex/backend/class_BDD.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/shinydex/backend/class_User.php';
+$db = new BDD();
+$userID = $user->userID;
 
 
-
-header('Content-Type: application/json');
 
 $response = [];
 
@@ -29,12 +28,12 @@ $local_deleted_data = json_decode($_POST['deleted-local-data'], true);
  */
 
 $online_data = $db->prepare('SELECT * FROM `shinydex_pokemon` WHERE `userid` = :userid ORDER BY id DESC');
-$online_data->bindParam(':userid', $user->userID, PDO::PARAM_STR, 36);
+$online_data->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
 $online_data->execute();
 $online_data = $online_data->fetchAll(PDO::FETCH_ASSOC);
 
 $online_deleted_data = $db->prepare('SELECT * FROM `shinydex_deleted_pokemon` WHERE `userid` = :userid ORDER BY id DESC');
-$online_deleted_data->bindParam(':userid', $user->userID, PDO::PARAM_STR, 36);
+$online_deleted_data->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
 $online_deleted_data->execute();
 $online_deleted_data = $online_deleted_data->fetchAll(PDO::FETCH_ASSOC);
 
@@ -190,7 +189,7 @@ foreach($to_insert_online as $key => $shiny) {
   )");
 
   $insert->bindParam(':huntid', $shiny['huntid'], PDO::PARAM_STR, 36);
-  $insert->bindParam(':userid', $user->userID, PDO::PARAM_STR, 36);
+  $insert->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
   $insert->bindParam(':creationTime', $shiny['lastUpdate'], PDO::PARAM_STR, 13);
   $insert->bindParam(':lastUpdate', $shiny['lastUpdate'], PDO::PARAM_STR, 13);
 
@@ -232,7 +231,7 @@ foreach($to_update_online as $key => $shiny) {
   WHERE `huntid` = :huntid AND `userid` = :userid');
 
   $update->bindParam(':huntid', $shiny['huntid'], PDO::PARAM_STR, 36);
-  $update->bindParam(':userid', $user->userID, PDO::PARAM_STR, 36);
+  $update->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
 
   $update->bindParam(':lastUpdate', $shiny['lastUpdate'], PDO::PARAM_STR, 13);
 
@@ -266,7 +265,7 @@ foreach($to_delete_online as $key => $shiny) {
   )");
 
   $insert->bindParam(':huntid', $shiny['huntid'], PDO::PARAM_STR, 36);
-  $insert->bindParam(':userid', $user->userID, PDO::PARAM_STR, 36);
+  $insert->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
   $insert->bindParam(':lastUpdate', $shiny['lastUpdate'], PDO::PARAM_STR, 13);
 
   $results[] = $insert->execute();
@@ -274,7 +273,7 @@ foreach($to_delete_online as $key => $shiny) {
   $delete = $db->prepare('DELETE FROM shinydex_pokemon WHERE huntid = :huntid AND userid = :userid');
 
   $delete->bindParam(':huntid', $shiny['huntid'], PDO::PARAM_STR, 36);
-  $delete->bindParam(':userid', $user->userID, PDO::PARAM_STR, 36);
+  $delete->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
 
   $results[] = $delete->execute();
 }
@@ -284,7 +283,7 @@ foreach($to_restore_online as $key => $shiny) {
   $delete = $db->prepare('DELETE FROM shinydex_deleted_pokemon WHERE huntid = :huntid AND userid = :userid');
 
   $delete->bindParam(':huntid', $shiny['huntid'], PDO::PARAM_STR, 36);
-  $delete->bindParam(':userid', $user->userID, PDO::PARAM_STR, 36);
+  $delete->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
 
   $results[] = $delete->execute();
 }

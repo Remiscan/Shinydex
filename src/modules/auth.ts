@@ -43,11 +43,17 @@ export async function callBackend(request: string, data: any = null, signedIn: b
   if (response.status != 200)
     throw '[:(] Erreur ' + response.status + ' lors de la requête';
 
-  const responseData = await response.json();
-  if ('error' in responseData) {
-    throw new Error(responseData.error);
+  const clonedResponse = response.clone();
+  try {
+    const responseData = await response.json();
+    if ('error' in responseData) {
+      throw new Error(responseData.error);
+    }
+    return responseData;
+  } catch (error) {
+    console.error(await clonedResponse.text());
+    throw error;
   }
-  return responseData;
 }
 
 
@@ -83,6 +89,13 @@ async function signIn(provider: SignInProvider, token: string = '', { notify = t
     if ('success' in responseBody) {
       await dataStorage.setItem('session-code-verifier', codeVerifier); // make it accessible from service worker
       await dataStorage.setItem('dismissed-signin', false); // Re-enable sign-in prompt after next sign-out
+
+      // Locally store e-mail address to tell user which account they used to sign in
+      if ('account' in responseBody) {
+        await dataStorage.setItem('signed-in-account', responseBody.account);
+        const currentAccountContainer = document.querySelector('[data-value="current-account"]');
+        if (currentAccountContainer) currentAccountContainer.innerHTML = responseBody.account;
+      }
       
       // Display "successfully signed in" notification
       console.log('User successfully signed in');
@@ -114,7 +127,7 @@ async function signIn(provider: SignInProvider, token: string = '', { notify = t
       // Remove "signing in" notification
       signInNotification.dismissable = true;
       signInNotification.remove();
-      
+
       const error = new Error('Échec de la connexion');
       new Notif(error.message).prompt();
     }
@@ -250,6 +263,14 @@ export async function init() {
       signInPrompt.prompt();
     }
   }
+
+  // Initialize current account display
+  {
+    const currentAccount = await dataStorage.getItem('signed-in-account');
+    const currentAccountContainer = document.querySelector('[data-value="current-account"]');
+    if (currentAccount && currentAccountContainer) currentAccountContainer.innerHTML = currentAccount;
+  }
+
 
   // Initialize sign in button
   document.querySelector('[data-action="sign-in-prompt"]')?.addEventListener('click', event => {
