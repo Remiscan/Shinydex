@@ -916,6 +916,23 @@ body[data-section-actuelle~="top-layer"] #top-layer {
   margin-top: 0;
 }
 
+.snackbar.signin-prompt {
+  grid-template-columns: 1fr var(--dismiss-column);
+  grid-template-rows: auto auto;
+}
+
+.snackbar.signin-prompt > .snackbar-message {
+  grid-row: 2;
+  grid-column: 1 / -1;
+  padding-top: 0;
+  padding-right: 16px;
+}
+
+.signin-button-container {
+  padding: 8px 0;
+  margin-left: -8px;
+}
+
 
 /*
  * Bouton installer

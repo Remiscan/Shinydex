@@ -2,7 +2,7 @@ import { Params } from './Params.js';
 
 
 
-const template = document.createElement('template');
+export const template = document.createElement('template');
 template.innerHTML = /*html*/`
   <div class="snackbar shadow elevation-3">
     <span class="snackbar-message body-medium"></span>
