@@ -790,6 +790,10 @@ input-slider[name="theme-hue"]::part(slider-thumb) {
   outline-offset: 5px;
 }
 
+.current-account-info {
+  margin-bottom: -8px;
+}
+
 [data-value="current-account"] {
   color: rgb(var(--primary));
 }
