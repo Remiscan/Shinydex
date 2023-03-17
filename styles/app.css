@@ -531,8 +531,11 @@ section.loading .message-vide {
 }
 
 .dex-icon:not(.got) {
-  /* setting opacity on .pkmnicon makes the pokedex section lag, particularly when opening it on mobile */
-  --surface-opacity: 1;
+  --surface-opacity: 0;
+}
+
+.dex-icon:not(.got):not(:hover, :focus, :active) {
+  --elevation-opacity: 0;
 }
 
 .dex-icon.got {
