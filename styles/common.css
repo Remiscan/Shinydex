@@ -171,8 +171,8 @@ button.text-button.success {
 
 button.fab {
   --surface-color: var(--primary-container);
-  --elevation-opacity: var(--elevation-1-opacity);
-  --elevation-shadow: var(--elevation-1-shadow);
+  --elevation-opacity: var(--elevation-3-opacity);
+  --elevation-shadow: var(--elevation-3-shadow);
   color: rgb(var(--on-primary-container));
   --state-tint: var(--on-primary-container);
   min-width: 56px;
@@ -194,18 +194,18 @@ button.fab.large {
 }
 
 button.fab:focus {
-  --elevation-opacity: var(--elevation-1-opacity);
-  --elevation-shadow: var(--elevation-1-shadow);
+  --elevation-opacity: var(--elevation-3-opacity);
+  --elevation-shadow: var(--elevation-3-shadow);
 }
 
 button.fab:hover {
-  --elevation-opacity: var(--elevation-2-opacity);
-  --elevation-shadow: var(--elevation-2-shadow);
+  --elevation-opacity: var(--elevation-4-opacity);
+  --elevation-shadow: var(--elevation-4-shadow);
 }
 
 button.fab:active {
-  --elevation-opacity: var(--elevation-1-opacity);
-  --elevation-shadow: var(--elevation-1-shadow);
+  --elevation-opacity: var(--elevation-3-opacity);
+  --elevation-shadow: var(--elevation-3-shadow);
 }
 
 /* Icon button */
