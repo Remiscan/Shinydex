@@ -30,18 +30,13 @@ $response = [];
 
 
 
-$body = json_decode(
-  file_get_contents('php://input'),
-  true
-);
-
-if (!isset($body['challenge'])) {
+if (!isset($_POST['challenge'])) {
   respondError('Missing data in POST body');
 }
 
 try {
   // Save code challenge
-  $challenge = $body['challenge'];
+  $challenge = $_POST['challenge'];
   setcookie('code-challenge', $challenge, [
     'expires' => time() + 60 * 60 * 24 * 30 * 6, // 6 months
     'secure' => true,
@@ -60,7 +55,7 @@ try {
   // If the user is not already signed in, they're signing in with an ID provider
   else {
     // Verify the ID token
-    $token = $body['token'] ?? '';
+    $token = $_POST['token'] ?? '';
     $payload = $jwt->decode($token, false);
     $providerID = $payload['iss'] ?? '';
     $provider = match ($providerID) {

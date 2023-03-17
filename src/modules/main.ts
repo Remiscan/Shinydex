@@ -210,23 +210,8 @@ importInput.addEventListener('change', async event => {
     button.tabIndex = -1;
 
     try {
-      let response = await fetch(`./backend/endpoint.php?request=delete-user-data&date=${Date.now()}`);
-      if (!(response.status === 200)) {
-        throw new Error('Could not fetch list of sprites');
-      }
-
-      let data;
-      let response2 = response.clone();
-      try {
-        data = await response.json();
-      } catch {
-        data = await response2.text();
-        throw new Error(`Invalid json: ${data}`);
-      }
-      if ('error' in data) throw new Error(data.error);
-
-      await Auth.signOut();
-
+      await Auth.callBackend('delete-user-data', undefined, true);
+      Auth.signOutCallback();
       new Notif('Données en ligne supprimées.').prompt();
     } catch (error) {
       console.error(error);

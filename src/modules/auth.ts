@@ -33,11 +33,22 @@ let codeVerifier: string = '';
 
 
 
-export async function callBackend(request: string, data: any = null, signedIn: boolean = false): Promise<any> {
-  if (signedIn) data.codeVerifier = codeVerifier;
+type BackendRequestData = {
+  'session-code-verifier'?: string,
+  [key: string]: any
+};
+export async function callBackend(request: string, data: BackendRequestData = {}, signedIn: boolean = false): Promise<any> {
+  // Prepare the data to send to the backend
+  if (signedIn) data['session-code-verifier'] = codeVerifier;
+  const formData = new FormData();
+  const dataKeys = Object.keys(data);
+  const method = dataKeys.length > 0 ? 'POST' : 'GET';
+  dataKeys.forEach(key => formData.append(key, data[key]));
+
+  // Send the request to the backend
   const response = await fetch(`/shinydex/backend/endpoint.php?request=${request}&date=${Date.now()}`, {
-    method: data ? 'POST' : 'GET',
-    body: data ? JSON.stringify(data) : undefined
+    method: method,
+    body: method === 'POST' ? formData : undefined
   });
 
   if (response.status != 200)
@@ -51,8 +62,13 @@ export async function callBackend(request: string, data: any = null, signedIn: b
     }
     return responseData;
   } catch (error) {
-    console.error(await clonedResponse.text());
-    throw error;
+    const cause = await clonedResponse.text();
+    if (error instanceof Error) {
+      throw new Error(error.message, { cause });
+    } else {
+      console.error(await clonedResponse.text());
+      throw error;
+    }
   }
 }
 
@@ -61,6 +77,7 @@ export async function callBackend(request: string, data: any = null, signedIn: b
 type SignInProvider = 'google' | 'shinydex';
 async function signIn(provider: SignInProvider, token: string = '', { notify = true } = {}) {
   // Display "signing in" notification
+  SignInPrompt.closeAll();
   const signInNotification = new Notif('Connexion en cours...');
   if (notify) {
     signInNotification.element?.classList.add('loading');
@@ -145,17 +162,20 @@ export async function signOut() {
   const responseBody = await callBackend('sign-out', undefined, true);
 
   if ('success' in responseBody) {
-    await dataStorage.removeItem('session-code-verifier');
-
-    console.log('User successfully signed out');
-    new Notif(`Vous n'êtes plus connecté.`).prompt();
-    document.body.setAttribute('data-logged-in', 'false');
+    signOutCallback();
     return true;
   } else {
     const error = new Error('Échec de la déconnexion');
     new Notif(error.message).prompt();
     throw error;
   }
+}
+
+export async function signOutCallback() {
+  await dataStorage.removeItem('session-code-verifier');
+  console.log('User successfully signed out');
+  new Notif(`Vous n'êtes plus connecté.`).prompt();
+  document.body.setAttribute('data-logged-in', 'false');
 }
 
 
@@ -206,6 +226,7 @@ async function initGoogleSignIn(signInButtonContainer: HTMLElement) {
 
 
 
+const signInPromptsList: Set<SignInPrompt> = new Set();
 class SignInPrompt extends Notif {
   showMessage: boolean = true;
 
@@ -246,6 +267,24 @@ class SignInPrompt extends Notif {
     } else {
       throw new TypeError('Expecting Element');
     }
+  }
+
+  prompt() {
+    SignInPrompt.closeAll();
+    signInPromptsList.add(this);
+    return super.prompt();
+  }
+
+  remove() {
+    signInPromptsList.delete(this);
+    return super.remove();
+  }
+
+  static closeAll() {
+    signInPromptsList.forEach(prompt => {
+      prompt.dismissable = true;
+      prompt.remove();
+    });
   }
 }
 

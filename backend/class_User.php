@@ -109,34 +109,6 @@ class User {
   }
 
 
-  /** Signs the user out. */
-  public function signOut() {
-    $cookieOptions = [
-      'expires' => time() - 3600, // in the past, so the browser immediately deletes the cookie
-      'secure' => true,
-      'samesite' => 'Strict',
-      'path' => '/shinydex/',
-      'httponly' => true
-    ];
-
-    $this->token = null;
-
-    // Delete access token from app
-    setcookie('user', '', $cookieOptions);
-
-    // Delete refresh token from database
-    $refreshToken = $_COOKIE['refresh'] ?? 'null';
-    $signedRefreshToken = bin2hex($this->jwt->sign($refreshToken));
-    $store_token = $this->db->prepare("DELETE FROM shinydex_user_sessions WHERE `userid` = :userid AND `token` = :token");
-    $store_token->bindParam(':userid', $this->userID, PDO::PARAM_STR, 36);
-    $store_token->bindParam(':token', $signedRefreshToken, PDO::PARAM_STR, 512);
-    $result = $store_token->execute();
-
-    // Delete refresh token from app
-    setcookie('refresh', '', $cookieOptions);
-  }
-
-
   public function isSignedIn(): bool {
     return isset($_COOKIE['user']);
   }
@@ -160,12 +132,31 @@ class User {
   }
 
 
+  /** Signs the user out. */
+  public function signOut() {
+    $this->validateToken();
+    $this->token = null;
+
+    // Delete refresh token from database
+    $userID = $this->userID;
+    $refreshToken = $_COOKIE['refresh'] ?? 'null';
+    $signedRefreshToken = bin2hex($this->jwt->sign($refreshToken));
+    $store_token = $this->db->prepare("DELETE FROM shinydex_user_sessions WHERE `userid` = :userid AND `token` = :token");
+    $store_token->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
+    $store_token->bindParam(':token', $signedRefreshToken, PDO::PARAM_STR, 512);
+    $result = $store_token->execute();
+
+    self::forceSignOut();
+  }
+
+
   /** Deletes the user from the database. */
   public function deleteDBEntry(): bool {
     $this->validateToken();
 
+    $userID = $this->userID;
     $delete_user = $this->db->prepare("DELETE FROM shinydex_users WHERE `uuid` = :userid");
-    $delete_user->bindParam(':userid', $this->userID, PDO::PARAM_STR, 36);
+    $delete_user->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
     return $delete_user->execute();
   }
 
@@ -174,11 +165,12 @@ class User {
   public function updateDBEntry(string $username, bool $public) {
     $this->validateToken();
 
+    $userID = $this->userID;
     $update = $this->db->prepare("UPDATE `shinydex_users` SET
       `username` = :username,
       `public` = :public
     WHERE `uuid` = :userid");
-    $update->bindParam(':userid', $this->userID, PDO::PARAM_STR, 36);
+    $update->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
     $update->bindParam(':username', $username, PDO::PARAM_STR, 30);
     $update->bindParam(':public', $public, PDO::PARAM_BOOL);
     $result = $update->execute();
@@ -193,11 +185,14 @@ class User {
 
     // Remove all user data from all database tables
     foreach(['shinydex_pokemon', 'shinydex_deleted_pokemon', 'shinydex_user_sessions'] as $table) {
+      $userID = $this->userID;
       $delete = $this->db->prepare("DELETE FROM $table WHERE `userid` = :userid");
-      $delete->bindParam(':userid', $this->userID, PDO::PARAM_STR, 36);
+      $delete->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
       $delete->execute();
     }
     $this->deleteDBEntry();
+
+    self::forceSignOut();
   }
 
 
@@ -297,5 +292,22 @@ class User {
     $user_data = $user_data->fetch(PDO::FETCH_ASSOC);
     if (!$user_data) return null;
     return $user_data;
+  }
+
+
+  public static function forceSignOut() {
+    $cookieOptions = [
+      'expires' => time() - 3600, // in the past, so the browser immediately deletes the cookie
+      'secure' => true,
+      'samesite' => 'Strict',
+      'path' => '/shinydex/',
+      'httponly' => true
+    ];
+
+    // Delete access token from app
+    setcookie('user', '', $cookieOptions);
+
+    // Delete refresh token from app
+    setcookie('refresh', '', $cookieOptions);
   }
 }
