@@ -931,6 +931,8 @@ body[data-section-actuelle~="top-layer"] #top-layer {
 .signin-button-container {
   padding: 8px 0;
   margin-left: -8px;
+  height: 40px;
+  overflow: hidden;
 }
 
 
