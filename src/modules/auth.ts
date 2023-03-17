@@ -99,8 +99,10 @@ async function signIn(provider: SignInProvider, token: string = '', { notify = t
       
       // Display "successfully signed in" notification
       console.log('User successfully signed in');
-      new Notif('Connexion réussie !').prompt();
       document.body.setAttribute('data-logged-in', 'true');
+      if (notify) {
+        new Notif('Connexion réussie !').prompt();
+      }
 
       // Apply user settings that were waved in database
       if ('username' in responseBody) {
