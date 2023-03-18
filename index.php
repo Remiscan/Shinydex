@@ -222,6 +222,7 @@
         <form name="user-search" class="search-form">
           <input type="text" name="username" class="surface variant elevation-3 interactive body-large"
           inputmode="search" enterkeyhint="search" role="searchbox" autocomplete="off"
+          minlength="1" maxlength="30"
           placeholder="Rechercher un utilisateur">
 
           <button type="reset" class="surface interactive icon-button only-icon reset-icon">

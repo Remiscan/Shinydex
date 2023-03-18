@@ -23,6 +23,7 @@ switch ($request) {
   // Do not need user to be signed in
   case 'get-file-versions':
   case 'get-all-sprites':
+  case 'check-public-user':
   case 'sign-in':
     $sessionNeeded = false;
     break;

@@ -106,10 +106,29 @@ document.querySelector('.fab')!.addEventListener('click', async () => {
 // AJOUT D'AMIS
 
 // Active le bouton de recherche d'utilisateur
-document.querySelector('form[name="user-search"]')!.addEventListener('submit', event => {
-  event.preventDefault();
-  // Ajouter un nouvel ami ici
-});
+{
+  const form = document.querySelector('form[name="user-search"]') as HTMLFormElement;
+  form.addEventListener('submit', async event => {
+    event.preventDefault();
+
+    // Get username from form
+    const username = String((new FormData(form)).get('username') ?? '');
+    if (username.length === 0 || username.length > 30) return;
+
+    // Ask backend if that username matches a public user
+    const response = await Auth.callBackend('check-public-user', { username }, false);
+    if (sectionActuelle === 'user-search') {
+      history.back();
+    }
+
+    if (response.matches === true) {
+      // If it matches, add that user to the friends list
+      new Notif('Profil correspondant trouvé !').prompt();
+    } else {
+      new Notif('Aucun profil public ne correspond à ce pseudo.').prompt();
+    }
+  });
+}
 
 
 
