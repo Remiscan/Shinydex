@@ -189,6 +189,37 @@ const sections: Section[] = [
     fab: null,
     element: document.getElementById('filter-menu')!
   }, {
+    nom: 'user-search',
+    rememberPosition: false,
+    openAnimation: (section: Element, event: Event) => {
+      const from = getComputedStyle(section).getPropertyValue('--from');
+      return section.animate([
+        { opacity: 0, transform: `translate3D(0, ${from}, 0)` },
+        { opacity: 1, transform: 'translate3D(0, 0, 0)' }
+      ], {
+        easing: Params.easingDecelerate,
+        duration: 200,
+        fill: 'both'
+      });
+    },
+    closeAnimation: (section: Element, event: Event) => {
+      const from = getComputedStyle(section).getPropertyValue('--from');
+      return section.animate([
+        { opacity: 1, transform: 'translate3D(0, 0, 0)' },
+        { opacity: 0, transform: `translate3D(0, ${from}, 0)` }
+      ], {
+        easing: Params.easingAccelerate,
+        duration: 150,
+        fill: 'both'
+      });
+    },
+    historique: true,
+    closePrevious: false,
+    makePreviousInert: true,
+    preload: [],
+    fab: null,
+    element: document.getElementById('user-search')!
+  }, {
     nom: 'obfuscator',
     rememberPosition: false,
     openAnimation: (section: Element, event: Event, data: any) => {

@@ -1,14 +1,14 @@
 const template = document.createElement('template');
 template.innerHTML = /*html*/`
-  <form name="search-box" part="form">
+  <form name="search-box" part="form" class="search-form">
     <input type="text" name="search" id="search" class="surface elevation-3 interactive body-large" part="input"
            inputmode="search" enterkeyhint="search" role="searchbox" autocomplete="off">
 
-    <label for="search" part="search-icon">
+    <label for="search" class="search-icon" part="search-icon">
       <span class="material-icons">search</span>
     </label>
 
-    <button type="reset" class="surface interactive icon-button only-icon" part="reset-icon">
+    <button type="reset" class="surface interactive icon-button only-icon reset-icon" part="reset-icon">
       <span class="material-icons">close</span>
     </button>
 

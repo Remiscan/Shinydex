@@ -58,18 +58,10 @@ for (const bouton of Array.from(document.querySelectorAll('.bouton-retour'))) {
 // L'obfuscator ramène en arrière quand on clique dessus
 document.getElementById('obfuscator')!.addEventListener('click', () => history.back());
 
-// Ferme le menu des filtres si on clique en-dehors
-{
-  const section = document.getElementById('filter-menu');
-  section?.addEventListener('click', event => {
-    if (event.target !== section) return;
-    history.back();
-  });
-}
-
-// Ferme le top layer si on clique en-dehors
-{
-  const section = document.getElementById('top-layer');
+// Ferme les sections suivantes si on clique en-dehors de leur contenu
+const sectionsToCloseWhenClickingOutside = ['filter-menu', 'user-search', 'top-layer'];
+for (const sectionName of sectionsToCloseWhenClickingOutside) {
+  const section = document.getElementById(sectionName);
   section?.addEventListener('click', event => {
     if (event.target !== section) return;
     history.back();
@@ -104,9 +96,19 @@ document.querySelector('.fab')!.addEventListener('click', async () => {
 
   // Ajoute un nouvel ami
   else if (sectionActuelle === 'partage') {
-    // Ajouter un nouvel ami ici
-    await navigate('obfuscator', new Event('navigate'), { search: true, section: 'ajouter-ami' })
+    await navigate('user-search', new Event('click'), {});
   }
+});
+
+
+
+///////////////
+// AJOUT D'AMIS
+
+// Active le bouton de recherche d'utilisateur
+document.querySelector('form[name="user-search"]')!.addEventListener('submit', event => {
+  event.preventDefault();
+  // Ajouter un nouvel ami ici
 });
 
 

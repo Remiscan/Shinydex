@@ -254,6 +254,7 @@ body[data-section-actuelle~="parametres"] #parametres,
 body[data-section-actuelle~="a-propos"] #a-propos,
 body[data-section-actuelle~="sprite-viewer"] #sprite-viewer,
 body[data-section-actuelle~="filter-menu"] #filter-menu,
+body[data-section-actuelle~="user-search"] #user-search,
 body[data-section-actuelle~="top-layer"] #top-layer,
 body[data-section-actuelle~="obfuscator"] #obfuscator {
   display: grid;
@@ -524,6 +525,7 @@ section.loading .message-vide {
   position: relative;
   content-visibility: auto;
   contain-intrinsic-size: 44px 44px;
+  contain: size layout paint;
 
   --surface-color: var(--surface);
   --elevation-opacity: var(--elevation-2-opacity);
@@ -624,12 +626,63 @@ body:not([data-filters~="chromatiques-ami"]) filter-menu[section="chromatiques-a
   display: none;
 }
 
-#filter-menu {
+#filter-menu,
+#user-search {
   --from: 1rem;
 }
 
-filter-menu {
+filter-menu,
+.user-search-card {
   margin-bottom: calc(var(--bottom-bar-height) + 8px);
+}
+
+
+
+/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!! USER SEARCH FORM !!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+
+.user-search-card {
+  height: fit-content;
+  box-sizing: border-box;
+  border-radius: var(--border-radius);
+  position: sticky;
+  z-index: var(--z-filter-menu);
+  max-width: min(100% - 16px, 600px);
+  max-height: calc(100% - 16px);
+  margin-inline: auto;
+  margin-top: auto;
+  overflow: hidden auto;
+  padding: 16px;
+  box-sizing: border-box;
+  border-radius: var(--border-radius);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 350px;
+}
+
+.search-form[name="user-search"] {
+  height: 48px;
+  margin-block: -4px;
+  --reset-icon-column: 40px;
+  grid-template-columns: [input-start search-icon] 56px 1fr [reset-icon] var(--reset-icon-column) [input-end] 4px [submit-button] auto;
+  container-type: inline-size;
+}
+
+.search-form[name="user-search"] input[role="searchbox"] {
+  grid-column: input-start / input-end;
+  padding-left: 16px;
+}
+
+.search-form[name="user-search"] button[type="submit"] {
+  grid-column: submit-button;
+}
+
+form[name="user-profile"] {
+  display: flex;
+  padding: 8px;
+  border-radius: var(--border-radius);
 }
 
 
@@ -685,8 +738,8 @@ h2:not(:first-child) {
   border-top: 1px solid rgb(var(--outline-variant));
 }
 
-.un-parametre .param-nom,
-.un-parametre .param-description {
+.param-nom,
+.param-description {
   max-width: 40ch;
 }
 
@@ -839,12 +892,6 @@ input-slider[name="theme-hue"]::part(slider-thumb) {
 !!!!! PARTAGE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
-form[name="user-profile"] {
-  display: flex;
-  padding: 8px;
-  border-radius: var(--border-radius);
-}
-
 
 
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -853,6 +900,7 @@ form[name="user-profile"] {
 
 #sprite-viewer,
 #filter-menu,
+#user-search,
 #top-layer,
 #obfuscator {
   grid-column: 1 / -1;
@@ -868,7 +916,8 @@ form[name="user-profile"] {
 }
 
 #top-layer,
-#filter-menu {
+#filter-menu,
+#user-search {
   background-color: transparent;
   z-index: var(--z-obfuscator);
 }
@@ -979,5 +1028,5 @@ iframe[src^="https://accounts.google.com"] {
 
 body:not([data-logged-in="true"]) [data-logged-in],
 body[data-logged-in="true"] [data-logged-out] {
-  display: none;
+  display: none !important;
 }

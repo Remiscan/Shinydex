@@ -114,6 +114,11 @@ filter-menu {
   margin-bottom: auto;
 }
 
+.user-search-card {
+  margin-bottom: 8px;
+  margin-left: calc(112px + 8px);
+}
+
 #google-one-tap-container {
   margin: 10px 8px 6px 8px; /* 16px - (6px 8px 10px 8px) */
 }

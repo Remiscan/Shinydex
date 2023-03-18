@@ -258,6 +258,7 @@ button:disabled {
   --surface-opacity: .12 !important;
   --state-opacity: 0 !important;
   color: rgb(var(--on-surface), .38) !important;
+  grid-template-columns: [search-icon] 56px 1fr [reset-icon] var(--reset-icon-column) [filter-icon] var(--filter-icon-column) 2px;
 }
 
 button.outlined:disabled {
@@ -274,6 +275,53 @@ input-slider {
   --tap-safe-size: inherit;
 }
 
+/* Search box */
+
+form.search-form {
+  flex-grow: 1;
+  height: 56px;
+  display: grid;
+  --icon-button-width: 44px;
+  --reset-icon-column: var(--icon-button-width);
+  place-items: center;
+  grid-template-columns: [search-icon] 56px 1fr [reset-icon] var(--reset-icon-column) 2px;
+}
+
+form.search-form > * {
+  grid-row: 1;
+}
+
+input[role="searchbox"]::placeholder {
+  color: rgb(var(--on-surface-variant));
+}
+
+.search-form .reset-icon {
+  color: rgb(var(--on-surface));
+  grid-column: reset-icon;
+}
+
+.search-form input[role="searchbox"]:placeholder-shown ~ .reset-icon {
+  display: none;
+}
+
+.search-form .search-icon {
+  color: rgb(var(--on-surface-variant));
+  grid-column: search-icon;
+  display: flex;
+}
+
+input[role="searchbox"] {
+  border: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: calc(100% - 8px);
+  padding: 0 calc(var(--reset-icon-column) + 4px) 0 56px;
+  box-sizing: border-box;
+  border-radius: 28px;
+  font-family: inherit;
+}
+
 /* Switch */
 
 input-switch,
@@ -282,6 +330,7 @@ shiny-switch {
   --on-track-color: rgb(var(--primary));
   --off-thumb-color: rgb(var(--outline));
   --on-thumb-color: rgb(var(--on-primary));
+  contain: size layout paint;
 }
 
 input-switch::part(button),

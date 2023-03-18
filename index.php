@@ -214,12 +214,31 @@
       <filter-menu data-section="chromatiques-ami" class="surface standard primary shadow elevation-3"></filter-menu>
     </section>
 
+    <!-- User search -->
+    <section id="user-search">
+      <div class="user-search-card surface standard primary shadow elevation-3">
+        <h2 class="title-medium">Ajouter un ami avec son pseudo :</h2>
+
+        <form name="user-search" class="search-form">
+          <input type="text" name="username" class="surface variant elevation-3 interactive body-large"
+          inputmode="search" enterkeyhint="search" role="searchbox" autocomplete="off"
+          placeholder="Rechercher un utilisateur">
+
+          <button type="reset" class="surface interactive icon-button only-icon reset-icon">
+            <span class="material-icons">close</span>
+          </button>
+
+          <button type="submit" class="surface interactive filled tonal only-icon">
+            <span class="material-icons">search</span>
+          </button>
+        </form>
+      </div>
+    </section>
+
     <!-- Misc top layer -->
     <section id="top-layer"></section>
 
     <!-- Notifications -->
-    <div class="notification-container">
-      <div id="google-one-tap-container"></div>
-    </div>
+    <div class="notification-container"></div>
   </body>
 </html>
