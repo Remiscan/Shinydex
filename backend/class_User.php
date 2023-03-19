@@ -216,14 +216,19 @@ class User {
       throw new \Exception('No current session');
     }
 
-    $jwt = self::jwt();
+    try {
+      $jwt = self::jwt();
+      $accessToken = $_COOKIE['user'];
 
-    $accessToken = $_COOKIE['user'];
-    $payload = $jwt->decode($accessToken);
-    $userID = $payload['sub'];
+      $payload = $jwt->decode($accessToken);
+      $userID = $payload['sub'];
 
-    $user = new User('shinydex', $userID);
-    return $user;
+      $user = new User('shinydex', $userID);
+      return $user;
+    } catch (\Throwable $error) {
+      self::forceSignOut();
+      throw $error;
+    }
   }
 
 
@@ -233,39 +238,44 @@ class User {
       throw new \Exception('No refresh token');
     }
 
-    $db = self::db();
-    $jwt = self::jwt();
-    $refreshToken = $_COOKIE['refresh'];
-    $signedRefreshToken = bin2hex($jwt->sign($refreshToken));
+    try {
+      $db = self::db();
+      $jwt = self::jwt();
+      $refreshToken = $_COOKIE['refresh'];
+      $signedRefreshToken = bin2hex($jwt->sign($refreshToken));
 
-    $session_data = $db->prepare("SELECT * FROM shinydex_user_sessions WHERE `token` = :token LIMIT 1");
-    $session_data->bindParam(':token', $signedRefreshToken, PDO::PARAM_STR, 512);
-    $session_data->execute();
-    $session_data = $session_data->fetch(PDO::FETCH_ASSOC);
+      $session_data = $db->prepare("SELECT * FROM shinydex_user_sessions WHERE `token` = :token LIMIT 1");
+      $session_data->bindParam(':token', $signedRefreshToken, PDO::PARAM_STR, 512);
+      $session_data->execute();
+      $session_data = $session_data->fetch(PDO::FETCH_ASSOC);
 
-    if (!$session_data) {
-      throw new \Exception('Invalid refresh token');
+      if (!$session_data) {
+        throw new \Exception('Invalid refresh token');
+      }
+
+      $expired = ((int) $session_data['expires']) <= time();
+
+      if ($expired) {
+        throw new \Exception('Expired refresh token');
+      }
+
+      $userID = $session_data['userid'];
+
+      // Consume the refresh token
+      $consume_token = $db->prepare("DELETE FROM shinydex_user_sessions WHERE `userid` = :userid AND `token` = :token");
+      $consume_token->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
+      $consume_token->bindParam(':token', $signedRefreshToken, PDO::PARAM_STR, 512);
+      $consume_token->execute();
+
+      if (!$consume_token) {
+        throw new \Exception('Failed to consume refresh token');
+      }
+
+      return new User('shinydex', $userID);
+    } catch (\Throwable $error) {
+      self::forceSignOut();
+      throw $error;
     }
-
-    $expired = ((int) $session_data['expires']) <= time();
-
-    if ($expired) {
-      throw new \Exception('Expired refresh token');
-    }
-
-    $userID = $session_data['userid'];
-
-    // Consume the refresh token
-    $consume_token = $db->prepare("DELETE FROM shinydex_user_sessions WHERE `userid` = :userid AND `token` = :token");
-    $consume_token->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
-    $consume_token->bindParam(':token', $signedRefreshToken, PDO::PARAM_STR, 512);
-    $consume_token->execute();
-
-    if (!$consume_token) {
-      throw new \Exception('Failed to consume refresh token');
-    }
-
-    return new User('shinydex', $userID);
   }
 
 
