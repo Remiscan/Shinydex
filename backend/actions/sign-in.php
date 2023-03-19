@@ -50,6 +50,7 @@ try {
   if (isset($_COOKIE['refresh'])) {
     $user = User::getFromRefreshToken();
     $accountID = null;
+    $dbEntry = User::getDBEntry('shinydex', $user->userID);
   }
   
   // If the user is not already signed in, they're signing in with an ID provider
@@ -75,8 +76,9 @@ try {
   $user->signIn();
 
   if ($accountID) $response['account'] = $accountID;
-  $response['username'] = $dbEntry['username'] ?? '';
+  $response['username'] = $dbEntry['username'] ?? null;
   $response['public'] = $dbEntry['public'] ?? false;
+  $response['lastUpdate'] = $dbEntry['lastUpdate'] ?? '0';
 
   $response['success'] = 'Connection successful';
 } catch (\Throwable $error) {

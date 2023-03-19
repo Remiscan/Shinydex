@@ -116,7 +116,7 @@ document.querySelector('.fab')!.addEventListener('click', async () => {
     if (username.length === 0 || username.length > 30) return;
 
     // Ask backend if that username matches a public user
-    const response = await Auth.callBackend('check-public-user', { username }, false);
+    const response = await Auth.callBackend('check-public-user-exists', { username }, false);
     if (sectionActuelle === 'user-search') {
       history.back();
     }

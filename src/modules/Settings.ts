@@ -1,6 +1,10 @@
+import { callBackend } from './auth.js';
 import { RadioGroup } from './components/radioGroup.js';
 import { dataStorage } from './localForage.js';
+import { Notif } from './notification.js';
 import { computePaletteCss, gradientString, setTheme, updateMetaThemeColorTag } from './theme.js';
+// @ts-expect-error
+import { queueable } from '../../../_common/js/per-function-async-queue.js';
 
 
 
@@ -20,8 +24,6 @@ export class Settings {
   'theme': Theme = 'system';
   'theme-hue': number = 255;
   'cache-all-sprites': boolean = false;
-  'public': boolean = false;
-  'username': string = '';
 
   constructor(data?: FormData | object) {
     if (!data) return;
@@ -31,8 +33,6 @@ export class Settings {
       if (isSupportedTheme(storedTheme)) this['theme'] = storedTheme;
       this['theme-hue'] = Number(data.get('theme-hue')) || this['theme-hue'];
       this['cache-all-sprites'] = data.get('cache-all-sprites') === 'true';
-      this['public'] = data.get('public') === 'true';
-      this['username'] = String(data.get('username')).substring(0, 30);
     } else {
       if ('theme' in data && typeof data['theme'] === 'string' && isSupportedTheme(data['theme'])) {
         this['theme'] = data['theme'];
@@ -45,20 +45,12 @@ export class Settings {
       if ('cache-all-sprites' in data) {
         this['cache-all-sprites'] = Boolean(data['cache-all-sprites']);
       }
-
-      if ('public' in data) {
-        this['public'] = Boolean(data['public']);
-      }
-
-      if ('username' in data) {
-        this['username'] = String(data['username']).substring(0, 30);
-      }
     }
   }
 
 
   toForm() {
-    const settingsForm = document.querySelector('form[name="app-settings"]')
+    const settingsForm = document.querySelector('form[name="app-settings"]');
     if (!(settingsForm instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
 
     {
@@ -82,33 +74,22 @@ export class Settings {
       if (!input || !('checked' in input)) throw new TypeError(`Expecting InputSwitch`);
       input.checked = this['cache-all-sprites'];
     }
-
-    {
-      // Public
-      const input = settingsForm.querySelector('[name="public"]');
-      if (!input || !('checked' in input)) throw new TypeError(`Expecting InputSwitch`);
-      input.checked = this['public'];
-    }
-
-    {
-      // Username
-      const input = settingsForm.querySelector('[name="username"]');
-      if (!input || !('value' in input)) throw new TypeError('Expecting TextField');
-      input.value = this['username'];
-    }
   }
 
 
   apply() {
+    const settingsForm = document.querySelector('form[name="app-settings"]')
+    if (!(settingsForm instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
+
     {
       // Theme
-      if (!appliedSettings || this['theme'] !== appliedSettings['theme'])
+      if (this.changedBy('theme', ['initial', 'manual']))
         setTheme(this['theme']);
     }
 
     {
       // Theme hue
-      if (!appliedSettings || this['theme-hue'] !== appliedSettings['theme-hue']) {
+      if (this.changedBy('theme-hue', ['initial', 'manual'])) {
         const css = computePaletteCss(this['theme-hue']);
         const container = document.querySelector('style#palette');
         if (!(container instanceof HTMLStyleElement)) throw new TypeError(`Expecting HTMLStyleElement`);
@@ -119,7 +100,7 @@ export class Settings {
 
     {
       // Cache all sprites
-      if (!appliedSettings) { // On app launch
+      if (this.changedBy('cache-all-sprites', ['initial'])) { // On app launch only
         if (this['cache-all-sprites']) {
           const progressContainer = document.querySelector('[data-sprites-progress]');
           dataStorage.getItem('sprites-cache-progress')
@@ -128,24 +109,8 @@ export class Settings {
           });
           // cacheAllSprites(true); // Cache all new sprites
         }
-      } else if (appliedSettings && this['cache-all-sprites'] !== appliedSettings['cache-all-sprites']) { // On manual settings change,
+      } else if (this.changedBy('cache-all-sprites', ['manual'])) { // On manual settings change,
         cacheAllSprites(this['cache-all-sprites']);                                                       // cache or delete all sprites.
-      }
-    }
-
-    {
-      // Public visibility
-      if (!appliedSettings || this['public'] !== appliedSettings['public']) {
-        const settingsForm = document.querySelector('form[name="app-settings"]')
-        if (!(settingsForm instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
-        settingsForm.setAttribute('data-public-profile', String(this['public']));
-      }
-    }
-
-    {
-      // Username OR public visibility
-      if (appliedSettings && (this['public'] !== appliedSettings['public'] || this['username'] !== appliedSettings['username'])) {
-        // updateProfile should be a queueableAsync
       }
     }
 
@@ -184,10 +149,31 @@ export class Settings {
     if (apply)  settings.apply();
     settings.save();
   }
+
+
+  /** Returns true if setting `id` was changed by one of `causes`. */
+  changedBy(id: keyof Settings, causes: Array<'initial'|'manual'|'unchanged'>): boolean {
+    let result = 0;
+    for (const cause of causes) {
+      let subResult = 0;
+      switch (cause) {
+        case 'initial':   if (!appliedSettings) subResult++; break;
+        case 'manual':    if (appliedSettings && this[id] !== appliedSettings[id]) subResult++; break;
+        case 'unchanged': if (appliedSettings && this[id] === appliedSettings[id]) subResult++; break;
+      }
+      result += subResult;
+    }
+    return result > 0;
+  }
 }
 
 
 
+/**
+ * Fills or empties the the sprites cache.
+ * @param bool - true to fill the cache, false to empty it.
+ * @returns true if there was no error, false if there was one.
+ */
 export async function cacheAllSprites(bool: boolean): Promise<boolean> {
   const worker = (await navigator.serviceWorker.ready).active;
   if (!worker) throw new Error('No service worker available to cache all sprites');
@@ -242,4 +228,124 @@ export async function cacheAllSprites(bool: boolean): Promise<boolean> {
   } finally {
     if (input && 'disabled' in input) input.disabled = false;
   }
+}
+
+
+
+/* User profile management */
+
+
+
+type UserProfileData = {
+  username?: string|null;
+  public?: boolean;
+  lastUpdate?: number;
+}
+
+/** Updates the stored user profile data. */
+let saveUserProfile = async (data: UserProfileData = {}) => {
+  const userProfile = (await dataStorage.getItem('user-profile')) ?? {};
+  if (data.username) userProfile.username = data.username;
+  if (data.public) userProfile.public = data.public;
+  if (data.lastUpdate) userProfile.lastUpdate = data.lastUpdate;
+  await dataStorage.setItem('user-profile', userProfile);
+};
+saveUserProfile = queueable(saveUserProfile);
+export { saveUserProfile };
+
+
+/** Asks the backend to update the user's profile public visibility. */
+export async function updateUserVisibility(visibility: boolean) {
+  const settingsForm = document.querySelector('form[name="app-settings"]');
+  if (!(settingsForm instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
+  
+  try {
+    await callBackend('update-user-profile', { public: String(visibility) }, true);
+    settingsForm.setAttribute('data-public-profile', String(visibility));
+    await saveUserProfile({ public: visibility });
+  } catch (error) {
+    throw new Error('Erreur lors du changement de visibilité du profil', { cause: error ?? undefined })
+  }
+}
+
+
+/** Handles changes to the profile visibility input. */
+export function initVisibilityChangeHandler() {
+  const settingsForm = document.querySelector('form[name="app-settings"]');
+  if (!(settingsForm instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
+
+  const input = settingsForm.querySelector('[name="public"]');
+  if (!input || !('disabled' in input) || !('checked' in input)) throw new TypeError(`Expecting InputSwitch`);
+
+  input.addEventListener('change', event => {
+    updateUserVisibility(Boolean(input.checked))
+    .catch(error => {
+      input.disabled = true;
+      console.error(error);
+    });
+  });
+}
+
+
+/** Asks the backend to update the user's username. */
+export async function updateUsername(username: string) {
+  try {
+    await callBackend('update-user-profile', { username }, true);
+    await saveUserProfile({ username });
+  } catch (error) {
+    throw new Error('Erreur lors du changement de pseudo', { cause: error ?? undefined});
+  }
+}
+
+
+/** Checks if the requested username is available. */
+let usernamePrompt: Notif;
+export async function checkUsernameavailability(username: string) {
+  if (username.length === 0) return;
+  const currentUsername = (await dataStorage.getItem('user-profile') ?? {})?.username ?? null;
+  if (username === currentUsername) return;
+  
+  const response = await callBackend('check-username-available', { username }, true);
+  if ('available' in response) {
+    if (usernamePrompt instanceof Notif) {
+      usernamePrompt.dismissable = true;
+      usernamePrompt.remove();
+    }
+
+    if (response['available'] === true) {
+      usernamePrompt = new Notif(`Le pseudo ${username} est disponible, voulez-vous le choisir ?`, Notif.maxDelay, 'Confirmer', () => {}, true);
+      const userChoice = await usernamePrompt.prompt();
+      if (userChoice) {
+        await updateUsername(username);
+        usernamePrompt.remove();
+      }
+    } else {
+      usernamePrompt = new Notif(`Le pseudo ${username} n'est pas disponible.`);
+    }
+  } else {
+    const message = 'Erreur lors de la vérification de la disponibilité du pseudo.';
+    new Notif(message).prompt();
+    throw new Error(message, { cause: response.error ?? undefined });
+  }
+}
+
+
+/** Handles changes to the username field. */
+export function initUsernameChangeHandler() {
+  const settingsForm = document.querySelector('form[name="app-settings"]');
+  if (!(settingsForm instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
+
+  const input = settingsForm.querySelector('[name="username"]');
+  if (!input || !('value' in input)) throw new TypeError(`Expecting TextField`);
+
+  let timeout: number;
+  input.addEventListener('input', event => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      checkUsernameavailability(String(input.value))
+      .catch(error => {
+        console.error(error);
+      });
+    }, 1000);
+  });
 }

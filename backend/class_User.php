@@ -162,17 +162,31 @@ class User {
 
 
   /** Updates the user's profile in the database. */
-  public function updateDBEntry(string $username, bool $public) {
+  public function updateDBEntry(string|null $username, string|null $public) {
     $this->validateToken();
 
     $userID = $this->userID;
+    $fieldsToUpdate = [];
+    if ($username != null)
+      $fieldsToUpdate[] = 'username';
+    if ($public != null)
+      $fieldsToUpdate[] = 'public';
+    if (count($fieldsToUpdate) === 0) return;
+    $now = floor(1000 * microtime(true));
+
+    $updateString = implode(', ', array_map(fn($e) => "`$e` = :$e", $fieldsToUpdate));
     $update = $this->db->prepare("UPDATE `shinydex_users` SET
-      `username` = :username,
-      `public` = :public
+      $updateString,
+      `lastUpdate` = :lastupdate
     WHERE `uuid` = :userid");
     $update->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
-    $update->bindParam(':username', $username, PDO::PARAM_STR, 30);
-    $update->bindParam(':public', $public, PDO::PARAM_BOOL);
+    $update->bindParam(':lastupdate', $now, PDO::PARAM_STR, 13);
+    if ($username != null)
+      $update->bindParam(':username', $username, PDO::PARAM_STR, 30);
+    if ($public != null) {
+      $public = ($public === 'true');
+      $update->bindParam(':public', $public, PDO::PARAM_BOOL);
+    }
     $result = $update->execute();
 
     if (!$result) throw new \Exception('Error while updating user account in database');

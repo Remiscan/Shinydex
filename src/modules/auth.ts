@@ -1,5 +1,5 @@
 import { Uint8ArrayToHexString, sha256 } from './Params.js';
-import { Settings } from './Settings.js';
+import { initUsernameChangeHandler, initVisibilityChangeHandler, saveUserProfile } from './Settings.js';
 import { dataStorage } from './localForage.js';
 import { Notif, template as notifTemplate } from './notification.js';
 import { requestSync } from './syncBackup.js';
@@ -33,6 +33,72 @@ let codeVerifier: string = '';
 
 
 
+const signInPromptsList: Set<SignInPrompt> = new Set();
+
+/** Sign-in prompt notification. */
+class SignInPrompt extends Notif {
+  showMessage: boolean = true;
+
+  constructor(showMessage = true) {
+    super('Vous pourrez vous connecter plus tard depuis les paramètres.', Notif.maxDelay, '', () => {}, true);
+    this.showMessage = showMessage;
+  }
+
+  /** Makes the HTML content of the notification. */
+  toHtml(): Element {
+    const html = notifTemplate.content.cloneNode(true) as DocumentFragment;
+
+    const snackbar = html.querySelector('.snackbar');
+
+    const messageContainer = html.querySelector('.snackbar-message');
+    if (messageContainer) {
+      if (this.showMessage) messageContainer.innerHTML = this.message;
+      else messageContainer.remove();
+    }
+
+    const actionButton = html.querySelector('.snackbar-action');
+    const signInButtonContainer = document.createElement('div');
+    signInButtonContainer.className = 'signin-button-container';
+
+    const dismissButton = html.querySelector('.snackbar-dismiss');
+    dismissButton?.addEventListener('click', () => {
+      this.remove();
+      dataStorage.setItem('dismissed-signin', true);
+    }, { once: true });
+
+    if (snackbar) {
+      this.element = snackbar;
+      snackbar.classList.add('signin-prompt');
+      snackbar.insertBefore(signInButtonContainer, actionButton);
+      actionButton?.remove();
+      initGoogleSignIn(signInButtonContainer);
+      return this.element;
+    } else {
+      throw new TypeError('Expecting Element');
+    }
+  }
+
+  prompt() {
+    SignInPrompt.closeAll();
+    signInPromptsList.add(this);
+    return super.prompt();
+  }
+
+  remove() {
+    signInPromptsList.delete(this);
+    return super.remove();
+  }
+
+  static closeAll() {
+    signInPromptsList.forEach(prompt => {
+      prompt.dismissable = true;
+      prompt.remove();
+    });
+  }
+}
+
+
+
 type BackendRequestData = {
   'session-code-verifier'?: string,
   [key: string]: any
@@ -46,6 +112,7 @@ export async function callBackend(request: string, data: BackendRequestData = {}
   dataKeys.forEach(key => formData.append(key, data[key]));
 
   // Send the request to the backend
+  console.log(`Sending request to backend: ${request}`);
   const response = await fetch(`/shinydex/backend/endpoint.php?request=${request}&date=${Date.now()}`, {
     method: method,
     body: method === 'POST' ? formData : undefined
@@ -121,17 +188,36 @@ async function signIn(provider: SignInProvider, token: string = '', { notify = t
         new Notif('Connexion réussie !').prompt();
       }
 
-      // Apply user settings that were waved in database
-      if ('username' in responseBody) {
-        try {
-          Settings.set('username', String(responseBody.username ?? ''), { toForm: true, apply: false });
-        } catch (error) {}
+      // Apply user settings that were saved in database
+      const userProfile = {
+        username: responseBody.username ?? null,
+        public: Boolean(responseBody.public ?? 0),
+        lastUpdate: Number(responseBody.lastUpdate ?? 0)
+      };
+      await saveUserProfile(userProfile);
+
+      const settingsForm = document.querySelector('form[name="app-settings"]');
+      if (!(settingsForm instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
+
+      // Username
+      try {
+        const input = settingsForm.querySelector('[name="username"]');
+        if (!input || !('value' in input)) throw new TypeError('Expecting TextField');
+        input.value = userProfile.username;
+        initUsernameChangeHandler();
+      } catch (error) {
+        console.error(error);
       }
 
-      if ('public' in responseBody) {
-        try {
-          Settings.set('public', Boolean(responseBody.public ?? false), { toForm: true, apply: false });
-        } catch (error) {}
+      // Visibility
+      try {
+        const input = settingsForm.querySelector('[name="public"]');
+        if (!input || !('checked' in input)) throw new TypeError(`Expecting InputSwitch`);
+        input.checked = userProfile.public;
+        initVisibilityChangeHandler();
+        settingsForm.setAttribute('data-public-profile', String(userProfile.public));
+      } catch (error) {
+        console.error(error);
       }
 
       requestSync();
@@ -158,6 +244,13 @@ async function signIn(provider: SignInProvider, token: string = '', { notify = t
 
 
 /** Signs a user out. */
+export async function signOutCallback() {
+  await dataStorage.removeItem('session-code-verifier');
+  console.log('User successfully signed out');
+  new Notif(`Vous n'êtes plus connecté.`).prompt();
+  document.body.setAttribute('data-logged-in', 'false');
+}
+
 export async function signOut() {
   const responseBody = await callBackend('sign-out', undefined, true);
 
@@ -171,22 +264,7 @@ export async function signOut() {
   }
 }
 
-export async function signOutCallback() {
-  await dataStorage.removeItem('session-code-verifier');
-  console.log('User successfully signed out');
-  new Notif(`Vous n'êtes plus connecté.`).prompt();
-  document.body.setAttribute('data-logged-in', 'false');
-}
 
-
-
-/*function renderGoogleButton() {
-  // Place a sign-in button in settings
-  const signInButtonContainer = document.getElementById('google-signin-button-container');
-  if (signInButtonContainer) google?.accounts?.id?.renderButton(signInButtonContainer, {
-    shape: 'pill',
-  });
-}*/
 
 /** Handles the response from Google's One-Tap sign-in. */
 async function googleSignInCallback(body: any) {
@@ -222,70 +300,6 @@ async function initGoogleSignIn(signInButtonContainer: HTMLElement) {
     shape: 'pill',
     theme: 'filled_blue'
   });
-}
-
-
-
-const signInPromptsList: Set<SignInPrompt> = new Set();
-class SignInPrompt extends Notif {
-  showMessage: boolean = true;
-
-  constructor(showMessage = true) {
-    super('Vous pourrez vous connecter plus tard depuis les paramètres.', Notif.maxDelay, '', () => {}, true);
-    this.showMessage = showMessage;
-  }
-
-  /** Makes the HTML content of the notification. */
-  toHtml(): Element {
-    const html = notifTemplate.content.cloneNode(true) as DocumentFragment;
-
-    const snackbar = html.querySelector('.snackbar');
-
-    const messageContainer = html.querySelector('.snackbar-message');
-    if (messageContainer) {
-      if (this.showMessage) messageContainer.innerHTML = this.message;
-      else messageContainer.remove();
-    }
-
-    const actionButton = html.querySelector('.snackbar-action');
-    const signInButtonContainer = document.createElement('div');
-    signInButtonContainer.className = 'signin-button-container';
-
-    const dismissButton = html.querySelector('.snackbar-dismiss');
-    dismissButton?.addEventListener('click', () => {
-      this.remove();
-      dataStorage.setItem('dismissed-signin', true);
-    }, { once: true });
-
-    if (snackbar) {
-      this.element = snackbar;
-      snackbar.classList.add('signin-prompt');
-      snackbar.insertBefore(signInButtonContainer, actionButton);
-      actionButton?.remove();
-      initGoogleSignIn(signInButtonContainer);
-      return this.element;
-    } else {
-      throw new TypeError('Expecting Element');
-    }
-  }
-
-  prompt() {
-    SignInPrompt.closeAll();
-    signInPromptsList.add(this);
-    return super.prompt();
-  }
-
-  remove() {
-    signInPromptsList.delete(this);
-    return super.remove();
-  }
-
-  static closeAll() {
-    signInPromptsList.forEach(prompt => {
-      prompt.dismissable = true;
-      prompt.remove();
-    });
-  }
 }
 
 
