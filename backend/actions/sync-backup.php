@@ -291,7 +291,74 @@ foreach($to_restore_online as $key => $shiny) {
 
 
 /**
- * Step 5: Send results to the frontend.
+ * Step 5: Compare local friends list with online friends list
+ */
+
+$friends_to_insert_online = [];
+$friends_to_delete_online = [];
+
+$friends_to_insert_local = [];
+$friends_to_delete_local = [];
+
+if (isset($_POST['friends-list'])) {
+  $local_friends = json_decode($_POST['friends-list']);
+  $local_profile_lastUpdate = $_POST['profile-last-update'] ?? 0;
+
+  $user_profile = $db->prepare('SELECT * FROM `shinydex_users` WHERE `userid` = :userid LIMIT 1');
+  $user_profile->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
+  $user_profile->execute();
+  $user_profile = $user_profile->fetchAll(PDO::FETCH_ASSOC);
+  $online_friends = json_decode($user_profile['friends']);
+  $online_profile_lastUpdate = $user_profile['lastUpdate'];
+
+  foreach($local_friends as $username) {
+    $is_online_key = array_search($username, $online_friends);
+
+    if ($is_online_key === false) {
+      if ($local_profile_lastUpdate > $online_profile_lastUpdate) {
+        $friends_to_insert_online[] = $username;
+      } else {
+        $friends_to_remove_local[] = $username;
+      }
+    }
+  }
+
+  foreach($online_friends as $username) {
+    $is_local_key = array_search($username, $local_friends);
+
+    if ($is_local_key === false) {
+      if ($local_profile_lastUpdate > $online_profile_lastUpdate) {
+        $friends_to_remove_online[] = $username;
+      } else {
+        $friends_to_insert_local[] = $username;
+      }
+    }
+  }
+
+  $recent_friends_list = array_merge(
+    array_diff($online_friends, $friends_to_delete_online),
+    $friends_to_insert_online
+  );
+
+  // If the friends list sent by the frontend is more recent, push it to the DB
+  if ($local_profile_lastUpdate > $online_profile_lastUpdate) {
+    $update_friends = $db->prepare('UPDATE `shinydex_users` SET 
+      `friends` = :friends,
+      `lastUpdate` = :lastupdate
+    WHERE `userid` = :userid');
+
+    $friends_string = json_encode($recent_friends_list);
+    $update->bindParam(':friends', $friends_string);
+    $update->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
+
+    $results[] = $update_friends->execute();
+  }
+}
+
+
+
+/**
+ * Step 6: Send results to the frontend.
  */
 
 /** Removes the user id from each Pokémon in an array of Pokémon. */
@@ -309,4 +376,6 @@ echo json_encode(array(
   'to_update_local' => removeUserID($to_update_local),
   'to_delete_local' => removeUserID($to_delete_local),
   'to_restore_local' => removeUserID($to_restore_local),
+  'friends_to_insert_local' => $friends_to_insert_local,
+  'friends_to_delete_local' => $friends_to_delete_local
 ), JSON_PRETTY_PRINT);

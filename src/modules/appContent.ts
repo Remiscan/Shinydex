@@ -1,18 +1,19 @@
 import { Hunt } from './Hunt.js';
 import { Pokemon } from './Pokemon.js';
 import { Shiny } from './Shiny.js';
+import { friendCard } from './components/friend-card/friendCard.js';
 import { huntCard } from './components/hunt-card/huntCard.js';
 import { shinyCard } from './components/shiny-card/shinyCard.js';
 import { computeOrders, updateCounters } from './filtres.js';
 import { lazyLoad } from './lazyLoading.js';
-import { friendStorage, huntStorage, localForageAPI, shinyStorage } from './localForage.js';
+import { friendShinyStorage, friendStorage, huntStorage, localForageAPI, shinyStorage } from './localForage.js';
 import { navigate } from './navigate.js';
 import { Notif } from './notification.js';
 
 
 
-export type PopulatableSection = 'mes-chromatiques' | 'chasses-en-cours' | 'chromatiques-ami' | 'corbeille';
-const populatableSections: PopulatableSection[] = ['mes-chromatiques', 'chasses-en-cours', 'chromatiques-ami', 'corbeille'];
+export type PopulatableSection = 'mes-chromatiques' | 'chasses-en-cours' | 'partage' | 'chromatiques-ami' | 'corbeille';
+const populatableSections: PopulatableSection[] = ['mes-chromatiques', 'chasses-en-cours', 'partage', 'chromatiques-ami', 'corbeille'];
 
 async function populateHandler(section: PopulatableSection, _ids?: string[]): Promise<PromiseSettledResult<string>[]> {
   let dataStore: localForageAPI; // base de données
@@ -23,8 +24,11 @@ async function populateHandler(section: PopulatableSection, _ids?: string[]): Pr
     case 'chasses-en-cours':
       dataStore = huntStorage;
       break;
-    case 'chromatiques-ami':
+    case 'partage':
       dataStore = friendStorage;
+      break;
+    case 'chromatiques-ami':
+      dataStore = friendShinyStorage;
       break;
     case 'corbeille':
       dataStore = huntStorage;
@@ -48,6 +52,8 @@ export const populator = Object.fromEntries(populatableSections.map(section => {
 
 
 export async function populateFromData(section: PopulatableSection, ids: string[]): Promise<PromiseSettledResult<string>[]> {
+  if (section === 'partage') return populateFriendsList(ids);
+
   let elementName: string; // Nom de l'élément de carte
   let dataStore: localForageAPI; // Base de données
   let dataClass: (typeof Shiny) | (typeof Hunt);
@@ -64,7 +70,7 @@ export async function populateFromData(section: PopulatableSection, ids: string[
       break;
     case 'chromatiques-ami':
       elementName = 'shiny-card';
-      dataStore = friendStorage;
+      dataStore = friendShinyStorage;
       dataClass = Shiny;
       break;
     case 'corbeille':
@@ -138,6 +144,59 @@ export async function populateFromData(section: PopulatableSection, ids: string[
 }
 
 
+/** Populates the friends list. */
+async function populateFriendsList(usernames: string[]): Promise<PromiseSettledResult<string>[]> {
+  const elementName = 'friend-card';
+  const dataStore = friendStorage;
+
+  // Traitons les cartes
+
+  const cardsToCreate: Array<friendCard> = [];
+  const results = await Promise.allSettled(usernames.map(async username => {
+    const pkmnList = await dataStore.getItem(username);
+    const friendInDB = pkmnList != null && Array.isArray(pkmnList);
+
+    let card: friendCard | null = document.querySelector(`${elementName}[username="${username}"]`);
+
+    // ABSENT DE LA BDD = Supprimer (manuellement)
+    if (!friendInDB) {
+      card?.remove();
+    }
+
+    // DANS LA BDD
+    else {
+      if (card == null) {
+        // DANS LA BDD & SANS CARTE = Créer
+        card = document.createElement(elementName) as friendCard;
+        card.setAttribute('username', username);
+        cardsToCreate.push(card);
+      } else {
+        // DANS LA BDD & AVEC CARTE = Éditer
+        await card.dataToContent();
+      }
+    }
+
+    return Promise.resolve(username);
+  }));
+
+  // Plaçons les cartes sur la page
+  // (après la préparation pour optimiser le temps d'éxecution)
+  const conteneur = document.querySelector('#partage > .section-contenu')!;
+
+  // Évite un bref moment où une carte est affichée en même temps que le message de section vide
+  if (conteneur.parentElement?.classList.contains('vide') && cardsToCreate.length > 0) {
+    conteneur.parentElement.classList.remove('vide');
+  }
+
+  await Promise.all(cardsToCreate.map(async card => {
+    conteneur.appendChild(card);
+    await card.dataToContent();
+  }));
+
+  return results;
+}
+
+
 /** Initialise le Pokédex. */
 let pokedexInitialized = false;
 export function initPokedex() {
@@ -201,6 +260,7 @@ export function initPokedex() {
 }
 
 
+/** Removes Pokémon deleted more than 30 days ago from the recycle bin. */
 export async function cleanUpRecycleBin() {
   const month = 1000 * 60 * 60 * 24 * 30;
   try {

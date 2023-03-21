@@ -36,6 +36,12 @@ const huntStorage = localforage.createInstance({
   storeName: 'hunts',
   driver: localforage.INDEXEDDB
 });
+// Friends list
+const friendStorage = localforage.createInstance({
+  name: 'shinydex',
+  storeName: 'friend-list',
+  driver: localforage.INDEXEDDB
+});
 //// Miscellaneous data
 const dataStorage = localforage.createInstance({
   name: 'shinydex',
@@ -407,11 +413,14 @@ async function syncBackup(message = true) {
       })
     ))
     .filter(pkmn => pkmn != null);
+    const friendsList = await friendStorage.keys();
 
     // Send local data to the backend
     const formData = new FormData();
     formData.append('local-data', JSON.stringify(localData));
     formData.append('deleted-local-data', JSON.stringify(deletedLocalData));
+    formData.append('friends-list', JSON.stringify(friendsList));
+    formData.append('profile-last-update', (await dataStorage.getItem('user-profile')).lastUpdate ?? 0);
     formData.append('session-code-verifier', await dataStorage.getItem('session-code-verifier'));
 
     const response = await fetch('/shinydex/backend/endpoint.php?request=sync-backup&date=' + Date.now(), {
@@ -468,12 +477,26 @@ async function syncBackup(message = true) {
       toRestore.map(shiny => huntStorage.removeItem(shiny.huntid))
     );
 
+    const friendsToSet = [...data['friends_to_insert_local']];
+    await Promise.all(
+      friendsToSet.map(username => friendStorage.setItem(username, []))
+    );
+
+    const friendsToDelete = [...data['friends_to_delete_local']];
+    await Promise.all(
+      friendsToDelete.map(username => friendStorage.removeItem(username))
+    );
+
     // List of inserted / updated / deleted huntids
     const modifiedHuntids = new Set([
       ...data['to_insert_local'].map(shiny => String(shiny.huntid)),
       ...data['to_update_local'].map(shiny => String(shiny.huntid)),
       ...data['to_delete_local'].map(shiny => String(shiny.huntid)),
       ...data['to_restore_local'].map(shiny => String(shiny.huntid)),
+    ]);
+    const modifiedFriends = new Set([
+      ...friendsToSet,
+      ...friendsToDelete
     ]);
 
     // Send data back to the app
@@ -485,6 +508,7 @@ async function syncBackup(message = true) {
         successfulBackupSync: true,
         quantity: data['results'].length,
         modified: [...modifiedHuntids],
+        modifiedFriends: [...modifiedFriends],
         error: !(data['results'].every(r => r === true))
       }));
     }

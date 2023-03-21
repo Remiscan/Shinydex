@@ -1,5 +1,6 @@
 import '../../../_common/components/input-slider/input-slider.js';
 import '../../../_common/components/input-switch/input-switch.js';
+import { Friend } from './Friend.js';
 import { Hunt } from './Hunt.js';
 import { getCookie } from './Params.js';
 import { Settings } from './Settings.js';
@@ -116,14 +117,26 @@ document.querySelector('.fab')!.addEventListener('click', async () => {
     if (username.length === 0 || username.length > 30) return;
 
     // Ask backend if that username matches a public user
-    const response = await Auth.callBackend('check-public-user-exists', { username }, false);
+    const response = await Auth.callBackend('get-friend-data', { username, scope: 'partial' }, false);
     if (sectionActuelle === 'user-search') {
       history.back();
     }
 
-    if (response.matches === true) {
-      // If it matches, add that user to the friends list
-      new Notif('Profil correspondant trouvé !').prompt();
+    if ('matches' in response && response.matches === true) {
+      // Add the requested user to the friends list
+      const friend = new Friend(username, response.pokemon);
+      await friend.save();
+
+      // Populate friends list
+      window.dispatchEvent(new CustomEvent('dataupdate', {
+        detail: {
+          sections: ['partage'],
+          ids: [username],
+          sync: true
+        }
+      }));
+
+      new Notif(`${username} a été ajouté à vos amis.`).prompt();
     } else {
       new Notif('Aucun profil public ne correspond à ce pseudo.').prompt();
     }
@@ -275,6 +288,14 @@ navigator.serviceWorker.addEventListener('message', async event => {
         detail: {
           sections: ['mes-chromatiques', 'chasses-en-cours', 'corbeille'],
           ids: event.data.modified,
+          sync: false
+        }
+      }));
+
+      window.dispatchEvent(new CustomEvent('dataupdate', {
+        detail: {
+          sections: ['partage'],
+          ids: event.data.modifiedFriends,
           sync: false
         }
       }));
