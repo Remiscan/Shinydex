@@ -495,7 +495,7 @@ async function syncBackup(message = true) {
       ...data['to_restore_local'].map(shiny => String(shiny.huntid)),
     ]);
     const modifiedFriends = new Set([
-      ...friendsToSet,
+      ...Object.keys(friendsPokemon),
       ...friendsToDelete
     ]);
 

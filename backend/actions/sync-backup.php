@@ -307,15 +307,15 @@ $friends_to_insert_local = [];
 $friends_to_delete_local = [];
 
 if (isset($_POST['friends-list'])) {
-  $local_friends = json_decode($_POST['friends-list']);
+  $local_friends = json_decode($_POST['friends-list'] ?? '[]');
   $local_profile_lastUpdate = $_POST['profile-last-update'] ?? 0;
 
-  $user_profile = $db->prepare('SELECT * FROM `shinydex_users` WHERE `userid` = :userid LIMIT 1');
+  $user_profile = $db->prepare('SELECT * FROM `shinydex_users` WHERE `uuid` = :userid LIMIT 1');
   $user_profile->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
   $user_profile->execute();
   $user_profile = $user_profile->fetchAll(PDO::FETCH_ASSOC);
-  $online_friends = json_decode($user_profile['friends']);
-  $online_profile_lastUpdate = $user_profile['lastUpdate'];
+  $online_friends = json_decode($user_profile['friends'] ?? '[]');
+  $online_profile_lastUpdate = $user_profile['lastUpdate'] ?? 0;
 
   foreach($local_friends as $username) {
     $is_online_key = array_search($username, $online_friends);
@@ -351,11 +351,14 @@ if (isset($_POST['friends-list'])) {
     $update_friends = $db->prepare('UPDATE `shinydex_users` SET 
       `friends` = :friends,
       `lastUpdate` = :lastupdate
-    WHERE `userid` = :userid');
+    WHERE `uuid` = :userid');
 
     $friends_string = json_encode($recent_friends_list);
-    $update->bindParam(':friends', $friends_string);
-    $update->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
+    $now = floor(1000 * microtime(true));
+
+    $update_friends->bindParam(':friends', $friends_string);
+    $update_friends->bindParam(':lastupdate', $now);
+    $update_friends->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
 
     $results[] = $update_friends->execute();
   }
@@ -368,13 +371,13 @@ if (isset($_POST['friends-list'])) {
  */
 
 $friends_pokemon = [];
-if (isset($_POST['friends-list'])) {
+if (isset($_POST['friends-list']) && count($recent_friends_list) > 0) {
   // Prepare query to get each friend's userid
   $friends_query_string = [];
   for ($i = 1; $i <= count($recent_friends_list); $i++) {
     $friends_query_string[] = ":user$i";
   }
-  $friends_query_string = join(', ', $friends_query_string);
+  $friends_query_string = join(',', $friends_query_string);
 
   // Get each friend's userid
   $get_friends_userid = $db->prepare("SELECT uuid, username FROM shinydex_users WHERE `username` IN ($friends_query_string)");
