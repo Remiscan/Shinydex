@@ -699,12 +699,12 @@ form[name="app-settings"],
 #a-propos > .section-contenu {
   box-sizing: border-box;
   width: 100%;
-  max-width: 65ch;
 }
 
 #parametres > .section-contenu,
 #a-propos > .section-contenu {
   padding-inline: 16px;
+  max-width: 65ch;
 }
 
 h2:not(:first-child) {
