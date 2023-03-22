@@ -140,6 +140,12 @@ foreach($online_data as $key => $online_shiny) {
 }
 
 
+$online_data = null;
+$online_deleted_data = null;
+$local_data = null;
+$local_deleted_data = null;
+
+
 
 /**
  * Step 4: Update online database with newer local data.
@@ -358,7 +364,68 @@ if (isset($_POST['friends-list'])) {
 
 
 /**
- * Step 6: Send results to the frontend.
+ * Step 6: Get partial data about each friend's 10 most recent Pokémon
+ */
+
+$friends_pokemon = [];
+if (isset($_POST['friends-list'])) {
+  // Prepare query to get each friend's userid
+  $friends_query_string = [];
+  for ($i = 1; $i <= count($recent_friends_list); $i++) {
+    $friends_query_string[] = ":user$i";
+  }
+  $friends_query_string = join(', ', $friends_query_string);
+
+  // Get each friend's userid
+  $get_friends_userid = $db->prepare("SELECT uuid, username FROM shinydex_users WHERE `username` IN ($friends_query_string)");
+
+  for ($i = 0; $i < count($recent_friends_list); $i++) {
+    $username = $recent_friends[$i];
+    $get_friends_userid->bindParam(":user$i", $username, PDO::PARAM_STR, 36);
+  }
+
+  $results[] = $get_friends_userid->execute();
+  $get_friends_userid = $get_friends_userid->fetchAll(PDO::FETCH_ASSOC);
+
+  // Associate each username to a userid in an array
+  $friends_userid = [];
+  foreach ($get_friends_userid as $friend) {
+    $friends_userid[$friend['username']] = $friend['uuid'];
+  }
+  $get_friends_userid = null;
+
+  // Get each friend's partial Pokémon data
+  $get_friends_pokemon = $db->prepare("WITH grouped_pokemon AS (
+    SELECT
+      dexid,
+      forme, 
+      ROW_NUMBER() OVER (PARTITION BY userid ORDER BY catchTime DESC) AS rownumber
+    FROM shinydex_pokemon
+    WHERE `userid` IN ($friends_query_string)
+  ) SELECT * FROM grouped_pokemon WHERE rownumber <= 10");
+
+  for ($i = 0; $i < count($recent_friends_list); $i++) {
+    $userid = $friends_userid[$recent_friends_list[$i]];
+    $get_friends_pokemon->bindParam(":user$i", $userid, PDO::PARAM_STR, 36);
+  }
+
+  $results[] = $get_friends_pokemon->execute();
+  $get_friends_pokemon = $get_friends_pokemon->fetchAll(PDO::FETCH_ASSOC);
+
+  // Associate each username to an array of Pokémon with partial data
+  foreach ($recent_friends_list as $username) {
+    $pokemon_list = [];
+    foreach ($get_friends_pokemon as $pokemon) {
+      $pokemon_list[] = ['dexid' => $pokemon['dexid'], 'forme' => $pokemon['forme']];
+    }
+    $friends_pokemon[$username] = $pokemon_list;
+  }
+}
+
+
+
+/**
+ * Step 7: Send results to the frontend.
  */
 
 /** Removes the user id from each Pokémon in an array of Pokémon. */
@@ -376,6 +443,6 @@ echo json_encode(array(
   'to_update_local' => removeUserID($to_update_local),
   'to_delete_local' => removeUserID($to_delete_local),
   'to_restore_local' => removeUserID($to_restore_local),
-  'friends_to_insert_local' => $friends_to_insert_local,
-  'friends_to_delete_local' => $friends_to_delete_local
+  'friends_to_delete_local' => $friends_to_delete_local,
+  'friends_pokemon' => $friends_pokemon
 ), JSON_PRETTY_PRINT);

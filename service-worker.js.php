@@ -477,9 +477,9 @@ async function syncBackup(message = true) {
       toRestore.map(shiny => huntStorage.removeItem(shiny.huntid))
     );
 
-    const friendsToSet = [...data['friends_to_insert_local']];
+    const friendsPokemon = data['friends_pokemon'];
     await Promise.all(
-      friendsToSet.map(username => friendStorage.setItem(username, []))
+      Object.keys(friendsPokemon).map(username => friendStorage.setItem(username, friendsPokemon[username]))
     );
 
     const friendsToDelete = [...data['friends_to_delete_local']];
