@@ -5,10 +5,6 @@ $userID = $user->userID;
 
 
 
-$response = [];
-
-
-
 /** 
  * Step 1: Get local data from JavaScript
  */
@@ -371,6 +367,7 @@ if (isset($_POST['friends-list'])) {
  */
 
 $friends_pokemon = [];
+$number_of_pokemon_to_get = 3;
 if (isset($_POST['friends-list']) && count($recent_friends_list) > 0) {
   // Prepare query to get each friend's userid
   $friends_query_string = [];
@@ -405,7 +402,7 @@ if (isset($_POST['friends-list']) && count($recent_friends_list) > 0) {
       ROW_NUMBER() OVER (PARTITION BY userid ORDER BY catchTime DESC) AS rownumber
     FROM shinydex_pokemon
     WHERE `userid` IN ($friends_query_string)
-  ) SELECT * FROM grouped_pokemon WHERE rownumber <= 10");
+  ) SELECT * FROM grouped_pokemon WHERE rownumber <= $number_of_pokemon_to_get");
 
   for ($i = 0; $i < count($recent_friends_list); $i++) {
     $userid = $friends_userid[$recent_friends_list[$i]];

@@ -31,7 +31,8 @@ switch ($request) {
 
   // Need user to be signed in
   case 'sign-out':
-  case 'sync-backup':
+  case 'sync-pokemon':
+  case 'sync-friends':
   case 'delete-user-data':
   case 'update-user-profile':
     $sessionNeeded = true;

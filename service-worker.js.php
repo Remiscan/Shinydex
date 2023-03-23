@@ -383,6 +383,160 @@ async function deleteOldCaches(newCacheName, action) {
 
 
 /**
+ * Compares and syncs Pokémon data between local storage and online database.
+ * @returns {Array<string>} The list of hunt IDs whose data was updated.
+ */
+async function syncPokemon() {
+  // Get local data
+  await Promise.all([shinyStorage.ready(), huntStorage.ready()]);
+  const localData = await Promise.all(
+    (await shinyStorage.keys())
+    .map(async key => {
+      const shiny = await shinyStorage.getItem(key);
+      return (new FrontendShiny(shiny)).toBackend();
+    })
+  );
+  const deletedLocalData = (await Promise.all(
+    (await huntStorage.keys())
+    .map(async key => {
+      const hunt = await huntStorage.getItem(key);
+      if ('deleted' in hunt && hunt.deleted && !hunt.destroy) return (new FrontendShiny(hunt)).toBackend();
+      else return null;
+    })
+  ))
+  .filter(pkmn => pkmn != null);
+
+  // Send local data to the backend
+  const formData = new FormData();
+  formData.append('local-data', JSON.stringify(localData));
+  formData.append('deleted-local-data', JSON.stringify(deletedLocalData));
+  formData.append('session-code-verifier', await dataStorage.getItem('session-code-verifier'));
+
+  const response = await fetch('/shinydex/backend/endpoint.php?request=sync-pokemon&date=' + Date.now(), {
+    method: 'POST',
+    body: formData
+  });
+  if (response.status != 200)
+    throw new Error('[:(] Erreur ' + response.status + ' lors de la requête');
+
+  let data;
+  let response2 = response.clone();
+  try {
+    data = await response.json();
+  } catch {
+    data = await response2.text();
+    throw new Error(`Invalid json: ${data}`);
+  }
+  
+  console.log('[sync-backup] Response from server:', data);
+
+  if ('error' in data) throw new Error(data.error);
+
+  // Update local data with newer online data
+  const toSet = [...data['to_insert_local'], ...data['to_update_local']];
+  await Promise.all(
+    toSet.map(shiny => {
+      const feShiny = new FrontendShiny(shiny);
+      return shinyStorage.setItem(String(shiny.huntid), feShiny);
+    })
+  );
+
+  const toDelete = [...data['to_delete_local']];
+  await Promise.all(
+    toDelete.map(async shiny => {
+      const storedShiny = await shinyStorage.getItem(shiny.huntid);
+      if (storedShiny) {
+        storedShiny.lastUpdate = shiny.lastUpdate;
+        storedShiny.deleted = true;
+        storedShiny.destroy = true;
+        await huntStorage.setItem(shiny.huntid, storedShiny);
+        return shinyStorage.removeItem(shiny.huntid);
+      } else {
+        const storedHunt = await huntStorage.getItem(shiny.huntid);
+        if (storedHunt) {
+          storedHunt.destroy = true;
+          return huntStorage.setItem(shiny.huntid, storedHunt);
+        }
+      }
+    })
+  );
+
+  const toRestore = [...data['to_restore_local']];
+  await Promise.all(
+    toRestore.map(shiny => huntStorage.removeItem(shiny.huntid))
+  );
+
+  // List of inserted / updated / deleted huntids
+  const modifiedHuntids = new Set([
+    ...data['to_insert_local'].map(shiny => String(shiny.huntid)),
+    ...data['to_update_local'].map(shiny => String(shiny.huntid)),
+    ...data['to_delete_local'].map(shiny => String(shiny.huntid)),
+    ...data['to_restore_local'].map(shiny => String(shiny.huntid)),
+  ]);
+
+  const results = data['results'];
+  return [modifiedHuntids, results];
+}
+
+
+/**
+ * Compares and syncs friends data between local storage and online database.
+ * @returns {Array<string>} The list of usernames whose data was updated.
+ */
+async function syncFriends() {
+  // Get local data
+  await friendStorage.ready();
+  const friendsList = await friendStorage.keys();
+
+  // Send local data to the backend
+  const formData = new FormData();
+  formData.append('friends-list', JSON.stringify(friendsList));
+  formData.append('profile-last-update', (await dataStorage.getItem('user-profile')).lastUpdate ?? 0);
+  formData.append('session-code-verifier', await dataStorage.getItem('session-code-verifier'));
+
+  const response = await fetch('/shinydex/backend/endpoint.php?request=sync-friends&date=' + Date.now(), {
+    method: 'POST',
+    body: formData
+  });
+  if (response.status != 200)
+    throw new Error('[:(] Erreur ' + response.status + ' lors de la requête');
+
+  let data;
+  let response2 = response.clone();
+  try {
+    data = await response.json();
+  } catch {
+    data = await response2.text();
+    throw new Error(`Invalid json: ${data}`);
+  }
+  
+  console.log('[sync-backup] Response from server:', data);
+
+  if ('error' in data) throw new Error(data.error);
+
+  // Update local data with newer online data
+  const friendsPokemon = data['friends_pokemon'];
+  await Promise.all(
+    Object.keys(friendsPokemon).map(username => friendStorage.setItem(username, friendsPokemon[username]))
+  );
+
+  const friendsToDelete = [...data['friends_to_delete_local']];
+  await Promise.all(
+    friendsToDelete.map(username => friendStorage.removeItem(username))
+  );
+
+  // List of updated friends
+  const modifiedFriends = new Set([
+    ...Object.keys(friendsPokemon),
+    ...friendsToDelete
+  ]);
+
+  const results = data['results'];
+  return [modifiedFriends, results];
+}
+
+
+/**
  * Compares and syncs data between local storage and online database.
  * @param {boolean} message - Whether to message sync progress to the client.
  * @returns {boolean} Whether the data sync was successful.
@@ -395,124 +549,36 @@ async function syncBackup(message = true) {
       clients.map(client => client.postMessage('startBackupSync'));
     }
 
-    // Get local data
-    await Promise.all([shinyStorage.ready(), huntStorage.ready()]);
-    const localData = await Promise.all(
-      (await shinyStorage.keys())
-      .map(async key => {
-        const shiny = await shinyStorage.getItem(key);
-        return (new FrontendShiny(shiny)).toBackend();
-      })
-    );
-    const deletedLocalData = (await Promise.all(
-      (await huntStorage.keys())
-      .map(async key => {
-        const hunt = await huntStorage.getItem(key);
-        if ('deleted' in hunt && hunt.deleted && !hunt.destroy) return (new FrontendShiny(hunt)).toBackend();
-        else return null;
-      })
-    ))
-    .filter(pkmn => pkmn != null);
-    const friendsList = await friendStorage.keys();
-
-    // Send local data to the backend
-    const formData = new FormData();
-    formData.append('local-data', JSON.stringify(localData));
-    formData.append('deleted-local-data', JSON.stringify(deletedLocalData));
-    formData.append('friends-list', JSON.stringify(friendsList));
-    formData.append('profile-last-update', (await dataStorage.getItem('user-profile')).lastUpdate ?? 0);
-    formData.append('session-code-verifier', await dataStorage.getItem('session-code-verifier'));
-
-    const response = await fetch('/shinydex/backend/endpoint.php?request=sync-backup&date=' + Date.now(), {
-      method: 'POST',
-      body: formData
-    });
-    if (response.status != 200)
-      throw new Error('[:(] Erreur ' + response.status + ' lors de la requête');
-
-    let data;
-    let response2 = response.clone();
-    try {
-      data = await response.json();
-    } catch {
-      data = await response2.text();
-      throw new Error(`Invalid json: ${data}`);
-    }
-    
-    console.log('[sync-backup] Response from server:', data);
-
-    if ('error' in data) throw new Error(data.error);
-
-    // Update local data with newer online data
-    const toSet = [...data['to_insert_local'], ...data['to_update_local']];
-    await Promise.all(
-      toSet.map(shiny => {
-        const feShiny = new FrontendShiny(shiny);
-        return shinyStorage.setItem(String(shiny.huntid), feShiny);
-      })
-    );
-
-    const toDelete = [...data['to_delete_local']];
-    await Promise.all(
-      toDelete.map(async shiny => {
-        const storedShiny = await shinyStorage.getItem(shiny.huntid);
-        if (storedShiny) {
-          storedShiny.lastUpdate = shiny.lastUpdate;
-          storedShiny.deleted = true;
-          storedShiny.destroy = true;
-          await huntStorage.setItem(shiny.huntid, storedShiny);
-          return shinyStorage.removeItem(shiny.huntid);
-        } else {
-          const storedHunt = await huntStorage.getItem(shiny.huntid);
-          if (storedHunt) {
-            storedHunt.destroy = true;
-            return huntStorage.setItem(shiny.huntid, storedHunt);
-          }
+    // Perform sync
+    await Promise.all([
+      syncPokemon()
+      .then(async ([modifiedHuntids, results]) => {
+        if (message) {
+          const clients = await self.clients.matchAll();
+          clients.map(client => client.postMessage({
+            successfulBackupSync: true,
+            quantity: results.length,
+            modified: [...modifiedHuntids],
+            error: !(results.every(r => r === true))
+          }));
+        }
+      }),
+      syncFriends()
+      .then(async ([modifiedFriends, results]) => {
+        if (message) {
+          const clients = await self.clients.matchAll();
+          clients.map(client => client.postMessage({
+            successfulBackupSync: true,
+            quantity: results.length,
+            modifiedFriends: [...modifiedFriends],
+            error: !(results.every(r => r === true))
+          }));
         }
       })
-    );
-
-    const toRestore = [...data['to_restore_local']];
-    await Promise.all(
-      toRestore.map(shiny => huntStorage.removeItem(shiny.huntid))
-    );
-
-    const friendsPokemon = data['friends_pokemon'];
-    await Promise.all(
-      Object.keys(friendsPokemon).map(username => friendStorage.setItem(username, friendsPokemon[username]))
-    );
-
-    const friendsToDelete = [...data['friends_to_delete_local']];
-    await Promise.all(
-      friendsToDelete.map(username => friendStorage.removeItem(username))
-    );
-
-    // List of inserted / updated / deleted huntids
-    const modifiedHuntids = new Set([
-      ...data['to_insert_local'].map(shiny => String(shiny.huntid)),
-      ...data['to_update_local'].map(shiny => String(shiny.huntid)),
-      ...data['to_delete_local'].map(shiny => String(shiny.huntid)),
-      ...data['to_restore_local'].map(shiny => String(shiny.huntid)),
-    ]);
-    const modifiedFriends = new Set([
-      ...Object.keys(friendsPokemon),
-      ...friendsToDelete
     ]);
 
     // Send data back to the app
     await dataStorage.setItem('last-sync-state', 'success');
-
-    if (message) {
-      const clients = await self.clients.matchAll();
-      clients.map(client => client.postMessage({
-        successfulBackupSync: true,
-        quantity: data['results'].length,
-        modified: [...modifiedHuntids],
-        modifiedFriends: [...modifiedFriends],
-        error: !(data['results'].every(r => r === true))
-      }));
-    }
-
     return true;
   }
 
