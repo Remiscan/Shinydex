@@ -223,7 +223,7 @@
           <input type="text" name="username" class="surface variant elevation-3 interactive body-large"
           inputmode="search" enterkeyhint="search" role="searchbox" autocomplete="off"
           minlength="1" maxlength="30"
-          placeholder="Rechercher un utilisateur">
+          placeholder="Rechercher un pseudo">
 
           <button type="reset" class="surface interactive icon-button only-icon reset-icon">
             <span class="material-icons">close</span>
