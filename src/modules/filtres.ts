@@ -153,7 +153,16 @@ function countFilteredCards(section: FiltrableSection): [number, number, Set<num
   const container = document.querySelector(`#${section}`);
   if (!(container instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
 
-  const allCards = [...container.querySelectorAll('[huntid]')];
+  let cardAttribute: string;
+  switch (section) {
+    case 'partage':
+      cardAttribute = 'username';
+      break;
+    default:
+      cardAttribute = 'huntid';
+  }
+
+  const allCards = [...container.querySelectorAll(`[${cardAttribute}]`)];
   const totalCount = allCards.length;
 
   let displayedCount = 0;

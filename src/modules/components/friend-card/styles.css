@@ -1,0 +1,120 @@
+.container {
+  width: 50%;
+  min-width: 402px;
+  max-width: 462px;
+  height: auto;
+  padding: 4px;
+  overflow: hidden;
+  border-radius: var(--border-radius);
+  display: grid;
+  --last-column: 0;
+  grid-template-columns: 1fr;
+  grid-template-rows: [identity] auto [sprites] 112px;
+  gap: 4px;
+  position: relative;
+  order: var(--order, 0);
+}
+
+.friend-infos__identity {
+  grid-row: 1;
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  gap: 4px;
+  padding-inline: 4px;
+}
+
+[data-type="username"] {
+  font-size: 1.5em;
+  font-weight: 300;
+  opacity: 1;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  position: relative;
+  left: 0;
+  top: 0;
+  text-shadow: 1px 1px rgb(var(--surface-variant));
+  z-index: 1;
+}
+
+.pokemon-preview {
+  grid-row: 2;
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, 112px) 50px;
+  gap: 4px;
+}
+
+button[data-action="see-pokemon"] {
+  grid-row: 1;
+  grid-column: -2;
+}
+
+.menu {
+  grid-row: 2;
+  grid-column: 1 / -1;
+  pointer-events: none;
+  opacity: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transform: translate3d(-50px, 0, 0);
+  --surface-opacity: .5;
+  --elevation-opacity: calc(var(--surface-opacity) * var(--elevation-2-opacity));
+  transition: transform .1s var(--easing-accelerate),
+              opacity .1s var(--easing-accelerate);
+}
+
+:host([open]) .menu {
+  pointer-events: initial;
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition: transform .1s var(--easing-decelerate),
+              opacity .1s var(--easing-decelerate);
+}
+
+pokemon-sprite {
+  --size: 112px;
+  width: var(--size);
+  height: var(--size);
+  display: grid;
+  place-items: center;
+  --distance-to-parent-border: 4px;
+  border-radius: var(--sub-border-radius);
+}
+
+pokemon-sprite,
+.menu {
+  --elevation-opacity: var(--elevation-2-opacity);
+}
+
+.menu-hint {
+  color: rgb(var(--on-surface-variant), .8);
+}
+
+button.icon-button.menu-hint {
+  width: 30px;
+  height: 30px;
+  min-height: 30px;
+  margin-right: 0;
+}
+
+button.icon-button.menu-hint::before {
+  display: none; /* not needed since the whole card is clickable */
+}
+
+.menu-hint:not(:hover, :active) {
+  --state-opacity: 0 !important;
+}
+
+.menu > button {
+  margin: 0;
+}
+
+.menu > button:not(:focus, :hover, :active) {
+  --state-opacity: 0;
+}

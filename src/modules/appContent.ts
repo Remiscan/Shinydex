@@ -135,8 +135,10 @@ export async function populateFromData(section: PopulatableSection, ids: string[
 
   await Promise.all(cardsToCreate.map(async card => {
     conteneur.appendChild(card);
-    await card.dataToContent();
-    if (section === 'chasses-en-cours') lazyLoad(card);
+    if (section === 'chasses-en-cours') {
+      await card.dataToContent();
+      lazyLoad(card);
+    }
     //lazyLoad(card, 'manual', { fixedSize: section !== 'chasses-en-cours' });
   }));
 
@@ -190,7 +192,6 @@ async function populateFriendsList(usernames: string[]): Promise<PromiseSettledR
 
   await Promise.all(cardsToCreate.map(async card => {
     conteneur.appendChild(card);
-    await card.dataToContent();
   }));
 
   return results;

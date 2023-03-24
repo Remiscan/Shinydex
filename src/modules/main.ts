@@ -9,6 +9,7 @@ import { appStart, checkUpdate } from './appLifeCycle.js';
 import * as Auth from './auth.js';
 import './components/corbeille-card/corbeilleCard.js';
 import './components/filter-menu/filterMenu.js';
+import './components/friend-card/friendCard.js';
 import './components/hunt-card/huntCard.js';
 import './components/loadSpinner.js';
 import './components/radioGroup.js';

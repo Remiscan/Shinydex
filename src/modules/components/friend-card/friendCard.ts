@@ -8,6 +8,8 @@ import iconSheet from '../../../../images/iconsheet.css' assert { type: 'css' };
 import themesSheet from '../../../../styles/themes.css.php' assert { type: 'css' };
 // @ts-expect-error
 import commonSheet from '../../../../styles/common.css' assert { type: 'css' };
+import { Friend } from '../../Friend.js';
+import { noAccent } from '../../Params.js';
 // @ts-expect-error
 import sheet from './styles.css' assert { type: 'css' };
 
@@ -40,7 +42,33 @@ export class friendCard extends HTMLElement {
    * Met à jour le contenu de la carte à partir des données sauvegardées.
    */
   async dataToContent() {
-    
+    let friend: Friend;
+    try {
+      friend = new Friend(this.username, await this.dataStore.getItem(this.username));
+    } catch (e) {
+      console.error('Échec de création du Friend', e);
+      throw e;
+    }
+
+    // Username
+    {
+      const element = this.shadow.querySelector('[data-type="username"]')!;
+      element.innerHTML = friend.username;
+    }
+
+    // Recent Pokémon list
+    {
+      const sprites = this.shadow.querySelectorAll('pokemon-sprite');
+      for (let i = 0; i < Math.min(friend.pokemonList.length, sprites.length); i++) {
+        const pokemon = friend.pokemonList[i];
+        const element = sprites[i];
+        element.setAttribute('dexid', String(pokemon.dexid));
+        element.setAttribute('forme', pokemon.forme);
+      }
+    }
+
+    // Filters
+    this.setAttribute('data-username', noAccent(friend.username || '').toLowerCase());
   }
 
 
@@ -75,7 +103,7 @@ export class friendCard extends HTMLElement {
     openButton.addEventListener('click', this.openHandler);
     this.addEventListener('click', this.clickHandler = event => openButton.click());
 
-    const deleteButton = this.shadow.querySelector('[data-action="delete"]');
+    const deleteButton = this.shadow.querySelector('[data-action="remove-friend"]');
     if (!(deleteButton instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
     deleteButton.addEventListener('click', this.deleteHandler);
 
@@ -91,7 +119,7 @@ export class friendCard extends HTMLElement {
 
     this.removeEventListener('click', this.clickHandler);
 
-    const deleteButton = this.shadow.querySelector('[data-action="delete"]');
+    const deleteButton = this.shadow.querySelector('[data-action="remove-friend"]');
     if (!(deleteButton instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
     deleteButton.removeEventListener('click', this.deleteHandler);
   }

@@ -81,6 +81,9 @@ export class SearchBox extends HTMLElement {
           selector = dexids.map(dexid => `:not([data-dexid="${dexid}"])`).join('');
           css += `#${section} ${cardSelector}${selector} { display: none; }`;
         }
+      } else if (section === 'partage') {
+        selector = `:not([data-username*="${search}"]):not([data-species*="${search}"])`;
+        css += `#${section} ${cardSelector}${selector} { display: none; }`;
       } else {
         if (!isNaN(parseFloat(search))) {
           selector = `:not([data-dexid="${parseFloat(search)}"])`;
