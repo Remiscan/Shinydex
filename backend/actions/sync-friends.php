@@ -101,7 +101,7 @@ $number_of_pokemon_to_get = 3;
 if (isset($_POST['friends-list']) && count($recent_friends_list) > 0) {
   // Prepare query to get each friend's userid
   $friends_query_string = [];
-  for ($i = 1; $i <= count($recent_friends_list); $i++) {
+  for ($i = 0; $i < count($recent_friends_list); $i++) {
     $friends_query_string[] = ":user$i";
   }
   $friends_query_string = join(',', $friends_query_string);
@@ -110,7 +110,7 @@ if (isset($_POST['friends-list']) && count($recent_friends_list) > 0) {
   $get_friends_userid = $db->prepare("SELECT uuid, username FROM shinydex_users WHERE `username` IN ($friends_query_string)");
 
   for ($i = 0; $i < count($recent_friends_list); $i++) {
-    $username = $recent_friends[$i];
+    $username = $recent_friends_list[$i];
     $get_friends_userid->bindParam(":user$i", $username, PDO::PARAM_STR, 36);
   }
 

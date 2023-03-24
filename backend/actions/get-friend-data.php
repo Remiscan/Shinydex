@@ -8,14 +8,19 @@ if (!isset($_POST['username'])) {
 }
 
 // Get the corresponding user's profile data if they exist
-$requestedUser = User::getDBEntry('shinydex', $_POST['username']);
-if (!$requestedUser || !isset($requestedUser['public']) || !$requestedUser['public']) {
+$username = $_POST['username'];
+$db = new BDD();
+$user_data = $db->prepare("SELECT * FROM shinydex_users WHERE `username` = :username LIMIT 1");
+$user_data->bindParam(':username', $username, PDO::PARAM_STR, 36);
+$user_data->execute();
+$user_data = $user_data->fetch(PDO::FETCH_ASSOC);
+if (!$user_data || !isset($user_data['public']) || !$user_data['public']) {
   respond(['matches' => false]);
   exit;
 }
 
 // Get the corresponding user's Pokémon data
-$requestedUserID = $requestedUser['uuid'];
+$requestedUserID = $user_data['uuid'];
 $pokemon = $db->prepare('SELECT * FROM `shinydex_pokemon` WHERE `userid` = :userid ORDER BY CAST(`catchTime` as INTEGER) DESC');
 $pokemon->bindParam(':userid', $requestedUserID, PDO::PARAM_STR, 36);
 $pokemon->execute();
@@ -43,12 +48,13 @@ switch ($scope) {
 
   case 'partial':
   default:
+    $number_of_pokemon_to_get = 3;
     $response['pokemon'] = array_map(
       fn($pkmn) => [
         'dexid' => $pkmn['dexid'],
         'forme' => $pkmn['forme']
       ],
-      array_slice($pokemon, 0, 10)
+      array_slice($pokemon, 0, $number_of_pokemon_to_get)
     );
 }
 

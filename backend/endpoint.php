@@ -24,6 +24,7 @@ switch ($request) {
   case 'get-file-versions':
   case 'get-all-sprites':
   case 'check-public-user-exists':
+  case 'get-friend-data':
   case 'check-username-available':
   case 'sign-in':
     $sessionNeeded = false;
