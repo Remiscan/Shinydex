@@ -15,6 +15,10 @@ import sheet from './styles.css' assert { type: 'css' };
 
 
 
+let currentCardId: string | null;
+
+
+
 export class friendCard extends HTMLElement {
   shadow: ShadowRoot;
   username: string = '';
@@ -52,8 +56,8 @@ export class friendCard extends HTMLElement {
 
     // Username
     {
-      const element = this.shadow.querySelector('[data-type="username"]')!;
-      element.innerHTML = friend.username;
+      const elements = this.shadow.querySelectorAll('[data-type="username"]')!;
+      elements.forEach(element => element.innerHTML = friend.username);
     }
 
     // Recent Pokémon list
@@ -73,10 +77,32 @@ export class friendCard extends HTMLElement {
 
 
   /**
-   * Affiche les notes d'une carte au clic.
+   * Affiche le menu d'une carte au clic.
    */
   toggleMenu() {
-    
+    const username = this.getAttribute('username');
+
+    // On ferme la carte déjà ouverte
+    if (currentCardId != null)
+      document.querySelector(`[username="${currentCardId}"]`)!.removeAttribute('open');
+
+    const menuButtons = [...this.shadow.querySelectorAll('.menu button')];
+
+    // Si la carte demandée n'est pas celle qu'on vient de fermer, on l'ouvre
+    if (username != currentCardId) {
+      this.setAttribute('open', 'true');
+      menuButtons.forEach(button => {
+        button.removeAttribute('disabled');
+        button.setAttribute('tabindex', '0');
+      });
+      currentCardId = username;
+    } else {
+      menuButtons.forEach(button => {
+        button.setAttribute('disabled', '');
+        button.setAttribute('tabindex', '-1');
+      });
+      currentCardId = null;
+    }
   }
 
 
@@ -101,7 +127,6 @@ export class friendCard extends HTMLElement {
     const openButton = this.shadow.querySelector('[data-action="open"]');
     if (!(openButton instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
     openButton.addEventListener('click', this.openHandler);
-    this.addEventListener('click', this.clickHandler = event => openButton.click());
 
     const deleteButton = this.shadow.querySelector('[data-action="remove-friend"]');
     if (!(deleteButton instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
@@ -116,8 +141,6 @@ export class friendCard extends HTMLElement {
     const openButton = this.shadow.querySelector('[data-action="open"]');
     if (!(openButton instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
     openButton.removeEventListener('click', this.openHandler);
-
-    this.removeEventListener('click', this.clickHandler);
 
     const deleteButton = this.shadow.querySelector('[data-action="remove-friend"]');
     if (!(deleteButton instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);

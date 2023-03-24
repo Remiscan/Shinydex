@@ -48,7 +48,7 @@ switch ($scope) {
 
   case 'partial':
   default:
-    $number_of_pokemon_to_get = 3;
+    $number_of_pokemon_to_get = 7;
     $response['pokemon'] = array_map(
       fn($pkmn) => [
         'dexid' => $pkmn['dexid'],

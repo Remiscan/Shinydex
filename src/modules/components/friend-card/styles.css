@@ -1,14 +1,13 @@
 .container {
-  width: 50%;
-  min-width: 402px;
-  max-width: 462px;
+  width: 100%;
   height: auto;
   padding: 4px;
+  box-sizing: border-box;
   overflow: hidden;
   border-radius: var(--border-radius);
   display: grid;
   --last-column: 0;
-  grid-template-columns: 1fr;
+  grid-template-columns: auto 1fr;
   grid-template-rows: [identity] auto [sprites] 112px;
   gap: 4px;
   position: relative;
@@ -22,10 +21,10 @@
   align-items: center;
   justify-content: start;
   gap: 4px;
-  padding-inline: 4px;
+  padding-left: 8px;
 }
 
-[data-type="username"] {
+.friend-infos__identity [data-type="username"] {
   font-size: 1.5em;
   font-weight: 300;
   opacity: 1;
@@ -35,26 +34,28 @@
   position: relative;
   left: 0;
   top: 0;
-  text-shadow: 1px 1px rgb(var(--surface-variant));
   z-index: 1;
 }
 
-.pokemon-preview {
-  grid-row: 2;
-  grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, 112px) 50px;
-  gap: 4px;
+button.icon-button.menu-hint {
+  width: 30px;
+  height: 30px;
+  min-height: 30px;
+  margin-right: 0;
+  color: rgb(var(--on-surface-variant), .8);
 }
 
-button[data-action="see-pokemon"] {
-  grid-row: 1;
-  grid-column: -2;
+.menu-hint:not(:hover, :active) {
+  --state-opacity: 0 !important;
+}
+
+.menu > button {
+  margin: 0;
 }
 
 .menu {
   grid-row: 2;
-  grid-column: 1 / -1;
+  grid-column: 1;
   pointer-events: none;
   opacity: 0;
   display: flex;
@@ -63,6 +64,8 @@ button[data-action="see-pokemon"] {
   justify-content: center;
   gap: 8px;
   transform: translate3d(-50px, 0, 0);
+  --distance-to-parent-border: 4px;
+  border-radius: var(--sub-border-radius);
   --surface-opacity: .5;
   --elevation-opacity: calc(var(--surface-opacity) * var(--elevation-2-opacity));
   transition: transform .1s var(--easing-accelerate),
@@ -77,6 +80,13 @@ button[data-action="see-pokemon"] {
               opacity .1s var(--easing-decelerate);
 }
 
+.pokemon-preview {
+  grid-row: 2;
+  grid-column: 1;
+  display: flex;
+  gap: 4px;
+}
+
 pokemon-sprite {
   --size: 112px;
   width: var(--size);
@@ -85,36 +95,89 @@ pokemon-sprite {
   place-items: center;
   --distance-to-parent-border: 4px;
   border-radius: var(--sub-border-radius);
-}
-
-pokemon-sprite,
-.menu {
   --elevation-opacity: var(--elevation-2-opacity);
 }
 
-.menu-hint {
-  color: rgb(var(--on-surface-variant), .8);
+/*
+ * Results of:
+ * -----------
+
+function generateContainerQuery(n) {
+  const containerWidth = 8 + 4 + n * 112 + (n-1) * 4 + 4 + 30 + 4 + 8;
+  let css = `
+  @container (width < ${containerWidth}px) {
+    pokemon-sprite:nth-child(${n-1}) ~ pokemon-sprite {
+      display: none;
+    }
+  }
+  `;
+  return css;
 }
 
-button.icon-button.menu-hint {
-  width: 30px;
-  height: 30px;
-  min-height: 30px;
-  margin-right: 0;
+let css = '';
+for (let i = 1; i <= 7; i++) {
+  css += generateContainerQuery(i);
 }
 
-button.icon-button.menu-hint::before {
-  display: none; /* not needed since the whole card is clickable */
+console.log(css);
+
+ * -----------
+ *
+ */
+
+@container (width < 170px) {
+  pokemon-sprite:nth-child(0) ~ pokemon-sprite {
+    display: none;
+  }
 }
 
-.menu-hint:not(:hover, :active) {
-  --state-opacity: 0 !important;
+@container (width < 286px) {
+  pokemon-sprite:nth-child(1) ~ pokemon-sprite {
+    display: none;
+  }
 }
 
-.menu > button {
-  margin: 0;
+@container (width < 402px) {
+  pokemon-sprite:nth-child(2) ~ pokemon-sprite {
+    display: none;
+  }
 }
 
-.menu > button:not(:focus, :hover, :active) {
-  --state-opacity: 0;
+@container (width < 518px) {
+  pokemon-sprite:nth-child(3) ~ pokemon-sprite {
+    display: none;
+  }
+}
+
+@container (width < 634px) {
+  pokemon-sprite:nth-child(4) ~ pokemon-sprite {
+    display: none;
+  }
+}
+
+@container (width < 750px) {
+  pokemon-sprite:nth-child(5) ~ pokemon-sprite {
+    display: none;
+  }
+}
+
+@container (width < 866px) {
+  pokemon-sprite:nth-child(6) ~ pokemon-sprite {
+    display: none;
+  }
+}
+
+button[data-action="see-pokemon"] {
+  grid-row: 2;
+  grid-column: 2;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  --distance-to-parent-border: 4px;
+  border-radius: var(--sub-border-radius);
+}
+
+button[data-action="see-pokemon"]:not(:hover, :active) {
+  --surface-opacity: 1;
+  --elevation-opacity: var(--elevation-2-opacity);
 }
