@@ -357,7 +357,7 @@ button.icon-button.menu-hint::before {
     grid-column: note / -1;
     opacity: 1;
     transform: none;
-    width: calc(100cqi - 400px);
+    width: min(calc(100cqi - 400px), 50cqi);
     max-height: 112px;
     margin: 4px;
     margin-left: 0;
