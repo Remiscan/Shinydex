@@ -22,13 +22,13 @@ template.innerHTML = /*html*/`
       <pokemon-sprite size="112" shiny="true" class="surface standard"></pokemon-sprite>
     </div>
 
-    <button type="button" class="surface standard interactive icon-button only-icon" data-action="see-pokemon">
+    <a href="#" class="icon-button surface standard interactive" data-nav-section="chromatiques-ami" data-nav-data='{"username":"a"}'>
       <span class="material-icons">arrow_forward_ios</span>
-    </button>
+    </a>
 
     <div class="menu surface standard">
       <button type="button" class="surface interactive filled tonal outlined only-text" data-action="remove-friend" disabled tabindex="-1">
-        <span class="label-large">Retirer <span data-type="username"></span> des amis</span>
+        <span class="label-large">Retirer de mes amis</span>
       </button>
     </div>
   </div>

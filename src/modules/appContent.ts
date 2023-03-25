@@ -69,7 +69,7 @@ export async function populateFromData(section: PopulatableSection, ids: string[
       dataClass = Hunt;
       break;
     case 'chromatiques-ami':
-      elementName = 'shiny-card';
+      elementName = 'friend-shiny-card';
       dataStore = friendShinyStorage;
       dataClass = Shiny;
       break;

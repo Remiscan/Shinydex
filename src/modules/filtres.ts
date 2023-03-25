@@ -1,6 +1,6 @@
 import { Pokemon } from './Pokemon.js';
 import { Shiny } from './Shiny.js';
-import { dataStorage, friendStorage, huntStorage, localForageAPI, shinyStorage } from './localForage.js';
+import { dataStorage, friendShinyStorage, friendStorage, huntStorage, localForageAPI, shinyStorage } from './localForage.js';
 // @ts-expect-error
 import { queueable } from '../../../_common/js/per-function-async-queue.js';
 import { Hunt } from './Hunt.js';
@@ -281,7 +281,7 @@ export async function computeOrders(section: FiltrableSection, ids: string[]): P
       dataClass = Hunt;
       break;
     case 'chromatiques-ami':
-      dataStore = friendStorage;
+      dataStore = friendShinyStorage;
       dataClass = Shiny;
       break;
     case 'corbeille':
@@ -289,7 +289,7 @@ export async function computeOrders(section: FiltrableSection, ids: string[]): P
       dataClass = Hunt;
       break;
     case 'partage':
-      dataStore = dataStorage;
+      dataStore = friendStorage;
       break;
   }
 

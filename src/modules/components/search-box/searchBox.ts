@@ -60,6 +60,7 @@ export class SearchBox extends HTMLElement {
       case 'chasses-en-cours': cardSelector = 'hunt-card'; break;
       case 'corbeille': cardSelector = 'corbeille-card'; break;
       case 'partage': cardSelector = 'friend-card'; break;
+      case 'chromatiques-ami': cardSelector = 'friend-shiny-card'; break;
     }
 
     // Hide non-corresponding cards via CSS
@@ -130,7 +131,7 @@ export class SearchBox extends HTMLElement {
             placeholder = 'Rechercher dans mes amis';
             break;
           case 'chromatiques-ami':
-            placeholder = 'Rechercher dans les Pokémon de {pseudo}';
+            placeholder = 'Rechercher dans ses Pokémon';
             break;
         }
         

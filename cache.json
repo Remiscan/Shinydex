@@ -50,6 +50,7 @@
         "./dist/modules/components/friend-card/friendCard.js",
         "./dist/modules/components/friend-card/styles.css",
         "./dist/modules/components/friend-card/template.js",
+        "./dist/modules/components/friend-shiny-card/friendShinyCard.js",
         "./dist/modules/components/hunt-card/huntCard.js",
         "./dist/modules/components/hunt-card/styles.css",
         "./dist/modules/components/hunt-card/template.js",

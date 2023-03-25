@@ -348,7 +348,7 @@ button.icon-button.menu-hint::before {
   flex-grow: 1;
 }
 
-@container (min-width: 750px) {
+@container (min-width: 650px) {
   .container {
     --last-column: auto;
   }
@@ -357,7 +357,7 @@ button.icon-button.menu-hint::before {
     grid-column: note / -1;
     opacity: 1;
     transform: none;
-    width: calc(100cqi - 500px);
+    width: calc(100cqi - 400px);
     max-height: 112px;
     margin: 4px;
     margin-left: 0;

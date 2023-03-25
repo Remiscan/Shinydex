@@ -167,7 +167,7 @@ console.log(css);
   }
 }
 
-button[data-action="see-pokemon"] {
+a[data-nav-section="chromatiques-ami"] {
   grid-row: 2;
   grid-column: 2;
   width: 100%;
@@ -177,7 +177,7 @@ button[data-action="see-pokemon"] {
   border-radius: var(--sub-border-radius);
 }
 
-button[data-action="see-pokemon"]:not(:hover, :active) {
+a[data-nav-section="chromatiques-ami"]:not(:hover, :active) {
   --surface-opacity: 1;
   --elevation-opacity: var(--elevation-2-opacity);
 }
