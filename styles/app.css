@@ -922,6 +922,11 @@ input-slider[name="theme-hue"]::part(slider-thumb) {
   z-index: var(--z-obfuscator);
 }
 
+#filter-menu,
+#user-search {
+  background: rgb(var(--surface), .5);
+}
+
 body[data-section-actuelle~="top-layer"] #top-layer {
   display: contents;
 }

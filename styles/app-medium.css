@@ -13,13 +13,19 @@ nav {
   grid-row: 1 / 2;
   display: flex;
   flex-direction: column;
-  justify-items: start;
   justify-content: start;
   align-items: center;
   padding: 0;
-  max-height: 100%;
+  max-height: calc(100% - 2 * var(--padding));
   overflow: auto;
-  padding-bottom: calc(56px + 2 * 16px);
+  --padding: calc(56px + 2 * 16px);
+  padding-block: var(--padding);
+}
+
+nav::before,
+nav::after {
+  content: '';
+  margin: auto;
 }
 
 nav > search-box::part(form) {
@@ -81,7 +87,7 @@ main {
 }
 
 .fab {
-  bottom: 0;
+  top: 0;
   right: unset;
   left: calc(.5 * 112px - .5 * 56px - 16px);
   margin: 16px 0;
@@ -114,9 +120,13 @@ filter-menu {
   margin-bottom: auto;
 }
 
+#user-search {
+  --from: -1rem;
+}
+
 .user-search-card {
-  margin-bottom: 8px;
-  margin-left: calc(112px + 8px);
+  margin-top: calc(56px + 2 * 16px);
+  margin-left: 16px;
 }
 
 #google-one-tap-container {
