@@ -274,6 +274,13 @@ body[data-section-actuelle~="obfuscator"] #obfuscator {
   position: sticky;
   top: 0;
   z-index: var(--z-section-titre);
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.section-titre h1 {
+  overflow: hidden;
 }
 
 .spacer {
