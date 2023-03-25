@@ -552,13 +552,13 @@ async function syncBackup(message = true) {
     // Perform sync
     await Promise.all([
       syncPokemon()
-      .then(async ([modifiedHuntids, results]) => {
+      .then(async ([modifiedPokemon, results]) => {
         if (message) {
           const clients = await self.clients.matchAll();
           clients.map(client => client.postMessage({
             successfulBackupSync: true,
             quantity: results.length,
-            modified: [...modifiedHuntids],
+            modifiedPokemon: [...modifiedPokemon],
             error: !(results.every(r => r === true))
           }));
         }

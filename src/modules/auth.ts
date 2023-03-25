@@ -1,5 +1,5 @@
 import { Uint8ArrayToHexString, sha256 } from './Params.js';
-import { initUsernameChangeHandler, initVisibilityChangeHandler, saveUserProfile } from './Settings.js';
+import { initUsernameChangeHandler, initVisibilityChangeHandler, updateUserProfile } from './Settings.js';
 import { dataStorage } from './localForage.js';
 import { Notif, template as notifTemplate } from './notification.js';
 import { requestSync } from './syncBackup.js';
@@ -30,6 +30,7 @@ declare var google: {
 
 
 let codeVerifier: string = '';
+export let loggedIn = false;
 
 
 
@@ -194,7 +195,7 @@ async function signIn(provider: SignInProvider, token: string = '', { notify = t
         public: Boolean(responseBody.public ?? 0),
         lastUpdate: Number(responseBody.lastUpdate ?? 0)
       };
-      await saveUserProfile(userProfile);
+      await updateUserProfile(userProfile);
 
       const settingsForm = document.querySelector('form[name="app-settings"]');
       if (!(settingsForm instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
@@ -222,6 +223,7 @@ async function signIn(provider: SignInProvider, token: string = '', { notify = t
 
       requestSync();
       document.body.setAttribute('data-logged-in', 'true');
+      loggedIn = true;
       return true;
     } else {
       if ('error' in responseBody) throw new Error(responseBody.error);
@@ -249,6 +251,7 @@ export async function signOutCallback() {
   console.log('User successfully signed out');
   new Notif(`Vous n'êtes plus connecté.`).prompt();
   document.body.setAttribute('data-logged-in', 'false');
+  loggedIn = false;
 }
 
 export async function signOut() {

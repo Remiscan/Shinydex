@@ -243,15 +243,15 @@ type UserProfileData = {
 }
 
 /** Updates the stored user profile data. */
-let saveUserProfile = async (data: UserProfileData = {}) => {
+let updateUserProfile = async (data: UserProfileData = {}) => {
   const userProfile = (await dataStorage.getItem('user-profile')) ?? {};
   if (data.username) userProfile.username = data.username;
   if (data.public) userProfile.public = data.public;
   if (data.lastUpdate) userProfile.lastUpdate = data.lastUpdate;
   await dataStorage.setItem('user-profile', userProfile);
 };
-saveUserProfile = queueable(saveUserProfile);
-export { saveUserProfile };
+updateUserProfile = queueable(updateUserProfile);
+export { updateUserProfile };
 
 
 /** Asks the backend to update the user's profile public visibility. */
@@ -262,7 +262,7 @@ export async function updateUserVisibility(visibility: boolean) {
   try {
     await callBackend('update-user-profile', { public: String(visibility) }, true);
     settingsForm.setAttribute('data-public-profile', String(visibility));
-    await saveUserProfile({ public: visibility });
+    await updateUserProfile({ public: visibility });
   } catch (error) {
     throw new Error('Erreur lors du changement de visibilité du profil', { cause: error ?? undefined })
   }
@@ -291,7 +291,7 @@ export function initVisibilityChangeHandler() {
 export async function updateUsername(username: string) {
   try {
     await callBackend('update-user-profile', { username }, true);
-    await saveUserProfile({ username });
+    await updateUserProfile({ username });
   } catch (error) {
     throw new Error('Erreur lors du changement de pseudo', { cause: error ?? undefined});
   }

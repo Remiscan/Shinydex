@@ -285,21 +285,25 @@ navigator.serviceWorker.addEventListener('message', async event => {
       loaders.forEach(loader => loader.setAttribute('state', 'success'));
       document.body.setAttribute('data-last-sync', 'success');
 
-      window.dispatchEvent(new CustomEvent('dataupdate', {
-        detail: {
-          sections: ['mes-chromatiques', 'chasses-en-cours', 'corbeille'],
-          ids: event.data.modified,
-          sync: false
-        }
-      }));
+      if ('modifiedPokemon' in event.data) {
+        window.dispatchEvent(new CustomEvent('dataupdate', {
+          detail: {
+            sections: ['mes-chromatiques', 'chasses-en-cours', 'corbeille'],
+            ids: event.data.modifiedPokemon,
+            sync: false
+          }
+        }));
+      }
 
-      window.dispatchEvent(new CustomEvent('dataupdate', {
-        detail: {
-          sections: ['partage'],
-          ids: event.data.modifiedFriends,
-          sync: false
-        }
-      }));
+      if ('modifiedFriends' in event.data) {
+        window.dispatchEvent(new CustomEvent('dataupdate', {
+          detail: {
+            sections: ['partage'],
+            ids: event.data.modifiedFriends,
+            sync: false
+          }
+        }));
+      }
     } else {
       loaders.forEach(loader => loader.setAttribute('state', 'failure'));
       document.body.setAttribute('data-last-sync', 'failure');
@@ -326,17 +330,15 @@ declare global {
 }
 
 window.addEventListener('dataupdate', async (event: DataUpdateEvent) => {
-  console.log(event);
-
   // On peuple l'application avec les nouvelles données
   const { sections, ids, sync } = event.detail;
+  console.log(`Populating sections [${(sections ?? []).join(', ')}] with IDs [${(ids ?? ['all']).join(', ')}] ${sync ? 'with sync' : ''}`);
   for (const section of sections) {
     await populator[section](ids);
   }
 
   // On demande une synchronisation des données
-  const loggedIn = getCookie('loggedin') === 'true';
-  if (loggedIn && sync) await requestSync();
+  if (Auth.loggedIn && sync) await requestSync();
 });
 
 

@@ -161,7 +161,7 @@ export async function appStart() {
     Pokemon.names(); // met en cache les noms des Pokémon
     logPerf('init Pokémon data');
 
-    const sectionsToPopulate: PopulatableSection[] = ['mes-chromatiques', 'chasses-en-cours', 'corbeille'];
+    const sectionsToPopulate: PopulatableSection[] = ['mes-chromatiques', 'chasses-en-cours', 'corbeille', 'partage'];
     await Promise.all([
       initPokedex(),
       ...sectionsToPopulate.map(async section => {
@@ -274,10 +274,6 @@ export async function appStart() {
     const date = new Date(lastSyncTime);
     syncTimeContainer.innerHTML = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
   }
-
-  // Demande une synchronisation des données au démarrrage
-  const loggedIn = getCookie('loggedin') === 'true';
-  if (loggedIn) await requestSync();
 
   // ---
 
