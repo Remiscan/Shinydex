@@ -1,4 +1,4 @@
-import { saveUserProfile } from './Settings.js';
+import { updateUserProfile } from './Settings.js';
 import { dataStorage, friendStorage } from './localForage.js';
 
 
@@ -34,6 +34,6 @@ export class Friend {
     await friendStorage.setItem(this.username, this.pokemonList);
     const userProfile = await dataStorage.getItem('user-profile');
     userProfile.lastUpdate = Date.now();
-    await saveUserProfile(userProfile);
+    await updateUserProfile(userProfile);
   }
 }

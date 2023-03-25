@@ -21,7 +21,7 @@
   align-items: center;
   justify-content: start;
   gap: 4px;
-  padding-left: 8px;
+  padding-left: 4px;
 }
 
 .friend-infos__identity [data-type="username"] {

@@ -10,8 +10,10 @@ import themesSheet from '../../../../styles/themes.css.php' assert { type: 'css'
 import commonSheet from '../../../../styles/common.css' assert { type: 'css' };
 import { Friend } from '../../Friend.js';
 import { noAccent } from '../../Params.js';
+import { updateUserProfile } from '../../Settings.js';
 // @ts-expect-error
 import sheet from './styles.css' assert { type: 'css' };
+import { warnBeforeDestruction } from '../../notification.js';
 
 
 
@@ -30,7 +32,8 @@ export class friendCard extends HTMLElement {
   };
   deleteHandler = (e: Event) => {
     e.stopPropagation();
-    this.delete();
+    warnBeforeDestruction(e.target as Element, `Retirer ${this.username} de votre liste d'amis ?`)
+    .then(userResponse => { if (userResponse) this.delete(); });
   };
 
 
@@ -109,8 +112,23 @@ export class friendCard extends HTMLElement {
   /**
    * Supprime l'ami associé à cette carte de la liste d'amis.
    */
-  delete() {
+  async delete(populate = true) {
+    try {
+      await friendStorage.removeItem(this.username);
+      await updateUserProfile({ lastUpdate: Date.now() });
 
+      if (populate) {
+        window.dispatchEvent(new CustomEvent('dataupdate', {
+          detail: {
+            sections: ['partage'],
+            ids: [this.username],
+            sync: true
+          }
+        }));
+      }
+    } catch (error) {
+      console.error(error);
+    }
   }
 
 
