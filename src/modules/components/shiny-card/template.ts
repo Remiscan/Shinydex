@@ -4,10 +4,10 @@ import '../pokemon-sprite/pokemonSprite.js';
 
 const template = document.createElement('template');
 template.innerHTML = /*html*/`
-  <div class="container surface variant elevation-0 interactive">
-    <pokemon-sprite size="112" shiny="true" class="surface standard"></pokemon-sprite>
+  <div class="container surface surface-container interactive">
+    <pokemon-sprite size="112" shiny="true" class="surface surface-container-low"></pokemon-sprite>
 
-    <div class="menu surface standard">
+    <div class="menu surface surface-container-low">
       <button type="button" class="surface interactive filled tonal outlined only-text" data-action="edit" disabled tabindex="-1">
         <span class="label-large">Éditer</span>
       </button>
@@ -39,7 +39,7 @@ template.innerHTML = /*html*/`
     </div>
 
     <div class="shiny-rate body-large">
-      <div class="shiny-rate-background surface"></div>
+      <div class="shiny-rate-background surface surface-container"></div>
       <div class="shiny-charm">
         <span class="icon" data-icon="key/shiny-charm"></span>
       </div>
@@ -50,8 +50,8 @@ template.innerHTML = /*html*/`
       </div>
     </div>
 
-    <div class="pokemon-notes surface body-large">
-      <div class="pokemon-notes__arrow surface"></div>
+    <div class="pokemon-notes surface surface-container body-large">
+      <div class="pokemon-notes__arrow surface surface-container-low"></div>
       <span class="pokemon-notes__texte"></span>
     </div>
   </div>

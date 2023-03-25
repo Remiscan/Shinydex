@@ -26,11 +26,6 @@ pokemon-sprite,
   border-radius: var(--sub-border-radius);
 }
 
-pokemon-sprite,
-.menu {
-  --elevation-opacity: var(--elevation-2-opacity);
-}
-
 .menu-hint {
   color: rgb(var(--on-surface-variant), .8);
 }
@@ -215,7 +210,6 @@ button.icon-button.menu-hint::before {
   gap: 8px;
   transform: translate3d(-50px, 0, 0);
   --surface-opacity: .5;
-  --elevation-opacity: calc(var(--surface-opacity) * var(--elevation-2-opacity));
 }
 
 :host([open]) .pokemon-notes,
@@ -361,8 +355,7 @@ button.icon-button.menu-hint::before {
     max-height: 112px;
     margin: 4px;
     margin-left: 0;
-    --elevation-opacity: var(--elevation-2-opacity);
-    --surface-color: var(--surface);
+    --surface-color: var(--surface-container-low);
     --distance-to-parent-border: 4px;
   border-radius: var(--sub-border-radius);
   }

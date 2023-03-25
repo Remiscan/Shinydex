@@ -4,7 +4,7 @@ import { Params } from './Params.js';
 
 export const template = document.createElement('template');
 template.innerHTML = /*html*/`
-  <div class="snackbar shadow elevation-3">
+  <div class="snackbar elevation-3-shadow">
     <span class="snackbar-message body-medium"></span>
     <button type="button" class="snackbar-action surface interactive text-button only-text">
       <span class="label-large"></span>

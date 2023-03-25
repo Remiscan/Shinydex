@@ -13,7 +13,7 @@ import { TextField } from './textField.js';
 const template = document.createElement('template');
 template.innerHTML = /*html*/`
   <form>
-    <label class="text-field surface standard elevation-2 interactive" part="container">
+    <label class="text-field surface surface-container interactive" part="container">
       <span class="leading-icon">
         <slot name="leading-icon"></slot>
       </span>
@@ -35,7 +35,7 @@ template.innerHTML = /*html*/`
       <div
         role="listbox"
         id="options-list"
-        class="surface standard primary shadow elevation-3 select-menu"
+        class="surface surface-container-high elevation-3-shadow select-menu"
         style="
           padding: 4px;
           display: flex;

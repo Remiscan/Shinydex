@@ -209,7 +209,7 @@ export function initPokedex() {
   for (const gen of generations) {
     let monsToPopulate = [];
     const genConteneur = document.createElement('div');
-    genConteneur.classList.add('pokedex-gen', 'surface', 'variant', 'elevation-0');
+    genConteneur.classList.add('pokedex-gen', 'surface', 'surface-container');
     const allNames = Pokemon.names();
 
     for (let i = gen.start; i <= gen.end; i++) {

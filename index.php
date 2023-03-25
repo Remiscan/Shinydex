@@ -74,7 +74,7 @@
     <link rel="stylesheet" href="./styles/app-large.css" media="screen and (min-width: 1140px)">
   </head>
 
-  <body data-section-actuelle="mes-chromatiques" class="background">
+  <body data-section-actuelle="mes-chromatiques" class="surface">
     <!-- Écran de chargement -->
     <div id="load-screen" style="grid-row: 1 / 3; grid-column: 1 / 2; position: absolute; z-index: 1000;width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: var(--bg-color, rgb(34, 34, 34));">
       <load-spinner id="spinner" style="--size: 3em;"></load-spinner>
@@ -82,7 +82,7 @@
     </div>
 
     <!-- Barre de navigation -->
-    <nav class="bottom-bar surface primary elevation-2">
+    <nav class="bottom-bar surface surface-container">
       <search-box section="mes-chromatiques"></search-box>
       <search-box section="pokedex"></search-box>
       <search-box section="chasses-en-cours"></search-box>
@@ -132,7 +132,7 @@
     </nav>
 
     <!-- Contenu de l'appli -->
-    <main class="surface primary">
+    <main class="surface">
 
       <!-- FAB -->
       <button type="button" class="surface interactive fab shadow only-icon">
@@ -198,29 +198,29 @@
     </main>
 
     <!-- Sprite viewer -->
-    <section id="sprite-viewer" class="background">
+    <section id="sprite-viewer" class="surface">
       <sprite-viewer></sprite-viewer>
     </section>
 
     <!-- Obfuscator -->
-    <section id="obfuscator" class="background"></section>
+    <section id="obfuscator" class="surface"></section>
 
     <!-- Menu de filtres -->
     <section id="filter-menu">
-      <filter-menu data-section="mes-chromatiques" class="surface standard primary shadow elevation-3"></filter-menu>
-      <filter-menu data-section="chasses-en-cours" class="surface standard primary shadow elevation-3"></filter-menu>
-      <filter-menu data-section="corbeille" class="surface standard primary shadow elevation-3"></filter-menu>
-      <filter-menu data-section="partage" class="surface standard primary shadow elevation-3"></filter-menu>
-      <filter-menu data-section="chromatiques-ami" class="surface standard primary shadow elevation-3"></filter-menu>
+      <filter-menu data-section="mes-chromatiques" class="surface surface-container-high elevation-3-shadow"></filter-menu>
+      <filter-menu data-section="chasses-en-cours" class="surface surface-container-high elevation-3-shadow"></filter-menu>
+      <filter-menu data-section="corbeille" class="surface surface-container-high elevation-3-shadow"></filter-menu>
+      <filter-menu data-section="partage" class="surface surface-container-high elevation-3-shadow"></filter-menu>
+      <filter-menu data-section="chromatiques-ami" class="surface surface-container-high elevation-3-shadow"></filter-menu>
     </section>
 
     <!-- User search -->
     <section id="user-search">
-      <div class="user-search-card surface standard primary shadow elevation-3">
+      <div class="user-search-card surface surface-container-high elevation-3-shadow">
         <h2 class="title-medium">Ajouter un ami avec son pseudo :</h2>
 
         <form name="user-search" class="search-form">
-          <input type="text" name="username" class="surface variant elevation-3 interactive body-large"
+          <input type="text" name="username" class="surface surface-container-highest interactive body-large"
           inputmode="search" enterkeyhint="search" role="searchbox" autocomplete="off"
           minlength="1" maxlength="30"
           placeholder="Rechercher un pseudo">
