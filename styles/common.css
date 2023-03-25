@@ -83,7 +83,7 @@ button.only-text {
 /* Elevated */
 
 button.elevated {
-  --surface-color: var(--surface);
+  --surface-color: var(--surface-container-low);
   --elevation-opacity: var(--elevation-1-opacity);
   --elevation-shadow: var(--elevation-1-shadow);
   color: rgb(var(--primary));

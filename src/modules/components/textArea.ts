@@ -5,7 +5,7 @@ import { TextField } from './textField.js';
 const template = document.createElement('template');
 template.innerHTML = /*html*/`
   <form>
-    <label class="text-field surface standard elevation-2 interactive" part="container">
+    <label class="text-field surface surface-container interactive" part="container">
       <span class="leading-icon">
         <slot name="leading-icon"></slot>
       </span>

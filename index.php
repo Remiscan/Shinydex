@@ -97,7 +97,7 @@ $httpLanguage = $translation->getLanguage();
     </div>
 
     <!-- Barre de navigation -->
-    <nav class="bottom-bar surface primary elevation-2">
+    <nav class="bottom-bar surface surface-container">
       <search-box section="mes-chromatiques"></search-box>
       <search-box section="pokedex"></search-box>
       <search-box section="chasses-en-cours"></search-box>
@@ -143,7 +143,7 @@ $httpLanguage = $translation->getLanguage();
     </nav>
 
     <!-- Contenu de l'appli -->
-    <main class="surface primary">
+    <main class="surface">
 
       <!-- FAB -->
       <button type="button" class="surface interactive fab shadow only-icon" data-label="fab-pokemon">
@@ -204,20 +204,20 @@ $httpLanguage = $translation->getLanguage();
     </main>
 
     <!-- Sprite viewer -->
-    <section id="sprite-viewer" class="background">
+    <section id="sprite-viewer" class="surface">
       <sprite-viewer></sprite-viewer>
     </section>
 
     <!-- Obfuscator -->
-    <section id="obfuscator" class="background"></section>
+    <section id="obfuscator" class="surface"></section>
 
     <!-- Menu de filtres -->
     <section id="filter-menu">
-      <filter-menu data-section="mes-chromatiques" class="surface standard primary shadow elevation-3"></filter-menu>
-      <filter-menu data-section="chasses-en-cours" class="surface standard primary shadow elevation-3"></filter-menu>
-      <filter-menu data-section="corbeille" class="surface standard primary shadow elevation-3"></filter-menu>
-      <filter-menu data-section="partage" class="surface standard primary shadow elevation-3"></filter-menu>
-      <filter-menu data-section="chromatiques-ami" class="surface standard primary shadow elevation-3"></filter-menu>
+      <filter-menu data-section="mes-chromatiques" class="surface surface-container-high elevation-3-shadow"></filter-menu>
+      <filter-menu data-section="chasses-en-cours" class="surface surface-container-high elevation-3-shadow"></filter-menu>
+      <filter-menu data-section="corbeille" class="surface surface-container-high elevation-3-shadow"></filter-menu>
+      <filter-menu data-section="partage" class="surface surface-container-high elevation-3-shadow"></filter-menu>
+      <filter-menu data-section="chromatiques-ami" class="surface surface-container-high elevation-3-shadow"></filter-menu>
     </section>
 
     <!-- User search -->

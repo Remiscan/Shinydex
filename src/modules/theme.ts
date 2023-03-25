@@ -66,7 +66,7 @@ export function setTheme(askedTheme?: string) {
 // Material Design 3-like color palette generator
 const materialLikeGenerator = function(hue: number) {
   return {
-    lightnesses: [1, .99, .95, .9, .8, .7, .6, .5, .4, .3, .2, .1, 0],
+    lightnesses: [1, .99, .98, .96, .95, .94, .92, .9, .87, .8, .7, .6, .5, .4, .3, .24, .22, .2, .17, .12, .1, .06, .04, 0],
     colors: [
       { label: 'primary', chroma: .1305, hue: hue },
       { label: 'secondary', chroma: .0357, hue: hue },
