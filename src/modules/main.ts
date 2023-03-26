@@ -20,7 +20,7 @@ import './components/sprite-viewer/spriteViewer.js';
 import './components/syncLine.js';
 import './components/syncProgress.js';
 import { export2json, json2import } from './exportToJSON.js';
-import { dataStorage, huntStorage, shinyStorage } from './localForage.js';
+import { dataStorage, friendStorage, huntStorage, shinyStorage } from './localForage.js';
 import { navLinkBubble, navigate, sectionActuelle } from './navigate.js';
 import { Notif, warnBeforeDestruction } from './notification.js';
 import { requestSync } from './syncBackup.js';
@@ -217,7 +217,8 @@ importInput.addEventListener('change', async event => {
     button.tabIndex = -1;
 
     const ids = [...(await shinyStorage.keys()), ...(await huntStorage.keys())];
-    await Promise.all([shinyStorage.clear(), huntStorage.clear()]);
+    const friends = [...(await friendStorage.keys())];
+    await Promise.all([shinyStorage.clear(), huntStorage.clear(), friendStorage.clear(), dataStorage.removeItem('user-profile')]);
 
     new Notif('Données supprimées.').prompt();
 
@@ -225,6 +226,14 @@ importInput.addEventListener('change', async event => {
       detail: {
         sections: ['mes-chromatiques', 'chasses-en-cours', 'corbeille'],
         ids: ids,
+        sync: false
+      }
+    }));
+
+    window.dispatchEvent(new CustomEvent('dataupdate', {
+      detail: {
+        sections: ['partage'],
+        ids: friends,
         sync: false
       }
     }));
