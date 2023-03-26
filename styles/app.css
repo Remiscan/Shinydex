@@ -418,11 +418,24 @@ section.loading .compteur {
 !!!!! CARTE D'UN POKÉMON !!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
-shiny-card + shiny-card,
-hunt-card + hunt-card,
-corbeille-card + corbeille-card {
+shiny-card,
+friend-shiny-card,
+corbeille-card {
   content-visibility: auto;
-  contain-intrinsic-size: 100px 120px;
+  contain-intrinsic-height: auto 120px;
+  contain: size layout paint;
+  height: 120px;
+  min-height: 120px;
+}
+
+friend-card {
+  content-visibility: auto;
+  contain-intrinsic-height: auto 154px;
+}
+
+hunt-card {
+  content-visibility: auto;
+  contain-intrinsic-height: auto 400px;
 }
 
 [data-rendered="hidden"] {
