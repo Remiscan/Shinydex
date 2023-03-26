@@ -2,6 +2,7 @@ import { Params, loadAllImages, wait } from './Params.js';
 import { Settings } from './Settings.js';
 import { FilterMenu } from './components/filter-menu/filterMenu.js';
 import { disableLazyLoad, enableLazyLoad } from './lazyLoading.js';
+import { friendShinyStorage } from './localForage.js';
 import { Notif } from './notification.js';
 
 
@@ -402,6 +403,12 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
   switch (ancienneSection.nom) {
     case 'sprite-viewer': {
       ancienneSection.element.querySelector('sprite-viewer')?.removeAttribute('dexid');
+    } break;
+
+    case 'chromatiques-ami': {
+      friendShinyStorage.clear();
+      ancienneSection.element.querySelectorAll('friend-shiny-card').forEach(card => card.remove());
+      ancienneSection.element.querySelectorAll('.compteur').forEach(compteur => compteur.innerHTML = '');
     } break;
   }
 
