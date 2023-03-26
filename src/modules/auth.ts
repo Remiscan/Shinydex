@@ -162,7 +162,10 @@ async function signIn(provider: SignInProvider, token: string = '', { notify = t
       try {
         const input = settingsForm.querySelector('[name="username"]');
         if (!input || !('value' in input)) throw new TypeError('Expecting TextField');
-        input.value = userProfile.username;
+        if (userProfile.username) {
+          input.value = userProfile.username;
+          document.body.setAttribute('data-has-username', 'true');
+        }
         initUsernameChangeHandler();
       } catch (error) {
         console.error(error);
@@ -175,6 +178,7 @@ async function signIn(provider: SignInProvider, token: string = '', { notify = t
         input.checked = userProfile.public;
         initVisibilityChangeHandler();
         settingsForm.setAttribute('data-public-profile', String(userProfile.public));
+        document.body.setAttribute('data-public-profile', String(userProfile.public));
       } catch (error) {
         console.error(error);
       }

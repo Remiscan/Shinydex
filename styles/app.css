@@ -650,6 +650,25 @@ filter-menu,
 !!!!! FRIENDS LIST !!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
+.outlined-card {
+  border: 1px solid rgb(var(--outline));
+  border-radius: var(--border-radius);
+  padding: 16px;
+}
+
+.message-tuto ul {
+  margin: 8px 0 0 0;
+  padding: 0 0 0 16px;
+}
+
+.message-tuto[data-not-shared] {
+  border-color: rgb(var(--error));
+}
+
+.message-tuto[data-shared] {
+  border-color: rgb(var(--success));
+}
+
 .user-search-card {
   height: fit-content;
   box-sizing: border-box;
@@ -1040,6 +1059,12 @@ iframe[src^="https://accounts.google.com"] {
 }
 
 body:not([data-logged-in="true"]) [data-logged-in],
-body[data-logged-in="true"] [data-logged-out] {
+body[data-logged-in="true"] [data-logged-out],
+body[data-public-profile="true"] [data-no-public-profile],
+body[data-has-username="true"] [data-no-username],
+body[data-logged-in="true"][data-public-profile="true"][data-has-username="true"] [data-not-shared]
+body:not([data-logged-in="true"]) [data-shared],
+body:not([data-public-profile="true"]) [data-shared],
+body:not([data-has-username="true"]) [data-shared] {
   display: none !important;
 }

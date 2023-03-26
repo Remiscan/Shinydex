@@ -263,6 +263,7 @@ export async function updateUserVisibility(visibility: boolean) {
     await callBackend('update-user-profile', { public: String(visibility) }, true);
     settingsForm.setAttribute('data-public-profile', String(visibility));
     await updateUserProfile({ public: visibility });
+    document.body.setAttribute('data-public-profile', String(visibility));
   } catch (error) {
     throw new Error('Erreur lors du changement de visibilité du profil', { cause: error ?? undefined })
   }
@@ -292,6 +293,7 @@ export async function updateUsername(username: string) {
   try {
     await callBackend('update-user-profile', { username }, true);
     await updateUserProfile({ username });
+    document.body.setAttribute('data-has-username', 'true');
   } catch (error) {
     throw new Error('Erreur lors du changement de pseudo', { cause: error ?? undefined});
   }
@@ -313,7 +315,7 @@ export async function checkUsernameavailability(username: string) {
     }
 
     if (response['available'] === true) {
-      usernamePrompt = new Notif(`Le pseudo ${username} est disponible, voulez-vous le choisir ?`, Notif.maxDelay, 'Confirmer', () => {}, true);
+      usernamePrompt = new Notif(`Le pseudo ${username} est disponible, voulez-vous le choisir ? Attention, si vous changez de pseudo, les gens qui vous ont précédemment ajouté en ami devront le faire à nouveau.`, Notif.maxDelay, 'Confirmer', () => {}, true);
       const userChoice = await usernamePrompt.prompt();
       if (userChoice) {
         await updateUsername(username);
