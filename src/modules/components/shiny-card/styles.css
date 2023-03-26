@@ -149,7 +149,7 @@ button.icon-button.menu-hint::before {
   grid-column: identity;
   display: grid;
   grid-template-columns: [game] 32px [info] auto;
-  grid-template-rows: [method] auto [date] auto [detail] auto;
+  grid-template-rows: [method] auto [date] auto;
   gap: 0 5px;
   margin-left: 16px;
   line-height: initial;
@@ -177,7 +177,7 @@ button.icon-button.menu-hint::before {
   font-size: 1em;
   text-align: justify;
   line-height: 20px;
-  padding: 10px;
+  padding: 4px 12px;
   z-index: 4;
   overflow: visible;
   scrollbar-width: thin;
@@ -230,8 +230,14 @@ button.icon-button.menu-hint::before {
 .pokemon-notes__texte {
   margin: auto;
   max-height: 100%;
-  overflow: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
   padding-right: .5ch;
+  width: 100%;
+}
+
+.pokemon-notes__texte > p {
+  margin: 0;
 }
 
 .empty {

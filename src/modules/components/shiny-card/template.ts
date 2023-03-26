@@ -35,7 +35,6 @@ template.innerHTML = /*html*/`
       <span data-type="game" class="icon"></span>
       <span data-type="method"></span>
       <span data-type="catchTime"></span>
-      <span data-type="count"></span>
     </div>
 
     <div class="shiny-rate body-large">
@@ -52,7 +51,13 @@ template.innerHTML = /*html*/`
 
     <div class="pokemon-notes surface body-large">
       <div class="pokemon-notes__arrow surface"></div>
-      <span class="pokemon-notes__texte"></span>
+      <span class="pokemon-notes__texte">
+        <h2 class="title-medium">Méthode de chasse - détails :</h2>
+        <p class="body-medium" data-type="count"></p>
+        <hr>
+        <h2 class="title-medium">Notes additionnelles :</h2>
+        <p class="body-medium" data-type="notes"></p>
+      </span>
     </div>
   </div>
 `;

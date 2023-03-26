@@ -24,6 +24,12 @@ h3 {
   gap: .5ch;
 }
 
+hr {
+  margin: 4px 0;
+  border: none;
+  border-bottom: 1px solid rgb(var(--outline-variant));
+}
+
 
 
 /*

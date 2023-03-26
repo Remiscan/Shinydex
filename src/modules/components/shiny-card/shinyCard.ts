@@ -101,16 +101,16 @@ export class shinyCard extends HTMLElement {
       if (getProp('encounters')) parts.push(`${getProp('encounters')} rencontres`);
 
       if ((shiny.game === 'ultrasun' || shiny.game === 'ultramoon') && shiny.method === 'ultrawormhole') {
-        parts.push(`Distance ${getProp('usum-distance')}m, ${getProp('usum-rings')} anneaux`);
+        parts.push(`Distance : ${getProp('usum-distance')}m, ${getProp('usum-rings')} anneaux`);
       }
 
       else if (shiny.game === 'letsgopikachu' || shiny.game === 'letsgoeevee') {
-        if (getProp('lgpe-nextSpawn')) parts.push(`Combo Capture ${getProp('lgpe-catchCombo')}`);
+        if (getProp('lgpe-nextSpawn')) parts.push(`Combo Capture : ${getProp('lgpe-catchCombo')}`);
         if (getProp('lgpe-lure')) parts.push('Parfum utilisé');
       }
 
       else if (shiny.game === 'sword' || shiny.game === 'shield') {
-        if (getProp('swsh-dexKo')) parts.push(`Compteur de KO ${getProp('swsh-dexKo')}`);
+        if (getProp('swsh-dexKo')) parts.push(`Compteur de KO : ${getProp('swsh-dexKo')}`);
       }
 
       else if (shiny.game === 'legendsarceus') {
@@ -132,13 +132,13 @@ export class shinyCard extends HTMLElement {
 
         if (getProp('sv-sparklingPower')) {
           const sparklingPower = getProp('sv-sparklingPower');
-          parts.push(`Rencontre brillance niv ${sparklingPower}`);
+          parts.push(`Rencontre brillance niv. ${sparklingPower}`);
         }
       }
 
       countString = parts.join(', ');
 
-      element.innerHTML = countString;
+      element.innerHTML = countString || '<span class="empty">Pas de détail.</span>';
     }
 
     // Temps de capture / date
@@ -173,7 +173,7 @@ export class shinyCard extends HTMLElement {
     // Notes
     {
       const notes = shiny.notes || '<span class="empty">Pas de note.</span>';
-      const element = this.shadow.querySelector('.pokemon-notes__texte')!;
+      const element = this.shadow.querySelector('[data-type="notes"]')!;
       element.innerHTML = notes;
     }
 
