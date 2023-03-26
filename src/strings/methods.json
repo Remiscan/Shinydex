@@ -24,7 +24,7 @@
     "massoutbreak": "Apparition massive",
     "massivemassoutbreak": "Mégapparition",
     "fixedencounter": "Rencontre fixe",
-    "hack": "Hack ou méthode non légitime"
+    "hack": "Méthode non légitime"
   },
 
   "en": {
@@ -52,6 +52,6 @@
     "massoutbreak": "Mass outbreak",
     "massivemassoutbreak": "Massive mass outbreak",
     "fixedencounter": "Fixed encounter",
-    "hack": "Hack or illegitimate method"
+    "hack": "Illegitimate method"
   }
 }

@@ -181,6 +181,13 @@ export class Shiny extends FrontendShiny {
       let charmRolls = Number(game.gen >= 5) * Number(this.charm) * 2;
 
       switch (methode.id) {
+        case 'hack':
+        case 'trade':
+        case 'wildevent': {
+          // ???
+          return null;
+        }
+
         case 'wild': {
           if (game.id === 'lgpe') {
             const lureRolls = this.count['lgpe-lure'] ? 1 : 0;
@@ -286,11 +293,6 @@ export class Shiny extends FrontendShiny {
                     : 1;
           const rate = Math.round(100 / odds);
           return rate;
-        }
-
-        case 'wildevent': {
-          // ???
-          return null;
         }
 
         case 'raid': {

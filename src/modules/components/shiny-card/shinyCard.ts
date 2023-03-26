@@ -88,6 +88,10 @@ export class shinyCard extends HTMLElement {
     {
       const element = this.shadow.querySelector('[data-type="name"]')!;
       element.innerHTML = shiny.name;
+
+      const speciesElement = this.shadow.querySelector('[data-type="species"]')!;
+      if (shiny.name) speciesElement.classList.remove('title-large');
+      else            speciesElement.classList.add('title-large');
     }
 
     // Compteur
@@ -150,7 +154,7 @@ export class shinyCard extends HTMLElement {
                              .format(new Date(time));
         element.innerHTML = date;
       } else {
-        element.innerHTML = '';
+        element.innerHTML = 'Date inconnue';
       }
     }
 
@@ -166,8 +170,8 @@ export class shinyCard extends HTMLElement {
       const ball = shiny.ball || '';
       const element = this.shadow.querySelector('[data-type="ball"]')!;
       element.setAttribute('data-icon', `ball/${ball}`);
-      if (shiny.mine && ball) element.classList.remove('off');
-      else                    element.classList.add('off');
+      if (ball) element.classList.remove('off');
+      else      element.classList.add('off');
     }
 
     // Notes
@@ -350,6 +354,7 @@ export class shinyCard extends HTMLElement {
     const openButton = this.shadow.querySelector('[data-action="open"]');
     if (!(openButton instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
     openButton.addEventListener('click', this.openHandler);
+    
     this.addEventListener('click', this.clickHandler = event => openButton.click());
 
     const editButton = this.shadow.querySelector('[data-action="edit"]');
