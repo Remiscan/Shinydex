@@ -19,7 +19,7 @@ template.innerHTML = /*html*/`
 
     <div class="pokemon-infos__identity body-large">
       <span data-type="ball" class="icon"></span>
-      <span data-type="name"></span>
+      <span data-type="name" class="title-large"></span>
       <span data-type="species"></span>
       <span data-type="gene"></span>
     </div>

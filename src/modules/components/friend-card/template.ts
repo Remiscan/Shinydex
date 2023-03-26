@@ -5,8 +5,8 @@ import '../pokemon-sprite/pokemonSprite.js';
 const template = document.createElement('template');
 template.innerHTML = /*html*/`
   <div class="container surface variant elevation-0">
-    <div class="friend-infos__identity body-large">
-      <span data-type="username"></span>
+    <div class="friend-infos__identity">
+      <span data-type="username" class="title-large"></span>
       <button type="button" class="surface interactive icon-button only-icon menu-hint" data-action="open">
         <span class="material-icons">more_horiz</span>
       </button>

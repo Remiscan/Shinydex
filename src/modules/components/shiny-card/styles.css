@@ -88,8 +88,6 @@ button.icon-button.menu-hint::before {
 [data-type="species"] {
   grid-row: species;
   grid-column: name;
-  font-size: 1em;
-  font-weight: 300;
   text-transform: capitalize;
   opacity: .8;
   display: flex;
@@ -104,8 +102,6 @@ button.icon-button.menu-hint::before {
 [data-type="name"]:empty + [data-type="species"] {
   grid-row: name;
   grid-column: name;
-  font-size: 1.5em;
-  font-weight: 300;
   opacity: 1;
   display: flex;
   justify-content: start;
@@ -357,7 +353,7 @@ button.icon-button.menu-hint::before {
     grid-column: note / -1;
     opacity: 1;
     transform: none;
-    width: min(calc(100cqi - 400px), 50cqi);
+    width: min(100cqi - 400px, 50cqi);
     max-height: 112px;
     margin: 4px;
     margin-left: 0;

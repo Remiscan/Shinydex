@@ -25,16 +25,9 @@
 }
 
 .friend-infos__identity [data-type="username"] {
-  font-size: 1.5em;
-  font-weight: 300;
-  opacity: 1;
   display: flex;
   justify-content: start;
   align-items: center;
-  position: relative;
-  left: 0;
-  top: 0;
-  z-index: 1;
 }
 
 button.icon-button.menu-hint {
