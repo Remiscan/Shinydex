@@ -1,4 +1,4 @@
-import { friendShinyStorage, friendStorage, localForageAPI } from '../../localForage.js';
+import { friendStorage, localForageAPI } from '../../localForage.js';
 import template from './template.js';
 // @ts-expect-error
 import materialIconsSheet from '../../../../ext/material_icons.css' assert { type: 'css' };
@@ -11,12 +11,10 @@ import commonSheet from '../../../../styles/common.css' assert { type: 'css' };
 import { Friend } from '../../Friend.js';
 import { noAccent } from '../../Params.js';
 import { updateUserProfile } from '../../Settings.js';
-import * as Auth from '../../auth.js';
 import { navigate } from '../../navigate.js';
 import { warnBeforeDestruction } from '../../notification.js';
 // @ts-expect-error
 import sheet from './styles.css' assert { type: 'css' };
-import { FrontendShiny } from '../../ShinyBackend.js';
 
 
 
@@ -40,36 +38,7 @@ export class friendCard extends HTMLElement {
   };
   navHandler = (event: Event) => {
     event.preventDefault();
-    const link = event.target;
-    if (!(link instanceof HTMLAnchorElement)) throw new TypeError('Expecting HTMLAnchorElement');
-
-    // Populate section with friend's username
-    const section = document.querySelector('#chromatiques-ami')!;
-    section.querySelectorAll('[data-type="username"]').forEach(e => e.innerHTML = this.username);
-
-    // Populate section with friend's Pokémon (don't await this before navigating)
-    Auth.callBackend('get-friend-data', { username: this.username, scope: 'full' }, false)
-    .then(async response => {
-      if ('matches' in response && response.matches === true) {
-        await Promise.all(
-          response.pokemon.map((shiny: any) => {
-            const feShiny = new FrontendShiny(shiny);
-            return friendShinyStorage.setItem(String(shiny.huntid), feShiny);
-          })
-        );
-
-        window.dispatchEvent(new CustomEvent('dataupdate', {
-          detail: {
-            sections: ['chromatiques-ami'],
-            ids: [response.pokemon.map((shiny: any) => shiny.huntid)],
-            sync: false
-          }
-        }));
-      }
-    });
-
-    // Open friend's Pokémon section
-    navigate(link.dataset.navSection || '', event, JSON.parse(link.dataset.navData || '{}'));
+    navigate('chromatiques-ami', event, { username: this.username });
   }
 
 

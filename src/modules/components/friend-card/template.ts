@@ -22,7 +22,7 @@ template.innerHTML = /*html*/`
       <pokemon-sprite size="112" shiny="true" class="surface standard"></pokemon-sprite>
     </div>
 
-    <a href="#" class="icon-button surface standard interactive" data-nav-section="chromatiques-ami" data-nav-data='{"username":"a"}'>
+    <a href="#" class="icon-button surface standard interactive" data-nav-section="chromatiques-ami">
       <span class="material-icons">arrow_forward_ios</span>
     </a>
 

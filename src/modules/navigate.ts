@@ -4,6 +4,8 @@ import { FilterMenu } from './components/filter-menu/filterMenu.js';
 import { disableLazyLoad, enableLazyLoad } from './lazyLoading.js';
 import { friendShinyStorage } from './localForage.js';
 import { Notif } from './notification.js';
+import * as Auth from './auth.js';
+import { FrontendShiny } from './ShinyBackend.js';
 
 
 
@@ -344,17 +346,47 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
 
   // On prépare la nouvelle section si besoin
   switch (sectionCible) {
-    case 'sprite-viewer':
+    case 'chromatiques-ami': {
+      document.body.removeAttribute('data-filters');
+      
+      // Populate section with friend's username
+      nouvelleSection.element.querySelectorAll('[data-type="username"]').forEach(e => e.innerHTML = data.username);
+
+      // Populate section with friend's Pokémon (don't await this before navigating)
+      Auth.callBackend('get-friend-data', { username: data.username, scope: 'full' }, false)
+      .then(async response => {
+        if ('matches' in response && response.matches === true) {
+          await Promise.all(
+            response.pokemon.map((shiny: any) => {
+              const feShiny = new FrontendShiny(shiny);
+              return friendShinyStorage.setItem(String(shiny.huntid), feShiny);
+            })
+          );
+
+          window.dispatchEvent(new CustomEvent('dataupdate', {
+            detail: {
+              sections: ['chromatiques-ami'],
+              ids: [response.pokemon.map((shiny: any) => shiny.huntid)],
+              sync: false
+            }
+          }));
+        }
+      });
+    } break;
+
+    case 'sprite-viewer': {
       const viewer = nouvelleSection.element.querySelector('sprite-viewer')!;
       viewer.setAttribute('dexid', data.dexid || '');
       viewer.setAttribute('shiny', 'true');
       viewer.setAttribute('size', navigator.onLine ? '512' : '112')
-      break;
+    } break;
+
     case 'filter-menu': {
       const menu = document.querySelector(`filter-menu[section="${data.section ?? ancienneSection.nom}"]`);
       if (!(menu instanceof FilterMenu)) throw new TypeError(`Expecting FilterMenu`);
       menu.open();
     } break;
+
     default: {
       document.body.removeAttribute('data-filters');
     }
