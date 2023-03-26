@@ -1,0 +1,77 @@
+{
+  "fr": {
+    "section-mes-chromatiques-short-title": "Pokémon <shiny-stars></shiny-stars>",
+    "section-mes-chromatiques-long-title": "Mes Pokémon <shiny-stars></shiny-stars>",
+    "section-message-vide": "Vous n'avez enregistré aucun Pokémon chromatique.",
+    "section-message-vide-filtres": "Aucun Pokémon ne correspond à ces filtres.",
+    "section-message-vide-recherche": "Aucun Pokémon ne correspond à cette recherche.",
+
+    "section-pokedex-short-title": "Pokédex <shiny-stars></shiny-stars>",
+    "section-pokedex-long-title": "Pokédex <shiny-stars></shiny-stars>",
+
+    "section-chasses-en-cours-short-title": "Chasses",
+    "section-chasses-en-cours-long-title": "Chasses en cours",
+    "section-chasses-en-cours-message-vide": "Aucune Chasse en cours.",
+
+    "section-corbeille-short-title": "Corbeille",
+    "section-corbeille-long-title": "Supprimés récemment",
+    "section-corbeille-message-vide": "La corbeille est vide.",
+
+    "section-partage-short-title": "Amis",
+    "section-partage-long-title": "Liste d'amis",
+    "section-partage-tuto-intro": "Pour partager votre collection de Pokémon <shiny-stars></shiny-stars> avec les gens qui vous ont ajouté en ami, effectuez les actions suivantes dans les paramètres :",
+    "section-partage-tuto-1": "Connectez-vous",
+    "section-partage-tuto-2": "Rendez votre profil public",
+    "section-partage-tuto-3": "Choisissez un pseudo",
+    "section-partage-tuto-done": "Votre collection de Pokémon <shiny-stars></shiny-stars> est partagée avec les gens qui vous ont ajouté en ami.",
+    "section-partage-message-vide": "Votre liste d'amis est vide.",
+    "section-partage-message-vide-recherche": "Aucun ami ne correspond à cette recherche.",
+
+    "section-parametres-short-title": "Paramètres",
+    "section-parametres-long-title": "Paramètres",
+
+    "section-a-propos-short-title": "À propos",
+    "section-a-propos-long-title": "À propos",
+    
+    "add-friend-hint": "Ajouter un ami avec son pseudo :",
+    "add-friend-placeholder": "Rechercher un pseudo"
+  },
+
+  "en": {
+    "section-mes-chromatiques-short-title": "Pokémon <shiny-stars></shiny-stars>",
+    "section-mes-chromatiques-long-title": "My Pokémon <shiny-stars></shiny-stars>",
+    "section-message-vide": "You did not add any Pokémon.",
+    "section-message-vide-filtres": "No Pokémon corresponds to these filters.",
+    "section-message-vide-recherche": "No Pokémon corresponds to this search.",
+
+    "section-pokedex-short-title": "Pokédex <shiny-stars></shiny-stars>",
+    "section-pokedex-long-title": "Pokédex <shiny-stars></shiny-stars>",
+
+    "section-chasses-en-cours-short-title": "Hunts",
+    "section-chasses-en-cours-long-title": "Current hunts",
+    "section-chasses-en-cours-message-vide": "No current hunt.",
+
+    "section-corbeille-short-title": "Recycle bin",
+    "section-corbeille-long-title": "Deleted recently",
+    "section-corbeille-message-vide": "The recycle bin is empty.",
+
+    "section-partage-title": "Friends",
+    "section-partage-long-title": "Friends list",
+    "section-partage-tuto-intro": "To share your Pokémon <shiny-stars></shiny-stars> collection with people who added you as friend, change these settings:",
+    "section-partage-tuto-1": "Sign in",
+    "section-partage-tuto-2": "Make your profile public",
+    "section-partage-tuto-3": "Choose a username",
+    "section-partage-tuto-done": "Your Pokémon <shiny-stars></shiny-stars> collection is shared with people who added you as friend.",
+    "section-partage-message-vide": "Your friends list is empty.",
+    "section-partage-message-vide-recherche": "No friend corresponds to this search.",
+
+    "section-parametres-title": "Settings",
+    "section-parametres-long-title": "Settings",
+
+    "section-a-propos-short-title": "About",
+    "section-a-propos-long-title": "About",
+
+    "add-friend-hint": "Add a friend with his username:",
+    "add-friend-placeholder": "Search for a username"
+  }
+}

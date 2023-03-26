@@ -1,16 +1,32 @@
+<?php
+$commonDir = '../_common';
+require_once $commonDir.'/php/Translation.php';
+$translation = new Translation(<<<STRINGS
+{
+  "fr": {
+    "meta-description": "Recensez votre collection de Pokémon chromatiques, et partagez-la avec vos amis."
+  },
+    
+  "en": {
+    "meta-description": "Keep track of your shiny Pokémon collection, and share it with friends."
+  }
+}
+STRINGS);
+$httpLanguage = $translation->getLanguage();
+?>
 <!doctype html>
-<html lang="fr">
+<html lang="<?=$httpLanguage?>">
 
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, user-scalable=no, interactive-widget=resizes-content">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
     <meta name="theme-color" content="#222222">
 
     <title>Shinydex</title>
-    <meta name="description" content="Pokédex recensant les Pokémon chromatiques possédés par Rémi.">
+    <meta name="description" content="<?=$translation->get('meta-description')?>">
     <meta property="og:title" content="Shinydex">
-    <meta property="og:description" content="Pokédex recensant les Pokémon chromatiques possédés par Rémi.">
+    <meta property="og:description" content="<?=$translation->get('meta-description')?>">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://remiscan.fr/shinydex/">
     <meta property="og:image" content="https://remiscan.fr/shinydex/images/preview.png">
