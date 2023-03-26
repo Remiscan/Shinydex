@@ -82,6 +82,10 @@ export default class CustomInput extends HTMLElement {
     return this.getAttribute('value');
   }
 
+  formResetCallback() {
+    this.value = this.initialValue ?? this.defaultValue;
+  }
+
 
   connectedCallback() {
     const initialValue = this.initialValue;

@@ -347,31 +347,38 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
   // On prépare la nouvelle section si besoin
   switch (sectionCible) {
     case 'chromatiques-ami': {
-      document.body.removeAttribute('data-filters');
+      if (data.username !== nouvelleSection.element.getAttribute('data-username')) {
+        nouvelleSection.element.setAttribute('data-username', data.username);
 
-      // Populate section with friend's username
-      nouvelleSection.element.querySelectorAll('[data-type="username"]').forEach(e => e.innerHTML = data.username);
+        nouvelleSection.element.classList.add('loading');
+        nouvelleSection.element.classList.remove('vide', 'vide-filtres', 'vide-recherche');
 
-      // Populate section with friend's Pokémon (don't await this before navigating)
-      callBackend('get-friend-data', { username: data.username, scope: 'full' }, false)
-      .then(async response => {
-        if ('matches' in response && response.matches === true) {
-          await Promise.all(
-            response.pokemon.map((shiny: any) => {
-              const feShiny = new FrontendShiny(shiny);
-              return friendShinyStorage.setItem(String(shiny.huntid), feShiny);
-            })
-          );
+        // Populate section with friend's username
+        nouvelleSection.element.querySelectorAll('[data-type="username"]').forEach(e => e.innerHTML = data.username);
 
-          window.dispatchEvent(new CustomEvent('dataupdate', {
-            detail: {
-              sections: ['chromatiques-ami'],
-              ids: [response.pokemon.map((shiny: any) => shiny.huntid)],
-              sync: false
-            }
-          }));
-        }
-      });
+        // Populate section with friend's Pokémon (don't await this before navigating)
+        callBackend('get-friend-data', { username: data.username, scope: 'full' }, false)
+        .then(async response => {
+          if ('matches' in response && response.matches === true) {
+            await Promise.all(
+              response.pokemon.map((shiny: any) => {
+                const feShiny = new FrontendShiny(shiny);
+                return friendShinyStorage.setItem(String(shiny.huntid), feShiny);
+              })
+            );
+
+            nouvelleSection.element.classList.remove('loading');
+
+            window.dispatchEvent(new CustomEvent('dataupdate', {
+              detail: {
+                sections: ['chromatiques-ami'],
+                ids: [response.pokemon.map((shiny: any) => String(shiny.huntid))],
+                sync: false
+              }
+            }));
+          }
+        });
+      }
     } break;
 
     case 'sprite-viewer': {
@@ -438,9 +445,22 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
     } break;
 
     case 'chromatiques-ami': {
-      friendShinyStorage.clear();
-      ancienneSection.element.querySelectorAll('friend-shiny-card').forEach(card => card.remove());
-      ancienneSection.element.querySelectorAll('.compteur').forEach(compteur => compteur.innerHTML = '');
+      if (nouvelleSection.closePrevious) {
+        friendShinyStorage.clear();
+        ancienneSection.element.querySelectorAll('friend-shiny-card').forEach(card => card.remove());
+        ancienneSection.element.querySelectorAll('.compteur').forEach(compteur => compteur.innerHTML = '');
+        ancienneSection.element.removeAttribute('data-username');
+
+        const filterMenu = document.querySelector('filter-menu[section="chromatiques-ami"]');
+        if (!(filterMenu instanceof FilterMenu)) throw new TypeError('Expecting FilterMenu');
+        filterMenu.reset();
+
+        const searchBoxes = document.querySelectorAll('search-box[section="chromatiques-ami"]');
+        searchBoxes.forEach(searchBox => {
+          const form = searchBox.shadowRoot?.querySelector('form');
+          if (form instanceof HTMLFormElement) form.reset();
+        });
+      }
     } break;
   }
 

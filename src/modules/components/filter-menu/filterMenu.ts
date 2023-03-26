@@ -102,6 +102,16 @@ export class FilterMenu extends HTMLElement {
   }
 
 
+  /** Resets the filters. */
+  reset() {
+    const section = this.section ?? '';
+    if (!isFiltrableSection(section)) throw new Error(`Should not be trying to filter ${section}`);
+    const newFilters = new FilterList(section);
+    this.filtersToForm(newFilters);
+    this.filtersChangeHandler(new Event('change'));
+  }
+
+
   async saveFilters(filters: FilterList) {
     if (!this.section) return;
     await saveFilters(this.section, filters);

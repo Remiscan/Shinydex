@@ -165,7 +165,7 @@
       </section>
 
       <!-- Chromatiques d'un ami -->
-      <section id="chromatiques-ami" class="vide">
+      <section id="chromatiques-ami">
         <?php include './pages/chromatiques-ami.html'; ?>
       </section>
 
