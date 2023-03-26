@@ -9,7 +9,6 @@
   grid-template-columns: [sprite] 116px [identity] 1fr [misc] auto [note] var(--last-column);
   grid-template-rows: 1fr [identity] auto 1fr [capture] auto 1fr;
   position: relative;
-  order: var(--order, 0);
 }
 
 pokemon-sprite,
@@ -177,7 +176,7 @@ button.icon-button.menu-hint::before {
   font-size: 1em;
   text-align: justify;
   line-height: 20px;
-  padding: 4px 12px;
+  padding: 4px 8px 4px 12px;
   z-index: 4;
   overflow: visible;
   scrollbar-width: thin;
