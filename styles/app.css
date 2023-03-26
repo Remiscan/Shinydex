@@ -307,6 +307,7 @@ body[data-section-actuelle~="obfuscator"] #obfuscator {
 a.icon-button.bouton-retour {
   margin: 8px;
   margin-right: 0;
+  min-width: 40px;
 }
 
 .compteur {
