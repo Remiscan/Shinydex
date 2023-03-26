@@ -662,7 +662,7 @@ filter-menu,
 }
 
 .message-tuto[data-not-shared] {
-  border-color: rgb(var(--error));
+  border-color: rgb(var(--outline));
 }
 
 .message-tuto[data-shared] {
