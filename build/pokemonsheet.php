@@ -116,6 +116,7 @@ function buildPokemonSheet(int $columns = 32, int $spriteSize = 44, string $form
   foreach ($pokemons as $id => $pokemon) {
     $dexid = $pokemon->dexid;
     $basicForm = $pokemon->formes[0];
+    if ($basicForm->gigamax) $basicForm = $pokemon->formes[1];
     foreach ($pokemon->formes as $forme) {
       if ($forme->dbid === '') {
         $basicForm = $forme;
