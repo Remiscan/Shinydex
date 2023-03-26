@@ -32,7 +32,7 @@ export class spriteViewer extends HTMLElement {
   /** Affiche les sprites de toutes les formes du Pokémon demandé. */
   async updateSprites(dexid: string) {
     const pokemon = new Pokemon(pokemonData[Number(dexid)]);
-    const nomFormeNormale = 'Normale';
+    const nomFormeNormale = pokemon.getName();
 
     const caughtFormsList: Set<string> = new Set();
     await shinyStorage.keys().then(keys => Promise.all(keys.map(async key => {
@@ -68,15 +68,15 @@ export class spriteViewer extends HTMLElement {
         case 'Gigamax':
           return nom;
         case '':
-          return `Forme ${nomFormeNormale}`;
+          return `${nomFormeNormale}`;
         default:
           return `Forme ${nom}`;
       }
     };
 
     for (const forme of formes) {
-      const afficherNomForme = true;//(forme.nom != '' || formes.length > 1);
       const caught = caughtFormsList.has(forme.dbid);
+      const afficherNomForme = (formes.length > 1 || forme.nom != '' || caught);
 
       const htmlS = `
         <div class="dex-sprite">
