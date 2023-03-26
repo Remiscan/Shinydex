@@ -24,6 +24,7 @@ import { dataStorage, huntStorage, shinyStorage } from './localForage.js';
 import { navLinkBubble, navigate, sectionActuelle } from './navigate.js';
 import { Notif, warnBeforeDestruction } from './notification.js';
 import { requestSync } from './syncBackup.js';
+import { callBackend } from './callBackend.js';
 
 
 
@@ -118,7 +119,7 @@ document.querySelector('.fab')!.addEventListener('click', async () => {
     if (username.length === 0 || username.length > 30) return;
 
     // Ask backend if that username matches a public user
-    const response = await Auth.callBackend('get-friend-data', { username, scope: 'partial' }, false);
+    const response = await callBackend('get-friend-data', { username, scope: 'partial' }, false);
     if (sectionActuelle === 'user-search') {
       history.back();
     }
@@ -245,7 +246,7 @@ importInput.addEventListener('change', async event => {
     button.tabIndex = -1;
 
     try {
-      await Auth.callBackend('delete-user-data', undefined, true);
+      await callBackend('delete-user-data', undefined, true);
       Auth.signOutCallback();
       new Notif('Données en ligne supprimées.').prompt();
     } catch (error) {

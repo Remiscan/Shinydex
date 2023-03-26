@@ -1,5 +1,6 @@
-import { Uint8ArrayToHexString, sha256 } from './Params.js';
+import { Params, Uint8ArrayToHexString, sha256 } from './Params.js';
 import { initUsernameChangeHandler, initVisibilityChangeHandler, updateUserProfile } from './Settings.js';
+import { callBackend } from './callBackend.js';
 import { dataStorage } from './localForage.js';
 import { Notif, template as notifTemplate } from './notification.js';
 import { requestSync } from './syncBackup.js';
@@ -29,7 +30,6 @@ declare var google: {
 
 
 
-let codeVerifier: string = '';
 export let loggedIn = false;
 
 
@@ -100,48 +100,6 @@ class SignInPrompt extends Notif {
 
 
 
-type BackendRequestData = {
-  'session-code-verifier'?: string,
-  [key: string]: any
-};
-export async function callBackend(request: string, data: BackendRequestData = {}, signedIn: boolean = false): Promise<any> {
-  // Prepare the data to send to the backend
-  if (signedIn) data['session-code-verifier'] = codeVerifier;
-  const formData = new FormData();
-  const dataKeys = Object.keys(data);
-  const method = dataKeys.length > 0 ? 'POST' : 'GET';
-  dataKeys.forEach(key => formData.append(key, data[key]));
-
-  // Send the request to the backend
-  console.log(`Sending request to backend: ${request}`);
-  const response = await fetch(`/shinydex/backend/endpoint.php?request=${request}&date=${Date.now()}`, {
-    method: method,
-    body: method === 'POST' ? formData : undefined
-  });
-
-  if (response.status != 200)
-    throw '[:(] Erreur ' + response.status + ' lors de la requête';
-
-  const clonedResponse = response.clone();
-  try {
-    const responseData = await response.json();
-    if ('error' in responseData) {
-      throw new Error(responseData.error);
-    }
-    return responseData;
-  } catch (error) {
-    const cause = await clonedResponse.text();
-    if (error instanceof Error) {
-      throw new Error(error.message, { cause });
-    } else {
-      console.error(await clonedResponse.text());
-      throw error;
-    }
-  }
-}
-
-
-
 type SignInProvider = 'google' | 'shinydex';
 async function signIn(provider: SignInProvider, token: string = '', { notify = true } = {}) {
   // Display "signing in" notification
@@ -154,8 +112,8 @@ async function signIn(provider: SignInProvider, token: string = '', { notify = t
   }
 
   // Generate code verifier
-  codeVerifier = Uint8ArrayToHexString(crypto.getRandomValues(new Uint8Array(32)));
-  const hashedCodeVerifier = await sha256(codeVerifier);
+  Params.codeVerifier = Uint8ArrayToHexString(crypto.getRandomValues(new Uint8Array(32)));
+  const hashedCodeVerifier = await sha256(Params.codeVerifier);
 
   try {
     // Send the token to the backend for verification
@@ -172,7 +130,7 @@ async function signIn(provider: SignInProvider, token: string = '', { notify = t
     }
 
     if ('success' in responseBody) {
-      await dataStorage.setItem('session-code-verifier', codeVerifier); // make it accessible from service worker
+      await dataStorage.setItem('session-code-verifier', Params.codeVerifier); // make it accessible from service worker
       await dataStorage.setItem('dismissed-signin', false); // Re-enable sign-in prompt after next sign-out
 
       // Locally store e-mail address to tell user which account they used to sign in

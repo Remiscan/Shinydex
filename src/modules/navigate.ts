@@ -1,11 +1,11 @@
 import { Params, loadAllImages, wait } from './Params.js';
 import { Settings } from './Settings.js';
+import { FrontendShiny } from './ShinyBackend.js';
+import { callBackend } from './callBackend.js';
 import { FilterMenu } from './components/filter-menu/filterMenu.js';
 import { disableLazyLoad, enableLazyLoad } from './lazyLoading.js';
 import { friendShinyStorage } from './localForage.js';
 import { Notif } from './notification.js';
-import * as Auth from './auth.js';
-import { FrontendShiny } from './ShinyBackend.js';
 
 
 
@@ -348,12 +348,12 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
   switch (sectionCible) {
     case 'chromatiques-ami': {
       document.body.removeAttribute('data-filters');
-      
+
       // Populate section with friend's username
       nouvelleSection.element.querySelectorAll('[data-type="username"]').forEach(e => e.innerHTML = data.username);
 
       // Populate section with friend's Pokémon (don't await this before navigating)
-      Auth.callBackend('get-friend-data', { username: data.username, scope: 'full' }, false)
+      callBackend('get-friend-data', { username: data.username, scope: 'full' }, false)
       .then(async response => {
         if ('matches' in response && response.matches === true) {
           await Promise.all(

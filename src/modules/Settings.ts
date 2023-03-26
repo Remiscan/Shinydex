@@ -1,4 +1,4 @@
-import { callBackend } from './auth.js';
+import { callBackend } from './callBackend.js';
 import { RadioGroup } from './components/radioGroup.js';
 import { dataStorage } from './localForage.js';
 import { Notif } from './notification.js';

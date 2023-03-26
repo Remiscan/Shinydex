@@ -1,4 +1,4 @@
-import { Params, getCookie, loadAllImages, timestamp2date, wait } from './Params.js';
+import { Params, loadAllImages, timestamp2date, wait } from './Params.js';
 import { Pokemon } from './Pokemon.js';
 import { Settings } from './Settings.js';
 import { PopulatableSection, cleanUpRecycleBin, initPokedex, populator } from './appContent.js';
@@ -6,9 +6,9 @@ import * as Auth from './auth.js';
 import { FilterMenu } from './components/filter-menu/filterMenu.js';
 import { dataStorage, huntStorage, shinyStorage } from './localForage.js';
 import { Notif } from './notification.js';
-import { requestSync } from './syncBackup.js';
 import { setTheme } from './theme.js';
 import { upgradeStorage } from './upgradeStorage.js';
+import { callBackend } from './callBackend.js';
 
 
 
@@ -323,7 +323,7 @@ export async function checkUpdate(checkNotification = false) {
 
     const installedFiles = await dataStorage.getItem('file-versions');
     const cacheVersion = Math.max(...Object.values(installedFiles).map(v => Number(v)));
-    const liveFiles = await Auth.callBackend('get-file-versions');
+    const liveFiles = await callBackend('get-file-versions');
 
     const updatedFiles = Object.entries(liveFiles).filter(file => {
       const [path, liveVersion] = file;

@@ -32,7 +32,9 @@ export const Params = {
   easingEmphasizedAccelerate: 'cubic-bezier(.3, 0, .8, .15)',
 
   spriteSize: 112,
-  defaultLang: 'fr'
+  defaultLang: 'fr',
+
+  codeVerifier: ''
 };
 
 
