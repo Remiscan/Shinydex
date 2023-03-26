@@ -32,7 +32,7 @@ export class Friend {
 
   async save() {
     await friendStorage.setItem(this.username, this.pokemonList);
-    const userProfile = await dataStorage.getItem('user-profile');
+    const userProfile = (await dataStorage.getItem('user-profile')) ?? {};
     userProfile.lastUpdate = Date.now();
     await updateUserProfile(userProfile);
   }
