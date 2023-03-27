@@ -637,10 +637,7 @@ export class huntCard extends HTMLElement {
           new Notif(message).prompt();
           return;
         } else {
-          const boutonSubmit = this.shadow.querySelector('[data-action="save-shiny"]');
-          if (!(boutonSubmit instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
-          const userResponse = await warnBeforeDestruction(boutonSubmit, 'Ajouter ce Pokémon à vos chromatiques ?', 'done');
-          if (userResponse) await this.submit();
+          await this.submit();
         }
       }
     };
