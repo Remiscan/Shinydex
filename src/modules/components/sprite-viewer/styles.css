@@ -15,7 +15,7 @@ sprite-viewer {
   grid-column: 2;
 }
 
-.switch-shiny-regular {
+form[name="switch-shiny-regular"] {
   grid-row: 2;
   grid-column: 2;
   width: fit-content;
