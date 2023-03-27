@@ -6,6 +6,12 @@ require_once __DIR__.'/class_Sprite.php';
 class Forme extends Sprite {
   public $dbid = '';
   public $nom = '';
+  public $form = 0;
+  public $gender = '';
+  public $gigamax = false;
+  public $candy = 0;
+  public $noShiny = false;
+  public $hasBackside = false;
 
   function __construct(Sprite $sprite, int $dexid) {
     // Formes à ne pas compter

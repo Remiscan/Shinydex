@@ -5,10 +5,10 @@ $dir = "../images/pokemon-sprites/home";
 $files = scandir($dir);
 
 $pokemons = [];
-forEach(Pokemon::ALL_POKEMON as $id => $name)
+forEach(Pokemon::POKEMON_NAMES_EN as $id => $name)
 {
   $sprites = preg_grep('/poke_capture_([0]+)?' . intval($id) . '_.+_n\.png/', $files);
-  $pokemons[] = new Pokemon($id, $name, $sprites);
+  $pokemons[] = new Pokemon($id, $sprites);
 }
 
 echo '<body style="display: grid; grid-template-columns: 3fr 1fr;">';
@@ -20,7 +20,7 @@ forEach($pokemons as $pokemon)
   ?>
 
   <div style="display: flex; flex-wrap: wrap; background-color: rgba(0, 0, 0, .02); box-shadow: 0 1px 5px rgba(0, 0, 0, .2); margin: 20px 10px; padding: 2px; border-radius: 5px;">
-    <div style="flex-basis: 100%;"><?=$pokemon->dexid . ' - ' . $pokemon->name . ' - ' . $pokemon->namefr?><br><pre><?php //print_r($pokemon); ?></pre></div>
+    <div style="flex-basis: 100%;"><?=$pokemon->dexid . ' - ' . $pokemon->name['en'] . ' - ' . $pokemon->name['fr']?><br><pre><?php //print_r($pokemon); ?></pre></div>
   <?php
   forEach($pokemon->formes as $forme)
   {
