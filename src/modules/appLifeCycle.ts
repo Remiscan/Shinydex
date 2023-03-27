@@ -5,6 +5,7 @@ import { PopulatableSection, cleanUpRecycleBin, initPokedex, populator } from '.
 import * as Auth from './auth.js';
 import { callBackend } from './callBackend.js';
 import { FilterMenu } from './components/filter-menu/filterMenu.js';
+import { updateCounters } from './filtres.js';
 import { dataStorage, huntStorage, shinyStorage } from './localForage.js';
 import { Notif } from './notification.js';
 import { setTheme } from './theme.js';
@@ -161,19 +162,6 @@ export async function appStart() {
     Pokemon.names(); // met en cache les noms des Pokémon
     logPerf('init Pokémon data');
 
-    const sectionsToPopulate: PopulatableSection[] = ['mes-chromatiques', 'chasses-en-cours', 'corbeille', 'partage'];
-    await Promise.all([
-      initPokedex(),
-      ...sectionsToPopulate.map(async section => {
-        await populator[section]();
-        document.querySelector(`#${section}`)?.classList.remove('loading');
-        if (section === 'mes-chromatiques') {
-          document.querySelector(`#pokedex`)?.classList.remove('loading');
-        }
-      })
-    ]);
-    logPerf('populate');
-
     const filterMenus = document.querySelectorAll('filter-menu');
     await Promise.all([...filterMenus].map(menu => {
       if (!(menu instanceof FilterMenu)) throw new TypeError(`Expecting FilterMenu`);
@@ -183,6 +171,25 @@ export async function appStart() {
       return menu.init();
     }));
     logPerf('init filters');
+
+    const sectionsToPopulate: PopulatableSection[] = ['mes-chromatiques', 'chasses-en-cours', 'corbeille', 'partage'];
+    await Promise.all([
+      initPokedex(),
+      ...sectionsToPopulate.map(async section => {
+        await populator[section]();
+
+        // Because this needs to run after styles have been applied to the populated cards
+        setTimeout(() => {
+          updateCounters(section);
+
+          document.querySelector(`#${section}`)?.classList.remove('loading');
+          if (section === 'mes-chromatiques') {
+            document.querySelector(`#pokedex`)?.classList.remove('loading');
+          }
+        });
+      })
+    ]);
+    logPerf('populate');
   } catch (error) {
     const message = `Erreur pendant la préparation du contenu de l'application.`;
     console.error(message, error);
@@ -205,12 +212,12 @@ export async function appStart() {
   }
 
   // On pré-charge les icônes
-  try {
-    await loadAllImages([`./images/iconsheet.webp`, `./images/pokemonsheet.webp`]);
+  /*try {
+    await loadAllImages([`./images/iconsheet.webp`]);
     logPerf('loadAllImages');
   } catch (error) {
     console.error(`Erreur de chargement d'image`, error);
-  }
+  }*/
 
   console.log('[:)] Chargement terminé !');
 

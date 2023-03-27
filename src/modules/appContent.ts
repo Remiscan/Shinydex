@@ -4,8 +4,7 @@ import { Shiny } from './Shiny.js';
 import { friendCard } from './components/friend-card/friendCard.js';
 import { huntCard } from './components/hunt-card/huntCard.js';
 import { shinyCard } from './components/shiny-card/shinyCard.js';
-import { computeOrders, updateCounters } from './filtres.js';
-import { lazyLoad } from './lazyLoading.js';
+import { computeOrders, supportedOrdres, updateCounters } from './filtres.js';
 import { friendShinyStorage, friendStorage, huntStorage, localForageAPI, shinyStorage } from './localForage.js';
 import { navigate } from './navigate.js';
 import { Notif } from './notification.js';
@@ -39,7 +38,6 @@ async function populateHandler(section: PopulatableSection, _ids?: string[]): Pr
   const ids = _ids ?? allIds;
   const populated = await populateFromData(section, ids);
 
-  computeOrders(section, allIds);
   updateCounters(section);
 
   return populated;
@@ -53,6 +51,9 @@ export const populator = Object.fromEntries(populatableSections.map(section => {
 
 export async function populateFromData(section: PopulatableSection, ids: string[]): Promise<PromiseSettledResult<string>[]> {
   if (section === 'partage') return populateFriendsList(ids);
+
+  const sectionElement = document.querySelector(`#${section}`)!;
+  const conteneur = sectionElement.querySelector(`.section-contenu`)!;
 
   let elementName: string; // Nom de l'élément de carte
   let dataStore: localForageAPI; // Base de données
@@ -94,6 +95,18 @@ export async function populateFromData(section: PopulatableSection, ids: string[
   // Traitons les cartes :
 
   const cardsToCreate: Array<shinyCard | huntCard> = [];
+  const cardsToCreateIDs: Array<string> = [];
+
+  const orderMap = await computeOrders(section);
+
+  const setOrders = (card: shinyCard | huntCard, id: string) => {
+    supportedOrdres.forEach(order => {
+      const orderedKeys = orderMap.get(order);
+      const k = orderedKeys?.findIndex((i: string) => i === id);
+      card.style.setProperty(`--${order}-order`, String(k));
+    });
+  };
+
   const results = await Promise.allSettled(ids.map(async huntid => {
     const pkmn = await dataStore.getItem(huntid);
     const pkmnInDB = pkmn != null && typeof pkmn === 'object';
@@ -114,9 +127,12 @@ export async function populateFromData(section: PopulatableSection, ids: string[
         // DANS LA BDD & SANS CARTE = Créer
         card = document.createElement(elementName) as shinyCard | huntCard;
         card.setAttribute('huntid', huntid);
+        setOrders(card, huntid);
         cardsToCreate.push(card);
+        cardsToCreateIDs.push(huntid);
       } else {
         // DANS LA BDD & AVEC CARTE = Éditer
+        setOrders(card, huntid);
         await card.dataToContent();
       }
     }
@@ -124,15 +140,13 @@ export async function populateFromData(section: PopulatableSection, ids: string[
     return Promise.resolve(huntid);
   }));
 
-  // Plaçons les cartes sur la page
-  // (après la préparation pour optimiser le temps d'exécution)
-  const conteneur = document.querySelector(`#${section} > .section-contenu`)!;
-
   // Évite un bref moment où une carte est affichée en même temps que le message de section vide
   if (conteneur.parentElement?.classList.contains('vide') && cardsToCreate.length > 0) {
     conteneur.parentElement.classList.remove('vide');
   }
 
+  // Plaçons les cartes sur la page
+  // (après la préparation pour optimiser le temps d'exécution)
   await Promise.all(cardsToCreate.map(async card => {
     conteneur.appendChild(card);
     if (section === 'chasses-en-cours') {
@@ -141,6 +155,13 @@ export async function populateFromData(section: PopulatableSection, ids: string[
     }
     //lazyLoad(card, 'manual');
   }));
+
+  // Ordonnons les cartes déjà présentes et non touchées
+  const untouchedIDs = (await dataStore.keys()).filter(key => !(ids.includes(key)));
+  untouchedIDs.forEach(id => {
+    const card: shinyCard | huntCard | null = document.querySelector(`${elementName}[huntid="${id}"]`);
+    if (card) setOrders(card, id);
+  })
 
   return results;
 }

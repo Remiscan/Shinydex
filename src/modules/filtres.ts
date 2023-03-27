@@ -7,8 +7,8 @@ import { Hunt } from './Hunt.js';
 
 
 
-type ordre = 'catchTime' | 'shinyRate' | 'dexid' | 'species' | 'name' | 'game' | 'creationTime' | 'username';
-const supportedOrdres: ordre[] = ['catchTime', 'shinyRate', 'dexid', 'species', 'name', 'game', 'creationTime'];
+export type ordre = 'catchTime' | 'shinyRate' | 'dexid' | 'species' | 'name' | 'game' | 'creationTime' | 'username';
+export const supportedOrdres: ordre[] = ['catchTime', 'shinyRate', 'dexid', 'species', 'name', 'game', 'creationTime'];
 
 export function isOrdre(string: string): string is ordre {
   return supportedOrdres.includes(string as ordre);
@@ -165,10 +165,19 @@ function countFilteredCards(section: FiltrableSection): [number, number, Set<num
   const allCards = [...container.querySelectorAll(`[${cardAttribute}]`)];
   const totalCount = allCards.length;
 
+  const sectionFilters = {
+    mine: new Set(container.getAttribute('data-filter-mine')?.split(' ') ?? []),
+    legit: new Set(container.getAttribute('data-filter-legit')?.split(' ') ?? [])
+  };
+
   let displayedCount = 0;
   const dexids: Set<number> = new Set();
   allCards.forEach(card => {
-    if (getComputedStyle(card).display !== 'none') {
+    const cardFilters = {
+      mine: card.getAttribute('data-mine') ?? '',
+      legit: card.getAttribute('data-legit') ?? ''
+    };
+    if (sectionFilters.mine.has(cardFilters.mine) && sectionFilters.legit.has(cardFilters.legit)) {
       displayedCount++;
       const dexid = Number(card.getAttribute('data-dexid'));
       if (!isNaN(dexid) && dexid > 0) dexids.add(dexid);
@@ -267,10 +276,12 @@ async function orderPokemon(pokemonList: Shiny[] | Hunt[], order: ordre): Promis
  * Computes the order of cards when comparing all cards is needed,
  * i.e. when knowing the properties of the card itself isn't enough to quantize its order among all cards.
  */
-export async function computeOrders(section: FiltrableSection, ids: string[]): Promise<void> {
+export type OrderMap = Map<ordre, string[]>;
+export async function computeOrders(section: FiltrableSection): Promise<OrderMap> {
   let dataStore: localForageAPI;
   let dataClass: (typeof Shiny) | (typeof Hunt);
 
+  // Determine variables that depend on the section
   switch (section) {
     case 'mes-chromatiques':
       dataStore = shinyStorage;
@@ -291,23 +302,37 @@ export async function computeOrders(section: FiltrableSection, ids: string[]): P
     case 'partage':
       dataStore = friendStorage;
       break;
+    default:
+      throw new Error(`Section ${section} can't be ordered`);
   }
 
-  if (!dataStore || section === 'partage') return;
-
-  const pokemonList = (await Promise.all(ids.map(id => dataStore.getItem(id))))
-    .filter(pkmn => pkmn != null)
-    .map(pkmn => new dataClass(pkmn));
-  const cardsMap = new Map(pokemonList.map(pkmn => [pkmn.huntid, document.querySelector(`#${section} [huntid="${pkmn.huntid}"]`)]));
+  const keys = await dataStore.keys();
+  const orderMap: OrderMap = new Map();
 
   await Promise.all(supportedOrdres.map(async order => {
-    const orderedHuntids = await orderPokemon(pokemonList, order);
-    for (let k = 0; k < orderedHuntids.length; k++) {
-      const huntid = orderedHuntids[k];
-      const card = cardsMap.get(huntid);
-      if (!(card instanceof HTMLElement)) continue;
-      card.style.setProperty(`--${order}-order`, String(k));
-      card.setAttribute('data-ordered', '');
+    let orderedKeys: string[];
+
+    // Actually order the keys associated to the requested section's data
+    switch (section) {
+      case 'mes-chromatiques':
+      case 'chasses-en-cours':
+      case 'corbeille':
+      case 'chromatiques-ami':
+        const list = (await Promise.all(
+          keys.map(key => dataStore.getItem(key))
+        )).map(data => new dataClass(data));
+      
+        orderedKeys = await orderPokemon(list, order);
+        break;
+      
+      case 'partage':
+        const lang = document.documentElement.getAttribute('lang') ?? 'fr';
+        orderedKeys = keys.sort((a, b) => a.localeCompare(b, lang));
+        break;
     }
+
+    orderMap.set(order, orderedKeys);
   }));
+
+  return orderMap;
 }
