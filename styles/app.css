@@ -1083,7 +1083,7 @@ body:not([data-logged-in="true"]) [data-logged-in],
 body[data-logged-in="true"] [data-logged-out],
 body[data-public-profile="true"] [data-no-public-profile],
 body[data-has-username="true"] [data-no-username],
-body[data-logged-in="true"][data-public-profile="true"][data-has-username="true"] [data-not-shared]
+body[data-logged-in="true"][data-public-profile="true"][data-has-username="true"] [data-not-shared],
 body:not([data-logged-in="true"]) [data-shared],
 body:not([data-public-profile="true"]) [data-shared],
 body:not([data-has-username="true"]) [data-shared] {
