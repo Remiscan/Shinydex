@@ -223,31 +223,31 @@ async function orderPokemon(pokemonList: Shiny[] | Hunt[], order: ordre): Promis
         const allGames = Pokemon.jeux;
         const game1 = allGames.findIndex(g => g.uid === s1.game);
         const game2 = allGames.findIndex(g => g.uid === s2.game);
-        return game1 - game2 || s1.catchTime - s2.catchTime || huntidComparison;
+        return game1 - game2 || s1.catchTime - s2.catchTime || s1.creationTime - s2.creationTime || huntidComparison;
       }
 
       case 'name': {
         const nom1 = s1.name || noms[s1.dexid] || '';
         const nom2 = s2.name || noms[s2.dexid] || '';
-        return nom1.localeCompare(nom2, lang) || s1.catchTime - s2.catchTime || huntidComparison;
+        return nom1.localeCompare(nom2, lang) || s1.catchTime - s2.catchTime || s1.creationTime - s2.creationTime || huntidComparison;
       }
 
       case 'species': {
         const nom1 = noms[s1.dexid] || '';
         const nom2 = noms[s2.dexid] || '';
-        return nom1.localeCompare(nom2, lang) || s1.catchTime - s2.catchTime || huntidComparison;
+        return nom1.localeCompare(nom2, lang) || s1.catchTime - s2.catchTime || s1.creationTime - s2.creationTime || huntidComparison;
       }
 
       case 'shinyRate': {
-        return (s1.shinyRate || 0) - (s2.shinyRate || 0) || s1.catchTime - s2.catchTime || huntidComparison;
+        return (s1.shinyRate || 0) - (s2.shinyRate || 0) || s1.catchTime - s2.catchTime || s1.creationTime - s2.creationTime || huntidComparison;
       }
 
       case 'dexid': {
-        return s1.dexid - s2.dexid || s1.catchTime - s2.catchTime || huntidComparison;
+        return s1.dexid - s2.dexid || s1.catchTime - s2.catchTime || s1.creationTime - s2.creationTime || huntidComparison;
       }
 
       case 'catchTime': {
-        return s1.catchTime - s2.catchTime || huntidComparison;
+        return s1.catchTime - s2.catchTime || s1.creationTime - s2.creationTime || huntidComparison;
       }
 
       case 'creationTime': {
