@@ -139,7 +139,7 @@ export async function populateFromData(section: PopulatableSection, ids: string[
       await card.dataToContent();
       lazyLoad(card);
     }
-    //lazyLoad(card, 'manual', { fixedSize: section !== 'chasses-en-cours' });
+    //lazyLoad(card, 'manual');
   }));
 
   return results;
@@ -192,6 +192,7 @@ async function populateFriendsList(usernames: string[]): Promise<PromiseSettledR
 
   await Promise.all(cardsToCreate.map(async card => {
     conteneur.appendChild(card);
+    //lazyLoad(card, 'manual');
   }));
 
   return results;
@@ -233,8 +234,8 @@ export function initPokedex() {
       });
 
       pkmnContainer.appendChild(pkmn);
+      //lazyLoad(pkmn, 'manual');
       monsToPopulate.push(pkmnContainer);
-      //lazyLoad(pkmnContainer, 'manual', { fixedSize: true });
     }
 
     for (let pkmn of monsToPopulate) { genConteneur.appendChild(pkmn); }
