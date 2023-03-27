@@ -1,7 +1,10 @@
 import { Params, loadAllImages, wait } from './Params.js';
 import { Settings } from './Settings.js';
+import { FrontendShiny } from './ShinyBackend.js';
+import { callBackend } from './callBackend.js';
 import { FilterMenu } from './components/filter-menu/filterMenu.js';
 import { disableLazyLoad, enableLazyLoad } from './lazyLoading.js';
+import { friendShinyStorage } from './localForage.js';
 import { Notif } from './notification.js';
 
 
@@ -189,6 +192,37 @@ const sections: Section[] = [
     fab: null,
     element: document.getElementById('filter-menu')!
   }, {
+    nom: 'user-search',
+    rememberPosition: false,
+    openAnimation: (section: Element, event: Event) => {
+      const from = getComputedStyle(section).getPropertyValue('--from');
+      return section.animate([
+        { opacity: 0, transform: `translate3D(0, ${from}, 0)` },
+        { opacity: 1, transform: 'translate3D(0, 0, 0)' }
+      ], {
+        easing: Params.easingDecelerate,
+        duration: 200,
+        fill: 'both'
+      });
+    },
+    closeAnimation: (section: Element, event: Event) => {
+      const from = getComputedStyle(section).getPropertyValue('--from');
+      return section.animate([
+        { opacity: 1, transform: 'translate3D(0, 0, 0)' },
+        { opacity: 0, transform: `translate3D(0, ${from}, 0)` }
+      ], {
+        easing: Params.easingAccelerate,
+        duration: 150,
+        fill: 'both'
+      });
+    },
+    historique: true,
+    closePrevious: false,
+    makePreviousInert: true,
+    preload: [],
+    fab: null,
+    element: document.getElementById('user-search')!
+  }, {
     nom: 'obfuscator',
     rememberPosition: false,
     openAnimation: (section: Element, event: Event, data: any) => {
@@ -312,17 +346,54 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
 
   // On prépare la nouvelle section si besoin
   switch (sectionCible) {
-    case 'sprite-viewer':
+    case 'chromatiques-ami': {
+      if (data.username !== nouvelleSection.element.getAttribute('data-username')) {
+        nouvelleSection.element.setAttribute('data-username', data.username);
+
+        nouvelleSection.element.classList.add('loading');
+        nouvelleSection.element.classList.remove('vide', 'vide-filtres', 'vide-recherche');
+
+        // Populate section with friend's username
+        nouvelleSection.element.querySelectorAll('[data-type="username"]').forEach(e => e.innerHTML = data.username);
+
+        // Populate section with friend's Pokémon (don't await this before navigating)
+        callBackend('get-friend-data', { username: data.username, scope: 'full' }, false)
+        .then(async response => {
+          if ('matches' in response && response.matches === true) {
+            await Promise.all(
+              response.pokemon.map((shiny: any) => {
+                const feShiny = new FrontendShiny(shiny);
+                return friendShinyStorage.setItem(String(shiny.huntid), feShiny);
+              })
+            );
+
+            nouvelleSection.element.classList.remove('loading');
+
+            window.dispatchEvent(new CustomEvent('dataupdate', {
+              detail: {
+                sections: ['chromatiques-ami'],
+                ids: [response.pokemon.map((shiny: any) => String(shiny.huntid))],
+                sync: false
+              }
+            }));
+          }
+        });
+      }
+    } break;
+
+    case 'sprite-viewer': {
       const viewer = nouvelleSection.element.querySelector('sprite-viewer')!;
       viewer.setAttribute('dexid', data.dexid || '');
       viewer.setAttribute('shiny', 'true');
       viewer.setAttribute('size', navigator.onLine ? '512' : '112')
-      break;
+    } break;
+
     case 'filter-menu': {
       const menu = document.querySelector(`filter-menu[section="${data.section ?? ancienneSection.nom}"]`);
       if (!(menu instanceof FilterMenu)) throw new TypeError(`Expecting FilterMenu`);
       menu.open();
     } break;
+
     default: {
       document.body.removeAttribute('data-filters');
     }
@@ -371,6 +442,25 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
   switch (ancienneSection.nom) {
     case 'sprite-viewer': {
       ancienneSection.element.querySelector('sprite-viewer')?.removeAttribute('dexid');
+    } break;
+
+    case 'chromatiques-ami': {
+      if (nouvelleSection.closePrevious) {
+        friendShinyStorage.clear();
+        ancienneSection.element.querySelectorAll('friend-shiny-card').forEach(card => card.remove());
+        ancienneSection.element.querySelectorAll('.compteur').forEach(compteur => compteur.innerHTML = '');
+        ancienneSection.element.removeAttribute('data-username');
+
+        const filterMenu = document.querySelector('filter-menu[section="chromatiques-ami"]');
+        if (!(filterMenu instanceof FilterMenu)) throw new TypeError('Expecting FilterMenu');
+        filterMenu.reset();
+
+        const searchBoxes = document.querySelectorAll('search-box[section="chromatiques-ami"]');
+        searchBoxes.forEach(searchBox => {
+          const form = searchBox.shadowRoot?.querySelector('form');
+          if (form instanceof HTMLFormElement) form.reset();
+        });
+      }
     } break;
   }
 

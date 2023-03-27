@@ -16,9 +16,11 @@ template.innerHTML = `
 <a class="icon-button surface interactive bouton-retour">
   <span class="material-icons">close</span>
 </a>
-<label for="shiny-switch" class="switch-shiny-regular">
-  <shiny-switch icons="checked" id="shiny-switch"></shiny-switch>
-</label>
+<form name="switch-shiny-regular">
+  <label for="shiny-switch">
+    <shiny-switch icons="checked" name="shiny" id="shiny-switch"></shiny-switch>
+  </label>
+</form>
 `;
 
 export default template;

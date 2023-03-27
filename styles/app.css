@@ -176,6 +176,10 @@ body[data-section-actuelle~="a-propos"] .nav-link[data-nav-section="a-propos"] {
   --indicator-elevation-opacity: var(--elevation-2-opacity);
 }
 
+body[data-section-actuelle~="pokedex"] {
+  --caught-filter-display: flex; /* disables "display: none" on caught filter in filter-menu */
+}
+
 body:not([data-section-actuelle~="mes-chromatiques"]) nav search-box[section="mes-chromatiques"]::part(form),
 body:not([data-section-actuelle~="pokedex"]) nav search-box[section="pokedex"]::part(form),
 body:not([data-section-actuelle~="chasses-en-cours"]) nav search-box[section="chasses-en-cours"]::part(form),
@@ -250,6 +254,7 @@ body[data-section-actuelle~="parametres"] #parametres,
 body[data-section-actuelle~="a-propos"] #a-propos,
 body[data-section-actuelle~="sprite-viewer"] #sprite-viewer,
 body[data-section-actuelle~="filter-menu"] #filter-menu,
+body[data-section-actuelle~="user-search"] #user-search,
 body[data-section-actuelle~="top-layer"] #top-layer,
 body[data-section-actuelle~="obfuscator"] #obfuscator {
   display: grid;
@@ -269,6 +274,13 @@ body[data-section-actuelle~="obfuscator"] #obfuscator {
   position: sticky;
   top: 0;
   z-index: var(--z-section-titre);
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.section-titre h1 {
+  overflow: hidden;
 }
 
 .spacer {
@@ -295,6 +307,7 @@ body[data-section-actuelle~="obfuscator"] #obfuscator {
 a.icon-button.bouton-retour {
   margin: 8px;
   margin-right: 0;
+  min-width: 40px;
 }
 
 .compteur {
@@ -405,11 +418,24 @@ section.loading .compteur {
 !!!!! CARTE D'UN POKÉMON !!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
-shiny-card + shiny-card,
-hunt-card + hunt-card,
-corbeille-card + corbeille-card {
+shiny-card,
+friend-shiny-card,
+corbeille-card {
   content-visibility: auto;
-  contain-intrinsic-size: 100px 120px;
+  contain-intrinsic-height: auto 120px;
+  contain: size layout paint;
+  height: 120px;
+  min-height: 120px;
+}
+
+friend-card {
+  content-visibility: auto;
+  contain-intrinsic-height: auto 154px;
+}
+
+hunt-card {
+  content-visibility: auto;
+  contain-intrinsic-height: auto 400px;
 }
 
 [data-rendered="hidden"] {
@@ -482,7 +508,15 @@ section.vide.vide-filtres .message-vide-filtres {
   margin: auto;
 }
 
-section:not(.loading) .section-loader {
+section:not(.loading) .section-loader,
+section.loading :is(
+  shiny-card,
+  .pokedex-gen,
+  hunt-card,
+  corbeille-card,
+  friend-card,
+  friend-shiny-card
+) {
   display: none;
 }
 
@@ -520,6 +554,7 @@ section.loading .message-vide {
   position: relative;
   content-visibility: auto;
   contain-intrinsic-size: 44px 44px;
+  contain: size layout paint;
 
   --surface-color: var(--surface);
   --elevation-opacity: var(--elevation-2-opacity);
@@ -527,8 +562,11 @@ section.loading .message-vide {
 }
 
 .dex-icon:not(.got) {
-  /* setting opacity on .pkmnicon makes the pokedex section lag, particularly when opening it on mobile */
-  --surface-opacity: 1;
+  --surface-opacity: 0;
+}
+
+.dex-icon:not(.got):not(:hover, :focus, :active) {
+  --elevation-opacity: 0;
 }
 
 .dex-icon.got {
@@ -561,6 +599,11 @@ section:not([data-filter-mine~="true"]) [data-mine="true"],
 section:not([data-filter-mine~="false"]) [data-mine="false"],
 section:not([data-filter-legit~="true"]) [data-legit="true"],
 section:not([data-filter-legit~="false"]) [data-legit="false"] {
+  display: none;
+}
+
+#pokedex:not([data-filter-caught~="true"]) .dex-icon.got,
+#pokedex:not([data-filter-caught~="false"]) .dex-icon:not(.got) {
   display: none;
 }
 
@@ -612,12 +655,82 @@ body:not([data-filters~="chromatiques-ami"]) filter-menu[section="chromatiques-a
   display: none;
 }
 
-#filter-menu {
+#filter-menu,
+#user-search {
   --from: 1rem;
 }
 
-filter-menu {
+filter-menu,
+.user-search-card {
   margin-bottom: calc(var(--bottom-bar-height) + 8px);
+}
+
+
+
+/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!! FRIENDS LIST !!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+
+.outlined-card {
+  border: 1px solid rgb(var(--outline));
+  border-radius: var(--border-radius);
+  padding: 16px;
+}
+
+.message-tuto ul {
+  margin: 8px 0 0 0;
+  padding: 0 0 0 16px;
+}
+
+.message-tuto[data-not-shared] {
+  border-color: rgb(var(--outline));
+}
+
+.message-tuto[data-shared] {
+  border-color: rgb(var(--success));
+}
+
+.user-search-card {
+  height: fit-content;
+  box-sizing: border-box;
+  border-radius: var(--border-radius);
+  position: sticky;
+  z-index: var(--z-filter-menu);
+  max-width: min(100% - 16px, 600px);
+  max-height: calc(100% - 16px);
+  margin-inline: auto;
+  margin-top: auto;
+  overflow: hidden auto;
+  padding: 16px;
+  box-sizing: border-box;
+  border-radius: var(--border-radius);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 350px;
+}
+
+.search-form[name="user-search"] {
+  height: 48px;
+  margin-block: -4px;
+  --reset-icon-column: 40px;
+  grid-template-columns: [input-start search-icon] 56px 1fr [reset-icon] var(--reset-icon-column) [input-end] 4px [submit-button] auto;
+  container-type: inline-size;
+}
+
+.search-form[name="user-search"] input[role="searchbox"] {
+  grid-column: input-start / input-end;
+  padding-left: 16px;
+}
+
+.search-form[name="user-search"] button[type="submit"] {
+  grid-column: submit-button;
+}
+
+form[name="user-profile"] {
+  display: flex;
+  padding: 8px;
+  border-radius: var(--border-radius);
 }
 
 
@@ -634,12 +747,12 @@ form[name="app-settings"],
 #a-propos > .section-contenu {
   box-sizing: border-box;
   width: 100%;
-  max-width: 65ch;
 }
 
 #parametres > .section-contenu,
 #a-propos > .section-contenu {
   padding-inline: 16px;
+  max-width: 65ch;
 }
 
 h2:not(:first-child) {
@@ -673,8 +786,8 @@ h2:not(:first-child) {
   border-top: 1px solid rgb(var(--outline-variant));
 }
 
-.un-parametre .param-nom,
-.un-parametre .param-description {
+.param-nom,
+.param-description {
   max-width: 40ch;
 }
 
@@ -751,14 +864,6 @@ label[for="pick-import-file"],
 	z-index: -1;
 }
 
-.account-warning {
-  border: 1px solid var(--success-color);
-  border-radius: var(--border-radius);
-  padding: 8px;
-  grid-template-columns: auto;
-  box-sizing: border-box;
-}
-
 .un-parametre.theme input[type="radio"] + label {
   margin: 0;
 }
@@ -787,6 +892,14 @@ input-slider[name="theme-hue"]::part(slider-thumb) {
   box-shadow: inset 0 0 0 2px rgb(var(--on-surface)),
               0 0 0 2px rgb(var(--inverse-on-surface));
   outline-offset: 5px;
+}
+
+.current-account-info {
+  margin-bottom: -8px;
+}
+
+[data-value="current-account"] {
+  color: rgb(var(--primary));
 }
 
 
@@ -827,12 +940,6 @@ input-slider[name="theme-hue"]::part(slider-thumb) {
 !!!!! PARTAGE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
-form[name="user-profile"] {
-  display: flex;
-  padding: 8px;
-  border-radius: var(--border-radius);
-}
-
 
 
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -841,6 +948,7 @@ form[name="user-profile"] {
 
 #sprite-viewer,
 #filter-menu,
+#user-search,
 #top-layer,
 #obfuscator {
   grid-column: 1 / -1;
@@ -856,9 +964,15 @@ form[name="user-profile"] {
 }
 
 #top-layer,
-#filter-menu {
+#filter-menu,
+#user-search {
   background-color: transparent;
   z-index: var(--z-obfuscator);
+}
+
+#filter-menu,
+#user-search {
+  background: rgb(var(--surface), .5);
 }
 
 body[data-section-actuelle~="top-layer"] #top-layer {
@@ -907,6 +1021,25 @@ body[data-section-actuelle~="top-layer"] #top-layer {
   margin-top: 0;
 }
 
+.snackbar.signin-prompt {
+  grid-template-columns: 1fr var(--dismiss-column);
+  grid-template-rows: auto auto;
+}
+
+.snackbar.signin-prompt > .snackbar-message {
+  grid-row: 2;
+  grid-column: 1 / -1;
+  padding-top: 0;
+  padding-right: 16px;
+}
+
+.signin-button-container {
+  padding: 8px 0;
+  margin-left: -8px;
+  height: 40px;
+  overflow: hidden;
+}
+
 
 /*
  * Bouton installer
@@ -947,6 +1080,12 @@ iframe[src^="https://accounts.google.com"] {
 }
 
 body:not([data-logged-in="true"]) [data-logged-in],
-body[data-logged-in="true"] [data-logged-out] {
-  display: none;
+body[data-logged-in="true"] [data-logged-out],
+body[data-public-profile="true"] [data-no-public-profile],
+body[data-has-username="true"] [data-no-username],
+body[data-logged-in="true"][data-public-profile="true"][data-has-username="true"] [data-not-shared]
+body:not([data-logged-in="true"]) [data-shared],
+body:not([data-public-profile="true"]) [data-shared],
+body:not([data-has-username="true"]) [data-shared] {
+  display: none !important;
 }

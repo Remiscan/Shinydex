@@ -9,7 +9,6 @@
   grid-template-columns: [sprite] 116px [identity] 1fr [misc] auto [note] var(--last-column);
   grid-template-rows: 1fr [identity] auto 1fr [capture] auto 1fr;
   position: relative;
-  order: var(--order, 0);
 }
 
 pokemon-sprite,
@@ -69,6 +68,7 @@ button.icon-button.menu-hint::before {
   grid-template-columns: [ball] 32px [name] fit-content(100%) [gene] 32px;
   position: relative;
   left: -16px;
+  margin-right: -32px;
   align-items: center;
   line-height: initial;
 }
@@ -88,24 +88,21 @@ button.icon-button.menu-hint::before {
 [data-type="species"] {
   grid-row: species;
   grid-column: name;
-  font-size: 1em;
-  font-weight: 300;
   text-transform: capitalize;
   opacity: .8;
   display: flex;
   justify-content: start;
   align-items: center;
   position: relative;
-  left: 25px;
-  top: -6px;
+  left: 8px;
+  top: -8px;
+  white-space: nowrap;
 }
 
 [data-type="name"],
 [data-type="name"]:empty + [data-type="species"] {
   grid-row: name;
   grid-column: name;
-  font-size: 1.5em;
-  font-weight: 300;
   opacity: 1;
   display: flex;
   justify-content: start;
@@ -115,6 +112,7 @@ button.icon-button.menu-hint::before {
   top: 0;
   text-shadow: 1px 1px rgb(var(--surface-variant));
   z-index: 1;
+  white-space: nowrap;
 }
 
 [data-type="name"]:empty {
@@ -125,7 +123,6 @@ button.icon-button.menu-hint::before {
   grid-row: name;
   grid-column: gene;
   scale: 0.9;
-  transform-origin: center bottom;
 }
 
 [data-type="gene"].icones.explain {
@@ -153,7 +150,7 @@ button.icon-button.menu-hint::before {
   grid-column: identity;
   display: grid;
   grid-template-columns: [game] 32px [info] auto;
-  grid-template-rows: [method] auto [date] auto [detail] auto;
+  grid-template-rows: [method] auto [date] auto;
   gap: 0 5px;
   margin-left: 16px;
   line-height: initial;
@@ -181,7 +178,7 @@ button.icon-button.menu-hint::before {
   font-size: 1em;
   text-align: justify;
   line-height: 20px;
-  padding: 10px;
+  padding: 4px 8px 4px 12px;
   z-index: 4;
   overflow: visible;
   scrollbar-width: thin;
@@ -234,8 +231,14 @@ button.icon-button.menu-hint::before {
 .pokemon-notes__texte {
   margin: auto;
   max-height: 100%;
-  overflow: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
   padding-right: .5ch;
+  width: 100%;
+}
+
+.pokemon-notes__texte > p {
+  margin: 0;
 }
 
 .empty {
@@ -348,7 +351,7 @@ button.icon-button.menu-hint::before {
   flex-grow: 1;
 }
 
-@container (min-width: 750px) {
+@container (min-width: 650px) {
   .container {
     --last-column: auto;
   }
@@ -357,7 +360,7 @@ button.icon-button.menu-hint::before {
     grid-column: note / -1;
     opacity: 1;
     transform: none;
-    width: calc(100cqi - 500px);
+    width: min(100cqi - 400px, 50cqi);
     max-height: 112px;
     margin: 4px;
     margin-left: 0;

@@ -30,14 +30,13 @@ const allMethodes: Methode[] = [
   { id: 'dexnavchain', jeux: allGames.filter(g => g.id == 'oras'), mine: true, charm: true },
   { id: 'soschain', jeux: allGames.filter(g => g.gen == 7), mine: true, charm: true },
   { id: 'ultrawormhole', jeux: allGames.filter(g => g.gen == 7), mine: true, charm: false },
-  { id: 'battlebonus', jeux: allGames.filter(g => g.gen == 8), mine: true, charm: true },
   { id: 'raid', jeux: allGames.filter(g => g.id == 'swsh' || g.id == 'sv'), mine: true, charm: false },
   { id: 'dynamaxadventure', jeux: allGames.filter(g => g.gen == 8), mine: true, charm: true },
   { id: 'massoutbreak', jeux: allGames.filter(g => g.id == 'pla' || g.id == 'sv'), mine: true, charm: true },
   { id: 'massivemassoutbreak', jeux: allGames.filter(g => g.id == 'pla'), mine: true, charm: true },
   
   { id: 'wildevent', jeux: allGames.filter(g => g.gen == 0), mine: true, charm: false },
-  { id: 'wildalwaysshiny', jeux: allGames.filter(g => ['gs', 'hgss', 'bw2'].includes(g.id)), mine: true, charm: false },
+  { id: 'wildalwaysshiny', jeux: allGames.filter(g => ['gs', 'hgss', 'bw2', 'pla'].includes(g.id)), mine: true, charm: false },
   { id: 'event', jeux: allGames, mine: false, charm: false },
 
   { id: 'trade', jeux: allGames, mine: false, charm: false },
@@ -181,15 +180,23 @@ export class Shiny extends FrontendShiny {
       let charmRolls = Number(game.gen >= 5) * Number(this.charm) * 2;
 
       switch (methode.id) {
+        case 'hack':
+        case 'trade':
+        case 'wildevent': {
+          // ???
+          return null;
+        }
+
         case 'wild': {
           if (game.id === 'lgpe') {
             const lureRolls = this.count['lgpe-lure'] ? 1 : 0;
             const combo = this.count['lgpe-catchCombo'] || 0;
+            const nextSpawn = this.count['lgpe-nextSpawn'] || 0;
             const chainRolls = (combo >= 31) ? 11
                             : (combo >= 21) ? 7
                             : (combo >= 11) ? 3
                             : 0
-            bonusRolls = lureRolls + chainRolls;
+            bonusRolls = lureRolls + nextSpawn * chainRolls;
           }
 
           else if (game.id === 'swsh') {
@@ -286,11 +293,6 @@ export class Shiny extends FrontendShiny {
                     : 1;
           const rate = Math.round(100 / odds);
           return rate;
-        }
-
-        case 'wildevent': {
-          // ???
-          return null;
         }
 
         case 'raid': {

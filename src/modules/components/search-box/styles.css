@@ -1,14 +1,8 @@
 :host { display: contents; }
 
-form {
-  flex-grow: 1;
-  height: 56px;
-  display: grid;
-  --icon-button-width: 44px;
+form.search-form {
   --filter-icon-column: var(--icon-button-width);
-  --reset-icon-column: var(--icon-button-width);
   grid-template-columns: [search-icon] 56px 1fr [reset-icon] var(--reset-icon-column) [filter-icon] var(--filter-icon-column) 2px;
-  place-items: center;
 }
 
 :host([no-filters]) form {
@@ -19,42 +13,13 @@ form {
   --reset-icon-column: 0px;
 }
 
-form > * {
-  grid-row: 1;
-}
-
 input[name="search"] {
   grid-column: 1 / -1;
-  border: none;
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: calc(100% - 8px);
   padding: 0 calc(var(--reset-icon-column) + var(--filter-icon-column) + 4px) 0 56px;
-  box-sizing: border-box;
-  border-radius: 28px;
-  font-family: inherit;
-}
-
-input[name="search"]::placeholder {
-  color: rgb(var(--on-surface-variant));
-}
-
-[part="reset-icon"], [part="filter-icon"] {
-  color: rgb(var(--on-surface));
-}
-
-[part="search-icon"] {
-  color: rgb(var(--on-surface-variant));
-  grid-column: search-icon;
-  display: flex;
-}
-
-[part="reset-icon"] {
-  grid-column: reset-icon;
 }
 
 [part="filter-icon"] {
+  color: rgb(var(--on-surface));
   grid-column: filter-icon;
   cursor: auto;
 }

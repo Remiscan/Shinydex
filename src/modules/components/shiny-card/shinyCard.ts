@@ -88,6 +88,10 @@ export class shinyCard extends HTMLElement {
     {
       const element = this.shadow.querySelector('[data-type="name"]')!;
       element.innerHTML = shiny.name;
+
+      const speciesElement = this.shadow.querySelector('[data-type="species"]')!;
+      if (shiny.name) speciesElement.classList.remove('title-large');
+      else            speciesElement.classList.add('title-large');
     }
 
     // Compteur
@@ -101,44 +105,42 @@ export class shinyCard extends HTMLElement {
       if (getProp('encounters')) parts.push(`${getProp('encounters')} rencontres`);
 
       if ((shiny.game === 'ultrasun' || shiny.game === 'ultramoon') && shiny.method === 'ultrawormhole') {
-        parts.push(`Distance ${getProp('usum-distance')}m, ${getProp('usum-rings')} anneaux`);
+        parts.push(`Distance : ${getProp('usum-distance')}m, ${getProp('usum-rings')} anneaux`);
       }
 
       else if (shiny.game === 'letsgopikachu' || shiny.game === 'letsgoeevee') {
-        if (getProp('lgpe-nextSpawn')) parts.push(`Combo Capture ${getProp('lgpe-catchCombo')}`);
+        if (getProp('lgpe-nextSpawn')) parts.push(`Combo Capture : ${getProp('lgpe-catchCombo')}`);
         if (getProp('lgpe-lure')) parts.push('Parfum utilisé');
       }
 
       else if (shiny.game === 'sword' || shiny.game === 'shield') {
-        if (getProp('swsh-dexKo')) parts.push(`Compteur de KO ${getProp('swsh-dexKo')}`);
+        if (getProp('swsh-dexKo')) parts.push(`Compteur de KO : ${getProp('swsh-dexKo')}`);
       }
 
       else if (shiny.game === 'legendsarceus') {
-        if (getProp('pla-dexResearch')) {
-          const dexResearch = getProp('pla-dexResearch');
-          const niv = dexResearch === 2 ? '100%' : dexResearch === 1 ? '10' : '9 ou -';
-          parts.push(`niv. rech. ${niv}`);
-        };
+        const dexResearch = getProp('pla-dexResearch');
+        const niv = dexResearch === 2 ? '100%' : dexResearch === 1 ? '10' : '9 ou -';
+        parts.push(`niv. de recherche ${niv}`);
       }
 
       else if (shiny.game === 'scarlet' || shiny.game === 'violet') {
-        if (getProp('sv-outbreakCleared')) {
+        if (shiny.method === 'massoutbreak') {
           const outbreakCleared = getProp('sv-outbreakCleared');
-          const num = outbreakCleared === 2 ? '60+'
+          const num = outbreakCleared === 2 ? 'Plus de 60'
                     : outbreakCleared === 1 ? '30 à 59'
-                    : '29-';
+                    : 'Moins de 29';
           parts.push(`${num} KO`);
         }
 
         if (getProp('sv-sparklingPower')) {
           const sparklingPower = getProp('sv-sparklingPower');
-          parts.push(`Rencontre brillance niv ${sparklingPower}`);
+          parts.push(`Rencontre brillance niv. ${sparklingPower}`);
         }
       }
 
       countString = parts.join(', ');
 
-      element.innerHTML = countString;
+      element.innerHTML = countString || '<span class="empty">Pas de détail.</span>';
     }
 
     // Temps de capture / date
@@ -150,7 +152,7 @@ export class shinyCard extends HTMLElement {
                              .format(new Date(time));
         element.innerHTML = date;
       } else {
-        element.innerHTML = '';
+        element.innerHTML = 'Date inconnue';
       }
     }
 
@@ -166,14 +168,14 @@ export class shinyCard extends HTMLElement {
       const ball = shiny.ball || '';
       const element = this.shadow.querySelector('[data-type="ball"]')!;
       element.setAttribute('data-icon', `ball/${ball}`);
-      if (shiny.mine && ball) element.classList.remove('off');
-      else                    element.classList.add('off');
+      if (ball) element.classList.remove('off');
+      else      element.classList.add('off');
     }
 
     // Notes
     {
       const notes = shiny.notes || '<span class="empty">Pas de note.</span>';
-      const element = this.shadow.querySelector('.pokemon-notes__texte')!;
+      const element = this.shadow.querySelector('[data-type="notes"]')!;
       element.innerHTML = notes;
     }
 
@@ -239,10 +241,10 @@ export class shinyCard extends HTMLElement {
           (game.gen > 5 && shinyRate >= 4096 - 1)
         ) {
           srContainer.classList.add('full-odds');
-        } else if (
+        } else if (charm && !(charmlessMethods.includes(methode)) && (
           (game.gen <= 5 && shinyRate >= 2731 - 1) ||
           (game.gen > 5 && shinyRate >= 1365 - 1)
-        ) {
+        )) {
           srContainer.classList.add('charm-odds');
         } else if (shinyRate <= 1) {
           srContainer.classList.add('one-odds');
@@ -350,6 +352,7 @@ export class shinyCard extends HTMLElement {
     const openButton = this.shadow.querySelector('[data-action="open"]');
     if (!(openButton instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
     openButton.addEventListener('click', this.openHandler);
+    
     this.addEventListener('click', this.clickHandler = event => openButton.click());
 
     const editButton = this.shadow.querySelector('[data-action="edit"]');

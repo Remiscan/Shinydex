@@ -40,8 +40,17 @@
 
     <h2 class="title-medium">Sauvegarde et partage des données en ligne</h2>
 
-    <p class="body-large param-nom" data-logged-out>Connectez-vous avec Google pour sauvegarder vos données en ligne.</p>
-    <div id="google-signin-button-container" data-logged-out></div>
+    <p class="un-parametre with-description" data-logged-out>
+      <span class="param-nom body-large">Se connecter</span>
+      <span class="param-description body-medium">pour sauvegarder vos données en ligne.</span>
+      <span class="param">
+        <button type="button" class="surface interactive filled tonal only-text" data-action="sign-in-prompt">
+          <span class="label-large">Se connecter</span>
+        </button>
+      </span>
+    </p>
+
+    <p class="body-medium current-account-info" data-logged-in>Actuellement connecté en tant que <span data-value="current-account"></span>.</p>
 
     <p class="un-parametre with-description" data-logged-in data-last-sync>
       <span class="param-nom body-large">Dernière sauvegarde</span>
@@ -76,7 +85,7 @@
       <span class="param-nom body-large">Choisir un pseudo</span>
       <span class="param-description body-medium">pour pouvoir être ajouté comme ami.</span>
       <span class="param">
-        <text-field name="username" autocomplete="off" spellcheck="false" maxlength="30">
+        <text-field name="username" autocomplete="off" spellcheck="false" maxlength="20">
           <span slot="label">Pseudo</span>
         </text-field>
       </span>

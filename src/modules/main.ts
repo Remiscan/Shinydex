@@ -1,13 +1,15 @@
 import '../../../_common/components/input-slider/input-slider.js';
 import '../../../_common/components/input-switch/input-switch.js';
+import { Friend } from './Friend.js';
 import { Hunt } from './Hunt.js';
-import { getCookie } from './Params.js';
 import { Settings } from './Settings.js';
 import { PopulatableSection, populator } from './appContent.js';
 import { appStart, checkUpdate } from './appLifeCycle.js';
 import * as Auth from './auth.js';
 import './components/corbeille-card/corbeilleCard.js';
 import './components/filter-menu/filterMenu.js';
+import './components/friend-card/friendCard.js';
+import './components/friend-shiny-card/friendShinyCard.js';
 import './components/hunt-card/huntCard.js';
 import './components/loadSpinner.js';
 import './components/radioGroup.js';
@@ -18,10 +20,11 @@ import './components/sprite-viewer/spriteViewer.js';
 import './components/syncLine.js';
 import './components/syncProgress.js';
 import { export2json, json2import } from './exportToJSON.js';
-import { dataStorage, huntStorage, shinyStorage } from './localForage.js';
+import { dataStorage, friendStorage, huntStorage, shinyStorage } from './localForage.js';
 import { navLinkBubble, navigate, sectionActuelle } from './navigate.js';
 import { Notif, warnBeforeDestruction } from './notification.js';
 import { requestSync } from './syncBackup.js';
+import { callBackend } from './callBackend.js';
 
 
 
@@ -58,18 +61,10 @@ for (const bouton of Array.from(document.querySelectorAll('.bouton-retour'))) {
 // L'obfuscator ramène en arrière quand on clique dessus
 document.getElementById('obfuscator')!.addEventListener('click', () => history.back());
 
-// Ferme le menu des filtres si on clique en-dehors
-{
-  const section = document.getElementById('filter-menu');
-  section?.addEventListener('click', event => {
-    if (event.target !== section) return;
-    history.back();
-  });
-}
-
-// Ferme le top layer si on clique en-dehors
-{
-  const section = document.getElementById('top-layer');
+// Ferme les sections suivantes si on clique en-dehors de leur contenu
+const sectionsToCloseWhenClickingOutside = ['filter-menu', 'user-search', 'top-layer'];
+for (const sectionName of sectionsToCloseWhenClickingOutside) {
+  const section = document.getElementById(sectionName);
   section?.addEventListener('click', event => {
     if (event.target !== section) return;
     history.back();
@@ -104,10 +99,51 @@ document.querySelector('.fab')!.addEventListener('click', async () => {
 
   // Ajoute un nouvel ami
   else if (sectionActuelle === 'partage') {
-    // Ajouter un nouvel ami ici
-    await navigate('obfuscator', new Event('navigate'), { search: true, section: 'ajouter-ami' })
+    await navigate('user-search', new Event('click'), {});
   }
 });
+
+
+
+///////////////
+// AJOUT D'AMIS
+
+// Active le bouton de recherche d'utilisateur
+{
+  const form = document.querySelector('form[name="user-search"]') as HTMLFormElement;
+  form.addEventListener('submit', async event => {
+    event.preventDefault();
+
+    // Get username from form
+    const username = String((new FormData(form)).get('username') ?? '');
+    if (username.length === 0 || username.length > 30) return;
+
+    // Ask backend if that username matches a public user
+    const response = await callBackend('get-friend-data', { username, scope: 'partial' }, false);
+    if (sectionActuelle === 'user-search') {
+      history.back();
+    }
+
+    if ('matches' in response && response.matches === true) {
+      // Add the requested user to the friends list
+      const friend = new Friend(username, response.pokemon);
+      await friend.save();
+
+      // Populate friends list
+      window.dispatchEvent(new CustomEvent('dataupdate', {
+        detail: {
+          sections: ['partage'],
+          ids: [username],
+          sync: true
+        }
+      }));
+
+      new Notif(`${username} a été ajouté à vos amis.`).prompt();
+    } else {
+      new Notif('Aucun profil public ne correspond à ce pseudo.').prompt();
+    }
+  });
+}
 
 
 
@@ -181,7 +217,8 @@ importInput.addEventListener('change', async event => {
     button.tabIndex = -1;
 
     const ids = [...(await shinyStorage.keys()), ...(await huntStorage.keys())];
-    await Promise.all([shinyStorage.clear(), huntStorage.clear()]);
+    const friends = [...(await friendStorage.keys())];
+    await Promise.all([shinyStorage.clear(), huntStorage.clear(), friendStorage.clear(), dataStorage.removeItem('user-profile')]);
 
     new Notif('Données supprimées.').prompt();
 
@@ -189,6 +226,14 @@ importInput.addEventListener('change', async event => {
       detail: {
         sections: ['mes-chromatiques', 'chasses-en-cours', 'corbeille'],
         ids: ids,
+        sync: false
+      }
+    }));
+
+    window.dispatchEvent(new CustomEvent('dataupdate', {
+      detail: {
+        sections: ['partage'],
+        ids: friends,
         sync: false
       }
     }));
@@ -210,23 +255,8 @@ importInput.addEventListener('change', async event => {
     button.tabIndex = -1;
 
     try {
-      let response = await fetch(`./backend/endpoint.php?request=delete-user-data&date=${Date.now()}`);
-      if (!(response.status === 200)) {
-        throw new Error('Could not fetch list of sprites');
-      }
-
-      let data;
-      let response2 = response.clone();
-      try {
-        data = await response.json();
-      } catch {
-        data = await response2.text();
-        throw new Error(`Invalid json: ${data}`);
-      }
-      if ('error' in data) throw new Error(data.error);
-
-      await Auth.signOut();
-
+      await callBackend('delete-user-data', undefined, true);
+      Auth.signOutCallback();
       new Notif('Données en ligne supprimées.').prompt();
     } catch (error) {
       console.error(error);
@@ -265,13 +295,25 @@ navigator.serviceWorker.addEventListener('message', async event => {
       loaders.forEach(loader => loader.setAttribute('state', 'success'));
       document.body.setAttribute('data-last-sync', 'success');
 
-      window.dispatchEvent(new CustomEvent('dataupdate', {
-        detail: {
-          sections: ['mes-chromatiques', 'chasses-en-cours', 'corbeille'],
-          ids: event.data.modified,
-          sync: false
-        }
-      }));
+      if ('modifiedPokemon' in event.data) {
+        window.dispatchEvent(new CustomEvent('dataupdate', {
+          detail: {
+            sections: ['mes-chromatiques', 'chasses-en-cours', 'corbeille'],
+            ids: event.data.modifiedPokemon,
+            sync: false
+          }
+        }));
+      }
+
+      if ('modifiedFriends' in event.data) {
+        window.dispatchEvent(new CustomEvent('dataupdate', {
+          detail: {
+            sections: ['partage'],
+            ids: event.data.modifiedFriends,
+            sync: false
+          }
+        }));
+      }
     } else {
       loaders.forEach(loader => loader.setAttribute('state', 'failure'));
       document.body.setAttribute('data-last-sync', 'failure');
@@ -298,17 +340,15 @@ declare global {
 }
 
 window.addEventListener('dataupdate', async (event: DataUpdateEvent) => {
-  console.log(event);
-
   // On peuple l'application avec les nouvelles données
   const { sections, ids, sync } = event.detail;
+  console.log(`Populating sections [${(sections ?? []).join(', ')}] with IDs [${(ids ?? ['all']).join(', ')}] ${sync ? 'with sync' : ''}`);
   for (const section of sections) {
     await populator[section](ids);
   }
 
   // On demande une synchronisation des données
-  const loggedIn = getCookie('loggedin') === 'true';
-  if (loggedIn && sync) await requestSync();
+  if (Auth.loggedIn && sync) await requestSync();
 });
 
 

@@ -1,12 +1,12 @@
-import { Params, getCookie, loadAllImages, timestamp2date, wait } from './Params.js';
+import { Params, loadAllImages, timestamp2date, wait } from './Params.js';
 import { Pokemon } from './Pokemon.js';
 import { Settings } from './Settings.js';
 import { PopulatableSection, cleanUpRecycleBin, initPokedex, populator } from './appContent.js';
 import * as Auth from './auth.js';
+import { callBackend } from './callBackend.js';
 import { FilterMenu } from './components/filter-menu/filterMenu.js';
 import { dataStorage, huntStorage, shinyStorage } from './localForage.js';
 import { Notif } from './notification.js';
-import { requestSync } from './syncBackup.js';
 import { setTheme } from './theme.js';
 import { upgradeStorage } from './upgradeStorage.js';
 
@@ -161,7 +161,7 @@ export async function appStart() {
     Pokemon.names(); // met en cache les noms des Pokémon
     logPerf('init Pokémon data');
 
-    const sectionsToPopulate: PopulatableSection[] = ['mes-chromatiques', 'chasses-en-cours', 'corbeille'];
+    const sectionsToPopulate: PopulatableSection[] = ['mes-chromatiques', 'chasses-en-cours', 'corbeille', 'partage'];
     await Promise.all([
       initPokedex(),
       ...sectionsToPopulate.map(async section => {
@@ -259,7 +259,11 @@ export async function appStart() {
 
   logPerf('Étape 6');
 
-  Auth.init();
+  if (navigator.onLine) {
+    Auth.init();
+  } else {
+    window.addEventListener('online', event => Auth.init(), { once: true });
+  }
 
   // Affiche l'état de la dernière synchronisation dans les paramètres
   const lastSyncState = await dataStorage.getItem('last-sync-state');
@@ -270,10 +274,6 @@ export async function appStart() {
     const date = new Date(lastSyncTime);
     syncTimeContainer.innerHTML = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
   }
-
-  // Demande une synchronisation des données au démarrrage
-  const loggedIn = getCookie('loggedin') === 'true';
-  if (loggedIn) await requestSync();
 
   // ---
 
@@ -323,12 +323,7 @@ export async function checkUpdate(checkNotification = false) {
 
     const installedFiles = await dataStorage.getItem('file-versions');
     const cacheVersion = Math.max(...Object.values(installedFiles).map(v => Number(v)));
-  
-    // On lance mod_update.php pour récupérer les données les plus récentes
-    const response = await fetch(`/shinydex/backend/endpoint.php?request=get-file-versions&date=${Date.now()}`);
-    if (response.status != 200)
-      throw '[:(] Erreur ' + response.status + ' lors de la requête';
-    const liveFiles = await response.json();
+    const liveFiles = await callBackend('get-file-versions');
 
     const updatedFiles = Object.entries(liveFiles).filter(file => {
       const [path, liveVersion] = file;

@@ -60,6 +60,7 @@ export class SearchBox extends HTMLElement {
       case 'chasses-en-cours': cardSelector = 'hunt-card'; break;
       case 'corbeille': cardSelector = 'corbeille-card'; break;
       case 'partage': cardSelector = 'friend-card'; break;
+      case 'chromatiques-ami': cardSelector = 'friend-shiny-card'; break;
     }
 
     // Hide non-corresponding cards via CSS
@@ -81,6 +82,9 @@ export class SearchBox extends HTMLElement {
           selector = dexids.map(dexid => `:not([data-dexid="${dexid}"])`).join('');
           css += `#${section} ${cardSelector}${selector} { display: none; }`;
         }
+      } else if (section === 'partage') {
+        selector = `:not([data-username*="${search}"]):not([data-species*="${search}"])`;
+        css += `#${section} ${cardSelector}${selector} { display: none; }`;
       } else {
         if (!isNaN(parseFloat(search))) {
           selector = `:not([data-dexid="${parseFloat(search)}"])`;
@@ -127,16 +131,18 @@ export class SearchBox extends HTMLElement {
             placeholder = 'Rechercher dans mes amis';
             break;
           case 'chromatiques-ami':
-            placeholder = 'Rechercher dans les Pokémon de {pseudo}';
+            placeholder = 'Rechercher dans ses Pokémon';
             break;
         }
         
         input.setAttribute('placeholder', placeholder);
 
         const filterMenuLink = this.shadow.querySelector('[data-nav-section="filter-menu"]');
-        if (isFiltrableSection(value ?? '')) {
+        let sectionToFilter = value;
+        if (value === 'pokedex') sectionToFilter = 'mes-chromatiques';
+        if (isFiltrableSection(sectionToFilter ?? '')) {
           this.removeAttribute('no-filters');
-          filterMenuLink?.setAttribute('data-nav-data', JSON.stringify({ section: value }));
+          filterMenuLink?.setAttribute('data-nav-data', JSON.stringify({ section: sectionToFilter, altSection: value }));
         } else {
           this.setAttribute('no-filters', '');
           filterMenuLink?.removeAttribute('data-nav-data');

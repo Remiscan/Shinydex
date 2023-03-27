@@ -3,16 +3,17 @@
     <span class="material-icons">arrow_back</span>
   </a>
 
-  <h1 class="title-large">Pokémon <shiny-stars></shiny-stars> de <span class="nom-ami">{ami}</span></h1>
+  <h1 class="title-large">Pokémon <shiny-stars></shiny-stars> de <span data-type="username">{ami}</span></h1>
+  <span class="compteur secondary title-large"></span>
 
   <search-box section="chromatiques-ami"></search-box>
 
   <div class="titre-icones">
     <!-- Bouton paramètres -->
-    <a class="icon-button surface interactive" data-nav-section="parametres" href="./parametres">
+    <!--<a class="icon-button surface interactive" data-nav-section="parametres" href="./parametres">
       <span class="material-icons">settings</span>
       <sync-progress></sync-progress>
-    </a>
+    </a>-->
   </div>
 </header>
 
@@ -21,7 +22,7 @@
   <!-- Message affiché quand liste vide -->
   <div class="message-vide">
     <span class="material-icons">error_outline</span>
-    <span>${pseudo} n'a enregistré aucun Pokémon chromatique.</span>
+    <span><span data-type="username">{ami}</span> n'a enregistré aucun Pokémon chromatique.</span>
   </div>
 
   <!-- Message affiché quand liste filtrée vide -->

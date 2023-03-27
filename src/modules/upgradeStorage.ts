@@ -114,6 +114,7 @@ export function updateDataFormat(shiny: { [key: string]: any }): { [key: string]
       ['Ultra Lune', 'Ultra-Lune'],
       ['GO', 'Pokémon GO'],
       ['Légendes Arceus', 'Légendes Pokémon : Arceus'],
+      ['Home', 'Pokémon Home']
     ]);
     const newName = renames.get(shiny['game']);
     if (newName) shiny['game'] = newName;
@@ -142,6 +143,9 @@ export function updateDataFormat(shiny: { [key: string]: any }): { [key: string]
       ['Échangé', 'Échange'],
       ['Échangé (GTS)', 'Échange'],
       ['Échangé (œuf)', 'Échange'],
+      ['Masuda', 'Œuf (Masuda)'],
+      ['Combo Capture', 'Sauvage'],
+      ['Bonus de combats', 'Sauvage']
     ]);
     const newName = renames.get(shiny['method']);
     if (newName) shiny['method'] = newName;

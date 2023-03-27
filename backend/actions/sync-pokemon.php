@@ -1,12 +1,7 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'].'/shinydex/backend/class_BDD.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/shinydex/backend/class_User.php';
-
-
-
-header('Content-Type: application/json');
-
-$response = [];
+$db = new BDD();
+$userID = $user->userID;
 
 
 
@@ -24,69 +19,24 @@ $local_deleted_data = json_decode($_POST['deleted-local-data'], true);
 
 
 /**
- * Step 2: Get user data
- */
-
-if (!User::isLoggedIn()) {
-  respondError('User is not logged in');
-}
-
-try {
-  $user = User::getFromCookies();
-} catch (\Throwable $error) {
-  respondError($error->getMessage());
-}
-
-
-$provider = $user->getProvider();
-$provideruserid = $user->getProviderUserId();
-
-
-
-/**
- * Step 3: Check if user exists; create it if it does not
- */
-
-$db = new BDD();
-
-try {
-  $userid = $user->getDBUserId($db);
-} catch (\Throwable $error) {
-  // If there is no local data to back up, no need to create a user, just stop here
-  if (count($local_data) === 0) {
-    respondError('Canceled user creation: no data to back up');
-  }
-
-  // Create new user and get its assigned db user id
-  try {
-    $user->createDBEntry($db);
-    $userid = $user->getDBUserId($db);
-  } catch (\Throwable $error) {
-    respondError($error->getMessage());
-  }
-}
-
-
-
-/**
- * Step 4: Get user's Pokémon from online database,
+ * Step 2: Get user's Pokémon from online database,
  * including his deleted Pokémon.
  */
 
 $online_data = $db->prepare('SELECT * FROM `shinydex_pokemon` WHERE `userid` = :userid ORDER BY id DESC');
-$online_data->bindParam(':userid', $userid, PDO::PARAM_STR, 36);
+$online_data->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
 $online_data->execute();
 $online_data = $online_data->fetchAll(PDO::FETCH_ASSOC);
 
 $online_deleted_data = $db->prepare('SELECT * FROM `shinydex_deleted_pokemon` WHERE `userid` = :userid ORDER BY id DESC');
-$online_deleted_data->bindParam(':userid', $userid, PDO::PARAM_STR, 36);
+$online_deleted_data->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
 $online_deleted_data->execute();
 $online_deleted_data = $online_deleted_data->fetchAll(PDO::FETCH_ASSOC);
 
 
 
 /**
- * Step 5: Compare local data with online database data
+ * Step 3: Compare local data with online database data
  * 
  * 1: local_data       2: local_deleted_data
  * A: online_data      B: online_deleted_data
@@ -186,9 +136,15 @@ foreach($online_data as $key => $online_shiny) {
 }
 
 
+$online_data = null;
+$online_deleted_data = null;
+$local_data = null;
+$local_deleted_data = null;
+
+
 
 /**
- * Step 6: Update online database with newer local data.
+ * Step 4: Update online database with newer local data.
  */
 
 $results = [];
@@ -235,7 +191,7 @@ foreach($to_insert_online as $key => $shiny) {
   )");
 
   $insert->bindParam(':huntid', $shiny['huntid'], PDO::PARAM_STR, 36);
-  $insert->bindParam(':userid', $userid, PDO::PARAM_STR, 36);
+  $insert->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
   $insert->bindParam(':creationTime', $shiny['lastUpdate'], PDO::PARAM_STR, 13);
   $insert->bindParam(':lastUpdate', $shiny['lastUpdate'], PDO::PARAM_STR, 13);
 
@@ -277,7 +233,7 @@ foreach($to_update_online as $key => $shiny) {
   WHERE `huntid` = :huntid AND `userid` = :userid');
 
   $update->bindParam(':huntid', $shiny['huntid'], PDO::PARAM_STR, 36);
-  $update->bindParam(':userid', $userid, PDO::PARAM_STR, 36);
+  $update->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
 
   $update->bindParam(':lastUpdate', $shiny['lastUpdate'], PDO::PARAM_STR, 13);
 
@@ -311,7 +267,7 @@ foreach($to_delete_online as $key => $shiny) {
   )");
 
   $insert->bindParam(':huntid', $shiny['huntid'], PDO::PARAM_STR, 36);
-  $insert->bindParam(':userid', $userid, PDO::PARAM_STR, 36);
+  $insert->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
   $insert->bindParam(':lastUpdate', $shiny['lastUpdate'], PDO::PARAM_STR, 13);
 
   $results[] = $insert->execute();
@@ -319,7 +275,7 @@ foreach($to_delete_online as $key => $shiny) {
   $delete = $db->prepare('DELETE FROM shinydex_pokemon WHERE huntid = :huntid AND userid = :userid');
 
   $delete->bindParam(':huntid', $shiny['huntid'], PDO::PARAM_STR, 36);
-  $delete->bindParam(':userid', $userid, PDO::PARAM_STR, 36);
+  $delete->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
 
   $results[] = $delete->execute();
 }
@@ -329,7 +285,7 @@ foreach($to_restore_online as $key => $shiny) {
   $delete = $db->prepare('DELETE FROM shinydex_deleted_pokemon WHERE huntid = :huntid AND userid = :userid');
 
   $delete->bindParam(':huntid', $shiny['huntid'], PDO::PARAM_STR, 36);
-  $delete->bindParam(':userid', $userid, PDO::PARAM_STR, 36);
+  $delete->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
 
   $results[] = $delete->execute();
 }
@@ -337,7 +293,139 @@ foreach($to_restore_online as $key => $shiny) {
 
 
 /**
- * Step 7: Send data back to the frontend.
+ * Step 5: Compare local friends list with online friends list
+ */
+
+$friends_to_insert_online = [];
+$friends_to_delete_online = [];
+
+$friends_to_insert_local = [];
+$friends_to_delete_local = [];
+
+if (isset($_POST['friends-list'])) {
+  $local_friends = json_decode($_POST['friends-list'] ?? '[]');
+  $local_profile_lastUpdate = $_POST['profile-last-update'] ?? 0;
+
+  $user_profile = $db->prepare('SELECT * FROM `shinydex_users` WHERE `uuid` = :userid LIMIT 1');
+  $user_profile->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
+  $user_profile->execute();
+  $user_profile = $user_profile->fetchAll(PDO::FETCH_ASSOC);
+  $online_friends = json_decode($user_profile['friends'] ?? '[]');
+  $online_profile_lastUpdate = $user_profile['lastUpdate'] ?? 0;
+
+  foreach($local_friends as $username) {
+    $is_online_key = array_search($username, $online_friends);
+
+    if ($is_online_key === false) {
+      if ($local_profile_lastUpdate > $online_profile_lastUpdate) {
+        $friends_to_insert_online[] = $username;
+      } else {
+        $friends_to_remove_local[] = $username;
+      }
+    }
+  }
+
+  foreach($online_friends as $username) {
+    $is_local_key = array_search($username, $local_friends);
+
+    if ($is_local_key === false) {
+      if ($local_profile_lastUpdate > $online_profile_lastUpdate) {
+        $friends_to_remove_online[] = $username;
+      } else {
+        $friends_to_insert_local[] = $username;
+      }
+    }
+  }
+
+  $recent_friends_list = array_merge(
+    array_diff($online_friends, $friends_to_delete_online),
+    $friends_to_insert_online
+  );
+
+  // If the friends list sent by the frontend is more recent, push it to the DB
+  if ($local_profile_lastUpdate > $online_profile_lastUpdate) {
+    $update_friends = $db->prepare('UPDATE `shinydex_users` SET 
+      `friends` = :friends,
+      `lastUpdate` = :lastupdate
+    WHERE `uuid` = :userid');
+
+    $friends_string = json_encode($recent_friends_list);
+    $now = floor(1000 * microtime(true));
+
+    $update_friends->bindParam(':friends', $friends_string);
+    $update_friends->bindParam(':lastupdate', $now);
+    $update_friends->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
+
+    $results[] = $update_friends->execute();
+  }
+}
+
+
+
+/**
+ * Step 6: Get partial data about each friend's 10 most recent Pokémon
+ */
+
+$friends_pokemon = [];
+$number_of_pokemon_to_get = 3;
+if (isset($_POST['friends-list']) && count($recent_friends_list) > 0) {
+  // Prepare query to get each friend's userid
+  $friends_query_string = [];
+  for ($i = 1; $i <= count($recent_friends_list); $i++) {
+    $friends_query_string[] = ":user$i";
+  }
+  $friends_query_string = join(',', $friends_query_string);
+
+  // Get each friend's userid
+  $get_friends_userid = $db->prepare("SELECT uuid, username FROM shinydex_users WHERE `username` IN ($friends_query_string)");
+
+  for ($i = 0; $i < count($recent_friends_list); $i++) {
+    $username = $recent_friends[$i];
+    $get_friends_userid->bindParam(":user$i", $username, PDO::PARAM_STR, 36);
+  }
+
+  $results[] = $get_friends_userid->execute();
+  $get_friends_userid = $get_friends_userid->fetchAll(PDO::FETCH_ASSOC);
+
+  // Associate each username to a userid in an array
+  $friends_userid = [];
+  foreach ($get_friends_userid as $friend) {
+    $friends_userid[$friend['username']] = $friend['uuid'];
+  }
+  $get_friends_userid = null;
+
+  // Get each friend's partial Pokémon data
+  $get_friends_pokemon = $db->prepare("WITH grouped_pokemon AS (
+    SELECT
+      dexid,
+      forme, 
+      ROW_NUMBER() OVER (PARTITION BY userid ORDER BY catchTime DESC) AS rownumber
+    FROM shinydex_pokemon
+    WHERE `userid` IN ($friends_query_string)
+  ) SELECT * FROM grouped_pokemon WHERE rownumber <= $number_of_pokemon_to_get");
+
+  for ($i = 0; $i < count($recent_friends_list); $i++) {
+    $userid = $friends_userid[$recent_friends_list[$i]];
+    $get_friends_pokemon->bindParam(":user$i", $userid, PDO::PARAM_STR, 36);
+  }
+
+  $results[] = $get_friends_pokemon->execute();
+  $get_friends_pokemon = $get_friends_pokemon->fetchAll(PDO::FETCH_ASSOC);
+
+  // Associate each username to an array of Pokémon with partial data
+  foreach ($recent_friends_list as $username) {
+    $pokemon_list = [];
+    foreach ($get_friends_pokemon as $pokemon) {
+      $pokemon_list[] = ['dexid' => $pokemon['dexid'], 'forme' => $pokemon['forme']];
+    }
+    $friends_pokemon[$username] = $pokemon_list;
+  }
+}
+
+
+
+/**
+ * Step 7: Send results to the frontend.
  */
 
 /** Removes the user id from each Pokémon in an array of Pokémon. */
@@ -355,4 +443,6 @@ echo json_encode(array(
   'to_update_local' => removeUserID($to_update_local),
   'to_delete_local' => removeUserID($to_delete_local),
   'to_restore_local' => removeUserID($to_restore_local),
+  'friends_to_delete_local' => $friends_to_delete_local,
+  'friends_pokemon' => $friends_pokemon
 ), JSON_PRETTY_PRINT);

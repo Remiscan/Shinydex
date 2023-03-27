@@ -6,6 +6,12 @@ require_once __DIR__.'/class_Sprite.php';
 class Forme extends Sprite {
   public $dbid = '';
   public $nom = '';
+  public $form = 0;
+  public $gender = '';
+  public $gigamax = false;
+  public $candy = 0;
+  public $noShiny = false;
+  public $hasBackside = false;
 
   function __construct(Sprite $sprite, int $dexid) {
     // Formes à ne pas compter
@@ -279,6 +285,30 @@ class Forme extends Sprite {
         case 902: // Paragruel
           $ids = ['', ''];
           $noms = ['', ''];
+        break;
+        case 925: // Familiol
+          $ids = ['', 'four'];
+          $noms = ['Famille de Trois', 'Famille de Quatre'];
+        break;
+        case 931: // Tapatoès
+          $ids = ['', 'blue', 'yellow', 'white'];
+          $noms = ['Plumage Vert', 'Plumage Bleu', 'Plumage Jaune', 'Plumage Blanc'];
+        break;
+        case 964: // Superdofin
+          $ids = ['', 'hero'];
+          $noms = ['Ordinaire', 'Super'];
+        break;
+        case 978: // Nigirigon
+          $ids = ['', 'droopy', 'stretch'];
+          $noms = ['Courbée', 'Affalée', 'Raide'];
+        break;
+        case 982: // Deusolourdo
+          $ids = ['', 'three'];
+          $noms = ['Double', 'Triple'];
+        break;
+        case 999: // Mordudor
+          $ids = ['', 'roaming'];
+          $noms = ['Coffre', 'Marche'];
         break;
         default:
           $done = false;

@@ -32,7 +32,9 @@ export const Params = {
   easingEmphasizedAccelerate: 'cubic-bezier(.3, 0, .8, .15)',
 
   spriteSize: 112,
-  defaultLang: 'fr'
+  defaultLang: 'fr',
+
+  codeVerifier: ''
 };
 
 
@@ -91,6 +93,24 @@ export function pad(s: string, long: number): string {
   while (chaine.length < long)
     chaine = `0${chaine}`;
   return chaine;
+}
+
+export function Uint8ArrayToHexString(values: Uint8Array) {
+  return Array.from(values)
+              .map(values => values.toString(16).padStart(2, '0'))
+              .join('');
+}
+
+export async function sha256(string: string) {
+  const encoder = new TextEncoder();
+  const shaValues = await crypto.subtle.digest('SHA-256', encoder.encode(string));
+  return Uint8ArrayToHexString(new Uint8Array(shaValues));
+}
+
+export function base64UrlEncode(string: string) {
+  return btoa(string).replace(/\+/g, '-')
+                     .replace(/\//g, '_')
+                     .replace(/=+$/, '');
 }
 
 

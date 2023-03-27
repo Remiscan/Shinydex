@@ -32,7 +32,7 @@ export class spriteViewer extends HTMLElement {
   /** Affiche les sprites de toutes les formes du Pokémon demandé. */
   async updateSprites(dexid: string) {
     const pokemon = new Pokemon(pokemonData[Number(dexid)]);
-    const nomFormeNormale = 'Normale';
+    const nomFormeNormale = pokemon.getName();
 
     const caughtFormsList: Set<string> = new Set();
     await shinyStorage.keys().then(keys => Promise.all(keys.map(async key => {
@@ -68,15 +68,15 @@ export class spriteViewer extends HTMLElement {
         case 'Gigamax':
           return nom;
         case '':
-          return `Forme ${nomFormeNormale}`;
+          return `${nomFormeNormale}`;
         default:
           return `Forme ${nom}`;
       }
     };
 
     for (const forme of formes) {
-      const afficherNomForme = true;//(forme.nom != '' || formes.length > 1);
       const caught = caughtFormsList.has(forme.dbid);
+      const afficherNomForme = (formes.length > 1 || forme.nom != '' || caught);
 
       const htmlS = `
         <div class="dex-sprite">
@@ -115,8 +115,9 @@ export class spriteViewer extends HTMLElement {
 
 
   toggleShinyRegular(event: Event) {
-    if (event.currentTarget == null || !('checked' in event.currentTarget)) throw new TypeError(`Expecting ShinySwitch`);
-    const shiny = event.currentTarget.checked;
+    if (!(event.currentTarget instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
+    const formData = new FormData(event.currentTarget);
+    const shiny = formData.get('shiny');
     document.querySelector('#sprite-viewer sprite-viewer')!.setAttribute('shiny', String(shiny));
   }
 
@@ -153,19 +154,26 @@ export class spriteViewer extends HTMLElement {
       this.update(attr);
     }
 
-    const spriteScroller = this.querySelector('.sprite-scroller')!;
+    const form = this.querySelector('form[name="switch-shiny-regular"]');
+    if (!(form instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
+    form.addEventListener('change', this.toggleShinyRegular);
+
     const switchSR = this.querySelector('shiny-switch');
+    const spriteScroller = this.querySelector('.sprite-scroller')!;
     if (switchSR == null || !('checked' in switchSR)) throw new TypeError(`Expecting ShinySwitch`);
-    switchSR.addEventListener('change', this.toggleShinyRegular);
     spriteScroller.addEventListener('click', this.toggle = () => switchSR.shadowRoot!.querySelector('button')?.click());
   }
 
   disconnectedCallback() {
-    const spriteScroller = this.querySelector('.sprite-scroller')!;
+    const form = this.querySelector('form[name="switch-shiny-regular"]');
+    if (!(form instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
+    form.removeEventListener('change', this.toggleShinyRegular);
+
     const switchSR = this.querySelector('shiny-switch');
+    const spriteScroller = this.querySelector('.sprite-scroller')!;
     if (switchSR == null || !('checked' in switchSR)) throw new TypeError(`Expecting ShinySwitch`);
-    switchSR.removeEventListener('change', this.toggleShinyRegular);
     spriteScroller.removeEventListener('click', this.toggle);
+
     this.ready = false;
   }
 
