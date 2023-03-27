@@ -307,6 +307,7 @@ export async function computeOrders(section: FiltrableSection, ids: string[]): P
       const card = cardsMap.get(huntid);
       if (!(card instanceof HTMLElement)) continue;
       card.style.setProperty(`--${order}-order`, String(k));
+      card.setAttribute('data-ordered', '');
     }
   }));
 }

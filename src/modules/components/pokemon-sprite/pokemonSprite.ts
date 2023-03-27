@@ -50,8 +50,8 @@ sheet.replaceSync(/*css*/`
   }
 
   img, svg {
-    width: 100%;
-    height: 100%;
+    width: var(--size);
+    height: var(--size);
   }
 
   #star-field {

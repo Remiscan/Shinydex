@@ -30,6 +30,10 @@ pokemon-sprite,
   --elevation-opacity: var(--elevation-2-opacity);
 }
 
+:host(:not([data-ordered])) pokemon-sprite {
+  display: none;
+}
+
 .menu-hint {
   color: rgb(var(--on-surface-variant), .8);
 }
