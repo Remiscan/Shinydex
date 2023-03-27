@@ -192,11 +192,12 @@ export class Shiny extends FrontendShiny {
           if (game.id === 'lgpe') {
             const lureRolls = this.count['lgpe-lure'] ? 1 : 0;
             const combo = this.count['lgpe-catchCombo'] || 0;
+            const nextSpawn = this.count['lgpe-nextSpawn'] || 0;
             const chainRolls = (combo >= 31) ? 11
                             : (combo >= 21) ? 7
                             : (combo >= 11) ? 3
                             : 0
-            bonusRolls = lureRolls + chainRolls;
+            bonusRolls = lureRolls + nextSpawn * chainRolls;
           }
 
           else if (game.id === 'swsh') {
