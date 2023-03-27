@@ -508,7 +508,15 @@ section.vide.vide-filtres .message-vide-filtres {
   margin: auto;
 }
 
-section:not(.loading) .section-loader {
+section:not(.loading) .section-loader,
+section.loading :is(
+  shiny-card,
+  .pokedex-gen,
+  hunt-card,
+  corbeille-card,
+  friend-card,
+  friend-shiny-card
+) {
   display: none;
 }
 
