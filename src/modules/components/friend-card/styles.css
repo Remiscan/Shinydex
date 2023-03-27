@@ -8,10 +8,11 @@
   display: grid;
   --last-column: 0;
   grid-template-columns: auto 1fr;
-  grid-template-rows: [identity] auto [sprites] 112px;
+  grid-template-rows: [identity] auto [sprites] calc(var(--sprite-scale) * 112px);
   gap: 4px;
   position: relative;
   order: var(--order, 0);
+  --sprite-scale: .75;
 }
 
 .friend-infos__identity {
@@ -89,6 +90,8 @@ pokemon-sprite {
   --distance-to-parent-border: 4px;
   border-radius: var(--sub-border-radius);
   --elevation-opacity: var(--elevation-2-opacity);
+  scale: var(--sprite-scale);
+  margin: calc(-1 * .5 * (1 - var(--sprite-scale)) * 112px);
 }
 
 /*
@@ -96,7 +99,7 @@ pokemon-sprite {
  * -----------
 
 function generateContainerQuery(n) {
-  const containerWidth = 8 + 4 + n * 112 + (n-1) * 4 + 4 + 30 + 4 + 8;
+  const containerWidth = 8 + 4 + n * (.75 * 112) + (n-1) * 4 + 4 + 30 + 4 + 8;
   let css = `
   @container (width < ${containerWidth}px) {
     pokemon-sprite:nth-child(${n-1}) ~ pokemon-sprite {
@@ -108,7 +111,7 @@ function generateContainerQuery(n) {
 }
 
 let css = '';
-for (let i = 1; i <= 7; i++) {
+for (let i = 1; i <= 10; i++) {
   css += generateContainerQuery(i);
 }
 
@@ -118,44 +121,62 @@ console.log(css);
  *
  */
 
-@container (width < 170px) {
+@container (width < 142px) {
   pokemon-sprite:nth-child(0) ~ pokemon-sprite {
     display: none;
   }
 }
 
-@container (width < 286px) {
+@container (width < 230px) {
   pokemon-sprite:nth-child(1) ~ pokemon-sprite {
     display: none;
   }
 }
 
-@container (width < 402px) {
+@container (width < 318px) {
   pokemon-sprite:nth-child(2) ~ pokemon-sprite {
     display: none;
   }
 }
 
-@container (width < 518px) {
+@container (width < 406px) {
   pokemon-sprite:nth-child(3) ~ pokemon-sprite {
     display: none;
   }
 }
 
-@container (width < 634px) {
+@container (width < 494px) {
   pokemon-sprite:nth-child(4) ~ pokemon-sprite {
     display: none;
   }
 }
 
-@container (width < 750px) {
+@container (width < 582px) {
   pokemon-sprite:nth-child(5) ~ pokemon-sprite {
     display: none;
   }
 }
 
-@container (width < 866px) {
+@container (width < 670px) {
   pokemon-sprite:nth-child(6) ~ pokemon-sprite {
+    display: none;
+  }
+}
+
+@container (width < 758px) {
+  pokemon-sprite:nth-child(7) ~ pokemon-sprite {
+    display: none;
+  }
+}
+
+@container (width < 846px) {
+  pokemon-sprite:nth-child(8) ~ pokemon-sprite {
+    display: none;
+  }
+}
+
+@container (width < 934px) {
+  pokemon-sprite:nth-child(9) ~ pokemon-sprite {
     display: none;
   }
 }

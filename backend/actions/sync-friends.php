@@ -97,7 +97,7 @@ if ($local_profile_lastUpdate > $online_profile_lastUpdate) {
  */
 
 $friends_pokemon = [];
-$number_of_pokemon_to_get = 7;
+$number_of_pokemon_to_get = 10;
 if (isset($_POST['friends-list']) && count($recent_friends_list) > 0) {
   // Prepare query to get each friend's userid
   $friends_query_string = [];
