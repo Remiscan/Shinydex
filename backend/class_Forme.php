@@ -286,6 +286,30 @@ class Forme extends Sprite {
           $ids = ['', ''];
           $noms = ['', ''];
         break;
+        case 925: // Familiol
+          $ids = ['', 'four'];
+          $noms = ['Famille de Trois', 'Famille de Quatre'];
+        break;
+        case 931: // Tapatoès
+          $ids = ['', 'blue', 'yellow', 'white'];
+          $noms = ['Plumage Vert', 'Plumage Bleu', 'Plumage Jaune', 'Plumage Blanc'];
+        break;
+        case 964: // Superdofin
+          $ids = ['', 'hero'];
+          $noms = ['Ordinaire', 'Super'];
+        break;
+        case 978: // Nigirigon
+          $ids = ['', 'droopy', 'stretch'];
+          $noms = ['Courbée', 'Affalée', 'Raide'];
+        break;
+        case 982: // Deusolourdo
+          $ids = ['', 'three'];
+          $noms = ['Double', 'Triple'];
+        break;
+        case 999: // Mordudor
+          $ids = ['', 'roaming'];
+          $noms = ['Coffre', 'Marche'];
+        break;
         default:
           $done = false;
       }

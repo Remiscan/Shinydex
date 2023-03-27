@@ -20,7 +20,8 @@ function buildWebpSprites(int $size = 512, bool $logs = true) {
     $pngSprite = imagecreatefrompng($srcPath);
 
     // Copy (and resize) the sprite onto the sheet
-    imagecopyresampled($webpSprite, $pngSprite, 0, 0, 0, 0, $size, $size, 512, 512);
+    $startSize = getimagesize($srcPath);
+    imagecopyresampled($webpSprite, $pngSprite, 0, 0, 0, 0, $size, $size, $startSize[0], $startSize[1]);
 
     $filename = str_replace('.png', '.webp', $file);
     $outPath = "$outDir/$filename";

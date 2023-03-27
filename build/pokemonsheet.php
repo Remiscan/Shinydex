@@ -132,7 +132,8 @@ function buildPokemonSheet(int $columns = 32, int $spriteSize = 44, string $form
     $sprite = imagecreatefrompng($spriteUrl);
 
     // Copy (and resize) the sprite onto the sheet
-    imagecopyresampled($sheet, $sprite, $x, $y, 0, 0, $spriteSize, $spriteSize, 512, 512);
+    $startSize = getimagesize($spriteUrl);
+    imagecopyresampled($sheet, $sprite, $x, $y, 0, 0, $spriteSize, $spriteSize, $startSize[0], $startSize[1]);
 
     // Insert position into CSS file
     file_put_contents($cssPath, ".pkmnicon[data-dexid=\"$dexid\"]{background-position: -{$x}px -{$y}px}", FILE_APPEND);

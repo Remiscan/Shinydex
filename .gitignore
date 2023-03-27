@@ -1,8 +1,10 @@
 # Ignore generated files
 backend/composer/vendor
 backend/composer/src
+backend/test-sprites-serebii-to-home.php
 dist
 images/out/
 images/pokemon-sprites/webp/
+images/pokemon-sprites/serebii/
 data/out/
 tsconfig.tsbuildinfo
