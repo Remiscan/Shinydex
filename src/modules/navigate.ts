@@ -372,7 +372,7 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
             window.dispatchEvent(new CustomEvent('dataupdate', {
               detail: {
                 sections: ['chromatiques-ami'],
-                ids: [response.pokemon.map((shiny: any) => String(shiny.huntid))],
+                ids: response.pokemon.map((shiny: any) => String(shiny.huntid)),
                 sync: false
               }
             }));
