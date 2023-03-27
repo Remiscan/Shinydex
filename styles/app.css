@@ -418,7 +418,7 @@ section.loading .compteur {
 !!!!! CARTE D'UN POKÉMON !!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
-shiny-card,
+/*shiny-card,
 friend-shiny-card,
 corbeille-card {
   content-visibility: auto;
@@ -430,13 +430,13 @@ corbeille-card {
 
 friend-card {
   content-visibility: auto;
-  contain-intrinsic-height: auto 154px;
+  contain-intrinsic-height: auto 126px;
 }
 
 hunt-card {
   content-visibility: auto;
   contain-intrinsic-height: auto 400px;
-}
+}*/
 
 [data-rendered="hidden"] {
   content-visibility: hidden;
@@ -543,18 +543,14 @@ section.loading .message-vide {
   align-items: flex-start;
 }
 
-/*.pokedex-gen + .pokedex-gen {
-  content-visibility: auto;
-}*/
-
 .dex-icon {
   display: grid;
   place-items: center;
   border-radius: calc(.5 * var(--border-radius));
   position: relative;
-  content-visibility: auto;
+  /*content-visibility: auto;
   contain-intrinsic-size: 44px 44px;
-  contain: size layout paint;
+  contain: size layout paint;*/
 
   --surface-color: var(--surface);
   --elevation-opacity: var(--elevation-2-opacity);

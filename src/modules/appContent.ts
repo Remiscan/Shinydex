@@ -137,7 +137,7 @@ export async function populateFromData(section: PopulatableSection, ids: string[
     conteneur.appendChild(card);
     if (section === 'chasses-en-cours') {
       await card.dataToContent();
-      lazyLoad(card);
+      //lazyLoad(card);
     }
     //lazyLoad(card, 'manual');
   }));
