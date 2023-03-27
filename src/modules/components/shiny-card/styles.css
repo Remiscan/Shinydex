@@ -68,6 +68,7 @@ button.icon-button.menu-hint::before {
   grid-template-columns: [ball] 32px [name] fit-content(100%) [gene] 32px;
   position: relative;
   left: -16px;
+  margin-right: -32px;
   align-items: center;
   line-height: initial;
 }
@@ -95,6 +96,7 @@ button.icon-button.menu-hint::before {
   position: relative;
   left: 8px;
   top: -8px;
+  white-space: nowrap;
 }
 
 [data-type="name"],
@@ -110,6 +112,7 @@ button.icon-button.menu-hint::before {
   top: 0;
   text-shadow: 1px 1px rgb(var(--surface-variant));
   z-index: 1;
+  white-space: nowrap;
 }
 
 [data-type="name"]:empty {
@@ -120,7 +123,6 @@ button.icon-button.menu-hint::before {
   grid-row: name;
   grid-column: gene;
   scale: 0.9;
-  transform-origin: center bottom;
 }
 
 [data-type="gene"].icones.explain {

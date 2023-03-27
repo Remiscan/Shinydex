@@ -3,12 +3,12 @@ import { Pokemon } from './Pokemon.js';
 import { Settings } from './Settings.js';
 import { PopulatableSection, cleanUpRecycleBin, initPokedex, populator } from './appContent.js';
 import * as Auth from './auth.js';
+import { callBackend } from './callBackend.js';
 import { FilterMenu } from './components/filter-menu/filterMenu.js';
 import { dataStorage, huntStorage, shinyStorage } from './localForage.js';
 import { Notif } from './notification.js';
 import { setTheme } from './theme.js';
 import { upgradeStorage } from './upgradeStorage.js';
-import { callBackend } from './callBackend.js';
 
 
 

@@ -118,19 +118,17 @@ export class shinyCard extends HTMLElement {
       }
 
       else if (shiny.game === 'legendsarceus') {
-        if (getProp('pla-dexResearch')) {
-          const dexResearch = getProp('pla-dexResearch');
-          const niv = dexResearch === 2 ? '100%' : dexResearch === 1 ? '10' : '9 ou -';
-          parts.push(`niv. rech. ${niv}`);
-        };
+        const dexResearch = getProp('pla-dexResearch');
+        const niv = dexResearch === 2 ? '100%' : dexResearch === 1 ? '10' : '9 ou -';
+        parts.push(`niv. de recherche ${niv}`);
       }
 
       else if (shiny.game === 'scarlet' || shiny.game === 'violet') {
-        if (getProp('sv-outbreakCleared')) {
+        if (shiny.method === 'massoutbreak') {
           const outbreakCleared = getProp('sv-outbreakCleared');
-          const num = outbreakCleared === 2 ? '60+'
+          const num = outbreakCleared === 2 ? 'Plus de 60'
                     : outbreakCleared === 1 ? '30 à 59'
-                    : '29-';
+                    : 'Moins de 29';
           parts.push(`${num} KO`);
         }
 
@@ -243,10 +241,10 @@ export class shinyCard extends HTMLElement {
           (game.gen > 5 && shinyRate >= 4096 - 1)
         ) {
           srContainer.classList.add('full-odds');
-        } else if (
+        } else if (charm && !(charmlessMethods.includes(methode)) && (
           (game.gen <= 5 && shinyRate >= 2731 - 1) ||
           (game.gen > 5 && shinyRate >= 1365 - 1)
-        ) {
+        )) {
           srContainer.classList.add('charm-odds');
         } else if (shinyRate <= 1) {
           srContainer.classList.add('one-odds');

@@ -30,14 +30,13 @@ const allMethodes: Methode[] = [
   { id: 'dexnavchain', jeux: allGames.filter(g => g.id == 'oras'), mine: true, charm: true },
   { id: 'soschain', jeux: allGames.filter(g => g.gen == 7), mine: true, charm: true },
   { id: 'ultrawormhole', jeux: allGames.filter(g => g.gen == 7), mine: true, charm: false },
-  { id: 'battlebonus', jeux: allGames.filter(g => g.gen == 8), mine: true, charm: true },
   { id: 'raid', jeux: allGames.filter(g => g.id == 'swsh' || g.id == 'sv'), mine: true, charm: false },
   { id: 'dynamaxadventure', jeux: allGames.filter(g => g.gen == 8), mine: true, charm: true },
   { id: 'massoutbreak', jeux: allGames.filter(g => g.id == 'pla' || g.id == 'sv'), mine: true, charm: true },
   { id: 'massivemassoutbreak', jeux: allGames.filter(g => g.id == 'pla'), mine: true, charm: true },
   
   { id: 'wildevent', jeux: allGames.filter(g => g.gen == 0), mine: true, charm: false },
-  { id: 'wildalwaysshiny', jeux: allGames.filter(g => ['gs', 'hgss', 'bw2'].includes(g.id)), mine: true, charm: false },
+  { id: 'wildalwaysshiny', jeux: allGames.filter(g => ['gs', 'hgss', 'bw2', 'pla'].includes(g.id)), mine: true, charm: false },
   { id: 'event', jeux: allGames, mine: false, charm: false },
 
   { id: 'trade', jeux: allGames, mine: false, charm: false },
