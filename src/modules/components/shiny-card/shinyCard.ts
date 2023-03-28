@@ -213,10 +213,11 @@ export class shinyCard extends HTMLElement {
       const charm = shiny.charm;
       const shinyRate = shiny.shinyRate ?? 0;
       const methode = shiny.method || '';
+      const game = shiny.jeuObj;
 
       // Icône du charme chroma
       if (charmlessMethods == null) charmlessMethods = Shiny.methodes('charmless').map(m => m.id);
-      if (charm && !(charmlessMethods.includes(methode))) {
+      if (charm && !(charmlessMethods.includes(methode)) && game.hasCharm) {
         srContainer.classList.add('with-charm');
       } else {
         srContainer.classList.remove('with-charm');
@@ -235,7 +236,6 @@ export class shinyCard extends HTMLElement {
       // Couleur du shiny rate
       srContainer.classList.remove('full-odds', 'charm-ods', 'one-odds');
       try {
-        const game = shiny.jeuObj;
         if (
           (game.gen <= 5 && shinyRate >= 8192 - 1) ||
           (game.gen > 5 && shinyRate >= 4096 - 1)

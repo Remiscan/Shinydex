@@ -513,7 +513,7 @@ export class huntCard extends HTMLElement {
       case 'game': {
         const jeu = Pokemon.jeux.find(jeu => jeu.uid === value);
         this.setAttribute('data-game', jeu?.id ?? '');
-        const charmAvailable = jeu ? jeu.gen >= 5 : false;
+        const charmAvailable = jeu ? jeu.hasCharm : false;
         this.setAttribute('data-charm-available', String(charmAvailable));
         const virtualconsoleGen = jeu ? (jeu.gen === 1 || jeu.gen === 2) : false;
         this.setAttribute('data-gen-vc', String(virtualconsoleGen));
