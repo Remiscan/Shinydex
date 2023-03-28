@@ -74,16 +74,15 @@ export class spriteViewer extends HTMLElement {
       }
     };
 
-    let loadedSprites = 0;
     for (const forme of formes) {
       const caught = caughtFormsList.has(forme.dbid);
       const afficherNomForme = (formes.length > 1 || forme.nom != '' || caught);
 
       const templateS = document.createElement('template');
       templateS.innerHTML = /*html*/`
-        <div class="dex-sprite">
+        <div class="dex-sprite" data-forme="${forme.dbid}">
           <picture ${(typeof forme.noShiny != 'undefined' && forme.noShiny) ? 'class="no-shiny"' : ''}>
-            <pokemon-sprite dexid="${pokemon.dexid}" shiny="true" forme="${forme.dbid}" size="${this.size}" lazy="false"></pokemon-sprite>
+            <pokemon-sprite dexid="${pokemon.dexid}" shiny="true" forme="${forme.dbid}" size="${this.size}" lazy="true"></pokemon-sprite>
             ${(typeof forme.noShiny != 'undefined' && forme.noShiny) ? '<span class="label-large">N\'existe pas<br>en chromatique</span>' : ''}
           </picture>
           <span class="forme-name surface variant label-medium ${afficherNomForme ? '' : 'off'} ${caught ? 'caught' : ''}">
@@ -97,7 +96,7 @@ export class spriteViewer extends HTMLElement {
 
       const templateR = document.createElement('template');
       templateR.innerHTML = /*html*/`
-        <div class="dex-sprite">
+        <div class="dex-sprite" data-forme="${forme.dbid}">
           <picture>
             <pokemon-sprite dexid="${pokemon.dexid}" shiny="false" forme="${forme.dbid}" size="${this.size}" lazy="true"></pokemon-sprite>
           </picture>
@@ -112,13 +111,9 @@ export class spriteViewer extends HTMLElement {
 
       // Load regular sprites after shiny sprites
       dexSpriteS.querySelector('pokemon-sprite')?.addEventListener('load', async () => {
-        loadedSprites++;
-        if (loadedSprites === formes.length) {
-          await wait(200);
-          listeRegular.querySelectorAll('pokemon-sprite').forEach(sprite => {
-            sprite.shadowRoot?.querySelector('img')?.setAttribute('loading', 'eager');
-          });
-        }
+        await wait(200);
+        listeRegular.querySelector(`.dex-sprite[data-forme="${forme.dbid}"] pokemon-sprite`)
+        ?.shadowRoot?.querySelector('img')?.setAttribute('loading', 'eager');
       }, { once: true });
 
       listeShiny.appendChild(dexSpriteS);
