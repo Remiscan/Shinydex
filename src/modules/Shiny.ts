@@ -236,7 +236,7 @@ export class Shiny extends FrontendShiny {
         }
         
         case 'pokeradar': {
-          const chain = Math.min(40, Math.max(0, this.count.encounters));
+          const chain = Math.min(40, Math.max(0, this.count.encounters ?? 0));
           let odds = 0;
           switch (game.id) {
             case 'dp':
@@ -258,7 +258,7 @@ export class Shiny extends FrontendShiny {
         }
         
         case 'chainfishing': {
-          const chain = Math.min(20, this.count.encounters);
+          const chain = Math.min(20, this.count.encounters ?? 0);
           bonusRolls = 2 * chain;
           break;
         }
@@ -274,7 +274,7 @@ export class Shiny extends FrontendShiny {
         }
 
         case 'soschain': {
-          const compteur = this.count.encounters;
+          const compteur = this.count.encounters ?? 0;
           const chainCoeff = (compteur >= 31) ? 3
                           : (compteur >= 21) ? 2
                           : (compteur >= 11) ? 1

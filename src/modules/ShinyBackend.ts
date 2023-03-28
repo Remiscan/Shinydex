@@ -33,7 +33,7 @@ export interface feShiny extends Omit<BackendShiny, 'id' | 'userid' | 'creationT
 
 
 export class Count {
-  'encounters': number = 0;
+  'encounters'?: number = 0;
   'usum-distance'?: number;
   'usum-rings'?: number;
   'lgpe-catchCombo'?: number;
@@ -107,6 +107,14 @@ export class FrontendShiny implements feShiny {
   }
 
 
+  get countWithoutNulls(): Count {
+    const entries = Object.entries(this.count);
+    return Object.fromEntries(
+      entries.filter(entry => entry[1])
+    );
+  }
+
+
   toBackend(): Omit<BackendShiny, 'id' | 'userid'> {
     return {
       huntid: this.huntid,
@@ -117,7 +125,7 @@ export class FrontendShiny implements feShiny {
       forme: this.forme,
       game: this.game,
       method: this.method,
-      count: JSON.stringify(this.count),
+      count: JSON.stringify(this.countWithoutNulls),
       charm: Number(this.charm),
 
       catchTime: String(this.catchTime),

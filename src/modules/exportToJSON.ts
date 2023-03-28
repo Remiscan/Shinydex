@@ -28,19 +28,21 @@ export async function json2import(file: File | Blob | undefined): Promise<string
       let modifiedIds = new Set();
       await shinyStorage.ready();
       await Promise.all(
-        importedData.shiny.map((shiny: any) => updateDataFormat(shiny))
-                          .map((shiny: any) => {
-                            modifiedIds.add(shiny.huntid);
-                            return shinyStorage.setItem(shiny.huntid, new Shiny(shiny))
-                          })
+        importedData.shiny
+        .map((shiny: any) => updateDataFormat(shiny))
+        .map((shiny: any) => {
+          modifiedIds.add(shiny.huntid);
+          return shinyStorage.setItem(shiny.huntid, new Shiny(shiny))
+        })
       );
       await huntStorage.ready();
       await Promise.all(
-        importedData.hunts.map((hunt: any) => updateDataFormat(hunt))
-                          .map((hunt: any) => {
-                            modifiedIds.add(hunt.huntid);
-                            return huntStorage.setItem(hunt.huntid, new Hunt(hunt))
-                          })
+        importedData.hunts
+        .map((hunt: any) => updateDataFormat(hunt))
+        .map((hunt: any) => {
+          modifiedIds.add(hunt.huntid);
+          return huntStorage.setItem(hunt.huntid, new Hunt(hunt))
+        })
       );
 
       await upgradeStorage();
@@ -80,8 +82,16 @@ export async function export2json(): Promise<void> {
   };
 
   const data = {
-    shiny: await getItems(shinyStorage),
-    hunts: await getItems(huntStorage)
+    shiny: (await getItems(shinyStorage)).map(data => {
+      const shiny = new Shiny(data);
+      shiny.count = shiny.countWithoutNulls;
+      return shiny;
+    }),
+    hunts: (await getItems(huntStorage)).map(data => {
+      const hunt = new Hunt(data);
+      hunt.count = hunt.countWithoutNulls;
+      return hunt;
+    })
   };
   const dataString = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(data))}`;
 
