@@ -95,6 +95,10 @@ export class pokemonSprite extends HTMLElement {
   };
   lastChange: number = 0;
 
+  loadHandler = (event: Event) => {
+    this.dispatchEvent(new Event('load', { bubbles: false }));
+  };
+
   
   constructor() {
     super();
@@ -311,10 +315,15 @@ export class pokemonSprite extends HTMLElement {
   
 
   connectedCallback() {
+    const img = this.shadow.querySelector('img');
+    img?.addEventListener('load', this.loadHandler);
+
     this.setSpriteUrl();
   }
 
   disconnectedCallback() {
+    const img = this.shadow.querySelector('img');
+    img?.removeEventListener('load', this.loadHandler);
   }
 
   static get observedAttributes() {
