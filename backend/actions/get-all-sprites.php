@@ -4,7 +4,7 @@ $sprites = [
   'size' => 0
 ];
 
-$dir = dirname(__DIR__, 1).'/images/pokemon-sprites/webp/112';
+$dir = dirname(__DIR__, 2).'/images/pokemon-sprites/webp/112';
 $fsIterator = new FilesystemIterator($dir, FilesystemIterator::SKIP_DOTS);
 foreach($fsIterator as $path => $obj) {
   if ($obj->isFile()) {
