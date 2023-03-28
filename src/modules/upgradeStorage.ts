@@ -14,14 +14,20 @@ export async function upgradeStorage(): Promise<void> {
   const shinyKeys = await shinyStorage.keys();
   for (const key of shinyKeys) {
     const shiny = new Shiny(updateDataFormat(await shinyStorage.getItem(key)));
-    await shinyStorage.setItem(key, shiny);
+    await shinyStorage.setItem(shiny.huntid, shiny);
+    if (key !== shiny.huntid) {
+      await shinyStorage.removeItem(key);
+    }
   }
 
   // Update the structure of stored Hunts
   const huntKeys = await huntStorage.keys();
   for (const key of huntKeys) {
     const hunt = new Hunt(updateDataFormat(await huntStorage.getItem(key)));
-    await huntStorage.setItem(key, hunt);
+    await huntStorage.setItem(hunt.huntid, hunt);
+    if (key !== hunt.huntid) {
+      await huntStorage.removeItem(key);
+    }
   }
 
   // Delete old, now obsolete stored items
@@ -84,6 +90,16 @@ export function updateDataFormat(shiny: { [key: string]: any }): { [key: string]
     if (!shiny.hasOwnProperty(prop)) {
       shiny[prop] = defaultValue;
     }
+  }
+
+  if (
+    // if shiny has no huntid
+    !shiny.hasOwnProperty('huntid') ||
+    // or if it has invalid huntid
+    !shiny['huntid'].match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
+  ) {
+    // generate new huntid
+    shiny['huntid'] = crypto.randomUUID();
   }
 
   // Delete properties that don't exist any more
