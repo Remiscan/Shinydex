@@ -147,11 +147,13 @@ export class shinyCard extends HTMLElement {
     {
       const time = shiny.catchTime;
       const element = this.shadow.querySelector('[data-type="catchTime"]')!;
-      if (time > 0) {
+      if (time > 825289200000) {
         const date = new Intl.DateTimeFormat('fr-FR', {day: 'numeric', month: 'short', year: 'numeric'})
                              .format(new Date(time));
         element.innerHTML = date;
       } else {
+        // Si la date est avant la sortie du premier jeu Pokémon au Japon,
+        // marquer la date comme inconnue.
         element.innerHTML = 'Date inconnue';
       }
     }

@@ -628,7 +628,7 @@ export class huntCard extends HTMLElement {
         if (hunt.dexid == 0) erreurs.push('Pokémon');
         if (hunt.game == '') erreurs.push('jeu');
         if (hunt.method == '')  erreurs.push('méthode');
-        if (hunt.catchTime == 0) erreurs.push('date');
+        if (hunt.catchTime < 0) erreurs.push('date');
   
         if (erreurs.length > 0) {
           let message = `Les champs suivants sont mal remplis : `;
