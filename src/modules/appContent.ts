@@ -4,7 +4,7 @@ import { Shiny } from './Shiny.js';
 import { friendCard } from './components/friend-card/friendCard.js';
 import { huntCard } from './components/hunt-card/huntCard.js';
 import { shinyCard } from './components/shiny-card/shinyCard.js';
-import { computeOrders, supportedOrdres, updateCounters } from './filtres.js';
+import { computeOrders, isOrdre, orderCards, supportedOrdres, updateCounters } from './filtres.js';
 import { friendShinyStorage, friendStorage, huntStorage, localForageAPI, shinyStorage } from './localForage.js';
 import { navigate } from './navigate.js';
 import { Notif } from './notification.js';
@@ -34,21 +34,41 @@ async function populateHandler(section: PopulatableSection, _ids?: string[]): Pr
       break;
   }
 
+  const sectionElement = document.querySelector(`#${section}`);
+  const orderMap = await computeOrders(section);
+  const currentOrder = sectionElement?.getAttribute('data-order') ?? '';
+  const reversed = sectionElement?.getAttribute('data-order-reversed') === 'true';
+
   const allIds = await dataStore.keys();
   const ids = _ids ?? allIds;
-  const populated = await populateFromData(section, ids);
 
-  switch (section) {
-    case 'chromatiques-ami':
-      setTimeout(() => {
-        updateCounters(section);
-        document.querySelector(`#${section}`)?.classList.remove('loading');
-      });
-      break;
-
-    default:
-      updateCounters(section);
+  // Populate cards in the order currently selected
+  let orderedIds = ids;
+  if (isOrdre(currentOrder)) {
+    const orderedStoredIds = orderMap.get(currentOrder) ?? [];
+    orderedIds = [
+      ...orderedStoredIds.filter(id => ids.includes(id)),
+      ...ids.filter(id => !(orderedStoredIds.includes(id)))
+    ];
   }
+
+  const populated = await populateFromData(section, orderedIds);
+
+  // Order all cards (newly populated + older cards) in the order currently selected
+  if (isOrdre(currentOrder)) {
+    await orderCards(section, orderMap, currentOrder, reversed);
+  }
+
+  // Update counters with number of displayed cards
+  // (in setTimeout because it needs to run after styles have been applied to the populated cards)
+  setTimeout(() => {
+    updateCounters(section);
+    
+    sectionElement?.classList.remove('loading');
+    if (section === 'mes-chromatiques') {
+      document.querySelector(`#pokedex`)?.classList.remove('loading');
+    }
+  });
 
   return populated;
 }
@@ -105,7 +125,6 @@ export async function populateFromData(section: PopulatableSection, ids: string[
   // Traitons les cartes :
 
   const cardsToCreate: Array<shinyCard | huntCard> = [];
-  const cardsToCreateIDs: Array<string> = [];
 
   const orderMap = await computeOrders(section);
 
@@ -113,6 +132,9 @@ export async function populateFromData(section: PopulatableSection, ids: string[
     supportedOrdres.forEach(order => {
       const orderedKeys = orderMap.get(order);
       const k = orderedKeys?.findIndex((i: string) => i === id);
+      if (k === -1) {
+        console.log('This should not happen');
+      }
       card.style.setProperty(`--${order}-order`, String(k));
     });
   };
@@ -139,7 +161,6 @@ export async function populateFromData(section: PopulatableSection, ids: string[
         card.setAttribute('huntid', huntid);
         setOrders(card, huntid);
         cardsToCreate.push(card);
-        cardsToCreateIDs.push(huntid);
       } else {
         // DANS LA BDD & AVEC CARTE = Éditer
         setOrders(card, huntid);
@@ -157,14 +178,14 @@ export async function populateFromData(section: PopulatableSection, ids: string[
 
   // Plaçons les cartes sur la page
   // (après la préparation pour optimiser le temps d'exécution)
-  await Promise.all(cardsToCreate.map(async card => {
+  for (const card of cardsToCreate) {
     conteneur.appendChild(card);
     if (section === 'chasses-en-cours') {
       await card.dataToContent();
       //lazyLoad(card);
     }
     //lazyLoad(card, 'manual');
-  }));
+  }
 
   // Ordonnons les cartes déjà présentes et non touchées
   const untouchedIDs = (await dataStore.keys()).filter(key => !(ids.includes(key)));

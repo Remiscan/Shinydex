@@ -131,6 +131,7 @@ export function filterSection(section: FiltrableSection, filters: FilterList = n
     element.setAttribute('data-order', filters.order);
     element.setAttribute('data-order-reversed', String(filters.orderReversed));
   }
+
   updateCounters(section);
 }
 
@@ -226,41 +227,43 @@ async function orderPokemon(pokemonList: Shiny[] | Hunt[], order: ordre): Promis
     const huntidComparison = s1.huntid > s2.huntid ? 1
                            : s1.huntid < s2.huntid ? -1
                            : 0;
+    const catchTimeComparison = -1 * (s1.catchTime - s2.catchTime);
+    const creationTimeComparison = -1 * (s1.creationTime - s2.creationTime);
 
     switch (order) {
       case 'game': {
         const allGames = Pokemon.jeux;
         const game1 = allGames.findIndex(g => g.uid === s1.game);
         const game2 = allGames.findIndex(g => g.uid === s2.game);
-        return game1 - game2 || s1.catchTime - s2.catchTime || s1.creationTime - s2.creationTime || huntidComparison;
+        return -1 * (game1 - game2) || catchTimeComparison || creationTimeComparison || huntidComparison;
       }
 
       case 'name': {
         const nom1 = s1.name || noms[s1.dexid] || '';
         const nom2 = s2.name || noms[s2.dexid] || '';
-        return nom1.localeCompare(nom2, lang) || s1.catchTime - s2.catchTime || s1.creationTime - s2.creationTime || huntidComparison;
+        return nom1.localeCompare(nom2, lang) || catchTimeComparison || creationTimeComparison || huntidComparison;
       }
 
       case 'species': {
         const nom1 = noms[s1.dexid] || '';
         const nom2 = noms[s2.dexid] || '';
-        return nom1.localeCompare(nom2, lang) || s1.catchTime - s2.catchTime || s1.creationTime - s2.creationTime || huntidComparison;
+        return nom1.localeCompare(nom2, lang) || catchTimeComparison || creationTimeComparison || huntidComparison;
       }
 
       case 'shinyRate': {
-        return (s1.shinyRate || 0) - (s2.shinyRate || 0) || s1.catchTime - s2.catchTime || s1.creationTime - s2.creationTime || huntidComparison;
+        return -1 * ((s1.shinyRate || 0) - (s2.shinyRate || 0)) || catchTimeComparison || creationTimeComparison || huntidComparison;
       }
 
       case 'dexid': {
-        return s1.dexid - s2.dexid || s1.catchTime - s2.catchTime || s1.creationTime - s2.creationTime || huntidComparison;
+        return s1.dexid - s2.dexid || catchTimeComparison || creationTimeComparison || huntidComparison;
       }
 
       case 'catchTime': {
-        return s1.catchTime - s2.catchTime || s1.creationTime - s2.creationTime || huntidComparison;
+        return catchTimeComparison || creationTimeComparison || huntidComparison;
       }
 
       case 'creationTime': {
-        return s1.creationTime - s2.creationTime || huntidComparison;
+        return creationTimeComparison || huntidComparison;
       }
 
       default: return huntidComparison;
@@ -335,4 +338,44 @@ export async function computeOrders(section: FiltrableSection): Promise<OrderMap
   }));
 
   return orderMap;
+}
+
+
+
+/** Changes the order of cards in the DOM to fit their visual order. */
+export async function orderCards(section: FiltrableSection, orderMap?: OrderMap, order?: ordre, reversed?: boolean) {
+  return;/*
+  const sectionElement = document.querySelector(`#${section}`);
+  if (!(sectionElement instanceof HTMLElement)) throw new TypeError('Expecting HTMLElement');
+
+  if (orderMap == null) orderMap = await computeOrders(section);
+  if (order == null) {
+    const tempOrder = sectionElement?.getAttribute('data-order') ?? '';
+    if (!isOrdre(tempOrder)) return;
+    order = tempOrder;
+  }
+  if (reversed == null) reversed = sectionElement?.getAttribute('data-order-reversed') === 'true';
+
+  const orderedIds = orderMap.get(order) ?? [];
+  if (reversed) orderedIds.reverse();
+
+  let elementAttribute: string;
+  switch (section) {
+    case 'partage':
+      elementAttribute = 'username';
+      break;
+
+    case 'mes-chromatiques':
+    case 'chasses-en-cours':
+    case 'corbeille':
+    case 'chromatiques-ami':
+      elementAttribute = 'huntid';
+      break;
+  }
+  
+  const orderedCards = orderedIds.map(id => sectionElement.querySelector(`[${elementAttribute}="${id}"]`));
+
+  for (const card of orderedCards) {
+    card?.parentElement?.appendChild(card);
+  }*/
 }

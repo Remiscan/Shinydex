@@ -1,11 +1,10 @@
-import { Params, loadAllImages, timestamp2date, wait } from './Params.js';
+import { Params, timestamp2date, wait } from './Params.js';
 import { Pokemon } from './Pokemon.js';
 import { Settings } from './Settings.js';
 import { PopulatableSection, cleanUpRecycleBin, initPokedex, populator } from './appContent.js';
 import * as Auth from './auth.js';
 import { callBackend } from './callBackend.js';
 import { FilterMenu } from './components/filter-menu/filterMenu.js';
-import { updateCounters } from './filtres.js';
 import { dataStorage, huntStorage, shinyStorage } from './localForage.js';
 import { Notif } from './notification.js';
 import { setTheme } from './theme.js';
@@ -177,16 +176,6 @@ export async function appStart() {
       initPokedex(),
       ...sectionsToPopulate.map(async section => {
         await populator[section]();
-
-        // Because this needs to run after styles have been applied to the populated cards
-        setTimeout(() => {
-          updateCounters(section);
-
-          document.querySelector(`#${section}`)?.classList.remove('loading');
-          if (section === 'mes-chromatiques') {
-            document.querySelector(`#pokedex`)?.classList.remove('loading');
-          }
-        });
       })
     ]);
     logPerf('populate');

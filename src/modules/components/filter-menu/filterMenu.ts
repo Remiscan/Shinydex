@@ -1,4 +1,4 @@
-import { FilterList, filterSection, isFiltrableSection, saveFilters } from '../../filtres.js';
+import { FilterList, filterSection, isFiltrableSection, orderCards, saveFilters } from '../../filtres.js';
 import { dataStorage } from '../../localForage.js';
 // @ts-expect-error
 import materialIconsSheet from '../../../../ext/material_icons.css' assert { type: 'css' };
@@ -50,6 +50,7 @@ export class FilterMenu extends HTMLElement {
 
       const newFilters = this.formToFilters(formData);
       filterSection(section, newFilters);
+      await orderCards(section, undefined, newFilters.order, newFilters.orderReversed);
       await this.saveFilters(newFilters);
     };
   }
