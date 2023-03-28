@@ -38,7 +38,17 @@ async function populateHandler(section: PopulatableSection, _ids?: string[]): Pr
   const ids = _ids ?? allIds;
   const populated = await populateFromData(section, ids);
 
-  updateCounters(section);
+  switch (section) {
+    case 'chromatiques-ami':
+      setTimeout(() => {
+        updateCounters(section);
+        document.querySelector(`#${section}`)?.classList.remove('loading');
+      });
+      break;
+
+    default:
+      updateCounters(section);
+  }
 
   return populated;
 }

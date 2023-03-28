@@ -367,8 +367,6 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
               })
             );
 
-            nouvelleSection.element.classList.remove('loading');
-
             window.dispatchEvent(new CustomEvent('dataupdate', {
               detail: {
                 sections: ['chromatiques-ami'],
