@@ -180,7 +180,7 @@ button.icon-button.menu-hint::before {
   height: 100%;
   max-height: 100%;
   font-size: 1em;
-  text-align: justify;
+  text-align: left;
   line-height: 20px;
   padding: 4px 8px 4px 12px;
   z-index: 4;
