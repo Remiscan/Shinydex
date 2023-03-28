@@ -20,6 +20,23 @@ import sheet from './styles.css' assert { type: 'css' };
 
 let currentCardId: string | null;
 
+const previewSheet = new CSSStyleSheet();
+{
+  let previewSheetCss = ``;
+  const maxArrowWidth = 20;
+  for (let i = 1; i <= 10; i++) {
+    const containerWidth = 8 + 4 + i * (.75 * 112) + (i-1) * 4 + 4 + maxArrowWidth + 4 + 8;
+    previewSheetCss += `
+      @container (width < ${containerWidth}px) {
+        pokemon-sprite:nth-child(${i-1}) ~ pokemon-sprite {
+          display: none;
+        }
+      }
+    `;
+  }
+  previewSheet.replaceSync(previewSheetCss);
+}
+
 
 
 export class friendCard extends HTMLElement {
@@ -46,7 +63,7 @@ export class friendCard extends HTMLElement {
     super();
     this.shadow = this.attachShadow({ mode: 'open' });
     this.shadow.appendChild(template.content.cloneNode(true));
-    this.shadow.adoptedStyleSheets = [materialIconsSheet, iconSheet, themesSheet, commonSheet, sheet];
+    this.shadow.adoptedStyleSheets = [materialIconsSheet, iconSheet, themesSheet, commonSheet, sheet, previewSheet];
   }
 
 
