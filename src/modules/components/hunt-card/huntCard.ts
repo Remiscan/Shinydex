@@ -637,7 +637,15 @@ export class huntCard extends HTMLElement {
           new Notif(message).prompt();
           return;
         } else {
-          await this.submit();
+          const edit = (await shinyStorage.getItem(this.huntid)) != null;
+          if (edit) {
+            const boutonSubmit = this.shadow.querySelector('[data-action="save-shiny"]');
+            if (!(boutonSubmit instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
+            const userResponse = await warnBeforeDestruction(boutonSubmit, 'Sauvegarder ces modifications ?', 'done');
+            if (userResponse) await this.submit();
+          } else {
+            await this.submit();
+          }
         }
       }
     };
