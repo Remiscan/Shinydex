@@ -176,6 +176,9 @@ export class friendCard extends HTMLElement {
     if (!(navLink instanceof HTMLAnchorElement)) throw new TypeError('Expecting HTMLAnchorElement');
     navLink.addEventListener('click', this.navHandler);
 
+    const spritesContainer = this.shadow.querySelector('.pokemon-preview');
+    spritesContainer?.addEventListener('click', () => navLink.click());
+
     // Peuple le contenu de la carte
     this.dataToContent();
   }
