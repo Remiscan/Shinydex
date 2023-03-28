@@ -10,6 +10,10 @@ sheet.replaceSync(/*css*/`
   }
 
   @container (min-width: 650px) {
+    .container {
+      --state-opacity: 0 !important;
+    }
+
     .menu-hint {
       display: none;
     }
@@ -33,9 +37,6 @@ export class friendShinyCard extends shinyCard {
 
   connectedCallback(): void {
     super.connectedCallback();
-
-    const container = this.shadow.querySelector('.container');
-    container?.classList.remove('interactive');
   }
 }
 
