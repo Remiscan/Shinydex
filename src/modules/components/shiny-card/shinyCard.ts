@@ -252,7 +252,7 @@ export class shinyCard extends HTMLElement {
 
         // Couleur de la bordure (0 = high shiny denominator / hard, 1 = low shiny denominator / easy)
         const hardestRate = (game.gen <= 5 ? 2731 : 1365);
-        const easiestRate = 512;
+        const easiestRate = 256;
         const hueCoeff = (hardestRate - Math.min(Math.max(easiestRate, shinyRate), hardestRate)) / (hardestRate - easiestRate);
         srContainer.style.setProperty('--hue-coeff', String(hueCoeff));
       } catch (error) {}
