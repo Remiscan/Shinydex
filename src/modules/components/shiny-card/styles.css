@@ -30,6 +30,10 @@ pokemon-sprite,
   --elevation-opacity: var(--elevation-2-opacity);
 }
 
+/*:host(:not([data-ordered])) pokemon-sprite {
+  display: none;
+}*/
+
 .menu-hint {
   color: rgb(var(--on-surface-variant), .8);
 }
@@ -176,7 +180,7 @@ button.icon-button.menu-hint::before {
   height: 100%;
   max-height: 100%;
   font-size: 1em;
-  text-align: justify;
+  text-align: left;
   line-height: 20px;
   padding: 4px 8px 4px 12px;
   z-index: 4;
@@ -262,8 +266,8 @@ button.icon-button.menu-hint::before {
   justify-self: end;
   border-radius: 20px;
   position: relative;
-  --hue-min: 30;
-  --hue-max: 170;
+  --hue-min: 20;
+  --hue-max: 130;
   background: hsl(calc(var(--hue-min) + var(--hue-coeff) * (var(--hue-max) - var(--hue-min))), 50%, 50%);
 }
 
@@ -351,7 +355,7 @@ button.icon-button.menu-hint::before {
   flex-grow: 1;
 }
 
-@container (min-width: 650px) {
+@container section-contenu (min-width: 650px) {
   .container {
     --last-column: auto;
   }

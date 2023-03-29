@@ -54,13 +54,13 @@ export class SearchBox extends HTMLElement {
     const sectionElement = document.querySelector(`section#${section}`);
     if (!sectionElement) return;
 
-    let cardSelector = 'shiny-card';
+    let cardSelector = ':is(shiny-card, [data-replaces="shiny-card"])';
     switch (section) {
       case 'pokedex': cardSelector = '.dex-icon'; break;
       case 'chasses-en-cours': cardSelector = 'hunt-card'; break;
-      case 'corbeille': cardSelector = 'corbeille-card'; break;
-      case 'partage': cardSelector = 'friend-card'; break;
-      case 'chromatiques-ami': cardSelector = 'friend-shiny-card'; break;
+      case 'corbeille': cardSelector = ':is(corbeille-card, [data-replaces="corbeille-card"])'; break;
+      case 'partage': cardSelector = ':is(friend-card, [data-replaces="friend-card"])'; break;
+      case 'chromatiques-ami': cardSelector = ':is(friend-shiny-card, [data-replaces="friend-shiny-card"])'; break;
     }
 
     // Hide non-corresponding cards via CSS

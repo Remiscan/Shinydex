@@ -20,6 +20,9 @@ template.innerHTML = /*html*/`
       <pokemon-sprite size="112" shiny="true" class="surface standard"></pokemon-sprite>
       <pokemon-sprite size="112" shiny="true" class="surface standard"></pokemon-sprite>
       <pokemon-sprite size="112" shiny="true" class="surface standard"></pokemon-sprite>
+      <pokemon-sprite size="112" shiny="true" class="surface standard"></pokemon-sprite>
+      <pokemon-sprite size="112" shiny="true" class="surface standard"></pokemon-sprite>
+      <pokemon-sprite size="112" shiny="true" class="surface standard"></pokemon-sprite>
     </div>
 
     <a href="#" class="icon-button surface standard interactive" data-nav-section="chromatiques-ami">

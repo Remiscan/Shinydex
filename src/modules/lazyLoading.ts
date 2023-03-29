@@ -1,5 +1,12 @@
 // Thank you https://infrequently.org/2020/12/resize-resilient-deferred-rendering/
 
+
+
+import { computeShinyFilters } from "./filtres.js";
+import { Shiny } from "./Shiny.js";
+
+
+
 const loaded = new WeakMap();
 
 /** Computes whether an element's bounding client rect is the same as it was before. */
@@ -13,7 +20,7 @@ function computeSize(element: HTMLElement, rect: DOMRect = element.getBoundingCl
   const oldRect = loaded.get(element);
   if ((!oldRect || !isRectSame(oldRect, rect)) && (rect.width > 0 && rect.height > 0)) {
     loaded.set(element, rect);
-    element.style.setProperty('contain-intrinsic-size', `100px ${rect.height}px`);
+    element.style.setProperty('contain-intrinsic-height', `${rect.height}px`);
   }
 }
 
@@ -36,15 +43,73 @@ const resizor = new ResizeObserver((entries: ResizeObserverEntry[]) => {
 });
 
 /** Manually sets an element as hidden or visible depending on whether it intersects the viewport. */
-const manualLoader = new IntersectionObserver((entries: IntersectionObserverEntry[]) => {
-  for (const entry of entries) {
-    if (!(entry.target instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
-    if (entry.isIntersecting) entry.target.setAttribute('data-rendered', 'visible');
-    else                      entry.target.setAttribute('data-rendered', 'hidden');
-  }
-}, {
-  rootMargin: '252px 0px 252px 0px'
+export const virtualizedSections: string[] = ['mes-chromatiques', 'corbeille', 'chromatiques-ami'];
+const manualLoaders: Map<string, IntersectionObserver> = new Map();
+const elementStorage: Map< string, Map<string, Element> > = new Map();
+
+virtualizedSections.forEach(section => {
+  const filterKeys = Object.keys(computeShinyFilters(new Shiny()));
+  const storage = new Map();
+  elementStorage.set(section, storage);
+
+  const loader = new IntersectionObserver((entries: IntersectionObserverEntry[]) => {
+    for (const entry of entries) {
+      if (!(entry.target instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
+      if (entry.isIntersecting) {
+        //entry.target.setAttribute('data-rendered', 'visible');
+        const elementName = entry.target.getAttribute('data-replaces');
+        const elementId = entry.target.getAttribute('data-huntid');
+        if (elementName && elementId) {
+          const replacement = storage.get(elementId) ?? document.createElement(elementName);
+          if (!replacement.getAttribute('huntid')) {
+            replacement.setAttribute('huntid', elementId);
+          }
+
+          replacement.setAttribute('style', entry.target.getAttribute('style') ?? '');
+          for (const filter of filterKeys) {
+            replacement.setAttribute(`data-${filter}`, entry.target.getAttribute(`data-${filter}`) ?? '');
+          }
+
+          entry.target.parentElement?.replaceChild(replacement, entry.target);
+          loader.observe(replacement);
+        }
+      } else {
+        //entry.target.setAttribute('data-rendered', 'hidden');
+        const elementName = entry.target.tagName.toLowerCase();
+        const elementId = entry.target.getAttribute('huntid');
+        if (elementName && elementId) {
+          if ((entry.target as HTMLElement & {obsolete: boolean}).obsolete) {
+            storage.delete(elementId);
+          } else {
+            storage.set(elementId, entry.target);
+
+            const replacement = document.createElement('div');
+            replacement.setAttribute('data-replaces', elementName);
+            replacement.setAttribute('data-huntid', elementId);
+            replacement.classList.add('surface', 'variant', 'elevation-0');
+
+            replacement.setAttribute('style', entry.target.getAttribute('style') ?? '');
+            for (const filter of filterKeys) {
+              replacement.setAttribute(`data-${filter}`, entry.target.getAttribute(`data-${filter}`) ?? '');
+            }
+
+            entry.target.parentElement?.replaceChild(replacement, entry.target);
+            loader.observe(replacement);
+          }
+        }
+      }
+    }
+  }, {
+    root: document.querySelector(`#${section} > .section-contenu`),
+    rootMargin: '256px 0px 256px 0px'
+  });
+
+  manualLoaders.set(section, loader);
 });
+
+export function clearElementStorage(section: string, id: string) {
+  elementStorage.get(section)?.delete(id);
+}
 
 type LazyLoadingMethod = 'auto' | 'manual';
 type LazyLoadingOptions = {
@@ -52,10 +117,10 @@ type LazyLoadingOptions = {
 };
 
 /** Computes an element's size whenever it changes, and set it as its contain-intrinsic-size. */
-export function lazyLoad(element: HTMLElement, method: LazyLoadingMethod = 'auto', { fixedSize = false }: LazyLoadingOptions = {}) {
+export function lazyLoad(element: Element, method: LazyLoadingMethod = 'auto', { fixedSize = false }: LazyLoadingOptions = {}) {
   switch (method) {
     case 'manual':
-      manualLoader.observe(element);
+      manualLoaders.get(element.closest('section')?.id ?? '')?.observe(element);
       if (fixedSize) break;
     default:
       intersector.observe(element);
@@ -63,14 +128,18 @@ export function lazyLoad(element: HTMLElement, method: LazyLoadingMethod = 'auto
   }
 }
 
-export function enableLazyLoad(element: HTMLElement) {
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      element.style.setProperty('content-visibility', 'auto');
-    })
-  });
+/** Virtualizes a section's list of cards. */
+export function lazyLoadSection(section: string) {
+  const cards = [...(document.querySelector(`#${section} .liste-cartes`)?.children ?? [])];
+  if (cards) cards.forEach((card: Element) => lazyLoad(card, 'manual', { fixedSize: true}));
 }
 
-export function disableLazyLoad(element: HTMLElement) {
-  element.style.setProperty('content-visibility', 'visible');
+/**
+ * Stops virtualization of a section's list of cards,
+ * leaving every card in its current state (potentially replaced by a placeholder).
+ */
+export function unLazyLoadSection(section: string) {
+  const cards = [...(document.querySelector(`#${section} .liste-cartes`)?.children ?? [])];
+  const observer = manualLoaders.get(section);
+  if (cards) cards.forEach((card: Element) => observer?.unobserve(card));
 }

@@ -50,8 +50,8 @@ sheet.replaceSync(/*css*/`
   }
 
   img, svg {
-    width: 100%;
-    height: 100%;
+    width: var(--size);
+    height: var(--size);
   }
 
   #star-field {
@@ -94,6 +94,10 @@ export class pokemonSprite extends HTMLElement {
     lazy: true
   };
   lastChange: number = 0;
+
+  loadHandler = (event: Event) => {
+    this.dispatchEvent(new Event('load', { bubbles: false }));
+  };
 
   
   constructor() {
@@ -311,10 +315,15 @@ export class pokemonSprite extends HTMLElement {
   
 
   connectedCallback() {
+    const img = this.shadow.querySelector('img');
+    img?.addEventListener('load', this.loadHandler);
+
     this.setSpriteUrl();
   }
 
   disconnectedCallback() {
+    const img = this.shadow.querySelector('img');
+    img?.removeEventListener('load', this.loadHandler);
   }
 
   static get observedAttributes() {

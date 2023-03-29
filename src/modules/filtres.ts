@@ -4,20 +4,34 @@ import { dataStorage, friendShinyStorage, friendStorage, huntStorage, localForag
 // @ts-expect-error
 import { queueable } from '../../../_common/js/per-function-async-queue.js';
 import { Hunt } from './Hunt.js';
+import { Params, noAccent } from './Params.js';
+import { isSupportedPokemonLang, pokemonData } from './jsonData.js';
 
 
 
-type ordre = 'catchTime' | 'shinyRate' | 'dexid' | 'species' | 'name' | 'game' | 'creationTime' | 'username';
-const supportedOrdres: ordre[] = ['catchTime', 'shinyRate', 'dexid', 'species', 'name', 'game', 'creationTime'];
+export type ordre = 'catchTime' | 'shinyRate' | 'dexid' | 'species' | 'name' | 'game' | 'creationTime' | 'username';
+export const supportedOrdres: ordre[] = ['catchTime', 'shinyRate', 'dexid', 'species', 'name', 'game', 'creationTime'];
 
 export function isOrdre(string: string): string is ordre {
   return supportedOrdres.includes(string as ordre);
 }
 
-export type FiltrableSection = 'mes-chromatiques' | 'chasses-en-cours' | 'corbeille' | 'partage' | 'chromatiques-ami';
-export const filtrableSections: FiltrableSection[] = ['mes-chromatiques', 'chasses-en-cours', 'corbeille', 'partage', 'chromatiques-ami'];
+export type PopulatableSection = 'mes-chromatiques' | 'chasses-en-cours' | 'partage' | 'chromatiques-ami' | 'corbeille';
+export const populatableSections: PopulatableSection[] = ['mes-chromatiques', 'chasses-en-cours', 'partage', 'chromatiques-ami', 'corbeille'];
+export function isPopulatableSection(string: string): string is PopulatableSection {
+  return populatableSections.includes(string as PopulatableSection);
+}
+
+export type FiltrableSection = 'mes-chromatiques' | 'corbeille' | 'chromatiques-ami';
+export const filtrableSections: FiltrableSection[] = ['mes-chromatiques', 'corbeille', 'chromatiques-ami'];
 export const savedFiltersSections: FiltrableSection[] = ['mes-chromatiques'];
 export function isFiltrableSection(string: string): string is FiltrableSection {
+  return filtrableSections.includes(string as FiltrableSection);
+}
+
+export type OrderableSection = 'mes-chromatiques' | 'chasses-en-cours' | 'corbeille' | 'partage' | 'chromatiques-ami';
+export const orderableSections: OrderableSection[] = ['mes-chromatiques', 'corbeille', 'chromatiques-ami'];
+export function isOrderableSection(string: string): string is FiltrableSection {
   return filtrableSections.includes(string as FiltrableSection);
 }
 
@@ -38,7 +52,7 @@ export class FilterList {
   order: ordre = 'catchTime';
   orderReversed: boolean = false;
 
-  constructor(section: FiltrableSection, data?: FormData | object) {
+  constructor(section: FiltrableSection | OrderableSection, data?: FormData | object) {
     let defaultOrder: ordre;
     switch (section) {
       case 'chasses-en-cours':
@@ -99,6 +113,9 @@ export class FilterList {
 }
 
 
+/**
+ * Saves user chosen filters to data storage.
+ */
 let saveFilters = async (section: FiltrableSection, filters: FilterList) => {
   const shouldSaveFilters = savedFiltersSections.includes(section);
   if (!shouldSaveFilters) return;
@@ -131,11 +148,15 @@ export function filterSection(section: FiltrableSection, filters: FilterList = n
     element.setAttribute('data-order', filters.order);
     element.setAttribute('data-order-reversed', String(filters.orderReversed));
   }
+
   updateCounters(section);
 }
 
 
 
+/** 
+ * Displays the Pokédex icons corresponding to the passed IDs as caught, others as uncaught.
+ */
 export function filterPokedex(dexids: Set<number>) {
   const generations = Pokemon.generations;
   const dexidMax = generations[generations.length - 1].end;
@@ -148,8 +169,70 @@ export function filterPokedex(dexids: Set<number>) {
 
 
 
+export type ShinyFilterData = {
+  mine: boolean,
+  legit: boolean,
+  species: string,
+  dexid: number,
+  name: string,
+  game: string
+};
+
+export type FilterMap = Map<string, ShinyFilterData>;
+
+/**
+ * Computes the filters corresponding to each card in a section.
+ */
+export async function computeFilters(section: FiltrableSection | OrderableSection): Promise<FilterMap> {
+  let dataStore: localForageAPI;
+  if (!isFiltrableSection(section)) return new Map();
+
+  switch (section) {
+    case 'mes-chromatiques':
+      dataStore = shinyStorage;
+      break;
+    case 'chromatiques-ami':
+      dataStore = friendShinyStorage;
+      break;
+    case 'corbeille':
+      dataStore = huntStorage;
+      break;
+    default:
+      throw new Error(`Section ${section} can't be filtered`);
+  }
+
+  const keys = await dataStore.keys();
+  const filterMap: FilterMap = new Map();
+
+  await Promise.all(keys.map(async key => {
+    const shiny = new Shiny(await dataStore.getItem(key));
+    filterMap.set(key, computeShinyFilters(shiny));
+  }));
+
+  return filterMap;
+}
+
+/** Computes the filters corresponding to one Shiny Pokémon. */
+export function computeShinyFilters(shiny: Shiny): ShinyFilterData {
+  let species = '';
+  const lang = document.documentElement.getAttribute('lang') ?? Params.defaultLang;
+  const pokemon = pokemonData[shiny.dexid];
+  if (isSupportedPokemonLang(lang)) species = noAccent(pokemon.name[lang] || '').toLowerCase();
+
+  return {
+    mine: shiny.mine,
+    legit: shiny.method !== 'hack',
+    species: species,
+    dexid: shiny.dexid,
+    name: noAccent(shiny.name || species || '').toLowerCase(),
+    game: shiny.game,
+  };
+}
+
+
+
 /** Counts the number of cards that are displayed in a section. */
-function countFilteredCards(section: FiltrableSection): [number, number, Set<number>] {
+function countVisibleCards(section: PopulatableSection): [number, number, Set<number>] {
   const container = document.querySelector(`#${section}`);
   if (!(container instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
 
@@ -162,13 +245,22 @@ function countFilteredCards(section: FiltrableSection): [number, number, Set<num
       cardAttribute = 'huntid';
   }
 
-  const allCards = [...container.querySelectorAll(`[${cardAttribute}]`)];
+  const allCards = [...container.querySelectorAll(`[${cardAttribute}], [data-replaces][data-${cardAttribute}]`)];
   const totalCount = allCards.length;
+
+  const sectionFilters = {
+    mine: new Set(container.getAttribute('data-filter-mine')?.split(' ') ?? []),
+    legit: new Set(container.getAttribute('data-filter-legit')?.split(' ') ?? [])
+  };
 
   let displayedCount = 0;
   const dexids: Set<number> = new Set();
   allCards.forEach(card => {
-    if (getComputedStyle(card).display !== 'none') {
+    const cardFilters = {
+      mine: card.getAttribute('data-mine') ?? '',
+      legit: card.getAttribute('data-legit') ?? ''
+    };
+    if (sectionFilters.mine.has(cardFilters.mine) && sectionFilters.legit.has(cardFilters.legit)) {
       displayedCount++;
       const dexid = Number(card.getAttribute('data-dexid'));
       if (!isNaN(dexid) && dexid > 0) dexids.add(dexid);
@@ -184,11 +276,11 @@ function countFilteredCards(section: FiltrableSection): [number, number, Set<num
  * Displays or hide "list is empty" messages in a section when needed,
  * and updates that section's counter if it has one.
  */
-export function updateCounters(section: FiltrableSection): void {
+export function updateCounters(section: PopulatableSection): void {
   const container = document.querySelector(`#${section}`);
   if (!(container instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
 
-  const [displayedCount, totalCount, dexids] = countFilteredCards(section);
+  const [displayedCount, totalCount, dexids] = countVisibleCards(section);
   if (totalCount > 0) container.classList.remove('vide');
   else                container.classList.add('vide');
   if (displayedCount > 0) container.classList.remove('vide-filtres');
@@ -217,41 +309,43 @@ async function orderPokemon(pokemonList: Shiny[] | Hunt[], order: ordre): Promis
     const huntidComparison = s1.huntid > s2.huntid ? 1
                            : s1.huntid < s2.huntid ? -1
                            : 0;
+    const catchTimeComparison = -1 * (s1.catchTime - s2.catchTime);
+    const creationTimeComparison = -1 * (s1.creationTime - s2.creationTime);
 
     switch (order) {
       case 'game': {
         const allGames = Pokemon.jeux;
         const game1 = allGames.findIndex(g => g.uid === s1.game);
         const game2 = allGames.findIndex(g => g.uid === s2.game);
-        return game1 - game2 || s1.catchTime - s2.catchTime || s1.creationTime - s2.creationTime || huntidComparison;
+        return -1 * (game1 - game2) || catchTimeComparison || creationTimeComparison || huntidComparison;
       }
 
       case 'name': {
         const nom1 = s1.name || noms[s1.dexid] || '';
         const nom2 = s2.name || noms[s2.dexid] || '';
-        return nom1.localeCompare(nom2, lang) || s1.catchTime - s2.catchTime || s1.creationTime - s2.creationTime || huntidComparison;
+        return nom1.localeCompare(nom2, lang) || catchTimeComparison || creationTimeComparison || huntidComparison;
       }
 
       case 'species': {
         const nom1 = noms[s1.dexid] || '';
         const nom2 = noms[s2.dexid] || '';
-        return nom1.localeCompare(nom2, lang) || s1.catchTime - s2.catchTime || s1.creationTime - s2.creationTime || huntidComparison;
+        return nom1.localeCompare(nom2, lang) || catchTimeComparison || creationTimeComparison || huntidComparison;
       }
 
       case 'shinyRate': {
-        return (s1.shinyRate || 0) - (s2.shinyRate || 0) || s1.catchTime - s2.catchTime || s1.creationTime - s2.creationTime || huntidComparison;
+        return -1 * ((s1.shinyRate || 0) - (s2.shinyRate || 0)) || catchTimeComparison || creationTimeComparison || huntidComparison;
       }
 
       case 'dexid': {
-        return s1.dexid - s2.dexid || s1.catchTime - s2.catchTime || s1.creationTime - s2.creationTime || huntidComparison;
+        return s1.dexid - s2.dexid || catchTimeComparison || creationTimeComparison || huntidComparison;
       }
 
       case 'catchTime': {
-        return s1.catchTime - s2.catchTime || s1.creationTime - s2.creationTime || huntidComparison;
+        return catchTimeComparison || creationTimeComparison || huntidComparison;
       }
 
       case 'creationTime': {
-        return s1.creationTime - s2.creationTime || huntidComparison;
+        return creationTimeComparison || huntidComparison;
       }
 
       default: return huntidComparison;
@@ -267,10 +361,12 @@ async function orderPokemon(pokemonList: Shiny[] | Hunt[], order: ordre): Promis
  * Computes the order of cards when comparing all cards is needed,
  * i.e. when knowing the properties of the card itself isn't enough to quantize its order among all cards.
  */
-export async function computeOrders(section: FiltrableSection, ids: string[]): Promise<void> {
+export type OrderMap = Map<ordre, string[]>;
+export async function computeOrders(section: OrderableSection): Promise<OrderMap> {
   let dataStore: localForageAPI;
   let dataClass: (typeof Shiny) | (typeof Hunt);
 
+  // Determine variables that depend on the section
   switch (section) {
     case 'mes-chromatiques':
       dataStore = shinyStorage;
@@ -291,22 +387,78 @@ export async function computeOrders(section: FiltrableSection, ids: string[]): P
     case 'partage':
       dataStore = friendStorage;
       break;
+    default:
+      throw new Error(`Section ${section} can't be ordered`);
   }
 
-  if (!dataStore || section === 'partage') return;
-
-  const pokemonList = (await Promise.all(ids.map(id => dataStore.getItem(id))))
-    .filter(pkmn => pkmn != null)
-    .map(pkmn => new dataClass(pkmn));
-  const cardsMap = new Map(pokemonList.map(pkmn => [pkmn.huntid, document.querySelector(`#${section} [huntid="${pkmn.huntid}"]`)]));
+  const keys = await dataStore.keys();
+  const orderMap: OrderMap = new Map();
 
   await Promise.all(supportedOrdres.map(async order => {
-    const orderedHuntids = await orderPokemon(pokemonList, order);
-    for (let k = 0; k < orderedHuntids.length; k++) {
-      const huntid = orderedHuntids[k];
-      const card = cardsMap.get(huntid);
-      if (!(card instanceof HTMLElement)) continue;
-      card.style.setProperty(`--${order}-order`, String(k));
+    let orderedKeys: string[];
+
+    // Actually order the keys associated to the requested section's data
+    switch (section) {
+      case 'mes-chromatiques':
+      case 'chasses-en-cours':
+      case 'corbeille':
+      case 'chromatiques-ami':
+        const list = (await Promise.all(
+          keys.map(key => dataStore.getItem(key))
+        )).map(data => new dataClass(data));
+      
+        orderedKeys = await orderPokemon(list, order);
+        break;
+      
+      case 'partage':
+        const lang = document.documentElement.getAttribute('lang') ?? 'fr';
+        orderedKeys = keys.sort((a, b) => a.localeCompare(b, lang));
+        break;
     }
+
+    orderMap.set(order, orderedKeys);
   }));
+
+  return orderMap;
+}
+
+
+
+/** Changes the order of cards in the DOM to fit their visual order. */
+export async function orderCards(section: OrderableSection, orderMap?: OrderMap, order?: ordre, reversed?: boolean) {
+  const sectionElement = document.querySelector(`#${section}`);
+  if (!(sectionElement instanceof HTMLElement)) throw new TypeError('Expecting HTMLElement');
+
+  if (orderMap == null) orderMap = await computeOrders(section);
+  if (order == null) {
+    const tempOrder = sectionElement?.getAttribute('data-order') ?? '';
+    if (!isOrdre(tempOrder)) return;
+    order = tempOrder;
+  }
+  if (reversed == null) reversed = sectionElement?.getAttribute('data-order-reversed') === 'true';
+
+  const orderedIds = orderMap.get(order) ?? [];
+  if (reversed) orderedIds.reverse();
+
+  let elementAttribute: string;
+  switch (section) {
+    case 'partage':
+      elementAttribute = 'username';
+      break;
+
+    case 'mes-chromatiques':
+    case 'chasses-en-cours':
+    case 'corbeille':
+    case 'chromatiques-ami':
+      elementAttribute = 'huntid';
+      break;
+  }
+  
+  const orderedCards = orderedIds.map(id => {
+    return sectionElement.querySelector(`[${elementAttribute}="${id}"], [data-replaces][data-${elementAttribute}="${id}"]`);
+  });
+
+  for (const card of orderedCards) {
+    card?.parentElement?.appendChild(card);
+  }
 }

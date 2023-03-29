@@ -8,10 +8,11 @@
   display: grid;
   --last-column: 0;
   grid-template-columns: auto 1fr;
-  grid-template-rows: [identity] auto [sprites] 112px;
+  grid-template-rows: [identity] auto [sprites] calc(var(--sprite-scale) * 112px);
   gap: 4px;
   position: relative;
   order: var(--order, 0);
+  --sprite-scale: .75;
 }
 
 .friend-infos__identity {
@@ -89,75 +90,8 @@ pokemon-sprite {
   --distance-to-parent-border: 4px;
   border-radius: var(--sub-border-radius);
   --elevation-opacity: var(--elevation-2-opacity);
-}
-
-/*
- * Results of:
- * -----------
-
-function generateContainerQuery(n) {
-  const containerWidth = 8 + 4 + n * 112 + (n-1) * 4 + 4 + 30 + 4 + 8;
-  let css = `
-  @container (width < ${containerWidth}px) {
-    pokemon-sprite:nth-child(${n-1}) ~ pokemon-sprite {
-      display: none;
-    }
-  }
-  `;
-  return css;
-}
-
-let css = '';
-for (let i = 1; i <= 7; i++) {
-  css += generateContainerQuery(i);
-}
-
-console.log(css);
-
- * -----------
- *
- */
-
-@container (width < 170px) {
-  pokemon-sprite:nth-child(0) ~ pokemon-sprite {
-    display: none;
-  }
-}
-
-@container (width < 286px) {
-  pokemon-sprite:nth-child(1) ~ pokemon-sprite {
-    display: none;
-  }
-}
-
-@container (width < 402px) {
-  pokemon-sprite:nth-child(2) ~ pokemon-sprite {
-    display: none;
-  }
-}
-
-@container (width < 518px) {
-  pokemon-sprite:nth-child(3) ~ pokemon-sprite {
-    display: none;
-  }
-}
-
-@container (width < 634px) {
-  pokemon-sprite:nth-child(4) ~ pokemon-sprite {
-    display: none;
-  }
-}
-
-@container (width < 750px) {
-  pokemon-sprite:nth-child(5) ~ pokemon-sprite {
-    display: none;
-  }
-}
-
-@container (width < 866px) {
-  pokemon-sprite:nth-child(6) ~ pokemon-sprite {
-    display: none;
-  }
+  scale: var(--sprite-scale);
+  margin: calc(-1 * .5 * (1 - var(--sprite-scale)) * 112px);
 }
 
 a[data-nav-section="chromatiques-ami"] {

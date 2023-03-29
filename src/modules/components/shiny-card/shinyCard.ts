@@ -4,6 +4,7 @@ import { Shiny } from '../../Shiny.js';
 import { isSupportedLang, isSupportedMethodID, isSupportedPokemonLang, methodStrings, pokemonData } from '../../jsonData.js';
 import { huntStorage, localForageAPI, shinyStorage } from '../../localForage.js';
 import { Notif } from '../../notification.js';
+import { computeShinyFilters } from '../../filtres.js';
 import template from './template.js';
 // @ts-expect-error
 import materialIconsSheet from '../../../../ext/material_icons.css' assert { type: 'css' };
@@ -18,7 +19,6 @@ import sheet from './styles.css' assert { type: 'css' };
 
 
 
-let currentCardId: string | null;
 let charmlessMethods: string[];
 let previousEditNotification: Notif;
 
@@ -147,11 +147,13 @@ export class shinyCard extends HTMLElement {
     {
       const time = shiny.catchTime;
       const element = this.shadow.querySelector('[data-type="catchTime"]')!;
-      if (time > 0) {
+      if (time > 825289200000) {
         const date = new Intl.DateTimeFormat('fr-FR', {day: 'numeric', month: 'short', year: 'numeric'})
                              .format(new Date(time));
         element.innerHTML = date;
       } else {
+        // Si la date est avant la sortie du premier jeu Pokémon au Japon,
+        // marquer la date comme inconnue.
         element.innerHTML = 'Date inconnue';
       }
     }
@@ -213,10 +215,11 @@ export class shinyCard extends HTMLElement {
       const charm = shiny.charm;
       const shinyRate = shiny.shinyRate ?? 0;
       const methode = shiny.method || '';
+      const game = shiny.jeuObj;
 
       // Icône du charme chroma
       if (charmlessMethods == null) charmlessMethods = Shiny.methodes('charmless').map(m => m.id);
-      if (charm && !(charmlessMethods.includes(methode))) {
+      if (charm && !(charmlessMethods.includes(methode)) && game.hasCharm) {
         srContainer.classList.add('with-charm');
       } else {
         srContainer.classList.remove('with-charm');
@@ -235,7 +238,6 @@ export class shinyCard extends HTMLElement {
       // Couleur du shiny rate
       srContainer.classList.remove('full-odds', 'charm-ods', 'one-odds');
       try {
-        const game = shiny.jeuObj;
         if (
           (game.gen <= 5 && shinyRate >= 8192 - 1) ||
           (game.gen > 5 && shinyRate >= 4096 - 1)
@@ -252,21 +254,17 @@ export class shinyCard extends HTMLElement {
 
         // Couleur de la bordure (0 = high shiny denominator / hard, 1 = low shiny denominator / easy)
         const hardestRate = (game.gen <= 5 ? 2731 : 1365);
-        const easiestRate = 512;
+        const easiestRate = 256;
         const hueCoeff = (hardestRate - Math.min(Math.max(easiestRate, shinyRate), hardestRate)) / (hardestRate - easiestRate);
         srContainer.style.setProperty('--hue-coeff', String(hueCoeff));
       } catch (error) {}
     }
 
     // Filters
-    this.setAttribute('data-mine', String(shiny.mine));
-    this.setAttribute('data-legit', String(shiny.method !== 'hack'));
-    let species = '';
-    if (isSupportedPokemonLang(lang)) species = noAccent(pokemon.name[lang] || '').toLowerCase();
-    this.setAttribute('data-species', species);
-    this.setAttribute('data-dexid', String(shiny.dexid));
-    this.setAttribute('data-name', noAccent(shiny.name || species || '').toLowerCase());
-    this.setAttribute('data-game', shiny.game);
+    const filters = computeShinyFilters(shiny);
+    for (const [filter, value] of Object.entries(filters)) {
+      this.setAttribute(`data-${filter}`, String(value));
+    }
   }
 
 
@@ -274,28 +272,22 @@ export class shinyCard extends HTMLElement {
    * Affiche les notes d'une carte au clic.
    */
   toggleNotes() {
-    const huntid = this.getAttribute('huntid');
-
-    // On ferme la carte déjà ouverte
-    if (currentCardId != null)
-      document.querySelector(`[huntid="${currentCardId}"]`)!.removeAttribute('open');
-
+    const currentState = this.getAttribute('open') === 'true';
     const menuButtons = [...this.shadow.querySelectorAll('.menu button')];
 
     // Si la carte demandée n'est pas celle qu'on vient de fermer, on l'ouvre
-    if (huntid != currentCardId) {
+    if (!currentState) {
       this.setAttribute('open', 'true');
       menuButtons.forEach(button => {
         button.removeAttribute('disabled');
         button.setAttribute('tabindex', '0');
       });
-      currentCardId = huntid;
     } else {
+      this.removeAttribute('open');
       menuButtons.forEach(button => {
         button.setAttribute('disabled', '');
         button.setAttribute('tabindex', '-1');
       });
-      currentCardId = null;
     }
   }
 

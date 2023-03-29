@@ -105,6 +105,7 @@ sprite-viewer a.icon-button.bouton-retour {
   width: 100%;
   height: auto;
   aspect-ratio: 1;
+  --size: 100% !important;
 }
 
 .forme-name {

@@ -1,4 +1,4 @@
-import { pad } from '../../Params.js';
+import { pad, wait } from '../../Params.js';
 import { Pokemon } from '../../Pokemon.js';
 import { Shiny } from '../../Shiny.js';
 import { pokemonData } from '../../jsonData.js';
@@ -33,6 +33,10 @@ export class spriteViewer extends HTMLElement {
   async updateSprites(dexid: string) {
     const pokemon = new Pokemon(pokemonData[Number(dexid)]);
     const nomFormeNormale = pokemon.getName();
+
+    // On place le numéro et nom
+    this.querySelector('.info-dexid')!.innerHTML = pad(String(pokemon.dexid), 3);
+    this.querySelector('.info-nom')!.innerHTML = pokemon.getName();
 
     const caughtFormsList: Set<string> = new Set();
     await shinyStorage.keys().then(keys => Promise.all(keys.map(async key => {
@@ -78,10 +82,11 @@ export class spriteViewer extends HTMLElement {
       const caught = caughtFormsList.has(forme.dbid);
       const afficherNomForme = (formes.length > 1 || forme.nom != '' || caught);
 
-      const htmlS = `
-        <div class="dex-sprite">
+      const templateS = document.createElement('template');
+      templateS.innerHTML = /*html*/`
+        <div class="dex-sprite" data-forme="${forme.dbid}">
           <picture ${(typeof forme.noShiny != 'undefined' && forme.noShiny) ? 'class="no-shiny"' : ''}>
-            <pokemon-sprite dexid="${pokemon.dexid}" shiny="true" forme="${forme.dbid}" size="${this.size}" lazy="false"></pokemon-sprite>
+            <pokemon-sprite dexid="${pokemon.dexid}" shiny="true" forme="${forme.dbid}" size="${this.size}" lazy="true"></pokemon-sprite>
             ${(typeof forme.noShiny != 'undefined' && forme.noShiny) ? '<span class="label-large">N\'existe pas<br>en chromatique</span>' : ''}
           </picture>
           <span class="forme-name surface variant label-medium ${afficherNomForme ? '' : 'off'} ${caught ? 'caught' : ''}">
@@ -91,26 +96,33 @@ export class spriteViewer extends HTMLElement {
           </span>
         </div>
       `;
-      listeShiny.innerHTML += htmlS;
+      const dexSpriteS = templateS.content.cloneNode(true) as DocumentFragment;
 
-      const htmlR = `
-      <div class="dex-sprite">
-        <picture>
-          <pokemon-sprite dexid="${pokemon.dexid}" shiny="false" forme="${forme.dbid}" size="${this.size}" lazy="false"></pokemon-sprite>
-        </picture>
-        <span class="forme-name surface variant label-medium ${afficherNomForme ? '' : 'off'} ${caught ? 'caught' : ''}">
-          <span class="forme-name-arrow surface variant"></span>
-          ${caught ? '<span class="icon" data-icon="ball/poke"></span>' : ''}
-          ${afficherNomForme ? nomForme(forme.nom) : '&nbsp;'}
-        </span>
-      </div>
-    `;
-    listeRegular.innerHTML += htmlR;
+      const templateR = document.createElement('template');
+      templateR.innerHTML = /*html*/`
+        <div class="dex-sprite" data-forme="${forme.dbid}">
+          <picture>
+            <pokemon-sprite dexid="${pokemon.dexid}" shiny="false" forme="${forme.dbid}" size="${this.size}" lazy="true"></pokemon-sprite>
+          </picture>
+          <span class="forme-name surface variant label-medium ${afficherNomForme ? '' : 'off'} ${caught ? 'caught' : ''}">
+            <span class="forme-name-arrow surface variant"></span>
+            ${caught ? '<span class="icon" data-icon="ball/poke"></span>' : ''}
+            ${afficherNomForme ? nomForme(forme.nom) : '&nbsp;'}
+          </span>
+        </div>
+      `;
+      const dexSpriteR = templateR.content.cloneNode(true) as DocumentFragment;
+
+      // Load regular sprites after shiny sprites
+      dexSpriteS.querySelector('pokemon-sprite')?.addEventListener('load', async () => {
+        await wait(200);
+        listeRegular.querySelector(`.dex-sprite[data-forme="${forme.dbid}"] pokemon-sprite`)
+        ?.shadowRoot?.querySelector('img')?.setAttribute('loading', 'eager');
+      }, { once: true });
+
+      listeShiny.appendChild(dexSpriteS);
+      listeRegular.appendChild(dexSpriteR);
     }
-
-    // On place le numéro et nom
-    this.querySelector('.info-dexid')!.innerHTML = pad(String(pokemon.dexid), 3);
-    this.querySelector('.info-nom')!.innerHTML = pokemon.getName();
   }
 
 
@@ -128,6 +140,8 @@ export class spriteViewer extends HTMLElement {
       case 'dexid': {
         if (value != null) this.updateSprites(value);
         else {
+          this.querySelector('.info-dexid')!.innerHTML = '';
+          this.querySelector('.info-nom')!.innerHTML = '';
           this.querySelector('.sprite-list.shiny')!.innerHTML = '';
           this.querySelector('.sprite-list.regular')!.innerHTML = '';
         }

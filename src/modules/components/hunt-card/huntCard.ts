@@ -513,7 +513,7 @@ export class huntCard extends HTMLElement {
       case 'game': {
         const jeu = Pokemon.jeux.find(jeu => jeu.uid === value);
         this.setAttribute('data-game', jeu?.id ?? '');
-        const charmAvailable = jeu ? jeu.gen >= 5 : false;
+        const charmAvailable = jeu ? jeu.hasCharm : false;
         this.setAttribute('data-charm-available', String(charmAvailable));
         const virtualconsoleGen = jeu ? (jeu.gen === 1 || jeu.gen === 2) : false;
         this.setAttribute('data-gen-vc', String(virtualconsoleGen));
@@ -628,7 +628,7 @@ export class huntCard extends HTMLElement {
         if (hunt.dexid == 0) erreurs.push('Pokémon');
         if (hunt.game == '') erreurs.push('jeu');
         if (hunt.method == '')  erreurs.push('méthode');
-        if (hunt.catchTime == 0) erreurs.push('date');
+        if (hunt.catchTime < 0) erreurs.push('date');
   
         if (erreurs.length > 0) {
           let message = `Les champs suivants sont mal remplis : `;
@@ -637,7 +637,15 @@ export class huntCard extends HTMLElement {
           new Notif(message).prompt();
           return;
         } else {
-          await this.submit();
+          const edit = (await shinyStorage.getItem(this.huntid)) != null;
+          if (edit) {
+            const boutonSubmit = this.shadow.querySelector('[data-action="save-shiny"]');
+            if (!(boutonSubmit instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
+            const userResponse = await warnBeforeDestruction(boutonSubmit, 'Sauvegarder ces modifications ?', 'done');
+            if (userResponse) await this.submit();
+          } else {
+            await this.submit();
+          }
         }
       }
     };
