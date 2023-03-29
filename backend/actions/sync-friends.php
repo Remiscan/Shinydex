@@ -129,7 +129,10 @@ if (isset($_POST['friends-list']) && count($recent_friends_list) > 0) {
     SELECT
       dexid,
       forme, 
-      ROW_NUMBER() OVER (PARTITION BY userid ORDER BY catchTime DESC) AS rownumber
+      ROW_NUMBER() OVER (
+        PARTITION BY userid
+        ORDER BY CAST(catchTime AS int) DESC, CAST(creationTime AS int) DESC
+      ) AS rownumber
     FROM shinydex_pokemon
     WHERE `userid` IN ($friends_query_string)
   ) SELECT * FROM grouped_pokemon WHERE rownumber <= $number_of_pokemon_to_get");
