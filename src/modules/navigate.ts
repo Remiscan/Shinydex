@@ -3,7 +3,7 @@ import { Settings } from './Settings.js';
 import { FrontendShiny } from './ShinyBackend.js';
 import { callBackend } from './callBackend.js';
 import { FilterMenu } from './components/filter-menu/filterMenu.js';
-import { clearElementStorage, disableLazyLoad, enableLazyLoad } from './lazyLoading.js';
+import { clearElementStorage } from './lazyLoading.js';
 import { friendShinyStorage } from './localForage.js';
 import { Notif } from './notification.js';
 
@@ -250,23 +250,6 @@ export let sectionActuelle = 'mes-chromatiques';
 const lastPosition: Map<string, number> = new Map(sections.filter(section => section.rememberPosition).map(section => [section.nom, 0]));
 
 
-/**
- * Récupère la première carte d'une section.
- * @param section - La section en question.
- * @returns La première carte.
- */
-const firstCard = (section: Element): HTMLElement | null | undefined => {
-  let card;
-  switch (section.id) {
-    case 'mes-chromatiques': card = section.querySelector('shiny-card'); break;
-    //case 'pokedex':          card = section.querySelector('.pokedex-gen'); break;
-    case 'chasses-en-cours': card = section.querySelector('hunt-card'); break;
-    case 'corbeille':        card = section.querySelector('corbeille-card'); break;
-  }
-  return card instanceof HTMLElement ? card : undefined;
-};
-
-
 const backOnEscape = (event: KeyboardEvent) => {
   if (event.code === 'Escape') {
     history.back();
@@ -300,10 +283,6 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
     
     // On enregistre la position du scroll sur l'ancienne section
     if (ancienneSection.rememberPosition) lastPosition.set(sectionActuelle, mainElement.scrollTop);
-
-    // Désactive le lazy loading de la première carte de l'ancienne section
-    const oldFirstCard = firstCard(ancienneSection.element);
-    if (oldFirstCard) disableLazyLoad(oldFirstCard);
 
     // On anime la disparition de l'ancienne section
     const anim = ancienneSection.closeAnimation(ancienneSection.element, event, data);
@@ -431,10 +410,6 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
     if (apparitionSection) return wait(apparitionSection);
     else                   return;
   }));
-
-  // Active le lazy loading de la première carte
-  const newFirstCard = firstCard(nouvelleSection.element);
-  if (newFirstCard) enableLazyLoad(newFirstCard);
 
   // On nettoie l'ancienne section si besoin
   switch (ancienneSection.nom) {

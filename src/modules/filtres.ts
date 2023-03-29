@@ -113,6 +113,9 @@ export class FilterList {
 }
 
 
+/**
+ * Saves user chosen filters to data storage.
+ */
 let saveFilters = async (section: FiltrableSection, filters: FilterList) => {
   const shouldSaveFilters = savedFiltersSections.includes(section);
   if (!shouldSaveFilters) return;
@@ -151,6 +154,9 @@ export function filterSection(section: FiltrableSection, filters: FilterList = n
 
 
 
+/** 
+ * Displays the Pokédex icons corresponding to the passed IDs as caught, others as uncaught.
+ */
 export function filterPokedex(dexids: Set<number>) {
   const generations = Pokemon.generations;
   const dexidMax = generations[generations.length - 1].end;
@@ -159,6 +165,68 @@ export function filterPokedex(dexids: Set<number>) {
     if (dexids.has(i)) icon?.classList.add('got');
     else               icon?.classList.remove('got');
   }
+}
+
+
+
+export type ShinyFilterData = {
+  mine: boolean,
+  legit: boolean,
+  species: string,
+  dexid: number,
+  name: string,
+  game: string
+};
+
+export type FilterMap = Map<string, ShinyFilterData>;
+
+/**
+ * Computes the filters corresponding to each card in a section.
+ */
+export async function computeFilters(section: FiltrableSection | OrderableSection): Promise<FilterMap> {
+  let dataStore: localForageAPI;
+  if (!isFiltrableSection(section)) return new Map();
+
+  switch (section) {
+    case 'mes-chromatiques':
+      dataStore = shinyStorage;
+      break;
+    case 'chromatiques-ami':
+      dataStore = friendShinyStorage;
+      break;
+    case 'corbeille':
+      dataStore = huntStorage;
+      break;
+    default:
+      throw new Error(`Section ${section} can't be filtered`);
+  }
+
+  const keys = await dataStore.keys();
+  const filterMap: FilterMap = new Map();
+
+  await Promise.all(keys.map(async key => {
+    const shiny = new Shiny(await dataStore.getItem(key));
+    filterMap.set(key, computeShinyFilters(shiny));
+  }));
+
+  return filterMap;
+}
+
+/** Computes the filters corresponding to one Shiny Pokémon. */
+export function computeShinyFilters(shiny: Shiny): ShinyFilterData {
+  let species = '';
+  const lang = document.documentElement.getAttribute('lang') ?? Params.defaultLang;
+  const pokemon = pokemonData[shiny.dexid];
+  if (isSupportedPokemonLang(lang)) species = noAccent(pokemon.name[lang] || '').toLowerCase();
+
+  return {
+    mine: shiny.mine,
+    legit: shiny.method !== 'hack',
+    species: species,
+    dexid: shiny.dexid,
+    name: noAccent(shiny.name || species || '').toLowerCase(),
+    game: shiny.game,
+  };
 }
 
 
@@ -289,67 +357,6 @@ async function orderPokemon(pokemonList: Shiny[] | Hunt[], order: ordre): Promis
 
 
 
-export type ShinyFilterData = {
-  mine: boolean,
-  legit: boolean,
-  species: string,
-  dexid: number,
-  name: string,
-  game: string
-};
-
-export type FilterMap = Map<string, ShinyFilterData>;
-
-/**
- * Computes the filters corresponding to each card in a section.
- */
-export async function computeFilters(section: FiltrableSection | OrderableSection): Promise<FilterMap> {
-  let dataStore: localForageAPI;
-  if (!isFiltrableSection(section)) return new Map();
-
-  switch (section) {
-    case 'mes-chromatiques':
-      dataStore = shinyStorage;
-      break;
-    case 'chromatiques-ami':
-      dataStore = friendShinyStorage;
-      break;
-    case 'corbeille':
-      dataStore = huntStorage;
-      break;
-    default:
-      throw new Error(`Section ${section} can't be filtered`);
-  }
-
-  const keys = await dataStore.keys();
-  const filterMap: FilterMap = new Map();
-
-  await Promise.all(keys.map(async key => {
-    const shiny = new Shiny(await dataStore.getItem(key));
-    filterMap.set(key, computeShinyFilters(shiny));
-  }));
-
-  return filterMap;
-}
-
-export function computeShinyFilters(shiny: Shiny): ShinyFilterData {
-  let species = '';
-  const lang = document.documentElement.getAttribute('lang') ?? Params.defaultLang;
-  const pokemon = pokemonData[shiny.dexid];
-  if (isSupportedPokemonLang(lang)) species = noAccent(pokemon.name[lang] || '').toLowerCase();
-
-  return {
-    mine: shiny.mine,
-    legit: shiny.method !== 'hack',
-    species: species,
-    dexid: shiny.dexid,
-    name: noAccent(shiny.name || species || '').toLowerCase(),
-    game: shiny.game,
-  };
-}
-
-
-
 /** 
  * Computes the order of cards when comparing all cards is needed,
  * i.e. when knowing the properties of the card itself isn't enough to quantize its order among all cards.
@@ -419,7 +426,6 @@ export async function computeOrders(section: OrderableSection): Promise<OrderMap
 
 /** Changes the order of cards in the DOM to fit their visual order. */
 export async function orderCards(section: OrderableSection, orderMap?: OrderMap, order?: ordre, reversed?: boolean) {
-  return;/*
   const sectionElement = document.querySelector(`#${section}`);
   if (!(sectionElement instanceof HTMLElement)) throw new TypeError('Expecting HTMLElement');
 
@@ -448,9 +454,11 @@ export async function orderCards(section: OrderableSection, orderMap?: OrderMap,
       break;
   }
   
-  const orderedCards = orderedIds.map(id => sectionElement.querySelector(`[${elementAttribute}="${id}"]`));
+  const orderedCards = orderedIds.map(id => {
+    return sectionElement.querySelector(`[${elementAttribute}="${id}"], [data-replaces][data-${elementAttribute}="${id}"]`);
+  });
 
   for (const card of orderedCards) {
     card?.parentElement?.appendChild(card);
-  }*/
+  }
 }

@@ -127,22 +127,8 @@ export async function populateFromData(section: PopulatableSection, ids: string[
 
   // Traitons les cartes :
 
-  //const cardsToCreate: Array<shinyCard | huntCard> = [];
   const cardsToCreate: HTMLElement[] = [];
-
-  const orderMap = await computeOrders(section);
   const filterMap = await computeFilters(section);
-
-  const setOrders = (card: HTMLElement, id: string) => {
-    supportedOrdres.forEach(order => {
-      const orderedKeys = orderMap.get(order);
-      const k = orderedKeys?.findIndex((i: string) => i === id);
-      if (k === -1) {
-        console.log('This should not happen');
-      }
-      card.style.setProperty(`--${order}-order`, String(k));
-    });
-  };
 
   const results = await Promise.allSettled(ids.map(async huntid => {
     const pkmn = await dataStore.getItem(huntid);
@@ -151,7 +137,6 @@ export async function populateFromData(section: PopulatableSection, ids: string[
     const pkmnInDBButDeleted = pkmnInDB && 'deleted' in pkmnObj && pkmnObj.deleted
     const ignoreCondition = section === 'corbeille' ? !pkmnInDBButDeleted : pkmnInDBButDeleted;
 
-    //let card: shinyCard | huntCard | null = document.querySelector(`${elementName}[huntid="${huntid}"]`);
     let card: HTMLElement | null = document.querySelector(`${elementName}[huntid="${huntid}"]`) ??
                                    document.querySelector(`div[data-replaces="${elementName}"][data-huntid="${huntid}"]`);
 
@@ -178,8 +163,6 @@ export async function populateFromData(section: PopulatableSection, ids: string[
           card.setAttribute('huntid', huntid);
         }
         
-        setOrders(card, huntid);
-        
         const cardFilters = filterMap.get(huntid);
         if (cardFilters) {
           for (const [filter, value] of Object.entries(cardFilters)) {
@@ -189,7 +172,6 @@ export async function populateFromData(section: PopulatableSection, ids: string[
         cardsToCreate.push(card);
       } else {
         // DANS LA BDD & AVEC CARTE = Éditer
-        setOrders(card, huntid);
         if (!virtualize) await (card as shinyCard | huntCard).dataToContent();
       }
     }
@@ -208,17 +190,8 @@ export async function populateFromData(section: PopulatableSection, ids: string[
     conteneur.appendChild(card);
     if (section === 'chasses-en-cours') {
       await (card as shinyCard | huntCard).dataToContent();
-      //lazyLoad(card);
     }
-    //if (virtualize) lazyLoad(card, 'manual', { fixedSize: true });
   }
-
-  // Ordonnons les cartes déjà présentes et non touchées
-  const untouchedIDs = (await dataStore.keys()).filter(key => !(ids.includes(key)));
-  untouchedIDs.forEach(id => {
-    const card: shinyCard | huntCard | null = document.querySelector(`${elementName}[huntid="${id}"]`);
-    if (card) setOrders(card, id);
-  })
 
   return results;
 }

@@ -46,6 +46,7 @@ const resizor = new ResizeObserver((entries: ResizeObserverEntry[]) => {
 export const virtualizedSections: string[] = ['mes-chromatiques', 'corbeille', 'chromatiques-ami'];
 const manualLoaders: Map<string, IntersectionObserver> = new Map();
 const elementStorage: Map< string, Map<string, Element> > = new Map();
+
 virtualizedSections.forEach(section => {
   const filterKeys = Object.keys(computeShinyFilters(new Shiny()));
   const storage = new Map();
@@ -133,14 +134,12 @@ export function lazyLoadSection(section: string) {
   if (cards) cards.forEach((card: Element) => lazyLoad(card, 'manual', { fixedSize: true}));
 }
 
-export function enableLazyLoad(element: HTMLElement) {
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      element.style.setProperty('content-visibility', 'auto');
-    })
-  });
-}
-
-export function disableLazyLoad(element: HTMLElement) {
-  element.style.setProperty('content-visibility', 'visible');
+/**
+ * Stops virtualization of a section's list of cards,
+ * leaving every card in its current state (potentially replaced by a placeholder).
+ */
+export function unLazyLoadSection(section: string) {
+  const cards = [...(document.querySelector(`#${section} .liste-cartes`)?.children ?? [])];
+  const observer = manualLoaders.get(section);
+  if (cards) cards.forEach((card: Element) => observer?.unobserve(card));
 }
