@@ -345,7 +345,21 @@ a.icon-button.bouton-retour {
   height: 100%;
   box-sizing: border-box;
   /*scrollbar-gutter: stable;*/
+  container-name: section-contenu;
   container-type: inline-size;
+  will-change: scroll-position;
+}
+
+.liste-cartes {
+  width: 100%;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.liste-cartes:empty {
+  display: none;
 }
 
 /*body[data-section-actuelle~="obfuscator"] .section-contenu {
@@ -418,25 +432,32 @@ section.loading .compteur {
 !!!!! CARTE D'UN POKÉMON !!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
-/*shiny-card,
+div[data-replaces="shiny-card"],
+div[data-replaces="friend-shiny-card"],
+div[data-replaces="corbeille-card"],
+shiny-card,
 friend-shiny-card,
 corbeille-card {
   content-visibility: auto;
-  contain-intrinsic-height: auto 120px;
+  contain-intrinsic-height: 120px;
   contain: size layout paint;
   height: 120px;
   min-height: 120px;
 }
 
+div[data-replaces] {
+  border-radius: var(--border-radius);
+}
+
 friend-card {
   content-visibility: auto;
-  contain-intrinsic-height: auto 126px;
+  contain-intrinsic-height: 126px;
 }
 
 hunt-card {
   content-visibility: auto;
   contain-intrinsic-height: auto 400px;
-}*/
+}
 
 [data-rendered="hidden"] {
   content-visibility: hidden;
@@ -541,6 +562,8 @@ section.loading .message-vide {
   gap: 8px;
   justify-content: space-evenly;
   align-items: flex-start;
+  content-visibility: auto;
+  contain-intrinsic-height: calc(var(--rows) * 44px + (var(--rows) - 1) * 8px);
 }
 
 .dex-icon {
@@ -603,43 +626,43 @@ section:not([data-filter-legit~="false"]) [data-legit="false"] {
   display: none;
 }
 
-:is(shiny-card, hunt-card, corbeille-card, friend-card) {
+:is(shiny-card, hunt-card, corbeille-card, friend-card, [data-replaces]) {
   --order-reversed: 1;
 }
 
-section[data-order-reversed="true"] :is(shiny-card, hunt-card, corbeille-card, friend-card) {
+section[data-order-reversed="true"] :is(shiny-card, hunt-card, corbeille-card, friend-card, [data-replaces]) {
   --order-reversed: -1;
 }
 
-section[data-order="catchTime"] :is(shiny-card, hunt-card, corbeille-card, friend-card) {
+section[data-order="catchTime"] :is(shiny-card, hunt-card, corbeille-card, friend-card, [data-replaces]) {
   order: calc(var(--order-reversed) * var(--catchTime-order, 0));
 }
 
-section[data-order="shinyRate"] :is(shiny-card, hunt-card, corbeille-card, friend-card) {
+section[data-order="shinyRate"] :is(shiny-card, hunt-card, corbeille-card, friend-card, [data-replaces]) {
   order: calc(var(--order-reversed) * var(--shinyRate-order, 0));
 }
 
-section[data-order="dexid"] :is(shiny-card, hunt-card, corbeille-card, friend-card) {
+section[data-order="dexid"] :is(shiny-card, hunt-card, corbeille-card, friend-card, [data-replaces]) {
   order: calc(var(--order-reversed) * var(--dexid-order, 0));
 }
 
-section[data-order="species"] :is(shiny-card, hunt-card, corbeille-card, friend-card) {
+section[data-order="species"] :is(shiny-card, hunt-card, corbeille-card, friend-card, [data-replaces]) {
   order: calc(var(--order-reversed) * var(--species-order, 0));
 }
 
-section[data-order="name"] :is(shiny-card, hunt-card, corbeille-card, friend-card) {
+section[data-order="name"] :is(shiny-card, hunt-card, corbeille-card, friend-card, [data-replaces]) {
   order: calc(var(--order-reversed) * var(--name-order, 0));
 }
 
-section[data-order="game"] :is(shiny-card, hunt-card, corbeille-card, friend-card) {
+section[data-order="game"] :is(shiny-card, hunt-card, corbeille-card, friend-card, [data-replaces]) {
   order: calc(var(--order-reversed) * var(--game-order, 0));
 }
 
-section[data-order="lastUpdate"] :is(shiny-card, hunt-card, corbeille-card, friend-card) {
+section[data-order="lastUpdate"] :is(shiny-card, hunt-card, corbeille-card, friend-card, [data-replaces]) {
   order: calc(-1 * var(--order-reversed) * var(--lastUpdate-order, 0));
 }
 
-section[data-order="creationTime"] :is(shiny-card, hunt-card, corbeille-card, friend-card) {
+section[data-order="creationTime"] :is(shiny-card, hunt-card, corbeille-card, friend-card, [data-replaces]) {
   order: calc(var(--order-reversed) * var(--creationTime-order, 0));
 }
 

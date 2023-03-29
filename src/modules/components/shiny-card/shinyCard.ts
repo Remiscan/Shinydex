@@ -4,6 +4,7 @@ import { Shiny } from '../../Shiny.js';
 import { isSupportedLang, isSupportedMethodID, isSupportedPokemonLang, methodStrings, pokemonData } from '../../jsonData.js';
 import { huntStorage, localForageAPI, shinyStorage } from '../../localForage.js';
 import { Notif } from '../../notification.js';
+import { computeShinyFilters } from '../../filtres.js';
 import template from './template.js';
 // @ts-expect-error
 import materialIconsSheet from '../../../../ext/material_icons.css' assert { type: 'css' };
@@ -18,7 +19,6 @@ import sheet from './styles.css' assert { type: 'css' };
 
 
 
-let currentCardId: string | null;
 let charmlessMethods: string[];
 let previousEditNotification: Notif;
 
@@ -261,14 +261,10 @@ export class shinyCard extends HTMLElement {
     }
 
     // Filters
-    this.setAttribute('data-mine', String(shiny.mine));
-    this.setAttribute('data-legit', String(shiny.method !== 'hack'));
-    let species = '';
-    if (isSupportedPokemonLang(lang)) species = noAccent(pokemon.name[lang] || '').toLowerCase();
-    this.setAttribute('data-species', species);
-    this.setAttribute('data-dexid', String(shiny.dexid));
-    this.setAttribute('data-name', noAccent(shiny.name || species || '').toLowerCase());
-    this.setAttribute('data-game', shiny.game);
+    const filters = computeShinyFilters(shiny);
+    for (const [filter, value] of Object.entries(filters)) {
+      this.setAttribute(`data-${filter}`, String(value));
+    }
   }
 
 
@@ -276,28 +272,22 @@ export class shinyCard extends HTMLElement {
    * Affiche les notes d'une carte au clic.
    */
   toggleNotes() {
-    const huntid = this.getAttribute('huntid');
-
-    // On ferme la carte déjà ouverte
-    if (currentCardId != null)
-      document.querySelector(`[huntid="${currentCardId}"]`)!.removeAttribute('open');
-
+    const currentState = this.getAttribute('open') === 'true';
     const menuButtons = [...this.shadow.querySelectorAll('.menu button')];
 
     // Si la carte demandée n'est pas celle qu'on vient de fermer, on l'ouvre
-    if (huntid != currentCardId) {
+    if (!currentState) {
       this.setAttribute('open', 'true');
       menuButtons.forEach(button => {
         button.removeAttribute('disabled');
         button.setAttribute('tabindex', '0');
       });
-      currentCardId = huntid;
     } else {
+      this.removeAttribute('open');
       menuButtons.forEach(button => {
         button.setAttribute('disabled', '');
         button.setAttribute('tabindex', '-1');
       });
-      currentCardId = null;
     }
   }
 

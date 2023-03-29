@@ -3,9 +3,10 @@ import '../../../_common/components/input-switch/input-switch.js';
 import { Friend } from './Friend.js';
 import { Hunt } from './Hunt.js';
 import { Settings } from './Settings.js';
-import { PopulatableSection, populator } from './appContent.js';
+import { populator } from './appContent.js';
 import { appStart, checkUpdate } from './appLifeCycle.js';
 import * as Auth from './auth.js';
+import { callBackend } from './callBackend.js';
 import './components/corbeille-card/corbeilleCard.js';
 import './components/filter-menu/filterMenu.js';
 import './components/friend-card/friendCard.js';
@@ -20,11 +21,11 @@ import './components/sprite-viewer/spriteViewer.js';
 import './components/syncLine.js';
 import './components/syncProgress.js';
 import { export2json, json2import } from './exportToJSON.js';
+import { PopulatableSection } from './filtres.js';
 import { dataStorage, friendStorage, huntStorage, shinyStorage } from './localForage.js';
 import { navLinkBubble, navigate, sectionActuelle } from './navigate.js';
 import { Notif, warnBeforeDestruction } from './notification.js';
 import { requestSync } from './syncBackup.js';
-import { callBackend } from './callBackend.js';
 
 
 

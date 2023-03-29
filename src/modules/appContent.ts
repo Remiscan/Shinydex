@@ -4,15 +4,13 @@ import { Shiny } from './Shiny.js';
 import { friendCard } from './components/friend-card/friendCard.js';
 import { huntCard } from './components/hunt-card/huntCard.js';
 import { shinyCard } from './components/shiny-card/shinyCard.js';
-import { computeOrders, isOrdre, orderCards, supportedOrdres, updateCounters } from './filtres.js';
+import { PopulatableSection, ShinyFilterData, computeFilters, computeOrders, isOrdre, orderCards, populatableSections, supportedOrdres, updateCounters } from './filtres.js';
+import { lazyLoadSection, virtualizedSections } from './lazyLoading.js';
 import { friendShinyStorage, friendStorage, huntStorage, localForageAPI, shinyStorage } from './localForage.js';
 import { navigate } from './navigate.js';
 import { Notif } from './notification.js';
 
 
-
-export type PopulatableSection = 'mes-chromatiques' | 'chasses-en-cours' | 'partage' | 'chromatiques-ami' | 'corbeille';
-const populatableSections: PopulatableSection[] = ['mes-chromatiques', 'chasses-en-cours', 'partage', 'chromatiques-ami', 'corbeille'];
 
 async function populateHandler(section: PopulatableSection, _ids?: string[]): Promise<PromiseSettledResult<string>[]> {
   let dataStore: localForageAPI; // base de données
@@ -33,6 +31,8 @@ async function populateHandler(section: PopulatableSection, _ids?: string[]): Pr
       dataStore = huntStorage;
       break;
   }
+
+  const virtualize = virtualizedSections.includes(section);
 
   const sectionElement = document.querySelector(`#${section}`);
   const orderMap = await computeOrders(section);
@@ -68,6 +68,8 @@ async function populateHandler(section: PopulatableSection, _ids?: string[]): Pr
     if (section === 'mes-chromatiques') {
       document.querySelector(`#pokedex`)?.classList.remove('loading');
     }
+
+    if (virtualize) lazyLoadSection(section);
   });
 
   return populated;
@@ -83,7 +85,8 @@ export async function populateFromData(section: PopulatableSection, ids: string[
   if (section === 'partage') return populateFriendsList(ids);
 
   const sectionElement = document.querySelector(`#${section}`)!;
-  const conteneur = sectionElement.querySelector(`.section-contenu`)!;
+  const conteneur = (sectionElement.querySelector(`.liste-cartes`) ?? sectionElement.querySelector(`.section-contenu`))!;
+  const virtualize = virtualizedSections.includes(section);
 
   let elementName: string; // Nom de l'élément de carte
   let dataStore: localForageAPI; // Base de données
@@ -124,11 +127,13 @@ export async function populateFromData(section: PopulatableSection, ids: string[
 
   // Traitons les cartes :
 
-  const cardsToCreate: Array<shinyCard | huntCard> = [];
+  //const cardsToCreate: Array<shinyCard | huntCard> = [];
+  const cardsToCreate: HTMLElement[] = [];
 
   const orderMap = await computeOrders(section);
+  const filterMap = await computeFilters(section);
 
-  const setOrders = (card: shinyCard | huntCard, id: string) => {
+  const setOrders = (card: HTMLElement, id: string) => {
     supportedOrdres.forEach(order => {
       const orderedKeys = orderMap.get(order);
       const k = orderedKeys?.findIndex((i: string) => i === id);
@@ -146,7 +151,9 @@ export async function populateFromData(section: PopulatableSection, ids: string[
     const pkmnInDBButDeleted = pkmnInDB && 'deleted' in pkmnObj && pkmnObj.deleted
     const ignoreCondition = section === 'corbeille' ? !pkmnInDBButDeleted : pkmnInDBButDeleted;
 
-    let card: shinyCard | huntCard | null = document.querySelector(`${elementName}[huntid="${huntid}"]`);
+    //let card: shinyCard | huntCard | null = document.querySelector(`${elementName}[huntid="${huntid}"]`);
+    let card: HTMLElement | null = document.querySelector(`${elementName}[huntid="${huntid}"]`) ??
+                                   document.querySelector(`div[data-replaces="${elementName}"][data-huntid="${huntid}"]`);
 
     // ABSENT DE LA BDD ou PRÉSENT MAIS À IGNORER = Supprimer (manuellement)
     if (!pkmnInDB || ignoreCondition) {
@@ -157,14 +164,29 @@ export async function populateFromData(section: PopulatableSection, ids: string[
     else {
       if (card == null) {
         // DANS LA BDD & SANS CARTE = Créer
-        card = document.createElement(elementName) as shinyCard | huntCard;
-        card.setAttribute('huntid', huntid);
+        if (virtualize) {
+          card = document.createElement('div') as HTMLElement;
+          card.setAttribute('data-replaces', elementName);
+          card.setAttribute('data-huntid', huntid);
+          card.classList.add('surface', 'variant', 'elevation-0');
+        } else {
+          card = document.createElement(elementName) as shinyCard | huntCard;
+          card.setAttribute('huntid', huntid);
+        }
+        
         setOrders(card, huntid);
+        
+        const cardFilters = filterMap.get(huntid);
+        if (cardFilters) {
+          for (const [filter, value] of Object.entries(cardFilters)) {
+            card?.setAttribute(`data-${filter}`, String(cardFilters[filter as keyof ShinyFilterData]));
+          }
+        }
         cardsToCreate.push(card);
       } else {
         // DANS LA BDD & AVEC CARTE = Éditer
         setOrders(card, huntid);
-        await card.dataToContent();
+        if (!virtualize) await (card as shinyCard | huntCard).dataToContent();
       }
     }
 
@@ -172,8 +194,8 @@ export async function populateFromData(section: PopulatableSection, ids: string[
   }));
 
   // Évite un bref moment où une carte est affichée en même temps que le message de section vide
-  if (conteneur.parentElement?.classList.contains('vide') && cardsToCreate.length > 0) {
-    conteneur.parentElement.classList.remove('vide');
+  if (sectionElement.classList.contains('vide') && cardsToCreate.length > 0) {
+    sectionElement.classList.remove('vide');
   }
 
   // Plaçons les cartes sur la page
@@ -181,10 +203,10 @@ export async function populateFromData(section: PopulatableSection, ids: string[
   for (const card of cardsToCreate) {
     conteneur.appendChild(card);
     if (section === 'chasses-en-cours') {
-      await card.dataToContent();
+      await (card as shinyCard | huntCard).dataToContent();
       //lazyLoad(card);
     }
-    //lazyLoad(card, 'manual');
+    //if (virtualize) lazyLoad(card, 'manual', { fixedSize: true });
   }
 
   // Ordonnons les cartes déjà présentes et non touchées
@@ -200,6 +222,9 @@ export async function populateFromData(section: PopulatableSection, ids: string[
 
 /** Populates the friends list. */
 async function populateFriendsList(usernames: string[]): Promise<PromiseSettledResult<string>[]> {
+  const sectionElement = document.querySelector(`#partage`)!;
+  const conteneur = sectionElement.querySelector(`.liste-cartes`)!;
+
   const elementName = 'friend-card';
   const dataStore = friendStorage;
 
@@ -235,11 +260,10 @@ async function populateFriendsList(usernames: string[]): Promise<PromiseSettledR
 
   // Plaçons les cartes sur la page
   // (après la préparation pour optimiser le temps d'éxecution)
-  const conteneur = document.querySelector('#partage > .section-contenu')!;
 
   // Évite un bref moment où une carte est affichée en même temps que le message de section vide
-  if (conteneur.parentElement?.classList.contains('vide') && cardsToCreate.length > 0) {
-    conteneur.parentElement.classList.remove('vide');
+  if (sectionElement?.classList.contains('vide') && cardsToCreate.length > 0) {
+    sectionElement.classList.remove('vide');
   }
 
   await Promise.all(cardsToCreate.map(async card => {
@@ -255,6 +279,19 @@ async function populateFriendsList(usernames: string[]): Promise<PromiseSettledR
 let pokedexInitialized = false;
 export function initPokedex() {
   if (pokedexInitialized) return;
+
+  // Observer le redimensionnement du Pokédex et passer la valeur en pixels
+  const observer = new ResizeObserver((entries: ResizeObserverEntry[]) => {
+    for (const entry of entries) {
+      if (!(entry.target instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
+      const width = entry.contentBoxSize[0].inlineSize;
+      if (width === 0) continue;
+      const icons = entry.target.children.length;
+      const columns = (width - 8) / (44 + 8);
+      const rows = Math.ceil(icons / columns);
+      entry.target.style.setProperty('--rows', String(rows));
+    }
+  });
 
   let gensToPopulate = [];
   const generations = Pokemon.generations;
@@ -292,12 +329,13 @@ export function initPokedex() {
 
     for (let pkmn of monsToPopulate) { genConteneur.appendChild(pkmn); }
     gensToPopulate.push(genConteneur);
+    observer.observe(genConteneur);
   }
 
   // Peuple le Pokédex
   const section = document.querySelector('#pokedex');
   if (!(section instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
-  const conteneur = section.querySelector('.section-contenu');
+  const conteneur = section.querySelector('.liste-cartes');
   if (!(conteneur instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
   for (let genConteneur of gensToPopulate) {
     conteneur.appendChild(genConteneur);

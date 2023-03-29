@@ -27,7 +27,7 @@ const previewSheet = new CSSStyleSheet();
   for (let i = 1; i <= 10; i++) {
     const containerWidth = 8 + 4 + i * (.75 * 112) + (i-1) * 4 + 4 + maxArrowWidth + 4 + 8;
     previewSheetCss += `
-      @container (width < ${containerWidth}px) {
+      @container section-contenu (width < ${containerWidth}px) {
         pokemon-sprite:nth-child(${i-1}) ~ pokemon-sprite {
           display: none;
         }

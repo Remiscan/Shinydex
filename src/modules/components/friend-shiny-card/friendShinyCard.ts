@@ -9,7 +9,7 @@ sheet.replaceSync(/*css*/`
     display: none;
   }
 
-  @container (min-width: 650px) {
+  @container section-contenu (min-width: 650px) {
     .container {
       --state-opacity: 0 !important;
     }

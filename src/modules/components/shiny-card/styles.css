@@ -355,7 +355,7 @@ button.icon-button.menu-hint::before {
   flex-grow: 1;
 }
 
-@container (min-width: 650px) {
+@container section-contenu (min-width: 650px) {
   .container {
     --last-column: auto;
   }
