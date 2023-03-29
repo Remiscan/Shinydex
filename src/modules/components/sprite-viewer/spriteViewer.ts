@@ -34,6 +34,10 @@ export class spriteViewer extends HTMLElement {
     const pokemon = new Pokemon(pokemonData[Number(dexid)]);
     const nomFormeNormale = pokemon.getName();
 
+    // On place le numéro et nom
+    this.querySelector('.info-dexid')!.innerHTML = pad(String(pokemon.dexid), 3);
+    this.querySelector('.info-nom')!.innerHTML = pokemon.getName();
+
     const caughtFormsList: Set<string> = new Set();
     await shinyStorage.keys().then(keys => Promise.all(keys.map(async key => {
       const shiny = new Shiny(await shinyStorage.getItem(key));
@@ -119,10 +123,6 @@ export class spriteViewer extends HTMLElement {
       listeShiny.appendChild(dexSpriteS);
       listeRegular.appendChild(dexSpriteR);
     }
-
-    // On place le numéro et nom
-    this.querySelector('.info-dexid')!.innerHTML = pad(String(pokemon.dexid), 3);
-    this.querySelector('.info-nom')!.innerHTML = pokemon.getName();
   }
 
 
@@ -140,6 +140,8 @@ export class spriteViewer extends HTMLElement {
       case 'dexid': {
         if (value != null) this.updateSprites(value);
         else {
+          this.querySelector('.info-dexid')!.innerHTML = '';
+          this.querySelector('.info-nom')!.innerHTML = '';
           this.querySelector('.sprite-list.shiny')!.innerHTML = '';
           this.querySelector('.sprite-list.regular')!.innerHTML = '';
         }
