@@ -59,9 +59,6 @@ virtualizedSections.forEach(section => {
         const elementName = entry.target.getAttribute('data-replaces');
         const elementId = entry.target.getAttribute('data-huntid');
         if (elementName && elementId) {
-          if (elementId === '809d3e81-ab26-4508-8464-468002947ffe') {
-            console.log(`Replacing ${elementId} placeholder with card`, entry.boundingClientRect);
-          }
           const replacement = storage.get(elementId) ?? document.createElement(elementName);
           if (!replacement.getAttribute('huntid')) {
             replacement.setAttribute('huntid', elementId);
@@ -80,22 +77,24 @@ virtualizedSections.forEach(section => {
         const elementName = entry.target.tagName.toLowerCase();
         const elementId = entry.target.getAttribute('huntid');
         if (elementName && elementId) {
-          if (elementId === '809d3e81-ab26-4508-8464-468002947ffe') {
-            console.log(`Replacing ${elementId} card with placeholder`, entry.boundingClientRect);
-          }
-          storage.set(elementId, entry.target);
-          const replacement = document.createElement('div');
-          replacement.setAttribute('data-replaces', elementName);
-          replacement.setAttribute('data-huntid', elementId);
-          replacement.classList.add('surface', 'variant', 'elevation-0');
+          if ((entry.target as HTMLElement & {obsolete: boolean}).obsolete) {
+            storage.delete(elementId);
+          } else {
+            storage.set(elementId, entry.target);
 
-          replacement.setAttribute('style', entry.target.getAttribute('style') ?? '');
-          for (const filter of filterKeys) {
-            replacement.setAttribute(`data-${filter}`, entry.target.getAttribute(`data-${filter}`) ?? '');
-          }
+            const replacement = document.createElement('div');
+            replacement.setAttribute('data-replaces', elementName);
+            replacement.setAttribute('data-huntid', elementId);
+            replacement.classList.add('surface', 'variant', 'elevation-0');
 
-          entry.target.parentElement?.replaceChild(replacement, entry.target);
-          loader.observe(replacement);
+            replacement.setAttribute('style', entry.target.getAttribute('style') ?? '');
+            for (const filter of filterKeys) {
+              replacement.setAttribute(`data-${filter}`, entry.target.getAttribute(`data-${filter}`) ?? '');
+            }
+
+            entry.target.parentElement?.replaceChild(replacement, entry.target);
+            loader.observe(replacement);
+          }
         }
       }
     }
@@ -106,6 +105,10 @@ virtualizedSections.forEach(section => {
 
   manualLoaders.set(section, loader);
 });
+
+export function clearElementStorage(section: string, id: string) {
+  elementStorage.get(section)?.delete(id);
+}
 
 type LazyLoadingMethod = 'auto' | 'manual';
 type LazyLoadingOptions = {

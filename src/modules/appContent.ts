@@ -5,7 +5,7 @@ import { friendCard } from './components/friend-card/friendCard.js';
 import { huntCard } from './components/hunt-card/huntCard.js';
 import { shinyCard } from './components/shiny-card/shinyCard.js';
 import { PopulatableSection, ShinyFilterData, computeFilters, computeOrders, isOrdre, orderCards, populatableSections, supportedOrdres, updateCounters } from './filtres.js';
-import { lazyLoadSection, virtualizedSections } from './lazyLoading.js';
+import { clearElementStorage, lazyLoadSection, virtualizedSections } from './lazyLoading.js';
 import { friendShinyStorage, friendStorage, huntStorage, localForageAPI, shinyStorage } from './localForage.js';
 import { navigate } from './navigate.js';
 import { Notif } from './notification.js';
@@ -157,7 +157,11 @@ export async function populateFromData(section: PopulatableSection, ids: string[
 
     // ABSENT DE LA BDD ou PRÉSENT MAIS À IGNORER = Supprimer (manuellement)
     if (!pkmnInDB || ignoreCondition) {
-      card?.remove();
+      if (card) {
+        (card as HTMLElement & {obsolete: boolean}).obsolete = true;
+        card.remove();
+        clearElementStorage(section, huntid);
+      }
     }
 
     // DANS LA BDD et À NE PAS IGNORER

@@ -3,7 +3,7 @@ import { Settings } from './Settings.js';
 import { FrontendShiny } from './ShinyBackend.js';
 import { callBackend } from './callBackend.js';
 import { FilterMenu } from './components/filter-menu/filterMenu.js';
-import { disableLazyLoad, enableLazyLoad } from './lazyLoading.js';
+import { clearElementStorage, disableLazyLoad, enableLazyLoad } from './lazyLoading.js';
 import { friendShinyStorage } from './localForage.js';
 import { Notif } from './notification.js';
 
@@ -445,7 +445,11 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
     case 'chromatiques-ami': {
       if (nouvelleSection.closePrevious) {
         friendShinyStorage.clear();
-        ancienneSection.element.querySelectorAll('friend-shiny-card').forEach(card => card.remove());
+        ancienneSection.element.querySelectorAll('friend-shiny-card, [data-replaces="friend-shiny-card"]').forEach(card => {
+          (card as Element & {obsolete: boolean}).obsolete = true;
+          card.remove();
+          clearElementStorage('chromatiques-ami', card.getAttribute('huntid') ?? card.getAttribute('data-huntid') ?? '');
+        });
         ancienneSection.element.querySelectorAll('.compteur').forEach(compteur => compteur.innerHTML = '');
         ancienneSection.element.removeAttribute('data-username');
 
