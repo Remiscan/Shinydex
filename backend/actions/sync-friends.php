@@ -102,19 +102,13 @@ if (isset($_POST['friends-list']) && count($recent_friends_list) > 0) {
   // Prepare query to get each friend's userid
   $friends_query_string = [];
   for ($i = 0; $i < count($recent_friends_list); $i++) {
-    $friends_query_string[] = ":user$i";
+    $friends_query_string[] = "?";
   }
   $friends_query_string = join(',', $friends_query_string);
 
   // Get each friend's userid
   $get_friends_userid = $db->prepare("SELECT uuid, username FROM shinydex_users WHERE `username` IN ($friends_query_string)");
-
-  for ($i = 0; $i < count($recent_friends_list); $i++) {
-    $username = $recent_friends_list[$i];
-    $get_friends_userid->bindParam(":user$i", $username, PDO::PARAM_STR, 36);
-  }
-
-  $results[] = $get_friends_userid->execute();
+  $results[] = $get_friends_userid->execute($recent_friends_list);
   $get_friends_userid = $get_friends_userid->fetchAll(PDO::FETCH_ASSOC);
 
   // Associate each username to a userid in an array
@@ -128,7 +122,8 @@ if (isset($_POST['friends-list']) && count($recent_friends_list) > 0) {
   $get_friends_pokemon = $db->prepare("WITH grouped_pokemon AS (
     SELECT
       dexid,
-      forme, 
+      forme,
+      userid,
       ROW_NUMBER() OVER (
         PARTITION BY userid
         ORDER BY CAST(catchTime AS int) DESC, CAST(creationTime AS int) DESC
@@ -137,18 +132,14 @@ if (isset($_POST['friends-list']) && count($recent_friends_list) > 0) {
     WHERE `userid` IN ($friends_query_string)
   ) SELECT * FROM grouped_pokemon WHERE rownumber <= $number_of_pokemon_to_get");
 
-  for ($i = 0; $i < count($recent_friends_list); $i++) {
-    $userid = $friends_userid[$recent_friends_list[$i]];
-    $get_friends_pokemon->bindParam(":user$i", $userid, PDO::PARAM_STR, 36);
-  }
-
-  $results[] = $get_friends_pokemon->execute();
-  $get_friends_pokemon = $get_friends_pokemon->fetchAll(PDO::FETCH_ASSOC);
+  $results[] = $get_friends_pokemon->execute(array_values($friends_userid));
+  $get_friends_pokemon = $get_friends_pokemon->fetchAll(PDO::FETCH_ASSOC);  
 
   // Associate each username to an array of Pokémon with partial data
   foreach ($recent_friends_list as $username) {
     $pokemon_list = [];
     foreach ($get_friends_pokemon as $pokemon) {
+      if ($pokemon['userid'] !== $friends_userid[$username]) continue;
       $pokemon_list[] = ['dexid' => $pokemon['dexid'], 'forme' => $pokemon['forme']];
     }
     $friends_pokemon[$username] = $pokemon_list;
