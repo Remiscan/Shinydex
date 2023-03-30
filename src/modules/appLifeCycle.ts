@@ -172,6 +172,19 @@ export async function appStart() {
     }));
     logPerf('init filters');
 
+    // On efface l'écran de chargement
+    const loadScreen = document.getElementById('load-screen')!;
+    const byeLoad = loadScreen.animate([
+      { opacity: 1 },
+      { opacity: 0 }
+    ], {
+      duration: 100,
+      easing: Params.easingStandard,
+      fill: 'forwards'
+    });
+    await wait(byeLoad);
+    loadScreen.remove();
+
     const sectionsToPopulate: PopulatableSection[] = ['mes-chromatiques', 'chasses-en-cours', 'corbeille', 'partage'];
     await Promise.all([
       initPokedex(),
@@ -210,20 +223,6 @@ export async function appStart() {
   }*/
 
   console.log('[:)] Chargement terminé !');
-
-  // On efface l'écran de chargement
-  const loadScreen = document.getElementById('load-screen')!;
-  const byeLoad = loadScreen.animate([
-    { opacity: 1 },
-    { opacity: 0 }
-  ], {
-    duration: 100,
-    easing: Params.easingStandard,
-    fill: 'forwards'
-  });
-  await wait(byeLoad);
-  loadScreen.remove();
-
   console.log('[:)] Bienvenue sur le Shinydex !');
 
   // ---
