@@ -213,7 +213,8 @@ export class Pokemon {
   getFormeName(id: string = '', withName: boolean = true, lang = document.documentElement.getAttribute('lang') ?? Params.defaultLang): string {
     if (!isSupportedPokemonLang(lang)) throw new Error('language-not-supported');
     const forme = this.formes.find(f => f.dbid === id);
-    const name = this.getName(lang);
+    let name = this.getName(lang);
+    name = name.charAt(0).toUpperCase() + name.slice(1);
     const normalFormName = {
       fr: 'Forme normale',
       en: 'Normal form'
