@@ -336,7 +336,6 @@ shiny-switch {
   --on-track-color: rgb(var(--primary));
   --off-thumb-color: rgb(var(--outline));
   --on-thumb-color: rgb(var(--on-primary));
-  contain: size layout paint;
 }
 
 input-switch::part(button),
