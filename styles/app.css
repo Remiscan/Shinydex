@@ -353,8 +353,7 @@ a.icon-button.bouton-retour {
 .liste-cartes {
   width: 100%;
   flex: none;
-  display: flex;
-  flex-direction: column;
+  display: grid;
   gap: 8px;
 }
 
