@@ -3,7 +3,7 @@
     <span class="material-icons">arrow_back</span>
   </a>
 
-  <h1 class="title-large">Paramètres</h1>
+  <h1 class="title-large" data-string="section-parametres-long-title"></h1>
 
   <div class="titre-icones">
     <!-- Bouton "à propos" -->
@@ -15,65 +15,74 @@
 
 <div class="section-contenu">
   <form name="app-settings">
-    <h2 class="title-medium">Apparence</h2>
+    <h2 class="title-medium" data-string="parametres-apparence"></h2>
 
     <p class="un-parametre theme">
-      <span class="param-nom body-large">Thème</span>
+      <span class="param-nom body-large" data-string="param-theme"></span>
 
       <span class="param">
-        <radio-group name="theme">
-          <option value="system">Système</option>
-          <option value="light">Clair</option>
-          <option value="dark">Sombre</option>
+        <radio-group name="theme" data-string="param-theme-options">
         </radio-group>
       </span>
     </p>
 
     <p class="un-parametre">
-      <span class="param-nom body-large">Teinte</span>
+      <span class="param-nom body-large" data-string="param-hue"></span>
       <span class="param">
         <input-slider name="theme-hue" min="1" max="360" step="1" value="320"></input-slider>
       </span>
     </p>
 
+    <!--<p class="un-parametre with-description">
+      <span class="param-nom body-large" data-string="param-lang-title">Langue</span>
+      <span class="param-description body-medium" data-string="param-lang-desc"></span>
+      <span class="param">
+        <input-select name="language" default-value="poke">
+          <span slot="label">Langue / Language</span>
+          <option value="fr">Français</option>
+          <option value="en">English</option>
+        </input-select>
+      </span>
+    </p>-->
+
     <!---->
 
-    <h2 class="title-medium">Sauvegarde et partage des données en ligne</h2>
+    <h2 class="title-medium" data-string="parametres-backup"></h2>
 
     <p class="un-parametre with-description" data-logged-out>
-      <span class="param-nom body-large">Se connecter</span>
-      <span class="param-description body-medium">pour sauvegarder vos données en ligne.</span>
+      <span class="param-nom body-large" data-string="param-signin-title"></span>
+      <span class="param-description body-medium" data-string="param-signin-desc"></span>
       <span class="param">
         <button type="button" class="surface interactive filled tonal only-text" data-action="sign-in-prompt">
-          <span class="label-large">Se connecter</span>
+          <span class="label-large" data-string="param-signin-title"></span>
         </button>
       </span>
     </p>
 
-    <p class="body-medium current-account-info" data-logged-in>Actuellement connecté en tant que <span data-value="current-account"></span>.</p>
+    <p class="body-medium current-account-info" data-logged-in data-string="current-account"></p>
 
     <p class="un-parametre with-description" data-logged-in data-last-sync>
-      <span class="param-nom body-large">Dernière sauvegarde</span>
+      <span class="param-nom body-large" data-string="param-last-sync-title"></span>
       <span class="param-description body-medium" data-sync-time-container>00/00/2000 00h00</span>
       <span class="param">
         <button type="button" class="surface interactive text-button success" data-action="sync-now" data-last-sync="success" aria-label="Sauvegarder maintenant">
           <span class="material-icons">done</span>
-          <span class="label-large">Succès</span>
+          <span class="label-large" data-string="success"></span>
         </button>
         <button type="button" class="surface interactive text-button danger" data-action="sync-now" data-last-sync="failure" aria-label="Sauvegarder maintenant">
           <span class="material-icons">error</span>
-          <span class="label-large">Échec</span>
+          <span class="label-large" data-string="failure"></span>
         </button>
         <button type="button" class="surface interactive text-button" data-action="sync-now" data-last-sync="loading" aria-label="Sauvegarder maintenant">
           <load-spinner></load-spinner>
-          <span class="label-large">En cours</span>
+          <span class="label-large" data-string="ongoing"></span>
         </button>
       </span>
     </p>
 
     <p class="un-parametre with-description" data-logged-in>
-      <span class="param-nom body-large">Rendre votre profil public</span>
-      <span class="param-description body-medium">pour partager votre liste de Pokémon&nbsp;<shiny-stars></shiny-stars>.</span>
+      <span class="param-nom body-large" data-string="param-public-profile-title"></span>
+      <span class="param-description body-medium" data-string="param-public-profile-desc"></span>
       <span class="param">
         <label for="public-profile">
           <input-switch name="public" id="public-profile" icons="checked"></input-switch>
@@ -82,42 +91,41 @@
     </p>
 
     <p class="un-parametre with-description" data-logged-in data-public-profile>
-      <span class="param-nom body-large">Choisir un pseudo</span>
-      <span class="param-description body-medium">pour pouvoir être ajouté comme ami.</span>
+      <span class="param-nom body-large" data-string="param-username-title"></span>
+      <span class="param-description body-medium" data-string="param-username-desc"></span>
       <span class="param">
-        <text-field name="username" autocomplete="off" spellcheck="false" maxlength="20">
-          <span slot="label">Pseudo</span>
+        <text-field name="username" autocomplete="off" spellcheck="false" maxlength="20" data-string="param-username-label">
         </text-field>
       </span>
     </p>
 
     <p class="un-parametre with-description" data-logged-in>
-      <span class="param-nom body-large">Se déconnecter</span>
-      <span class="param-description body-medium">et arrêter de sauvegarder vos données en ligne.</span>
+      <span class="param-nom body-large" data-string="param-signout-title"></span>
+      <span class="param-description body-medium" data-string="param-signout-desc"></span>
       <span class="param">
         <button type="button" class="surface interactive filled tonal only-text g_id_signout" data-action="sign-out">
-          <span class="label-large">Se déconnecter</span>
+          <span class="label-large" data-string="param-signout-title"></span>
         </button>
       </span>
     </p>
 
     <p class="un-parametre with-description" data-logged-in>
-      <span class="param-nom body-large">Supprimer la sauvegarde en ligne</span>
-      <span class="param-description body-medium">Vous ne pourrez plus accéder à vos données depuis un autre appareil.</span>
+      <span class="param-nom body-large" data-string="param-delete-backup-title"></span>
+      <span class="param-description body-medium" data-string="param-delete-backup-desc"></span>
       <span class="param">
         <button type="button" class="surface interactive filled tonal danger only-text" data-action="delete-backup">
-          <span class="label-large">Supprimer</span>
+          <span class="label-large" data-string="param-delete-backup-label"></span>
         </button>
       </span>
     </p>
 
     <!---->
 
-    <h2 class="title-medium">Gestion des données sur votre appareil</h2>
+    <h2 class="title-medium" data-string="parametres-local-data"></h2>
 
     <p class="un-parametre with-description">
-      <span class="param-nom body-large">Télécharger les icônes</span>
-      <span class="param-description body-medium">pour pouvoir observer les Pokémon dans le Pokédex sans connexion internet. <span data-sprites-progress></span></span>
+      <span class="param-nom body-large" data-string="param-cache-icons-title"></span>
+      <span class="param-description body-medium" data-string="param-cache-icons-desc"></span>
       <span class="param">
         <label for="cache-all-sprites">
           <input-switch name="cache-all-sprites" id="cache-all-sprites" icons="checked"></input-switch>
@@ -126,33 +134,33 @@
     </p>
 
     <p class="un-parametre with-description">
-      <span class="param-nom body-large">Exporter les données</span>
-      <span class="param-description body-medium">au format JSON.</span>
+      <span class="param-nom body-large" data-string="param-export-title"></span>
+      <span class="param-description body-medium" data-string="param-export-desc"></span>
       <span class="param">
         <button type="button" class="surface interactive filled tonal only-text" data-action="export-json">
-          <span class="label-large">Exporter</span>
+          <span class="label-large" data-string="param-export-label"></span>
         </button>
       </span>
     </p>
 
     <p class="un-parametre with-description">
-      <span class="param-nom body-large">Importer des données</span>
-      <span class="param-description body-medium">depuis un fichier JSON.</span>
+      <span class="param-nom body-large" data-string="param-import-title"></span>
+      <span class="param-description body-medium" data-string="param-import-desc"></span>
       <span class="param">
         <input type="file" id="pick-import-file" accept=".json" tabindex="-1">
-        <label for="pick-import-file" class="ghost">Importer</label>
+        <label for="pick-import-file" class="ghost" data-string="param-import-label"></label>
         <button type="button" class="surface interactive filled tonal only-text" data-action="import-json" aria-hidden="true">
-          <span class="label-large">Importer</span>
+          <span class="label-large" data-string="param-import-label"></span>
         </button>
       </span>
     </p>
 
     <p class="un-parametre with-description no-backup">
-      <span class="param-nom body-large">Supprimer les données</span>
-      <span class="param-description body-medium">Supprime la sauvegarde locale, mais n'affecte pas la sauvegarde en ligne.</span>
+      <span class="param-nom body-large" data-string="param-delete-local-data-title"></span>
+      <span class="param-description body-medium" data-string="param-delete-local-data-desc"></span>
       <span class="param">
         <button type="button" class="surface interactive filled danger only-text" data-action="delete-local-data">
-          <span class="label-large">Supprimer</span>
+          <span class="label-large" data-string="param-delete-local-data-label"></span>
         </button>
       </span>
     </p>

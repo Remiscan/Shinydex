@@ -46,7 +46,8 @@ $httpLanguage = $translation->getLanguage();
       "imports": {
         "input-switch-styles": "../_common/components/input-switch/styles.css",
         "input-switch-template": "../_common/components/input-switch/template.js",
-        "colori": "../colori/lib/dist/colori.min.js"
+        "colori": "../colori/lib/dist/colori.min.js",
+        "translation-observer": "../_common/js/translation-observer.js"
       }
     }
     </script>
@@ -111,38 +112,38 @@ $httpLanguage = $translation->getLanguage();
 
       <a class="nav-link lien-section surface interactive" data-nav-section="mes-chromatiques" href="./mes-chromatiques">
         <span class="material-icons surface" aria-hidden="true">catching_pokemon</span>
-        <span class="label-medium">Pokémon <shiny-stars></shiny-stars></span>
+        <span class="label-medium" data-string="section-mes-chromatiques-short-title"></span>
       </a>
 
       <a class="nav-link lien-section surface interactive" data-nav-section="pokedex" href="./pokedex">
         <span class="material-icons surface" aria-hidden="true">apps</span>
-        <span class="label-medium">Pokédex <shiny-stars></shiny-stars></span>
+        <span class="label-medium" data-string="section-pokedex-short-title"></span>
       </a>
 
       <a class="nav-link lien-section surface interactive" data-nav-section="chasses-en-cours" href="./chasses-en-cours">
         <span class="material-icons surface" aria-hidden="true">add_circle</span>
-        <span class="label-medium">Chasses</span>
+        <span class="label-medium" data-string="section-chasses-en-cours-short-title"></span>
       </a>
 
       <a class="nav-link lien-section surface interactive only-pc" data-nav-section="corbeille" href="./corbeille">
         <span class="material-icons surface" aria-hidden="true">auto_delete</span>
-        <span class="label-medium">Corbeille</span>
+        <span class="label-medium" data-string="section-corbeille-short-title"></span>
       </a>
 
       <a class="nav-link lien-section surface interactive" data-nav-section="partage" href="./partage">
         <span class="material-icons surface" aria-hidden="true">group</span>
-        <span class="label-medium">Amis</span>
+        <span class="label-medium" data-string="section-partage-short-title"></span>
       </a>
 
       <a class="nav-link lien-section surface interactive only-pc" data-nav-section="parametres" href="./parametres">
         <span class="material-icons surface" aria-hidden="true">settings</span>
         <sync-progress></sync-progress>
-        <span class="label-medium">Paramètres</span>
+        <span class="label-medium" data-string="section-parametres-short-title"></span>
       </a>
 
       <a class="nav-link lien-section surface interactive only-pc" data-nav-section="a-propos" href="./a-propos">
         <span class="material-icons surface" aria-hidden="true">info</span>
-        <span class="label-medium">À propos</span>
+        <span class="label-medium" data-string="section-a-propos-short-title"></span>
       </a>
     </nav>
 
@@ -193,10 +194,6 @@ $httpLanguage = $translation->getLanguage();
       <section id="a-propos">
         <?php
         ob_start();
-        include './pages/politique-confidentialite.html';
-        $politique = ob_get_clean();
-
-        ob_start();
         include './images/app-icons/icon.svg';
         $icon = ob_get_clean();
 
@@ -204,7 +201,6 @@ $httpLanguage = $translation->getLanguage();
         include './pages/a-propos.html';
         $apropos = ob_get_clean();
 
-        $apropos = str_replace('{{polconf}}', $politique, $apropos);
         $apropos = str_replace('{{app-icon}}', $icon, $apropos);
         echo $apropos;
         ?>
@@ -232,13 +228,13 @@ $httpLanguage = $translation->getLanguage();
     <!-- User search -->
     <section id="user-search">
       <div class="user-search-card surface standard primary shadow elevation-3">
-        <h2 class="title-medium">Ajouter un ami avec son pseudo :</h2>
+        <h2 class="title-medium" data-string="add-friend-hint"></h2>
 
         <form name="user-search" class="search-form">
           <input type="text" name="username" class="surface variant elevation-3 interactive body-large"
-          inputmode="search" enterkeyhint="search" role="searchbox" autocomplete="off"
-          minlength="1" maxlength="20"
-          placeholder="Rechercher un pseudo">
+            inputmode="search" enterkeyhint="search" role="searchbox" autocomplete="off"
+            minlength="1" maxlength="20"
+            data-placeholder="add-friend-placeholder">
 
           <button type="reset" class="surface interactive icon-button only-icon reset-icon">
             <span class="material-icons">close</span>

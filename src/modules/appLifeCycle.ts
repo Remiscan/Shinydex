@@ -10,6 +10,7 @@ import { dataStorage, huntStorage, shinyStorage } from './localForage.js';
 import { Notif } from './notification.js';
 import { setTheme } from './theme.js';
 import { upgradeStorage } from './upgradeStorage.js';
+import { translationObserver } from './translation.js';
 
 
 
@@ -106,6 +107,10 @@ export async function appStart() {
   // ÉTAPE 1 : on vérifie si l'application est installée localement
 
   logPerf('Étape 1');
+
+  // Translate app interface
+  translationObserver.serve(document.documentElement);
+  translationObserver.translate(document.documentElement);
 
   // On vérifie si les données sont installées
   await Promise.all([dataStorage.ready(), shinyStorage.ready(), huntStorage.ready()]);

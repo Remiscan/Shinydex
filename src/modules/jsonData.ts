@@ -1,15 +1,16 @@
 import pokemonData from '../data/pokemon.json' assert { type: 'json' };
 import gameStrings from '../strings/games.json' assert { type: 'json' };
 import methodStrings from '../strings/methods.json' assert { type: 'json' };
+import appStrings from '../strings/app.json' assert { type: 'json' };
 
 
 
-export { gameStrings, methodStrings, pokemonData };
+export { gameStrings, methodStrings, pokemonData, appStrings };
 
 
 
 // Strings languages
-export type SupportedLang = keyof typeof gameStrings | keyof typeof methodStrings;
+export type SupportedLang = keyof typeof gameStrings | keyof typeof methodStrings | keyof typeof appStrings;
 export function isSupportedLang(string: string): string is SupportedLang {
   return Object.keys(gameStrings).includes(string as SupportedLang) || Object.keys(methodStrings).includes(string as SupportedLang);
 }
