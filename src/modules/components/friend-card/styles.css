@@ -108,3 +108,10 @@ a[data-nav-section="chromatiques-ami"]:not(:hover, :active) {
   --surface-opacity: 1;
   --elevation-opacity: var(--elevation-2-opacity);
 }
+
+a[data-nav-section="chromatiques-ami"]::before {
+  width: 100%;
+  height: 84px;
+  bottom: 4px;
+  left: 0;
+}
