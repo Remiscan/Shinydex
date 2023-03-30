@@ -78,7 +78,10 @@ const generations: Generation[] = [
 /** Structure d'une Forme de Pokémon. */
 export class Forme {
   dbid: string = '';
-  nom: string = '';
+  name: {
+    fr: string,
+    en: string
+  } = { fr: '', en: '' };
   form: number = 0;
   gender: string = 'mf';
   gigamax: boolean = false;
@@ -88,7 +91,12 @@ export class Forme {
 
   constructor(forme: object = {}) {
     if ('dbid' in forme) this.dbid = String(forme.dbid);
-    if ('nom' in forme) this.nom = String(forme.nom);
+    if ('name' in forme && typeof forme.name === 'object' && forme.name != null) {
+      this.name = {
+        fr: 'fr' in forme.name ? String(forme.name.fr ?? '') : '',
+        en: 'en' in forme.name ? String(forme.name.en ?? '') : ''
+      };
+    }
     if ('form' in forme) this.form = Number(forme.form) || 0;
     if ('gender' in forme) this.gender = String(forme.gender);
     if ('gigamax' in forme) this.gigamax = Boolean(forme.gigamax);
@@ -197,6 +205,21 @@ export class Pokemon {
   getName(lang = document.documentElement.getAttribute('lang') ?? Params.defaultLang): string {
     if (!isSupportedPokemonLang(lang)) throw new Error('language-not-supported');
     return this.name[lang];
+  }
+
+  /**
+   * @returns Nom d'une forme du Pokémon.
+   */
+  getFormeName(id: string = '', withName: boolean = true, lang = document.documentElement.getAttribute('lang') ?? Params.defaultLang): string {
+    if (!isSupportedPokemonLang(lang)) throw new Error('language-not-supported');
+    const forme = this.formes.find(f => f.dbid === id);
+    const name = this.getName(lang);
+    const normalFormName = {
+      fr: 'Forme normale',
+      en: 'Normal form'
+    };
+    if (withName) return forme?.name[lang].replace('{{name}}', name) || name;
+    else          return forme?.name[lang].replace('{{name}}', '').trim() || normalFormName[lang];
   }
 
   /**

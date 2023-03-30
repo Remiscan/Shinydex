@@ -725,12 +725,12 @@ export class huntCard extends HTMLElement {
 
     select.setAttribute('value', formeToSelect ?? ''); // set initial value before regenerating the options
 
-    const pkmn = pokemonData[k];
-    const formes = pkmn.formes.slice().sort((a: Forme, b: Forme) => { if (a.nom == '') return -1; else return 0;});
+    const pkmn = new Pokemon(pokemonData[k]);
+    const formes = pkmn.formes.slice().sort((a: Forme, b: Forme) => { if (a.name['fr'] == '') return -1; else return 0;});
     let availableChoices = 0;
     for (const forme of formes) {
       if ('noShiny' in forme && forme.noShiny == true) continue;
-      select.innerHTML += `<option value="${forme.dbid}">${forme.nom || 'Forme normale'}</option>`;
+      select.innerHTML += `<option value="${forme.dbid}">${pkmn.getFormeName(forme.dbid, false)}</option>`;
       availableChoices++;
     }
     if (availableChoices > 0) select.setAttribute('default-label', 'Choisir une forme');
