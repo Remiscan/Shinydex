@@ -137,12 +137,13 @@ if (isset($_POST['friends-list']) && count($recent_friends_list) > 0) {
 
   // Associate each username to an array of Pokémon with partial data
   foreach ($recent_friends_list as $username) {
-    $pokemon_list = [];
-    foreach ($get_friends_pokemon as $pokemon) {
-      if ($pokemon['userid'] !== $friends_userid[$username]) continue;
-      $pokemon_list[] = ['dexid' => $pokemon['dexid'], 'forme' => $pokemon['forme']];
-    }
-    $friends_pokemon[$username] = $pokemon_list;
+    $friends_pokemon[$username] = [];
+  }
+
+  $friends_usernames = array_flip($friends_userid);
+  foreach ($get_friends_pokemon as $pokemon) {
+    $username = $friends_usernames[$pokemon['userid']];
+    $friends_pokemon[$username][] = ['dexid' => $pokemon['dexid'], 'forme' => $pokemon['forme']];
   }
 }
 
