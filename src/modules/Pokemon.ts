@@ -1,6 +1,9 @@
 import { appStrings, isSupportedPokemonLang, pokemonData } from './jsonData.js';
 import { pad, Params } from './Params.js';
-import { getCurrentLang } from './translation.js';
+
+
+
+function getCurrentLang() { return document.documentElement.lang; }
 
 
 
