@@ -61,10 +61,6 @@ sprite-viewer[shiny="true"] .sprite-list.regular {
   opacity: .7;
 }
 
-.info-nom {
-  text-transform: capitalize;
-}
-
 sprite-viewer a.icon-button.bouton-retour {
   margin: 0;
 }
@@ -109,7 +105,6 @@ sprite-viewer a.icon-button.bouton-retour {
 }
 
 .forme-name {
-  text-transform: capitalize;
   --padding-inline: 4px;
   padding: var(--padding-inline) calc(3 * var(--padding-inline));
   border-radius: calc(.5 * var(--height));

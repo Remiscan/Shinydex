@@ -5,7 +5,7 @@ require_once __DIR__.'/class_Sprite.php';
 
 class Forme extends Sprite {
   public $dbid = '';
-  public $nom = '';
+  public $name = '';
   public $form = 0;
   public $gender = '';
   public $gigamax = false;
@@ -59,17 +59,26 @@ class Forme extends Sprite {
           switch($this->form) {
             case 0:
               $this->dbid = 'gigamax';
-              $this->nom = 'Poing Final - Gigamax';
+              $this->name = [
+                'fr' => '{{name}} Gigamax (Style Poing Final)',
+                'en' => 'Gigantamax {{name}} (Single Strike Style)'
+              ];
             break;
             case 1:
               $this->dbid = 'water-gigamax';
-              $this->nom = 'Mille Poings - Gigamax';
+              $this->name = [
+                'fr' => '{{name}} Gigamax (Style Mille Poings)',
+                'en' => 'Gigantamax {{name}} (Rapid Strike Style)'
+              ];
             break;
           }
         break;
         default:
           $this->dbid = 'gigamax';
-          $this->nom = 'Gigamax';
+          $this->name = [
+            'fr' => '{{name}} Gigamax',
+            'en' => 'Gigantamax {{name}}'
+          ];
       }
     }
 
@@ -79,236 +88,291 @@ class Forme extends Sprite {
         case 0: // Œuf
           $ids = ['', 'manaphy'];
           $noms = ['Œuf', 'Œuf de Manaphy'];
+          $nomsEN = ['Egg', 'Manaphy Egg'];
         break;
         case 25: // Pikachu
           $ids = ['', 'original-cap', 'hoenn-cap', 'sinnoh-cap', 'unys-cap', 'kalos-cap', 'alola-cap', 'partner-cap', '', 'world-cap'];
-          $noms = ['', 'Casquette Originale', 'Casquette de Hoenn', 'Casquette de Sinnoh', 'Casquette d\'Unys', 'Casquette de Kalos', 'Casquette d\'Alola', 'Casquette de Partenaire', '', 'Casquette Monde'];
+          $noms = ['', '{{name}} Casquette Originale', '{{name}} Casquette de Hoenn', '{{name}} Casquette de Sinnoh', '{{name}} Casquette d\'Unys', '{{name}} Casquette de Kalos', '{{name}} Casquette d\'Alola', '{{name}} Casquette de Partenaire', '', '{{name}} Casquette Monde'];
+          $nomsEN = ['', 'Original Cap {{name}}', 'Hoenn Cap {{name}}', 'Sinnoh Cap {{name}}', 'Unova Cap {{name}}', 'Kalos Cap {{name}}', 'Alola Cap {{name}}', 'Partner Cap {{name}}', '', 'World Cap {{name}}'];
         break;
         case 201: // Zarbi
           $ids = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '!', '?'];
           $noms = array_map('strtoupper', $ids);
+          $nomsEN = $noms;
         break;
         case 351: // Morphéo
           $ids = ['', 'sunny', 'rainy', 'snowy'];
-          $noms = ['', 'Solaire', 'Eau de Pluie', 'Blizzard'];
+          $noms = ['', '{{name}} Forme Solaire', '{{name}} Forme Eau de Pluie', '{{name}} Forme Blizzard'];
+          $nomsEN = ['', 'Sunny Form {{name}}', 'Rainy Form {{name}}', 'Snowy Form {{name}}'];
         break;
         case 386: //Deoxys
           $ids = ['', 'attack', 'defense', 'speed'];
-          $noms = ['Normal', 'Attaque', 'Défense', 'Vitesse'];
+          $noms = ['{{name}} Forme Normale', '{{name}} Forme Attaque', '{{name}} Forme Défense', '{{name}} Forme Vitesse'];
+          $nomsEN = ['Normal Forme {{name}}', 'Attack Forme {{name}}', 'Defense Forme {{name}}', 'Speed Forme {{name}}'];
         break;
         case 412: // Cheniti
         case 413: // Cheniselle
           $ids = ['plant', 'sandy', 'trash'];
-          $noms = ['Plante', 'Sable', 'Déchet'];
+          $noms = ['{{name}} Cape Plante', '{{name}} Cape Sable', '{{name}} Cape Déchet'];
+          $nomsEN = ['Plant Cloak {{name}}', 'Sandy Cloak {{name}}', 'Trash Cloak {{name}}'];
         break;
         case 421: // Ceriflor
           $ids = ['', 'sunny'];
-          $noms = ['Couvert', 'Ensoleillé'];
+          $noms = ['{{name}} Temps Couvert', '{{name}} Temps Ensoleillé'];
+          $nomsEN = ['Overcast Form {{name}}', 'Sunshine Form {{name}}'];
         break;
         case 422: // Sancoki
         case 423: // Tritosor
           $ids = ['west', 'east'];
-          $noms = ['Mer Occident', 'Mer Orient'];
+          $noms = ['{{name}} Mer Occident', '{{name}} Mer Orient'];
+          $nomsEN = ['West Sea {{name}}', 'East Sea {{name}}'];
         break;
         case 479: // Motisma
           $ids = ['', 'heat', 'wash', 'frost', 'fan', 'mow'];
-          $noms = ['', 'Chaleur', 'Lavage', 'Froid', 'Hélice', 'Tonte'];
+          $noms = ['', '{{name}} Chaleur', '{{name}} Lavage', '{{name}} Froid', '{{name}} Hélice', '{{name}} Tonte'];
+          $nomsEN = ['', 'Heat {{name}}', 'Wash {{name}}', 'Frost {{name}}', 'Fan {{name}}', 'Mow {{name}}'];
         break;
         case 483: // Dialga
         case 484: // Palkia
         case 487: // Giratina
           $ids = ['', 'origin'];
-          $noms = ['Alternative', 'Originelle'];
+          $noms = ['{{name}} Forme Alternative', '{{name}} Forme Originelle'];
+          $nomsEN = ['Altered Forme {{name}}', 'Origin Forme {{name}}'];
         break;
         case 492: // Shaymin
           $ids = ['', 'sky'];
-          $noms = ['Terrestre', 'Céleste'];
+          $noms = ['{{name}} Forme Terrestre', '{{name}} Forme Céleste'];
+          $nomsEN = ['Land Forme {{name}}', 'Sky Forme {{name}}'];
         break;
         case 493: // Arceus
         case 773: // Silvallié
           $ids = ['', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy'];
-          $noms = ['Normal', 'Combat', 'Vol', 'Poison', 'Sol', 'Roche', 'Insecte', 'Spectre', 'Acier', 'Feu', 'Eau', 'Plante', 'Électrik', 'Psy', 'Glace', 'Dragon', 'Ténèbres', 'Fée'];
+          $noms = ['{{name}} Type Normal', '{{name}} Type Combat', '{{name}} Type Vol', '{{name}} Type Poison', '{{name}} Type Sol', '{{name}} Type Roche', '{{name}} Type Insecte', '{{name}} Type Spectre', '{{name}} Type Acier', '{{name}} Type Feu', '{{name}} Type Eau', '{{name}} Type Plante', '{{name}} Type Électrik', '{{name}} Type Psy', '{{name}} Type Glace', '{{name}} Type Dragon', '{{name}} Type Ténèbres', '{{name}} Type Fée'];
+          $nomsEN = ['Normal-type {{name}}', 'Fighting-type {{name}}', 'Flying-type {{name}}', 'Poison-type {{name}}', 'Ground-type {{name}}', 'Rock-type {{name}}', 'Bug-type {{name}}', 'Ghost-type {{name}}', 'Steel-type {{name}}', 'Fire-type {{name}}', 'Water-type {{name}}', 'Grass-type {{name}}', 'Electric-type {{name}}', 'Psychic-type {{name}}', 'Ice-type {{name}}', 'Dragon-type {{name}}', 'Dark-type {{name}}', 'Fairy-type {{name}}'];
         break;
         case 550: // Bargantua
           $ids = ['red', 'blue', 'white'];
-          $noms = ['Motif Rouge', 'Motif Bleu', 'Motif Blanc'];
+          $noms = ['{{name}} Motif Rouge', '{{name}} Motif Bleu', '{{name}} Motif Blanc'];
+          $nomsEN = ['Red-Striped {{name}}', 'Blue-Striped {{name}}', 'White-Striped {{name}}'];
         break;
         case 555: // Darumacho
           $ids = ['', 'zen', 'galar', 'galar-zen'];
-          $noms = ['', 'Mode Transe', 'de Galar', 'de Galar - Mode Transe'];
+          $noms = ['{{name}} Mode Standard', '{{name}} Mode Transe', '{{name}} de Galar', '{{name}} de Galar - Mode Transe'];
+          $nomsEN = ['Standard Mode {{name}}', 'Zen Mode {{name}}', 'Standard Mode Galarian {{name}}', 'Zen Mode Galarian {{name}}'];
         break;
         case 585: // Vivaldaim
         case 586: // Haydaim
           $ids = ['spring', 'summer', 'autumn', 'winter'];
-          $noms = ['Printemps', 'Été', 'Automne', 'Hiver'];
+          $noms = ['{{name}} Forme Printemps', '{{name}} Forme Été', '{{name}} Forme Automne', '{{name}} Forme Hiver'];
+          $nomsEN = ['Spring Form {{name}}', 'Summer Form {{name}}', 'Autumn Form {{name}}', 'Winter Form {{name}}'];
         break;
         case 641: // Boréas
         case 642: // Fulguris
         case 645: // Démétéros
         case 905: // Amovénus
           $ids = ['', 'therian'];
-          $noms = ['Avatar', 'Totémique'];
+          $noms = ['{{name}} Avatar', '{{name}} Totémique'];
+          $nomsEN = ['Incarnate Forme {{name}}', 'Therian Forme {{name}}'];
         break;
         case 646: // Kyurem
           $ids = ['', 'white', 'black'];
-          $noms = ['', 'Blanc', 'Noir'];
+          $noms = ['', '{{name}} Blanc', '{{name}} Noir'];
+          $nomsEN = ['', 'White {{name}}', 'Black {{name}}'];
         break;
         case 647: // Keldeo
           $ids = ['', 'resolute'];
-          $noms = ['Normal', 'Décidé'];
+          $noms = ['{{name}} Aspect Normal', '{{name}} Aspect Décidé'];
+          $nomsEN = ['Ordinary Form {{name}}', 'Resolute Form {{name}}'];
         break;
         case 648: // Meloetta
           $ids = ['', 'pirouette'];
-          $noms = ['Chant', 'Danse'];
+          $noms = ['{{name}} Forme Chant', '{{name}} Forme Danse'];
+          $nomsEN = ['Aria Forme {{name}}', 'Pirouette Forme {{name}}'];
         break;
         case 649: // Genesect
           $ids = ['', 'douse', 'shock', 'burn', 'chill'];
-          $noms = ['', 'Aqua', 'Choc', 'Pyro', 'Cryo'];
+          $noms = ['', '{{name}} Module Aqua', '{{name}} Module Choc', '{{name}} Module Pyro', '{{name}} Module Cryo'];
+          $nomsEN = ['', 'Douse Drive {{name}}', 'Shock Drive {{name}}', 'Burn Drive {{name}}', 'Chill Drive {{name}}'];
         break;
         case 658: // Amphinobi
           $ids = ['', '', 'ash'];
-          $noms = ['', '', 'de Sacha'];
+          $noms = ['', '', '{{name}} Forme Sacha'];
+          $nomsEN = ['', '', 'Ash-{{name}}'];
         break;
         case 666: // Prismillon
           $ids = ['icysnow', 'polar', 'tundra', 'continental', 'garden', 'elegant', 'meadow', 'modern', 'marine', 'archipelago', 'highplains', 'sandstorm', 'river', 'monsoon', 'savanna', 'sun', 'ocean', 'jungle', 'fancy', 'pokeball'];
-          $noms = ['Blizzard', 'Banquise', 'Glace', 'Continent', 'Verdure', 'Monarchie', 'Floraison', 'Métropole', 'Rivage', 'Archipel', 'Sécheresse', 'Sable', 'Delta', 'Cyclone', 'Mangrove', 'Zénith', 'Soleil Levant', 'Jungle', 'Fantaisie', 'Poké Ball'];
+          $noms = ['{{name}} Motif Blizzard', '{{name}} Motif Banquise', '{{name}} Motif Glace', '{{name}} Motif Continent', '{{name}} Motif Verdure', '{{name}} Motif Monarchie', '{{name}} Motif Floraison', '{{name}} Motif Métropole', '{{name}} Motif Rivage', '{{name}} Motif Archipel', '{{name}} Motif Sécheresse', '{{name}} Motif Sable', '{{name}} Motif Delta', '{{name}} Motif Cyclone', '{{name}} Motif Mangrove', '{{name}} Motif Zénith', '{{name}} Motif Soleil Levant', '{{name}} Motif Jungle', '{{name}} Motif Fantaisie', '{{name}} Motif Poké Ball'];
+          $nomsEN = ['Icy Snow Pattern {{name}}', 'Polar Pattern {{name}}', 'Tundra Pattern {{name}}', 'Continental Pattern {{name}}', 'Garden Pattern {{name}}', 'Elegant Pattern {{name}}', 'Meadow Pattern {{name}}', 'Modern Pattern {{name}}', 'Marine Pattern {{name}}', 'Achipelago Pattern {{name}}', 'High Plains Pattern {{name}}', 'Sandstorm Pattern {{name}}', 'River Pattern {{name}}', 'Monsoon Pattern {{name}}', 'Savanna Pattern {{name}}', 'Sun Pattern {{name}}', 'Ocean Pattern {{name}}', 'Jungle Pattern {{name}}', 'Fancy Pattern {{name}}', 'Poké Ball Pattern {{name}}'];
         break;
         case 669: // Flabébé
         case 670: // Floette
         case 671: // Florges
           $ids = ['red', 'yellow', 'orange', 'blue', 'white'];
-          $noms = ['Rouge', 'Jaune', 'Orange', 'Bleue', 'Blanche'];
+          $noms = ['{{name}} Fleur Rouge', '{{name}} Fleur Jaune', '{{name}} Fleur Orange', '{{name}} Fleur Bleue', '{{name}} Fleur Blanche'];
+          $nomsEN = ['Red Flower {{name}}', 'Yellow Flower {{name}}', 'Orange Flower {{name}}', 'Blue Flower {{name}}', 'White Flower {{name}}'];
         break;
         case 676: // Couafarel
           $ids = ['', 'heart', 'star', 'diamond', 'debutante', 'matron', 'dandy', 'la-reine', 'kabuki', 'pharaoh'];
-          $noms = ['Sauvage', 'Cœur', 'Étoile', 'Diamant', 'Demoiselle', 'Madame', 'Monsieur', 'Reine', 'Kabuki', 'Pharaon'];
+          $noms = ['{{name}} Forme Sauvage', '{{name}} Coupe Cœur', '{{name}} Coupe Étoile', '{{name}} Coupe Diamant', '{{name}} Coupe Demoiselle', '{{name}} Coupe Madame', '{{name}} Coupe Monsieur', '{{name}} Coupe Reine', '{{name}} Coupe Kabuki', '{{name}} Coupe Pharaon'];
+          $nomsEN = ['Natural Form {{name}}', 'Heart Trim {{name}}', 'Star Trim {{name}}', 'Diamond Trim {{name}}', 'Debutante Trim {{name}}', 'Matron Trim {{name}}', 'Dandy Trim {{name}}', 'La Reine Trim {{name}}', 'Kabuki Trim {{name}}', 'Pharaoh Trim {{name}}'];
         break;
         case 678: // Mistigrix
         case 876: // Wimessir
           $ids = ['', 'female'];
-          $noms = ['Mâle', 'Femelle'];
+          $noms = ['{{name}} (Mâle)', '{{name}} (Femelle)'];
+          $nomsEN = ['{{name}} (Male)', '{{name}} (Female)'];
         break;
         case 681: // Exagide
           $ids = ['', 'blade'];
-          $noms = ['Parade', 'Assaut'];
+          $noms = ['{{name}} Forme Parade', '{{name}} Forme Assaut'];
+          $nomsEN = ['Shield Forme {{name}}', 'Blade Forme {{name}}'];
         break;
         case 710: // Pitrouille
         case 711: // Banshitrouye
           $ids = ['', 'small', 'large', 'super'];
-          $noms = ['Normale', 'Mini', 'Maxi', 'Ultra'];
+          $noms = ['{{name}} Taille Normale', '{{name}} Taille Mini', '{{name}} Taille Maxi', '{{name}} Taille Ultra'];
+          $nomsEN = ['Average Size {{name}}', 'Small Size {{name}}', 'Large Size {{name}}', 'Super Size {{name}}'];
         break;
         case 716: // Xerneas
           $ids = ['', 'active'];
-          $noms = ['Paisible', 'Déchaîné'];
+          $noms = ['{{name}} Mode Paisible', '{{name}} Mode Déchaîné'];
+          $nomsEN = ['Neutral Mode {{name}}', 'Active Mode {{name}}'];
         break;
         case 718: // Zygarde
           $ids = ['', '10', '', '', '100'];
-          $noms = ['50%', '10%', '', '', '100%'];
+          $noms = ['{{name}} Forme 50%', '{{name}} Forme 10%', '', '', '{{name}} Forme 100%'];
+          $nomsEN = ['50% Forme {{name}}', '10% Forme {{name}}', '', '', '100% Forme {{name}}'];
         break;
         case 720: // Hoopa
           $ids = ['', 'unbound'];
-          $noms = ['Enchaîné', 'Déchaîné'];
+          $noms = ['{{name}} Forme Enchaîné', '{{name}} Forme Déchaîné'];
+          $nomsEN = ['{{name}} Confined', '{{name}} Unbound'];
         break;
         case 741: // Plumeline
           $ids = ['flamenco', 'pau', 'pompom', 'sensu'];
-          $noms = ['Flamenco', 'Hula', 'Pom-pom', 'Buyō'];
+          $noms = ['{{name}} Style Flamenco', '{{name}} Style Hula', '{{name}} Style Pom-pom', '{{name}} Style Buyō'];
+          $nomsEN = ['Baile Style {{name}}', "Pa'u Style {{name}}", 'Pom-Pom Style {{name}}', 'Sensu Style {{name}}'];
         break;
         case 745: // Lougaroc
           $ids = ['', 'midnight', 'dusk'];
-          $noms = ['Diurne', 'Nocturne', 'Crépusculaire'];
+          $noms = ['{{name}} Forme Diurne', '{{name}} Forme Nocturne', '{{name}} Forme Crépusculaire'];
+          $nomsEN = ['Midday Form {{name}}', 'Midnight Form{{name}}', 'Dusk Form {{name}}'];
         break;
         case 746: // Froussardine
           $ids = ['', 'school'];
-          $noms = ['Solitaire', 'Banc'];
+          $noms = ['{{name}} Forme Solitaire', '{{name}} Forme Banc'];
+          $nomsEN = ['Solo Form {{name}}', 'School Form {{name}}'];
         break;
         case 774: // Météno
           $ids = ['', '', '', '', '', '', '', 'red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'];
-          $noms = ['Météore', '', '', '', '', '', '', 'Rouge', 'Orange', 'Jaune', 'Vert', 'Bleu', 'Indigo', 'Violet'];
+          $noms = ['{{name}} Forme Météore', '', '', '', '', '', '', '{{name}} Forme Noyau (Rouge)', '{{name}} Forme Noyau (Orange)', '{{name}} Forme Noyau (Jaune)', '{{name}} Forme Noyau (Vert)', '{{name}} Forme Noyau (Bleu)', '{{name}} Forme Noyau (Indigo)', '{{name}} Forme Noyau (Violet)'];
+          $nomsEN = ['Meteor Form {{name}}', '', '', '', '', '', '', 'Red Core {{name}}', 'Orange Core {{name}}', 'Yellow Core {{name}}', 'Green Core {{name}}', 'Blue Core {{name}}', 'Indigo Core {{name}}', 'Violet Core {{name}}'];
         break;
         case 778: // Mimiqui
           $ids = ['', 'busted'];
-          $noms = ['Déguisée', 'Démasquée'];
+          $noms = ['{{name}} Forme Déguisée', '{{name}} Forme Démasquée'];
+          $nomsEN = ['Disguised Form {{name}}', 'Busted Form {{name}}'];
         break;
         case 800: // Necrozma
           $ids = ['', 'solgaleo', 'lunala', 'ultra'];
-          $noms = ['', 'Crinières du Couchant', 'Ailes de l\'Aurore', 'Ultra'];
+          $noms = ['', '{{name}} Crinières du Couchant', '{{name}} Ailes de l\'Aurore', 'Ultra-{{name}}'];
+          $nomsEN = ['', 'Dusk Mane {{name}}', 'Dawn Wings {{name}}', 'Ultra {{name}}'];
         break;
         case 801: // Magearna
           $ids = ['', 'original'];
-          $noms = ['', 'Couleur du Passé'];
+          $noms = ['', '{{name}} Forme Couleur du Passé'];
+          $nomsEN = ['', 'Original Color {{name}}'];
         break;
         case 845: // Nigosier
           $ids = ['', 'gobe', 'chu'];
-          $noms = ['', 'Gobe-Tout', 'Gobe-Chu'];
+          $noms = ['', '{{name}} Forme Gobe-Tout', '{{name}} Forme Gobe-Chu'];
+          $nomsEN = ['', 'Gulping Form {{name}}', 'Gorging Form {{name}}'];
         break;
         case 849: // Salarsen
           $ids = ['aigue', 'grave'];
-          $noms = ['Aigüe', 'Grave'];
+          $noms = ['{{name}} Forme Aigüe', '{{name}} Forme Grave'];
+          $nomsEN = ['Amped Form {{name}}', 'Low Key Form {{name}}'];
         break;
         case 854: // Théffroi
         case 855: // Polthégeist
           $ids = ['', 'antique'];
-          $noms = ['Contrefaçon', 'Authentique'];
+          $noms = ['{{name}} Forme Contrefaçon', '{{name}} Forme Authentique'];
+          $nomsEN = ['Phony Form {{name}}', 'Antique Form {{name}}'];
         break;
         case 875: // Bekaglaçon
           $ids = ['gel', 'degel'];
-          $noms = ['Tête de Gel', 'Tête Dégel'];
+          $noms = ['{{name}} Tête de Gel', '{{name}} Tête Dégel'];
+          $nomsEN = ['Ice Face {{name}}', 'Noice Face {{name}}'];
         break;
         case 877: // Morpeko
           $ids = ['full', 'hangry'];
-          $noms = ['Rassasié', 'Affamé'];
+          $noms = ['{{name}} Mode Rassasié', '{{name}} Mode Affamé'];
+          $nomsEN = ['Full Belly Mode {{name}}', 'Hangry Mode {{name}}'];
         break;
         case 888: // Zacian
           $ids = ['', 'sword'];
-          $noms = ['Héros Aguerri', 'Épée Suprême'];
+          $noms = ['{{name}} Forme Héros Aguerri', '{{name}} Forme Épée Suprême'];
+          $nomsEN = ['Hero of Many Battles {{name}}', 'Crowned Sword {{name}}'];
         break;
         case 889: // Zamazenta
           $ids = ['', 'shield'];
-          $noms = ['Héros Aguerri', 'Bouclier Suprême'];
+          $noms = ['{{name}} Forme Héros Aguerri', '{{name}} Forme Bouclier Suprême'];
+          $nomsEN = ['Hero of Many Battles {{name}}', 'Crowned Shield {{name}}'];
         break;
         case 890: // Éthernatos
           $ids = ['', 'infini'];
-          $noms = ['', 'Infinimax'];
+          $noms = ['', '{{name}} Infinimax'];
+          $nomsEN = ['', 'Eternamax {{name}}'];
         break;
         case 892: // Shifours
           $ids = ['', 'water'];
-          $noms = ['Poing Final', 'Mille Poings'];
+          $noms = ['{{name}} Style Poing Final', '{{name}} Style Mille Poings'];
+          $nomsEN = ['Single Strike Style {{name}}', 'Rapid Strike Style {{name}}'];
         break;
         case 893: // Zarude
           $ids = ['', 'dada'];
-          $noms = ['', 'Dada'];
+          $noms = ['', '{{name}} Forme Dada'];
+          $nomsEN = ['', 'Dada {{name}}'];
         break;
         case 898: // Sylveroy
           $ids = ['', 'ice', 'ghost'];
-          $noms = ['', 'Cavalier du Froid', 'Cavalier d\'Effroi'];
+          $noms = ['', '{{name}}, le Cavalier du Froid', '{{name}}, le Cavalier d\'Effroi'];
+          $nomsEN = ['', 'Ice Rider {{name}}', 'Shadow Rider {{name}}'];
         break;
         case 902: // Paragruel
           $ids = ['', ''];
           $noms = ['', ''];
+          $nomsEN = ['', ''];
         break;
-        case 925: // Familiol
+        case 925: // Famignol
           $ids = ['', 'four'];
-          $noms = ['Famille de Trois', 'Famille de Quatre'];
+          $noms = ['{{name}} Famille de Trois', '{{name}} Famille de Quatre'];
+          $nomsEN = ['{{name}} Family of Three', '{{name}} Family of Four'];
         break;
         case 931: // Tapatoès
           $ids = ['', 'blue', 'yellow', 'white'];
-          $noms = ['Plumage Vert', 'Plumage Bleu', 'Plumage Jaune', 'Plumage Blanc'];
+          $noms = ['{{name}} Plumage Vert', '{{name}} Plumage Bleu', '{{name}} Plumage Jaune', '{{name}} Plumage Blanc'];
+          $nomsEN = ['Green Plumage {{name}}', 'Blue Plumage {{name}}', 'Yellow Plumage {{name}}', 'White Plumage {{name}}'];
         break;
         case 964: // Superdofin
           $ids = ['', 'hero'];
-          $noms = ['Ordinaire', 'Super'];
+          $noms = ['{{name}} Forme Ordinaire', '{{name}} Forme Super'];
+          $nomsEN = ['Zero Form {{name}}', 'Hero Form {{name}}'];
         break;
         case 978: // Nigirigon
           $ids = ['', 'droopy', 'stretch'];
-          $noms = ['Courbée', 'Affalée', 'Raide'];
+          $noms = ['{{name}} Forme Courbée', '{{name}} Forme Affalée', '{{name}} Forme Raide'];
+          $nomsEN = ['Curly Form {{name}}', 'Droopy Form {{name}}', 'Stretchy Form {{name}}'];
         break;
         case 982: // Deusolourdo
           $ids = ['', 'three'];
-          $noms = ['Double', 'Triple'];
+          $noms = ['{{name}} Forme Double', '{{name}} Forme Triple'];
+          $nomsEN = ['Two-Segment Form {{name}}', 'Three-Segment Form {{name}}'];
         break;
         case 999: // Mordudor
           $ids = ['', 'roaming'];
-          $noms = ['Coffre', 'Marche'];
+          $noms = ['{{name}} Forme Coffre', '{{name}} Forme Marche'];
+          $nomsEN = ['Chest Form {{name}}', 'Roaming Form {{name}}'];
         break;
         default:
           $done = false;
@@ -317,26 +381,34 @@ class Forme extends Sprite {
       // Charmilly
       if ($dexid == 869) {
         $ids = ['vanille', 'ruby', 'matcha', 'menthe', 'citron', 'sale', 'melruby', 'caramel', 'tricolore'];
-        $noms = ['Lait Vanille', 'Lait Ruby', 'Lait Matcha', 'Lait Menthe', 'Lait Citron', 'Lait Salé', 'Mélange Ruby', 'Mélange Caramel', 'Mélange Tricolore'];
+        $noms = ['{{name}} Lait Vanille', '{{name}} Lait Ruby', '{{name}} Lait Matcha', '{{name}} Lait Menthe', '{{name}} Lait Citron', '{{name}} Lait Salé', '{{name}} Mélange Ruby', '{{name}} Mélange Caramel', '{{name}} Mélange Tricolore'];
+        $nomsEN = ['Vanilla Cream {{name}}', 'Ruby Cream {{name}}', 'Matcha Cream {{name}}', 'Mint Cream {{name}}', 'Lemon Cream {{name}}', 'Salted Cream {{name}}', 'Ruby Swirl {{name}}', 'Caramel Swirl {{name}}', 'Rainbow Swirl {{name}}'];
 
         $friandises = ['fraise', 'baie', 'coeur', 'etoile', 'trefle', 'fleur', 'ruban'];
-        $friandisesNoms = ['Fraise', 'Baie', 'Cœur', 'Étoile', 'Trèfle', 'Fleur', 'Ruban'];
+        $friandisesNoms = ['Fraise en Sucre', 'Baie en Sucre', 'Cœur en Sucre', 'Étoile en Sucre', 'Trèfle en Sucre', 'Fleur en Sucre', 'Ruban en Sucre'];
+        $friandisesNomsEN = ['Strawberry Sweet', 'Berry Sweet', 'Love Sweet', 'Star Sweet', 'Clover Sweet', 'Flower Sweet', 'Ribbon Sweet'];
 
         $this->dbid = $ids[$sprite->form] . '-' . $friandises[$sprite->candy];
-        $this->nom = $noms[$sprite->form] . ' - ' . $friandisesNoms[$sprite->candy];
+        $this->name = [
+          'fr' => $noms[$sprite->form] . ' - ' . $friandisesNoms[$sprite->candy],
+          'en' => $nomsEN[$sprite->form] . ' - ' . $friandisesNomsEN[$sprite->candy]
+        ];
       }
 
       else if ($done) {
         $this->dbid = $ids[$sprite->form];
-        $this->nom = $noms[$sprite->form];
+        $this->name = [
+          'fr' => $noms[$sprite->form],
+          'en' => $nomsEN[$sprite->form]
+        ];
       }
       
       else {
         $this->dbid = '';
-        $this->nom = '';
+        $this->name = ['fr' => '', 'en' => ''];
         if (in_array($spriteid, ['mf', 'uk', 'mo', 'fo', 'md', 'fd'])) {
           $this->dbid = '';
-          $this->nom = '';
+          $this->name = ['fr' => '', 'en' => ''];
         }
         /*else if ($spriteid == 'md')
         {
@@ -351,42 +423,74 @@ class Forme extends Sprite {
         // Méga-évolutions
         else if (self::has('mega', $dexid) && $sprite->form == 1) {
           $this->dbid = 'mega';
-          $this->nom = 'Méga';
+          $this->name = [
+            'fr' => 'Méga-{{name}}',
+            'en' => 'Mega {{name}}'
+          ];
         }
         // Méga-évolutions X et Y
         else if (self::has('megaX', $dexid) && in_array($sprite->form, [1, 2])) {
           if ($sprite->form == 1) {
             $this->dbid = 'xmega';
-            $this->nom = 'Méga (X)';
+            $this->name = [
+              'fr' => 'Méga-{{name}} X',
+              'en' => 'Mega {{name}} X'
+            ];
           }
           else if ($sprite->form == 2) {
             $this->dbid = 'ymega';
-            $this->nom = 'Méga (Y)';
+            $this->name = [
+              'fr' => 'Méga-{{name}} Y',
+              'en' => 'Mega {{name}} Y'
+            ];
           }
         }
         // Primo-résurgences
         else if (self::has('primal', $dexid) && $sprite->form == 1) {
           $this->dbid = 'primal';
-          $this->nom = 'Primo';
+          $this->name = [
+            'fr' => 'Primo-{{name}}',
+            'en' => 'Primal {{name}}'
+          ];
         }
         // Formes d'Alola
         else if (self::has('alolan', $dexid) && self::isAlolan($sprite, $dexid)) {
           $this->dbid = 'alola';
-          $this->nom = 'd\'Alola';
+          $this->name = [
+            'fr' => "{{name}} d'Alola",
+            'en' => "Alolan {{name}}"
+          ];
         }
         // Formes de Galar
         else if (self::has('galarian', $dexid) && self::isGalarian($sprite, $dexid)) {
           $this->dbid = 'galar';
-          $this->nom = 'de Galar';
+          $this->name = [
+            'fr' => "{{name}} de Galar",
+            'en' => "Galarian {{name}}"
+          ];
         }
         // Formes de Hisui
         else if (self::has('hisuian', $dexid) && self::isHisuian($sprite, $dexid)) {
           $this->dbid = 'hisui';
-          $this->nom = 'de Hisui';
+          $this->name = [
+            'fr' => "{{name}} de Hisui",
+            'en' => "Hisuian {{name}}"
+          ];
+        }
+        // Formes de Paldea
+        else if (self::has('paldean', $dexid) && self::isPaldean($sprite, $dexid)) {
+          $this->dbid = 'paldea';
+          $this->name = [
+            'fr' => "{{name}} de Paldea",
+            'en' => "Paldean {{name}}"
+          ];
         }
         else {
           $this->dbid = 'unknown';
-          $this->nom = 'Forme inconnue';
+          $this->name = [
+            'fr' => 'Forme inconnue',
+            'en' => 'Unknown form'
+          ];
         }
       }
 
@@ -394,10 +498,16 @@ class Forme extends Sprite {
       $ignoreGender = [905]; // Amovénus
       if (!in_array($dexid, $ignoreGender)) {
         if ($sprite->gender == 'md') {
-          $this->nom = 'Mâle' . ($this->nom == '' ? '' : ' ' . $this->nom);
+          $this->name = [
+            'fr' => ($this->name['fr'] ? $this->name['fr'] . ' (Mâle)' : '{{name}} (Mâle)'),
+            'en' => ($this->name['en'] ? $this->name['en'] . ' (Male)' : '{{name}} (Male)')
+          ];
         } else if ($sprite->gender == 'fd') {
           $this->dbid = $this->dbid . ($this->dbid == '' ? '' : '-') . 'female';
-          $this->nom = 'Femelle' . ($this->nom == '' ? '' : ' ' . $this->nom);
+          $this->name = [
+            'fr' => ($this->name['fr'] ? $this->name['fr'] . ' (Mâle)' : '{{name}} (Femelle)'),
+            'en' => ($this->name['en'] ? $this->name['en'] . ' (Male)' : '{{name}} (Female)')
+          ];
         }
       }
     }

@@ -8,11 +8,11 @@ template.innerHTML = /*html*/`
       <span class="material-icons">search</span>
     </label>
 
-    <button type="reset" class="surface interactive icon-button only-icon reset-icon" part="reset-icon">
+    <button type="reset" class="surface interactive icon-button only-icon reset-icon" part="reset-icon" data-label="reset-search">
       <span class="material-icons">close</span>
     </button>
 
-    <a class="icon-button surface interactive" data-nav-section="filter-menu" href="#" part="filter-icon">
+    <a class="icon-button surface interactive" data-nav-section="filter-menu" href="#" part="filter-icon" data-label="open-filter-menu">
       <span class="material-icons">filter_list</span>
     </a>
   </form>

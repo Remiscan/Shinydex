@@ -1,4 +1,5 @@
 import { noAccent } from '../../Params.js';
+import { translationObserver } from '../../translation.js';
 // @ts-expect-error
 import materialIconsSheet from '../../../../ext/material_icons.css' assert { type: 'css' };
 // @ts-expect-error
@@ -10,6 +11,7 @@ import commonSheet from '../../../../styles/common.css' assert { type: 'css' };
 // @ts-expect-error
 import sheet from './styles.css' assert { type: 'css' };
 import template from './template.js';
+import { getString } from '../../translation.js';
 
 
 
@@ -115,27 +117,12 @@ export class SearchBox extends HTMLElement {
         if (!isSearchableSection(value ?? '')) return;
 
         const input = this.shadow.querySelector('[name="search"]')!;
-        let placeholder: string = 'Rechercher dans mes Pokémon';
-
-        switch (value) {
-          case 'pokedex':
-            placeholder = 'Rechercher dans le Pokédex';
-            break;
-          case 'chasses-en-cours': 
-            placeholder = 'Rechercher dans mes chasses';
-            break;
-          case 'corbeille':
-            placeholder = 'Rechercher dans la corbeille';
-            break;
-          case 'partage':
-            placeholder = 'Rechercher dans mes amis';
-            break;
-          case 'chromatiques-ami':
-            placeholder = 'Rechercher dans ses Pokémon';
-            break;
-        }
+        const placeholder = getString(`search-${value}`);
         
         input.setAttribute('placeholder', placeholder);
+        input.setAttribute('data-placeholder', `search-${value}`);
+        input.setAttribute('label', placeholder);
+        input.setAttribute('data-label', `search-${value}`);
 
         const filterMenuLink = this.shadow.querySelector('[data-nav-section="filter-menu"]');
         let sectionToFilter = value;
@@ -148,6 +135,10 @@ export class SearchBox extends HTMLElement {
           filterMenuLink?.removeAttribute('data-nav-data');
         }
       } break;
+
+      case 'lang':
+        translationObserver.translate(this, value ?? '');
+        break;
     }
   }
 
@@ -165,6 +156,8 @@ export class SearchBox extends HTMLElement {
   
 
   connectedCallback() {
+    translationObserver.serve(this, { method: 'attribute' });
+
     const form = this.shadow.querySelector('form');
     form?.addEventListener('input', this.searchInputHandler);
     form?.addEventListener('reset', this.searchInputHandler);
@@ -172,6 +165,8 @@ export class SearchBox extends HTMLElement {
   }
 
   disconnectedCallback() {
+    translationObserver.unserve(this);
+
     const form = this.shadow.querySelector('form');
     form?.removeEventListener('input', this.searchInputHandler);
     form?.removeEventListener('reset', this.searchInputHandler);
@@ -179,7 +174,7 @@ export class SearchBox extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ['section'];
+    return ['section', 'lang'];
   }
 
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {

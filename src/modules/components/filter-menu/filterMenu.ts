@@ -11,6 +11,7 @@ import { RadioGroup } from '../radioGroup.js';
 // @ts-expect-error
 import sheet from './styles.css' assert { type: 'css' };
 import template from './template.js';
+import { translationObserver } from '../../translation.js';
 
 
 
@@ -150,6 +151,10 @@ export class FilterMenu extends HTMLElement {
         this.#initialized = true;
         this.dispatchEvent(new Event('initialized'));
       } break;
+
+      case 'lang':
+        translationObserver.translate(this, value ?? '');
+        break;
     }
   }
 
@@ -173,18 +178,22 @@ export class FilterMenu extends HTMLElement {
   
 
   connectedCallback() {
+    translationObserver.serve(this, { method: 'attribute' });
+
     const filterForm = this.shadow.querySelector('form[name="search-options"]');
     filterForm?.addEventListener('change', this.filtersChangeHandler);
 
   }
 
   disconnectedCallback() {
+    translationObserver.unserve(this);
+
     const filterForm = this.shadow.querySelector('form[name="search-options"]');
     filterForm?.removeEventListener('change', this.filtersChangeHandler);
   }
 
   static get observedAttributes() {
-    return ['section'];
+    return ['section', 'lang'];
   }
 
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {

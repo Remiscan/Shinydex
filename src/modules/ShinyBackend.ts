@@ -94,7 +94,7 @@ export class FrontendShiny implements feShiny {
     if ('count' in shiny) {
       let count = shiny.count;
       if (typeof count === 'string') count = JSON.parse(count);
-      if (typeof count === 'object' && count != null && 'encounters' in count) this.count = new Count(count);
+      if (typeof count === 'object' && count != null) this.count = new Count(count);
     }
     if ('charm' in shiny) this.charm = Boolean(shiny.charm);
 

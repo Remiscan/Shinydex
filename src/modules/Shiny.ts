@@ -2,6 +2,7 @@ import { Params } from './Params.js';
 import { Forme, Jeu, Pokemon, SpriteOptions, backendPokemon } from './Pokemon.js';
 import { Count, FrontendShiny } from './ShinyBackend.js';
 import { isSupportedPokemonLang, pokemonData } from './jsonData.js';
+import { getCurrentLang } from './translation.js';
 
 
 
@@ -75,7 +76,7 @@ export class Shiny extends FrontendShiny {
   /**
    * @returns Nom du Pokémon.
    */
-  getName(lang = document.documentElement.getAttribute('lang') ?? Params.defaultLang): string {
+  getName(lang = getCurrentLang()): string {
     try {
       if (!isSupportedPokemonLang(lang)) throw new Error('language-not-supported');
       const pokemon = this.getEspece();

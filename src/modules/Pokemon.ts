@@ -1,5 +1,6 @@
-import { isSupportedPokemonLang, pokemonData } from './jsonData.js';
+import { appStrings, isSupportedPokemonLang, pokemonData } from './jsonData.js';
 import { pad, Params } from './Params.js';
+import { getCurrentLang } from './translation.js';
 
 
 
@@ -78,7 +79,10 @@ const generations: Generation[] = [
 /** Structure d'une Forme de Pokémon. */
 export class Forme {
   dbid: string = '';
-  nom: string = '';
+  name: {
+    fr: string,
+    en: string
+  } = { fr: '', en: '' };
   form: number = 0;
   gender: string = 'mf';
   gigamax: boolean = false;
@@ -88,7 +92,12 @@ export class Forme {
 
   constructor(forme: object = {}) {
     if ('dbid' in forme) this.dbid = String(forme.dbid);
-    if ('nom' in forme) this.nom = String(forme.nom);
+    if ('name' in forme && typeof forme.name === 'object' && forme.name != null) {
+      this.name = {
+        fr: 'fr' in forme.name ? String(forme.name.fr ?? '') : '',
+        en: 'en' in forme.name ? String(forme.name.en ?? '') : ''
+      };
+    }
     if ('form' in forme) this.form = Number(forme.form) || 0;
     if ('gender' in forme) this.gender = String(forme.gender);
     if ('gigamax' in forme) this.gigamax = Boolean(forme.gigamax);
@@ -194,15 +203,27 @@ export class Pokemon {
   /**
    * @returns Nom du Pokémon.
    */
-  getName(lang = document.documentElement.getAttribute('lang') ?? Params.defaultLang): string {
+  getName(lang = getCurrentLang()): string {
     if (!isSupportedPokemonLang(lang)) throw new Error('language-not-supported');
     return this.name[lang];
   }
 
   /**
+   * @returns Nom d'une forme du Pokémon.
+   */
+  getFormeName(id: string = '', withName: boolean = true, lang = getCurrentLang()): string {
+    if (!isSupportedPokemonLang(lang)) throw new Error('language-not-supported');
+    const forme = this.formes.find(f => f.dbid === id);
+    let name = this.getName(lang);
+    name = name.charAt(0).toUpperCase() + name.slice(1);
+    if (withName) return forme?.name[lang].replace('{{name}}', name) || name;
+    else          return forme?.name[lang].replace('{{name}}', '').trim() || appStrings[lang]?.['forme-base'];
+  }
+
+  /**
    * @returns Liste des noms de tous les Pokémon, dans l'ordre du Pokédex national.
    */
-  static names(lang = document.documentElement.getAttribute('lang') ?? Params.defaultLang): string[] {
+  static names(lang = getCurrentLang()): string[] {
     if (!isSupportedPokemonLang(lang)) throw new Error('language-not-supported');
 
     const cachedNames = Pokemon.#names[lang];

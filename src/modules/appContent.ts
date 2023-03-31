@@ -4,7 +4,7 @@ import { Shiny } from './Shiny.js';
 import { friendCard } from './components/friend-card/friendCard.js';
 import { huntCard } from './components/hunt-card/huntCard.js';
 import { shinyCard } from './components/shiny-card/shinyCard.js';
-import { PopulatableSection, ShinyFilterData, computeFilters, computeOrders, isOrdre, orderCards, populatableSections, supportedOrdres, updateCounters } from './filtres.js';
+import { PopulatableSection, ShinyFilterData, computeFilters, computeOrders, isOrdre, orderCards, populatableSections, updateCounters } from './filtres.js';
 import { clearElementStorage, lazyLoadSection, virtualizedSections } from './lazyLoading.js';
 import { friendShinyStorage, friendStorage, huntStorage, localForageAPI, shinyStorage } from './localForage.js';
 import { navigate } from './navigate.js';

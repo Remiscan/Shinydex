@@ -10,11 +10,11 @@ $cache['files'] = [
   "./images/pokemonsheet.webp",
   "../_common/polyfills/adoptedStyleSheets.min.js",
   "../_common/polyfills/es-module-shims.js",
-  "../_common/polyfills/inert.min.js",
   "../_common/polyfills/element-internals.js",
   "../_common/components/input-slider/input-slider.js",
   "../_common/components/input-switch/input-switch.js",
   "../_common/js/per-function-async-queue.js",
+  "../_common/js/translation-observer.js",
   "../colori/lib/dist/colori.min.js",
   "../colori/palette/palette.js",
 ];

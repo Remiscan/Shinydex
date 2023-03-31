@@ -11,7 +11,6 @@ template.innerHTML = `
 </div>
 <div class="sprite-viewer-dex-info surface variant elevation-0 label-medium">
   <span class="info-dexid"></span>
-  <span class="info-nom"></span>
 </div>
 <a class="icon-button surface interactive bouton-retour">
   <span class="material-icons">close</span>

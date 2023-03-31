@@ -9,51 +9,51 @@ template.innerHTML = /*html*/`
   <form class="search-options" name="search-options">
 
     <div class="orders" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours partage">
-      <h2 class="title-medium if-ordre">Ordonner par :</h2>
+      <h2 class="title-medium if-ordre" data-string="orders-title"></h2>
 
       <fieldset class="liste-options if-ordre" aria-labelledby="label-ordre">
         <check-box name="orderReversed">
           <span slot="icon-unchecked">vertical_align_bottom</span>
           <span slot="icon-checked">vertical_align_top</span>
-          <span>Inverser l'ordre</span>
+          <span data-string="order-reverse"></span>
         </check-box>
 
         <radio-group name="order">
-          <option value="catchTime" data-section="mes-chromatiques corbeille chromatiques-ami">Date de capture</option>
-          <option value="shinyRate" data-section="mes-chromatiques corbeille chromatiques-ami">Taux de chromatiques</option>
-          <option value="dexid" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours">N° du Pokédex</option>
-          <option value="species" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours">Espèce</option>
-          <option value="name" data-section="mes-chromatiques corbeille chromatiques-ami">Surnom</option>
-          <option value="game" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours">Jeu (date de sortie)</option>
-          <option value="creationTime" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours">Date d'ajout</option>
-          <option value="username" data-section="partage">Pseudo (alphabétique)</option>
+          <option value="catchTime" data-section="mes-chromatiques corbeille chromatiques-ami" data-string="order-catchTime"></option>
+          <option value="shinyRate" data-section="mes-chromatiques corbeille chromatiques-ami" data-string="order-shinyRate"></option>
+          <option value="dexid" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours" data-string="order-dexid"></option>
+          <option value="species" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours" data-string="order-species"></option>
+          <option value="name" data-section="mes-chromatiques corbeille chromatiques-ami" data-string="order-name"></option>
+          <option value="game" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours" data-string="order-game"></option>
+          <option value="creationTime" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours" data-string="order-creationTime"></option>
+          <option value="username" data-section="partage" data-string="order-username"></option>
         </radio-group>
       </fieldset>
     </div>
 
     <div class="filters" data-section="mes-chromatiques corbeille chromatiques-ami">
-      <h2 class="title-medium if-ordre">Afficher :</h2>
+      <h2 class="title-medium if-ordre" data-string="filters-title"></h2>
 
       <div class="cote-a-cote if-filters">
         <fieldset class="liste-options" data-section="mes-chromatiques corbeille chromatiques-ami">
-          <legend class="titre-options title-small">Pokémon <shiny-stars></shiny-stars> dont le dresseur d'origine est :</legend>
+          <legend class="titre-options title-small" data-string="filter-mine"></legend>
 
-          <check-box name="filter-mine-true">Moi</check-box>
-          <check-box name="filter-mine-false">Quelqu'un d'autre</check-box>
+          <check-box name="filter-mine-true" data-string="filter-mine-true"></check-box>
+          <check-box name="filter-mine-false" data-string="filter-mine-false"></check-box>
         </fieldset>
 
         <fieldset class="liste-options" data-section="mes-chromatiques corbeille chromatiques-ami">
-          <legend class="titre-options title-small">Pokémon <shiny-stars></shiny-stars> dont la légitimité est :</legend>
+          <legend class="titre-options title-small" data-string="filter-legit"></legend>
 
-          <check-box name="filter-legit-true">Confirmée</check-box>
-          <check-box name="filter-legit-false">Non confirmée</check-box>
+          <check-box name="filter-legit-true" data-string="filter-legit-true"></check-box>
+          <check-box name="filter-legit-false" data-string="filter-legit-false"></check-box>
         </fieldset>
 
         <fieldset class="liste-options caught-filter" data-section="mes-chromatiques">
-          <legend class="titre-options title-small">Pokémon <shiny-stars></shiny-stars> dans le Pokédex <shiny-stars></shiny-stars> qui sont :</legend>
+          <legend class="titre-options title-small" data-string="filter-caught"></legend>
 
-          <check-box name="filter-caught-true">Capturés</check-box>
-          <check-box name="filter-caught-false">Non capturés</check-box>
+          <check-box name="filter-caught-true" data-string="filter-caught-true"></check-box>
+          <check-box name="filter-caught-false" data-string="filter-caught-false"></check-box>
         </fieldset>
       </div>
     </div>

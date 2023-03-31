@@ -1,4 +1,5 @@
 import { sheet as checkboxSheet } from './checkBox.js';
+import { translationObserver } from '../translation.js';
 import CustomInput from './customInput.js';
 // @ts-expect-error
 import materialIconsSheet from '../../../ext/material_icons.css' assert { type: 'css' };
@@ -39,7 +40,7 @@ sheet.replaceSync(/*css*/`
 export class RadioGroup extends CustomInput {
   static template = template;
   static sheets = [materialIconsSheet, themesSheet, commonSheet, checkboxSheet, sheet];
-  static attributes = ['name', 'value'];
+  static attributes = ['name', 'value', 'lang'];
   static defaultValue = null;
   #initialSlotsAssigned = false;
 
@@ -71,9 +72,10 @@ export class RadioGroup extends CustomInput {
       const inputAttributes = [];
       for (const attr of node.attributes) {
         if (['disabled'].includes(attr.name)) inputAttributes.push(attr);
-        else if (['value', 'selected'].includes(attr.name)) { /* Do nothing */ }
+        else if (['value', 'selected', 'data-string'].includes(attr.name)) { /* Do nothing */ }
         else containerAttributes.push(attr);
       }
+      const dataStringAttr = node.getAttribute('data-string') ?? '';
 
       const template = document.createElement('template');
       template.innerHTML = /*html*/`
@@ -87,7 +89,7 @@ export class RadioGroup extends CustomInput {
             <span class="material-icons" part="icon icon-checked">
               <slot name="icon-checked">radio_button_checked</slot>
             </span>
-            <span part="option-label" class="label-large">${label}</span>
+            <span part="option-label" class="label-large" data-string="${dataStringAttr}">${label}</span>
           </label>
         </span>
       `;
@@ -115,6 +117,7 @@ export class RadioGroup extends CustomInput {
       form.appendChild(option);
     }
 
+    translationObserver.translate(this, this.lang ?? '');
     this.value = currentValue ?? this.initialValue;
   };
 
@@ -144,6 +147,7 @@ export class RadioGroup extends CustomInput {
       super.updateFormValue(this.defaultValue);
       setValue = this.defaultValue;
     }
+
     this.dispatchEvent(new CustomEvent('valuechange', {
       detail: {
         value: setValue,
@@ -164,6 +168,8 @@ export class RadioGroup extends CustomInput {
 
 
   connectedCallback(): void {
+    translationObserver.serve(this, { method: 'attribute' });
+
     const source = this.shadow.querySelector('datalist > slot');
     source?.addEventListener('slotchange', this.slotchangeHandler);
 
@@ -183,6 +189,8 @@ export class RadioGroup extends CustomInput {
   }
 
   disconnectedCallback(): void {
+    translationObserver.unserve(this);
+
     const source = this.shadow.querySelector('datalist > slot');
     source?.removeEventListener('slotchange', this.slotchangeHandler);
     
@@ -190,6 +198,19 @@ export class RadioGroup extends CustomInput {
     form?.removeEventListener('input', this.inputHandler);
     form?.removeEventListener('change', this.inputHandler);
     form?.removeEventListener('submit', this.formSubmitHandler);
+  }
+
+  attributeChangedCallback(attr: string, oldValue: string | null, newValue: string | null): void {
+    if (oldValue === newValue) return;
+
+    switch (attr) {
+      case 'lang':
+        translationObserver.translate(this, newValue ?? '');
+        break;
+
+      default:
+        super.attributeChangedCallback(attr, oldValue, newValue);
+    }
   }
 }
 
