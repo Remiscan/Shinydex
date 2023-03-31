@@ -1,11 +1,10 @@
 import { DexDatalist } from '../../DexDatalist.js';
 import { Hunt, huntedPokemon } from '../../Hunt.js';
-import { Params } from '../../Params.js';
 import { Forme, Pokemon } from '../../Pokemon.js';
 import { Count, Shiny } from '../../Shiny.js';
 import { huntStorage, shinyStorage } from '../../localForage.js';
 import { Notif, warnBeforeDestruction } from '../../notification.js';
-import { getCurrentLang, translationObserver } from '../../translation.js';
+import { getCurrentLang, getString, translationObserver } from '../../translation.js';
 import { InputSelect } from '../inputSelect.js';
 import { pokemonSprite } from '../pokemon-sprite/pokemonSprite.js';
 import { TextArea } from '../textArea.js';
@@ -172,7 +171,7 @@ export class huntCard extends HTMLElement {
     const storedShiny = await shinyStorage.getItem(this.huntid);
     const edit = storedShiny != null;
     if (!edit) {
-      new Notif(`Impossible d'annuler les modifications : aucun Pokémon chromatique ne correspond à cette chasse.`).prompt();
+      new Notif(getString('error-cant-cancel-edit')).prompt();
       return;
     }
 
@@ -196,7 +195,7 @@ export class huntCard extends HTMLElement {
     const storedShiny = await shinyStorage.getItem(this.huntid);
     const edit = storedShiny != null;
     if (!edit) {
-      new Notif(`Impossible de supprimer : aucun Pokémon chromatique ne correspond à cette chasse.`).prompt();
+      new Notif(getString('error-cant-delete-hunt')).prompt();
       return;
     }
 
@@ -596,7 +595,7 @@ export class huntCard extends HTMLElement {
       element: this.shadow.querySelector('[data-action="cancel-edit"]'),
       type: 'click',
       function: async event => {
-        const cancelMessage = 'Les modifications seront perdues et cette chasse sera supprimée.';
+        const cancelMessage = getString('notif-modifications-will-be-lost');
         if (!(event.currentTarget instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
         const userResponse = await warnBeforeDestruction(event.currentTarget, cancelMessage);
         if (userResponse)  await this.cancelEdit();
@@ -609,7 +608,7 @@ export class huntCard extends HTMLElement {
       element: this.shadow.querySelector('[data-action="delete-hunt"]'),
       type: 'click',
       function: async event => {
-        const cancelMessage = 'Cette chasse sera supprimée.';
+        const cancelMessage = getString('notif-hunt-will-be-deleted');
         if (!(event.currentTarget instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
         const userResponse = await warnBeforeDestruction(event.currentTarget, cancelMessage);
         if (userResponse)  await this.delete();
@@ -634,9 +633,9 @@ export class huntCard extends HTMLElement {
         if (hunt.catchTime < 0) erreurs.push('date');
   
         if (erreurs.length > 0) {
-          let message = `Les champs suivants sont mal remplis : `;
-          erreurs.forEach(e => message += `${e}, `);
-          message = message.replace(/,\ $/, '.');
+          let message = getString('error-badly-filled-inputs');
+          erreurs.forEach(e => message += ` ${e},`);
+          message = message.replace(/,$/, '.');
           new Notif(message).prompt();
           return;
         } else {
@@ -644,7 +643,7 @@ export class huntCard extends HTMLElement {
           if (edit) {
             const boutonSubmit = this.shadow.querySelector('[data-action="save-shiny"]');
             if (!(boutonSubmit instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
-            const userResponse = await warnBeforeDestruction(boutonSubmit, 'Sauvegarder ces modifications ?', 'done');
+            const userResponse = await warnBeforeDestruction(boutonSubmit, getString('notif-save-edits'), 'done');
             if (userResponse) await this.submit();
           } else {
             await this.submit();
@@ -659,7 +658,7 @@ export class huntCard extends HTMLElement {
       element: this.shadow.querySelector('[data-action="delete-shiny"]'),
       type: 'click',
       function: async event => {
-        const deleteMessage = 'Ce Pokémon chromatique sera supprimé et déplacé dans la corbeille.';
+        const deleteMessage = getString('notif-shiny-will-be-deleted');
         if (!(event.currentTarget instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
         const userResponse = await warnBeforeDestruction(event.currentTarget, deleteMessage);
         if (userResponse) await this.deleteShiny();

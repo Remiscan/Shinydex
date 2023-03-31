@@ -6,7 +6,7 @@ import { computePaletteCss, gradientString, setTheme, updateMetaThemeColorTag } 
 // @ts-expect-error
 import { queueable } from '../../../_common/js/per-function-async-queue.js';
 import { SupportedLang, isSupportedLang } from './jsonData.js';
-import { getCurrentLang, translationObserver } from './translation.js';
+import { getCurrentLang, getString, translationObserver } from './translation.js';
 import { InputSelect } from './components/inputSelect.js';
 
 
@@ -300,7 +300,7 @@ export async function updateUserVisibility(visibility: boolean) {
     await updateUserProfile({ public: visibility });
     document.body.setAttribute('data-public-profile', String(visibility));
   } catch (error) {
-    throw new Error('Erreur lors du changement de visibilité du profil', { cause: error ?? undefined })
+    throw new Error(getString('error-changing-profile-visibility'), { cause: error ?? undefined })
   }
 }
 
@@ -330,7 +330,7 @@ export async function updateUsername(username: string) {
     await updateUserProfile({ username });
     document.body.setAttribute('data-has-username', 'true');
   } catch (error) {
-    throw new Error('Erreur lors du changement de pseudo', { cause: error ?? undefined});
+    throw new Error(getString('error-changing-username'), { cause: error ?? undefined});
   }
 }
 
@@ -350,17 +350,17 @@ export async function checkUsernameavailability(username: string) {
     }
 
     if (response['available'] === true) {
-      usernamePrompt = new Notif(`Le pseudo ${username} est disponible, voulez-vous le choisir ? Attention, si vous changez de pseudo, les gens qui vous ont précédemment ajouté en ami devront le faire à nouveau.`, Notif.maxDelay, 'Confirmer', () => {}, true);
+      usernamePrompt = new Notif(getString('notif-username-available').replace('{username}', username), Notif.maxDelay, getString('notif-username-available-label'), () => {}, true);
       const userChoice = await usernamePrompt.prompt();
       if (userChoice) {
         await updateUsername(username);
         usernamePrompt.remove();
       }
     } else {
-      usernamePrompt = new Notif(`Le pseudo ${username} n'est pas disponible.`);
+      usernamePrompt = new Notif(getString('notif-username-unavailable').replace('{username}', username));
     }
   } else {
-    const message = 'Erreur lors de la vérification de la disponibilité du pseudo.';
+    const message = getString('error-checking-username');
     new Notif(message).prompt();
     throw new Error(message, { cause: response.error ?? undefined });
   }

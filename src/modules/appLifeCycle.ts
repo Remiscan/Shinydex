@@ -9,6 +9,7 @@ import { PopulatableSection } from './filtres.js';
 import { dataStorage, huntStorage, shinyStorage } from './localForage.js';
 import { Notif } from './notification.js';
 import { setTheme } from './theme.js';
+import { getString } from './translation.js';
 import { upgradeStorage } from './upgradeStorage.js';
 
 
@@ -69,7 +70,7 @@ async function initServiceWorker() {
         if (newWorker.state == 'installed') {
           console.log('[sw] Service worker mis à jour');
           
-          const updateNotif = new Notif('Mise à jour installée !', Notif.maxDelay, 'Actualiser', updateHandler, false);
+          const updateNotif = new Notif(getString('notif-update-installed'), Notif.maxDelay, getString('notif-update-installed-label'), updateHandler, false);
           window.dispatchEvent(new Event('updateinstalled'));
           const userActed = await updateNotif.prompt();
           if (userActed) updateNotif.element?.classList.add('loading');
@@ -129,7 +130,7 @@ export async function appStart() {
     // On vérifie si le service worker est prêt
     isServiceWorkerReady = 'serviceWorker' in navigator && navigator.serviceWorker.controller != null;
   } catch (error) {
-    const message = `Erreur pendant la vérification des données.`;
+    const message = getString('error-verifying-data');
     console.error(error);
     new Notif(message).prompt();
   }
@@ -147,7 +148,7 @@ export async function appStart() {
   try {
     if (lastStorageUpgrade < cacheVersion * 1000) await upgradeStorage();
   } catch (error) {
-    const message = `Erreur pendant la mise à jour du format des données.`;
+    const message = getString('error-updating-data-format');
     console.error(message, error);
     new Notif(message).prompt();
   }
@@ -194,7 +195,7 @@ export async function appStart() {
     ]);
     logPerf('populate');
   } catch (error) {
-    const message = `Erreur pendant la préparation du contenu de l'application.`;
+    const message = getString('error-preparing-content');
     console.error(message, error);
     new Notif(message).prompt();
   }
@@ -294,11 +295,11 @@ export async function checkUpdate(checkNotification = false) {
   if (checkingUpdate) return;
   checkingUpdate = true;
 
-  const texteSucces = 'Mise à jour disponible...';
+  const texteSucces = getString('notif-update-available');
   const notifyMaj = async () => {
     checkingUpdate = false;
     if (updateNotification) updateNotification.remove();
-    updateNotification = new Notif(texteSucces, undefined, 'Installer', () => {
+    updateNotification = new Notif(texteSucces, undefined, getString('notif-update-available-label'), () => {
       window.dispatchEvent(new Event('updatecheck'));
     });
     const userActed = await updateNotification.prompt();
@@ -314,7 +315,7 @@ export async function checkUpdate(checkNotification = false) {
   };
 
   try {
-    if (!navigator.onLine) throw 'Pas de connexion internet';
+    if (!navigator.onLine) throw new Error(getString('error-no-connection'));
     if (updateAvailable) return notifyMaj();
 
     const installedFiles = await dataStorage.getItem('file-versions');
@@ -340,7 +341,7 @@ export async function checkUpdate(checkNotification = false) {
       updateAvailable = false;
       console.log('[:)] Aucune mise à jour disponible');
       console.log('     Installé : fichiers v. ' + timestamp2date(cacheVersion * 1000));
-      throw 'Pas de mise à jour';
+      throw getString('notif-no-update');
     }
   }
   

@@ -1,4 +1,5 @@
 import { Params } from './Params.js';
+import { getString } from './translation.js';
 
 
 
@@ -138,12 +139,12 @@ export class Notif {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Envoie une notification et attend confirmation de l'utilisateur avant de réaliser une action destructrice.
-export async function warnBeforeDestruction(bouton: Element, message: string = 'Supprimer définitivement ces données ?', icon: string = 'delete') {
+export async function warnBeforeDestruction(bouton: Element, message: string = getString('notif-warn-before-destruction'), icon: string = 'delete') {
   bouton.setAttribute('disabled', 'true');
-  const warning = `Êtes-vous sûr ? ${message}`;
+  const warning = `${getString('notif-are-you-sure')} ${message}`;
 
   const action = () => window.dispatchEvent(new Event('destructionconfirmed'));
-  const notification = new Notif(warning, undefined, 'Confirmer', action, true);
+  const notification = new Notif(warning, undefined, getString('notif-warn-before-destruction-label'), action, true);
 
   const userResponse = await notification.prompt();
   notification.remove();

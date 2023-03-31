@@ -1,6 +1,7 @@
 import { Hunt } from '../../Hunt.js';
 import { huntStorage, localForageAPI } from '../../localForage.js';
 import { Notif } from '../../notification.js';
+import { getString } from '../../translation.js';
 import { shinyCard } from '../shiny-card/shinyCard.js';
 
 
@@ -53,7 +54,7 @@ export class corbeilleCard extends shinyCard {
     try {
       let hunt = await huntStorage.getItem(this.huntid);
       if (hunt == null) {
-        throw `Ce Pokémon ne peut pas être restauré.`;
+        throw getString('error-cant-be-restored');
       }
 
       hunt = new Hunt(hunt);
@@ -72,7 +73,7 @@ export class corbeilleCard extends shinyCard {
         }));
       }
     } catch (error) {
-      const message = (typeof error === 'string') ? error : `Erreur : impossible de restaurer ce Pokémon.`;
+      const message = (typeof error === 'string') ? error : getString('error-cant-restore');
       console.error(error);
       new Notif(message).prompt();
     }

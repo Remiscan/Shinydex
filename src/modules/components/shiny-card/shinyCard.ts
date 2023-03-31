@@ -1,5 +1,5 @@
 import { Hunt } from '../../Hunt.js';
-import { translationObserver } from '../../translation.js';
+import { TranslatedString, translationObserver } from '../../translation.js';
 import { Shiny } from '../../Shiny.js';
 import { isSupportedLang, isSupportedMethodID, isSupportedPokemonLang, methodStrings, pokemonData } from '../../jsonData.js';
 import { huntStorage, localForageAPI, shinyStorage } from '../../localForage.js';
@@ -111,7 +111,7 @@ export class shinyCard extends HTMLElement {
       }
 
       else if (shiny.game === 'letsgopikachu' || shiny.game === 'letsgoeevee') {
-        if (getProp('lgpe-nextSpawn')) parts.push(`<span data-string="bonus-lgpe-catchCombo-${getProp('lgpe-catchCombo')}">${getString("bonus-lgpe-catchCombo-${getProp('lgpe-catchCombo')}", lang)}</span>`);
+        if (getProp('lgpe-nextSpawn')) parts.push(`<span data-string="bonus-lgpe-catchCombo-${getProp('lgpe-catchCombo')}">${getString(`bonus-lgpe-catchCombo-${getProp('lgpe-catchCombo')}` as TranslatedString, lang)}</span>`);
         if (getProp('lgpe-lure')) parts.push(`<span data-string="bonus-lgpe-lure">${getString('bonus-lgpe-lure', lang)}</span>`);
       }
 
@@ -122,7 +122,7 @@ export class shinyCard extends HTMLElement {
       else if (shiny.game === 'legendsarceus') {
         const dexResearch = getProp('pla-dexResearch');
         const niv = dexResearch === 2 ? '100%' : dexResearch === 1 ? '10' : '9 ou -';
-        parts.push(`<span data-string="bonus-pla-dexResearch-${dexResearch}">${getString(`bonus-pla-dexResearch-${dexResearch}`, lang)}</span>`);
+        parts.push(`<span data-string="bonus-pla-dexResearch-${dexResearch}">${getString(`bonus-pla-dexResearch-${dexResearch}` as TranslatedString, lang)}</span>`);
       }
 
       else if (shiny.game === 'scarlet' || shiny.game === 'violet') {
@@ -131,7 +131,7 @@ export class shinyCard extends HTMLElement {
           const num = outbreakCleared === 2 ? 'Plus de 60'
                     : outbreakCleared === 1 ? '30 à 59'
                     : 'Moins de 29';
-          parts.push(`<span data-string="bonus-sv-outbreakCleared-${outbreakCleared}">${getString(`bonus-sv-outbreakCleared-${outbreakCleared}`, lang)}</span> <span data-string="bonus-sv-outbreakCleared-alt">${getString('bonus-sv-outbreakCleared-alt', lang)}</span>`);
+          parts.push(`<span data-string="bonus-sv-outbreakCleared-${outbreakCleared}">${getString(`bonus-sv-outbreakCleared-${outbreakCleared}` as TranslatedString, lang)}</span> <span data-string="bonus-sv-outbreakCleared-alt">${getString('bonus-sv-outbreakCleared-alt', lang)}</span>`);
         }
 
         if (getProp('sv-sparklingPower')) {
@@ -309,14 +309,14 @@ export class shinyCard extends HTMLElement {
     try {
       let k = await huntStorage.getItem(this.huntid);
       if (k != null) {
-        throw `Ce Pokémon est déjà en cours de modification.`;
+        throw getString('error-already-editing');
       }
 
       const card = document.createElement('hunt-card');
       card.setAttribute('huntid', this.huntid);
 
       const hunt = await Hunt.getOrMake(this.huntid);
-      if (!(hunt instanceof Hunt)) throw new Error('Erreur lors de la création de la chasse à éditer');
+      if (!(hunt instanceof Hunt)) throw new Error(getString('error-creating-edit'));
       hunt.caught = true;
       await huntStorage.setItem(hunt.huntid, hunt);
 
@@ -332,7 +332,7 @@ export class shinyCard extends HTMLElement {
       if (!(navLink instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
       navLink.click();
     } catch (error) {
-      const message = (typeof error === 'string') ? error : `Erreur : impossible de modifier ce Pokémon.`;
+      const message = (typeof error === 'string') ? error : getString('error-cant-edit');
       console.error(error);
       if (previousEditNotification) previousEditNotification.remove();
       previousEditNotification = new Notif(message);

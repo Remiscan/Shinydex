@@ -4,6 +4,7 @@ import { callBackend } from './callBackend.js';
 import { dataStorage } from './localForage.js';
 import { Notif, template as notifTemplate } from './notification.js';
 import { requestSync } from './syncBackup.js';
+import { getString } from './translation.js';
 
 
 
@@ -104,7 +105,7 @@ type SignInProvider = 'google' | 'shinydex';
 async function signIn(provider: SignInProvider, token: string = '', { notify = true } = {}) {
   // Display "signing in" notification
   SignInPrompt.closeAll();
-  const signInNotification = new Notif('Connexion en cours...');
+  const signInNotification = new Notif(getString('notif-signing-in'));
   if (notify) {
     signInNotification.element?.classList.add('loading');
     signInNotification.dismissable = false;
@@ -144,7 +145,7 @@ async function signIn(provider: SignInProvider, token: string = '', { notify = t
       console.log('User successfully signed in');
       document.body.setAttribute('data-logged-in', 'true');
       if (notify) {
-        new Notif('Connexion réussie !').prompt();
+        new Notif(getString('notif-signed-in')).prompt();
       }
 
       // Apply user settings that were saved in database
@@ -189,7 +190,7 @@ async function signIn(provider: SignInProvider, token: string = '', { notify = t
       return true;
     } else {
       if ('error' in responseBody) throw new Error(responseBody.error);
-      else throw new Error('Échec de la connexion');
+      else throw new Error(getString('error-sign-in-failed'));
     }
   } catch (err) {    
     if (notify) {
@@ -197,7 +198,7 @@ async function signIn(provider: SignInProvider, token: string = '', { notify = t
       signInNotification.dismissable = true;
       signInNotification.remove();
 
-      const error = new Error('Échec de la connexion');
+      const error = new Error(getString('error-sign-in-failed'));
       new Notif(error.message).prompt();
     }
 
@@ -211,7 +212,7 @@ async function signIn(provider: SignInProvider, token: string = '', { notify = t
 export async function signOutCallback() {
   await dataStorage.removeItem('session-code-verifier');
   console.log('User successfully signed out');
-  new Notif(`Vous n'êtes plus connecté.`).prompt();
+  new Notif(getString('notif-signed-out')).prompt();
   document.body.setAttribute('data-logged-in', 'false');
   loggedIn = false;
 }
@@ -223,7 +224,7 @@ export async function signOut() {
     signOutCallback();
     return true;
   } else {
-    const error = new Error('Échec de la déconnexion');
+    const error = new Error(getString('error-sign-out-failed'));
     new Notif(error.message).prompt();
     throw error;
   }

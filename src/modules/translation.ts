@@ -14,12 +14,19 @@ export function getCurrentLang() {
 
 
 
-export function getString(id: string, lang: SupportedLang = getCurrentLang()): string {
+export type TranslatedString =
+  keyof typeof appStrings['fr'] |
+  `game/${keyof typeof gameStrings['fr']}` |
+  `method/${keyof typeof methodStrings['fr']}` |
+  `pokemon/${number}` |
+  `pokemon/${number}/forme/${string}`;
+
+export function getString(id: TranslatedString, lang: SupportedLang = getCurrentLang()): string {
   const parts = id.split('/');
   let strings: { [key: string]: { [key: string]: string} };
   switch (parts[0]) {
-    case 'method': strings = methodStrings; id = parts[1]; break;
-    case 'game': strings = gameStrings; id = parts[1]; break;
+    case 'method': strings = methodStrings; id = (parts[1] as TranslatedString); break;
+    case 'game': strings = gameStrings; id = (parts[1] as TranslatedString); break;
     case 'pokemon': {
       if (!isNaN(parseInt(parts[1]))) {
         const dexid = parseInt(parts[1]);
@@ -66,18 +73,18 @@ class TranslationObserver extends TODef {
     // Translate all texts in the container
     let _container = container.shadowRoot ?? container;
     for (const e of [..._container.querySelectorAll('[data-string]')]) {
-      const stringKey = e.getAttribute('data-string') ?? '';
+      const stringKey = (e.getAttribute('data-string') ?? '') as TranslatedString;
       if (stringKey.length === 0) continue;
       if (e.tagName == 'IMG') e.setAttribute('alt', getString(stringKey));
       else                    e.innerHTML = getString(stringKey);
     }
     for (const e of [..._container.querySelectorAll('[data-label]')]) {
-      const stringKey = e.getAttribute('data-label') ?? '';
+      const stringKey = (e.getAttribute('data-label') ?? '') as TranslatedString;
       if (stringKey.length === 0) continue;
       e.setAttribute('aria-label', getString(stringKey));
     }
     for (const e of [..._container.querySelectorAll('[data-placeholder]')]) {
-      const stringKey = e.getAttribute('data-placeholder') ?? '';
+      const stringKey = (e.getAttribute('data-placeholder') ?? '') as TranslatedString;
       if (stringKey.length === 0) continue;
       e.setAttribute('placeholder', getString(stringKey));
     }

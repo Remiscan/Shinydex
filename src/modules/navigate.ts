@@ -6,6 +6,7 @@ import { FilterMenu } from './components/filter-menu/filterMenu.js';
 import { clearElementStorage } from './lazyLoading.js';
 import { friendShinyStorage } from './localForage.js';
 import { Notif } from './notification.js';
+import { getString } from './translation.js';
 
 
 
@@ -265,12 +266,12 @@ const backOnEscape = (event: KeyboardEvent) => {
 export async function navigate(sectionCible: string, event: Event, data?: any) {
   if (sectionActuelle === sectionCible) return Promise.resolve();
   if (sectionCible === 'sprite-viewer' && !(navigator.onLine)) {
-    if (!(Settings.get('cache-all-sprites'))) return new Notif('Pas de connexion internet.').prompt();
+    if (!(Settings.get('cache-all-sprites'))) return new Notif(getString('error-no-connection')).prompt();
   }
 
   const ancienneSection = sections.find(section => section.nom === sectionActuelle)!;
   const nouvelleSection = sections.find(section => section.nom === sectionCible);
-  if (!nouvelleSection) throw `La section demandée n'existe pas.`;
+  if (!nouvelleSection) throw getString('error-no-section');
 
   // Pré-chargement des images de la nouvelle section
   await Promise.all([loadAllImages(nouvelleSection.preload || [])]);

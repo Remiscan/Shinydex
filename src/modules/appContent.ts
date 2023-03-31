@@ -9,6 +9,7 @@ import { clearElementStorage, lazyLoadSection, virtualizedSections } from './laz
 import { friendShinyStorage, friendStorage, huntStorage, localForageAPI, shinyStorage } from './localForage.js';
 import { navigate } from './navigate.js';
 import { Notif } from './notification.js';
+import { getString } from './translation.js';
 
 
 
@@ -293,7 +294,7 @@ export function initPokedex() {
         try {
           navigate('sprite-viewer', event, { dexid: String(i) });
         } catch (error) {
-          const message = `Erreur : impossible d'afficher ce Pokémon`;
+          const message = getString('error-cant-display-pokemon');
           console.error(message, error);
           new Notif(message).prompt();
         }
