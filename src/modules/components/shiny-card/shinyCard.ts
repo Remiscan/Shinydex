@@ -1,5 +1,5 @@
 import { Hunt } from '../../Hunt.js';
-import { Params, noAccent } from '../../Params.js';
+import { translationObserver } from '../../translation.js';
 import { Shiny } from '../../Shiny.js';
 import { isSupportedLang, isSupportedMethodID, isSupportedPokemonLang, methodStrings, pokemonData } from '../../jsonData.js';
 import { huntStorage, localForageAPI, shinyStorage } from '../../localForage.js';
@@ -16,6 +16,7 @@ import themesSheet from '../../../../styles/themes.css.php' assert { type: 'css'
 import commonSheet from '../../../../styles/common.css' assert { type: 'css' };
 // @ts-expect-error
 import sheet from './styles.css' assert { type: 'css' };
+import { getCurrentLang, getString } from '../../translation.js';
 
 
 
@@ -28,6 +29,7 @@ export class shinyCard extends HTMLElement {
   shadow: ShadowRoot;
   huntid: string = '';
   dataStore: localForageAPI = shinyStorage;
+  #translationObserved: boolean = false;
   clickHandler: (e: Event) => void = () => {};
   openHandler = (e: Event) => {
     e.stopPropagation();
@@ -62,7 +64,7 @@ export class shinyCard extends HTMLElement {
 
     this.setAttribute('last-update', String(shiny.lastUpdate));
 
-    const lang = document.documentElement.getAttribute('lang') ?? Params.defaultLang;
+    const lang = getCurrentLang();
     const pokemon = pokemonData[shiny.dexid];
 
     // Espèce
@@ -105,22 +107,22 @@ export class shinyCard extends HTMLElement {
       if (getProp('encounters')) parts.push(`${getProp('encounters')} rencontres`);
 
       if ((shiny.game === 'ultrasun' || shiny.game === 'ultramoon') && shiny.method === 'ultrawormhole') {
-        parts.push(`Distance : ${getProp('usum-distance')}m, ${getProp('usum-rings')} anneaux`);
+        parts.push(`<span data-string="bonus-usum-distance">${getString('bonus-usum-distance', lang)}</span> ${getProp('usum-distance')}, ${getProp('usum-rings')} <span data-string="bonus-usum-rings">${getString('bonus-usum-rings', lang)}</span>`);
       }
 
       else if (shiny.game === 'letsgopikachu' || shiny.game === 'letsgoeevee') {
-        if (getProp('lgpe-nextSpawn')) parts.push(`Combo Capture : ${getProp('lgpe-catchCombo')}`);
-        if (getProp('lgpe-lure')) parts.push('Parfum utilisé');
+        if (getProp('lgpe-nextSpawn')) parts.push(`<span data-string="bonus-lgpe-catchCombo-${getProp('lgpe-catchCombo')}">${getString("bonus-lgpe-catchCombo-${getProp('lgpe-catchCombo')}", lang)}</span>`);
+        if (getProp('lgpe-lure')) parts.push(`<span data-string="bonus-lgpe-lure">${getString('bonus-lgpe-lure', lang)}</span>`);
       }
 
       else if (shiny.game === 'sword' || shiny.game === 'shield') {
-        if (getProp('swsh-dexKo')) parts.push(`Compteur de KO : ${getProp('swsh-dexKo')}`);
+        if (getProp('swsh-dexKo')) parts.push(`<span data-string="bonus-swsh-dexKo-alt">${getString('bonus-swsh-dexKo-alt', lang)}</span> ${getProp('swsh-dexKo')}`);
       }
 
       else if (shiny.game === 'legendsarceus') {
         const dexResearch = getProp('pla-dexResearch');
         const niv = dexResearch === 2 ? '100%' : dexResearch === 1 ? '10' : '9 ou -';
-        parts.push(`niv. de recherche ${niv}`);
+        parts.push(`<span data-string="bonus-pla-dexResearch-${dexResearch}">${getString(`bonus-pla-dexResearch-${dexResearch}`, lang)}</span>`);
       }
 
       else if (shiny.game === 'scarlet' || shiny.game === 'violet') {
@@ -129,18 +131,18 @@ export class shinyCard extends HTMLElement {
           const num = outbreakCleared === 2 ? 'Plus de 60'
                     : outbreakCleared === 1 ? '30 à 59'
                     : 'Moins de 29';
-          parts.push(`${num} KO`);
+          parts.push(`<span data-string="bonus-sv-outbreakCleared-${outbreakCleared}">${getString(`bonus-sv-outbreakCleared-${outbreakCleared}`, lang)}</span> <span data-string="bonus-sv-outbreakCleared-alt">${getString('bonus-sv-outbreakCleared-alt', lang)}</span>`);
         }
 
         if (getProp('sv-sparklingPower')) {
           const sparklingPower = getProp('sv-sparklingPower');
-          parts.push(`Rencontre brillance niv. ${sparklingPower}`);
+          parts.push(`<span data-string="bonus-sv-sparklingPower-alt">${getString('bonus-sv-sparklingPower-alt', lang)}</span> ${sparklingPower}`);
         }
       }
 
       countString = parts.join(', ');
 
-      element.innerHTML = countString || '<span class="empty">Pas de détail.</span>';
+      element.innerHTML = countString || `<span class="empty" data-string="shiny-card-method-details-empty">${getString('shiny-card-method-details-empty', lang)}</span>`;
     }
 
     // Temps de capture / date
@@ -176,7 +178,7 @@ export class shinyCard extends HTMLElement {
 
     // Notes
     {
-      const notes = shiny.notes || '<span class="empty">Pas de note.</span>';
+      const notes = shiny.notes || `<span class="empty" data-string="shiny-card-notes-empty">${getString('shiny-card-notes-empty', lang)}</span>`;
       const element = this.shadow.querySelector('[data-type="notes"]')!;
       element.innerHTML = notes;
     }
@@ -340,6 +342,11 @@ export class shinyCard extends HTMLElement {
 
 
   connectedCallback() {
+    /*if (!this.#translationObserved) {*/
+      translationObserver.serve(this, { method: 'attribute' });
+      /*this.#translationObserved = true;
+    }*/
+
     // Détecte le clic pour "ouvrir" la carte
     const openButton = this.shadow.querySelector('[data-action="open"]');
     if (!(openButton instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
@@ -361,6 +368,8 @@ export class shinyCard extends HTMLElement {
 
 
   disconnectedCallback() {
+    translationObserver.unserve(this);
+
     const openButton = this.shadow.querySelector('[data-action="open"]');
     if (!(openButton instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
     openButton.removeEventListener('click', this.openHandler);
@@ -378,7 +387,7 @@ export class shinyCard extends HTMLElement {
 
 
   static get observedAttributes() {
-    return ['huntid'];
+    return ['huntid', 'lang'];
   }
 
 
@@ -389,7 +398,11 @@ export class shinyCard extends HTMLElement {
       case 'huntid': {
         this.huntid = newValue;
         //this.dataToContent();
-      } break
+      } break;
+
+      case 'lang':
+        translationObserver.translate(this, newValue ?? '');
+        break;
     }
   }
 }

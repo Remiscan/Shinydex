@@ -7,6 +7,7 @@
 
 import { backFromTopLayer, closeTopLayer, openTopLayer, toTopLayer } from '../topLayer.js';
 import { TextField } from './textField.js';
+import { translationObserver } from '../translation.js';
 
 
 
@@ -70,7 +71,7 @@ optionTemplate.innerHTML = /*html*/`
     <span class="material-icons" part="icon icon-checked" aria-hidden="true">
       <slot name="icon-checked">check</slot>
     </span>
-    <span part="option-label" class="label-large">{label}</span>
+    <span part="option-label" class="label-large" data-string="{stringKey}">{label}</span>
   </span>
 `;
 
@@ -218,7 +219,7 @@ function maintainScrollVisibility(activeElement: HTMLElement, scrollParent: HTML
 export class InputSelect extends TextField {
   static template = template;
   static sheets = [...TextField.sheets, sheet];
-  static attributes = ['disabled', 'multiple', 'name', 'required', 'size', 'value'];
+  static attributes = ['disabled', 'multiple', 'name', 'required', 'size', 'value', 'lang'];
   static defaultValue = 'null';
   static defaultLabel = '⋯'; // label displayed on the button when no option is selected
   #initialSlotsAssigned = false; // to check if options need to be generated from slot in connectedCallback
@@ -252,7 +253,7 @@ export class InputSelect extends TextField {
 
       const optionAttributes = [];
       for (const attr of node.attributes) {
-        if (['value', 'selected'].includes(attr.name)) {} // Do nothing
+        if (['value', 'selected', 'data-string'].includes(attr.name)) {} // Do nothing
         else optionAttributes.push(attr);
       }
 
@@ -260,7 +261,8 @@ export class InputSelect extends TextField {
       template.innerHTML = optionTemplate.innerHTML
         .replace('{label}', label)
         .replace('{value}', value)
-        .replace('{attr}', optionAttributes.map(attr => `${attr.name}="${attr.value}"`).join(' '));
+        .replace('{attr}', optionAttributes.map(attr => `${attr.name}="${attr.value}"`).join(' '))
+        .replace('{stringKey}', node.getAttribute('data-string') ?? '');
       
       options.push(template);
     }
@@ -288,6 +290,7 @@ export class InputSelect extends TextField {
       optionsList.appendChild(option.content.cloneNode(true));
     }
 
+    translationObserver.translate(this, this.lang ?? '');
     this.value = currentValue ?? this.initialValue;
   };
 
@@ -609,12 +612,14 @@ export class InputSelect extends TextField {
     // If the requested value is an existing option, select it.
     const allOptions = this.allOptions;
     let optionExists = false;
+    let stringKey = '';
     for (let k = 0; k < allOptions.length; k++) {
       const option = allOptions[k];
       const value = option.getAttribute('data-value');
       if (value === val) {
         option.setAttribute('aria-selected', 'true');
         optionExists = true;
+        stringKey = option.querySelector('[part="option-label"]')?.getAttribute('data-string') ?? '';
       } else {
         option.setAttribute('aria-selected', 'false');
       }
@@ -624,7 +629,10 @@ export class InputSelect extends TextField {
     this.updateFormValue(appliedValue);
     this.dispatchEvent(new CustomEvent('valuechange', { detail: { value: appliedValue }}));
     const button = this.button;
-    if (button) button.innerHTML = this.getLabel(appliedValue);
+    if (button) {
+      button.innerHTML = this.getLabel(appliedValue);
+      button.setAttribute('data-string', stringKey);
+    }
   }
 
   updateFormValue(val: any) {
@@ -655,6 +663,8 @@ export class InputSelect extends TextField {
 
 
   connectedCallback(): void {
+    translationObserver.serve(this, { method: 'attribute' });
+
     // To retain control of the options list when it's promoted to the top layer.
     const optionsList = this.optionsList;
     if (optionsList instanceof HTMLElement) this.#optionsList = optionsList;
@@ -682,6 +692,8 @@ export class InputSelect extends TextField {
   }
 
   disconnectedCallback(): void {
+    translationObserver.unserve(this);
+
     if (this.isOpen) this.close(false);
 
     const button = this.button;
@@ -691,6 +703,19 @@ export class InputSelect extends TextField {
 
     const source = this.shadow.querySelector('datalist > slot');
     source?.removeEventListener('slotchange', this.slotchangeHandler);
+  }
+
+  attributeChangedCallback(attr: string, oldValue: string | null, newValue: string | null): void {
+    if (oldValue === newValue) return;
+
+    switch (attr) {
+      case 'lang':
+        translationObserver.translate(this, newValue ?? '');
+        break;
+
+      default:
+        super.attributeChangedCallback(attr, oldValue, newValue);
+    }
   }
 }
 

@@ -9,11 +9,11 @@ template.innerHTML = /*html*/`
 
     <div class="menu surface standard">
       <button type="button" class="surface interactive filled tonal outlined only-text" data-action="edit" disabled tabindex="-1">
-        <span class="label-large">Éditer</span>
+        <span class="label-large" data-string="edit-shiny"></span>
       </button>
 
       <button type="button" class="surface interactive filled tonal outlined only-text" data-action="restore" disabled tabindex="-1">
-        <span class="label-large">Restaurer</span>
+        <span class="label-large" data-string="restore-hunt"></span>
       </button>
     </div>
 
@@ -26,7 +26,7 @@ template.innerHTML = /*html*/`
 
     <div class="pokemon-infos__misc">
       <span data-type="originMark" class="icon"></span>
-      <button type="button" class="surface interactive icon-button only-icon menu-hint" data-action="open">
+      <button type="button" class="surface interactive icon-button only-icon menu-hint" data-action="open" data-label="shiny-card-menu">
         <span class="material-icons">more_horiz</span>
       </button>
     </div>
@@ -52,10 +52,10 @@ template.innerHTML = /*html*/`
     <div class="pokemon-notes surface body-large">
       <div class="pokemon-notes__arrow surface"></div>
       <span class="pokemon-notes__texte">
-        <h2 class="title-medium">Méthode de chasse - détails :</h2>
+        <h2 class="title-medium" data-string="shiny-card-method-details"></h2>
         <p class="body-medium" data-type="count"></p>
         <hr>
-        <h2 class="title-medium">Notes additionnelles :</h2>
+        <h2 class="title-medium" data-string="shiny-card-notes"></h2>
         <p class="body-medium" data-type="notes"></p>
       </span>
     </div>

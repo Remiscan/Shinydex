@@ -14,6 +14,7 @@ $cache['files'] = [
   "../_common/components/input-slider/input-slider.js",
   "../_common/components/input-switch/input-switch.js",
   "../_common/js/per-function-async-queue.js",
+  "../_common/js/translation-observer.js",
   "../colori/lib/dist/colori.min.js",
   "../colori/palette/palette.js",
 ];

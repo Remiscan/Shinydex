@@ -6,6 +6,7 @@ import { queueable } from '../../../_common/js/per-function-async-queue.js';
 import { Hunt } from './Hunt.js';
 import { Params, noAccent } from './Params.js';
 import { isSupportedPokemonLang, pokemonData } from './jsonData.js';
+import { getCurrentLang } from './translation.js';
 
 
 
@@ -215,7 +216,7 @@ export async function computeFilters(section: FiltrableSection | OrderableSectio
 /** Computes the filters corresponding to one Shiny Pokémon. */
 export function computeShinyFilters(shiny: Shiny): ShinyFilterData {
   let species = '';
-  const lang = document.documentElement.getAttribute('lang') ?? Params.defaultLang;
+  const lang = getCurrentLang();
   const pokemon = pokemonData[shiny.dexid];
   if (isSupportedPokemonLang(lang)) species = noAccent(pokemon.name[lang] || '').toLowerCase();
 
@@ -303,7 +304,7 @@ export function updateCounters(section: PopulatableSection): void {
 // et renvoie leurs huntids dans l'ordre.
 async function orderPokemon(pokemonList: Shiny[] | Hunt[], order: ordre): Promise<string[]> {
   const noms = await Pokemon.names();
-  const lang = document.documentElement.getAttribute('lang') ?? 'fr';
+  const lang = getCurrentLang();
 
   let orderedShiny = pokemonList.sort((s1, s2) => {
     const huntidComparison = s1.huntid > s2.huntid ? 1
@@ -411,7 +412,7 @@ export async function computeOrders(section: OrderableSection): Promise<OrderMap
         break;
       
       case 'partage':
-        const lang = document.documentElement.getAttribute('lang') ?? 'fr';
+        const lang = getCurrentLang();
         orderedKeys = keys.sort((a, b) => a.localeCompare(b, lang));
         break;
     }

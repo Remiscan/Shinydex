@@ -1,4 +1,5 @@
 import { friendStorage, localForageAPI } from '../../localForage.js';
+import { translationObserver } from '../../translation.js';
 import template from './template.js';
 // @ts-expect-error
 import materialIconsSheet from '../../../../ext/material_icons.css' assert { type: 'css' };
@@ -163,6 +164,8 @@ export class friendCard extends HTMLElement {
 
 
   connectedCallback() {
+    translationObserver.serve(this, { method: 'attribute' });
+
     // Détecte le clic pour "ouvrir" la carte
     const openButton = this.shadow.querySelector('[data-action="open"]');
     if (!(openButton instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
@@ -182,6 +185,8 @@ export class friendCard extends HTMLElement {
 
 
   disconnectedCallback() {
+    translationObserver.unserve(this);
+
     const openButton = this.shadow.querySelector('[data-action="open"]');
     if (!(openButton instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
     openButton.removeEventListener('click', this.openHandler);
@@ -197,7 +202,7 @@ export class friendCard extends HTMLElement {
 
 
   static get observedAttributes() {
-    return ['username'];
+    return ['username', 'lang'];
   }
 
 
@@ -208,7 +213,11 @@ export class friendCard extends HTMLElement {
       case 'username': {
         this.username = newValue;
         //this.dataToContent();
-      } break
+      } break;
+
+      case 'lang':
+        translationObserver.translate(this, newValue ?? '');
+        break;
     }
   }
 }

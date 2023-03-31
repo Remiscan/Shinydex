@@ -1,5 +1,6 @@
-import { isSupportedPokemonLang, pokemonData } from './jsonData.js';
+import { appStrings, isSupportedPokemonLang, pokemonData } from './jsonData.js';
 import { pad, Params } from './Params.js';
+import { getCurrentLang } from './translation.js';
 
 
 
@@ -202,7 +203,7 @@ export class Pokemon {
   /**
    * @returns Nom du Pokémon.
    */
-  getName(lang = document.documentElement.getAttribute('lang') ?? Params.defaultLang): string {
+  getName(lang = getCurrentLang()): string {
     if (!isSupportedPokemonLang(lang)) throw new Error('language-not-supported');
     return this.name[lang];
   }
@@ -210,23 +211,19 @@ export class Pokemon {
   /**
    * @returns Nom d'une forme du Pokémon.
    */
-  getFormeName(id: string = '', withName: boolean = true, lang = document.documentElement.getAttribute('lang') ?? Params.defaultLang): string {
+  getFormeName(id: string = '', withName: boolean = true, lang = getCurrentLang()): string {
     if (!isSupportedPokemonLang(lang)) throw new Error('language-not-supported');
     const forme = this.formes.find(f => f.dbid === id);
     let name = this.getName(lang);
     name = name.charAt(0).toUpperCase() + name.slice(1);
-    const normalFormName = {
-      fr: 'Forme normale',
-      en: 'Normal form'
-    };
     if (withName) return forme?.name[lang].replace('{{name}}', name) || name;
-    else          return forme?.name[lang].replace('{{name}}', '').trim() || normalFormName[lang];
+    else          return forme?.name[lang].replace('{{name}}', '').trim() || appStrings[lang]?.['forme-base'];
   }
 
   /**
    * @returns Liste des noms de tous les Pokémon, dans l'ordre du Pokédex national.
    */
-  static names(lang = document.documentElement.getAttribute('lang') ?? Params.defaultLang): string[] {
+  static names(lang = getCurrentLang()): string[] {
     if (!isSupportedPokemonLang(lang)) throw new Error('language-not-supported');
 
     const cachedNames = Pokemon.#names[lang];

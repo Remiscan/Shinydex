@@ -5,6 +5,7 @@ import { Forme, Pokemon } from '../../Pokemon.js';
 import { Count, Shiny } from '../../Shiny.js';
 import { huntStorage, shinyStorage } from '../../localForage.js';
 import { Notif, warnBeforeDestruction } from '../../notification.js';
+import { getCurrentLang, translationObserver } from '../../translation.js';
 import { InputSelect } from '../inputSelect.js';
 import { pokemonSprite } from '../pokemon-sprite/pokemonSprite.js';
 import { TextArea } from '../textArea.js';
@@ -523,6 +524,8 @@ export class huntCard extends HTMLElement {
 
 
   connectedCallback() {
+    translationObserver.serve(this, { method: 'attribute' });
+
     // 🔽 Active les boutons du formulaire
 
     const form = this.shadow.querySelector('form');
@@ -730,7 +733,7 @@ export class huntCard extends HTMLElement {
     let availableChoices = 0;
     for (const forme of formes) {
       if ('noShiny' in forme && forme.noShiny == true) continue;
-      select.innerHTML += `<option value="${forme.dbid}">${pkmn.getFormeName(forme.dbid, false)}</option>`;
+      select.innerHTML += `<option value="${forme.dbid}" data-string="pokemon/${pkmn.dexid}/forme/${forme.dbid}">${pkmn.getFormeName(forme.dbid, false)}</option>`;
       availableChoices++;
     }
     if (availableChoices > 0) select.setAttribute('default-label', 'Choisir une forme');
@@ -753,7 +756,7 @@ export class huntCard extends HTMLElement {
     
     select.setAttribute('value', methodToSelect ?? 'wild'); // set initial value before regenerating the options
 
-    const lang = document.documentElement.getAttribute('lang') ?? Params.defaultLang;
+    const lang = getCurrentLang();
     let availableChoices = 0;
     for (const methode of Shiny.allMethodes) {
       const gameIds = new Set(methode.jeux.map(jeu => jeu.id));
@@ -762,7 +765,7 @@ export class huntCard extends HTMLElement {
       if (isSupportedLang(lang) && isSupportedMethodID(methode.id)) {
         nom = methodStrings[lang][methode.id];
       }
-      select.innerHTML += `<option value="${methode.id}">${nom}</option>`;
+      select.innerHTML += `<option value="${methode.id}" data-string="method/${methode.id}">${nom}</option>`;
       availableChoices++;
     }
     if (availableChoices > 0) select.setAttribute('default-label', 'Choisir une méthode');
@@ -774,18 +777,20 @@ export class huntCard extends HTMLElement {
     const select = this.shadow.querySelector('input-select[name="game"]');
     if (!select) throw new TypeError(`Expecting InputSelect`);
     
-    const lang = document.documentElement.getAttribute('lang') ?? Params.defaultLang;
+    const lang = getCurrentLang();
     for (const jeu of [...Pokemon.jeux].reverse()) {
       let nom = '';
       if (isSupportedLang(lang) && isSupportedGameID(jeu.uid)) {
         nom = gameStrings[lang][jeu.uid];
       }
-      select.innerHTML += `<option value="${jeu.uid}">${nom}</option>`;
+      select.innerHTML += `<option value="${jeu.uid}" data-string="game/${jeu.uid}">${nom}</option>`;
     }
   }
   
 
   disconnectedCallback() {
+    translationObserver.unserve(this);
+
     for (const [name, handler] of Object.entries(this.handlers)) {
       unhandle(handler);
     }
@@ -793,7 +798,7 @@ export class huntCard extends HTMLElement {
 
 
   static get observedAttributes() {
-    return ['huntid'];
+    return ['huntid', 'lang'];
   }
 
 
@@ -804,7 +809,11 @@ export class huntCard extends HTMLElement {
       case 'huntid': {
         this.huntid = newValue;
         //this.huntToForm();
-      } break
+      } break;
+
+      case 'lang':
+        translationObserver.translate(this, newValue ?? '');
+        break;
     }
   }
 }

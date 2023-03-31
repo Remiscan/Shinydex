@@ -5,6 +5,9 @@ import { Notif } from './notification.js';
 import { computePaletteCss, gradientString, setTheme, updateMetaThemeColorTag } from './theme.js';
 // @ts-expect-error
 import { queueable } from '../../../_common/js/per-function-async-queue.js';
+import { SupportedLang, isSupportedLang } from './jsonData.js';
+import { getCurrentLang, translationObserver } from './translation.js';
+import { InputSelect } from './components/inputSelect.js';
 
 
 
@@ -17,10 +20,12 @@ function isSupportedTheme(string: string): string is Theme {
 
 
 let appliedSettings: Settings;
+let langChangeNotif: Notif;
 
 
 
 export class Settings {
+  'lang': SupportedLang = getCurrentLang();
   'theme': Theme = 'system';
   'theme-hue': number = 255;
   'cache-all-sprites': boolean = false;
@@ -29,11 +34,20 @@ export class Settings {
     if (!data) return;
 
     if (data instanceof FormData) {
+      const storedLang = String(data.get('lang'));
+      if (isSupportedLang(storedLang)) this['lang'] = storedLang;
+
       const storedTheme = String(data.get('theme'));
       if (isSupportedTheme(storedTheme)) this['theme'] = storedTheme;
+
       this['theme-hue'] = Number(data.get('theme-hue')) || this['theme-hue'];
+
       this['cache-all-sprites'] = data.get('cache-all-sprites') === 'true';
     } else {
+      if ('lang' in data && typeof data['lang'] === 'string' && isSupportedLang(data['lang'])) {
+        this['lang'] = data['lang'];
+      }
+
       if ('theme' in data && typeof data['theme'] === 'string' && isSupportedTheme(data['theme'])) {
         this['theme'] = data['theme'];
       }
@@ -52,6 +66,13 @@ export class Settings {
   toForm() {
     const settingsForm = document.querySelector('form[name="app-settings"]');
     if (!(settingsForm instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
+
+    {
+      // Lang
+      const input = settingsForm.querySelector(`[name="lang"]`);
+      if (!(input instanceof InputSelect)) throw new TypeError(`Expecting InputSelect`);
+      input.value = this.lang;
+    }
 
     {
       // Theme
@@ -80,6 +101,20 @@ export class Settings {
   apply() {
     const settingsForm = document.querySelector('form[name="app-settings"]')
     if (!(settingsForm instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
+
+    {
+      // Lang
+      const html = document.documentElement;
+      if (this.changedBy('lang', ['initial', 'manual'])) {
+        html.lang = this['lang'];
+      }
+      if (this.changedBy('lang', ['initial'])) {
+        html.addEventListener('translate', event => {
+          translationObserver.translate(html, this['lang']);
+        });
+        translationObserver.serve(html);
+      }
+    }
 
     {
       // Theme

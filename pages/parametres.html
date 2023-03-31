@@ -21,7 +21,10 @@
       <span class="param-nom body-large" data-string="param-theme"></span>
 
       <span class="param">
-        <radio-group name="theme" data-string="param-theme-options">
+        <radio-group name="theme">
+          <option value="system" data-string="param-theme-system"></option>
+          <option value="light" data-string="param-theme-light"></option>
+          <option value="dark" data-string="param-theme-dark"></option>
         </radio-group>
       </span>
     </p>
@@ -33,17 +36,17 @@
       </span>
     </p>
 
-    <!--<p class="un-parametre with-description">
-      <span class="param-nom body-large" data-string="param-lang-title">Langue</span>
+    <p class="un-parametre with-description">
+      <span class="param-nom body-large" data-string="param-lang-title"></span>
       <span class="param-description body-medium" data-string="param-lang-desc"></span>
       <span class="param">
-        <input-select name="language" default-value="poke">
-          <span slot="label">Langue / Language</span>
+        <input-select name="lang">
+          <span slot="label" data-string="param-lang-label"></span>
           <option value="fr">Français</option>
           <option value="en">English</option>
         </input-select>
       </span>
-    </p>-->
+    </p>
 
     <!---->
 
@@ -59,7 +62,9 @@
       </span>
     </p>
 
-    <p class="body-medium current-account-info" data-logged-in data-string="current-account"></p>
+    <p class="body-medium current-account-info" data-logged-in>
+      <span data-string="current-account"></span> <span data-value="current-account"></span>.
+    </p>
 
     <p class="un-parametre with-description" data-logged-in data-last-sync>
       <span class="param-nom body-large" data-string="param-last-sync-title"></span>
@@ -125,7 +130,9 @@
 
     <p class="un-parametre with-description">
       <span class="param-nom body-large" data-string="param-cache-icons-title"></span>
-      <span class="param-description body-medium" data-string="param-cache-icons-desc"></span>
+      <span class="param-description body-medium">
+        <span data-string="param-cache-icons-desc"></span> <span data-sprites-progress></span>
+      </span>
       <span class="param">
         <label for="cache-all-sprites">
           <input-switch name="cache-all-sprites" id="cache-all-sprites" icons="checked"></input-switch>
