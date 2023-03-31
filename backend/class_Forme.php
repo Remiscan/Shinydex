@@ -219,7 +219,7 @@ class Forme extends Sprite {
         case 678: // Mistigrix
         case 876: // Wimessir
           $ids = ['', 'female'];
-          $noms = ['{{name}} Mâle', '{{name}} Femelle'];
+          $noms = ['{{name}} mâle', '{{name}} femelle'];
           $nomsEN = ['Male {{name}}', 'Female {{name}}'];
         break;
         case 681: // Exagide
@@ -499,13 +499,13 @@ class Forme extends Sprite {
       if (!in_array($dexid, $ignoreGender)) {
         if ($sprite->gender == 'md') {
           $this->name = [
-            'fr' => ($this->name['fr'] ? $this->name['fr'] . ' Mâle' : '{{name}} Mâle'),
+            'fr' => ($this->name['fr'] ? $this->name['fr'] . ' mâle' : '{{name}} mâle'),
             'en' => ($this->name['en'] ? 'Male ' . $this->name['en'] : 'Male {{name}}')
           ];
         } else if ($sprite->gender == 'fd') {
           $this->dbid = $this->dbid . ($this->dbid == '' ? '' : '-') . 'female';
           $this->name = [
-            'fr' => ($this->name['fr'] ? $this->name['fr'] . ' Femelle' : '{{name}} Femelle'),
+            'fr' => ($this->name['fr'] ? $this->name['fr'] . ' femelle' : '{{name}} femelle'),
             'en' => ($this->name['en'] ? 'Female ' . $this->name['en'] : 'Female {{name}}')
           ];
         }
