@@ -12,6 +12,7 @@
     "shiny-card-method-details-empty": "Pas de détail.",
     "shiny-card-notes": "Notes additionnelles :",
     "shiny-card-notes-empty": "Pas de note.",
+    "shiny-card-unknown-date": "Date inconnue",
 
     "section-pokedex-short-title": "Pokédex <shiny-stars></shiny-stars>",
     "section-pokedex-long-title": "Pokédex <shiny-stars></shiny-stars>",
@@ -239,6 +240,7 @@
     "shiny-card-method-details-empty": "No detail.",
     "shiny-card-notes": "Additional notes:",
     "shiny-card-notes-empty": "No note.",
+    "shiny-card-unknown-date": "Date unknown",
 
     "section-pokedex-short-title": "Pokédex <shiny-stars></shiny-stars>",
     "section-pokedex-long-title": "Pokédex <shiny-stars></shiny-stars>",

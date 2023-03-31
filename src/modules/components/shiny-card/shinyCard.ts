@@ -156,7 +156,7 @@ export class shinyCard extends HTMLElement {
       } else {
         // Si la date est avant la sortie du premier jeu Pokémon au Japon,
         // marquer la date comme inconnue.
-        element.innerHTML = 'Date inconnue';
+        element.innerHTML = `<span data-string="shiny-card-unknown-date">${getString('shiny-card-unknown-date')}</span>`;
       }
     }
 
