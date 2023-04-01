@@ -1,4 +1,5 @@
 import { pad, wait } from '../../Params.js';
+import { TranslatedString, translationObserver, getString } from '../../translation.js';
 import { Pokemon } from '../../Pokemon.js';
 import { pokemonData } from '../../jsonData.js';
 // @ts-expect-error
@@ -206,7 +207,8 @@ export class pokemonSprite extends HTMLElement {
     if (currentChange === this.lastChange) {
       img.loading = this.params.lazy ? 'lazy' : 'eager';
       img.src = url;
-      img.setAttribute('alt', `${name}${this.params.shiny ? ' chromatique' : ''}`);
+      img.setAttribute('alt', getString(`pokemon/${this.params.dexid}/forme/${this.params.forme}/name-shiny` as TranslatedString));
+      img.setAttribute('data-string', `pokemon/${this.params.dexid}/forme/${this.params.forme}/name-shiny` as TranslatedString);
       img.setAttribute('width', String(isSheet ? 56 : this.params.size));
       img.setAttribute('height', String(isSheet ? 56 : this.params.size));
       this.style.setProperty('--size', `${isSheet ? 56 : this.params.size}px`);
@@ -315,6 +317,8 @@ export class pokemonSprite extends HTMLElement {
   
 
   connectedCallback() {
+    translationObserver.serve(this, { method: 'attribute' });
+
     const img = this.shadow.querySelector('img');
     img?.addEventListener('load', this.loadHandler);
 
@@ -322,18 +326,28 @@ export class pokemonSprite extends HTMLElement {
   }
 
   disconnectedCallback() {
+    translationObserver.unserve(this);
+
     const img = this.shadow.querySelector('img');
     img?.removeEventListener('load', this.loadHandler);
   }
 
   static get observedAttributes() {
-    return ['dexid', 'forme', 'backside', 'shiny', 'size', 'lazy'];
+    return ['dexid', 'forme', 'backside', 'shiny', 'size', 'lazy', 'lang'];
   }
 
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {
     if (oldValue === newValue) return;
-    this.update(name, newValue);
-    this.setSpriteUrl();
+
+    switch (name) {
+      case 'lang':
+        translationObserver.translate(this, newValue ?? '');
+        break;
+
+      default:
+        this.update(name, newValue);
+        this.setSpriteUrl();
+    }
   }
 }
 

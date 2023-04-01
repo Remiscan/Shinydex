@@ -110,7 +110,7 @@ export class Settings {
       }
       if (this.changedBy('lang', ['initial'])) {
         html.addEventListener('translate', event => {
-          translationObserver.translate(html, this['lang']);
+          translationObserver.translate(html, (event as CustomEvent).detail.lang);
         });
         translationObserver.serve(html);
       }

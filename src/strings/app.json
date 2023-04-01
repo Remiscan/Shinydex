@@ -1,6 +1,7 @@
 {
   "fr": {
     "shiny": "chromatique",
+    "shiny-pokemon": "Pokémon chromatique",
 
     "section-mes-chromatiques-short-title": "Pokémon <shiny-stars></shiny-stars>",
     "section-mes-chromatiques-long-title": "Mes Pokémon <shiny-stars></shiny-stars>",
@@ -15,6 +16,7 @@
     "shiny-card-notes": "Notes additionnelles :",
     "shiny-card-notes-empty": "Pas de note.",
     "shiny-card-unknown-date": "Date inconnue",
+    "legit-confirmed": "Légitimité confirmée",
 
     "section-pokedex-short-title": "Pokédex <shiny-stars></shiny-stars>",
     "section-pokedex-long-title": "Pokédex <shiny-stars></shiny-stars>",
@@ -298,6 +300,7 @@
 
   "en": {
     "shiny": "shiny",
+    "shiny-pokemon": "shiny Pokémon",
 
     "section-mes-chromatiques-short-title": "Pokémon <shiny-stars></shiny-stars>",
     "section-mes-chromatiques-long-title": "My Pokémon <shiny-stars></shiny-stars>",
@@ -312,6 +315,7 @@
     "shiny-card-notes": "Additional notes:",
     "shiny-card-notes-empty": "No note.",
     "shiny-card-unknown-date": "Date unknown",
+    "legit-confirmed": "Confirmed legitimity",
 
     "section-pokedex-short-title": "Pokédex <shiny-stars></shiny-stars>",
     "section-pokedex-long-title": "Pokédex <shiny-stars></shiny-stars>",

@@ -34,7 +34,7 @@ template.innerHTML = /*html*/`
     <div class="pokemon-infos__capture body-medium">
       <span data-type="game" class="icon"></span>
       <span data-type="method"></span>
-      <span data-type="catchTime"></span>
+      <span data-type="catchTime" data-format='{"day":"numeric","month":"short","year":"numeric"}'></span>
     </div>
 
     <div class="shiny-rate body-large">
