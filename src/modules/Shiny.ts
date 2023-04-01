@@ -2,7 +2,7 @@ import { Params } from './Params.js';
 import { Forme, Jeu, Pokemon, SpriteOptions, backendPokemon } from './Pokemon.js';
 import { Count, FrontendShiny } from './ShinyBackend.js';
 import { isSupportedPokemonLang, pokemonData } from './jsonData.js';
-import { getCurrentLang } from './translation.js';
+import { getCurrentLang, getString } from './translation.js';
 
 
 
@@ -58,7 +58,7 @@ export class Shiny extends FrontendShiny {
    */
   getEspece(): backendPokemon {
     const pokemon = pokemonData[this.dexid];
-    if (pokemon == null) throw `Aucun Pokémon ne correspond à ce Shiny (${this.name} / ${this.forme})`;
+    if (pokemon == null) throw getString('error-no-pokemon-corresponds').replace('{name}', this.name).replace('{forme}', this.forme);
     return pokemon;
   }
 
@@ -69,7 +69,7 @@ export class Shiny extends FrontendShiny {
     const pokemon = this.getEspece();
 
     const k = pokemon.formes.findIndex(p => p.dbid == this.forme);
-    if (k == -1) throw `La forme de ce Shiny est invalide (${this.name} / ${pokemon.name.fr} / ${this.forme})`;
+    if (k == -1) throw `${getString('error-invalid-forme')} (${this.name} / ${pokemon.name.fr} / ${this.forme})`;
     return pokemon.formes[k];
   }
 
@@ -136,7 +136,7 @@ export class Shiny extends FrontendShiny {
    */
   get jeuObj(): Jeu {
     let k = Pokemon.jeux.findIndex(p => p.uid == this.game);
-    if (k == -1) throw `Jeu invalide (${this.game})`;
+    if (k == -1) throw `${getString('error-invalid-game')} (${this.game})`;
 
     return Pokemon.jeux[k];
   }
@@ -173,7 +173,7 @@ export class Shiny extends FrontendShiny {
       const methodes = Shiny.methodes();
 
       let k = methodes.findIndex(p => p.id == this.method);
-      if (k == -1) throw `Méthode invalide (${this.method})`;
+      if (k == -1) throw `${getString('error-invalid-method')} (${this.method})`;
 
       const methode = methodes[k];
       let rolls = 1;

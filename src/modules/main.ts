@@ -26,6 +26,7 @@ import { dataStorage, friendStorage, huntStorage, shinyStorage } from './localFo
 import { navLinkBubble, navigate, sectionActuelle } from './navigate.js';
 import { Notif, warnBeforeDestruction } from './notification.js';
 import { requestSync } from './syncBackup.js';
+import { getString } from './translation.js';
 
 
 
@@ -139,9 +140,9 @@ document.querySelector('.fab')!.addEventListener('click', async () => {
         }
       }));
 
-      new Notif(`${username} a été ajouté à vos amis.`).prompt();
+      new Notif(getString('notif-added-friend').replace('{user}', username)).prompt();
     } else {
-      new Notif('Aucun profil public ne correspond à ce pseudo.').prompt();
+      new Notif(getString('error-no-profile')).prompt();
     }
   });
 }
@@ -183,7 +184,7 @@ document.querySelector('[data-action="export-json"]')!.addEventListener('click',
   try {
     export2json();
   } catch (error) {
-    const message = typeof error === 'string' ? error : `Erreur pendant l'export des données.`;
+    const message = typeof error === 'string' ? error : getString('error-export');
     console.error(error);
     new Notif(message).prompt();
   }
@@ -211,7 +212,7 @@ importInput.addEventListener('change', async event => {
   const button = document.querySelector('[data-action="delete-local-data"]');
   if (!(button instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
   button.addEventListener('click', async event => {
-    const userResponse = await warnBeforeDestruction(button, 'Êtes-vous sûr ? Toutes vos données seront supprimées de cet appareil.');
+    const userResponse = await warnBeforeDestruction(button, getString('notif-local-data-will-be-deleted'));
     if (!userResponse) return;
 
     button.disabled = true;
@@ -221,7 +222,7 @@ importInput.addEventListener('change', async event => {
     const friends = [...(await friendStorage.keys())];
     await Promise.all([shinyStorage.clear(), huntStorage.clear(), friendStorage.clear(), dataStorage.removeItem('user-profile')]);
 
-    new Notif('Données supprimées.').prompt();
+    new Notif(getString('notif-deleted-data')).prompt();
 
     window.dispatchEvent(new CustomEvent('dataupdate', {
       detail: {
@@ -249,7 +250,7 @@ importInput.addEventListener('change', async event => {
   const button = document.querySelector('[data-action="delete-backup"]');
   if (!(button instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
   button.addEventListener('click', async event => {
-    const userResponse = await warnBeforeDestruction(button, 'Êtes-vous sûr ? Toutes vos données en ligne seront supprimées.');
+    const userResponse = await warnBeforeDestruction(button, getString('notif-online-data-will-be-deleted'));
     if (!userResponse) return;
 
     button.disabled = true;
@@ -258,10 +259,10 @@ importInput.addEventListener('change', async event => {
     try {
       await callBackend('delete-user-data', undefined, true);
       Auth.signOutCallback();
-      new Notif('Données en ligne supprimées.').prompt();
+      new Notif(getString('notif-deleted-online-data')).prompt();
     } catch (error) {
       console.error(error);
-      new Notif('Erreur pendant la suppression des données en ligne.').prompt();
+      new Notif(getString('error-deleting-online-data')).prompt();
     }
 
     button.disabled = false;

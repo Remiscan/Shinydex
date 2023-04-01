@@ -1,3 +1,8 @@
+import { SupportedLang } from '../jsonData.js';
+import { getString, translationObserver } from '../translation.js';
+
+
+
 export const template = document.createElement('template');
 template.innerHTML = /*html*/`
   <svg viewBox="0 0 24 24" role="img" aria-labelledby="title">
@@ -28,6 +33,27 @@ export class shinyStars extends HTMLElement {
     this.shadow = this.attachShadow({ mode: 'open' });
     this.shadow.appendChild(template.content.cloneNode(true));
     this.shadow.adoptedStyleSheets = [sheet];
+  }
+
+  connectedCallback() {
+    translationObserver.serve(this, { method: 'attribute' });
+  }
+
+  disconnectedCallback() {
+    translationObserver.unserve(this);
+  }
+
+  static get observedAttributes() { return ['lang']; }
+
+  attributeChangedCallback(attr: string, oldValue: string | null, newValue: string | null) {
+    if (oldValue === newValue) return;
+
+    switch (attr) {
+      case 'lang': {
+        const title = this.shadow.querySelector('title');
+        if (title) title.innerHTML = getString('shiny', (newValue ?? '') as SupportedLang);
+      } break;
+    }
   }
 }
 

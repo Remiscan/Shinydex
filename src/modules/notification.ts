@@ -1,4 +1,6 @@
 import { Params } from './Params.js';
+import { getString } from './translation.js';
+import { translationObserver } from './translation.js';
 
 
 
@@ -9,10 +11,10 @@ template.innerHTML = /*html*/`
     <button type="button" class="snackbar-action surface interactive text-button only-text">
       <span class="label-large"></span>
     </button>
-    <button type="button" class="snackbar-dismiss surface interactive icon-button only-icon">
+    <button type="button" class="snackbar-dismiss surface interactive icon-button only-icon" data-label="button-close">
       <span class="material-icons">close</span>
     </button>
-    <load-spinner></load-spinner>
+    <load-spinner aria-hidden="true"></load-spinner>
   </div>
 `;
 
@@ -111,6 +113,7 @@ export class Notif {
   async prompt(): Promise<boolean> {
     const html = this.toHtml();
     notificationContainer?.appendChild(html);
+    translationObserver.translate(html as HTMLElement);
 
     const actionButton = html.querySelector('.snackbar-action');
     const dismissButton = html.querySelector('.snackbar-dismiss');
@@ -138,12 +141,12 @@ export class Notif {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Envoie une notification et attend confirmation de l'utilisateur avant de réaliser une action destructrice.
-export async function warnBeforeDestruction(bouton: Element, message: string = 'Supprimer définitivement ces données ?', icon: string = 'delete') {
+export async function warnBeforeDestruction(bouton: Element, message: string = getString('notif-warn-before-destruction'), icon: string = 'delete') {
   bouton.setAttribute('disabled', 'true');
-  const warning = `Êtes-vous sûr ? ${message}`;
+  const warning = `${getString('notif-are-you-sure')} ${message}`;
 
   const action = () => window.dispatchEvent(new Event('destructionconfirmed'));
-  const notification = new Notif(warning, undefined, 'Confirmer', action, true);
+  const notification = new Notif(warning, undefined, getString('notif-warn-before-destruction-label'), action, true);
 
   const userResponse = await notification.prompt();
   notification.remove();

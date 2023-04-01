@@ -14,19 +14,37 @@ export function getCurrentLang() {
 
 
 
-export function getString(id: string, lang: SupportedLang = getCurrentLang()): string {
+export type TranslatedString =
+  keyof typeof appStrings['fr'] |
+  `game/${keyof typeof gameStrings['fr']}` |
+  `method/${keyof typeof methodStrings['fr']}` |
+  `pokemon/${number}` |
+  `pokemon/${number}/forme/${string}`;
+
+export function getString(id: TranslatedString, lang: SupportedLang = getCurrentLang()): string {
   const parts = id.split('/');
   let strings: { [key: string]: { [key: string]: string} };
   switch (parts[0]) {
-    case 'method': strings = methodStrings; id = parts[1]; break;
-    case 'game': strings = gameStrings; id = parts[1]; break;
+    case 'method': strings = methodStrings; id = (parts[1] as TranslatedString); break;
+    case 'game': strings = gameStrings; id = (parts[1] as TranslatedString); break;
     case 'pokemon': {
       if (!isNaN(parseInt(parts[1]))) {
         const dexid = parseInt(parts[1]);
         if (parts[2] === 'forme') {
           const form = parts[3];
           const pkmn = new Pokemon(pokemonData[dexid]);
-          return pkmn.getFormeName(form, false, lang);
+
+          const modifier = parts[4];
+          let withName = false;
+          let withShiny = false;
+          if (modifier) {
+            const mods = modifier.split('-');
+            withName = mods.includes('name');
+            withShiny = mods.includes('shiny');
+          }
+          const string = pkmn.getFormeName(form, withName, lang);
+          if (withShiny) return getString('shiny-pokemon', lang).replace('Pokémon', string);
+          return string;
         } else if (parts.length === 2) {
           return pokemonData[dexid].name[lang] ?? 'undefined Pokémon name';
         }
@@ -66,20 +84,28 @@ class TranslationObserver extends TODef {
     // Translate all texts in the container
     let _container = container.shadowRoot ?? container;
     for (const e of [..._container.querySelectorAll('[data-string]')]) {
-      const stringKey = e.getAttribute('data-string') ?? '';
+      const stringKey = (e.getAttribute('data-string') ?? '') as TranslatedString;
       if (stringKey.length === 0) continue;
-      if (e.tagName == 'IMG') e.setAttribute('alt', getString(stringKey));
-      else                    e.innerHTML = getString(stringKey);
+      if (e.tagName == 'IMG') e.setAttribute('alt', getString(stringKey, currentLang));
+      else                    e.innerHTML = getString(stringKey, currentLang);
     }
     for (const e of [..._container.querySelectorAll('[data-label]')]) {
-      const stringKey = e.getAttribute('data-label') ?? '';
+      const stringKey = (e.getAttribute('data-label') ?? '') as TranslatedString;
       if (stringKey.length === 0) continue;
-      e.setAttribute('aria-label', getString(stringKey));
+      e.setAttribute('aria-label', getString(stringKey, currentLang));
     }
     for (const e of [..._container.querySelectorAll('[data-placeholder]')]) {
-      const stringKey = e.getAttribute('data-placeholder') ?? '';
+      const stringKey = (e.getAttribute('data-placeholder') ?? '') as TranslatedString;
       if (stringKey.length === 0) continue;
-      e.setAttribute('placeholder', getString(stringKey));
+      e.setAttribute('placeholder', getString(stringKey, currentLang));
+    }
+    for (const e of [..._container.querySelectorAll('[data-datetime]')]) {
+      const timestamp = e.getAttribute('data-datetime') ?? '0';
+      if (timestamp.length === 0) continue;
+      const string = new Intl
+        .DateTimeFormat(currentLang, JSON.parse(e.getAttribute('data-format') ?? '{}'))
+        .format(new Date(Number(timestamp)));
+      e.innerHTML = string;
     }
   }
 }

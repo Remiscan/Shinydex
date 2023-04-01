@@ -1,5 +1,5 @@
 import { noAccent } from '../../Params.js';
-import { translationObserver } from '../../translation.js';
+import { TranslatedString, translationObserver } from '../../translation.js';
 // @ts-expect-error
 import materialIconsSheet from '../../../../ext/material_icons.css' assert { type: 'css' };
 // @ts-expect-error
@@ -117,7 +117,7 @@ export class SearchBox extends HTMLElement {
         if (!isSearchableSection(value ?? '')) return;
 
         const input = this.shadow.querySelector('[name="search"]')!;
-        const placeholder = getString(`search-${value}`);
+        const placeholder = getString(`search-${value}` as TranslatedString);
         
         input.setAttribute('placeholder', placeholder);
         input.setAttribute('data-placeholder', `search-${value}`);

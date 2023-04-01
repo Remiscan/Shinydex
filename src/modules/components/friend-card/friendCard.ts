@@ -1,5 +1,5 @@
 import { friendStorage, localForageAPI } from '../../localForage.js';
-import { translationObserver } from '../../translation.js';
+import { getString, translationObserver } from '../../translation.js';
 import template from './template.js';
 // @ts-expect-error
 import materialIconsSheet from '../../../../ext/material_icons.css' assert { type: 'css' };
@@ -51,7 +51,7 @@ export class friendCard extends HTMLElement {
   };
   deleteHandler = (e: Event) => {
     e.stopPropagation();
-    warnBeforeDestruction(e.target as Element, `Retirer ${this.username} de votre liste d'amis ?`)
+    warnBeforeDestruction(e.target as Element, getString('notif-remove-friend').replace('{username}', this.username))
     .then(userResponse => { if (userResponse) this.delete(); });
   };
   navHandler = (event: Event) => {

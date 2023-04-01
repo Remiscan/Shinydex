@@ -1,4 +1,5 @@
 import { Params } from './Params.js';
+import { getString } from './translation.js';
 
 
 
@@ -22,7 +23,7 @@ export async function callBackend(request: string, data: BackendRequestData = {}
   });
 
   if (response.status != 200)
-    throw '[:(] Erreur ' + response.status + ' lors de la requête';
+    throw getString('error-fetch-status').replace('{status}', String(response.status));
 
   const clonedResponse = response.clone();
   try {

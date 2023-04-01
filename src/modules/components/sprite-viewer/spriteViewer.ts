@@ -1,8 +1,9 @@
 import { pad, wait } from '../../Params.js';
 import { Pokemon } from '../../Pokemon.js';
 import { Shiny } from '../../Shiny.js';
-import { pokemonData } from '../../jsonData.js';
+import { SupportedLang, pokemonData } from '../../jsonData.js';
 import { shinyStorage } from '../../localForage.js';
+import { TranslatedString, getString, translationObserver } from '../../translation.js';
 // @ts-expect-error
 import sheet from './styles.css' assert { type: 'css' };
 import template from './template.js';
@@ -134,11 +135,18 @@ export class spriteViewer extends HTMLElement {
       case 'size': {
         this.size = Number(value) || 512;
       } break;
+      case 'lang':
+        translationObserver.translate(this, value ?? '');
+        const switchSR = this.querySelector('shiny-switch');
+        switchSR?.setAttribute('label', getString('shiny-switch', (value ?? '') as SupportedLang));
+        break;
     }
   }
   
 
   connectedCallback() {
+    translationObserver.serve(this, { method: 'attribute' });
+
     this.appendChild(template.content.cloneNode(true));
     if (!(document.adoptedStyleSheets.includes(sheet))) {
       document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
@@ -159,6 +167,8 @@ export class spriteViewer extends HTMLElement {
   }
 
   disconnectedCallback() {
+    translationObserver.unserve(this);
+
     const form = this.querySelector('form[name="switch-shiny-regular"]');
     if (!(form instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
     form.removeEventListener('change', this.toggleShinyRegular);
@@ -172,7 +182,7 @@ export class spriteViewer extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ['dexid', 'shiny', 'size'];
+    return ['dexid', 'shiny', 'size', 'lang'];
   }
 
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {

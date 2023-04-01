@@ -1,10 +1,10 @@
 import { Hunt } from '../../Hunt.js';
-import { translationObserver } from '../../translation.js';
 import { Shiny } from '../../Shiny.js';
+import { computeShinyFilters } from '../../filtres.js';
 import { isSupportedLang, isSupportedMethodID, isSupportedPokemonLang, methodStrings, pokemonData } from '../../jsonData.js';
 import { huntStorage, localForageAPI, shinyStorage } from '../../localForage.js';
 import { Notif } from '../../notification.js';
-import { computeShinyFilters } from '../../filtres.js';
+import { TranslatedString, translationObserver } from '../../translation.js';
 import template from './template.js';
 // @ts-expect-error
 import materialIconsSheet from '../../../../ext/material_icons.css' assert { type: 'css' };
@@ -14,9 +14,9 @@ import iconSheet from '../../../../images/iconsheet.css' assert { type: 'css' };
 import themesSheet from '../../../../styles/themes.css.php' assert { type: 'css' };
 // @ts-expect-error
 import commonSheet from '../../../../styles/common.css' assert { type: 'css' };
+import { getCurrentLang, getString } from '../../translation.js';
 // @ts-expect-error
 import sheet from './styles.css' assert { type: 'css' };
-import { getCurrentLang, getString } from '../../translation.js';
 
 
 
@@ -111,7 +111,7 @@ export class shinyCard extends HTMLElement {
       }
 
       else if (shiny.game === 'letsgopikachu' || shiny.game === 'letsgoeevee') {
-        if (getProp('lgpe-nextSpawn')) parts.push(`<span data-string="bonus-lgpe-catchCombo-${getProp('lgpe-catchCombo')}">${getString("bonus-lgpe-catchCombo-${getProp('lgpe-catchCombo')}", lang)}</span>`);
+        if (getProp('lgpe-nextSpawn')) parts.push(`<span data-string="bonus-lgpe-catchCombo-${getProp('lgpe-catchCombo')}">${getString(`bonus-lgpe-catchCombo-${getProp('lgpe-catchCombo')}` as TranslatedString, lang)}</span>`);
         if (getProp('lgpe-lure')) parts.push(`<span data-string="bonus-lgpe-lure">${getString('bonus-lgpe-lure', lang)}</span>`);
       }
 
@@ -122,7 +122,7 @@ export class shinyCard extends HTMLElement {
       else if (shiny.game === 'legendsarceus') {
         const dexResearch = getProp('pla-dexResearch');
         const niv = dexResearch === 2 ? '100%' : dexResearch === 1 ? '10' : '9 ou -';
-        parts.push(`<span data-string="bonus-pla-dexResearch-${dexResearch}">${getString(`bonus-pla-dexResearch-${dexResearch}`, lang)}</span>`);
+        parts.push(`<span data-string="bonus-pla-dexResearch-${dexResearch}">${getString(`bonus-pla-dexResearch-${dexResearch}` as TranslatedString, lang)}</span>`);
       }
 
       else if (shiny.game === 'scarlet' || shiny.game === 'violet') {
@@ -131,7 +131,7 @@ export class shinyCard extends HTMLElement {
           const num = outbreakCleared === 2 ? 'Plus de 60'
                     : outbreakCleared === 1 ? '30 à 59'
                     : 'Moins de 29';
-          parts.push(`<span data-string="bonus-sv-outbreakCleared-${outbreakCleared}">${getString(`bonus-sv-outbreakCleared-${outbreakCleared}`, lang)}</span> <span data-string="bonus-sv-outbreakCleared-alt">${getString('bonus-sv-outbreakCleared-alt', lang)}</span>`);
+          parts.push(`<span data-string="bonus-sv-outbreakCleared-${outbreakCleared}">${getString(`bonus-sv-outbreakCleared-${outbreakCleared}` as TranslatedString, lang)}</span> <span data-string="bonus-sv-outbreakCleared-alt">${getString('bonus-sv-outbreakCleared-alt', lang)}</span>`);
         }
 
         if (getProp('sv-sparklingPower')) {
@@ -150,9 +150,10 @@ export class shinyCard extends HTMLElement {
       const time = shiny.catchTime;
       const element = this.shadow.querySelector('[data-type="catchTime"]')!;
       if (time > 825289200000) {
-        const date = new Intl.DateTimeFormat('fr-FR', {day: 'numeric', month: 'short', year: 'numeric'})
+        const date = new Intl.DateTimeFormat(lang, JSON.parse(element.getAttribute('data-format') ?? '{}'))
                              .format(new Date(time));
         element.innerHTML = date;
+        element.setAttribute('data-datetime', String(time));
       } else {
         // Si la date est avant la sortie du premier jeu Pokémon au Japon,
         // marquer la date comme inconnue.
@@ -165,6 +166,8 @@ export class shinyCard extends HTMLElement {
       const game = shiny.game;
       const element = this.shadow.querySelector('[data-type="game"]')!
       element.setAttribute('data-icon', `game/${game}`);
+      element.setAttribute('data-label', `game/${game}`);
+      element.setAttribute('aria-label', getString(`game/${game}` as TranslatedString));
     }
 
     // Ball
@@ -172,6 +175,8 @@ export class shinyCard extends HTMLElement {
       const ball = shiny.ball || '';
       const element = this.shadow.querySelector('[data-type="ball"]')!;
       element.setAttribute('data-icon', `ball/${ball}`);
+      element.setAttribute('data-label', `${ball}-ball`);
+      element.setAttribute('aria-label', getString(`${ball}-ball` as TranslatedString));
       if (ball) element.classList.remove('off');
       else      element.classList.add('off');
     }
@@ -188,6 +193,8 @@ export class shinyCard extends HTMLElement {
       const origin = shiny.appliedOriginMark;
       const element = this.shadow.querySelector('[data-type="originMark"]')!;
       element.setAttribute('data-icon', `origin-mark/${origin}`);
+      element.setAttribute('data-label', `legit-confirmed`);
+      element.setAttribute('aria-label', getString(`legit-confirmed`));
       if (origin) element.classList.remove('off');
       else        element.classList.add('off');
     }
@@ -309,14 +316,14 @@ export class shinyCard extends HTMLElement {
     try {
       let k = await huntStorage.getItem(this.huntid);
       if (k != null) {
-        throw `Ce Pokémon est déjà en cours de modification.`;
+        throw getString('error-already-editing');
       }
 
       const card = document.createElement('hunt-card');
       card.setAttribute('huntid', this.huntid);
 
       const hunt = await Hunt.getOrMake(this.huntid);
-      if (!(hunt instanceof Hunt)) throw new Error('Erreur lors de la création de la chasse à éditer');
+      if (!(hunt instanceof Hunt)) throw new Error(getString('error-creating-edit'));
       hunt.caught = true;
       await huntStorage.setItem(hunt.huntid, hunt);
 
@@ -332,7 +339,7 @@ export class shinyCard extends HTMLElement {
       if (!(navLink instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
       navLink.click();
     } catch (error) {
-      const message = (typeof error === 'string') ? error : `Erreur : impossible de modifier ce Pokémon.`;
+      const message = (typeof error === 'string') ? error : getString('error-cant-edit');
       console.error(error);
       if (previousEditNotification) previousEditNotification.remove();
       previousEditNotification = new Notif(message);
@@ -342,10 +349,7 @@ export class shinyCard extends HTMLElement {
 
 
   connectedCallback() {
-    /*if (!this.#translationObserved) {*/
-      translationObserver.serve(this, { method: 'attribute' });
-      /*this.#translationObserved = true;
-    }*/
+    translationObserver.serve(this, { method: 'attribute' });
 
     // Détecte le clic pour "ouvrir" la carte
     const openButton = this.shadow.querySelector('[data-action="open"]');

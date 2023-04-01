@@ -2,14 +2,14 @@
 
 Keep track of your shiny Pokémon collection by entering data about your hunts (for example your Pokémon's form and name, the game and method you used to hunt it, etc.).
 
-![List of the user's shiny Pokémon](https://user-images.githubusercontent.com/1685446/229228786-cf0b1535-c455-48ed-9187-9f8d8b35c5cd.jpg) ![Shiny hunt in progress](https://user-images.githubusercontent.com/1685446/229228794-3bec3d82-49c8-473a-b4f6-74f31cb6e041.jpg)
+![List of the user's shiny Pokémon](https://user-images.githubusercontent.com/1685446/229303666-b7af22c4-3f21-4ac9-8220-d31112f2bdc0.jpg) ![Shiny hunt in progress](https://user-images.githubusercontent.com/1685446/229303670-17362480-8f53-4c5e-b830-0506cd3b3e62.jpg)
 
 See how close you are to completing your shiny Pokédex, and see what every shiny Pokémon looks like.
 
-![Shiny Pokédex](https://user-images.githubusercontent.com/1685446/229228801-7739dc42-607c-4f45-a6fd-a10ddfb9103f.jpg) ![List of all shiny forms of a Pokémon](https://user-images.githubusercontent.com/1685446/229228810-2a796daa-322e-4d86-8f1a-16c074ad5c03.jpg)
+![Shiny Pokédex](https://user-images.githubusercontent.com/1685446/229303675-cd15bca7-6d0b-4257-9e50-abc8c13ea6d8.jpg) ![List of all shiny forms of a Pokémon](https://user-images.githubusercontent.com/1685446/229303678-080b20df-5caa-46a9-b5a6-c5632552138e.jpg)
 
 Share your collection with friends, and see their collections as well.
 
-![Friends list](https://user-images.githubusercontent.com/1685446/229228823-c605874f-17ca-4560-af17-2aac3fbf10ba.jpg)
+![Friends list](https://user-images.githubusercontent.com/1685446/229303680-68e93e8e-57b1-439d-8871-a7180571c094.jpg)
 
 Try it out at <https://remiscan.fr/shinydex/>.

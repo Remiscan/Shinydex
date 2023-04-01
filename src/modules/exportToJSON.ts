@@ -3,6 +3,7 @@ import { timestamp2date, wait } from "./Params.js";
 import { Shiny } from "./Shiny.js";
 import { dataStorage, huntStorage, localForageAPI, shinyStorage } from "./localForage.js";
 import { Notif } from "./notification.js";
+import { getString } from "./translation.js";
 import { updateDataFormat, upgradeStorage } from "./upgradeStorage.js";
 
 
@@ -10,16 +11,16 @@ import { updateDataFormat, upgradeStorage } from "./upgradeStorage.js";
 //////////////////////////////////////////////////////////
 // Peuple l'application avec les données d'un fichier JSON
 export async function json2import(file: File | Blob | undefined): Promise<string> {
-  if (file == null) return 'Aucun fichier choisi';
+  if (file == null) return getString('error-import-no-file');
 
   return await new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.addEventListener('load', async (event: ProgressEvent)  => {
       const importedData = typeof reader.result === 'string' ? JSON.parse(reader.result) : reader.result;
       if (!('shiny' in importedData) || !('hunts' in importedData))
-        return reject(`Le fichier importé n'est pas structuré correctement.`);
+        return reject(getString('error-import-structure'));
 
-      const notification = new Notif('Mise à jour des données...', Notif.maxDelay, undefined, undefined, false);
+      const notification = new Notif(getString('notif-updating-data'), Notif.maxDelay, undefined, undefined, false);
       notification.prompt();
       notification.element?.classList.add('loading');
       notification.dismissable = false;
@@ -60,7 +61,7 @@ export async function json2import(file: File | Blob | undefined): Promise<string
       notification.dismissable = true;
       notification.remove();
 
-      return resolve(`Fichier correctement importé !`);
+      return resolve(getString('notif-import'));
     });
     reader.readAsText(file);
   });

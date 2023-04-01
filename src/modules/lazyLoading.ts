@@ -4,6 +4,7 @@
 
 import { computeShinyFilters } from "./filtres.js";
 import { Shiny } from "./Shiny.js";
+import { getCurrentLang } from "./translation.js";
 
 
 
@@ -69,6 +70,8 @@ virtualizedSections.forEach(section => {
           for (const filter of filterKeys) {
             replacement.setAttribute(`data-${filter}`, entry.target.getAttribute(`data-${filter}`) ?? '');
           }
+
+          replacement.setAttribute('lang', getCurrentLang());
 
           entry.target.parentElement?.replaceChild(replacement, entry.target);
           loader.observe(replacement);
