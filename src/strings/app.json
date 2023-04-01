@@ -1,5 +1,7 @@
 {
   "fr": {
+    "shiny": "chromatique",
+
     "section-mes-chromatiques-short-title": "Pokémon <shiny-stars></shiny-stars>",
     "section-mes-chromatiques-long-title": "Mes Pokémon <shiny-stars></shiny-stars>",
     "section-mes-chromatiques-message-vide": "Vous n'avez enregistré aucun Pokémon chromatique.",
@@ -295,6 +297,8 @@
   },
 
   "en": {
+    "shiny": "shiny",
+
     "section-mes-chromatiques-short-title": "Pokémon <shiny-stars></shiny-stars>",
     "section-mes-chromatiques-long-title": "My Pokémon <shiny-stars></shiny-stars>",
     "section-mes-chromatiques-message-vide": "You did not add any Pokémon.",
