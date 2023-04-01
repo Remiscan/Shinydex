@@ -44,26 +44,42 @@ const resizor = new ResizeObserver((entries: ResizeObserverEntry[]) => {
 });
 
 /** Manually sets an element as hidden or visible depending on whether it intersects the viewport. */
-export const virtualizedSections: string[] = ['mes-chromatiques', 'corbeille', 'chromatiques-ami'];
+export const virtualizedSections: string[] = ['mes-chromatiques', 'corbeille', 'chromatiques-ami', 'pokedex'];
 const manualLoaders: Map<string, IntersectionObserver> = new Map();
 const elementStorage: Map< string, Map<string, Element> > = new Map();
 
 virtualizedSections.forEach(section => {
-  const filterKeys = Object.keys(computeShinyFilters(new Shiny()));
   const storage = new Map();
   elementStorage.set(section, storage);
+
+  let filterKeys: string[];
+  let elementAttribute: string;
+  let rootMargin: number;
+  switch (section) {
+    case 'pokedex':
+      filterKeys = ['caught'];
+      elementAttribute = 'dexid';
+      rootMargin = 256;
+      break;
+
+    default:
+      filterKeys = Object.keys(computeShinyFilters(new Shiny()));
+      elementAttribute = 'huntid';
+      rootMargin = 256;
+      break;
+  }
 
   const loader = new IntersectionObserver((entries: IntersectionObserverEntry[]) => {
     for (const entry of entries) {
       if (!(entry.target instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
       if (entry.isIntersecting) {
-        //entry.target.setAttribute('data-rendered', 'visible');
         const elementName = entry.target.getAttribute('data-replaces');
-        const elementId = entry.target.getAttribute('data-huntid');
+        const elementId = entry.target.getAttribute(`data-${elementAttribute}`);
+
         if (elementName && elementId) {
           const replacement = storage.get(elementId) ?? document.createElement(elementName);
-          if (!replacement.getAttribute('huntid')) {
-            replacement.setAttribute('huntid', elementId);
+          if (!replacement.getAttribute(elementAttribute)) {
+            replacement.setAttribute(elementAttribute, elementId);
           }
 
           replacement.setAttribute('style', entry.target.getAttribute('style') ?? '');
@@ -78,9 +94,9 @@ virtualizedSections.forEach(section => {
           loader.observe(replacement);
         }
       } else {
-        //entry.target.setAttribute('data-rendered', 'hidden');
         const elementName = entry.target.tagName.toLowerCase();
-        const elementId = entry.target.getAttribute('huntid');
+        const elementId = entry.target.getAttribute(elementAttribute);
+
         if (elementName && elementId) {
           if ((entry.target as HTMLElement & {obsolete: boolean}).obsolete) {
             storage.delete(elementId);
@@ -89,8 +105,7 @@ virtualizedSections.forEach(section => {
 
             const replacement = document.createElement('div');
             replacement.setAttribute('data-replaces', elementName);
-            replacement.setAttribute('data-huntid', elementId);
-            replacement.classList.add('surface', 'variant', 'elevation-0');
+            replacement.setAttribute(`data-${elementAttribute}`, elementId);
 
             replacement.setAttribute('style', entry.target.getAttribute('style') ?? '');
             for (const filter of filterKeys) {
@@ -105,7 +120,7 @@ virtualizedSections.forEach(section => {
     }
   }, {
     root: document.querySelector(`#${section} > .section-contenu`),
-    rootMargin: '256px 0px 256px 0px'
+    rootMargin: `${rootMargin}px 0px ${rootMargin}px 0px`
   });
 
   manualLoaders.set(section, loader);
@@ -134,7 +149,15 @@ export function lazyLoad(element: Element, method: LazyLoadingMethod = 'auto', {
 
 /** Virtualizes a section's list of cards. */
 export function lazyLoadSection(section: string) {
-  const cards = [...(document.querySelector(`#${section} .liste-cartes`)?.children ?? [])];
+  let cards: Element[];
+  switch (section) {
+    case 'pokedex':
+      cards = [...(document.querySelectorAll(`#${section} :is(dex-icon, [data-replaces="dex-icon"])`) ?? [])];
+      break;
+
+    default:
+      cards = [...(document.querySelector(`#${section} .liste-cartes`)?.children ?? [])];
+  }
   if (cards) cards.forEach((card: Element) => lazyLoad(card, 'manual', { fixedSize: true}));
 }
 

@@ -8,6 +8,7 @@ import { appStart, checkUpdate } from './appLifeCycle.js';
 import * as Auth from './auth.js';
 import { callBackend } from './callBackend.js';
 import './components/corbeille-card/corbeilleCard.js';
+import './components/dexIcon.js';
 import './components/filter-menu/filterMenu.js';
 import './components/friend-card/friendCard.js';
 import './components/friend-shiny-card/friendShinyCard.js';

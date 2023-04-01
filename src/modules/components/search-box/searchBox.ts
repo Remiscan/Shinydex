@@ -58,8 +58,8 @@ export class SearchBox extends HTMLElement {
 
     let cardSelector = ':is(shiny-card, [data-replaces="shiny-card"])';
     switch (section) {
-      case 'pokedex': cardSelector = '.dex-icon'; break;
-      case 'chasses-en-cours': cardSelector = 'hunt-card'; break;
+      case 'pokedex': cardSelector = ':is(dex-icon, [data-replaces="dex-icon"])'; break;
+      case 'chasses-en-cours': cardSelector = ':is(hunt-card, [data-replaces="hunt-card"])'; break;
       case 'corbeille': cardSelector = ':is(corbeille-card, [data-replaces="corbeille-card"])'; break;
       case 'partage': cardSelector = ':is(friend-card, [data-replaces="friend-card"])'; break;
       case 'chromatiques-ami': cardSelector = ':is(friend-shiny-card, [data-replaces="friend-shiny-card"])'; break;
@@ -71,7 +71,7 @@ export class SearchBox extends HTMLElement {
     if (search.length > 0) {
       if (section === 'pokedex') {
         if (!isNaN(parseFloat(search))) {
-          selector = `:not([data-dexid="${parseFloat(search)}"])`;
+          selector = `:not([dexid="${parseFloat(search)}"]):not([data-dexid="${parseFloat(search)}"])`;
           css += `#${section} ${cardSelector}${selector} { display: none; }`;
         } else {
           const names = Pokemon.names();
@@ -81,7 +81,7 @@ export class SearchBox extends HTMLElement {
             const simplifiedName = noAccent(name).toLowerCase();
             if (simplifiedName.includes(search)) dexids.push(dexid);
           });
-          selector = dexids.map(dexid => `:not([data-dexid="${dexid}"])`).join('');
+          selector = dexids.map(dexid => `:not([dexid="${dexid}"]):not([data-dexid="${dexid}"])`).join('');
           css += `#${section} ${cardSelector}${selector} { display: none; }`;
         }
       } else if (section === 'partage') {

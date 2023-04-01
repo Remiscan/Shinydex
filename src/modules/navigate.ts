@@ -514,8 +514,8 @@ async function animateFabIcon(ancienneSection: Section, nouvelleSection: Section
   if (fabIcon && animate) {
     const deg = (k2 >= k1) ? '-90deg' : '+90deg';
     animFabIcon.end = fabIcon.animate([
-      { transform: 'translate3D(0, 0, 0) rotate(' + deg + ')', opacity: '0' },
-      { transform: 'translate3D(0, 0, 0) rotate(0)', opacity: '1' }
+      { transform: 'rotate(' + deg + ')', opacity: '0' },
+      { transform: 'rotate(0)', opacity: '1' }
     ], {
       easing: Params.easingDecelerate,
       duration: 100,

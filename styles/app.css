@@ -395,6 +395,10 @@ section.loading .compteur {
   --decalage: 0;
 }
 
+.fab > .material-icons {
+  backface-visibility: hidden;
+}
+
 .fab.notif {
   --decalage: calc(-1 * var(--bottom-bar-height));
   transition: transform .15s var(--easing-decelerate);
@@ -431,6 +435,10 @@ section.loading .compteur {
 !!!!! CARTE D'UN POKÉMON !!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
+div[data-replaces] {
+  border-radius: var(--border-radius);
+}
+
 div[data-replaces="shiny-card"],
 div[data-replaces="friend-shiny-card"],
 div[data-replaces="corbeille-card"],
@@ -444,15 +452,13 @@ corbeille-card {
   min-height: 120px;
 }
 
-div[data-replaces] {
-  border-radius: var(--border-radius);
-}
-
+div[data-replaces="friend-card"],
 friend-card {
   content-visibility: auto;
   contain-intrinsic-height: 126px;
 }
 
+div[data-replaces="hunt-card"],
 hunt-card {
   content-visibility: auto;
   contain-intrinsic-height: auto 400px;
@@ -566,38 +572,38 @@ section.loading .message-vide {
   contain-intrinsic-height: calc(var(--rows) * 44px + (var(--rows) - 1) * 8px);
 }
 
-.dex-icon {
+div[data-replaces="dex-icon"],
+dex-icon {
   display: grid;
   place-items: center;
   border-radius: calc(.5 * var(--border-radius));
   position: relative;
-  /*content-visibility: auto;
-  contain-intrinsic-size: 44px 44px;
-  contain: size layout paint;*/
+  width: 44px;
+  height: 44px;
 
   --surface-color: var(--surface);
   --elevation-opacity: var(--elevation-2-opacity);
   --state-tint: var(--on-primary);
 }
 
-.dex-icon:not(.got) {
+dex-icon:not([data-caught="true"]) {
   --surface-opacity: 0;
 }
 
-.dex-icon:not(.got):not(:hover, :focus, :active) {
+dex-icon:not([data-caught="true"]):not(:hover, :focus, :active) {
   --elevation-opacity: 0;
 }
 
-.dex-icon.got {
+dex-icon[data-caught="true"] {
   --surface-color: var(--primary-container);
   --state-tint: var(--on-primary-container);
 }
 
-.dex-icon .pkmnicon {
+dex-icon .pkmnicon {
   outline-offset: -1px;
 }
 
-.dex-icon:not(.got) .pkmnicon {
+dex-icon:not([data-caught="true"]) .pkmnicon {
   filter: grayscale(.95) brightness(var(--pkmnicon-brightness));
 }
 
@@ -621,8 +627,8 @@ section:not([data-filter-legit~="false"]) [data-legit="false"] {
   display: none;
 }
 
-#pokedex:not([data-filter-caught~="true"]) .dex-icon.got,
-#pokedex:not([data-filter-caught~="false"]) .dex-icon:not(.got) {
+#pokedex:not([data-filter-caught~="true"]) [data-caught="true"],
+#pokedex:not([data-filter-caught~="false"]) [data-caught="false"] {
   display: none;
 }
 

@@ -7,9 +7,6 @@ import { shinyCard } from './components/shiny-card/shinyCard.js';
 import { PopulatableSection, ShinyFilterData, computeFilters, computeOrders, isOrdre, orderCards, populatableSections, updateCounters } from './filtres.js';
 import { clearElementStorage, lazyLoadSection, virtualizedSections } from './lazyLoading.js';
 import { friendShinyStorage, friendStorage, huntStorage, localForageAPI, shinyStorage } from './localForage.js';
-import { navigate } from './navigate.js';
-import { Notif } from './notification.js';
-import { getString } from './translation.js';
 
 
 
@@ -273,44 +270,27 @@ export function initPokedex() {
     }
   });
 
-  let gensToPopulate = [];
-  const generations = Pokemon.generations;
+  const genBlockTemplate = document.createElement('template');
+  genBlockTemplate.innerHTML = /*html*/`
+    <div class="pokedex-gen surface variant elevation-0"></div>
+  `;
 
+  const pokedex = new DocumentFragment();
+
+  const generations = Pokemon.generations;
   for (const gen of generations) {
-    let monsToPopulate = [];
-    const genConteneur = document.createElement('div');
-    genConteneur.classList.add('pokedex-gen', 'surface', 'variant', 'elevation-0');
-    const allNames = Pokemon.names();
+    const genBlock = genBlockTemplate.content.cloneNode(true) as DocumentFragment;
+    const genContainer = genBlock.querySelector('.pokedex-gen')!;
 
     for (let i = gen.start; i <= gen.end; i++) {
-      const pkmnContainer = document.createElement('span');
-      pkmnContainer.classList.add('dex-icon', 'surface', 'interactive');
-      pkmnContainer.setAttribute('data-dexid', String(i));
-
-      const pkmn = document.createElement('button');
-      pkmn.setAttribute('type', 'button');
-      pkmn.setAttribute('aria-label', allNames[i]);
-      pkmn.setAttribute('data-label', `pokemon/${i}`);
-      pkmn.classList.add('pkmnicon');
-      pkmn.setAttribute('data-dexid', String(i));
-      pkmn.addEventListener('click', event => {
-        try {
-          navigate('sprite-viewer', event, { dexid: String(i) });
-        } catch (error) {
-          const message = getString('error-cant-display-pokemon');
-          console.error(message, error);
-          new Notif(message).prompt();
-        }
-      });
-
-      pkmnContainer.appendChild(pkmn);
-      //lazyLoad(pkmn, 'manual');
-      monsToPopulate.push(pkmnContainer);
+      const pkmnIcon = document.createElement('div');
+      pkmnIcon.setAttribute('data-replaces', 'dex-icon');
+      pkmnIcon.setAttribute('data-dexid', String(i));
+      genContainer?.appendChild(pkmnIcon);
     }
 
-    for (let pkmn of monsToPopulate) { genConteneur.appendChild(pkmn); }
-    gensToPopulate.push(genConteneur);
-    observer.observe(genConteneur);
+    pokedex.appendChild(genBlock);
+    observer.observe(genContainer);
   }
 
   // Peuple le Pokédex
@@ -318,10 +298,7 @@ export function initPokedex() {
   if (!(section instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
   const conteneur = section.querySelector('.liste-cartes');
   if (!(conteneur instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
-  for (let genConteneur of gensToPopulate) {
-    conteneur.appendChild(genConteneur);
-    //lazyLoad(genConteneur);
-  }
+  conteneur.appendChild(pokedex);
 
   // Peuple le compteur total de Pokémon dans le Pokédex
   const totalPokemon = generations[generations.length - 1].end;
@@ -329,6 +306,7 @@ export function initPokedex() {
   if (totalCounter) totalCounter.innerHTML = String(totalPokemon);
 
   pokedexInitialized = true;
+  lazyLoadSection('pokedex');
   return;
 }
 
