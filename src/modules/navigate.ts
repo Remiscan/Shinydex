@@ -6,7 +6,7 @@ import { FilterMenu } from './components/filter-menu/filterMenu.js';
 import { clearElementStorage } from './lazyLoading.js';
 import { friendShinyStorage } from './localForage.js';
 import { Notif } from './notification.js';
-import { getString } from './translation.js';
+import { TranslatedString, getString } from './translation.js';
 
 
 
@@ -500,7 +500,16 @@ async function animateFabIcon(ancienneSection: Section, nouvelleSection: Section
     await wait(animFabIcon.start);
   }
 
-  if (nouvelleSection.fab) fabIcon.innerHTML = nouvelleSection.fab || '';
+  if (nouvelleSection.fab) {
+    fabIcon.innerHTML = nouvelleSection.fab || '';
+    let labelKey;
+    switch (nouvelleSection.nom) {
+      case 'partage' : labelKey = 'fab-friend'; break;
+      default: labelKey = 'fab-pokemon';
+    }
+    fab.setAttribute('data-label', labelKey);
+    fab.setAttribute('aria-label', getString(labelKey as TranslatedString));
+  }
   
   if (fabIcon && animate) {
     const deg = (k2 >= k1) ? '-90deg' : '+90deg';

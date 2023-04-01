@@ -105,10 +105,6 @@ $httpLanguage = $translation->getLanguage();
       <search-box section="corbeille"></search-box>
       <search-box section="partage"></search-box>
       <search-box section="chromatiques-ami"></search-box>
-      
-      <a class="nav-link lien-section search-button" data-nav-section="obfuscator" data-nav-data='{ "search": true }' href="#" style="display: none">
-        <span class="material-icons">search</span>
-      </a>
 
       <a class="nav-link lien-section surface interactive" data-nav-section="mes-chromatiques" href="./mes-chromatiques">
         <span class="material-icons surface" aria-hidden="true">catching_pokemon</span>
@@ -151,8 +147,8 @@ $httpLanguage = $translation->getLanguage();
     <main class="surface primary">
 
       <!-- FAB -->
-      <button type="button" class="surface interactive fab shadow only-icon">
-        <span class="material-icons">add</span>
+      <button type="button" class="surface interactive fab shadow only-icon" data-label="fab-pokemon">
+        <span class="material-icons" aria-hidden="true">add</span>
       </button>
 
       <!-- Mes chromatiques -->
@@ -236,12 +232,12 @@ $httpLanguage = $translation->getLanguage();
             minlength="1" maxlength="20"
             data-placeholder="add-friend-placeholder">
 
-          <button type="reset" class="surface interactive icon-button only-icon reset-icon">
-            <span class="material-icons">close</span>
+          <button type="reset" class="surface interactive icon-button only-icon reset-icon" data-label="reset-search">
+            <span class="material-icons" aria-hidden="true">close</span>
           </button>
 
-          <button type="submit" class="surface interactive filled tonal only-icon">
-            <span class="material-icons">search</span>
+          <button type="submit" class="surface interactive filled tonal only-icon" data-label="submit-search">
+            <span class="material-icons" aria-hidden="true">search</span>
           </button>
         </form>
       </div>

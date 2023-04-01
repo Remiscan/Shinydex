@@ -6,13 +6,13 @@
 
   <div class="titre-icones">
     <!-- Bouton installer -->
-    <button type="button" class="surface interactive icon-button only-icon off" data-action="install-app">
-      <span class="material-icons">get_app</span>
+    <button type="button" class="surface interactive icon-button only-icon off" data-action="install-app" data-label="install-app">
+      <span class="material-icons" aria-hidden="true">get_app</span>
     </button>
     <!-- Bouton paramètres -->
-    <a class="icon-button surface interactive" data-nav-section="parametres" href="./parametres">
-      <span class="material-icons">settings</span>
-      <sync-progress></sync-progress>
+    <a class="icon-button surface interactive" data-nav-section="parametres" href="./parametres" data-label="section-parametres-short-title">
+      <span class="material-icons" aria-hidden="true">settings</span>
+      <sync-progress aria-hidden="true"></sync-progress>
     </a>
   </div>
 </header>
@@ -21,19 +21,19 @@
 
   <!-- Message affiché quand liste vide -->
   <div class="message-vide">
-    <span class="material-icons">error_outline</span>
+    <span class="material-icons" aria-hidden="true">error_outline</span>
     <span data-string="section-mes-chromatiques-message-vide"></span>
   </div>
 
   <!-- Message affiché quand liste filtrée vide -->
   <div class="message-vide-filtres">
-    <span class="material-icons">error_outline</span>
+    <span class="material-icons" aria-hidden="true">error_outline</span>
     <span data-string="section-message-vide-filtres"></span>
   </div>
 
   <!-- Message affiché quand liste filtrée par recherche vide -->
   <div class="message-vide-recherche">
-    <span class="material-icons">error_outline</span>
+    <span class="material-icons" aria-hidden="true">error_outline</span>
     <span data-string="section-message-vide-recherche"></span>
   </div>
 
