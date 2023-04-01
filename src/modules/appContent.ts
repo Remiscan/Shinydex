@@ -288,6 +288,7 @@ export function initPokedex() {
       const pkmn = document.createElement('button');
       pkmn.setAttribute('type', 'button');
       pkmn.setAttribute('aria-label', allNames[i]);
+      pkmn.setAttribute('data-label', `pokemon/${i}`);
       pkmn.classList.add('pkmnicon');
       pkmn.setAttribute('data-dexid', String(i));
       pkmn.addEventListener('click', event => {
