@@ -153,7 +153,7 @@ export class syncProgress extends HTMLElement {
       else if (newValue == 'success') {
         this.loadingAnim.pause();
 
-        const offset = ((this.loadingAnim.currentTime || 0) % loadingDuration < .5 * loadingDuration) ? '0' : '-202px';
+        const offset = (Number(this.loadingAnim.currentTime || 0) % loadingDuration < .5 * loadingDuration) ? '0' : '-202px';
         this.successAnim = progressLine.animate([
           { strokeDashoffset: offset, stroke: 'rgb(var(--success))' }
         ], {
@@ -170,7 +170,7 @@ export class syncProgress extends HTMLElement {
       else if (newValue == 'failure') {
         this.loadingAnim.pause();
 
-        const offset = ((this.loadingAnim.currentTime || 0) % loadingDuration < .5 * loadingDuration) ? '0' : '-202px';
+        const offset = (Number(this.loadingAnim.currentTime || 0) % loadingDuration < .5 * loadingDuration) ? '0' : '-202px';
         this.failureAnim = progressLine.animate([
           { strokeDashoffset: offset, stroke: 'rgb(var(--error))' }
         ], {
@@ -187,7 +187,7 @@ export class syncProgress extends HTMLElement {
       else if (newValue == 'lazy') {
         this.loadingAnim.pause();
 
-        const offset = ((this.loadingAnim.currentTime || 0) % loadingDuration < .5 * loadingDuration) ? '-101px' : '-101px';
+        const offset = (Number(this.loadingAnim.currentTime || 0) % loadingDuration < .5 * loadingDuration) ? '-101px' : '-101px';
         this.lazyAnim = progressLine.animate([
           { strokeDashoffset: offset }
         ], {
@@ -234,7 +234,7 @@ export class syncProgress extends HTMLElement {
         this.disappear.pause();
 
         if (this.state == 'success') {
-          setTimeout(() => this.disappear.play(), 3000);
+          setTimeout(() => this.disappear.play(), 1000);
           this.disappear.onfinish = () => {
             this.bye.play();
             this.bye.onfinish = () => { this.removeAttribute('state'); this.bye.cancel(); this.disappear.cancel(); };
@@ -250,7 +250,7 @@ export class syncProgress extends HTMLElement {
         }
 
         else {
-          setTimeout(() => this.bye.play(), 3000);
+          setTimeout(() => this.bye.play(), 1000);
           this.bye.onfinish = () => { this.removeAttribute('state'); this.bye.cancel(); this.disappear.cancel(); };
         }
       }
