@@ -162,9 +162,9 @@ export function filterPokedex(dexids: Set<number>) {
   const generations = Pokemon.generations;
   const dexidMax = generations[generations.length - 1].end;
   for (let i = 1; i <= dexidMax; i++) {
-    const icon = document.querySelector(`#pokedex span[data-dexid="${i}"]`);
-    if (dexids.has(i)) icon?.classList.add('got');
-    else               icon?.classList.remove('got');
+    const icon = document.querySelector(`#pokedex [dexid="${i}"], #pokedex [data-replaces="dex-icon"][data-dexid="${i}"]`);
+    if (dexids.has(i)) icon?.setAttribute('data-caught', 'true');
+    else               icon?.setAttribute('data-caught', 'false');
   }
 }
 

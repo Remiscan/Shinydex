@@ -44,6 +44,7 @@
         "./dist/modules/components/checkBox.js",
         "./dist/modules/components/corbeille-card/corbeilleCard.js",
         "./dist/modules/components/customInput.js",
+        "./dist/modules/components/dexIcon.js",
         "./dist/modules/components/filter-menu/filterMenu.js",
         "./dist/modules/components/filter-menu/styles.css",
         "./dist/modules/components/filter-menu/template.js",
