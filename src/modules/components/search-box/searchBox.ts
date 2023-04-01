@@ -124,6 +124,10 @@ export class SearchBox extends HTMLElement {
         input.setAttribute('label', placeholder);
         input.setAttribute('data-label', `search-${value}`);
 
+        const label = this.shadow.querySelector('label[for="search"]');
+        label?.setAttribute('aria-label', placeholder);
+        label?.setAttribute('data-label', `search-${value}`);
+
         const filterMenuLink = this.shadow.querySelector('[data-nav-section="filter-menu"]');
         let sectionToFilter = value;
         if (value === 'pokedex') sectionToFilter = 'mes-chromatiques';

@@ -163,6 +163,7 @@ export async function populateFromData(section: PopulatableSection, ids: string[
           card = document.createElement(elementName) as shinyCard | huntCard;
           card.setAttribute('huntid', huntid);
         }
+        card.setAttribute('role', 'listitem');
         
         const cardFilters = filterMap.get(huntid);
         if (cardFilters) {
@@ -226,6 +227,7 @@ async function populateFriendsList(usernames: string[]): Promise<PromiseSettledR
         // DANS LA BDD & SANS CARTE = Créer
         card = document.createElement(elementName) as friendCard;
         card.setAttribute('username', username);
+        card.setAttribute('role', 'listitem');
         cardsToCreate.push(card);
       } else {
         // DANS LA BDD & AVEC CARTE = Éditer

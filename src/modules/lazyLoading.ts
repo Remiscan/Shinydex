@@ -72,6 +72,7 @@ virtualizedSections.forEach(section => {
           }
 
           replacement.setAttribute('lang', getCurrentLang());
+          replacement.setAttribute('role', entry.target.getAttribute('role'));
 
           entry.target.parentElement?.replaceChild(replacement, entry.target);
           loader.observe(replacement);
