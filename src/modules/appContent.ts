@@ -171,9 +171,9 @@ export async function populateFromData(section: PopulatableSection, ids: string[
         cardsToCreate.push(card);
       } else {
         // DANS LA BDD & AVEC CARTE = Éditer
-        if (!virtualize || card instanceof huntCard) await (card as shinyCard | huntCard).dataToContent();
+        if (!virtualize) await (card as shinyCard | huntCard).dataToContent();
         else {
-          if (card instanceof shinyCard) {
+          if (card instanceof shinyCard || card instanceof huntCard) {
             card.dataToContent();
             card.needsRefresh = false;
           } else {
@@ -195,9 +195,6 @@ export async function populateFromData(section: PopulatableSection, ids: string[
   // (après la préparation pour optimiser le temps d'exécution)
   for (const card of cardsToCreate) {
     conteneur.appendChild(card);
-    if (section === 'chasses-en-cours') {
-      await (card as shinyCard | huntCard).dataToContent();
-    }
   }
 
   return results;

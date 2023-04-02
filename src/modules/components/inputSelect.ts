@@ -219,7 +219,7 @@ function maintainScrollVisibility(activeElement: HTMLElement, scrollParent: HTML
 export class InputSelect extends TextField {
   static template = template;
   static sheets = [...TextField.sheets, sheet];
-  static attributes = ['disabled', 'multiple', 'name', 'required', 'size', 'value', 'lang'];
+  static attributes = ['disabled', 'multiple', 'name', 'required', 'size', 'value', 'default-label', 'lang'];
   static defaultValue = 'null';
   static defaultLabel = '⋯'; // label displayed on the button when no option is selected
   #initialSlotsAssigned = false; // to check if options need to be generated from slot in connectedCallback
@@ -711,6 +711,14 @@ export class InputSelect extends TextField {
     switch (attr) {
       case 'lang':
         translationObserver.translate(this, newValue ?? '');
+        break;
+
+      case 'default-label':
+        const currentLabelIsDefault = !(this.labels.get(this.value));
+        if (currentLabelIsDefault) {
+          const button = this.button;
+          if (button) button.innerHTML = this.defaultLabel;
+        }
         break;
 
       default:

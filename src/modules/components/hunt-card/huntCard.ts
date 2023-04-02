@@ -1,5 +1,5 @@
 import { DexDatalist } from '../../DexDatalist.js';
-import { Hunt, huntedPokemon } from '../../Hunt.js';
+import { Hunt } from '../../Hunt.js';
 import { Forme, Pokemon } from '../../Pokemon.js';
 import { Count, Shiny } from '../../Shiny.js';
 import { huntStorage, shinyStorage } from '../../localForage.js';
@@ -22,6 +22,7 @@ import { gameStrings, isSupportedGameID, isSupportedLang, isSupportedMethodID, m
 import { CheckBox } from '../checkBox.js';
 // @ts-expect-error
 import sheet from './styles.css' assert { type: 'css' };
+import { capitalizeFirstLetter } from '../../Params.js';
 
 
 
@@ -34,64 +35,248 @@ gameSpecificSheet.replaceSync(`
 `);
 
 
-const compteurProps: Array<keyof Shiny['count']> = ['usum-distance', 'usum-rings', 'lgpe-catchCombo', 'lgpe-lure', 'lgpe-nextSpawn', 'swsh-dexKo', 'pla-dexResearch', 'sv-outbreakCleared', 'sv-sparklingPower'];
+const compteurProps = Object.keys(new Shiny().count).filter(e => {
+  return !(['encounters'].includes(e));
+}) as Array<keyof Shiny['count']>;
 
 
 
-interface HuntUpdateEvent extends CustomEvent {
-  detail: {
-    shiny: huntedPokemon;
-  }
-}
-
-declare global {
-  interface HTMLElementEventMap {
-    huntupdate: HuntUpdateEvent;
-  }
-}
-
-
-
-type huntProperty = keyof Hunt;
-
-interface Handler {
-  element: Element | null;
-  type: string;
-  function: (e: Event) => void;
-}
-
-interface HandlerMap {
-  [name: string]: Handler
-}
-
-function handle(handler: Handler) {
-  handler.element?.addEventListener(handler.type, handler.function);
-}
-
-function unhandle(handler: Handler) {
-  handler.element?.removeEventListener(handler.type, handler.function);
-}
+type Handler = {
+  element: Element,
+  type: string,
+  callback: (e: Event) => void
+};
 
 
 
 export class huntCard extends HTMLElement {
-  shadow: ShadowRoot;
-  huntid: string = '';
-  pokemon?: Pokemon;
-  handlers: HandlerMap = {};
-  changeNonce: Object = {};
+  #shadow: ShadowRoot;
+  #huntid: string = '';
+  #handlers: Handler[] = [];
+  #changeNonce: Object = {};
+  needsRefresh = true;
+
+
+  /** Adds 1 encounter. */
+  #counterAddHandler = (event: Event) => {
+    const inputCompteur = this.getInput('count');
+    if (!(inputCompteur instanceof TextField)) throw new TypeError(`Expecting TextField`);
+
+    const value = Number(inputCompteur.value);
+    const newValue = Math.min(value + 1, 999999);
+    inputCompteur.value = String(newValue);
+    this.form.dispatchEvent(new Event('change'));
+  };
+
+
+  /** Substracts 1 encounter. */
+  #counterSubHandler = (event: Event) => {
+    const inputCompteur = this.getInput('count');
+    if (!(inputCompteur instanceof TextField)) throw new TypeError(`Expecting TextField`);
+
+    const value = Number(inputCompteur.value);
+    const newValue = Math.max(value - 1, 0);
+    inputCompteur.value = String(newValue);
+    this.form.dispatchEvent(new Event('change'));
+  };
+
+
+  /** Marks the Pokémon as caught. */
+  #catchHandler = async (event: Event) => {
+    const form = this.form;
+
+    // Allow marking as caught only if first part of the form is valid
+    if (!form.checkValidity()) {
+      if (!(event.currentTarget instanceof CheckBox)) throw new TypeError(`Expecting CheckBox`);
+      event.currentTarget.checked = false;
+      form.dispatchEvent(new Event('change'));
+      return;
+    }
+    form.classList.toggle('caught');
+    
+    const sprite: pokemonSprite | null = this.#shadow.querySelector('pokemon-sprite');
+
+    if (form.classList.contains('caught')) {
+      // Update Pokémon sprite to shiny form
+      sprite?.setAttribute('shiny', 'true');
+      sprite?.sparkle();
+
+      // If it's not an edit, update catch time to current time
+      const edit = await this.isEdit();
+      if (!edit) {
+        const inputDate = this.getInput('catchTime');
+        if (!(inputDate instanceof TextField)) throw new TypeError(`Expecting TextField`);
+
+        inputDate.value = new Date().toISOString().split('T')[0];
+        form.dispatchEvent(new Event('change'));
+      }
+    } else {
+      // Update Pokémon sprite to regular form
+      sprite?.setAttribute('shiny', 'false');
+    }
+  };
+
+
+  /** Cancels edit and doesn't save modifications to shinyStorage. */
+  #cancelHandler = async (event: Event) => {
+    const cancelMessage = getString('notif-modifications-will-be-lost');
+    if (!(event.currentTarget instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
+    const userResponse = await warnBeforeDestruction(event.currentTarget, cancelMessage);
+    if (userResponse)  await this.cancelEdit();
+  };
+
+
+  /** Deletes a hunt. */
+  #deleteHandler = async (event: Event) => {
+    const cancelMessage = getString('notif-hunt-will-be-deleted');
+    if (!(event.currentTarget instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
+    const userResponse = await warnBeforeDestruction(event.currentTarget, cancelMessage);
+    if (userResponse)  await this.delete();
+  };
+
+
+  /** Submits a hunt and saves it to shinyStorage. */
+  #submitHandler = async (event: Event) => {
+    event.preventDefault();
+
+    const hunt = await this.getHunt();
+
+    // Manage form errors
+    const erreurs = [];
+    if (hunt.dexid == 0) erreurs.push('Pokémon');
+    if (hunt.game == '') erreurs.push('jeu');
+    if (hunt.method == '')  erreurs.push('méthode');
+    if (hunt.catchTime < 0) erreurs.push('date');
+
+    if (erreurs.length > 0) {
+      let message = getString('error-badly-filled-inputs');
+      erreurs.forEach(e => message += ` ${e},`);
+      message = message.replace(/,$/, '.');
+      new Notif(message).prompt();
+      return;
+    }
+
+    const edit = await this.isEdit();
+    if (edit) {
+      // If it's an edit, ask for user confirmation before overwriting shinyStorage
+      const boutonSubmit = this.getButton('save-shiny');
+      if (!(boutonSubmit instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
+      const userResponse = await warnBeforeDestruction(boutonSubmit, getString('notif-save-edits'), 'done');
+      if (!userResponse) return;
+    }
+
+    await this.submit();
+  };
+
+
+  /** Deletes a hunt being edited AND the associated shiny in shinyStorage. */
+  #deleteShinyHandler = async (event: Event) => {
+    const deleteMessage = getString('notif-shiny-will-be-deleted');
+    if (!(event.currentTarget instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
+    const userResponse = await warnBeforeDestruction(event.currentTarget, deleteMessage);
+    if (userResponse) await this.deleteShiny();
+  };
+
+
+  /** Generates datalist of Pokémon species when the user starts writing a species name. */
+  #previousSpeciesString = '';
+  #speciesInputHandler = (event: Event) => {
+    const inputEspece = event.currentTarget;
+    if (!(inputEspece instanceof TextField)) throw new TypeError(`Expecting TextField`);
+
+    const string = inputEspece.value;
+
+    // Generate datalist
+    // - Si on revient aux mêmes 2 caractères qu'au départ, on garde la même liste
+    if (string.length == 2 && this.#previousSpeciesString.length == 3) return;
+    this.#previousSpeciesString = string;
+    const datalist = new DexDatalist(string);
+
+    const element = datalist.toElement();
+    element.setAttribute('id', 'datalist-pokedex');
+
+    const previousDatalist = inputEspece.shadow.querySelector('datalist#datalist-pokedex');
+    if (previousDatalist) previousDatalist.remove();
+    inputEspece.shadow.appendChild(element);
+  }
+
+
+  #formChangeHandler = async (event: Event) => {
+    const nonce = {};
+    this.#changeNonce = nonce;
+
+    const form = this.form;
+    // Update locally saved data with changes from the form
+    if (form) {
+      const formData = new FormData(form);
+    
+      // Add checkboxes state to formData
+      const checkboxes = [...this.#shadow.querySelectorAll('input[type="checkbox"][name]')];
+      checkboxes.forEach(checkbox => {
+        if (!(checkbox instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
+        const name = checkbox.getAttribute('name')!;
+        if (!checkbox.checked) formData.append(name, 'false');
+      });
+
+      const hunt = await this.formToHunt(formData);
+      
+      this.genereFormes(Pokemon.names()[hunt.dexid], hunt.forme);
+      this.genereMethodes(hunt.game, hunt.method)
+      this.updateAttribute('method', hunt.method);
+      this.updateAttribute('game', hunt.game);
+
+      const caughtCheckBox = this.getInput('caught');
+      if (!this.checkFormUncaughtPartValidity()) caughtCheckBox?.setAttribute('disabled', '');
+      else                                       caughtCheckBox?.removeAttribute('disabled');
+
+      if (this.#changeNonce !== nonce) return;
+      await huntStorage.setItem(hunt.huntid, hunt);
+
+      // Update some visuals with changes from the form
+      await this.updateVisuals(hunt);
+    }
+  }
 
 
   constructor() {
     super();
-    this.shadow = this.attachShadow({ mode: 'open' });
-    this.shadow.appendChild(template.content.cloneNode(true));
-    this.shadow.adoptedStyleSheets = [materialIconsSheet, iconSheet, themesSheet, commonSheet, sheet, gameSpecificSheet];
+    this.#shadow = this.attachShadow({ mode: 'open' });
+    this.#shadow.appendChild(template.content.cloneNode(true));
+    this.#shadow.adoptedStyleSheets = [materialIconsSheet, iconSheet, themesSheet, commonSheet, sheet, gameSpecificSheet];
     this.genereJeux();
   }
 
+
   async getHunt() {
-    return await Hunt.getOrMake(this.huntid ?? undefined);
+    return await Hunt.getOrMake(this.#huntid ?? undefined);
+  }
+
+
+  async isEdit() {
+    return (await shinyStorage.getItem(this.#huntid)) != null;
+  }
+
+
+  get form() {
+    const form = this.#shadow.querySelector('form');
+    if (!(form instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
+    return form;
+  }
+
+  getInput(name: string) {
+    return this.#shadow.querySelector(`[name="${name}"]`);
+  }
+
+  getButton(action: string) {
+    return this.#shadow.querySelector(`[data-action="${action}"]`);
+  }
+
+
+  handle(element: Element | null, type: string, callback: (e: Event) => void) {
+    if (element) {
+      this.#handlers.push({ element, type, callback });
+      element.addEventListener(type, callback);
+    }
   }
 
 
@@ -104,13 +289,13 @@ export class huntCard extends HTMLElement {
 
     try {
       const shiny = new Shiny(hunt);
-      await shinyStorage.setItem(this.huntid, shiny);
-      await huntStorage.removeItem(this.huntid);
+      await shinyStorage.setItem(this.#huntid, shiny);
+      await huntStorage.removeItem(this.#huntid);
 
       window.dispatchEvent(new CustomEvent('dataupdate', {
         detail: {
           sections: ['mes-chromatiques', 'chasses-en-cours'],
-          ids: [this.huntid],
+          ids: [this.#huntid],
           sync: true
         }
       }));
@@ -130,12 +315,12 @@ export class huntCard extends HTMLElement {
     try {
       // Si la chasse n'a pas été modifiée, on la supprime complètement
       if (hunt.isEmpty()) {
-        await huntStorage.removeItem(this.huntid);
+        await huntStorage.removeItem(this.#huntid);
 
         window.dispatchEvent(new CustomEvent('dataupdate', {
           detail: {
             sections: ['chasses-en-cours'],
-            ids: [this.huntid],
+            ids: [this.#huntid],
             sync: false
           }
         }));
@@ -146,13 +331,13 @@ export class huntCard extends HTMLElement {
         hunt.lastUpdate = Date.now();
         hunt.deleted = true;
         hunt.destroy = true;
-        await huntStorage.setItem(this.huntid, hunt);
+        await huntStorage.setItem(this.#huntid, hunt);
 
         if (populate) {
           window.dispatchEvent(new CustomEvent('dataupdate', {
             detail: {
               sections: ['chasses-en-cours', 'corbeille'],
-              ids: [this.huntid],
+              ids: [this.#huntid],
               sync: false
             }
           }));
@@ -168,7 +353,7 @@ export class huntCard extends HTMLElement {
    * Annule l'édition d'un Pokémon shiny, en supprimant les modifications pour toujours.
    */
   async cancelEdit() {
-    const storedShiny = await shinyStorage.getItem(this.huntid);
+    const storedShiny = await shinyStorage.getItem(this.#huntid);
     const edit = storedShiny != null;
     if (!edit) {
       new Notif(getString('error-cant-cancel-edit')).prompt();
@@ -176,12 +361,12 @@ export class huntCard extends HTMLElement {
     }
 
     // On supprime la chasse, sans toucher au shiny associé
-    await huntStorage.removeItem(this.huntid);
+    await huntStorage.removeItem(this.#huntid);
 
     window.dispatchEvent(new CustomEvent('dataupdate', {
       detail: {
         sections: ['chasses-en-cours'],
-        ids: [this.huntid],
+        ids: [this.#huntid],
         sync: false
       }
     }));
@@ -192,7 +377,7 @@ export class huntCard extends HTMLElement {
    * Supprime la chasse et le shiny qu'elle éditait, et déplace ce dernier dans la corbeille.
    */
   async deleteShiny() {
-    const storedShiny = await shinyStorage.getItem(this.huntid);
+    const storedShiny = await shinyStorage.getItem(this.#huntid);
     const edit = storedShiny != null;
     if (!edit) {
       new Notif(getString('error-cant-delete-hunt')).prompt();
@@ -202,15 +387,15 @@ export class huntCard extends HTMLElement {
     const hunt = await this.getHunt();
     hunt.lastUpdate = Date.now();
     hunt.deleted = true;
-    await huntStorage.setItem(this.huntid, hunt);
+    await huntStorage.setItem(this.#huntid, hunt);
 
     // On supprime le shiny associé
-    await shinyStorage.removeItem(this.huntid);
+    await shinyStorage.removeItem(this.#huntid);
 
     window.dispatchEvent(new CustomEvent('dataupdate', {
       detail: {
         sections: ['mes-chromatiques', 'chasses-en-cours', 'corbeille'],
-        ids: [this.huntid],
+        ids: [this.#huntid],
         sync: true
       }
     }));
@@ -230,133 +415,131 @@ export class huntCard extends HTMLElement {
     }
 
     for (const prop of hunt.orderedKeys) {
-      const input = this.shadow.querySelector(`[name="${prop}"]`);
+      const input = this.getInput(prop);
 
       switch (prop) {
         case 'dexid': {
-          if (!(input instanceof TextField)) {
-            console.error(new TypeError(`Expecting TextField`));
-            continue;
-          }
           const value = hunt.dexid;
           let name = '';
           if (value > 0) {
             const allNames = Pokemon.names();
-            name = allNames[value];
+            name = capitalizeFirstLetter(allNames[value]);
           }
-          input.value = name;
+
+          if (input instanceof TextField) input.value = name;
+          else input?.setAttribute('value', name);
+
           this.genereFormes(name, hunt.forme);
         } break;
 
         case 'game': {
-          if (!(input instanceof InputSelect)) {
-            console.error(new TypeError(`Expecting InputSelect`));
-            continue;
-          }
           const value = hunt.game;
-          input.value = value;
+
+          if (input instanceof InputSelect) input.value = value;
+          else input?.setAttribute('value', value);
+
           this.genereMethodes(value, hunt.method);
           this.updateAttribute('game', value);
         } break;
 
         case 'method': {
-          if (!(input instanceof InputSelect)) {
-            console.error(new TypeError(`Expecting InputSelect`));
-            continue;
-          }
           const value = hunt.method;
-          input.value = value;
+          
+          if (input instanceof InputSelect) input.value = value;
+          else input?.setAttribute('value', value);
+
           this.updateAttribute('method', value);
         } break;
 
         case 'forme':
         case 'ball':
         case 'gene': {
-          if (!(input instanceof InputSelect)) {
-            console.error(new TypeError(`Expecting InputSelect`));
-            continue;
-          }
           const value = String(hunt[prop]);
-          input.value = value;
+          
+          if (input instanceof InputSelect) input.value = value;
+          else input?.setAttribute('value', value);
         } break;
 
         case 'name': {
-          if (!(input instanceof TextField)) {
-            console.error(new TypeError(`Expecting TextField`));
-            continue;
-          }
           const value = String(hunt[prop]);
-          input.value = value;
+          
+          if (input instanceof TextField) input.value = value;
+          else input?.setAttribute('value', value);
         } break;
 
         case 'notes': {
-          if (!(input instanceof TextArea)) {
-            console.error(new TypeError(`Expecting TextArea`));
-            continue;
-          }
           const value = String(hunt[prop]);
-          input.value = value;
+          
+          if (input instanceof TextArea) input.value = value;
+          else input?.setAttribute('value', value);
         } break;
 
         case 'charm': {
-          if (!(input instanceof CheckBox)) {
-            console.error(new TypeError(`Expecting Checkbox`));
-            continue;
-          }
           const value = hunt[prop];
-          input.checked = value;
+          
+          if (input instanceof CheckBox) input.checked = value;
+          else input?.setAttribute('checked', String(value));
         } break;
 
         case 'count': {
-          if (!(input instanceof TextField)) throw new TypeError(`Expecting TextField`);
           const value = hunt.count;
-          input.value = String(value['encounters'] || 0);
+          const encounters = value['encounters'] || 0;
+
+          if (input instanceof TextField) input.value = String(encounters);
+          else input?.setAttribute('value', String(encounters));
 
           for (const compteurProp of compteurProps) {
-            const input = this.shadow.querySelector(`[name="${compteurProp}"]`);
-            if (!(input instanceof TextField) && !(input instanceof InputSelect) && !(input instanceof CheckBox)) {
-              throw new TypeError(`Expecting TextField, InputSelect or CheckBox`);
-            }
-            const propValue = String(value[compteurProp] || 0);
-            if (input instanceof CheckBox) input.checked = input.value === propValue;
-            else input.value = propValue;
+            const input = this.getInput(compteurProp);
+            const propValue = value[compteurProp] || 0;
+
+            if (input instanceof TextField) input.value = String(propValue);
+            else if (input instanceof InputSelect) input.value = String(propValue);
+            else if (input instanceof CheckBox) input.checked = propValue > 0;
+            else if (input && input.tagName === 'CHECK-BOX') input.setAttribute('checked', String(propValue > 0));
+            else input?.setAttribute('value', String(propValue));
           }
         } break;
 
         case 'catchTime': {
-          if (!(input instanceof TextField)) throw new TypeError(`Expecting TextField`);
           const value = hunt.catchTime || 0;
           const date = (new Date(value)).toISOString().split('T')[0];
-          input.value = date;
+          
+          if (input instanceof TextField) input.value = date;
+          else input?.setAttribute('value', date);
         } break;
 
         case 'caught': {
-          if (!(input instanceof CheckBox)) throw new TypeError(`Expecting CheckBox`);
           const value = hunt.caught;
-          input.checked = value;
-          const form = this.shadow.querySelector('form');
+
+          if (input instanceof CheckBox) input.checked = value;
+          else input?.setAttribute('checked', String(value));
+
+          const form = this.form;
           if (value) {
-            form?.classList.add('caught');
-            input.removeAttribute('disabled');
+            form.classList.add('caught');
+            input?.removeAttribute('disabled');
           } else {
-            form?.classList.remove('caught');
-            if (!this.checkFormUncaughtPartValidity()) input.setAttribute('disabled', '');
-            else                                       input.removeAttribute('disabled');
+            form.classList.remove('caught');
+            if (!this.checkFormUncaughtPartValidity()) input?.setAttribute('disabled', '');
+            else                                       input?.removeAttribute('disabled');
           }
         } break;
 
         case 'huntid': {
           const value = hunt.huntid;
-          const form = this.shadow.querySelector('form');
+          const form = this.form;
           const edit = (await shinyStorage.getItem(value)) != null;
-          if (edit) form?.setAttribute('data-edit', '');
-          else      form?.removeAttribute('data-edit');
+          if (edit) form.setAttribute('data-edit', '');
+          else      form.removeAttribute('data-edit');
         } break;
       }
     }
   }
 
-  async dataToContent() { return this.huntToForm(); }
+  async dataToContent() { 
+    await this.huntToForm();
+    await this.updateVisuals();
+  }
 
 
   /**
@@ -421,81 +604,40 @@ export class huntCard extends HTMLElement {
   }
 
 
-  async formChangeHandler(event: Event) {
-    const nonce = {};
-    this.changeNonce = nonce;
-
-    const form = this.shadow.querySelector('form');
-    // Update locally saved data with changes from the form
-    if (form) {
-      const formData = new FormData(form);
-    
-      // Add checkboxes state to formData
-      const checkboxes = [...this.shadow.querySelectorAll('input[type="checkbox"][name]')];
-      checkboxes.forEach(checkbox => {
-        if (!(checkbox instanceof HTMLInputElement)) throw new TypeError(`Expecting HTMLInputElement`);
-        const name = checkbox.getAttribute('name')!;
-        if (!checkbox.checked) formData.append(name, 'false');
-      });
-
-      const hunt = await this.formToHunt(formData);
-      
-      this.genereFormes(Pokemon.names()[hunt.dexid], hunt.forme);
-      this.genereMethodes(hunt.game, hunt.method)
-      this.updateAttribute('method', hunt.method);
-      this.updateAttribute('game', hunt.game);
-
-      const caughtCheckBox = this.shadow.querySelector('[name="caught"]');
-      if (!this.checkFormUncaughtPartValidity()) caughtCheckBox?.setAttribute('disabled', '');
-      else                                       caughtCheckBox?.removeAttribute('disabled');
-
-      if (this.changeNonce !== nonce) return;
-      await huntStorage.setItem(hunt.huntid, hunt);
-
-      // Update some visuals with changes from the form
-      await this.updateVisuals(hunt);
-    }
-  }
-
-
   /** Checks whether the part of the form displayed when the "caught" checkbox isn't checked is valid. */
   checkFormUncaughtPartValidity(): boolean {
-    const form = this.shadow.querySelector('form');
-    if (form) {
-      const inputs = [...form.querySelectorAll('text-field, input-select, check-box')]
-        .filter(input => !input.matches('.capture-button-group ~ *'));
-      return inputs.every(input => 'checkValidity' in input && typeof input.checkValidity === 'function' && input.checkValidity());
-    } else {
-      return false;
-    }
+    const form = this.form;
+    const inputs = [...form.querySelectorAll('text-field, input-select, check-box')]
+      .filter(input => !input.matches('.capture-button-group ~ *'));
+    return inputs.every(input => 'checkValidity' in input && typeof input.checkValidity === 'function' && input.checkValidity());
   }
 
 
   async updateVisuals(_hunt?: Hunt) {
     const hunt = _hunt ?? (await this.getHunt());
     
-    const gameIcon = this.shadow.querySelector(`[data-icon^="game"]`)!;
+    const gameIcon = this.#shadow.querySelector(`[data-icon^="game"]`)!;
     if (hunt.game) {
       gameIcon.setAttribute('data-icon', `game/${hunt.game}`);
     } else {
       gameIcon.setAttribute('data-icon', 'game');
     }
 
-    const ballIcon = this.shadow.querySelector(`[data-icon^="ball"]`)!;
+    const ballIcon = this.#shadow.querySelector(`[data-icon^="ball"]`)!;
     if (hunt.ball) {
       ballIcon.setAttribute('data-icon', `ball/${hunt.ball}`);
     } else {
       ballIcon.setAttribute('data-icon', 'ball');
     }
 
-    const geneIcon = this.shadow.querySelector('[data-icon^="gene"]')!;
+    const geneIcon = this.#shadow.querySelector('[data-icon^="gene"]')!;
     if (hunt.gene) {
       geneIcon.setAttribute('data-icon', `gene/${hunt.gene}`);
     } else {
       geneIcon.setAttribute('data-icon', 'gene');
     }
 
-    const sprite = this.shadow.querySelector('pokemon-sprite')!;
+    const sprite = this.#shadow.querySelector('pokemon-sprite')!;
     sprite.setAttribute('dexid', String(hunt.dexid));
     sprite.setAttribute('forme', hunt.forme);
     sprite.setAttribute('shiny', String(hunt.caught));
@@ -522,201 +664,13 @@ export class huntCard extends HTMLElement {
   }
 
 
-  connectedCallback() {
-    translationObserver.serve(this, { method: 'attribute' });
-
-    // 🔽 Active les boutons du formulaire
-
-    const form = this.shadow.querySelector('form');
-    if (!(form instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
-
-    // Active les boutons d'incrémentation du compteur
-    const inputCompteur = this.shadow.querySelector('[name="count"]');
-
-    this.handlers.counterAdd = {
-      element: this.shadow.querySelector('[data-action="count-add"]'),
-      type: 'click',
-      function: event => {
-        if (!(inputCompteur instanceof TextField)) throw new TypeError(`Expecting TextField`);
-        const value = Number(inputCompteur.value);
-        const newValue = Math.min(value + 1, 999999);
-        inputCompteur.value = String(newValue);
-        form.dispatchEvent(new Event('change'));
-      }
-    };
-    handle(this.handlers.counterAdd);
-
-    this.handlers.counterSub = {
-      element: this.shadow.querySelector('[data-action="count-sub"]'),
-      type: 'click',
-      function: event => {
-        if (!(inputCompteur instanceof TextField)) throw new TypeError(`Expecting TextField`);
-        const value = Number(inputCompteur.value);
-        const newValue = Math.max(value - 1, 0);
-        inputCompteur.value = String(newValue);
-        form.dispatchEvent(new Event('change'));
-      }
-    };
-    handle(this.handlers.counterSub);
-
-    // Active le bouton "capturé"
-    this.handlers.caught = {
-      element: this.shadow.querySelector('[name="caught"]'),
-      type: 'change',
-      function: async event => {
-        if (!form.checkValidity()) {
-          if (!(event.currentTarget instanceof CheckBox)) throw new TypeError(`Expecting CheckBox`);
-          event.currentTarget.checked = false;
-          form.dispatchEvent(new Event('change'));
-          return;
-        }
-
-        form.classList.toggle('caught');
-        const inputDate = this.shadow.querySelector('[name="catchTime"]');
-        if (!(inputDate instanceof TextField)) throw new TypeError(`Expecting TextField`);
-        const sprite: pokemonSprite | null = this.shadow.querySelector('pokemon-sprite');
-  
-        if (form.classList.contains('caught')) {
-          sprite?.setAttribute('shiny', 'true');
-          sprite?.sparkle();
-          if (!form.getAttribute('edit') != null) {
-            inputDate.value = new Date().toISOString().split('T')[0];
-            form.dispatchEvent(new Event('change'));
-          }
-        } else {
-          sprite?.setAttribute('shiny', 'false');
-        }
-      }
-    };
-    handle(this.handlers.caught);
-
-    // Active le bouton "annuler"
-    this.handlers.cancel = {
-      element: this.shadow.querySelector('[data-action="cancel-edit"]'),
-      type: 'click',
-      function: async event => {
-        const cancelMessage = getString('notif-modifications-will-be-lost');
-        if (!(event.currentTarget instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
-        const userResponse = await warnBeforeDestruction(event.currentTarget, cancelMessage);
-        if (userResponse)  await this.cancelEdit();
-      }
-    };
-    handle(this.handlers.cancel);
-
-    // Active le bouton "supprimer"
-    this.handlers.delete = {
-      element: this.shadow.querySelector('[data-action="delete-hunt"]'),
-      type: 'click',
-      function: async event => {
-        const cancelMessage = getString('notif-hunt-will-be-deleted');
-        if (!(event.currentTarget instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
-        const userResponse = await warnBeforeDestruction(event.currentTarget, cancelMessage);
-        if (userResponse)  await this.delete();
-      }
-    };
-    handle(this.handlers.delete);
-
-    // Active le bouton "enregistrer"
-    this.handlers.submit = {
-      element: this.shadow.querySelector('form'),
-      type: 'submit',
-      function: async event => {
-        event.preventDefault();
-
-        const hunt = await this.getHunt();
-  
-        // Gestion des erreurs de formulaire
-        const erreurs = [];
-        if (hunt.dexid == 0) erreurs.push('Pokémon');
-        if (hunt.game == '') erreurs.push('jeu');
-        if (hunt.method == '')  erreurs.push('méthode');
-        if (hunt.catchTime < 0) erreurs.push('date');
-  
-        if (erreurs.length > 0) {
-          let message = getString('error-badly-filled-inputs');
-          erreurs.forEach(e => message += ` ${e},`);
-          message = message.replace(/,$/, '.');
-          new Notif(message).prompt();
-          return;
-        } else {
-          const edit = (await shinyStorage.getItem(this.huntid)) != null;
-          if (edit) {
-            const boutonSubmit = this.shadow.querySelector('[data-action="save-shiny"]');
-            if (!(boutonSubmit instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
-            const userResponse = await warnBeforeDestruction(boutonSubmit, getString('notif-save-edits'), 'done');
-            if (userResponse) await this.submit();
-          } else {
-            await this.submit();
-          }
-        }
-      }
-    };
-    handle(this.handlers.submit);
-
-    // Active le bouton "supprimer"
-    this.handlers.deleteShiny = {
-      element: this.shadow.querySelector('[data-action="delete-shiny"]'),
-      type: 'click',
-      function: async event => {
-        const deleteMessage = getString('notif-shiny-will-be-deleted');
-        if (!(event.currentTarget instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
-        const userResponse = await warnBeforeDestruction(event.currentTarget, deleteMessage);
-        if (userResponse) await this.deleteShiny();
-      }
-    };
-    handle(this.handlers.deleteShiny);
-
-    // 🔽 Détecte les changements dans le formulaire :
-
-    // Changements de tous les inputs
-    this.handlers.form = {
-      element: form,
-      type: 'change',
-      function: this.formChangeHandler.bind(this)
-    }
-    handle(this.handlers.form);
-
-    // Génère la liste des formes au choix d'un Pokémon
-    // et génère la liste des Pokémon correspondants quand on commence à écrire un nom
-    const inputEspece = this.shadow.querySelector('[name="dexid"]');
-    let previousSpeciesString = '';
-    this.handlers.listeFormes = {
-      element: inputEspece,
-      type: 'input',
-      function: event => {
-        if (!(inputEspece instanceof TextField)) throw new TypeError(`Expecting TextField`);
-
-        const string = inputEspece.value;
-        //this.genereFormes(string);
-
-        // Generate datalist
-        // - Si on revient aux mêmes 2 caractères qu'au départ, on garde la même liste
-        if (string.length == 2 && previousSpeciesString.length == 3) return;
-        previousSpeciesString = string;
-        const datalist = new DexDatalist(string);
-
-        const element = datalist.toElement();
-        element.setAttribute('id', 'datalist-pokedex');
-
-        const previousDatalist = inputEspece.shadow.querySelector('datalist#datalist-pokedex');
-        if (previousDatalist) previousDatalist.remove();
-        inputEspece.shadow.appendChild(element);
-      }
-    }
-    handle(this.handlers.listeFormes);
-
-    // Peuple le contenu de la carte
-    if (this.huntid) this.updateVisuals();
-  }
-
-
   /** 
    * Génère la liste des formes à partir du Pokémon entré.
    * Ne doit PAS être async, pour préserver l'ordre d'exécution dans huntToForm.
    */
   genereFormes(value: string, formeToSelect?: string) {
-    const select = this.shadow.querySelector('input-select[name="forme"]');
-    if (!(select instanceof InputSelect)) throw new TypeError(`Expecting InputSelect`);
+    const select = this.getInput('forme');
+    if (!select) throw new TypeError(`Expecting InputSelect`);
 
     select.querySelectorAll('option').forEach(option => option.remove());
     select.removeAttribute('default-label');
@@ -735,17 +689,19 @@ export class huntCard extends HTMLElement {
       select.innerHTML += `<option value="${forme.dbid}" data-string="pokemon/${pkmn.dexid}/forme/${forme.dbid}">${pkmn.getFormeName(forme.dbid, false)}</option>`;
       availableChoices++;
     }
-    if (availableChoices > 0) select.setAttribute('default-label', 'Choisir une forme');
+    if (availableChoices > 0) {
+      select.setAttribute('default-label', getString('forme-select-label'));
+    }
   }
 
 
   /**
    * Génère la liste des méthodes à partir du jeu entré.
-   * * Ne doit PAS être async, pour préserver l'ordre d'exécution dans huntToForm.
+   * Ne doit PAS être async, pour préserver l'ordre d'exécution dans huntToForm.
    */
   genereMethodes(game: string, methodToSelect?: string) {
-    const select = this.shadow.querySelector('input-select[name="method"]');
-    if (!(select instanceof InputSelect)) throw new TypeError(`Expecting InputSelect`);
+    const select = this.getInput('method');
+    if (!select) throw new TypeError(`Expecting InputSelect`);
 
     select.querySelectorAll('option').forEach(option => option.remove());
     select.removeAttribute('default-label');
@@ -767,13 +723,13 @@ export class huntCard extends HTMLElement {
       select.innerHTML += `<option value="${methode.id}" data-string="method/${methode.id}">${nom}</option>`;
       availableChoices++;
     }
-    if (availableChoices > 0) select.setAttribute('default-label', 'Choisir une méthode');
+    if (availableChoices > 0) select.setAttribute('default-label', getString('method-select-label'));
   }
 
 
   /** Génère la liste des jeux. */
   genereJeux() {
-    const select = this.shadow.querySelector('input-select[name="game"]');
+    const select = this.getInput('game');
     if (!select) throw new TypeError(`Expecting InputSelect`);
     
     const lang = getCurrentLang();
@@ -784,14 +740,40 @@ export class huntCard extends HTMLElement {
       }
       select.innerHTML += `<option value="${jeu.uid}" data-string="game/${jeu.uid}">${nom}</option>`;
     }
+
+    select.setAttribute('default-label', getString('game-select-label'));
+  }
+
+
+  connectedCallback() {
+    translationObserver.serve(this, { method: 'attribute' });
+
+    // 🔽 Active les boutons du formulaire
+    this.handle(this.getButton('count-add'), 'click', this.#counterAddHandler);
+    this.handle(this.getButton('count-sub'), 'click', this.#counterSubHandler);
+    this.handle(this.getButton('cancel-edit'), 'click', this.#cancelHandler);
+    this.handle(this.getButton('delete-hunt'), 'click', this.#deleteHandler);
+    this.handle(this.getButton('delete-shiny'), 'click', this.#deleteShinyHandler);
+
+    // 🔽 Détecte les changements dans le formulaire :
+    this.handle(this.getInput('dexid'), 'input', this.#speciesInputHandler);
+    this.handle(this.getInput('caught'), 'change', this.#catchHandler);
+    this.handle(this.form, 'change', this.#formChangeHandler);
+    this.handle(this.form, 'submit', this.#submitHandler);
+
+    // Peuple le contenu de la carte
+    if (this.needsRefresh && this.#huntid) {
+      this.dataToContent();
+      this.needsRefresh = false;
+    }
   }
   
 
   disconnectedCallback() {
     translationObserver.unserve(this);
 
-    for (const [name, handler] of Object.entries(this.handlers)) {
-      unhandle(handler);
+    for (const { element, type, callback } of this.#handlers) {
+      element.removeEventListener(type, callback);
     }
   }
 
@@ -806,13 +788,24 @@ export class huntCard extends HTMLElement {
 
     switch (attr) {
       case 'huntid': {
-        this.huntid = newValue;
-        //this.huntToForm();
+        this.#huntid = newValue;
+        this.dataToContent();
+        this.needsRefresh = false;
       } break;
 
-      case 'lang':
+      case 'lang': {
+        {
+          const input = this.getInput('game');
+          if (input && input.querySelectorAll('option').length > 0) input.setAttribute('default-label', getString('game-select-label'));
+        } {
+          const input = this.getInput('method');
+          if (input && input.querySelectorAll('option').length > 0) input.setAttribute('default-label', getString('method-select-label'));
+        } {
+          const input = this.getInput('forme');
+          if (input && input.querySelectorAll('option').length > 0) input.setAttribute('default-label', getString('forme-select-label'));
+        }
         translationObserver.translate(this, newValue ?? '');
-        break;
+      } break;
     }
   }
 }

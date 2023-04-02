@@ -1,3 +1,4 @@
+import { capitalizeFirstLetter } from './Params.js';
 import { Pokemon } from './Pokemon.js';
 
 
@@ -14,7 +15,9 @@ export class DexDatalist {
 
     for (let p = 1; p < pkmnNumber; p++) {
       const name = allNames[p];
-      if (name.startsWith(string.toLowerCase())) this.correspondances.push(name);
+      if (name.startsWith(string.toLowerCase())) {
+        this.correspondances.push(capitalizeFirstLetter(name));
+      }
     }
 
     if (this.correspondances.length === 1 && this.correspondances[0] === string.toLowerCase()) {
