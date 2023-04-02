@@ -471,6 +471,22 @@ hunt-card {
   contain-intrinsic-height: auto 400px;
 }
 
+@keyframes intro {
+  0% { transform: translateY(60px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+body.welcome [data-replaces="shiny-card"] {
+  opacity: 0;
+}
+
+body.welcome shiny-card {
+  animation: intro .35s var(--easing-decelerate);
+  --delay: calc(var(--order) * 50ms);
+  animation-delay: var(--delay, 0ms);
+  animation-fill-mode: backwards;
+}
+
 .vide {
   height: 100%;
 }
