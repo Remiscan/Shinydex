@@ -59,6 +59,8 @@ export class huntCard extends HTMLElement {
 
   /** Adds 1 encounter. */
   #counterAddHandler = (event: Event) => {
+    event.preventDefault(); // prevent from focusing the input field
+    
     const inputCompteur = this.getInput('count');
     if (!(inputCompteur instanceof TextField)) throw new TypeError(`Expecting TextField`);
 
@@ -71,6 +73,8 @@ export class huntCard extends HTMLElement {
 
   /** Substracts 1 encounter. */
   #counterSubHandler = (event: Event) => {
+    event.preventDefault(); // prevent from focusing the input field
+    
     const inputCompteur = this.getInput('count');
     if (!(inputCompteur instanceof TextField)) throw new TypeError(`Expecting TextField`);
 
