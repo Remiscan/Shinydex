@@ -1,7 +1,6 @@
 import { Hunt } from '../../Hunt.js';
 import { Shiny } from '../../Shiny.js';
 import { computeShinyFilters } from '../../filtres.js';
-import { isSupportedPokemonLang, pokemonData } from '../../jsonData.js';
 import { huntStorage, localForageAPI, shinyStorage } from '../../localForage.js';
 import { Notif } from '../../notification.js';
 import { TranslatedString, translationObserver } from '../../translation.js';
@@ -26,20 +25,23 @@ let previousEditNotification: Notif;
 
 
 export class shinyCard extends HTMLElement {
+  dataStore: localForageAPI = shinyStorage;
   shadow: ShadowRoot;
   huntid: string = '';
-  dataStore: localForageAPI = shinyStorage;
-  #translationObserved: boolean = false;
   needsRefresh = true;
+
   clickHandler: (e: Event) => void = () => {};
+
   openHandler = (e: Event) => {
     e.stopPropagation();
     this.toggleNotes();
   };
+
   editHandler = (e: Event) => {
     e.stopPropagation();
     this.makeEdit();
   };
+
   restoreHandler = (e: Event) => {};
 
 
@@ -365,7 +367,7 @@ export class shinyCard extends HTMLElement {
     restoreButton.addEventListener('click', this.restoreHandler);
 
     // Peuple le contenu de la carte
-    if (this.needsRefresh) {
+    if (this.needsRefresh && this.huntid) {
       this.dataToContent();
       this.needsRefresh = false;
     }

@@ -1,7 +1,7 @@
 import { pad, wait } from '../../Params.js';
-import { TranslatedString, translationObserver, getString } from '../../translation.js';
 import { Pokemon } from '../../Pokemon.js';
 import { pokemonData } from '../../jsonData.js';
+import { TranslatedString, getString, translationObserver } from '../../translation.js';
 // @ts-expect-error
 import pokemonSheet from '../../../../images/pokemonsheet.css' assert { type: 'css' };
 
@@ -9,8 +9,8 @@ import pokemonSheet from '../../../../images/pokemonsheet.css' assert { type: 'c
 
 const template = document.createElement('template');
 template.innerHTML = /*html*/`
-  <img loading="lazy" width="512" height="512" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=">
-  <svg width="512" height="512" viewBox="0 0 512 512">
+  <img loading="lazy" width="512" height="512" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" part="image">
+  <svg width="512" height="512" viewBox="0 0 512 512" part="sparkles">
     <style>
       #shiny-star {
         fill: #ffd400;

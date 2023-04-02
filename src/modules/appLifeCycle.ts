@@ -191,6 +191,13 @@ export async function appStart() {
       initPokedex(),
       ...sectionsToPopulate.map(async section => {
         await populator[section]();
+        if (section === 'mes-chromatiques') {
+          const visibleCardsOnScreen = Math.ceil(
+            ((document.querySelector('#mes-chromatiques > .section-contenu') as HTMLElement)?.offsetHeight ?? 0) / 128
+          );
+          await wait(50 * visibleCardsOnScreen + 350);
+          document.body.classList.remove('welcome');
+        }
       })
     ]);
     logPerf('populate');

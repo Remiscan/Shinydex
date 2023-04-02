@@ -459,7 +459,10 @@ export async function orderCards(section: OrderableSection, orderMap?: OrderMap,
     return sectionElement.querySelector(`[${elementAttribute}="${id}"], [data-replaces][data-${elementAttribute}="${id}"]`);
   });
 
+  let i = 0;
   for (const card of orderedCards) {
+    (card as HTMLElement)?.style.setProperty('--order', String(i));
     card?.parentElement?.appendChild(card);
+    i++;
   }
 }

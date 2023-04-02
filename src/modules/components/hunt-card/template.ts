@@ -19,7 +19,7 @@ template.innerHTML = /*html*/`
       <fieldset name="which-pokemon">
         <legend class="invisible" data-string="fieldset-which-pokemon-legend"></legend>
 
-        <text-field name="dexid" required list="datalist-pokedex" autocomplete="off" spellcheck="false" placeholder="ex : Bulbizarre">
+        <text-field name="dexid" required list="datalist-pokedex" autocomplete="off" spellcheck="false" data-placeholder="species-placeholder">
           <span slot="label" data-string="species-label"></span>
           <datalist id="datalist-pokedex"></datalist>
         </text-field>
@@ -28,7 +28,7 @@ template.innerHTML = /*html*/`
           <span slot="label" data-string="forme-label"></span>
         </input-select>
 
-        <input-select name="game" icons="leading" default-label="Choisir un jeu" required>
+        <input-select name="game" icons="leading" required>
           <span slot="leading-icon" class="icon" data-icon="game"></span>
           <span slot="label" data-string="game-label"></span>
         </input-select>

@@ -91,10 +91,6 @@ form[data-edit] pokemon-sprite {
   flex-basis: 12ch;
 }
 
-[name="dexid"]::part(input) {
-  text-transform: capitalize;
-}
-
 [name="forme"] {
   flex-grow: 1;
   flex-basis: 12ch;

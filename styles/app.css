@@ -178,6 +178,7 @@ body[data-section-actuelle~="a-propos"] .nav-link[data-nav-section="a-propos"] {
 
 body[data-section-actuelle~="pokedex"] {
   --caught-filter-display: flex; /* disables "display: none" on caught filter in filter-menu */
+  --orders-display: none;
 }
 
 body:not([data-section-actuelle~="mes-chromatiques"]) nav search-box[section="mes-chromatiques"]::part(form),
@@ -468,6 +469,22 @@ div[data-replaces="hunt-card"],
 hunt-card {
   content-visibility: auto;
   contain-intrinsic-height: auto 400px;
+}
+
+@keyframes intro {
+  0% { transform: translateY(60px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+body.welcome [data-replaces="shiny-card"] {
+  opacity: 0;
+}
+
+body.welcome shiny-card {
+  animation: intro .35s var(--easing-decelerate);
+  --delay: calc(var(--order) * 50ms);
+  animation-delay: var(--delay, 0ms);
+  animation-fill-mode: backwards;
 }
 
 .vide {

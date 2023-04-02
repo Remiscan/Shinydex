@@ -1,5 +1,5 @@
 import { appStrings, isSupportedPokemonLang, pokemonData } from './jsonData.js';
-import { pad, Params } from './Params.js';
+import { capitalizeFirstLetter, pad, Params } from './Params.js';
 
 
 
@@ -218,7 +218,7 @@ export class Pokemon {
     if (!isSupportedPokemonLang(lang)) throw new Error('language-not-supported');
     const forme = this.formes.find(f => f.dbid === id);
     let name = this.getName(lang);
-    name = name.charAt(0).toUpperCase() + name.slice(1);
+    name = capitalizeFirstLetter(name);
     if (withName) return forme?.name[lang].replace('{{name}}', name) || name;
     else          return forme?.name[lang].replace('{{name}}', '').trim() || appStrings[lang]?.['forme-base'];
   }

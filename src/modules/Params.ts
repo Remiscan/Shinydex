@@ -86,6 +86,13 @@ export function noAccent(str: string): string {
 }
 
 
+/////////////////////////////////////////////////////////////////
+// Met en majuscule la première lettre d'une chaîne de caractères
+export function capitalizeFirstLetter(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+
 ////////////////////////////////
 // Pads a string with leading 0s
 export function pad(s: string, long: number): string {
