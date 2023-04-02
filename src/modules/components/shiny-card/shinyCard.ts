@@ -348,8 +348,7 @@ export class shinyCard extends HTMLElement {
 
 
   connectedCallback() {
-    // Cause 100% cpu use for some reason?
-    //translationObserver.serve(this, { method: 'attribute' });
+    translationObserver.serve(this, { method: 'attribute' });
 
     // Détecte le clic pour "ouvrir" la carte
     const openButton = this.shadow.querySelector('[data-action="open"]');
@@ -371,15 +370,11 @@ export class shinyCard extends HTMLElement {
       this.dataToContent();
       this.needsRefresh = false;
     }
-
-    // While the 100% cpu use bug with .serve isn't solved, this is enough,
-    // since the lazy loading causes the card to be reconnected after changing lang & coming back from settings
-    translationObserver.translate(this, getCurrentLang());
   }
 
 
   disconnectedCallback() {
-    //translationObserver.unserve(this);
+    translationObserver.unserve(this);
 
     const openButton = this.shadow.querySelector('[data-action="open"]');
     if (!(openButton instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
