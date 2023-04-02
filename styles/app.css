@@ -178,6 +178,7 @@ body[data-section-actuelle~="a-propos"] .nav-link[data-nav-section="a-propos"] {
 
 body[data-section-actuelle~="pokedex"] {
   --caught-filter-display: flex; /* disables "display: none" on caught filter in filter-menu */
+  --orders-display: none;
 }
 
 body:not([data-section-actuelle~="mes-chromatiques"]) nav search-box[section="mes-chromatiques"]::part(form),
