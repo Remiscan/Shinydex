@@ -30,6 +30,11 @@ pokemon-sprite,
   --elevation-opacity: var(--elevation-2-opacity);
 }
 
+pokemon-sprite:not([dexid]),
+pokemon-sprite:not([dexid]) ~ * {
+  display: none;
+}
+
 /*:host(:not([data-ordered])) pokemon-sprite {
   display: none;
 }*/
