@@ -36,9 +36,12 @@ fieldset {
   margin-top: 8px;
 }
 
+fieldset:first-child {
+  margin-top: 0;
+}
+
 .orders > fieldset {
   align-items: center;
-  margin-top: 0;
 }
 
 .cote-a-cote {
