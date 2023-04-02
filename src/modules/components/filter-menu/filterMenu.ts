@@ -50,8 +50,18 @@ export class FilterMenu extends HTMLElement {
       });
 
       const newFilters = this.formToFilters(formData);
+
+      const sectionElement = document.querySelector(`#${section}`);
+      if (!(sectionElement instanceof HTMLElement)) throw new TypeError('Expecting HTMLElement');
+      const oldFilters = {
+        order: sectionElement.getAttribute('data-order') ?? '',
+        orderReversed: sectionElement.getAttribute('data-order-reversed') === 'true'
+      };
+
       filterSection(section, newFilters);
-      await orderCards(section, undefined, newFilters.order, newFilters.orderReversed);
+      if (newFilters.order !== oldFilters.order || newFilters.orderReversed !== oldFilters.orderReversed) {
+        await orderCards(section, undefined, newFilters.order, newFilters.orderReversed);
+      }
       await this.saveFilters(newFilters);
     };
   }
