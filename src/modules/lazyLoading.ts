@@ -54,17 +54,20 @@ virtualizedSections.forEach(section => {
 
   let filterKeys: string[];
   let elementAttribute: string;
+  let replacementClasses: string[];
   let rootMargin: number;
   switch (section) {
     case 'pokedex':
       filterKeys = ['caught'];
       elementAttribute = 'dexid';
+      replacementClasses = [];
       rootMargin = 256;
       break;
 
     default:
       filterKeys = Object.keys(computeShinyFilters(new Shiny()));
       elementAttribute = 'huntid';
+      replacementClasses = ['surface', 'variant', 'elevation-0'];
       rootMargin = 256;
       break;
   }
@@ -111,7 +114,7 @@ virtualizedSections.forEach(section => {
             replacement.setAttribute('data-replaces', elementName);
             replacement.setAttribute(`data-${elementAttribute}`, elementId);
 
-            replacement.classList.add('surface', 'variant', 'elevation-0');
+            replacement.classList.add(...replacementClasses);
             replacement.setAttribute('style', entry.target.getAttribute('style') ?? '');
             for (const filter of filterKeys) {
               replacement.setAttribute(`data-${filter}`, entry.target.getAttribute(`data-${filter}`) ?? '');
