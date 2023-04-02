@@ -9,16 +9,8 @@ template.innerHTML = /*html*/`
   <form class="search-options" name="search-options">
 
     <div class="orders" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours partage">
-      <h2 class="title-medium if-ordre" data-string="orders-title"></h2>
-
       <fieldset class="liste-options if-ordre" aria-labelledby="label-ordre">
-        <check-box name="orderReversed">
-          <span slot="icon-unchecked">vertical_align_bottom</span>
-          <span slot="icon-checked">vertical_align_top</span>
-          <span data-string="order-reverse"></span>
-        </check-box>
-
-        <radio-group name="order">
+        <template id="orders-select-options">
           <option value="catchTime" data-section="mes-chromatiques corbeille chromatiques-ami" data-string="order-catchTime"></option>
           <option value="shinyRate" data-section="mes-chromatiques corbeille chromatiques-ami" data-string="order-shinyRate"></option>
           <option value="dexid" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours" data-string="order-dexid"></option>
@@ -27,13 +19,21 @@ template.innerHTML = /*html*/`
           <option value="game" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours" data-string="order-game"></option>
           <option value="creationTime" data-section="mes-chromatiques corbeille chromatiques-ami chasses-en-cours" data-string="order-creationTime"></option>
           <option value="username" data-section="partage" data-string="order-username"></option>
-        </radio-group>
+        </template>
+
+        <input-select name="order">
+          <span slot="label" data-string="orders-title"></span>
+        </input-select>
+
+        <check-box name="orderReversed">
+          <span slot="icon-unchecked">vertical_align_bottom</span>
+          <span slot="icon-checked">vertical_align_top</span>
+          <span data-string="order-reverse"></span>
+        </check-box>
       </fieldset>
     </div>
 
     <div class="filters" data-section="mes-chromatiques corbeille chromatiques-ami">
-      <h2 class="title-medium if-ordre" data-string="filters-title"></h2>
-
       <div class="cote-a-cote if-filters">
         <fieldset class="liste-options" data-section="mes-chromatiques corbeille chromatiques-ami">
           <legend class="titre-options title-small" data-string="filter-mine"></legend>

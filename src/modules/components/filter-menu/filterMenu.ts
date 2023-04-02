@@ -6,12 +6,12 @@ import materialIconsSheet from '../../../../ext/material_icons.css' assert { typ
 import themesSheet from '../../../../styles/themes.css.php' assert { type: 'css' };
 // @ts-expect-error
 import commonSheet from '../../../../styles/common.css' assert { type: 'css' };
+import { translationObserver } from '../../translation.js';
 import { CheckBox } from '../checkBox.js';
-import { RadioGroup } from '../radioGroup.js';
+import { InputSelect } from '../inputSelect.js';
 // @ts-expect-error
 import sheet from './styles.css' assert { type: 'css' };
 import template from './template.js';
-import { translationObserver } from '../../translation.js';
 
 
 
@@ -89,25 +89,25 @@ export class FilterMenu extends HTMLElement {
   filtersToForm(filters: FilterList) {
     order: {
       const input = this.shadow.querySelector(`[name="order"]`);
-      if (!(input instanceof RadioGroup)) throw new TypeError(`Expecting RadioGroup`);
-      input.value = filters.order;
+      if (input instanceof InputSelect) input.value = filters.order;
+      else input?.setAttribute('value', filters.order);
     }
   
     orderReverse: {
       const input = this.shadow.querySelector(`[name="orderReversed"]`);
-      if (!(input instanceof CheckBox)) throw new TypeError(`Expecting CheckBox`);
-      input.checked = filters.orderReversed;
+      if (input instanceof CheckBox) input.checked = filters.orderReversed;
+      else input?.setAttribute('checked', String(filters.orderReversed));
     }
   
     filters: {
       const allInputs = [...this.shadow.querySelectorAll('[name^="filter"]')];
       for (const input of allInputs) {
-        if (!(input instanceof CheckBox)) throw new TypeError(`Expecting CheckBox`);
         const [x, key, value] = input.getAttribute('name')!.split('-');
         if (FilterList.isKey(key) && key !== 'order' && key !== 'orderReversed') {
           const filter = filters[key];
-          if (filter && filter.has(value === 'true')) input.checked = true;
-          else                                        input.checked = false;
+          const checked = filter && filter.has(value === 'true');
+          if (input instanceof CheckBox) input.checked = checked;
+          else input?.setAttribute('checked', String(checked));
         }
       }
     }
@@ -138,18 +138,23 @@ export class FilterMenu extends HTMLElement {
           const savedFilters = await dataStorage.getItem('filters');
           const filters: FilterList = new FilterList(section, savedFilters?.get(section));
 
-          // On supprime les options des radio-group qui ne correspondent pas à la section
-          this.shadow.querySelectorAll('radio-group').forEach(radioGroup => {
-            // On choisit la valeur par défaut
-            if (radioGroup.getAttribute('name') === 'order') {
-              radioGroup.setAttribute('value', filters.order);
-            }
+          const input = this.shadow.querySelector('[name="order"]');
+          const validOptions = new DocumentFragment();
 
-            // On supprime les options inutiles
-            radioGroup.querySelectorAll('option').forEach(option => {
-              if (!(option.matches(`[data-section~="${section}"]`))) option.remove();
-            });
-          });
+          // On applique l'ordre sauvegardé pour cette section avant regénération des options
+          input?.setAttribute('value', filters.order);
+
+          // On crée les options du input-select qui correspondent à la section
+          const optionsTemplate = this.shadow.querySelector('template#orders-select-options') as HTMLTemplateElement;
+          const options = optionsTemplate.content.querySelectorAll('option');
+          for (const option of options) {
+            if (option.matches(`[data-section~="${section}"]`)) {
+              validOptions.appendChild(option);
+            }
+          }
+
+          input?.querySelectorAll('option').forEach(option => option.remove());
+          input?.appendChild(validOptions);
 
           // On applique au formulaire les filtres enregistrés de la section demandée.
           // Si aucun n'est sauvegardé, on applique les filtres par défaut.

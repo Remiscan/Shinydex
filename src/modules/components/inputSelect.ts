@@ -7,7 +7,7 @@
 
 import { backFromTopLayer, closeTopLayer, openTopLayer, toTopLayer } from '../topLayer.js';
 import { TextField } from './textField.js';
-import { translationObserver } from '../translation.js';
+import { TranslatedString, getString, translationObserver } from '../translation.js';
 
 
 
@@ -61,7 +61,7 @@ template.innerHTML = /*html*/`
 
 const optionTemplate = document.createElement('template');
 optionTemplate.innerHTML = /*html*/`
-  <span role="option" id="option-{key}" class="surface interactive"
+  <span role="option" part="option" id="option-{key}" class="surface interactive"
     data-value="{value}" aria-selected="false"
     {attr}
   >
@@ -230,6 +230,7 @@ export class InputSelect extends TextField {
   #searchTimeout?: number;
 
   labels: Map<string, string> = new Map(); // stores options as couples of values and labels
+  labelStringKeys: Map<string, string> = new Map(); // stores options as couples of values and keys to their labels
 
   /** Builds a list of option nodes from the options passed to the slot. */
   makeOptionsFromSlot = (slot: HTMLSlotElement) => {
@@ -247,9 +248,12 @@ export class InputSelect extends TextField {
 
       if (!(node instanceof HTMLOptionElement)) continue;
 
+      const dataStringAttr = node.getAttribute('data-string') ?? '';
+
       const label = node.innerHTML || node.getAttribute('value') || `Option ${k}`;
       const value = node.getAttribute('value') ?? label;
       this.labels.set(value, label);
+      this.labelStringKeys.set(value, dataStringAttr);
 
       const optionAttributes = [];
       for (const attr of node.attributes) {
@@ -262,7 +266,7 @@ export class InputSelect extends TextField {
         .replace('{label}', label)
         .replace('{value}', value)
         .replace('{attr}', optionAttributes.map(attr => `${attr.name}="${attr.value}"`).join(' '))
-        .replace('{stringKey}', node.getAttribute('data-string') ?? '');
+        .replace('{stringKey}', dataStringAttr);
       
       options.push(template);
     }
@@ -657,7 +661,11 @@ export class InputSelect extends TextField {
 
   getLabel(val: string | null): string {
     let label = this.defaultLabel;
-    if (val !== null) label = this.labels.get(val) ?? label;
+    if (val !== null) {
+      const stringKey = this.labelStringKeys.get(val);
+      if (stringKey) return getString(stringKey as TranslatedString);
+      else return this.labels.get(val) ?? label;
+    }
     return label;
   }
 
