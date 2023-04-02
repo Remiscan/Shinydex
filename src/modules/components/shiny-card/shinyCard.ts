@@ -1,7 +1,7 @@
 import { Hunt } from '../../Hunt.js';
 import { Shiny } from '../../Shiny.js';
 import { computeShinyFilters } from '../../filtres.js';
-import { isSupportedLang, isSupportedMethodID, isSupportedPokemonLang, methodStrings, pokemonData } from '../../jsonData.js';
+import { isSupportedPokemonLang, pokemonData } from '../../jsonData.js';
 import { huntStorage, localForageAPI, shinyStorage } from '../../localForage.js';
 import { Notif } from '../../notification.js';
 import { TranslatedString, translationObserver } from '../../translation.js';
@@ -30,6 +30,7 @@ export class shinyCard extends HTMLElement {
   huntid: string = '';
   dataStore: localForageAPI = shinyStorage;
   #translationObserved: boolean = false;
+  needsRefresh = true;
   clickHandler: (e: Event) => void = () => {};
   openHandler = (e: Event) => {
     e.stopPropagation();
@@ -65,16 +66,13 @@ export class shinyCard extends HTMLElement {
     this.setAttribute('last-update', String(shiny.lastUpdate));
 
     const lang = getCurrentLang();
-    const pokemon = pokemonData[shiny.dexid];
 
     // Espèce
     {
       const element = this.shadow.querySelector('[data-type="species"]')!;
-      let name = '';
-      if (isSupportedPokemonLang(lang)) {
-        name = pokemon.name?.[lang] ?? '';
-      }
-      element.innerHTML = name;
+      const species = getString(`pokemon/${shiny.dexid}` as TranslatedString, lang);
+      element.setAttribute('data-string', `pokemon/${shiny.dexid}`);
+      element.innerHTML = species;
 
       const sprite = this.shadow.querySelector('pokemon-sprite')!;
       sprite.setAttribute('dexid', String(shiny.dexid));
@@ -157,7 +155,7 @@ export class shinyCard extends HTMLElement {
       } else {
         // Si la date est avant la sortie du premier jeu Pokémon au Japon,
         // marquer la date comme inconnue.
-        element.innerHTML = `<span data-string="shiny-card-unknown-date">${getString('shiny-card-unknown-date')}</span>`;
+        element.innerHTML = `<span data-string="shiny-card-unknown-date">${getString('shiny-card-unknown-date', lang)}</span>`;
       }
     }
 
@@ -167,7 +165,7 @@ export class shinyCard extends HTMLElement {
       const element = this.shadow.querySelector('[data-type="game"]')!
       element.setAttribute('data-icon', `game/${game}`);
       element.setAttribute('data-label', `game/${game}`);
-      element.setAttribute('aria-label', getString(`game/${game}` as TranslatedString));
+      element.setAttribute('aria-label', getString(`game/${game}` as TranslatedString, lang));
     }
 
     // Ball
@@ -176,7 +174,7 @@ export class shinyCard extends HTMLElement {
       const element = this.shadow.querySelector('[data-type="ball"]')!;
       element.setAttribute('data-icon', `ball/${ball}`);
       element.setAttribute('data-label', `${ball}-ball`);
-      element.setAttribute('aria-label', getString(`${ball}-ball` as TranslatedString));
+      element.setAttribute('aria-label', getString(`${ball}-ball` as TranslatedString, lang));
       if (ball) element.classList.remove('off');
       else      element.classList.add('off');
     }
@@ -194,7 +192,7 @@ export class shinyCard extends HTMLElement {
       const element = this.shadow.querySelector('[data-type="originMark"]')!;
       element.setAttribute('data-icon', `origin-mark/${origin}`);
       element.setAttribute('data-label', `legit-confirmed`);
-      element.setAttribute('aria-label', getString(`legit-confirmed`));
+      element.setAttribute('aria-label', getString(`legit-confirmed`, lang));
       if (origin) element.classList.remove('off');
       else        element.classList.add('off');
     }
@@ -204,6 +202,8 @@ export class shinyCard extends HTMLElement {
       const gene = shiny.gene;
       const element = this.shadow.querySelector('[data-type="gene"]')!;
       element.setAttribute('data-icon', `gene/${gene}`);
+      element.setAttribute('data-label', `capture-gene-${gene}`);
+      element.setAttribute('aria-label', getString(`capture-gene-${gene}` as TranslatedString, lang));
       if (gene) element.classList.remove('off');
       else      element.classList.add('off');
     }
@@ -211,10 +211,8 @@ export class shinyCard extends HTMLElement {
     // Méthode
     {
       const element = this.shadow.querySelector('[data-type="method"]')!;
-      let method = '';
-      if (isSupportedLang(lang) && isSupportedMethodID(shiny.method)) {
-        method = methodStrings[lang][shiny.method] ?? '';
-      }
+      const method = getString(`method/${shiny.method}` as TranslatedString, lang);
+      element.setAttribute('data-string', `method/${shiny.method}`);
       element.innerHTML = method;
     }
 
@@ -367,7 +365,10 @@ export class shinyCard extends HTMLElement {
     restoreButton.addEventListener('click', this.restoreHandler);
 
     // Peuple le contenu de la carte
-    this.dataToContent();
+    if (this.needsRefresh) {
+      this.dataToContent();
+      this.needsRefresh = false;
+    }
   }
 
 
@@ -401,7 +402,8 @@ export class shinyCard extends HTMLElement {
     switch (attr) {
       case 'huntid': {
         this.huntid = newValue;
-        //this.dataToContent();
+        this.dataToContent();
+        this.needsRefresh = false;
       } break;
 
       case 'lang':
