@@ -1,7 +1,7 @@
 import { Hunt } from '../../Hunt.js';
 import { Shiny } from '../../Shiny.js';
 import { computeShinyFilters } from '../../filtres.js';
-import { isSupportedLang, isSupportedMethodID, isSupportedPokemonLang, methodStrings, pokemonData } from '../../jsonData.js';
+import { isSupportedPokemonLang, pokemonData } from '../../jsonData.js';
 import { huntStorage, localForageAPI, shinyStorage } from '../../localForage.js';
 import { Notif } from '../../notification.js';
 import { TranslatedString, translationObserver } from '../../translation.js';
@@ -30,6 +30,7 @@ export class shinyCard extends HTMLElement {
   huntid: string = '';
   dataStore: localForageAPI = shinyStorage;
   #translationObserved: boolean = false;
+  needsRefresh = true;
   clickHandler: (e: Event) => void = () => {};
   openHandler = (e: Event) => {
     e.stopPropagation();
@@ -211,10 +212,8 @@ export class shinyCard extends HTMLElement {
     // Méthode
     {
       const element = this.shadow.querySelector('[data-type="method"]')!;
-      let method = '';
-      if (isSupportedLang(lang) && isSupportedMethodID(shiny.method)) {
-        method = methodStrings[lang][shiny.method] ?? '';
-      }
+      const method = getString(`method/${shiny.method}` as TranslatedString);
+      element.setAttribute('data-string', `method/${shiny.method}`);
       element.innerHTML = method;
     }
 
@@ -349,7 +348,8 @@ export class shinyCard extends HTMLElement {
 
 
   connectedCallback() {
-    translationObserver.serve(this, { method: 'attribute' });
+    // Cause 100% cpu use for some reason?
+    //translationObserver.serve(this, { method: 'attribute' });
 
     // Détecte le clic pour "ouvrir" la carte
     const openButton = this.shadow.querySelector('[data-action="open"]');
@@ -367,12 +367,19 @@ export class shinyCard extends HTMLElement {
     restoreButton.addEventListener('click', this.restoreHandler);
 
     // Peuple le contenu de la carte
-    this.dataToContent();
+    if (this.needsRefresh) {
+      this.dataToContent();
+      this.needsRefresh = false;
+    }
+
+    // While the 100% cpu use bug with .serve isn't solved, this is enough,
+    // since the lazy loading causes the card to be reconnected after changing lang & coming back from settings
+    translationObserver.translate(this, getCurrentLang());
   }
 
 
   disconnectedCallback() {
-    translationObserver.unserve(this);
+    //translationObserver.unserve(this);
 
     const openButton = this.shadow.querySelector('[data-action="open"]');
     if (!(openButton instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
@@ -401,7 +408,8 @@ export class shinyCard extends HTMLElement {
     switch (attr) {
       case 'huntid': {
         this.huntid = newValue;
-        //this.dataToContent();
+        this.dataToContent();
+        this.needsRefresh = false;
       } break;
 
       case 'lang':

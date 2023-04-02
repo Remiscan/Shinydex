@@ -171,7 +171,15 @@ export async function populateFromData(section: PopulatableSection, ids: string[
         cardsToCreate.push(card);
       } else {
         // DANS LA BDD & AVEC CARTE = Éditer
-        if (!virtualize) await (card as shinyCard | huntCard).dataToContent();
+        if (!virtualize || card instanceof huntCard) await (card as shinyCard | huntCard).dataToContent();
+        else {
+          if (card instanceof shinyCard) {
+            card.dataToContent();
+            card.needsRefresh = false;
+          } else {
+            card.setAttribute('data-needs-refresh', 'true');
+          }
+        }
       }
     }
 

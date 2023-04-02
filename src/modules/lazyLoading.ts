@@ -87,6 +87,10 @@ virtualizedSections.forEach(section => {
             replacement.setAttribute(`data-${filter}`, entry.target.getAttribute(`data-${filter}`) ?? '');
           }
 
+          if ('needsRefresh' in replacement) {
+            replacement.needsRefresh = entry.target.getAttribute('data-needs-refresh') === 'true';
+          }
+
           replacement.setAttribute('lang', getCurrentLang());
           replacement.setAttribute('role', entry.target.getAttribute('role'));
 
@@ -107,6 +111,7 @@ virtualizedSections.forEach(section => {
             replacement.setAttribute('data-replaces', elementName);
             replacement.setAttribute(`data-${elementAttribute}`, elementId);
 
+            replacement.classList.add('surface', 'variant', 'elevation-0');
             replacement.setAttribute('style', entry.target.getAttribute('style') ?? '');
             for (const filter of filterKeys) {
               replacement.setAttribute(`data-${filter}`, entry.target.getAttribute(`data-${filter}`) ?? '');

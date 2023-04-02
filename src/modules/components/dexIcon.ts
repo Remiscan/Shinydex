@@ -1,7 +1,7 @@
 import { Pokemon } from '../Pokemon.js';
 import { navigate } from '../navigate.js';
-import { getString, translationObserver } from '../translation.js';
 import { Notif } from '../notification.js';
+import { getString, translationObserver } from '../translation.js';
 
 
 
