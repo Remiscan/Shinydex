@@ -166,6 +166,8 @@ export function lazyLoad(element: Element, method: LazyLoadingMethod = 'auto', {
 
 /** Virtualizes a section's list of cards. */
 export function lazyLoadSection(section: string) {
+  const sectionElement = document.querySelector(`#${section}`);
+  sectionElement?.setAttribute('data-lazy-loaded', 'true');
   const cards = getLazyLoadableCards(section);
   cards.forEach((card: Element) => lazyLoad(card, 'manual', { fixedSize: true}));
 }
@@ -175,6 +177,8 @@ export function lazyLoadSection(section: string) {
  * leaving every card in its current state (potentially replaced by a placeholder).
  */
 export function unLazyLoadSection(section: string) {
+  const sectionElement = document.querySelector(`#${section}`);
+  sectionElement?.removeAttribute('data-lazy-loaded');
   const cards = getLazyLoadableCards(section);
   const observer = manualLoaders.get(section);
   cards.forEach((card: Element) => observer?.unobserve(card));

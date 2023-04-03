@@ -30,8 +30,6 @@ async function populateHandler(section: PopulatableSection, _ids?: string[]): Pr
       break;
   }
 
-  const virtualize = virtualizedSections.includes(section);
-
   const sectionElement = document.querySelector(`#${section}`);
   const isCurrentSection = document.body.matches(`[data-section-actuelle~="${section}"]`);
 
@@ -69,7 +67,9 @@ async function populateHandler(section: PopulatableSection, _ids?: string[]): Pr
       document.querySelector(`#pokedex`)?.classList.remove('loading');
     }
 
-    if (virtualize && isCurrentSection) lazyLoadSection(section);
+    const virtualize = virtualizedSections.includes(section) && 
+      (isCurrentSection || sectionElement?.getAttribute('data-lazy-loaded') === 'true');
+    if (virtualize) lazyLoadSection(section);
   });
 
   return populated;
