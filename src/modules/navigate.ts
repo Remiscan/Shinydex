@@ -283,8 +283,10 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
     window.removeEventListener('keydown', backOnEscape);
 
     // On dé-virtualise la section précédente si elle l'était
-    const virtualized = virtualizedSections.includes(ancienneSection.nom);
-    if (virtualized) unLazyLoadSection(ancienneSection.nom);
+    if (nouvelleSection.closePrevious) {
+      const virtualized = virtualizedSections.includes(ancienneSection.nom);
+      if (virtualized) unLazyLoadSection(ancienneSection.nom);
+    }
     
     // On enregistre la position du scroll sur l'ancienne section
     if (ancienneSection.rememberPosition) lastPosition.set(sectionActuelle, mainElement.scrollTop);
