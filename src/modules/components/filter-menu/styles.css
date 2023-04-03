@@ -67,3 +67,7 @@ fieldset:first-child {
 .caught-filter {
   display: var(--caught-filter-display, none);
 }
+
+input-select::part(container) {
+  --elevation-opacity: var(--elevation-1-opacity);
+}
