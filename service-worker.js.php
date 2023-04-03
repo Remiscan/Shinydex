@@ -64,7 +64,6 @@ self.addEventListener('install', function(event) {
   console.log('[install] Installing service worker...');
   event.waitUntil(
     installFiles(event)
-    .then(cacheAllSprites)
     .catch(raison => console.log('[install] ' + raison))
     .then(() => {
       console.log('[install] Service worker installed!');

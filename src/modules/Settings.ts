@@ -27,7 +27,7 @@ export class Settings {
   'lang': SupportedLang = getCurrentLang();
   'theme': Theme = 'system';
   'theme-hue': number = 255;
-  //'cache-all-sprites': boolean = true;
+  'cache-all-sprites': boolean = false;
 
   constructor(data?: FormData | object) {
     if (!data) return;
@@ -41,7 +41,7 @@ export class Settings {
 
       this['theme-hue'] = Number(data.get('theme-hue')) || this['theme-hue'];
 
-      //this['cache-all-sprites'] = data.get('cache-all-sprites') === 'true';
+      this['cache-all-sprites'] = data.get('cache-all-sprites') === 'true';
     } else {
       if ('lang' in data && typeof data['lang'] === 'string' && isSupportedLang(data['lang'])) {
         this['lang'] = data['lang'];
@@ -55,9 +55,9 @@ export class Settings {
         this['theme-hue'] = data['theme-hue'];
       }
 
-      /*if ('cache-all-sprites' in data) {
+      if ('cache-all-sprites' in data) {
         this['cache-all-sprites'] = Boolean(data['cache-all-sprites']);
-      }*/
+      }
     }
   }
 
@@ -88,13 +88,13 @@ export class Settings {
       input?.setAttribute('style', `--gradient:${gradientString};`);
     }
 
-    /*{
+    {
       // Cache all sprites
       const input = settingsForm.querySelector('[name="cache-all-sprites"]');
       if (input instanceof HTMLElement && 'checked' in input) input.checked = this['cache-all-sprites'];
       else if (this['cache-all-sprites']) input?.setAttribute('checked', 'true');
       else input?.removeAttribute('checked');
-    }*/
+    }
   }
 
 
@@ -133,7 +133,7 @@ export class Settings {
       }
     }
 
-    /*{
+    {
       // Cache all sprites
       if (this.changedBy('cache-all-sprites', ['initial'])) { // On app launch only
         if (this['cache-all-sprites']) {
@@ -147,7 +147,7 @@ export class Settings {
       } else if (this.changedBy('cache-all-sprites', ['manual'])) { // On manual settings change,
         cacheAllSprites(this['cache-all-sprites']);                 // cache or delete all sprites.
       }
-    }*/
+    }
 
     appliedSettings = this;
   }
