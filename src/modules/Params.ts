@@ -20,9 +20,8 @@ declare global {
 //////////////////////
 // Constantes globales
 export const Params = {
-  layoutPC: 960,
+  layoutPC: 720,
   layoutPClarge: 1140,
-  layoutPCcomplet: 1600,
   
   easingStandard: 'cubic-bezier(.2, 0, 0, 1)',
   easingDecelerate: 'cubic-bezier(0, 0, 0, 1)',

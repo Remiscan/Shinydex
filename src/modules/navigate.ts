@@ -41,7 +41,7 @@ const sections: Section[] = [
     historique: true,
     closePrevious: true,
     makePreviousInert: false,
-    preload: [`./images/iconsheet.webp`, `./images/pokemonsheet.webp`],
+    preload: [`./images/iconsheet.webp`],
     fab: 'add',
     element: document.getElementById('mes-chromatiques')!
   }, {
@@ -258,6 +258,24 @@ const backOnEscape = (event: KeyboardEvent) => {
 };
 
 
+const getLinkedSections = (section: Section['nom']): Section[] => {
+  let linkedSections = [section];
+  if (window.innerWidth >= Params.layoutPClarge) {
+    switch (section) {
+      case 'mes-chromatiques': linkedSections.push('pokedex'); break;
+      case 'pokedex':          linkedSections.push('mes-chromatiques'); break;
+      case 'chasses-en-cours': linkedSections.push('corbeille'); break;
+      case 'corbeille':        linkedSections.push('chasses-en-cours'); break;
+      case 'parametres':       linkedSections.push('a-propos'); break;
+      case 'a-propos':         linkedSections.push('parametres'); break;
+      case 'partage':          linkedSections.push('chromatiques-ami'); break;
+      case 'chromatiques-ami': linkedSections.push('partage'); break;
+    }
+  }
+  return linkedSections.map(nom => sections.find(s => s.nom === nom)!);
+}
+
+
 /**
  * Navigue vers la section demandée.
  * @param sectionCible - ID de la section demandée.
@@ -282,18 +300,24 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
     // On désactive le retour à la section précédente à l'appui sur Échap
     window.removeEventListener('keydown', backOnEscape);
 
-    // On dé-virtualise la section précédente si elle l'était
-    if (nouvelleSection.closePrevious) {
-      const virtualized = virtualizedSections.includes(ancienneSection.nom);
-      if (virtualized) unLazyLoadSection(ancienneSection.nom);
-    }
-    
-    // On enregistre la position du scroll sur l'ancienne section
-    if (ancienneSection.rememberPosition) lastPosition.set(sectionActuelle, mainElement.scrollTop);
+    const linkedAnciennesSections = getLinkedSections(ancienneSection.nom);
+    await Promise.all(linkedAnciennesSections.map(async section => {
+      // On dé-virtualise la section précédente si elle l'était
+      if (nouvelleSection.closePrevious) {
+        const virtualized = virtualizedSections.includes(section.nom);
+        if (virtualized) unLazyLoadSection(section.nom);
+      }
 
-    // On anime la disparition de l'ancienne section
-    const anim = ancienneSection.closeAnimation(ancienneSection.element, event, data);
-    if (anim) await wait(anim);
+      // On enregistre la position du scroll sur l'ancienne section
+      if (section.rememberPosition) {
+        const scrolledElement = section.element.querySelector('.section-contenu')!;
+        lastPosition.set(sectionActuelle, scrolledElement.scrollTop);
+      }
+
+      // On anime la disparition de l'ancienne section
+      const anim = section.closeAnimation(section.element, event, data);
+      if (anim) await wait(anim);
+    }));
   }
 
   // Disparition de l'indicateur de l'état du backup autour du bouton paramètres
@@ -302,98 +326,8 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
     sp.removeAttribute('finished');
   });
 
-  // On affiche la nouvelle section
-  sectionActuelle = sectionCible;
-  const sectionsString = `${nouvelleSection.closePrevious ? '' : ancienneSection.nom} ${nouvelleSection.nom}`;
-  document.body.dataset.sectionActuelle = sectionsString;
-
   if (nouvelleSection.historique && event.type !== 'popstate') history.pushState({ section: sectionCible, data: data }, '');
   if (nouvelleSection.rememberPosition) mainElement.scroll(0, lastPosition.get(sectionCible) || 0); // scrolle vers la position précédemment enregistrée
-
-  // Only animate new section(s) if the one we're closing was NOT displayed over it,
-  // i.e. if it closed its previous section.
-  const animateNewSection = ancienneSection.closePrevious;
-  const sectionsToAnimate: string[] = [];
-  if (animateNewSection) {
-    sectionsToAnimate.push(nouvelleSection.nom);
-    if (window.innerWidth >= Params.layoutPClarge) {
-      switch (sectionCible) {
-        case 'mes-chromatiques': sectionsToAnimate.push('pokedex'); break;
-        case 'pokedex':          sectionsToAnimate.push('mes-chromatiques'); break;
-        case 'chasses-en-cours': sectionsToAnimate.push('corbeille'); break;
-        case 'corbeille':        sectionsToAnimate.push('chasses-en-cours'); break;
-        case 'parametres':       sectionsToAnimate.push('a-propos'); break;
-        case 'a-propos':         sectionsToAnimate.push('parametres'); break;
-        case 'partage':          sectionsToAnimate.push('chromatiques-ami'); break;
-        case 'chromatiques-ami': sectionsToAnimate.push('partage'); break;
-      }
-    }
-  }
-
-  // On prépare la nouvelle section si besoin
-  switch (sectionCible) {
-    case 'chromatiques-ami': {
-      if (data.username !== nouvelleSection.element.getAttribute('data-username')) {
-        nouvelleSection.element.setAttribute('data-username', data.username);
-
-        nouvelleSection.element.classList.add('loading');
-        nouvelleSection.element.classList.remove('vide', 'vide-filtres', 'vide-recherche');
-
-        // Populate section with friend's username
-        nouvelleSection.element.querySelectorAll('[data-type="username"]').forEach(e => e.innerHTML = data.username);
-
-        // Populate section with friend's Pokémon (don't await this before navigating)
-        callBackend('get-friend-data', { username: data.username, scope: 'full' }, false)
-        .then(async response => {
-          if ('matches' in response && response.matches === true) {
-            await Promise.all(
-              response.pokemon.map((shiny: any) => {
-                const feShiny = new FrontendShiny(shiny);
-                return friendShinyStorage.setItem(String(shiny.huntid), feShiny);
-              })
-            );
-
-            window.dispatchEvent(new CustomEvent('dataupdate', {
-              detail: {
-                sections: ['chromatiques-ami'],
-                ids: response.pokemon.map((shiny: any) => String(shiny.huntid)),
-                sync: false
-              }
-            }));
-          }
-        });
-      }
-    } break;
-
-    case 'sprite-viewer': {
-      const viewer = nouvelleSection.element.querySelector('sprite-viewer')!;
-      viewer.setAttribute('dexid', data.dexid || '');
-      viewer.setAttribute('shiny', 'true');
-      viewer.setAttribute('size', navigator.onLine ? '512' : '112')
-    } break;
-
-    case 'filter-menu': {
-      const menu = document.querySelector(`filter-menu[section="${data.section ?? ancienneSection.nom}"]`);
-      if (!(menu instanceof FilterMenu)) throw new TypeError(`Expecting FilterMenu`);
-      menu.open();
-    } break;
-
-    default: {
-      document.body.removeAttribute('data-filters');
-    }
-  }
-
-  // On prépare les liens de retour de la nouvelle section s'il y en a
-  if (event.type !== 'popstate') {
-    const container = (sectionCible === 'obfuscator' && data.filters) ? document.querySelector(`filter-menu`)! : nouvelleSection.element;
-    for (const a of [...container.querySelectorAll('a.bouton-retour')]) {
-      if (!(a instanceof HTMLAnchorElement)) throw new TypeError(`Expecting HTMLAnchorElement`);
-      a.href = `./${ancienneSection.nom}`;
-    }
-  }
-
-  // On anime le FAB si besoin
-  animateFabIcon(ancienneSection, nouvelleSection);
 
   // On rend l'ancienne section inerte si la nouvelle section s'affiche par-dessus
   const main = document.querySelector('main');
@@ -409,18 +343,92 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
     bottomBar?.removeAttribute('inert');
   }
 
-  // On anime l'apparition de la nouvelle section
-  await Promise.all(sectionsToAnimate.map(nom => {
-    const section = sections.find(section => section.nom === nom);
-    const apparitionSection = section?.openAnimation(section.element, event, data);
+  // On anime le FAB si besoin
+  animateFabIcon(ancienneSection, nouvelleSection);
 
-    if (apparitionSection) return wait(apparitionSection);
-    else                   return;
+  // Only animate new section(s) if the one we're closing was NOT displayed over it,
+  // i.e. if it closed its previous section.
+  const animateNewSection = ancienneSection.closePrevious;
+
+  // On affiche la nouvelle section
+  sectionActuelle = sectionCible;
+  const sectionsString = `${nouvelleSection.closePrevious ? '' : ancienneSection.nom} ${nouvelleSection.nom}`;
+  document.body.dataset.sectionActuelle = sectionsString;
+
+  const linkedNouvellesSections = getLinkedSections(nouvelleSection.nom);
+  await Promise.all(linkedNouvellesSections.map(section => {
+    // On prépare la nouvelle section si besoin
+    switch (section.nom) {
+      case 'chromatiques-ami': {
+        if (data.username !== section.element.getAttribute('data-username')) {
+          section.element.setAttribute('data-username', data.username);
+
+          section.element.classList.add('loading');
+          section.element.classList.remove('vide', 'vide-filtres', 'vide-recherche');
+
+          // Populate section with friend's username
+          section.element.querySelectorAll('[data-type="username"]').forEach(e => e.innerHTML = data.username);
+
+          // Populate section with friend's Pokémon (don't await this before navigating)
+          callBackend('get-friend-data', { username: data.username, scope: 'full' }, false)
+          .then(async response => {
+            if ('matches' in response && response.matches === true) {
+              await Promise.all(
+                response.pokemon.map((shiny: any) => {
+                  const feShiny = new FrontendShiny(shiny);
+                  return friendShinyStorage.setItem(String(shiny.huntid), feShiny);
+                })
+              );
+
+              window.dispatchEvent(new CustomEvent('dataupdate', {
+                detail: {
+                  sections: ['chromatiques-ami'],
+                  ids: response.pokemon.map((shiny: any) => String(shiny.huntid)),
+                  sync: false
+                }
+              }));
+            }
+          });
+        }
+      } break;
+
+      case 'sprite-viewer': {
+        const viewer = section.element.querySelector('sprite-viewer')!;
+        viewer.setAttribute('dexid', data.dexid || '');
+        viewer.setAttribute('shiny', 'true');
+        viewer.setAttribute('size', navigator.onLine ? '512' : '112')
+      } break;
+
+      case 'filter-menu': {
+        const menu = document.querySelector(`filter-menu[section="${data.section ?? ancienneSection.nom}"]`);
+        if (!(menu instanceof FilterMenu)) throw new TypeError(`Expecting FilterMenu`);
+        menu.open();
+      } break;
+
+      default: {
+        document.body.removeAttribute('data-filters');
+      }
+    }
+
+    // On prépare les liens de retour de la nouvelle section s'il y en a
+    if (event.type !== 'popstate') {
+      const container = (sectionCible === 'obfuscator' && data.filters) ? document.querySelector(`filter-menu`)! : nouvelleSection.element;
+      for (const a of [...container.querySelectorAll('a.bouton-retour')]) {
+        if (!(a instanceof HTMLAnchorElement)) throw new TypeError(`Expecting HTMLAnchorElement`);
+        a.href = `./${ancienneSection.nom}`;
+      }
+    }
+    
+    // On anime l'apparition de la nouvelle section
+    if (animateNewSection) {
+      const apparitionSection = section?.openAnimation(section.element, event, data);
+      if (apparitionSection) wait(apparitionSection);
+    }
+
+    // On virtualise la nouvelle section si elle peut l'être
+    const virtualize = virtualizedSections.includes(section.nom);
+    if (virtualize) lazyLoadSection(section.nom);
   }));
-
-  // On virtualise la nouvelle section si elle peut l'être
-  const virtualize = virtualizedSections.includes(nouvelleSection.nom);
-  if (virtualize) lazyLoadSection(nouvelleSection.nom);
 
   // On nettoie l'ancienne section si besoin
   switch (ancienneSection.nom) {
