@@ -481,7 +481,7 @@ body.welcome [data-replaces="shiny-card"] {
 }
 
 body.welcome shiny-card {
-  animation: intro .35s var(--easing-decelerate);
+  animation: intro .35s var(--easing-standard);
   --delay: calc(var(--order) * 50ms);
   animation-delay: var(--delay, 0ms);
   animation-fill-mode: backwards;
