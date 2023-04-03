@@ -138,6 +138,15 @@ export function clearElementStorage(section: string, id: string) {
   elementStorage.get(section)?.delete(id);
 }
 
+function getLazyLoadableCards(section: string): Element[] {
+  switch (section) {
+    case 'pokedex':
+      return [...(document.querySelectorAll(`#${section} :is(dex-icon, [data-replaces="dex-icon"])`) ?? [])];
+    default:
+      return [...(document.querySelector(`#${section} .liste-cartes`)?.children ?? [])];
+  }
+}
+
 type LazyLoadingMethod = 'auto' | 'manual';
 type LazyLoadingOptions = {
   fixedSize?: boolean
@@ -157,16 +166,8 @@ export function lazyLoad(element: Element, method: LazyLoadingMethod = 'auto', {
 
 /** Virtualizes a section's list of cards. */
 export function lazyLoadSection(section: string) {
-  let cards: Element[];
-  switch (section) {
-    case 'pokedex':
-      cards = [...(document.querySelectorAll(`#${section} :is(dex-icon, [data-replaces="dex-icon"])`) ?? [])];
-      break;
-
-    default:
-      cards = [...(document.querySelector(`#${section} .liste-cartes`)?.children ?? [])];
-  }
-  if (cards) cards.forEach((card: Element) => lazyLoad(card, 'manual', { fixedSize: true}));
+  const cards = getLazyLoadableCards(section);
+  cards.forEach((card: Element) => lazyLoad(card, 'manual', { fixedSize: true}));
 }
 
 /**
@@ -174,7 +175,7 @@ export function lazyLoadSection(section: string) {
  * leaving every card in its current state (potentially replaced by a placeholder).
  */
 export function unLazyLoadSection(section: string) {
-  const cards = [...(document.querySelector(`#${section} .liste-cartes`)?.children ?? [])];
+  const cards = getLazyLoadableCards(section);
   const observer = manualLoaders.get(section);
-  if (cards) cards.forEach((card: Element) => observer?.unobserve(card));
+  cards.forEach((card: Element) => observer?.unobserve(card));
 }

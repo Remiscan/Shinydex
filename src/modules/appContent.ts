@@ -33,6 +33,8 @@ async function populateHandler(section: PopulatableSection, _ids?: string[]): Pr
   const virtualize = virtualizedSections.includes(section);
 
   const sectionElement = document.querySelector(`#${section}`);
+  const isCurrentSection = document.body.matches(`[data-section-actuelle~="${section}"]`);
+
   const orderMap = await computeOrders(section);
   const currentOrder = sectionElement?.getAttribute('data-order') ?? '';
   const reversed = sectionElement?.getAttribute('data-order-reversed') === 'true';
@@ -67,7 +69,7 @@ async function populateHandler(section: PopulatableSection, _ids?: string[]): Pr
       document.querySelector(`#pokedex`)?.classList.remove('loading');
     }
 
-    if (virtualize) lazyLoadSection(section);
+    if (virtualize && isCurrentSection) lazyLoadSection(section);
   });
 
   return populated;

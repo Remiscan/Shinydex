@@ -3,7 +3,7 @@ import { Settings } from './Settings.js';
 import { FrontendShiny } from './ShinyBackend.js';
 import { callBackend } from './callBackend.js';
 import { FilterMenu } from './components/filter-menu/filterMenu.js';
-import { clearElementStorage } from './lazyLoading.js';
+import { clearElementStorage, lazyLoadSection, unLazyLoadSection, virtualizedSections } from './lazyLoading.js';
 import { friendShinyStorage } from './localForage.js';
 import { Notif } from './notification.js';
 import { TranslatedString, getString } from './translation.js';
@@ -281,6 +281,10 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
   if (ancienneSection) {
     // On désactive le retour à la section précédente à l'appui sur Échap
     window.removeEventListener('keydown', backOnEscape);
+
+    // On dé-virtualise la section précédente si elle l'était
+    const virtualized = virtualizedSections.includes(ancienneSection.nom);
+    if (virtualized) unLazyLoadSection(ancienneSection.nom);
     
     // On enregistre la position du scroll sur l'ancienne section
     if (ancienneSection.rememberPosition) lastPosition.set(sectionActuelle, mainElement.scrollTop);
@@ -411,6 +415,10 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
     if (apparitionSection) return wait(apparitionSection);
     else                   return;
   }));
+
+  // On virtualise la nouvelle section si elle peut l'être
+  const virtualize = virtualizedSections.includes(nouvelleSection.nom);
+  if (virtualize) lazyLoadSection(nouvelleSection.nom);
 
   // On nettoie l'ancienne section si besoin
   switch (ancienneSection.nom) {
