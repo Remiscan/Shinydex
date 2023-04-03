@@ -5,9 +5,9 @@ import { Notif } from './notification.js';
 import { computePaletteCss, gradientString, setTheme, updateMetaThemeColorTag } from './theme.js';
 // @ts-expect-error
 import { queueable } from '../../../_common/js/per-function-async-queue.js';
+import { InputSelect } from './components/inputSelect.js';
 import { SupportedLang, isSupportedLang } from './jsonData.js';
 import { getCurrentLang, getString, translationObserver } from './translation.js';
-import { InputSelect } from './components/inputSelect.js';
 
 
 
@@ -20,7 +20,6 @@ function isSupportedTheme(string: string): string is Theme {
 
 
 let appliedSettings: Settings;
-let langChangeNotif: Notif;
 
 
 
@@ -28,7 +27,7 @@ export class Settings {
   'lang': SupportedLang = getCurrentLang();
   'theme': Theme = 'system';
   'theme-hue': number = 255;
-  'cache-all-sprites': boolean = false;
+  //'cache-all-sprites': boolean = true;
 
   constructor(data?: FormData | object) {
     if (!data) return;
@@ -42,7 +41,7 @@ export class Settings {
 
       this['theme-hue'] = Number(data.get('theme-hue')) || this['theme-hue'];
 
-      this['cache-all-sprites'] = data.get('cache-all-sprites') === 'true';
+      //this['cache-all-sprites'] = data.get('cache-all-sprites') === 'true';
     } else {
       if ('lang' in data && typeof data['lang'] === 'string' && isSupportedLang(data['lang'])) {
         this['lang'] = data['lang'];
@@ -56,9 +55,9 @@ export class Settings {
         this['theme-hue'] = data['theme-hue'];
       }
 
-      if ('cache-all-sprites' in data) {
+      /*if ('cache-all-sprites' in data) {
         this['cache-all-sprites'] = Boolean(data['cache-all-sprites']);
-      }
+      }*/
     }
   }
 
@@ -70,31 +69,32 @@ export class Settings {
     {
       // Lang
       const input = settingsForm.querySelector(`[name="lang"]`);
-      if (!(input instanceof InputSelect)) throw new TypeError(`Expecting InputSelect`);
-      input.value = this.lang;
+      if (input instanceof InputSelect) input.value = this.lang;
+      else input?.setAttribute('value', this.lang);
     }
 
     {
       // Theme
       const input = settingsForm.querySelector(`[name="theme"]`);
-      if (!(input instanceof RadioGroup)) throw new TypeError(`Expecting RadioGroup`);
-      input.value = this.theme;
+      if (input instanceof RadioGroup) input.value = this.theme;
+      else input?.setAttribute('value', this.theme);
     }
 
     {
       // Theme hue
       const input = settingsForm.querySelector('[name="theme-hue"]');
-      if (!input || !('value' in input) || !('style' in input)) throw new TypeError('Expecting InputSlider');
-      input.value = this['theme-hue'];
-      input.setAttribute('style', `--gradient:${gradientString};`);
+      if (input instanceof HTMLElement && 'value' in input) input.value = this['theme-hue'];
+      else input?.setAttribute('value', String(this['theme-hue']));
+      input?.setAttribute('style', `--gradient:${gradientString};`);
     }
 
-    {
+    /*{
       // Cache all sprites
       const input = settingsForm.querySelector('[name="cache-all-sprites"]');
-      if (!input || !('checked' in input)) throw new TypeError(`Expecting InputSwitch`);
-      input.checked = this['cache-all-sprites'];
-    }
+      if (input instanceof HTMLElement && 'checked' in input) input.checked = this['cache-all-sprites'];
+      else if (this['cache-all-sprites']) input?.setAttribute('checked', 'true');
+      else input?.removeAttribute('checked');
+    }*/
   }
 
 
@@ -133,7 +133,7 @@ export class Settings {
       }
     }
 
-    {
+    /*{
       // Cache all sprites
       if (this.changedBy('cache-all-sprites', ['initial'])) { // On app launch only
         if (this['cache-all-sprites']) {
@@ -145,9 +145,9 @@ export class Settings {
           // cacheAllSprites(true); // Cache all new sprites
         }
       } else if (this.changedBy('cache-all-sprites', ['manual'])) { // On manual settings change,
-        cacheAllSprites(this['cache-all-sprites']);                                                       // cache or delete all sprites.
+        cacheAllSprites(this['cache-all-sprites']);                 // cache or delete all sprites.
       }
-    }
+    }*/
 
     appliedSettings = this;
   }
