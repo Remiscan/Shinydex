@@ -327,7 +327,6 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
   });
 
   if (nouvelleSection.historique && event.type !== 'popstate') history.pushState({ section: sectionCible, data: data }, '');
-  if (nouvelleSection.rememberPosition) mainElement.scroll(0, lastPosition.get(sectionCible) || 0); // scrolle vers la position précédemment enregistrée
 
   // On rend l'ancienne section inerte si la nouvelle section s'affiche par-dessus
   const main = document.querySelector('main');
@@ -417,6 +416,12 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
         if (!(a instanceof HTMLAnchorElement)) throw new TypeError(`Expecting HTMLAnchorElement`);
         a.href = `./${ancienneSection.nom}`;
       }
+    }
+
+    // On restaure la position de scroll précédemment enregistrée
+    if (section.rememberPosition) {
+      const scrolledElement = section.element.querySelector('.section-contenu')!;
+      scrolledElement.scroll(0, lastPosition.get(sectionCible) || 0);
     }
     
     // On anime l'apparition de la nouvelle section
