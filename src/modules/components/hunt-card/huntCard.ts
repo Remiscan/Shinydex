@@ -602,8 +602,14 @@ export class huntCard extends HTMLElement {
           });
 
           for (const compteurProp of compteurProps) {
-            const val = Math.max(0, Math.min(parseInt(String(formData.get(compteurProp))) || 0, 999999));
-            if (val > 0) compteur[compteurProp] = val;
+            const val = String(formData.get(compteurProp));
+            let propVal: number | boolean = parseInt(val);
+            if (isNaN(propVal)) {
+              propVal = Number(val === 'true');
+            } else {
+              propVal = Math.max(0, Math.min(propVal || 0, 999999));
+            }
+            compteur[compteurProp] = propVal;
           }
 
           hunt.count = compteur;
