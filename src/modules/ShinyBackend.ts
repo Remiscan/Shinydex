@@ -36,6 +36,9 @@ export interface feShiny extends Omit<BackendShiny, 'id' | 'userid' | 'creationT
 
 export class Count {
   'encounters'?: number = 0;
+  'gsc-shinyParent'?: number;
+  'oras-dexnavChain'?: number;
+  'oras-dexnavLevel'?: number;
   'usum-distance'?: number;
   'usum-rings'?: number;
   'lgpe-catchCombo'?: number;

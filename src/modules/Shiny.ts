@@ -235,6 +235,10 @@ export class Shiny extends FrontendShiny {
 
           break;
         }
+
+        case 'egg': {
+          if (game.id === 'gsc' && this.count['gsc-shinyParent']) return 64; 
+        } break;
         
         case 'masuda': {
           bonusRolls = (game.gen >= 8) ? 6 : (game.gen >= 5) ? 5 : 4;
@@ -270,8 +274,25 @@ export class Shiny extends FrontendShiny {
         }
         
         case 'dexnavchain': {
-          // compliqué...
-          break;
+          const chain = this.count['oras-dexnavChain'] || 0;
+          const level = this.count['oras-dexnavLevel'] || 0;
+          const charm = this.charm;
+
+          let targetValue = 0;
+          if (level <= 100) targetValue = 6 * level;
+          else if (level <= 200) targetValue = 6 * 100 + 2 * (level - 100);
+          else targetValue = 6 * 100 + 2 * 100 + 1 * (level - 200);
+          targetValue = Math.ceil(targetValue / 100);
+
+          const probability = (bool: boolean) => {
+            const rolls = 1 + Number(bool) * 4 + Number(charm) * 2 + (chain === 49 ? 5 : chain === 99 ? 10 : 0);
+            const dexnavShinyProbability = 1 - (1 - targetValue / 10000) ** rolls;
+            const randomShinyProbability = 1 - (1 - 1 / baseRate) ** (1 + Number(charm) * 2);
+            return (1 - dexnavShinyProbability) * randomShinyProbability + dexnavShinyProbability;
+          }
+
+          const realProbability = .96 * probability(false) + .04 * probability(true);
+          return Math.round(1 / realProbability);
         }
 
         case 'friendsafari': {
@@ -352,7 +373,7 @@ export class Shiny extends FrontendShiny {
       }
 
       rolls += (charmRolls || 0) + (bonusRolls || 0);
-      const rate = Math.round(baseRate / rolls);
+      const rate = Math.round(1 / (1 - (1 - 1 / baseRate) ** rolls));
       return rate;
     } catch (error) {
       return null;

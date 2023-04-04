@@ -1,5 +1,5 @@
 import { appStrings, isSupportedPokemonLang, pokemonData } from './jsonData.js';
-import { capitalizeFirstLetter, pad, Params } from './Params.js';
+import { capitalizeFirstLetter, pad } from './Params.js';
 
 
 
@@ -16,12 +16,12 @@ export type Jeu = {
 };
 
 const allGames: Jeu[] = [
-  { uid: 'blue', gen: 1, id: 'rb', hasCharm: false, originMark: 'game-boy' },
-  { uid: 'red', gen: 1, id: 'rb', hasCharm: false, originMark: 'game-boy' },
-  { uid: 'yellow', gen: 1, id: 'yellow', hasCharm: false, originMark: 'game-boy' },
-  { uid: 'gold', gen: 2, id: 'gs', hasCharm: false, originMark: 'game-boy' },
-  { uid: 'silver', gen: 2, id: 'gs', hasCharm: false, originMark: 'game-boy' },
-  { uid: 'crystal', gen: 2, id: 'crystal', hasCharm: false, originMark: 'game-boy' },
+  { uid: 'blue', gen: 1, id: 'rby', hasCharm: false, originMark: 'game-boy' },
+  { uid: 'red', gen: 1, id: 'rby', hasCharm: false, originMark: 'game-boy' },
+  { uid: 'yellow', gen: 1, id: 'rby', hasCharm: false, originMark: 'game-boy' },
+  { uid: 'gold', gen: 2, id: 'gsc', hasCharm: false, originMark: 'game-boy' },
+  { uid: 'silver', gen: 2, id: 'gsc', hasCharm: false, originMark: 'game-boy' },
+  { uid: 'crystal', gen: 2, id: 'gsc', hasCharm: false, originMark: 'game-boy' },
   { uid: 'sapphire', gen: 3, id: 'rs', hasCharm: false },
   { uid: 'ruby', gen: 3, id: 'rs', hasCharm: false },
   { uid: 'emerald', gen: 3, id: 'emerald', hasCharm: false },
