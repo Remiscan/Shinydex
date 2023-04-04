@@ -18,11 +18,11 @@ import themesSheet from '../../../../styles/themes.css.php' assert { type: 'css'
 import iconSheet from '../../../../images/iconsheet.css' assert { type: 'css' };
 // @ts-expect-error
 import commonSheet from '../../../../styles/common.css' assert { type: 'css' };
+import { capitalizeFirstLetter } from '../../Params.js';
 import { gameStrings, isSupportedGameID, isSupportedLang, isSupportedMethodID, methodStrings, pokemonData } from '../../jsonData.js';
 import { CheckBox } from '../checkBox.js';
 // @ts-expect-error
 import sheet from './styles.css' assert { type: 'css' };
-import { capitalizeFirstLetter } from '../../Params.js';
 
 
 
@@ -609,7 +609,9 @@ export class huntCard extends HTMLElement {
             } else {
               propVal = Math.max(0, Math.min(propVal || 0, 999999));
             }
-            compteur[compteurProp] = propVal;
+
+            if (propVal > 0) compteur[compteurProp] = propVal;
+            else delete compteur[compteurProp];
           }
 
           hunt.count = compteur;

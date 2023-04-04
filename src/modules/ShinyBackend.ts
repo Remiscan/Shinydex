@@ -48,17 +48,13 @@ export class Count {
   'sv-sparklingPower'?: number;
 
   constructor(obj: object = {}) {
-    if ('encounters' in obj) this['encounters'] = Number(obj['encounters']) || 0;
-    if ('usum-distance' in obj) this['usum-distance'] = Number(obj['usum-distance']) || 0;
-    if ('usum-rings' in obj) this['usum-rings'] = Number(obj['usum-rings']) || 0;
-    if ('lgpe-catchCombo' in obj) this['lgpe-catchCombo'] = Number(obj['lgpe-catchCombo']) || 0;
-    if ('lgpe-lure' in obj) this['lgpe-lure'] = Number(obj['lgpe-lure']) || 0;
-    if ('lgpe-nextSpawn' in obj) this['lgpe-nextSpawn'] = Number(obj['lgpe-nextSpawn']) || 0;
-    if ('swsh-dexKo' in obj) this['swsh-dexKo'] = Number(obj['swsh-dexKo']) || 0;
-    if ('bdsp-diglettBonus' in obj) this['bdsp-diglettBonus'] = Number(obj['bdsp-diglettBonus']) || 0;
-    if ('pla-dexResearch' in obj) this['pla-dexResearch'] = Number(obj['pla-dexResearch']) || 0;
-    if ('sv-outbreakCleared' in obj) this['sv-outbreakCleared'] = Number(obj['sv-outbreakCleared']) || 0;
-    if ('sv-sparklingPower' in obj) this['sv-sparklingPower'] = Number(obj['sv-sparklingPower']) || 0;
+    for (const key of Object.keys(this)) {
+      if (key in obj) {
+        const value = Number(obj[key as keyof {}]) || 0;
+        if (value > 0) this[key as keyof Count] = value;
+        else delete this[key as keyof Count];
+      }
+    }
   }
 };
 
