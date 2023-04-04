@@ -21,6 +21,10 @@ function buildIconSheet(int $columns = 24, int $iconSize = 32, string $format = 
       'size' => 64,
       'path' => __DIR__.'/../images/misc-icons/origin-mark',
     ],
+    'other' => [
+      'size' => 64,
+      'path' => __DIR__.'/../images/misc-icons/other',
+    ]
   ];
 
   // Count icons

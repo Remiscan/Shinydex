@@ -17,16 +17,18 @@ interface BackendShiny {
   name: string,
   ball: string,
   gene: string,
+  originalTrainer: number,
 
   notes: string,
 };
 
 /** Structure d'un Pokémon shiny tel que stocké dans la BDD locale. */
-export interface feShiny extends Omit<BackendShiny, 'id' | 'userid' | 'creationTime' | 'lastUpdate' | 'count' | 'charm' | 'catchTime' | 'deleted'> {
+export interface feShiny extends Omit<BackendShiny, 'id' | 'userid' | 'creationTime' | 'lastUpdate' | 'count' | 'charm' | 'originalTrainer' | 'catchTime' | 'deleted'> {
   creationTime: number,
   lastUpdate: number,
   count: Count,
   charm: boolean,
+  originalTrainer: boolean,
   catchTime: number,
 }
 
@@ -77,6 +79,7 @@ export class FrontendShiny implements feShiny {
   name: string = '';
   ball: string = '';
   gene: string = '';
+  originalTrainer: boolean = true;
   
   notes: string = '';
 
@@ -102,6 +105,7 @@ export class FrontendShiny implements feShiny {
     if ('name' in shiny) this.name = String(shiny.name);
     if ('ball' in shiny) this.ball = String(shiny.ball);
     if ('gene' in shiny) this.gene = String(shiny.gene);
+    if ('originalTrainer' in shiny) this.originalTrainer = Boolean(shiny.originalTrainer);
 
     if ('notes' in shiny) this.notes = String(shiny.notes);
   }
@@ -132,6 +136,7 @@ export class FrontendShiny implements feShiny {
       name: this.name,
       ball: this.ball,
       gene: this.gene,
+      originalTrainer: Number(this.originalTrainer),
 
       notes: this.notes
     };

@@ -236,6 +236,8 @@ template.innerHTML = /*html*/`
           <option value="jet" data-game="pla" data-string="jet-ball"></option>
           <option value="origin" data-game="pla" data-string="origin-ball"></option>
         </input-select>
+
+        <check-box name="originalTrainer" data-string="capture-originalTrainer" data-mine></check-box>
       </fieldset>
 
 

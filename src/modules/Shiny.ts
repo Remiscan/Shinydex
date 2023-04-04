@@ -1,4 +1,3 @@
-import { Params } from './Params.js';
 import { Forme, Jeu, Pokemon, SpriteOptions, backendPokemon } from './Pokemon.js';
 import { Count, FrontendShiny } from './ShinyBackend.js';
 import { isSupportedPokemonLang, pokemonData } from './jsonData.js';
@@ -40,10 +39,9 @@ const allMethodes: Methode[] = [
   { id: 'wildalwaysshiny', jeux: allGames.filter(g => ['gs', 'hgss', 'bw2', 'pla'].includes(g.id)), mine: true, charm: false },
   { id: 'event', jeux: allGames, mine: false, charm: false },
 
-  { id: 'trade', jeux: allGames, mine: false, charm: false },
-
   { id: 'glitch', jeux: allGames.filter(g => [1, 2].includes(g.gen)), mine: true, charm: false },
-  { id: 'hack', jeux: allGames, mine: false, charm: false },
+  { id: 'hack', jeux: allGames, mine: true, charm: false },
+  { id: 'unknown', jeux: allGames, mine: true, charm: false }
 ];
 
 
@@ -107,14 +105,14 @@ export class Shiny extends FrontendShiny {
    */
   get mine(): boolean {
     let k = Shiny.methodes('notmine').findIndex(m => m.id == this.method);
-    if (k == -1) return true;
+    if (k == -1 && this.originalTrainer) return true;
     else return false;
   }
 
   get appliedOriginMark(): string {
     try {
       if (!this.game || !this.method) return ''; // If game or method wasn't set, we can't compute an origin mark
-      if (this.method === 'hack') return ''; // Hacked Pokémon don't deserve an origin mark
+      if (this.method === 'hack' || this.method === 'unknown') return ''; // Hacked Pokémon don't deserve an origin mark
 
       const jeu = this.jeuObj;
       if (jeu.originMark) return jeu.originMark;
@@ -182,7 +180,7 @@ export class Shiny extends FrontendShiny {
 
       switch (methode.id) {
         case 'hack':
-        case 'trade':
+        case 'unknown':
         case 'wildevent': {
           // ???
           return null;

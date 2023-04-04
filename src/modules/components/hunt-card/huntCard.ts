@@ -485,6 +485,14 @@ export class huntCard extends HTMLElement {
           else input?.setAttribute('checked', String(value));
         } break;
 
+        case 'originalTrainer': {
+          // The field is reversed! It asks if the Pokémon is traded, i.e. if you are NOT its original trainer
+          const value = !hunt[prop];
+          
+          if (input instanceof CheckBox) input.checked = value;
+          else input?.setAttribute('checked', String(value));
+        } break;
+
         case 'count': {
           const value = hunt.count;
           const encounters = value['encounters'] || 0;
@@ -579,6 +587,12 @@ export class huntCard extends HTMLElement {
         case 'caught':
         case 'charm': {
           const boolean = value === 'false' ? false : true;
+          Object.assign(hunt, { [prop]: boolean });
+        } break;
+
+        case 'originalTrainer': {
+          // The field is reversed! It asks if the Pokémon is traded, i.e. if you are NOT its original trainer
+          const boolean = !(value === 'false' ? false : true);
           Object.assign(hunt, { [prop]: boolean });
         } break;
 

@@ -178,6 +178,12 @@ export function updateDataFormat(shiny: { [key: string]: any }): { [key: string]
         }
       }
     }
+
+    // Convert old methods into new data
+    if (shiny['method'] === 'trade') {
+      shiny['method'] = "unknown";
+      shiny['originalTrainer'] = false;
+    }
   }
 
   // Replace checkmark number with checkmark name

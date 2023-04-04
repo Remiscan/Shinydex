@@ -6,10 +6,17 @@
   border-radius: var(--border-radius);
   display: grid;
   --last-column: 0;
-  grid-template-columns: [sprite] 116px [identity] 1fr [misc] auto [note] var(--last-column);
+  grid-template-columns: [sprite] 112px [identity] 1fr [misc] auto [note] var(--last-column);
   grid-template-rows: 1fr [identity] auto 1fr [capture] auto 1fr;
   position: relative;
+  padding: 4px;
+  box-sizing: border-box;
 }
+
+
+/**
+ * Sprite & menu
+ */
 
 pokemon-sprite,
 .menu {
@@ -18,7 +25,6 @@ pokemon-sprite,
   --size: 112px;
   width: var(--size);
   height: var(--size);
-  margin: 4px;
   display: grid;
   place-items: center;
   --distance-to-parent-border: 4px;
@@ -35,24 +41,6 @@ pokemon-sprite:not([dexid]) ~ * {
   display: none;
 }
 
-.menu-hint {
-  color: rgb(var(--on-surface-variant), .8);
-}
-
-button.icon-button.menu-hint {
-  width: 30px;
-  height: 30px;
-  min-height: 30px;
-}
-
-button.icon-button.menu-hint::before {
-  display: none; /* not needed since the whole card is clickable */
-}
-
-.menu-hint:not(:hover, :active) {
-  --state-opacity: 0 !important;
-}
-
 .menu > button {
   margin: 0;
 }
@@ -63,141 +51,6 @@ button.icon-button.menu-hint::before {
 
 [data-action="restore"] {
   display: none;
-}
-
-.pokemon-infos__identity {
-  grid-row: identity;
-  grid-column: identity;
-  display: grid;
-  grid-template-rows: [name] 32px [species] auto;
-  grid-template-columns: [ball] 32px [name] fit-content(100%) [gene] 32px;
-  position: relative;
-  left: -16px;
-  margin-right: -32px;
-  align-items: center;
-  line-height: initial;
-}
-
-[data-type="ball"] {
-  grid-row: name;
-  grid-column: ball;
-  transition: transform .2s var(--easing-decelerate);
-  transform: translate(0) rotate(0);
-}
-
-:host([open]) [data-type="ball"] {
-  transition: transform .11s var(--easing-accelerate);
-  transform: translate(15px) rotate(120deg);
-}
-
-[data-type="species"] {
-  grid-row: species;
-  grid-column: name;
-  text-transform: capitalize;
-  opacity: .8;
-  display: flex;
-  justify-content: start;
-  align-items: center;
-  position: relative;
-  left: 8px;
-  top: -8px;
-  white-space: nowrap;
-}
-
-[data-type="name"],
-[data-type="name"]:empty + [data-type="species"] {
-  grid-row: name;
-  grid-column: name;
-  opacity: 1;
-  display: flex;
-  justify-content: start;
-  align-items: center;
-  position: relative;
-  left: 0;
-  top: 0;
-  text-shadow: 1px 1px rgb(var(--surface-variant));
-  z-index: 1;
-  white-space: nowrap;
-}
-
-[data-type="name"]:empty {
-  display: none;
-}
-
-[data-type="gene"] {
-  grid-row: name;
-  grid-column: gene;
-  scale: 0.9;
-}
-
-[data-type="gene"].icones.explain {
-  margin: 3px 5px;
-}
-
-.pokemon-infos__misc {
-  grid-row: 1 / span 2;
-  grid-column: misc;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  align-items: center;
-  align-self: start;
-  justify-self: end;
-  margin: 10px;
-}
-
-[data-type="originMark"] {
-  filter: invert(var(--dark-coeff));
-}
-
-.pokemon-infos__capture {
-  grid-row: capture;
-  grid-column: identity;
-  display: grid;
-  grid-template-columns: [game] 32px [info] auto;
-  grid-template-rows: [method] auto [date] auto;
-  gap: 0 5px;
-  margin-left: 16px;
-  line-height: initial;
-  align-items: center;
-}
-
-.pokemon-infos__capture > [data-type="game"] {
-	grid-row: 1 / -1;
-  grid-column: game;
-}
-.pokemon-infos__capture > [data-type="method"] {
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-}
-
-.pokemon-notes {
-  grid-row: 1 / -1;
-  grid-column: identity / -1;
-  box-sizing: border-box;
-  display: flex;
-  width: 100%;
-  height: 100%;
-  max-height: 100%;
-  font-size: 1em;
-  text-align: left;
-  line-height: 20px;
-  padding: 4px 8px 4px 12px;
-  z-index: 4;
-  overflow: visible;
-  scrollbar-width: thin;
-  position: relative;
-}
-
-.pokemon-notes__arrow {
-  display: none;
-  position: absolute;
-  width: 7px;
-  height: 14px;
-  top: calc(50% - 7px);
-  left: -6px;
-  clip-path: polygon(0% 50%, 100% 0%, 100% 100%);
 }
 
 .pokemon-notes,
@@ -229,41 +82,180 @@ button.icon-button.menu-hint::before {
               opacity .1s var(--easing-decelerate);
 }
 
-#restore-button {
+
+/**
+ * Pokémon identity: name, species, icons, menu button
+ */
+
+.pokemon-infos__identity {
+  grid-row: identity;
+  grid-column: identity;
+  display: grid;
+  grid-template-rows: [name] 32px [species] auto;
+  grid-template-columns: [ball] 32px [name] fit-content(100%) [icons] auto;
+  position: relative;
+  left: -16px;
+  align-items: center;
+  line-height: initial;
+}
+
+/* Ball */
+
+[data-type="ball"] {
+  grid-row: name;
+  grid-column: ball;
+  transition: transform .2s var(--easing-decelerate);
+  transform: translate(0) rotate(0);
+}
+
+:host([open]) [data-type="ball"] {
+  transition: transform .11s var(--easing-accelerate);
+  transform: translate(15px) rotate(120deg);
+}
+
+/* Name & species */
+
+[data-type="species"] {
+  grid-row: species;
+  grid-column: name;
+  text-transform: capitalize;
+  opacity: .8;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  position: relative;
+  left: 8px;
+  top: -8px;
+  white-space: nowrap;
+}
+
+[data-type="name"],
+[data-type="name"]:empty + [data-type="species"] {
+  grid-row: name;
+  grid-column: name;
+  opacity: 1;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  position: relative;
+  left: 0;
+  top: 0;
+  text-shadow: 1px 1px rgb(var(--surface-variant));
+  z-index: 1;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+[data-type="name"]:empty {
   display: none;
 }
 
-.pokemon-notes__texte {
-  margin: auto;
-  max-height: 100%;
-  overflow-x: hidden;
-  overflow-y: auto;
-  padding-right: .5ch;
-  width: 100%;
+/* Icons */
+
+.identity-icons {
+  grid-row: name;
+  grid-column: icons;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-left: 4px;
 }
 
-.pokemon-notes__texte > p {
+[data-type="gene"] {
+  scale: .9;
+}
+
+[data-type="originalTrainer"],
+[data-type="originMark"] {
+  scale: .8;
+  filter: invert(var(--dark-coeff));
+}
+
+/* Menu button */
+
+.menu-hint {
+  color: rgb(var(--on-surface-variant), .8);
+}
+
+button.icon-button.menu-hint {
+  width: 32px;
+  height: 32px;
+  min-height: 32px;
   margin: 0;
 }
 
-.empty {
-  color: rgb(var(--on-surface-variant), .5);
+button.icon-button.menu-hint::before {
+  display: none; /* not needed since the whole card is clickable */
+}
+
+.menu-hint:not(:hover, :active) {
+  --state-opacity: 0 !important;
+}
+
+/*[data-type="gene"].icones.explain {
+  margin: 3px 5px;
+}*/
+
+/*.pokemon-infos__misc {
+  grid-row: 1 / span 2;
+  grid-column: misc;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  align-items: center;
+  align-self: start;
+  justify-self: end;
+  margin: 10px;
+}*/
+
+
+/**
+ * Capture data: game, method, date, shiny rate
+ */
+
+.pokemon-infos__capture {
+  grid-row: capture;
+  grid-column: identity;
+  display: grid;
+  grid-template-columns: [game] 32px [info] auto [rate] 1fr;
+  grid-template-rows: [method] auto [date] auto [details] auto;
+  gap: 0 5px;
+  margin-inline: 16px;
+  line-height: initial;
+  align-items: center;
+}
+
+/* Game */
+
+.pokemon-infos__capture > [data-type="game"] {
+	grid-row: method / details;
+  grid-column: game;
+}
+
+/* Method */
+
+.pokemon-infos__capture > [data-type="method"] {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 /* Shiny rate */
 
 .shiny-rate {
-  grid-row: capture / span 2;
-  grid-column: misc;
+  grid-row: method / details;
+  grid-column: rate;
+  /*grid-row: capture / span 2;
+  grid-column: misc;*/
   display: grid;
   grid-template-columns: auto;
   grid-template-rows: 20px;
   gap: 4px;
   padding: 2px 8px;
-  margin: 10px;
+  margin: 0;
   line-height: initial;
   height: fit-content;
-  align-self: end;
+  align-self: center;
   justify-self: end;
   border-radius: 20px;
   position: relative;
@@ -352,6 +344,80 @@ button.icon-button.menu-hint::before {
   font-size: 1em;
 }
 
+/* Method details (if enabled in the main card) */
+
+.pokemon-infos__capture > .count-container {
+  grid-row: details;
+  grid-column: 1 / -1;
+  margin: 7px -12px 0;
+  --padding-inline: 4px;
+  padding: var(--padding-inline) calc(3 * var(--padding-inline));
+  --distance-to-parent-border: 4px;
+  border-radius: var(--sub-border-radius);
+  --text-color: var(--on-surface-variant);
+}
+
+.pokemon-infos__capture > .count-container > .arrow {
+  position: absolute;
+  left: calc(50% - 7px);
+  top: -6px;
+  height: 7px;
+  width: 14px;
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+  --surface-color: inherit;
+  --text-color: inherit;
+}
+
+
+/**
+ * Notes & method details (if disabled in main card)
+ */
+
+.pokemon-notes {
+  grid-row: 1 / -1;
+  grid-column: identity / -1;
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  font-size: 1em;
+  text-align: left;
+  line-height: 20px;
+  padding: 0 4px 0 12px;
+  z-index: 4;
+  overflow: visible;
+  scrollbar-width: thin;
+  position: relative;
+}
+
+.pokemon-notes__arrow {
+  display: none;
+  position: absolute;
+  width: 7px;
+  height: 14px;
+  top: calc(50% - 7px);
+  left: -6px;
+  clip-path: polygon(0% 50%, 100% 0%, 100% 100%);
+}
+
+.pokemon-notes__texte {
+  margin: auto;
+  max-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-right: .5ch;
+  width: 100%;
+}
+
+.pokemon-notes__texte > p {
+  margin: 0;
+}
+
+.empty {
+  color: rgb(var(--on-surface-variant), .5);
+}
+
 .spacer {
   flex-grow: 1;
 }
@@ -367,12 +433,11 @@ button.icon-button.menu-hint::before {
     transform: none;
     width: min(100cqi - 400px, 50cqi);
     max-height: 112px;
-    margin: 4px;
-    margin-left: 0;
     --elevation-opacity: var(--elevation-2-opacity);
     --surface-color: var(--surface);
     --distance-to-parent-border: 4px;
-  border-radius: var(--sub-border-radius);
+    border-radius: var(--sub-border-radius);
+    padding: 4px 8px 4px 12px;
   }
 
   .pokemon-notes__arrow {
