@@ -419,10 +419,10 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
     }
 
     // On restaure la position de scroll précédemment enregistrée
-    if (section.rememberPosition) {
+    /*if (section.rememberPosition) {
       const scrolledElement = section.element.querySelector('.section-contenu')!;
       scrolledElement.scroll(0, lastPosition.get(sectionCible) || 0);
-    }
+    }*/
     
     // On anime l'apparition de la nouvelle section
     if (animateNewSection) {
