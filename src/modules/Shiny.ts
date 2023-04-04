@@ -119,7 +119,7 @@ export class Shiny extends FrontendShiny {
   get appliedOriginMark(): string {
     try {
       if (!this.game || !this.method) return ''; // If game or method wasn't set, we can't compute an origin mark
-      if (this.legit) return ''; // Hacked Pokémon don't deserve an origin mark
+      if (!this.legit) return ''; // Hacked Pokémon don't deserve an origin mark
 
       const jeu = this.jeuObj;
       if (jeu.originMark) return jeu.originMark;
