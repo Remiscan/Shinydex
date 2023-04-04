@@ -109,10 +109,17 @@ export class Shiny extends FrontendShiny {
     else return false;
   }
 
+  /**
+   * @returns Whether the Pokémon is confirmed legit or not.
+   */
+  get legit(): boolean {
+    return this.method !== 'hack' && this.method !== 'unknown';
+  }
+
   get appliedOriginMark(): string {
     try {
       if (!this.game || !this.method) return ''; // If game or method wasn't set, we can't compute an origin mark
-      if (this.method === 'hack' || this.method === 'unknown') return ''; // Hacked Pokémon don't deserve an origin mark
+      if (this.legit) return ''; // Hacked Pokémon don't deserve an origin mark
 
       const jeu = this.jeuObj;
       if (jeu.originMark) return jeu.originMark;

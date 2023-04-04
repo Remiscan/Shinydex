@@ -4,7 +4,7 @@ import { dataStorage, friendShinyStorage, friendStorage, huntStorage, localForag
 // @ts-expect-error
 import { queueable } from '../../../_common/js/per-function-async-queue.js';
 import { Hunt } from './Hunt.js';
-import { Params, noAccent } from './Params.js';
+import { noAccent } from './Params.js';
 import { isSupportedPokemonLang, pokemonData } from './jsonData.js';
 import { getCurrentLang } from './translation.js';
 
@@ -222,7 +222,7 @@ export function computeShinyFilters(shiny: Shiny): ShinyFilterData {
 
   return {
     mine: shiny.mine,
-    legit: shiny.method !== 'hack',
+    legit: shiny.legit,
     species: species,
     dexid: shiny.dexid,
     name: noAccent(shiny.name || species || '').toLowerCase(),
