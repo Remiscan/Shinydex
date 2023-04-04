@@ -282,7 +282,14 @@ const getLinkedSections = (section: Section['nom']): Section[] => {
  * @param event - L'évènement qui a déclenché la navigation.
  */
 export async function navigate(sectionCible: string, event: Event, data?: any) {
-  if (sectionActuelle === sectionCible) return Promise.resolve();
+  if (sectionActuelle === sectionCible) {
+    // If trying to navigate to the already open section, scroll back to top
+    const section = sections.find(section => section.nom === sectionActuelle)!;
+    const scrolledElement = section.element.querySelector('.section-contenu')!;
+    scrolledElement.scroll(0, 0);
+    return Promise.resolve();
+  }
+
   if (sectionCible === 'sprite-viewer' && !(navigator.onLine)) {
     if (!(Settings.get('cache-all-sprites'))) return new Notif(getString('error-no-connection')).prompt();
   }
@@ -293,8 +300,6 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
 
   // Pré-chargement des images de la nouvelle section
   await Promise.all([loadAllImages(nouvelleSection.preload || [])]);
-
-  const mainElement = document.querySelector('main')!;
 
   if (ancienneSection) {
     // On désactive le retour à la section précédente à l'appui sur Échap
