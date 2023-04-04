@@ -32,12 +32,13 @@ const allMethodes: Methode[] = [
   { id: 'ultrawormhole', jeux: allGames.filter(g => g.gen == 7), mine: true, charm: false },
   { id: 'raid', jeux: allGames.filter(g => g.id == 'swsh' || g.id == 'sv'), mine: true, charm: false },
   { id: 'dynamaxadventure', jeux: allGames.filter(g => g.gen == 8), mine: true, charm: true },
+  { id: 'grandunderground', jeux: allGames.filter(g => g.id == 'bdsp'), mine: true, charm: false },
   { id: 'massoutbreak', jeux: allGames.filter(g => g.id == 'pla' || g.id == 'sv'), mine: true, charm: true },
   { id: 'massivemassoutbreak', jeux: allGames.filter(g => g.id == 'pla'), mine: true, charm: true },
   
   { id: 'wildevent', jeux: allGames.filter(g => g.gen == 0), mine: true, charm: false },
   { id: 'wildalwaysshiny', jeux: allGames.filter(g => ['gs', 'hgss', 'bw2', 'pla'].includes(g.id)), mine: true, charm: false },
-  { id: 'event', jeux: allGames, mine: false, charm: false },
+  { id: 'event', jeux: allGames.filter(g => g.gen > 1), mine: false, charm: false },
 
   { id: 'glitch', jeux: allGames.filter(g => [1, 2].includes(g.gen)), mine: true, charm: false },
   { id: 'hack', jeux: allGames, mine: true, charm: false },
@@ -188,10 +189,14 @@ export class Shiny extends FrontendShiny {
       switch (methode.id) {
         case 'hack':
         case 'unknown':
-        case 'wildevent': {
+        case 'wildevent':
           // ???
           return null;
-        }
+
+        case 'glitch':
+        case 'wildalwaysshiny':
+        case 'event':
+          return 1;
 
         case 'wild': {
           if (game.id === 'lgpe') {
@@ -230,11 +235,6 @@ export class Shiny extends FrontendShiny {
 
           break;
         }
-
-        case 'glitch':
-        case 'wildalwaysshiny':
-        case 'event':
-          return 1;
         
         case 'masuda': {
           bonusRolls = (game.gen >= 8) ? 6 : (game.gen >= 5) ? 5 : 4;
@@ -309,6 +309,11 @@ export class Shiny extends FrontendShiny {
         case 'dynamaxadventure': {
           const rate = (charmRolls > 0) ? 100 : 300;
           return rate;
+        }
+
+        case 'grandunderground': {
+          const diglettBonus = this.count['bdsp-diglettBonus'] || 0;
+          return Math.round(baseRate / (1 + diglettBonus));
         }
 
         case 'massoutbreak': {

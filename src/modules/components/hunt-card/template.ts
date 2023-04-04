@@ -106,6 +106,16 @@ template.innerHTML = /*html*/`
       </fieldset>
 
 
+      <!-- Bonus de Diamant Étincelant / Perle Scintillante (BDSP) -->
+      <fieldset data-game="bdsp">
+        <legend>
+          <span class="title-small" data-string="bonuses-bdsp"></span>
+        </legend>
+
+        <check-box name="bdsp-diglettBonus" data-method="grandunderground" data-string="bonus-bdsp-diglettBonus"></check-box>
+      </fieldset>
+
+
       <!-- Bonus de Épée / Bouclier (SWSH) -->
       <fieldset data-game="swsh">
         <legend>
