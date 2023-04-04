@@ -2,7 +2,7 @@
 
 Keep track of your shiny Pokémon collection by entering data about your hunts (for example your Pokémon's form and name, the game and method you used to hunt it, etc.).
 
-![List of the user's shiny Pokémon](https://user-images.githubusercontent.com/1685446/229303666-b7af22c4-3f21-4ac9-8220-d31112f2bdc0.jpg) ![Shiny hunt in progress](https://user-images.githubusercontent.com/1685446/229303670-17362480-8f53-4c5e-b830-0506cd3b3e62.jpg)
+![List of the user's shiny Pokémon](https://user-images.githubusercontent.com/1685446/229846128-21dc98a5-9a0d-4130-bce9-63e737c5d5d4.jpg) ![Shiny hunt in progress](https://user-images.githubusercontent.com/1685446/229303670-17362480-8f53-4c5e-b830-0506cd3b3e62.jpg)
 
 See how close you are to completing your shiny Pokédex, and see what every shiny Pokémon looks like.
 

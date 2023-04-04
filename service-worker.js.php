@@ -315,6 +315,7 @@ async function cacheAllSprites(source) {
     const spritesAlreadyCachedNumber = spritesAlreadyCached.length;
 
     if (spritesAlreadyCachedNumber === allSpritesNumber) {
+      console.log(`[install] Sprites cached! (newly cached 0 / failed 0 / already cached ${spritesAlreadyCachedNumber} / total ${allSpritesNumber})`);
       source?.postMessage({ action: 'cache-all-sprites', totalSize, progress: 1, progressWithErrors: 1, error: false });
       return;
     }
@@ -324,6 +325,7 @@ async function cacheAllSprites(source) {
     let spritesFailedToCache = 0;
 
     // Fetch sprits in groups, to avoid "insufficient resources" error
+    console.log('[install] Caching sprites...');
     const groupSize = 25;
     while (spritesToCache.length > 0) {
       const group = spritesToCache.splice(0, groupSize);
@@ -344,6 +346,8 @@ async function cacheAllSprites(source) {
         }
       }));
     }
+
+    console.log(`[install] Sprites cached! (newly cached ${spritesNewlyCachedNumber} / failed ${spritesFailedToCache} / already cached ${spritesAlreadyCachedNumber} / total ${allSpritesNumber})`);
 
     return;
   } catch (error) {

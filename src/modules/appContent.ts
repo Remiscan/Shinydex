@@ -30,9 +30,9 @@ async function populateHandler(section: PopulatableSection, _ids?: string[]): Pr
       break;
   }
 
-  const virtualize = virtualizedSections.includes(section);
-
   const sectionElement = document.querySelector(`#${section}`);
+  const isCurrentSection = document.body.matches(`[data-section-actuelle~="${section}"]`);
+
   const orderMap = await computeOrders(section);
   const currentOrder = sectionElement?.getAttribute('data-order') ?? '';
   const reversed = sectionElement?.getAttribute('data-order-reversed') === 'true';
@@ -67,6 +67,8 @@ async function populateHandler(section: PopulatableSection, _ids?: string[]): Pr
       document.querySelector(`#pokedex`)?.classList.remove('loading');
     }
 
+    const virtualize = virtualizedSections.includes(section) && 
+      (isCurrentSection || sectionElement?.getAttribute('data-lazy-loaded') === 'true');
     if (virtualize) lazyLoadSection(section);
   });
 

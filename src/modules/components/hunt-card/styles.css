@@ -177,6 +177,7 @@ form:not(.caught) .capture-button-group ~ * {
 }
 
 :host(:not([data-method-mine="false"])) [data-not-mine],
+:host(:not([data-method-mine="true"])) [data-mine],
 :host(:not([data-charm-available="true"])) [name="charm"],
 :host(:not([data-charm-available="true"])) fieldset[name="common-bonus"],
 :host([data-game="usum"]:not([data-method="ultrawormhole"])) fieldset[name="bonus"] fieldset[data-game="usum"],

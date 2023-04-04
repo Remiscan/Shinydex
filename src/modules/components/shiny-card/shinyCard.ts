@@ -210,6 +210,17 @@ export class shinyCard extends HTMLElement {
       else      element.classList.add('off');
     }
 
+    // Icône d'échange
+    {
+      const traded = !shiny.originalTrainer;
+      const element = this.shadow.querySelector('[data-type="originalTrainer"]')!;
+      element.setAttribute('data-icon', `other/${traded ? 'traded' : ''}`);
+      element.setAttribute('data-label', 'capture-originalTrainer');
+      element.setAttribute('aria-label', getString('capture-originalTrainer'));
+      if (traded) element.classList.remove('off');
+      else        element.classList.add('off');
+    }
+
     // Méthode
     {
       const element = this.shadow.querySelector('[data-type="method"]')!;
