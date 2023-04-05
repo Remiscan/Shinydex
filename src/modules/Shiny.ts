@@ -142,9 +142,19 @@ export class Shiny extends FrontendShiny {
    */
   get jeuObj(): Jeu {
     let k = Pokemon.jeux.findIndex(p => p.uid == this.game);
-    if (k == -1) throw `${getString('error-invalid-game')} (${this.game})`;
+    if (k == -1) throw new Error(`${getString('error-invalid-game')} (${this.game})`);
 
     return Pokemon.jeux[k];
+  }
+
+  /**
+   * @returns Méthode avec laquelle le Pokémon a été chassé.
+   */
+  get methodObj(): Methode {
+    let k = Shiny.allMethodes.findIndex(m => m.id === this.method);
+    if (k == -1) throw new Error(`${getString('error-invalid-method')} (${this.method})`);
+
+    return Shiny.allMethodes[k];
   }
 
   /**
