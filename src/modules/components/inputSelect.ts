@@ -236,6 +236,8 @@ export class InputSelect extends TextField {
   makeOptionsFromSlot = (slot: HTMLSlotElement) => {
     const assignedNodes = slot.assignedNodes();
     const options: HTMLTemplateElement[] = [];
+    this.labels.clear();
+    this.labelStringKeys.clear();
     
     for (let k = 0; k < assignedNodes.length; k++) {
       const node = assignedNodes[k];
@@ -641,10 +643,15 @@ export class InputSelect extends TextField {
 
   updateFormValue(val: any) {
     const isRequired = this.getAttribute('required') !== null;
+    const isValue = this.labels.has(val);
     const validity = {
-      valueMissing: isRequired ? (val == null || val === 'null') : false
+      valueMissing: isRequired ? (val == null || val === 'null') : false,
+      customError: !isValue
     };
-    super.updateFormValue(val, validity, `Aucune valeur n'est sélectionnée`);
+    const message = validity.valueMissing ? `No value selected` :
+                    validity.customError ? `Selected value is not a valid choice` :
+                    undefined;
+    super.updateFormValue(val, validity, message);
   }
 
   get valueLabel() {
