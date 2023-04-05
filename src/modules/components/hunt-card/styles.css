@@ -178,12 +178,15 @@ form:not(.caught) .capture-button-group ~ * {
 
 :host(:not([data-method-mine="false"])) [data-not-mine],
 :host(:not([data-method-mine="true"])) [data-mine],
+/* Cache les bonus communs (= charme chroma) pour les jeux qui n'en ont pas */
 :host(:not([data-charm-available="true"])) [name="charm"],
 :host(:not([data-charm-available="true"])) fieldset[name="common-bonus"],
-:host([data-game="gsc"]:not([data-method="egg"])) fieldset[name="bonus"] fieldset[data-game="gsc"],
+/* Cache les bonus spécifiques pour les combinaisons jeu + méthode qui n'en ont pas */
 :host([data-game="oras"]:not([data-method="dexnavchain"])) fieldset[name="bonus"] fieldset[data-game="oras"],
 :host([data-game="usum"]:not([data-method="ultrawormhole"])) fieldset[name="bonus"] fieldset[data-game="usum"],
 :host([data-game="bdsp"]:not([data-method="grandunderground"])) fieldset[name="bonus"] fieldset[data-game="bdsp"],
+/* Cache les bonus communs et spécifiques pour les combinaisons jeu + méthode qui n'en ont pas */
+:host([data-game="gsc"]:not([data-method="egg"])) fieldset[name="bonus"],
 :host(:not([data-charm-available="true"]):not([data-game="sv"]):not([data-game="pla"]):not([data-game="bdsp"]):not([data-game="swsh"]):not([data-game="lgpe"]):not([data-game="usum"]):not([data-game="oras"]):not([data-game="gsc"])) fieldset[name="bonus"] {
   display: none;
 }
