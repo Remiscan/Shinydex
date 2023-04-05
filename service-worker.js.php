@@ -314,7 +314,7 @@ async function cacheAllSprites(source) {
     const spritesAlreadyCached = (await cache.keys()).map(key => key.url);
     const spritesAlreadyCachedNumber = spritesAlreadyCached.length;
 
-    if (spritesAlreadyCachedNumber === allSpritesNumber) {
+    if (spritesAlreadyCachedNumber >= allSpritesNumber) {
       console.log(`[install] Sprites cached! (newly cached 0 / failed 0 / already cached ${spritesAlreadyCachedNumber} / total ${allSpritesNumber})`);
       source?.postMessage({ action: 'cache-all-sprites', totalSize, progress: 1, progressWithErrors: 1, error: false });
       return;

@@ -2,7 +2,7 @@ import { callBackend } from './callBackend.js';
 import { RadioGroup } from './components/radioGroup.js';
 import { dataStorage } from './localForage.js';
 import { Notif } from './notification.js';
-import { computePaletteCss, gradientString, setTheme, updateMetaThemeColorTag } from './theme.js';
+import { computePaletteCss, setTheme, updateMetaThemeColorTag } from './theme.js';
 // @ts-expect-error
 import { queueable } from '../../../_common/js/per-function-async-queue.js';
 import { InputSelect } from './components/inputSelect.js';
@@ -19,10 +19,6 @@ function isSupportedTheme(string: string): string is Theme {
 
 
 
-let appliedSettings: Settings;
-
-
-
 export class Settings {
   'lang': SupportedLang = getCurrentLang();
   'theme': Theme = 'system';
@@ -33,15 +29,17 @@ export class Settings {
     if (!data) return;
 
     if (data instanceof FormData) {
-      const storedLang = String(data.get('lang'));
-      if (isSupportedLang(storedLang)) this['lang'] = storedLang;
+      const formLang = String(data.get('lang'));
+      if (isSupportedLang(formLang)) this['lang'] = formLang;
 
-      const storedTheme = String(data.get('theme'));
-      if (isSupportedTheme(storedTheme)) this['theme'] = storedTheme;
+      const formTheme = String(data.get('theme'));
+      if (isSupportedTheme(formTheme)) this['theme'] = formTheme;
 
-      this['theme-hue'] = Number(data.get('theme-hue')) || this['theme-hue'];
+      const formThemeHue = Number(data.get('theme-hue'));
+      this['theme-hue'] = formThemeHue || this['theme-hue'];
 
-      this['cache-all-sprites'] = data.get('cache-all-sprites') === 'true';
+      const formCacheAllSprites = String(data.get('cache-all-sprites'));
+      this['cache-all-sprites'] = formCacheAllSprites === 'true';
     } else {
       if ('lang' in data && typeof data['lang'] === 'string' && isSupportedLang(data['lang'])) {
         this['lang'] = data['lang'];
@@ -62,98 +60,85 @@ export class Settings {
   }
 
 
-  toForm() {
+  static #toForm(setting: keyof Settings, value: any) {
     const settingsForm = document.querySelector('form[name="app-settings"]');
     if (!(settingsForm instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
 
-    {
-      // Lang
-      const input = settingsForm.querySelector(`[name="lang"]`);
-      if (input instanceof InputSelect) input.value = this.lang;
-      else input?.setAttribute('value', this.lang);
-    }
+    const input = settingsForm.querySelector(`[name="${setting}"]`);
+    switch (input?.tagName.toLowerCase()) {
+      case 'input-select': {
+        const parsedValue = String(value);
+        if (input instanceof InputSelect) input.value = parsedValue;
+        else input.setAttribute('value', String(value));
+      } break;
 
-    {
-      // Theme
-      const input = settingsForm.querySelector(`[name="theme"]`);
-      if (input instanceof RadioGroup) input.value = this.theme;
-      else input?.setAttribute('value', this.theme);
-    }
+      case 'radio-group': {
+        if (input instanceof RadioGroup) input.value = String(value);
+        else input.setAttribute('value', String(value));
+      } break;
 
-    {
-      // Theme hue
-      const input = settingsForm.querySelector('[name="theme-hue"]');
-      if (input instanceof HTMLElement && 'value' in input) input.value = this['theme-hue'];
-      else input?.setAttribute('value', String(this['theme-hue']));
-      input?.setAttribute('style', `--gradient:${gradientString};`);
-    }
+      case 'input-slider': {
+        if ('value' in input) input.value = Number(value);
+        else input.setAttribute('value', String(value));
+      } break;
 
-    {
-      // Cache all sprites
-      const input = settingsForm.querySelector('[name="cache-all-sprites"]');
-      if (input instanceof HTMLElement && 'checked' in input) input.checked = this['cache-all-sprites'];
-      else if (this['cache-all-sprites']) input?.setAttribute('checked', 'true');
-      else input?.removeAttribute('checked');
+      case 'input-switch': {
+        if (value === 'true') value = true;
+        else if (value === 'false') value = false;
+        if ('checked' in input) input.checked = Boolean(value);
+        else input.setAttribute('checked', String(Boolean(value)));
+      } break;
     }
   }
 
 
-  apply() {
-    const settingsForm = document.querySelector('form[name="app-settings"]')
-    if (!(settingsForm instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
+  static #apply(setting: keyof Settings, value: any, { initial = false }) {
+    switch (setting) {
+      case 'lang': {
+        const html = document.documentElement;
+        html.lang = value;
 
-    {
-      // Lang
-      const html = document.documentElement;
-      if (this.changedBy('lang', ['initial', 'manual'])) {
-        html.lang = this['lang'];
-      }
-      if (this.changedBy('lang', ['initial'])) {
-        html.addEventListener('translate', event => {
-          translationObserver.translate(html, (event as CustomEvent).detail.lang);
-        });
-        translationObserver.serve(html);
-      }
-    }
+        if (initial) {
+          html.addEventListener('translate', event => {
+            translationObserver.translate(html, (event as CustomEvent).detail.lang);
+          });
+          translationObserver.serve(html);
+        }
+      } break;
 
-    {
-      // Theme
-      if (this.changedBy('theme', ['initial', 'manual']))
-        setTheme(this['theme']);
-    }
+      case 'theme': {
+        setTheme(value);
+      } break;
 
-    {
-      // Theme hue
-      if (this.changedBy('theme-hue', ['initial', 'manual'])) {
-        const css = computePaletteCss(this['theme-hue']);
+      case 'theme-hue': {
+        const css = computePaletteCss(value);
         const container = document.querySelector('style#palette');
         if (!(container instanceof HTMLStyleElement)) throw new TypeError(`Expecting HTMLStyleElement`);
         container.innerHTML = `:root { ${css} }`;
         updateMetaThemeColorTag();
-      }
-    }
+      } break;
 
-    {
-      // Cache all sprites
-      if (this.changedBy('cache-all-sprites', ['initial'])) { // On app launch only
-        if (this['cache-all-sprites']) {
-          const progressContainer = document.querySelector('[data-sprites-progress]');
-          dataStorage.getItem('sprites-cache-progress')
-          .then(val => {
-            if (progressContainer && val) progressContainer.innerHTML = val;
-          });
-          // cacheAllSprites(true); // Cache all new sprites
+      case 'cache-all-sprites': {
+        if (initial) {
+          if (value) {
+            const progressContainer = document.querySelector('[data-sprites-progress]');
+            dataStorage.getItem('sprites-cache-progress')
+            .then(val => {
+              if (progressContainer && val) progressContainer.innerHTML = val;
+            });
+
+            // If the option is turned on, check if there are new sprites to cache on app launch
+            cacheAllSprites(true);
+          }
+        } else {
+          cacheAllSprites(value);
         }
-      } else if (this.changedBy('cache-all-sprites', ['manual'])) { // On manual settings change,
-        cacheAllSprites(this['cache-all-sprites']);                 // cache or delete all sprites.
-      }
+      } break;
     }
-
-    appliedSettings = this;
   }
 
 
-  async save() {
+  async #save() {
     await dataStorage.ready();
     dataStorage.setItem('app-settings', this);
   }
@@ -162,43 +147,50 @@ export class Settings {
   static async restore() {
     await dataStorage.ready();
     const savedSettings = new Settings(await dataStorage.getItem('app-settings'));
-    savedSettings.toForm();
-    savedSettings.apply();
+
+    for (const setting of Object.keys(savedSettings) as Array<keyof Settings>) {
+      const value = savedSettings[setting];
+      Settings.#toForm(setting, value);
+      Settings.#apply(setting, value, { initial: true });
+    }
     return;
   }
 
 
-  static get(id: string): any {
-    if (id in appliedSettings) return appliedSettings[id as keyof Settings];
-    else throw new Error(`${id} is not a valid setting`);
-  }
+  static async set(setting: keyof Settings, value: any, { apply = true, toForm = true }: { apply?: boolean, toForm?: boolean } = {}) {
+    await dataStorage.ready();
+    const currentSettings = new Settings(await dataStorage.getItem('app-settings'));
 
+    switch (setting) {
+      case 'lang':
+        if (isSupportedLang(value)) currentSettings.lang = value;
+        break;
 
-  static set(id: string, value: any, { apply = true, toForm = true }: { apply?: boolean, toForm?: boolean } = {}) {
-    const settingsForm = document.querySelector('form[name="app-settings"]')
-    if (!(settingsForm instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
-    const formData = new FormData(settingsForm);
-    formData.set(id, String(value));
-    const settings = new Settings(formData);
-    if (toForm) settings.toForm();
-    if (apply)  settings.apply();
-    settings.save();
-  }
+      case 'theme':
+        if (isSupportedTheme(value)) currentSettings.theme = value;
+        break;
 
+      case 'theme-hue':
+        if (!isNaN(parseInt(value))) currentSettings['theme-hue'] = parseInt(value);
+        break;
 
-  /** Returns true if setting `id` was changed by one of `causes`. */
-  changedBy(id: keyof Settings, causes: Array<'initial'|'manual'|'unchanged'>): boolean {
-    let result = 0;
-    for (const cause of causes) {
-      let subResult = 0;
-      switch (cause) {
-        case 'initial':   if (!appliedSettings) subResult++; break;
-        case 'manual':    if (appliedSettings && this[id] !== appliedSettings[id]) subResult++; break;
-        case 'unchanged': if (appliedSettings && this[id] === appliedSettings[id]) subResult++; break;
-      }
-      result += subResult;
+      case 'cache-all-sprites':
+        if (['true', 'false', true, false].includes(value)) currentSettings['cache-all-sprites'] = String(value) === 'true';
+        break; 
     }
-    return result > 0;
+
+    if (toForm) Settings.#toForm(setting, currentSettings[setting]);
+    if (apply) Settings.#apply(setting, currentSettings[setting], { initial: false });
+    await currentSettings.#save();
+  }
+
+
+  static async get(id: string): Promise<any> {
+    await dataStorage.ready();
+    const currentSettings = new Settings(await dataStorage.getItem('app-settings'));
+
+    if (id in currentSettings) return currentSettings[id as keyof Settings];
+    else throw new Error(`${id} is not a valid setting`);
   }
 }
 

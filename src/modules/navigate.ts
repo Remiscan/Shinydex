@@ -268,8 +268,6 @@ const getLinkedSections = (section: Section['nom']): Section[] => {
       case 'corbeille':        linkedSections.push('chasses-en-cours'); break;
       case 'parametres':       linkedSections.push('a-propos'); break;
       case 'a-propos':         linkedSections.push('parametres'); break;
-      case 'partage':          linkedSections.push('chromatiques-ami'); break;
-      case 'chromatiques-ami': linkedSections.push('partage'); break;
     }
   }
   return linkedSections.map(nom => sections.find(s => s.nom === nom)!);
@@ -291,7 +289,7 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
   }
 
   if (sectionCible === 'sprite-viewer' && !(navigator.onLine)) {
-    if (!(Settings.get('cache-all-sprites'))) return new Notif(getString('error-no-connection')).prompt();
+    if (!(await Settings.get('cache-all-sprites'))) return new Notif(getString('error-no-connection')).prompt();
   }
 
   const ancienneSection = sections.find(section => section.nom === sectionActuelle)!;
@@ -391,6 +389,8 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
                   sync: false
                 }
               }));
+            } else {
+              new Notif(getString('error-no-profile')).prompt();
             }
           });
         }

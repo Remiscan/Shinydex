@@ -157,10 +157,11 @@ document.querySelector('.fab')!.addEventListener('click', async () => {
 const settingsForm = document.querySelector('form[name="app-settings"]');
 if (!(settingsForm instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
 settingsForm.addEventListener('change', event => {
-  const formData = new FormData(settingsForm);
-  const settings = new Settings(formData);
-  settings.apply();
-  settings.save();
+  const setting = (event.target as EventTarget & { name: string })?.name;
+  const settings = new Settings(new FormData(settingsForm));
+  if (setting in settings) {
+    Settings.set(setting as keyof Settings, settings[setting as keyof Settings], { apply: true, toForm: false });
+  }
 });
 
 // Détecte le clic sur l'état du dernier backup pour en lancer un nouveau
