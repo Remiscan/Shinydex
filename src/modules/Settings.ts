@@ -128,7 +128,7 @@ export class Settings {
             });
 
             // If the option is turned on, check if there are new sprites to cache on app launch
-            cacheAllSprites(true, { priority: 'low' });
+            //cacheAllSprites(true, { priority: 'low' }); // don't, causes slow loading of other stuff while waiting for this
           }
         } else {
           cacheAllSprites(value);

@@ -119,7 +119,7 @@ export async function appStart() {
     [fileVersions, lastStorageUpgrade] = await Promise.all([
       dataStorage.getItem('file-versions').then(vers => vers ?? {}),
       dataStorage.getItem('last-storage-upgrade').then(ver => Number(ver)),
-      Settings.restore({ exclude: ['cache-all-sprites'] }),
+      Settings.restore(),
     ]);
     cacheVersion = Math.max(...Object.values(fileVersions).map(v => Number(v)));
     if (cacheVersion < 0) cacheVersion = pokemonReleaseDate;
@@ -201,9 +201,6 @@ export async function appStart() {
       })
     ]);
     logPerf('populate');
-
-    await Settings.restore({ include: ['cache-all-sprites'] });
-    Settings.initChangeHandler(); // toujours après Settings.restore()
   } catch (error) {
     const message = getString('error-preparing-content');
     console.error(message, error);
@@ -215,6 +212,8 @@ export async function appStart() {
   // ÉTAPE 4 : on affiche l'application
 
   logPerf('Étape 4');
+
+  Settings.initChangeHandler(); // toujours après Settings.restore()
 
   // Préparation du thème
   try {
