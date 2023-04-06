@@ -144,11 +144,16 @@ export class Settings {
   }
 
 
-  static async restore() {
+  static async restore({ include = [], exclude = [] }: { include?: string[], exclude?: string[] } = {}) {
     await dataStorage.ready();
     const savedSettings = new Settings(await dataStorage.getItem('app-settings'));
 
-    for (const setting of Object.keys(savedSettings) as Array<keyof Settings>) {
+    if (include.length === 0) {
+      include = Object.keys(savedSettings);
+    }
+    include = include.filter(s => !(exclude.includes(s)));
+    
+    for (const setting of include as Array<keyof Settings>) {
       const value = savedSettings[setting];
       Settings.#toForm(setting, value);
       Settings.#apply(setting, value, { initial: true });
@@ -191,6 +196,20 @@ export class Settings {
 
     if (id in currentSettings) return currentSettings[id as keyof Settings];
     else throw new Error(`${id} is not a valid setting`);
+  }
+
+
+  static initChangeHandler() {
+    const settingsForm = document.querySelector('form[name="app-settings"]');
+    if (!(settingsForm instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
+
+    settingsForm.addEventListener('change', event => {
+      const setting = (event.target as EventTarget & { name: string })?.name;
+      const settings = new Settings(new FormData(settingsForm));
+      if (setting in settings) {
+        Settings.set(setting as keyof Settings, settings[setting as keyof Settings], { apply: true, toForm: false });
+      }
+    });
   }
 }
 

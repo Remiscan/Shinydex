@@ -153,17 +153,6 @@ document.querySelector('.fab')!.addEventListener('click', async () => {
 /////////////
 // PARAMÈTRES
 
-// Détecte les changements de paramètres
-const settingsForm = document.querySelector('form[name="app-settings"]');
-if (!(settingsForm instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
-settingsForm.addEventListener('change', event => {
-  const setting = (event.target as EventTarget & { name: string })?.name;
-  const settings = new Settings(new FormData(settingsForm));
-  if (setting in settings) {
-    Settings.set(setting as keyof Settings, settings[setting as keyof Settings], { apply: true, toForm: false });
-  }
-});
-
 // Détecte le clic sur l'état du dernier backup pour en lancer un nouveau
 const syncTriggers = [...document.querySelectorAll('[data-action="sync-now"]')];
 syncTriggers.forEach(element => {
