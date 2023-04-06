@@ -128,7 +128,7 @@ export class Settings {
             });
 
             // If the option is turned on, check if there are new sprites to cache on app launch
-            cacheAllSprites(true);
+            cacheAllSprites(true, { priority: 'low' });
           }
         } else {
           cacheAllSprites(value);
@@ -220,7 +220,7 @@ export class Settings {
  * @param bool - true to fill the cache, false to empty it.
  * @returns true if there was no error, false if there was one.
  */
-export async function cacheAllSprites(bool: boolean): Promise<boolean> {
+export async function cacheAllSprites(bool: boolean, fetchOptions: RequestInit & { priority?: string } = {}): Promise<boolean> {
   const worker = (await navigator.serviceWorker.ready).active;
   if (!worker) throw new Error('No service worker available to cache all sprites');
 
@@ -263,7 +263,7 @@ export async function cacheAllSprites(bool: boolean): Promise<boolean> {
         reject(event);
       };
       
-      worker.postMessage({ 'action': `cache-all-sprites` }, [channel.port2]);
+      worker.postMessage({ 'action': `cache-all-sprites`, 'options': fetchOptions }, [channel.port2]);
     });
 
     await dataStorage.setItem('sprites-cache-progress', `${progress}% : ${(size / (10 ** unitPower)).toFixed(2)} ${unit}`);
@@ -273,6 +273,7 @@ export async function cacheAllSprites(bool: boolean): Promise<boolean> {
     return false;
   } finally {
     if (input && 'disabled' in input) input.disabled = false;
+    else input?.removeAttribute('disabled');
   }
 }
 

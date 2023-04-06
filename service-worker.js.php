@@ -170,7 +170,7 @@ self.addEventListener('message', async function(event) {
       const source = event.ports[0];
 
       event.waitUntil(
-        cacheAllSprites(source)
+        cacheAllSprites(source, event.data?.options)
         .catch(error => console.error(error))
       );
     } break;
@@ -270,7 +270,7 @@ async function installFiles(event = null) {
     await caches.open(spritesCacheName);
     const shouldCacheAllSprites = await dataStorage.getItem('cache-all-sprites');
     if (shouldCacheAllSprites === true) {
-      cacheAllSprites();
+      cacheAllSprites(undefined, { priority: 'low' });
     }
   }
 
@@ -288,12 +288,12 @@ async function installFiles(event = null) {
 
 /** Stores all sprites in the sprites cache. */
 let cachingAllSprites = false;
-async function cacheAllSprites(source) {
+async function cacheAllSprites(source, fetchOptions = {}) {
   if (cachingAllSprites) return;
   try {
     cachingAllSprites = true;
 
-    let response = await fetch(`./backend/endpoint.php?request=get-all-sprites&date=${Date.now()}`);
+    let response = await fetch(`./backend/endpoint.php?request=get-all-sprites&date=${Date.now()}`, fetchOptions);
     if (!(response.status === 200)) {
       throw new Error('Could not fetch list of sprites');
     }
