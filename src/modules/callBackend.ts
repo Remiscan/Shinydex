@@ -1,5 +1,7 @@
 import { Params } from './Params.js';
 import { getString } from './translation.js';
+// @ts-expect-error
+import { queueable } from '../../../_common/js/per-function-async-queue.js';
 
 
 
@@ -7,7 +9,7 @@ type BackendRequestData = {
   'session-code-verifier'?: string,
   [key: string]: any
 };
-export async function callBackend(request: string, data: BackendRequestData = {}, signedIn: boolean = false): Promise<any> {
+let callBackend = async (request: string, data: BackendRequestData = {}, signedIn: boolean = false): Promise<any> => {
   // Prepare the data to send to the backend
   if (signedIn) data['session-code-verifier'] = Params.codeVerifier;
   const formData = new FormData();
@@ -41,4 +43,7 @@ export async function callBackend(request: string, data: BackendRequestData = {}
       throw error;
     }
   }
-}
+};
+
+callBackend = queueable(callBackend);
+export { callBackend };
