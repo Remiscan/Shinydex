@@ -2,7 +2,6 @@ import '../../../_common/components/input-slider/input-slider.js';
 import '../../../_common/components/input-switch/input-switch.js';
 import { Friend } from './Friend.js';
 import { Hunt } from './Hunt.js';
-import { Settings } from './Settings.js';
 import { populator } from './appContent.js';
 import { appStart, checkUpdate } from './appLifeCycle.js';
 import * as Auth from './auth.js';
@@ -26,7 +25,7 @@ import { PopulatableSection } from './filtres.js';
 import { dataStorage, friendStorage, huntStorage, shinyStorage } from './localForage.js';
 import { navLinkBubble, navigate, sectionActuelle } from './navigate.js';
 import { Notif, warnBeforeDestruction } from './notification.js';
-import { requestSync } from './syncBackup.js';
+import { immediateSync, requestSync } from './syncBackup.js';
 import { getString } from './translation.js';
 
 
@@ -153,22 +152,12 @@ document.querySelector('.fab')!.addEventListener('click', async () => {
 /////////////
 // PARAMÈTRES
 
-// Détecte les changements de paramètres
-const settingsForm = document.querySelector('form[name="app-settings"]');
-if (!(settingsForm instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
-settingsForm.addEventListener('change', event => {
-  const formData = new FormData(settingsForm);
-  const settings = new Settings(formData);
-  settings.apply();
-  settings.save();
-});
-
 // Détecte le clic sur l'état du dernier backup pour en lancer un nouveau
 const syncTriggers = [...document.querySelectorAll('[data-action="sync-now"]')];
 syncTriggers.forEach(element => {
   if (!(element instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
   element.addEventListener('click', event => {
-    requestSync();
+    immediateSync();
   });
 });
 

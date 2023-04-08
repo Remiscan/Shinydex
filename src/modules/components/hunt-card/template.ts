@@ -53,6 +53,7 @@ template.innerHTML = /*html*/`
 
 
     <fieldset name="bonus">
+    
       <legend>
         <span class="title-medium" data-string="bonuses-title"></span>
       </legend>
@@ -106,6 +107,16 @@ template.innerHTML = /*html*/`
       </fieldset>
 
 
+      <!-- Bonus de Diamant Étincelant / Perle Scintillante (BDSP) -->
+      <fieldset data-game="bdsp">
+        <legend>
+          <span class="title-small" data-string="bonuses-bdsp"></span>
+        </legend>
+
+        <check-box name="bdsp-diglettBonus" data-method="grandunderground" data-string="bonus-bdsp-diglettBonus"></check-box>
+      </fieldset>
+
+
       <!-- Bonus de Épée / Bouclier (SWSH) -->
       <fieldset data-game="swsh">
         <legend>
@@ -155,6 +166,33 @@ template.innerHTML = /*html*/`
           <option>3</option>
         </input-select>
       </fieldset>
+
+
+      <!-- Bonus de Rubis Oméga / Saphir Alpha (ORAS) -->
+      <fieldset data-game="oras">
+        <legend>
+          <span class="title-small" data-string="bonuses-oras"></span>
+        </legend>
+
+        <text-field name="oras-dexnavChain" inputmode="numeric" pattern="[0-9]*" default-value="0" data-method="dexnavchain">
+          <span slot="label" data-string="bonus-oras-dexnavChain"></span>
+        </text-field>
+
+        <text-field name="oras-dexnavLevel" inputmode="numeric" pattern="[0-9]*" default-value="0" data-method="dexnavchain">
+          <span slot="label" data-string="bonus-oras-dexnavLevel"></span>
+        </text-field>
+      </fieldset>
+
+
+      <!-- Bonus de Rubis Oméga / Saphir Alpha (ORAS) -->
+      <fieldset data-game="gsc">
+        <legend>
+          <span class="title-small" data-string="bonuses-gsc"></span>
+        </legend>
+
+        <check-box name="gsc-shinyParent" data-string="bonus-gsc-shinyParent"></check-box>
+      </fieldset>
+
     </fieldset>
 
 

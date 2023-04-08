@@ -52,7 +52,6 @@ $httpLanguage = $translation->getLanguage();
     }
     </script>
     <script defer src="./ext/localforage.min.js"></script>
-    <script defer src="https://accounts.google.com/gsi/client"></script>
     <script type="module" src="./dist/modules/main.js"></script>
 
     <?php

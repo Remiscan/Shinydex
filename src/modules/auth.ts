@@ -162,9 +162,9 @@ async function signIn(provider: SignInProvider, token: string = '', { notify = t
       // Username
       try {
         const input = settingsForm.querySelector('[name="username"]');
-        if (!input || !('value' in input)) throw new TypeError('Expecting TextField');
         if (userProfile.username) {
-          input.value = userProfile.username;
+          if (input && 'value' in input)  input.value = userProfile.username;
+          else input?.setAttribute('value', userProfile.username);
           document.body.setAttribute('data-has-username', 'true');
         }
         initUsernameChangeHandler();
@@ -175,8 +175,9 @@ async function signIn(provider: SignInProvider, token: string = '', { notify = t
       // Visibility
       try {
         const input = settingsForm.querySelector('[name="public"]');
-        if (!input || !('checked' in input)) throw new TypeError(`Expecting InputSwitch`);
-        input.checked = userProfile.public;
+        if (input && 'checked' in input) input.checked = userProfile.public;
+        else if (userProfile.public) input?.setAttribute('checked', 'true');
+        else input?.removeAttribute('checked');
         initVisibilityChangeHandler();
         settingsForm.setAttribute('data-public-profile', String(userProfile.public));
         document.body.setAttribute('data-public-profile', String(userProfile.public));

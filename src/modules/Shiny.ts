@@ -32,12 +32,13 @@ const allMethodes: Methode[] = [
   { id: 'ultrawormhole', jeux: allGames.filter(g => g.gen == 7), mine: true, charm: false },
   { id: 'raid', jeux: allGames.filter(g => g.id == 'swsh' || g.id == 'sv'), mine: true, charm: false },
   { id: 'dynamaxadventure', jeux: allGames.filter(g => g.gen == 8), mine: true, charm: true },
+  { id: 'grandunderground', jeux: allGames.filter(g => g.id == 'bdsp'), mine: true, charm: false },
   { id: 'massoutbreak', jeux: allGames.filter(g => g.id == 'pla' || g.id == 'sv'), mine: true, charm: true },
   { id: 'massivemassoutbreak', jeux: allGames.filter(g => g.id == 'pla'), mine: true, charm: true },
   
   { id: 'wildevent', jeux: allGames.filter(g => g.gen == 0), mine: true, charm: false },
   { id: 'wildalwaysshiny', jeux: allGames.filter(g => ['gs', 'hgss', 'bw2', 'pla'].includes(g.id)), mine: true, charm: false },
-  { id: 'event', jeux: allGames, mine: false, charm: false },
+  { id: 'event', jeux: allGames.filter(g => g.gen > 1), mine: false, charm: false },
 
   { id: 'glitch', jeux: allGames.filter(g => [1, 2].includes(g.gen)), mine: true, charm: false },
   { id: 'hack', jeux: allGames, mine: true, charm: false },
@@ -141,9 +142,19 @@ export class Shiny extends FrontendShiny {
    */
   get jeuObj(): Jeu {
     let k = Pokemon.jeux.findIndex(p => p.uid == this.game);
-    if (k == -1) throw `${getString('error-invalid-game')} (${this.game})`;
+    if (k == -1) throw new Error(`${getString('error-invalid-game')} (${this.game})`);
 
     return Pokemon.jeux[k];
+  }
+
+  /**
+   * @returns Méthode avec laquelle le Pokémon a été chassé.
+   */
+  get methodObj(): Methode {
+    let k = Shiny.allMethodes.findIndex(m => m.id === this.method);
+    if (k == -1) throw new Error(`${getString('error-invalid-method')} (${this.method})`);
+
+    return Shiny.allMethodes[k];
   }
 
   /**
@@ -188,10 +199,14 @@ export class Shiny extends FrontendShiny {
       switch (methode.id) {
         case 'hack':
         case 'unknown':
-        case 'wildevent': {
+        case 'wildevent':
           // ???
           return null;
-        }
+
+        case 'glitch':
+        case 'wildalwaysshiny':
+        case 'event':
+          return 1;
 
         case 'wild': {
           if (game.id === 'lgpe') {
@@ -231,10 +246,9 @@ export class Shiny extends FrontendShiny {
           break;
         }
 
-        case 'glitch':
-        case 'wildalwaysshiny':
-        case 'event':
-          return 1;
+        case 'egg': {
+          if (game.id === 'gsc' && this.count['gsc-shinyParent']) return 64; 
+        } break;
         
         case 'masuda': {
           bonusRolls = (game.gen >= 8) ? 6 : (game.gen >= 5) ? 5 : 4;
@@ -270,8 +284,25 @@ export class Shiny extends FrontendShiny {
         }
         
         case 'dexnavchain': {
-          // compliqué...
-          break;
+          const chain = this.count['oras-dexnavChain'] || 0;
+          const level = this.count['oras-dexnavLevel'] || 0;
+          const charm = this.charm;
+
+          let targetValue = 0;
+          if (level <= 100) targetValue = 6 * level;
+          else if (level <= 200) targetValue = 6 * 100 + 2 * (level - 100);
+          else targetValue = 6 * 100 + 2 * 100 + 1 * (level - 200);
+          targetValue = Math.ceil(targetValue / 100);
+
+          const probability = (bool: boolean) => {
+            const rolls = 1 + Number(bool) * 4 + Number(charm) * 2 + (chain === 49 ? 5 : chain === 99 ? 10 : 0);
+            const dexnavShinyProbability = 1 - (1 - targetValue / 10000) ** rolls;
+            const randomShinyProbability = 1 - (1 - 1 / baseRate) ** (1 + Number(charm) * 2);
+            return (1 - dexnavShinyProbability) * randomShinyProbability + dexnavShinyProbability;
+          }
+
+          const realProbability = .96 * probability(false) + .04 * probability(true);
+          return Math.round(1 / realProbability);
         }
 
         case 'friendsafari': {
@@ -311,6 +342,11 @@ export class Shiny extends FrontendShiny {
           return rate;
         }
 
+        case 'grandunderground': {
+          const diglettBonus = this.count['bdsp-diglettBonus'] || 0;
+          return Math.round(baseRate / (1 + diglettBonus));
+        }
+
         case 'massoutbreak': {
           if (game.id === 'pla') bonusRolls = 25;
           else if (game.id === 'sv') bonusRolls = this.count['sv-outbreakCleared'] || 0;
@@ -347,7 +383,7 @@ export class Shiny extends FrontendShiny {
       }
 
       rolls += (charmRolls || 0) + (bonusRolls || 0);
-      const rate = Math.round(baseRate / rolls);
+      const rate = Math.round(1 / (1 - (1 - 1 / baseRate) ** rolls));
       return rate;
     } catch (error) {
       return null;

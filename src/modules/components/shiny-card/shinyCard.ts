@@ -119,6 +119,10 @@ export class shinyCard extends HTMLElement {
         if (getProp('swsh-dexKo')) parts.push(`<span data-string="bonus-swsh-dexKo-alt">${getString('bonus-swsh-dexKo-alt', lang)}</span> ${getProp('swsh-dexKo')}`);
       }
 
+      else if ((shiny.game === 'brilliantdiamond' || shiny.game === 'shiningpearl') && shiny.method === 'grandunderground') {
+        if (getProp('bdsp-diglettBonus')) parts.push(`<span data-string="bonus-bdsp-diglettBonus">${getString('bonus-bdsp-diglettBonus', lang)}</span>`);
+      }
+
       else if (shiny.game === 'legendsarceus') {
         const dexResearch = getProp('pla-dexResearch');
         const niv = dexResearch === 2 ? '100%' : dexResearch === 1 ? '10' : '9 ou -';

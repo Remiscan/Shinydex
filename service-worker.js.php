@@ -170,7 +170,7 @@ self.addEventListener('message', async function(event) {
       const source = event.ports[0];
 
       event.waitUntil(
-        cacheAllSprites(source)
+        cacheAllSprites(source, event.data?.options)
         .catch(error => console.error(error))
       );
     } break;
@@ -270,7 +270,7 @@ async function installFiles(event = null) {
     await caches.open(spritesCacheName);
     const shouldCacheAllSprites = await dataStorage.getItem('cache-all-sprites');
     if (shouldCacheAllSprites === true) {
-      cacheAllSprites();
+      cacheAllSprites(undefined, { priority: 'low' });
     }
   }
 
@@ -288,12 +288,12 @@ async function installFiles(event = null) {
 
 /** Stores all sprites in the sprites cache. */
 let cachingAllSprites = false;
-async function cacheAllSprites(source) {
+async function cacheAllSprites(source, fetchOptions = {}) {
   if (cachingAllSprites) return;
   try {
     cachingAllSprites = true;
 
-    let response = await fetch(`./backend/endpoint.php?request=get-all-sprites&date=${Date.now()}`);
+    let response = await fetch(`./backend/endpoint.php?request=get-all-sprites&date=${Date.now()}`, fetchOptions);
     if (!(response.status === 200)) {
       throw new Error('Could not fetch list of sprites');
     }
@@ -314,7 +314,7 @@ async function cacheAllSprites(source) {
     const spritesAlreadyCached = (await cache.keys()).map(key => key.url);
     const spritesAlreadyCachedNumber = spritesAlreadyCached.length;
 
-    if (spritesAlreadyCachedNumber === allSpritesNumber) {
+    if (spritesAlreadyCachedNumber >= allSpritesNumber) {
       console.log(`[install] Sprites cached! (newly cached 0 / failed 0 / already cached ${spritesAlreadyCachedNumber} / total ${allSpritesNumber})`);
       source?.postMessage({ action: 'cache-all-sprites', totalSize, progress: 1, progressWithErrors: 1, error: false });
       return;
@@ -388,7 +388,6 @@ async function deleteOldCaches(newCacheName, action) {
 
 /**
  * Compares and syncs Pokémon data between local storage and online database.
- * @returns {Array<string>} The list of hunt IDs whose data was updated.
  */
 async function syncPokemon() {
   // Get local data
@@ -485,7 +484,6 @@ async function syncPokemon() {
 
 /**
  * Compares and syncs friends data between local storage and online database.
- * @returns {Array<string>} The list of usernames whose data was updated.
  */
 async function syncFriends() {
   // Get local data
@@ -553,33 +551,28 @@ async function syncBackup(message = true) {
       clients.map(client => client.postMessage('startBackupSync'));
     }
 
-    // Perform sync
-    await Promise.all([
-      syncPokemon()
-      .then(async ([modifiedPokemon, results]) => {
-        if (message) {
-          const clients = await self.clients.matchAll();
-          clients.map(client => client.postMessage({
-            successfulBackupSync: true,
-            quantity: results.length,
-            modifiedPokemon: [...modifiedPokemon],
-            error: !(results.every(r => r === true))
-          }));
-        }
-      }),
-      syncFriends()
-      .then(async ([modifiedFriends, results]) => {
-        if (message) {
-          const clients = await self.clients.matchAll();
-          clients.map(client => client.postMessage({
-            successfulBackupSync: true,
-            quantity: results.length,
-            modifiedFriends: [...modifiedFriends],
-            error: !(results.every(r => r === true))
-          }));
-        }
-      })
-    ]);
+    // Perform sync (in a sequence, not in parallel, in case the backend needs to sign the user in)
+    const [modifiedPokemon, resultsPokemon] = await syncPokemon();
+    const [modifiedFriends, resultsFriends] = await syncFriends();
+
+    if (message) {
+      const clients = await self.clients.matchAll();
+      for (const client of clients) {
+        client.postMessage({
+          successfulBackupSync: true,
+          quantity: resultsPokemon.length,
+          modifiedPokemon: [...modifiedPokemon],
+          error: !(resultsPokemon.every(r => r === true))
+        });
+
+        client.postMessage({
+          successfulBackupSync: true,
+          quantity: resultsFriends.length,
+          modifiedFriends: [...modifiedFriends],
+          error: !(resultsFriends.every(r => r === true))
+        });
+      }
+    }
 
     // Send data back to the app
     await dataStorage.setItem('last-sync-state', 'success');

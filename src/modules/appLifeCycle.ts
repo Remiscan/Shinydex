@@ -173,6 +173,8 @@ export async function appStart() {
     }));
     logPerf('init filters');
 
+    Settings.initChangeHandler(); // toujours après Settings.restore()
+
     // On efface l'écran de chargement
     const loadScreen = document.getElementById('load-screen')!;
     const byeLoad = loadScreen.animate([

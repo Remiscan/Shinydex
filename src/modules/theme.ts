@@ -6,7 +6,8 @@ import DefPalette from '../../../colori/palette/palette.js';
 
 
 const gradient = Couleur.interpolateInSteps('oklch(70% 0.19 1)', 'oklch(70% 0.19 360)', 25, { interpolationSpace: 'oklch', hueInterpolationMethod: 'longer' });
-export const gradientString = `linear-gradient(to right, ${gradient.map((c: Couleur) => c.rgb).join(', ')})`;
+const gradientString = `linear-gradient(to right, ${gradient.map((c: Couleur) => c.rgb).join(', ')})`;
+(document.querySelector('form[name="app-settings"] [name="theme-hue"]') as HTMLElement)?.style.setProperty('--gradient', gradientString);
 
 export const metaThemeColors = {
   light: null,

@@ -282,10 +282,12 @@ class User {
   /** Gets the user from the current session OR a refresh token. */
   public static function getFromAnyToken(): self {
     if (isset($_COOKIE['user'])) {
-      return self::getFromAccessToken();
+      $user = self::getFromAccessToken();
     } else if (isset($_COOKIE['refresh'])) {
-      return self::getFromRefreshToken();
+      $user = self::getFromRefreshToken();
+      $user->signIn();
     }
+    return $user;
   }
 
 
