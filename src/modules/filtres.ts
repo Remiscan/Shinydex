@@ -282,10 +282,18 @@ export function updateCounters(section: PopulatableSection): void {
   if (!(container instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
 
   const [displayedCount, totalCount, dexids] = countVisibleCards(section);
+
+  // Display "section is empty" message
   if (totalCount > 0) container.classList.remove('vide');
   else                container.classList.add('vide');
-  if (displayedCount > 0) container.classList.remove('vide-filtres');
-  else                    container.classList.add('vide-filtres');
+
+  // Display "no data corresponds to these filters" message
+  if (isFiltrableSection(section)) {
+    if (displayedCount > 0) container.classList.remove('vide-filtres');
+    else                    container.classList.add('vide-filtres');
+  } else {
+    container.classList.remove('vide-filtres');
+  }
 
   const displayedCounter = container.querySelector('.compteur');
   if (displayedCounter) displayedCounter.innerHTML = String(displayedCount);
