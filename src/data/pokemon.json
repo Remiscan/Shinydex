@@ -3861,6 +3861,45 @@
                 },
                 "noShiny": false,
                 "hasBackside": false
+            },
+            {
+                "form": 1,
+                "gender": "md",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "paldea",
+                "name": {
+                    "fr": "{{name}} de Paldea Race Combative mâle",
+                    "en": "Male Paldean {{name}} Combat Breed"
+                },
+                "noShiny": false,
+                "hasBackside": false
+            },
+            {
+                "form": 2,
+                "gender": "md",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "paldea-blaze",
+                "name": {
+                    "fr": "{{name}} de Paldea Race Flamboyante mâle",
+                    "en": "Male Paldean {{name}} Blaze Breed"
+                },
+                "noShiny": false,
+                "hasBackside": false
+            },
+            {
+                "form": 3,
+                "gender": "md",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "paldea-aqua",
+                "name": {
+                    "fr": "{{name}} de Paldea Race Aquatique mâle",
+                    "en": "Male Paldean {{name}} Aqua Breed"
+                },
+                "noShiny": false,
+                "hasBackside": false
             }
         ]
     },
@@ -5609,6 +5648,19 @@
                 "name": {
                     "fr": "{{name}} mâle",
                     "en": "Male {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false
+            },
+            {
+                "form": 1,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "paldea",
+                "name": {
+                    "fr": "{{name}} de Paldea",
+                    "en": "Paldean {{name}}"
                 },
                 "noShiny": false,
                 "hasBackside": false
@@ -26634,26 +26686,26 @@
         "formes": [
             {
                 "form": 0,
-                "gender": "fd",
-                "gigamax": false,
-                "candy": 0,
-                "dbid": "female",
-                "name": {
-                    "fr": "{{name}} femelle",
-                    "en": "Female {{name}}"
-                },
-                "noShiny": false,
-                "hasBackside": false
-            },
-            {
-                "form": 0,
                 "gender": "md",
                 "gigamax": false,
                 "candy": 0,
                 "dbid": "",
                 "name": {
-                    "fr": "{{name}} mâle",
-                    "en": "Male {{name}}"
+                    "fr": "{{name}} mâle mâle",
+                    "en": "Male Male {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false
+            },
+            {
+                "form": 1,
+                "gender": "fd",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "female-female",
+                "name": {
+                    "fr": "{{name}} femelle femelle",
+                    "en": "Female Female {{name}}"
                 },
                 "noShiny": false,
                 "hasBackside": false
@@ -26823,7 +26875,7 @@
         "formes": [
             {
                 "form": 0,
-                "gender": "mf",
+                "gender": "uk",
                 "gigamax": false,
                 "candy": 0,
                 "dbid": "",
@@ -26845,7 +26897,7 @@
         "formes": [
             {
                 "form": 0,
-                "gender": "mf",
+                "gender": "uk",
                 "gigamax": false,
                 "candy": 0,
                 "dbid": "",
@@ -26858,7 +26910,7 @@
             },
             {
                 "form": 1,
-                "gender": "mf",
+                "gender": "uk",
                 "gigamax": false,
                 "candy": 0,
                 "dbid": "four",
@@ -27601,13 +27653,13 @@
         "formes": [
             {
                 "form": 0,
-                "gender": "mf",
+                "gender": "fd",
                 "gigamax": false,
                 "candy": 0,
-                "dbid": "",
+                "dbid": "female",
                 "name": {
-                    "fr": "",
-                    "en": ""
+                    "fr": "{{name}} femelle",
+                    "en": "Female {{name}}"
                 },
                 "noShiny": false,
                 "hasBackside": false
@@ -27623,13 +27675,13 @@
         "formes": [
             {
                 "form": 0,
-                "gender": "mf",
+                "gender": "fd",
                 "gigamax": false,
                 "candy": 0,
-                "dbid": "",
+                "dbid": "female",
                 "name": {
-                    "fr": "",
-                    "en": ""
+                    "fr": "{{name}} femelle",
+                    "en": "Female {{name}}"
                 },
                 "noShiny": false,
                 "hasBackside": false
@@ -27645,13 +27697,13 @@
         "formes": [
             {
                 "form": 0,
-                "gender": "mf",
+                "gender": "fd",
                 "gigamax": false,
                 "candy": 0,
-                "dbid": "",
+                "dbid": "female",
                 "name": {
-                    "fr": "",
-                    "en": ""
+                    "fr": "{{name}} femelle",
+                    "en": "Female {{name}}"
                 },
                 "noShiny": false,
                 "hasBackside": false
@@ -28247,7 +28299,7 @@
         "formes": [
             {
                 "form": 0,
-                "gender": "mf",
+                "gender": "uk",
                 "gigamax": false,
                 "candy": 0,
                 "dbid": "",
@@ -28269,7 +28321,7 @@
         "formes": [
             {
                 "form": 0,
-                "gender": "mf",
+                "gender": "uk",
                 "gigamax": false,
                 "candy": 0,
                 "dbid": "",
@@ -28291,7 +28343,7 @@
         "formes": [
             {
                 "form": 0,
-                "gender": "mf",
+                "gender": "uk",
                 "gigamax": false,
                 "candy": 0,
                 "dbid": "",
@@ -28313,7 +28365,7 @@
         "formes": [
             {
                 "form": 0,
-                "gender": "mf",
+                "gender": "uk",
                 "gigamax": false,
                 "candy": 0,
                 "dbid": "",
@@ -28335,7 +28387,7 @@
         "formes": [
             {
                 "form": 0,
-                "gender": "mf",
+                "gender": "uk",
                 "gigamax": false,
                 "candy": 0,
                 "dbid": "",
@@ -28357,7 +28409,7 @@
         "formes": [
             {
                 "form": 0,
-                "gender": "mf",
+                "gender": "uk",
                 "gigamax": false,
                 "candy": 0,
                 "dbid": "",
@@ -28379,7 +28431,7 @@
         "formes": [
             {
                 "form": 0,
-                "gender": "mf",
+                "gender": "uk",
                 "gigamax": false,
                 "candy": 0,
                 "dbid": "",
@@ -28401,7 +28453,7 @@
         "formes": [
             {
                 "form": 0,
-                "gender": "mf",
+                "gender": "uk",
                 "gigamax": false,
                 "candy": 0,
                 "dbid": "",
@@ -28423,7 +28475,7 @@
         "formes": [
             {
                 "form": 0,
-                "gender": "mf",
+                "gender": "uk",
                 "gigamax": false,
                 "candy": 0,
                 "dbid": "",
@@ -28445,7 +28497,7 @@
         "formes": [
             {
                 "form": 0,
-                "gender": "mf",
+                "gender": "uk",
                 "gigamax": false,
                 "candy": 0,
                 "dbid": "",
@@ -28467,7 +28519,7 @@
         "formes": [
             {
                 "form": 0,
-                "gender": "mf",
+                "gender": "uk",
                 "gigamax": false,
                 "candy": 0,
                 "dbid": "",
@@ -28489,7 +28541,7 @@
         "formes": [
             {
                 "form": 0,
-                "gender": "mf",
+                "gender": "uk",
                 "gigamax": false,
                 "candy": 0,
                 "dbid": "",
@@ -28577,7 +28629,7 @@
         "formes": [
             {
                 "form": 0,
-                "gender": "mf",
+                "gender": "uk",
                 "gigamax": false,
                 "candy": 0,
                 "dbid": "",
@@ -28590,7 +28642,7 @@
             },
             {
                 "form": 1,
-                "gender": "mf",
+                "gender": "uk",
                 "gigamax": false,
                 "candy": 0,
                 "dbid": "roaming",
@@ -28612,7 +28664,7 @@
         "formes": [
             {
                 "form": 0,
-                "gender": "mf",
+                "gender": "uk",
                 "gigamax": false,
                 "candy": 0,
                 "dbid": "",
@@ -28634,7 +28686,7 @@
         "formes": [
             {
                 "form": 0,
-                "gender": "mf",
+                "gender": "uk",
                 "gigamax": false,
                 "candy": 0,
                 "dbid": "",
@@ -28656,7 +28708,7 @@
         "formes": [
             {
                 "form": 0,
-                "gender": "mf",
+                "gender": "uk",
                 "gigamax": false,
                 "candy": 0,
                 "dbid": "",
@@ -28678,7 +28730,7 @@
         "formes": [
             {
                 "form": 0,
-                "gender": "mf",
+                "gender": "uk",
                 "gigamax": false,
                 "candy": 0,
                 "dbid": "",
@@ -28700,7 +28752,7 @@
         "formes": [
             {
                 "form": 0,
-                "gender": "mf",
+                "gender": "uk",
                 "gigamax": false,
                 "candy": 0,
                 "dbid": "",
@@ -28722,7 +28774,7 @@
         "formes": [
             {
                 "form": 0,
-                "gender": "mf",
+                "gender": "uk",
                 "gigamax": false,
                 "candy": 0,
                 "dbid": "",
@@ -28744,7 +28796,7 @@
         "formes": [
             {
                 "form": 0,
-                "gender": "mf",
+                "gender": "uk",
                 "gigamax": false,
                 "candy": 0,
                 "dbid": "",
@@ -28766,7 +28818,7 @@
         "formes": [
             {
                 "form": 0,
-                "gender": "mf",
+                "gender": "uk",
                 "gigamax": false,
                 "candy": 0,
                 "dbid": "",
@@ -28788,7 +28840,7 @@
         "formes": [
             {
                 "form": 0,
-                "gender": "mf",
+                "gender": "uk",
                 "gigamax": false,
                 "candy": 0,
                 "dbid": "",
@@ -28810,7 +28862,7 @@
         "formes": [
             {
                 "form": 0,
-                "gender": "mf",
+                "gender": "uk",
                 "gigamax": false,
                 "candy": 0,
                 "dbid": "",
@@ -28818,7 +28870,7 @@
                     "fr": "",
                     "en": ""
                 },
-                "noShiny": true,
+                "noShiny": false,
                 "hasBackside": false
             }
         ]
@@ -28832,7 +28884,7 @@
         "formes": [
             {
                 "form": 0,
-                "gender": "mf",
+                "gender": "uk",
                 "gigamax": false,
                 "candy": 0,
                 "dbid": "",
@@ -28840,7 +28892,7 @@
                     "fr": "",
                     "en": ""
                 },
-                "noShiny": true,
+                "noShiny": false,
                 "hasBackside": false
             }
         ]

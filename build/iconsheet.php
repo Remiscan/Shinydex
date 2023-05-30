@@ -2,27 +2,21 @@
 function buildIconSheet(int $columns = 24, int $iconSize = 32, string $format = 'webp', bool $logs = true) {
   $iconData = [
     'game' => [
-      'size' => 32,
       'path' => __DIR__.'/../images/game-icons',
     ],
     'ball' => [
-      'size' => 32,
       'path' => __DIR__.'/../images/item-icons/ball',
     ],
     'key' => [
-      'size' => 32,
       'path' => __DIR__.'/../images/item-icons/key',
     ],
     'gene' => [
-      'size' => 32,
       'path' => __DIR__.'/../images/misc-icons/gene',
     ],
     'origin-mark' => [
-      'size' => 64,
       'path' => __DIR__.'/../images/misc-icons/origin-mark',
     ],
     'other' => [
-      'size' => 64,
       'path' => __DIR__.'/../images/misc-icons/other',
     ]
   ];
@@ -149,8 +143,9 @@ function buildIconSheet(int $columns = 24, int $iconSize = 32, string $format = 
       $icon = imagecreatefrompng($fileUrl);
 
       // Copy (and resize) the sprite onto the sheet
-      if ($iconSize === $data['size']) imagecopy($sheet, $icon, $x, $y, 0, 0, $iconSize, $iconSize); // better quality
-      else imagecopyresampled($sheet, $icon, $x, $y, 0, 0, $iconSize, $iconSize, $data['size'], $data['size']);
+      $startSize = getimagesize($fileUrl);
+      if ($iconSize === $startSize[0] && $iconSize === $startSize[1]) imagecopy($sheet, $icon, $x, $y, 0, 0, $iconSize, $iconSize); // better quality
+      else imagecopyresampled($sheet, $icon, $x, $y, 0, 0, $iconSize, $iconSize, $startSize[0], $startSize[1]);
 
       // Insert position into CSS file
       file_put_contents($cssPath, ".icon[data-icon=\"$id\"]{background-position: -{$x}px -{$y}px}", FILE_APPEND);
