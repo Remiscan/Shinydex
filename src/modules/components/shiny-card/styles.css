@@ -110,7 +110,7 @@ pokemon-sprite:not([dexid]) ~ * {
 
 :host([open]) [data-type="ball"] {
   transition: transform .11s var(--easing-accelerate);
-  transform: translate(15px) rotate(120deg);
+  transform: translate(20px) rotate(120deg);
 }
 
 /* Name & species */
