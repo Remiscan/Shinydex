@@ -256,7 +256,6 @@ template.innerHTML = /*html*/`
           <option value="luxury" data-string="luxury-ball"></option>
           <option value="dive" data-string="dive-ball"></option>
           <option value="cherish" data-string="cherish-ball"></option>
-          <option value="park" data-string="park-ball"></option>
           <option value="quick" data-string="quick-ball"></option>
           <option value="heal" data-string="heal-ball"></option>
           <option value="dusk" data-string="dusk-ball"></option>
