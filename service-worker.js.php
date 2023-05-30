@@ -52,7 +52,7 @@ const dataStorage = localforage.createInstance({
 const cachePrefix = 'shinydex-sw';
 const currentCacheName = `${cachePrefix}-<?=$maxVersion?>`;
 const liveFileVersions = JSON.parse(`<?=json_encode($fileVersions, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES)?>`);
-const spritesCacheName = 'shinydex-sw-sprites-v1';
+const spritesCacheName = 'shinydex-sw-sprites-v2';
 
 
 
