@@ -49,7 +49,7 @@ function buildIconSheet(int $columns = 24, int $iconSize = 32, string $format = 
   }
 
   // Initialize CSS file
-  file_put_contents($cssPath, ".icon {background-image: var(--link-iconsheet);background-repeat: no-repeat;display: inline-block;width:32px;height:32px}.icon[data-icon^=\"ball/\"]{scale:.6}");
+  file_put_contents($cssPath, ".icon {background-image: var(--link-iconsheet);background-repeat: no-repeat;display: inline-block;width:32px;height:32px}.icon[data-icon^=\"ball/\"]{scale:.6}.icon[data-icon^=\"game/\"]{border-radius:calc(.5 * var(--border-radius))}");
 
   // Initialize preview file
   file_put_contents($previewPath, <<<preview
