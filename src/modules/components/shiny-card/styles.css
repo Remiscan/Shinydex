@@ -291,6 +291,10 @@ button.icon-button.menu-hint::before {
   background: white;
 }
 
+.unknown-odds {
+  background: transparent;
+}
+
 .shiny-rate-background {
   position: absolute;
   width: calc(100% - 4px);
@@ -312,7 +316,11 @@ button.icon-button.menu-hint::before {
   align-items: center;
 }
 
-.shiny-rate:not(.with-charm)>.shiny-charm {
+.shiny-rate:not(.with-charm) > .shiny-charm {
+  display: none;
+}
+
+.shiny-rate.unknown-odds :is(.shiny-charm, .shiny-rate-data) {
   display: none;
 }
 
