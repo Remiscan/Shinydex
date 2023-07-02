@@ -3,7 +3,7 @@ import { Pokemon } from '../../Pokemon.js';
 import { Shiny } from '../../Shiny.js';
 import { SupportedLang, pokemonData } from '../../jsonData.js';
 import { shinyStorage } from '../../localForage.js';
-import { TranslatedString, getString, translationObserver } from '../../translation.js';
+import { getString, translationObserver } from '../../translation.js';
 // @ts-expect-error
 import sheet from './styles.css' assert { type: 'css' };
 import template from './template.js';
@@ -37,11 +37,27 @@ export class spriteViewer extends HTMLElement {
     // On place le numéro et nom
     this.querySelector('.info-dexid')!.innerHTML = pad(String(pokemon.dexid), 3);
 
+    const container = document.querySelector(`#pokedex`);
+    if (!(container instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
+
+    const sectionFilters = {
+      mine: new Set(container.getAttribute('data-filter-mine')?.split(' ') ?? []),
+      legit: new Set(container.getAttribute('data-filter-legit')?.split(' ') ?? [])
+    };
+
     const caughtFormsList: Set<string> = new Set();
     await shinyStorage.keys().then(keys => Promise.all(keys.map(async key => {
       const shiny = new Shiny(await shinyStorage.getItem(key));
       if (shiny.dexid !== Number(dexid)) return;
-      caughtFormsList.add(shiny.forme);
+
+      // On vérifie si le Shiny correspond aux filtres sélectionnés
+      const shinyFilters = {
+        mine: String(shiny.mine),
+        legit: String(shiny.legit)
+      };
+      if (sectionFilters.mine.has(shinyFilters.mine) && sectionFilters.legit.has(shinyFilters.legit)) {
+        caughtFormsList.add(shiny.forme);
+      }
     })));
 
     // On réordonne les formes (normale d'abord, les autres ensuite)
