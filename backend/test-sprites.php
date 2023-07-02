@@ -33,7 +33,7 @@ forEach($pokemons as $pokemon)
         <img src="<?=$pokemon->getSprite($forme, (object) [ 'shiny' => true, 'format' => 'webp' ])?>" width="112" height="112">
       </div>
       <div style="grid-row: 2 / 3;">
-        <?=($forme->nom != '') ? $forme->nom : '(Normal)'?>
+        <?=($forme->name['fr'] != '') ? $forme->name['fr'] : '(Normal)'?>
       </div>
     </div>
     <?php

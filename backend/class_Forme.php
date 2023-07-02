@@ -18,13 +18,18 @@ class Forme extends Sprite {
     if (
       ($dexid == 25 && $sprite->form == 8) // Pikachu starter
       || ($dexid == 20 && $sprite->form == 2) // Rattatac totem
+      || ($dexid == 59 && $sprite->form == 2) // Arcanin de Hisui monarque
+      || ($dexid == 101 && $sprite->form == 2) // Électrode de Hisui monarque
       || ($dexid == 105 && $sprite->form == 2) // Ossatueur totem
       || ($dexid == 133 && $sprite->form == 1) // Évoli starter
       || ($dexid == 414 && $sprite->form > 0) // Papilord (formes capes de Cheniti)
+      || ($dexid == 493 && $sprite->form == 18) // Arceus avec Plaque Légende
+      || ($dexid == 549 && $sprite->form == 2) // Fragilady de Hisui monarque
       || ($dexid == 658 && $sprite->form == 1) // Amphinobi de Sacha forme normale
       || ($dexid == 664 && $sprite->form > 0) // Lépidonille (formes de Prismillon)
       || ($dexid == 665 && $sprite->form > 0) // Pérégrain (formes de Prismillon)
       || ($dexid == 670 && $sprite->form == 5) // Floette de AZ
+      || ($dexid == 713 && $sprite->form == 2) // Séracrawl de Hisui monarque
       || ($dexid == 718 && $sprite->form == 2) // Zygarde (doublon)
       || ($dexid == 718 && $sprite->form == 3) // Zygarde (doublon)
       || ($dexid == 735 && $sprite->form == 1) // Argouste totem
@@ -40,6 +45,7 @@ class Forme extends Sprite {
       || ($dexid == 784 && $sprite->form == 1) // Ékaïser totem
       || ($dexid == 849 && $sprite->form == 1 && $sprite->gigamax == 1) // Salarsen Gigamax Grave (identique au Aigu)
       || ($dexid == 869 && $sprite->gigamax == 1 && ($sprite->form > 0 || $sprite->candy > 0)) // Charmilly Gigamax (autres friandises)
+      || ($dexid == 900 && $sprite->form == 1) // Hachécateur monarque
     ) {
       throw new Exception('Forme ignorée');
     }
@@ -94,6 +100,11 @@ class Forme extends Sprite {
           $ids = ['', 'original-cap', 'hoenn-cap', 'sinnoh-cap', 'unys-cap', 'kalos-cap', 'alola-cap', 'partner-cap', '', 'world-cap'];
           $noms = ['', '{{name}} Casquette Originale', '{{name}} Casquette de Hoenn', '{{name}} Casquette de Sinnoh', '{{name}} Casquette d\'Unys', '{{name}} Casquette de Kalos', '{{name}} Casquette d\'Alola', '{{name}} Casquette de Partenaire', '', '{{name}} Casquette Monde'];
           $nomsEN = ['', 'Original Cap {{name}}', 'Hoenn Cap {{name}}', 'Sinnoh Cap {{name}}', 'Unova Cap {{name}}', 'Kalos Cap {{name}}', 'Alola Cap {{name}}', 'Partner Cap {{name}}', '', 'World Cap {{name}}'];
+        break;
+        case 128: // Tauros
+          $ids = ['', 'paldea', 'paldea-blaze', 'paldea-aqua'];
+          $noms = ['', '{{name}} de Paldea Race Combative', '{{name}} de Paldea Race Flamboyante', '{{name}} de Paldea Race Aquatique'];
+          $nomsEN = ['', 'Paldean {{name}} Combat Breed', 'Paldean {{name}} Blaze Breed', 'Paldean {{name}} Aqua Breed'];
         break;
         case 201: // Zarbi
           $ids = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '!', '?'];
@@ -218,6 +229,7 @@ class Forme extends Sprite {
         break;
         case 678: // Mistigrix
         case 876: // Wimessir
+        case 916: // Fragroin
           $ids = ['', 'female'];
           $noms = ['{{name}} mâle', '{{name}} femelle'];
           $nomsEN = ['Male {{name}}', 'Female {{name}}'];
@@ -523,6 +535,7 @@ class Forme extends Sprite {
     $alolan = [19, 20, 26, 27, 28, 37, 38, 50, 51, 52, 53, 74, 75, 76, 88, 89, 103, 105];
     $galarian = [52, 77, 78, 79, 80, 83, 110, 122, 144, 145, 146, 199, 222, 263, 264, 554, 555, 562, 618];
     $hisuian = [58, 59, 100, 101, 157, 211, 215, 503, 549, 570, 571, 628, 705, 706, 713, 724];
+    $paldean = [128, 194];
 
     return in_array($dexid, $$formType);
   }
@@ -544,6 +557,15 @@ class Forme extends Sprite {
     $tempForm = 1;
     if (self::has('alolan', $dexid)) $tempForm++;
     if (self::has('galarian', $dexid)) $tempForm++;
+    if (self::has('mega', $dexid)) $tempForm++;
+    return $sprite->form == $tempForm;
+  }
+
+  static private function isPaldean(Sprite $sprite, int $dexid): bool {
+    $tempForm = 1;
+    if (self::has('alolan', $dexid)) $tempForm++;
+    if (self::has('galarian', $dexid)) $tempForm++;
+    if (self::has('hisuian', $dexid)) $tempForm++;
     if (self::has('mega', $dexid)) $tempForm++;
     return $sprite->form == $tempForm;
   }
