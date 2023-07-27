@@ -1,7 +1,7 @@
+// @ts-ignore
+import { queueable } from '../../../_common/js/per-function-async-queue/mod.js';
 import { Params } from './Params.js';
 import { getString } from './translation.js';
-// @ts-expect-error
-import { queueable } from '../../../_common/js/per-function-async-queue.js';
 
 
 
@@ -47,3 +47,4 @@ let callBackend = async (request: string, data: BackendRequestData = {}, signedI
 
 callBackend = queueable(callBackend);
 export { callBackend };
+
