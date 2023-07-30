@@ -36,7 +36,7 @@ const allMethodes: Methode[] = [
   { id: 'massoutbreak', jeux: allGames.filter(g => g.id == 'pla' || g.id == 'sv'), mine: true, charm: true },
   { id: 'massivemassoutbreak', jeux: allGames.filter(g => g.id == 'pla'), mine: true, charm: true },
   
-  { id: 'wildevent', jeux: allGames.filter(g => g.gen == 0), mine: true, charm: false },
+  { id: 'wildevent', jeux: allGames.filter(g => g.id === 'go'), mine: true, charm: false },
   { id: 'wildalwaysshiny', jeux: allGames.filter(g => ['gs', 'hgss', 'bw2', 'pla'].includes(g.id)), mine: true, charm: false },
   { id: 'event', jeux: allGames.filter(g => g.gen > 1), mine: false, charm: false },
 
@@ -374,6 +374,10 @@ export class Shiny extends FrontendShiny {
         case 'sv': {
           const sparklingPower = this.count['sv-sparklingPower'] || 0;
           bonusRolls += sparklingPower;
+        } break;
+
+        case 'sleep': {
+          return null;
         } break;
       }
 
