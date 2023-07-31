@@ -138,7 +138,7 @@ function buildIconSheet(int $columns = 24, int $iconSize = 32, string $format = 
 
     foreach ($iconFiles as $file) {
       $fileUrl = $data['path']."/$file";
-      $id = str_replace('.png', '', "$group/$file");
+      $id = strtolower(str_replace('.png', '', "$group/$file"));
 
       $icon = imagecreatefrompng($fileUrl);
 
