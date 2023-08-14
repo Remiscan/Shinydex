@@ -372,26 +372,29 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
           // Populate section with friend's username
           section.element.querySelectorAll('[data-type="username"]').forEach(e => e.innerHTML = data.username);
 
-          // Populate section with friend's Pokémon (don't await this before navigating)
-          const response = await callBackend('get-friend-data', { username: data.username, scope: 'full' }, false);
-          if ('matches' in response && response.matches === true) {
-            await Promise.all(
-              response.pokemon.map((shiny: any) => {
-                const feShiny = new FrontendShiny(shiny);
-                return friendShinyStorage.setItem(String(shiny.huntid), feShiny);
-              })
-            );
+          // Populate section with friend's Pokémon
+          // ⚠️ (don't await this before navigating)
+          callBackend('get-friend-data', { username: data.username, scope: 'full' }, false)
+          .then(async response => {
+            if ('matches' in response && response.matches === true) {
+              await Promise.all(
+                response.pokemon.map((shiny: any) => {
+                  const feShiny = new FrontendShiny(shiny);
+                  return friendShinyStorage.setItem(String(shiny.huntid), feShiny);
+                })
+              );
 
-            window.dispatchEvent(new CustomEvent('dataupdate', {
-              detail: {
-                sections: ['chromatiques-ami'],
-                ids: response.pokemon.map((shiny: any) => String(shiny.huntid)),
-                sync: false
-              }
-            }));
-          } else {
-            new Notif(getString('error-no-profile')).prompt();
-          }
+              window.dispatchEvent(new CustomEvent('dataupdate', {
+                detail: {
+                  sections: ['chromatiques-ami'],
+                  ids: response.pokemon.map((shiny: any) => String(shiny.huntid)),
+                  sync: false
+                }
+              }));
+            } else {
+              new Notif(getString('error-no-profile')).prompt();
+            }
+          });
         }
       } break;
 
@@ -462,6 +465,7 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
     case 'chromatiques-ami': {
       if (nouvelleSection.closePrevious) {
         friendShinyStorage.clear();
+        ancienneSection.element.removeAttribute('data-ready');
         ancienneSection.element.querySelectorAll('friend-shiny-card, [data-replaces="friend-shiny-card"]').forEach(card => {
           (card as Element & {obsolete: boolean}).obsolete = true;
           card.remove();
