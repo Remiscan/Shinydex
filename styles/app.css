@@ -901,6 +901,10 @@ input-slider[name="theme-hue"]::part(slider-thumb) {
   color: rgb(var(--primary));
 }
 
+text-field[name="username"] {
+  max-width: 18ch;
+}
+
 
 
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
