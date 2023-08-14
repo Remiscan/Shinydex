@@ -769,9 +769,15 @@ h2:not(:first-child) {
   --description-row: auto;
 }
 
+.un-parametre.theme {
+  grid-template-columns: auto 1fr;
+}
+
 .un-parametre.theme > .param {
   grid-template-columns: auto auto auto;
   gap: 8px;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .un-parametre + .un-parametre {
