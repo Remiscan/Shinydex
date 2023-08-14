@@ -56,7 +56,7 @@ export async function upgradeStorage(): Promise<void> {
 
 
 
-export function updateDataFormat(shiny: { [key: string]: any }): { [key: string]: any } {
+export function updateDataFormat(shiny: { [key: string]: unknown }): { [key: string]: unknown } {
   // Rename properties whose name changed
   const renames = new Map([
     ['last_update', 'lastUpdate'],
@@ -82,7 +82,7 @@ export function updateDataFormat(shiny: { [key: string]: any }): { [key: string]
   }
 
   // Add properties that didn't exist before
-  const newProperties: Map<string, any> = new Map([
+  const newProperties: Map<string, unknown> = new Map([
     ['gene', '']
   ]);
 
@@ -96,6 +96,7 @@ export function updateDataFormat(shiny: { [key: string]: any }): { [key: string]
     // if shiny has no huntid
     !shiny.hasOwnProperty('huntid') ||
     // or if it has invalid huntid
+    typeof shiny['huntid'] !== 'string' ||
     !shiny['huntid'].match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
   ) {
     // generate new huntid
@@ -103,7 +104,7 @@ export function updateDataFormat(shiny: { [key: string]: any }): { [key: string]
   }
 
   // Delete properties that don't exist any more
-  const oldProperties = ['userid', 'DO', 'horsChasse'];
+  const oldProperties = ['userid', 'DO', 'horsChasse', 'originMark'];
 
   for (const prop of oldProperties) {
     if (shiny.hasOwnProperty(prop)) {
@@ -114,82 +115,87 @@ export function updateDataFormat(shiny: { [key: string]: any }): { [key: string]
   // Replace date by timestamp
   // (date will be formatted on display)
   if (shiny.hasOwnProperty('date')) {
-    const timestamp = new Date(shiny.date).getTime();
+    let timestamp: number = 0;
+    if (typeof shiny.date === 'string' || typeof shiny.date === 'number') {
+      timestamp = new Date(shiny.date).getTime();
+    }
     shiny['catchTime'] = Math.max(0, timestamp);
     delete shiny.date;
   }
 
   // Replace game names with game uid
   if (shiny.hasOwnProperty('game')) {
-    // Replace game names with accented versions
-    const renames = new Map([
-      ['Emeraude', 'Émeraude'],
-      ['Let\'s Go Evoli', 'Let\'s Go Évoli'],
-      ['Epee', 'Épée'],
-      ['Ultra Soleil', 'Ultra-Soleil'],
-      ['Ultra Lune', 'Ultra-Lune'],
-      ['GO', 'Pokémon GO'],
-      ['Légendes Arceus', 'Légendes Pokémon : Arceus'],
-      ['Home', 'Pokémon Home']
-    ]);
-    const newName = renames.get(shiny['game']);
-    if (newName) shiny['game'] = newName;
+    if (typeof shiny.game === 'string') {
+      // Replace game names with accented versions
+      const renames = new Map([
+        ['Emeraude', 'Émeraude'],
+        ['Let\'s Go Evoli', 'Let\'s Go Évoli'],
+        ['Epee', 'Épée'],
+        ['Ultra Soleil', 'Ultra-Soleil'],
+        ['Ultra Lune', 'Ultra-Lune'],
+        ['GO', 'Pokémon GO'],
+        ['Légendes Arceus', 'Légendes Pokémon : Arceus'],
+        ['Home', 'Pokémon Home']
+      ]);
+      const newName = renames.get(shiny['game']);
+      if (newName) shiny['game'] = newName;
 
-    // Replace game names with game uid
-    gameStringsLoop:
-    for (const lang of Object.keys(gameStrings)) {
-      if (!isSupportedLang(lang)) continue;
-      for (const uid of Object.keys(gameStrings[lang])) {
-        if (!isSupportedGameID(uid)) continue;
-        if (gameStrings[lang][uid] === shiny['game']) {
-          shiny['game'] = uid;
-          break gameStringsLoop;
+      // Replace game names with game uid
+      gameStringsLoop:
+      for (const lang of Object.keys(gameStrings)) {
+        if (!isSupportedLang(lang)) continue;
+        for (const uid of Object.keys(gameStrings[lang])) {
+          if (!isSupportedGameID(uid)) continue;
+          if (gameStrings[lang][uid] === shiny['game']) {
+            shiny['game'] = uid;
+            break gameStringsLoop;
+          }
         }
       }
+    } else {
+      shiny['game'] = 'null';
     }
   }
 
   // Replace method names with method id
   if (shiny.hasOwnProperty('method')) {
-    // Replace method names with updated versions
-    const renames = new Map([
-      ['Chaîne de captures', 'Combo Capture'],
-      ['Raid Dynamax', 'Raid'],
-      ['Sauvage (garanti)', 'Sauvage (chromatique garanti)'],
-      ['Échangé', 'Échange'],
-      ['Échangé (GTS)', 'Échange'],
-      ['Échangé (œuf)', 'Échange'],
-      ['Masuda', 'Œuf (Masuda)'],
-      ['Combo Capture', 'Sauvage'],
-      ['Bonus de combats', 'Sauvage']
-    ]);
-    const newName = renames.get(shiny['method']);
-    if (newName) shiny['method'] = newName;
+    if (typeof shiny.method === 'string') {
+      // Replace method names with updated versions
+      const renames = new Map([
+        ['Chaîne de captures', 'Combo Capture'],
+        ['Raid Dynamax', 'Raid'],
+        ['Sauvage (garanti)', 'Sauvage (chromatique garanti)'],
+        ['Échangé', 'Échange'],
+        ['Échangé (GTS)', 'Échange'],
+        ['Échangé (œuf)', 'Échange'],
+        ['Masuda', 'Œuf (Masuda)'],
+        ['Combo Capture', 'Sauvage'],
+        ['Bonus de combats', 'Sauvage']
+      ]);
+      const newName = renames.get(shiny['method']);
+      if (newName) shiny['method'] = newName;
 
-    // Replace method names with method id
-    methodStringsLoop:
-    for (const lang of Object.keys(methodStrings)) {
-      if (!isSupportedLang(lang)) continue;
-      for (const id of Object.keys(methodStrings[lang])) {
-        if (!isSupportedMethodID(id)) continue;
-        if (methodStrings[lang][id] === shiny['method']) {
-          shiny['method'] = id;
-          break methodStringsLoop;
+      // Replace method names with method id
+      methodStringsLoop:
+      for (const lang of Object.keys(methodStrings)) {
+        if (!isSupportedLang(lang)) continue;
+        for (const id of Object.keys(methodStrings[lang])) {
+          if (!isSupportedMethodID(id)) continue;
+          if (methodStrings[lang][id] === shiny['method']) {
+            shiny['method'] = id;
+            break methodStringsLoop;
+          }
         }
       }
-    }
 
-    // Convert old methods into new data
-    if (shiny['method'] === 'trade') {
-      shiny['method'] = "unknown";
-      shiny['originalTrainer'] = false;
+      // Convert old methods into new data
+      if (shiny['method'] === 'trade') {
+        shiny['method'] = "unknown";
+        shiny['originalTrainer'] = false;
+      }
+    } else {
+      shiny['method'] = 'unknown';
     }
-  }
-
-  // Replace checkmark number with checkmark name
-  if (shiny.hasOwnProperty('originMark') && typeof shiny['originMark'] === 'number') {
-    const names = ['old', 'gen6', 'alola', 'game-boy', 'lets-go', 'go', 'galar', 'sinnoh-gen8', 'hisui', 'paldea'];
-    shiny['originMark'] = names[shiny['originMark']];
   }
 
   // Replace compteur string by object
@@ -225,7 +231,7 @@ export function updateDataFormat(shiny: { [key: string]: any }): { [key: string]
 
   // Translate old hacked property to method if needed
   if (shiny.hasOwnProperty('hacked')) {
-    if (shiny['hacked'] >= 2) {
+    if (typeof shiny.hacked === 'number' && shiny['hacked'] >= 2) {
       shiny['method'] = 'hack';
     }
     delete shiny['hacked'];
