@@ -84,7 +84,7 @@ export class spriteViewer extends HTMLElement {
       templateS.innerHTML = /*html*/`
         <div class="dex-sprite" data-forme="${forme.dbid}">
           <picture ${(typeof forme.noShiny != 'undefined' && forme.noShiny) ? 'class="no-shiny"' : ''}>
-            <pokemon-sprite dexid="${pokemon.dexid}" shiny="true" forme="${forme.dbid}" size="${this.size}" lazy="true"></pokemon-sprite>
+            <pokemon-sprite dexid="${pokemon.dexid}" shiny="true" forme="${forme.dbid}" size="${this.size}" lazy="false"></pokemon-sprite>
             ${(typeof forme.noShiny != 'undefined' && forme.noShiny) ? '<span class="label-large">N\'existe pas<br>en chromatique</span>' : ''}
           </picture>
           <span class="forme-name surface variant label-medium ${caught ? 'caught' : ''}">
@@ -120,6 +120,8 @@ export class spriteViewer extends HTMLElement {
 
       listeShiny.appendChild(dexSpriteS);
       listeRegular.appendChild(dexSpriteR);
+
+      this.dispatchEvent(new Event('contentready'));
     }
   }
 

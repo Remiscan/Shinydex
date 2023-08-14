@@ -3,6 +3,7 @@ import { Settings } from './Settings.js';
 import { FrontendShiny } from './ShinyBackend.js';
 import { callBackend } from './callBackend.js';
 import { FilterMenu } from './components/filter-menu/filterMenu.js';
+import { spriteViewer } from './components/sprite-viewer/spriteViewer.js';
 import { clearElementStorage, lazyLoadSection, unLazyLoadSection, virtualizedSections } from './lazyLoading.js';
 import { friendShinyStorage } from './localForage.js';
 import { Notif } from './notification.js';
@@ -358,7 +359,7 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
   document.body.dataset.sectionActuelle = sectionsString;
 
   const linkedNouvellesSections = getLinkedSections(nouvelleSection.nom);
-  await Promise.all(linkedNouvellesSections.map(section => {
+  await Promise.all(linkedNouvellesSections.map(async section => {
     // On prépare la nouvelle section si besoin
     switch (section.nom) {
       case 'chromatiques-ami': {
@@ -372,35 +373,46 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
           section.element.querySelectorAll('[data-type="username"]').forEach(e => e.innerHTML = data.username);
 
           // Populate section with friend's Pokémon (don't await this before navigating)
-          callBackend('get-friend-data', { username: data.username, scope: 'full' }, false)
-          .then(async response => {
-            if ('matches' in response && response.matches === true) {
-              await Promise.all(
-                response.pokemon.map((shiny: any) => {
-                  const feShiny = new FrontendShiny(shiny);
-                  return friendShinyStorage.setItem(String(shiny.huntid), feShiny);
-                })
-              );
+          const response = await callBackend('get-friend-data', { username: data.username, scope: 'full' }, false);
+          if ('matches' in response && response.matches === true) {
+            await Promise.all(
+              response.pokemon.map((shiny: any) => {
+                const feShiny = new FrontendShiny(shiny);
+                return friendShinyStorage.setItem(String(shiny.huntid), feShiny);
+              })
+            );
 
-              window.dispatchEvent(new CustomEvent('dataupdate', {
-                detail: {
-                  sections: ['chromatiques-ami'],
-                  ids: response.pokemon.map((shiny: any) => String(shiny.huntid)),
-                  sync: false
-                }
-              }));
-            } else {
-              new Notif(getString('error-no-profile')).prompt();
-            }
-          });
+            window.dispatchEvent(new CustomEvent('dataupdate', {
+              detail: {
+                sections: ['chromatiques-ami'],
+                ids: response.pokemon.map((shiny: any) => String(shiny.huntid)),
+                sync: false
+              }
+            }));
+          } else {
+            new Notif(getString('error-no-profile')).prompt();
+          }
         }
       } break;
 
       case 'sprite-viewer': {
-        const viewer = section.element.querySelector('sprite-viewer')!;
+        const viewer = section.element.querySelector('sprite-viewer');
+        if (!(viewer instanceof spriteViewer)) throw new TypeError('Expecting SpriteViewer');
+
+        const readinessChecker = new Promise(resolve => {
+          viewer.addEventListener('contentready', () => {
+            resolve(true);
+            nouvelleSection.element.setAttribute('data-ready', 'true');
+          });
+        });
+
         viewer.setAttribute('dexid', data.dexid || '');
         viewer.setAttribute('shiny', 'true');
-        viewer.setAttribute('size', navigator.onLine ? '512' : '112')
+        viewer.setAttribute('size', navigator.onLine ? '512' : '112');
+
+        // On attend que le sprite viewer soit bien peuplé pour lancer l'animation d'apparition
+        // (si le peuplement prend + de 300ms, on lance l'animation quand même)
+        await Promise.any([readinessChecker, new Promise(resolve => setTimeout(resolve, 300))]);
       } break;
 
       case 'filter-menu': {
@@ -444,6 +456,7 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
   switch (ancienneSection.nom) {
     case 'sprite-viewer': {
       ancienneSection.element.querySelector('sprite-viewer')?.removeAttribute('dexid');
+      ancienneSection.element.removeAttribute('data-ready');
     } break;
 
     case 'chromatiques-ami': {
