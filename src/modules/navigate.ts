@@ -171,7 +171,7 @@ const sections: Section[] = [
         { opacity: 1, transform: 'translate3D(0, 0, 0)' }
       ], {
         easing: Params.easingDecelerate,
-        duration: 200,
+        duration: 100,
         fill: 'both'
       });
     },
@@ -182,7 +182,7 @@ const sections: Section[] = [
         { opacity: 0, transform: `translate3D(0, ${from}, 0)` }
       ], {
         easing: Params.easingAccelerate,
-        duration: 150,
+        duration: 75,
         fill: 'both'
       });
     },
@@ -202,7 +202,7 @@ const sections: Section[] = [
         { opacity: 1, transform: 'translate3D(0, 0, 0)' }
       ], {
         easing: Params.easingDecelerate,
-        duration: 200,
+        duration: 100,
         fill: 'both'
       });
     },
@@ -213,7 +213,7 @@ const sections: Section[] = [
         { opacity: 0, transform: `translate3D(0, ${from}, 0)` }
       ], {
         easing: Params.easingAccelerate,
-        duration: 150,
+        duration: 75,
         fill: 'both'
       });
     },
