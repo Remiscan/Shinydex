@@ -5,6 +5,6 @@ backend/test-sprites-serebii-to-home.php
 dist
 images/out/
 images/pokemon-sprites/webp/
-images/pokemon-sprites/serebii/
+images/pokemon-sprites/svg/
 data/out/
 tsconfig.tsbuildinfo
