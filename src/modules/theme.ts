@@ -44,7 +44,7 @@ export function updateMetaThemeColorTag() {
 /** Application du thème (clair ou sombre). */
 export function setTheme(askedTheme?: string) {
   let html = document.documentElement;
-  html.dataset.theme = askedTheme || '';
+  html.dataset.theme = askedTheme || html.dataset.theme || '';
 
   // Thème par défaut
   const defaultTheme = 'dark';
