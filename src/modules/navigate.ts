@@ -119,7 +119,7 @@ const sections: Section[] = [
     historique: true,
     closePrevious: true,
     makePreviousInert: false,
-    preload: ['./images/app-icons/icon.svg'],
+    preload: [],
     fab: null,
     element: document.getElementById('a-propos')!
   }, {

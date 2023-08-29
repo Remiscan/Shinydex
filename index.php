@@ -91,7 +91,7 @@ $httpLanguage = $translation->getLanguage();
 
   <body data-section-actuelle="mes-chromatiques" class="background welcome">
     <!-- Écran de chargement -->
-    <div id="load-screen" style="grid-row: 1 / 3; grid-column: 1 / 2; position: absolute; z-index: 1000;width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: var(--bg-color, rgb(34, 34, 34));">
+    <div id="load-screen" style="grid-row: 1 / 3; grid-column: 1 / 2; position: absolute; z-index: 1000;width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: var(--bg-color, rgb(34, 34, 34)); --surface-color: var(--surface-container-low);">
       <load-spinner id="spinner" style="--size: 3em;"></load-spinner>
       <p style="margin-top: 20px; display: none;" id="load-screen-message"></p>
     </div>
@@ -143,10 +143,10 @@ $httpLanguage = $translation->getLanguage();
     </nav>
 
     <!-- Contenu de l'appli -->
-    <main class="surface">
+    <main class="surface surface-container-low">
 
       <!-- FAB -->
-      <button type="button" class="surface interactive fab shadow only-icon" data-label="fab-pokemon">
+      <button type="button" class="surface interactive fab elevation-3-shadow only-icon" data-label="fab-pokemon">
         <span class="material-icons" aria-hidden="true">add</span>
       </button>
 
@@ -222,11 +222,11 @@ $httpLanguage = $translation->getLanguage();
 
     <!-- User search -->
     <section id="user-search">
-      <div class="user-search-card surface standard primary shadow elevation-3">
+      <div class="user-search-card surface elevation-3-shadow surface-container-high">
         <h2 class="title-medium" data-string="add-friend-hint"></h2>
 
         <form name="user-search" class="search-form">
-          <input type="text" name="username" class="surface variant elevation-3 interactive body-large"
+          <input type="text" name="username" class="surface surface-bright interactive body-large"
             inputmode="search" enterkeyhint="search" role="searchbox" autocomplete="off"
             minlength="1" maxlength="20"
             data-placeholder="add-friend-placeholder">
@@ -235,7 +235,7 @@ $httpLanguage = $translation->getLanguage();
             <span class="material-icons" aria-hidden="true">close</span>
           </button>
 
-          <button type="submit" class="surface interactive filled tonal only-icon" data-label="submit-search">
+          <button type="submit" class="surface interactive filled tonal elevation-3 only-icon" data-label="submit-search">
             <span class="material-icons" aria-hidden="true">search</span>
           </button>
         </form>

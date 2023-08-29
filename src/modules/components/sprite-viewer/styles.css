@@ -52,10 +52,6 @@ sprite-viewer[shiny="true"] .sprite-list.regular {
   margin-left: 5px;
 }
 
-.info-dexid {
-  opacity: .7;
-}
-
 .info-dexid::before {
   content: '#';
   opacity: .7;
@@ -125,8 +121,8 @@ sprite-viewer a.icon-button.bouton-retour {
 }
 
 .forme-name.caught {
-  --surface-color: var(--primary-container);
-  --text-color: var(--on-primary-container);
+  --surface-color: var(--secondary);
+  --text-color: var(--on-secondary);
   padding-left: var(--padding-inline);
 }
 .forme-name > .icon {

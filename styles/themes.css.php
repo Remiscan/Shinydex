@@ -37,8 +37,8 @@ echo '/'.'*'; ?>*/
   --on-success-container: var(--success-10);
 
   --surface-dim: var(--neutral-87);
-  --surface: var(--neutral-98);
-  --surface-bright: var(--neutral-98);
+  --surface: var(--neutral-99);
+  --surface-bright: var(--neutral-99);
   --on-surface: var(--neutral-10);
   --on-surface-variant: var(--neutral-variant-30);
   --outline: var(--neutral-variant-50);
@@ -53,6 +53,8 @@ echo '/'.'*'; ?>*/
   --inverse-surface: var(--neutral-20);
   --inverse-on-surface: var(--neutral-95);
   --inverse-primary: var(--primary-80);
+  --inverse-secondary: var(--secondary-80);
+  --inverse-tertiary: var(--tertiary-80);
   --shadow: var(--neutral-0);
   --scrim: var(--neutral-0);
 }
@@ -106,23 +108,25 @@ echo '/'.'*'; ?>*/
   --inverse-surface: var(--neutral-90);
   --inverse-on-surface: var(--neutral-20);
   --inverse-primary: var(--primary-40);
+  --inverse-secondary: var(--secondary-40);
+  --inverse-tertiary: var(--tertiary-40);
   --scrim: var(--neutral-0);
 }
 /*<?php themeSheetEnd(closeComment: true); ?>*/
 
 :root {
   --primary-fixed: var(--primary-90);
-  --primary-fidex-dim: var(--primary-80);
+  --primary-fixed-dim: var(--primary-80);
   --on-primary-fixed: var(--primary-10);
   --on-primary-fixed-variant: var(--primary-30);
 
   --secondary-fixed: var(--secondary-90);
-  --secondary-fidex-dim: var(--secondary-80);
+  --secondary-fixed-dim: var(--secondary-80);
   --on-secondary-fixed: var(--secondary-10);
   --on-secondary-fixed-variant: var(--secondary-30);
 
   --tertiary-fixed: var(--tertiary-90);
-  --tertiary-fidex-dim: var(--tertiary-80);
+  --tertiary-fixed-dim: var(--tertiary-80);
   --on-tertiary-fixed: var(--tertiary-10);
   --on-tertiary-fixed-variant: var(--tertiary-30);
 
@@ -154,7 +158,7 @@ echo '/'.'*'; ?>*/
 }
 
 :root {
-  --bg-color: rgb(var(--surface));
+  --bg-color: rgb(var(--surface-container-low));
   --accent-color: rgb(var(--primary));
   --soft-accent-color: rgb(var(--primary-container));
   --nav-text-color: rgb(var(--on-surface-variant));
@@ -172,6 +176,11 @@ echo '/'.'*'; ?>*/
     linear-gradient(to bottom, rgb(var(--surface-tint, var(--primary)), var(--elevation-opacity, 0)) 0% 100%);
   color: rgb(var(--text-color, var(--on-surface)));
   transition: box-shadow .3s var(--easing-standard);
+}
+
+.surface-default {
+  --surface-color: var(--surface);
+  --text-color: var(--on-surface);
 }
 
 .surface-dim {

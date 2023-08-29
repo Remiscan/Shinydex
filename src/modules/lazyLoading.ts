@@ -67,7 +67,7 @@ virtualizedSections.forEach(section => {
     default:
       filterKeys = Object.keys(computeShinyFilters(new Shiny()));
       elementAttribute = 'huntid';
-      replacementClasses = ['surface', 'variant', 'elevation-0'];
+      replacementClasses = ['surface', 'surface-container-lowest'];
       rootMargin = 256;
       break;
   }

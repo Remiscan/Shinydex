@@ -1,7 +1,7 @@
 const template = document.createElement('template');
 template.innerHTML = /*html*/`
   <form name="search-box" part="form" class="search-form">
-    <input type="text" name="search" id="search" class="surface elevation-3 interactive body-large" part="input"
+    <input type="text" name="search" id="search" class="surface surface-bright interactive body-large" part="input"
            inputmode="search" enterkeyhint="search" role="searchbox" autocomplete="off">
 
     <label for="search" class="search-icon" part="search-icon">

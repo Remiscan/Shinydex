@@ -61,7 +61,7 @@ button.icon-button.menu-hint {
   --distance-to-parent-border: 4px;
   border-radius: var(--sub-border-radius);
   --surface-opacity: .5;
-  --elevation-opacity: calc(var(--surface-opacity) * var(--elevation-2-opacity));
+  /*--elevation-opacity: calc(var(--surface-opacity) * var(--elevation-2-opacity));*/
   transition: transform .1s var(--easing-accelerate),
               opacity .1s var(--easing-accelerate);
 }
@@ -89,7 +89,7 @@ pokemon-sprite {
   place-items: center;
   --distance-to-parent-border: 4px;
   border-radius: var(--sub-border-radius);
-  --elevation-opacity: var(--elevation-2-opacity);
+  /*--elevation-opacity: var(--elevation-2-opacity);*/
   scale: var(--sprite-scale);
   margin: calc(-1 * .5 * (1 - var(--sprite-scale)) * 112px);
 }
@@ -106,7 +106,7 @@ a[data-nav-section="chromatiques-ami"] {
 
 a[data-nav-section="chromatiques-ami"]:not(:hover, :active) {
   --surface-opacity: 1;
-  --elevation-opacity: var(--elevation-2-opacity);
+  /*--elevation-opacity: var(--elevation-2-opacity);*/
 }
 
 a[data-nav-section="chromatiques-ami"]::before {

@@ -9,7 +9,7 @@ template.innerHTML = `
   <div class="sprite-list shiny"></div>
   <div class="sprite-list regular"></div>
 </div>
-<div class="sprite-viewer-dex-info surface variant elevation-0 label-medium">
+<div class="sprite-viewer-dex-info surface surface-container-highest label-medium">
   <span class="info-dexid"></span>
 </div>
 <a class="icon-button surface interactive bouton-retour" data-label="button-close">

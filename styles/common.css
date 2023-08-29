@@ -176,11 +176,11 @@ button.text-button.success {
 /* Fab */
 
 button.fab {
-  --surface-color: var(--primary-container);
-  --elevation-opacity: var(--elevation-3-opacity);
+  --surface-color: var(--secondary-container);
+  --elevation-opacity: var(--elevation-0-opacity);
   --elevation-shadow: var(--elevation-3-shadow);
-  color: rgb(var(--on-primary-container));
-  --state-tint: var(--on-primary-container);
+  color: rgb(var(--on-secondary-container));
+  --state-tint: var(--on-secondary-container);
   min-width: 56px;
   height: 56px;
   border-radius: 16px;
@@ -471,7 +471,7 @@ input:is([type=file]):focus:not(:focus-visible) + label {
 
 load-spinner {
   --size: 40px;
-  --bg-color: rgb(var(--surface));
+  --bg-color: rgb(var(--surface-color, var(--surface)));
   --accent-color: rgb(var(--primary));
   --text-color: rgb(var(--on-surface));
 }

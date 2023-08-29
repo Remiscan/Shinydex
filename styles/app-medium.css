@@ -18,7 +18,7 @@ nav {
   padding: 0;
   max-height: calc(100% - 2 * var(--padding));
   overflow: auto;
-  --padding: calc(56px + 2 * 16px);
+  --padding: calc(var(--section-title-height) + 56px + 16px);
   padding-block: var(--padding);
 }
 
@@ -66,8 +66,20 @@ main {
   display: grid;
   grid-template-rows: 1fr;
   grid-template-columns: 1fr;
+  --sections-gap: 16px;
+  gap: var(--sections-gap);
   overflow-y: hidden;
-  padding: 0 8px;
+  padding: 0;
+  padding-right: var(--sections-gap);
+  --surface-color: var(--surface-container) !important;
+}
+
+main > section {
+  grid-template-rows: var(--section-title-height) auto var(--sections-gap);
+}
+
+.section-titre {
+  --surface-opacity: 0;
 }
 
 .section-titre search-box {
@@ -87,7 +99,7 @@ main {
 }
 
 .fab {
-  top: 0;
+  top: calc(var(--section-title-height) - 16px);
   right: unset;
   left: calc(.5 * 112px - .5 * 56px - 16px);
   margin: 16px 0;
@@ -95,8 +107,23 @@ main {
   --notification-container-height: 0;
 }
 
-.app-icon {
-  margin: 0;
+.section-contenu {
+  --padding: 16px;
+  border-radius: calc(var(--padding) + var(--border-radius) / 1.12);
+  padding: var(--padding);
+  --surface-color: var(--surface-container-low);
+}
+
+#mes-chromatiques > .section-contenu,
+#pokedex > .section-contenu,
+#chasses-en-cours > .section-contenu,
+#partage > .section-contenu {
+  padding-bottom: var(--padding);
+}
+
+#parametres > .section-contenu,
+#a-propos > .section-contenu {
+  padding-top: var(--padding);
 }
 
 .notification-container {
@@ -131,4 +158,12 @@ filter-menu {
 
 #google-one-tap-container {
   margin: 10px 8px 6px 8px; /* 16px - (6px 8px 10px 8px) */
+}
+
+*::-webkit-scrollbar {
+  width: 1em;
+}
+ 
+*::-webkit-scrollbar-track {
+  background: transparent;
 }

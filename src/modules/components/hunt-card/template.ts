@@ -8,11 +8,11 @@ import '../textField.js';
 
 const template = document.createElement('template');
 template.innerHTML = /*html*/`
-  <form class="surface variant">
+  <form class="surface surface-container-lowest">
     <div class="intro">
       <div class="sprite-container">
-        <span data-edit class="edit-notice label-large secondary elevation-2" data-string="edit-notice"></span>
-        <pokemon-sprite size="112" class="surface standard elevation-2"></pokemon-sprite>
+        <span data-edit class="edit-notice label-large surface secondary" data-string="edit-notice"></span>
+        <pokemon-sprite size="112" class="surface surface-container-low"></pokemon-sprite>
       </div>
 
       <!-- Espèce, forme -->

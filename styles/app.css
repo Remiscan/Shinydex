@@ -88,9 +88,9 @@ nav > search-box::part(form) {
   box-sizing: border-box;
 }
 
-nav > search-box::part(input) {
+/*nav > search-box::part(input) {
   --elevation-opacity: var(--elevation-5-opacity);
-}
+}*/
 
 .nav-link {
   display: flex;
@@ -110,11 +110,17 @@ nav > search-box::part(input) {
   padding-bottom: 16px;
   color: rgb(var(--on-surface-variant));
   --indicator-elevation-opacity: 0;
+  background: none;
+}
+
+.nav-link:is(:focus, :hover, :active) {
+  --indicator-elevation-opacity: var(--elevation-2-opacity);
 }
 
 @media (hover: none) {
   .nav-link:is(:focus, :hover) {
     --state-opacity: 0;
+    --indicator-elevation-opacity: 0;
   }
 }
 
@@ -160,7 +166,7 @@ nav > search-box::part(input) {
   background-color: rgb(var(--icon-surface, 0 0 0 0));
   color: rgb(var(--icon-color, var(--on-surface-variant)));
   --elevation-opacity: var(--indicator-elevation-opacity);
-  --state-opacity: 0;
+  --state-tint: var(--icon-state-tint, var(--on-surface-variant));
 }
 
 body[data-section-actuelle~="mes-chromatiques"] .nav-link[data-nav-section="mes-chromatiques"],
@@ -174,6 +180,7 @@ body[data-section-actuelle~="a-propos"] .nav-link[data-nav-section="a-propos"] {
   --icon-surface: var(--secondary-container);
   --icon-color: var(--on-secondary-container);
   --indicator-elevation-opacity: var(--elevation-2-opacity);
+  --icon-state-tint: var(--on-surface);
 }
 
 body[data-section-actuelle~="pokedex"] {
@@ -261,6 +268,11 @@ body[data-section-actuelle~="obfuscator"] #obfuscator {
   display: grid;
 }
 
+/*body[data-section-actuelle~="mes-chromatiques"] main,
+body[data-section-actuelle~="pokedex"] main {
+  --surface-color: var(--surface-container);
+}*/
+
 .section-titre {
   grid-row: 1 / 2;
   grid-column: 1 / 2;
@@ -278,6 +290,20 @@ body[data-section-actuelle~="obfuscator"] #obfuscator {
   max-width: 100%;
   box-sizing: border-box;
   overflow: hidden;
+  /*transition: --surface-opacity .2s linear;
+  transition-timing-function: var(--easing-standard);*/
+}
+
+@property --surface-opacity {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 1; /* unitless */
+}
+
+.section-titre.at-top {
+  --surface-opacity: 0;
+  /*transition-delay: 0s;
+  transition-duration: 0s;*/
 }
 
 .section-titre h1 {
@@ -346,6 +372,7 @@ a.icon-button.bouton-retour {
   height: 100%;
   box-sizing: border-box;
   /*scrollbar-gutter: stable;*/
+  scrollbar-width: thin;
   container-name: section-contenu;
   container-type: inline-size;
   will-change: scroll-position;
@@ -394,6 +421,7 @@ section.loading .compteur {
   transition: transform .3s var(--easing-standard),
               box-shadow .3s var(--easing-standard);
   --decalage: 0;
+  --elevation-opacity: 0;
 }
 
 .fab > .material-icons {
@@ -585,8 +613,8 @@ dex-icon {
   height: 44px;
 
   --surface-color: var(--surface);
-  --elevation-opacity: var(--elevation-2-opacity);
-  --state-tint: var(--on-primary);
+  --elevation-opacity: var(--elevation-3-opacity);
+  --state-tint: var(--on-secondary);
 }
 
 div[data-replaces="dex-icon"] {
@@ -603,8 +631,10 @@ dex-icon:not([data-caught="true"]):not(:hover, :focus, :active) {
 }
 
 dex-icon[data-caught="true"] {
-  --surface-color: var(--primary-container);
-  --state-tint: var(--on-primary-container);
+  --surface-color: var(--secondary-container);
+  --state-tint: var(--on-secondary-container);
+  --surface-tint: var(--secondary);
+  --elevation-opacity: 0;
 }
 
 dex-icon .pkmnicon {
@@ -742,10 +772,22 @@ form[name="app-settings"],
   width: 100%;
 }
 
+body[data-section-actuelle~="parametres"] main,
+body[data-section-actuelle~="a-propos"] main {
+  --surface-color: var(--surface-default);
+}
+
 #parametres > .section-contenu,
 #a-propos > .section-contenu {
-  padding-inline: 16px;
+  --padding: 16px;
+  padding: var(--padding);
+  padding-top: 0;
+}
+
+#parametres > .section-contenu > *,
+#a-propos > .section-contenu > * {
   max-width: 65ch;
+  margin-inline: auto;
 }
 
 h2:not(:first-child) {
@@ -905,11 +947,21 @@ text-field[name="username"] {
   max-width: 18ch;
 }
 
+form[name="app-settings"] > *:last-child {
+  padding-bottom: 0;
+}
+
 
 
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!! À PROPOS DU SHINYDEX !!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+
+.a-propos-conteneur {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 
 .app-icon {
   display: flex;

@@ -16,6 +16,8 @@ export const metaThemeColors = {
 
 
 
+const CIElightnesses = [1, .99, .98, .96, .95, .94, .92, .9, .87, .8, .7, .6, .5, .4, .3, .24, .22, .2, .17, .12, .1, .06, .04, 0];
+
 class Palette extends DefPalette {
   toCSS() {
     let css = ``;
@@ -24,7 +26,7 @@ class Palette extends DefPalette {
       for (let k = 0; k < colors.length; k++) {
         const color = colors[k];
         // @ts-ignore
-        const lightness = this.lightnesses[k];
+        const lightness = CIElightnesses[k];
         css += `--${label}-${String(100 * lightness).replace(/[^0-9]/g, '_')}:${color.rgb.slice(4, -1)};`;
       }
     }
@@ -35,7 +37,7 @@ class Palette extends DefPalette {
 
 
 export function updateMetaThemeColorTag() {
-  const themeColor = `rgb(${String(getComputedStyle(document.documentElement).getPropertyValue('--background')).trim()})`;
+  const themeColor = `rgb(${String(getComputedStyle(document.documentElement).getPropertyValue('--surface-container')).trim()})`;
   document.querySelector("meta[name=theme-color]")!.setAttribute('content', themeColor);
 }
 
@@ -65,16 +67,23 @@ export function setTheme(askedTheme?: string) {
 
 // Material Design 3-like color palette generator
 const materialLikeGenerator = function(hue: number) {
+  const OKLRCHlightnesses = [];
+  for (const ciel of CIElightnesses) {
+    const grey = new Couleur(`lch(${ciel * 100}% 0 0)`);
+    OKLRCHlightnesses.push(grey.valuesTo('oklrch')[0]);
+  }
+  OKLRCHlightnesses[0] = 1;
+
   return {
-    lightnesses: [1, .99, .98, .96, .95, .94, .92, .9, .87, .8, .7, .6, .5, .4, .3, .24, .22, .2, .17, .12, .1, .06, .04, 0],
+    lightnesses: OKLRCHlightnesses,
     colors: [
       { label: 'primary', chroma: .1305, hue: hue },
       { label: 'secondary', chroma: .0357, hue: hue },
       { label: 'tertiary', chroma: .0605, hue: hue + 60},
       { label: 'success', chroma: .1783, hue: 143 },
       { label: 'error', chroma: .1783, hue: 28 },
-      { label: 'neutral', chroma: .0058, hue: hue },
-      { label: 'neutral-variant', chroma: .0178, hue: hue }
+      { label: 'neutral', chroma: .0132, hue: hue },
+      { label: 'neutral-variant', chroma: .0182, hue: hue }
     ]
   };
 };

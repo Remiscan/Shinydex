@@ -31,10 +31,10 @@ pokemon-sprite,
   border-radius: var(--sub-border-radius);
 }
 
-pokemon-sprite,
+/*pokemon-sprite,
 .menu {
   --elevation-opacity: var(--elevation-2-opacity);
-}
+}*/
 
 pokemon-sprite:not([dexid]),
 pokemon-sprite:not([dexid]) ~ * {
@@ -70,7 +70,7 @@ pokemon-sprite:not([dexid]) ~ * {
   gap: 8px;
   transform: translate3d(-50px, 0, 0);
   --surface-opacity: .5;
-  --elevation-opacity: calc(var(--surface-opacity) * var(--elevation-2-opacity));
+  /*--elevation-opacity: calc(var(--surface-opacity) * var(--elevation-2-opacity));*/
 }
 
 :host([open]) .pokemon-notes,
@@ -414,6 +414,7 @@ button.icon-button.menu-hint::before {
   max-height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
+  scrollbar-width: thin;
   padding-right: .5ch;
   width: 100%;
 }
@@ -441,8 +442,8 @@ button.icon-button.menu-hint::before {
     transform: none;
     width: min(100cqi - 400px, 50cqi);
     max-height: 112px;
-    --elevation-opacity: var(--elevation-2-opacity);
-    --surface-color: var(--surface);
+    /*--elevation-opacity: var(--elevation-2-opacity);*/
+    --surface-color: var(--surface-container-low);
     --distance-to-parent-border: 4px;
     border-radius: var(--sub-border-radius);
     padding: 4px 8px 4px 12px;

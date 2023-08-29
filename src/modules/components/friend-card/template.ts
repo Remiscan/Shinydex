@@ -4,7 +4,7 @@ import '../pokemon-sprite/pokemonSprite.js';
 
 const template = document.createElement('template');
 template.innerHTML = /*html*/`
-  <div class="container surface variant elevation-0">
+  <div class="container surface surface-container-lowest">
     <div class="friend-infos__identity">
       <span data-type="username" class="title-large"></span>
       <button type="button" class="surface interactive icon-button only-icon menu-hint" data-action="open" data-label="friend-card-menu">
@@ -13,16 +13,16 @@ template.innerHTML = /*html*/`
     </div>
     
     <div class="pokemon-preview">
-      <pokemon-sprite size="112" shiny="true" class="surface standard"></pokemon-sprite>
-      <pokemon-sprite size="112" shiny="true" class="surface standard"></pokemon-sprite>
-      <pokemon-sprite size="112" shiny="true" class="surface standard"></pokemon-sprite>
-      <pokemon-sprite size="112" shiny="true" class="surface standard"></pokemon-sprite>
-      <pokemon-sprite size="112" shiny="true" class="surface standard"></pokemon-sprite>
-      <pokemon-sprite size="112" shiny="true" class="surface standard"></pokemon-sprite>
-      <pokemon-sprite size="112" shiny="true" class="surface standard"></pokemon-sprite>
-      <pokemon-sprite size="112" shiny="true" class="surface standard"></pokemon-sprite>
-      <pokemon-sprite size="112" shiny="true" class="surface standard"></pokemon-sprite>
-      <pokemon-sprite size="112" shiny="true" class="surface standard"></pokemon-sprite>
+      <pokemon-sprite size="112" shiny="true" class="surface surface-container-low"></pokemon-sprite>
+      <pokemon-sprite size="112" shiny="true" class="surface surface-container-low"></pokemon-sprite>
+      <pokemon-sprite size="112" shiny="true" class="surface surface-container-low"></pokemon-sprite>
+      <pokemon-sprite size="112" shiny="true" class="surface surface-container-low"></pokemon-sprite>
+      <pokemon-sprite size="112" shiny="true" class="surface surface-container-low"></pokemon-sprite>
+      <pokemon-sprite size="112" shiny="true" class="surface surface-container-low"></pokemon-sprite>
+      <pokemon-sprite size="112" shiny="true" class="surface surface-container-low"></pokemon-sprite>
+      <pokemon-sprite size="112" shiny="true" class="surface surface-container-low"></pokemon-sprite>
+      <pokemon-sprite size="112" shiny="true" class="surface surface-container-low"></pokemon-sprite>
+      <pokemon-sprite size="112" shiny="true" class="surface surface-container-low"></pokemon-sprite>
     </div>
 
     <a href="#" class="icon-button surface standard interactive" data-nav-section="chromatiques-ami" data-label="see-friends-pokemon">

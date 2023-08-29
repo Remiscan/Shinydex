@@ -87,8 +87,8 @@ export class spriteViewer extends HTMLElement {
             <pokemon-sprite dexid="${pokemon.dexid}" shiny="true" forme="${forme.dbid}" size="${this.size}" lazy="false"></pokemon-sprite>
             ${(typeof forme.noShiny != 'undefined' && forme.noShiny) ? '<span class="label-large">N\'existe pas<br>en chromatique</span>' : ''}
           </picture>
-          <span class="forme-name surface variant label-medium ${caught ? 'caught' : ''}">
-            <span class="forme-name-arrow surface variant"></span>
+          <span class="forme-name surface surface-container-high label-medium ${caught ? 'caught' : ''}">
+            <span class="forme-name-arrow surface"></span>
             ${caught ? '<span class="icon" data-icon="ball/poke"></span>' : ''}
             ${pokemon.getFormeName(forme.dbid, true)}
           </span>
@@ -102,8 +102,8 @@ export class spriteViewer extends HTMLElement {
           <picture>
             <pokemon-sprite dexid="${pokemon.dexid}" shiny="false" forme="${forme.dbid}" size="${this.size}" lazy="true"></pokemon-sprite>
           </picture>
-          <span class="forme-name surface variant label-medium ${caught ? 'caught' : ''}">
-            <span class="forme-name-arrow surface variant"></span>
+          <span class="forme-name surface surface-container-high label-medium ${caught ? 'caught' : ''}">
+            <span class="forme-name-arrow surface"></span>
             ${caught ? '<span class="icon" data-icon="ball/poke"></span>' : ''}
             ${pokemon.getFormeName(forme.dbid, true)}
           </span>
