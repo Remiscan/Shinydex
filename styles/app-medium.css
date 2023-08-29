@@ -152,8 +152,8 @@ filter-menu {
 }
 
 .user-search-card {
-  margin-top: calc(56px + 2 * 16px);
-  margin-left: 16px;
+  margin-top: var(--section-title-height);
+  margin-left: 112px;
 }
 
 #google-one-tap-container {
