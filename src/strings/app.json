@@ -461,7 +461,7 @@
     "section-partage-message-vide": "Your friends list is empty.",
     "section-partage-message-vide-recherche": "No friend corresponds to this search.",
 
-    "section-chromatiques-ami-long-title": "<span data-type=\"username\"></span>'s Pokémon <shiny-stars></shiny-stars>",
+    "section-chromatiques-ami-long-title": "<span><span data-type=\"username\"></span>'s</span> Pokémon <shiny-stars></shiny-stars>",
     "section-chromatiques-ami-message-vide": "<span data-type=\"username\"></span> did not save any shiny Pokémon.</span>",
 
     "section-parametres-short-title": "Settings",
@@ -518,7 +518,7 @@
     "confidentiality-policy": "<p>When you use the app without signing in, it stores on your device all data you enter about your Pokémon.</p><p>When you sign in with a Google account, Google gives us some public information about your account: names, profile picture, email address, and a character string used as a unique identifier. We use that unique identifier to create a Shinydex account for you and link it to your Google account. We do not save any data from your Google account. Your email address is stored on your device (but is not sent to us) to display which Google account you used to sign in.</p><p>Once you're signed in, data about your Pokémon is saved in an online database. If you choose to make your profile public and if you choose a username, then anyone who knows that username can see your Pokémon data.</p><p>No data is shared with any other service.</p>",
     "used-resources-title": "Used resources",
     "resource-home-sprites": "Pokémon sprites: Pokémon Home via @mattyoukhana_",
-    "resource-home-icons": "Balls an other icons: Pokémon Home via @mattyoukhana",
+    "resource-home-icons": "Balls and other icons: Pokémon Home via @mattyoukhana",
     "resource-pokesprite": "Item icons and other icons: pokesprite",
     "resource-gen9-sprites": "Pokémon 9G sprites: Serebii",
 
