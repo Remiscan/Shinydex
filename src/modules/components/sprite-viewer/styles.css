@@ -116,8 +116,8 @@ sprite-viewer a.icon-button.bouton-retour {
 
 .sprite-viewer-dex-info.caught,
 .forme-name.caught {
-  --surface-color: var(--primary-container);
-  --text-color: var(--on-primary-container);
+  --surface-color: var(--secondary-container);
+  --text-color: var(--on-secondary-container);
   padding-left: var(--padding-inline);
 }
 
