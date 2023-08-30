@@ -34,9 +34,6 @@ export class spriteViewer extends HTMLElement {
   async updateSprites(dexid: string) {
     const pokemon = new Pokemon(pokemonData[Number(dexid)]);
 
-    // On place le numéro et nom
-    this.querySelector('.info-dexid')!.innerHTML = pad(String(pokemon.dexid), 3);
-
     const container = document.querySelector(`#pokedex`);
     if (!(container instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
 
@@ -59,6 +56,13 @@ export class spriteViewer extends HTMLElement {
         caughtFormsList.add(shiny.forme);
       }
     })));
+
+    // On place le numéro
+    const dexInfos = this.querySelector('.sprite-viewer-dex-info')!;
+    const dexNumberContainer = dexInfos.querySelector('.info-dexid')!;
+    if (caughtFormsList.size > 0) dexInfos.classList.add('caught');
+    else                          dexInfos.classList.remove('caught');
+    dexNumberContainer.innerHTML = pad(String(pokemon.dexid), 3);
 
     // On réordonne les formes (normale d'abord, les autres ensuite)
     const formes = pokemon.formes.slice().sort((a, b) => {

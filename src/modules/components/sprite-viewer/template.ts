@@ -10,6 +10,7 @@ template.innerHTML = `
   <div class="sprite-list regular"></div>
 </div>
 <div class="sprite-viewer-dex-info surface surface-container-high label-medium">
+  <span class="icon" data-icon="ball/poke"></span>
   <span class="info-dexid"></span>
 </div>
 <a class="icon-button surface interactive bouton-retour" data-label="button-close">

@@ -38,18 +38,7 @@ sprite-viewer[shiny="true"] .sprite-list.regular {
   justify-self: start;
   align-self: center;
   margin-left: 16px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 13px;
-  height: 26px;
-  --padding-inline: 4px;
-  padding: var(--padding-inline) calc(3 * var(--padding-inline));
-  box-sizing: border-box;
-}
-
-.sprite-viewer-dex-info span + span {
-  margin-left: 5px;
+  height: var(--height);
 }
 
 .info-dexid::before {
@@ -100,33 +89,45 @@ sprite-viewer a.icon-button.bouton-retour {
   --size: 100% !important;
 }
 
+.sprite-viewer-dex-info,
 .forme-name {
   --padding-inline: 4px;
   padding: var(--padding-inline) calc(3 * var(--padding-inline));
+  --height: 26px;
   border-radius: calc(.5 * var(--height));
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: calc(2.5 * var(--padding-inline));
+  box-sizing: border-box;
+}
+
+.forme-name {
   min-width: 35px;
   max-width: calc(var(--sprite-size) - 10px);
-  --height: 26px;
   min-height: var(--height);
-  box-sizing: border-box;
   margin: 7px auto 0;
   position: relative;
-  display: flex;
-  place-items: center;
-  gap: calc(2.5 * var(--padding-inline));
 }
 
 .forme-name.off {
   display: none;
 }
 
+.sprite-viewer-dex-info.caught,
 .forme-name.caught {
   --surface-color: var(--primary-container);
   --text-color: var(--on-primary-container);
   padding-left: var(--padding-inline);
 }
+
+.sprite-viewer-dex-info > .icon,
 .forme-name > .icon {
   margin: -7px;
+}
+
+.sprite-viewer-dex-info:not(.caught) > .icon {
+  display: none;
 }
 
 .forme-name-arrow {
