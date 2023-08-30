@@ -77,7 +77,7 @@ const materialLikeGenerator = function(hue: number) {
   return {
     lightnesses: OKLRCHlightnesses,
     colors: [
-      { label: 'primary', chroma: .1305, hue: hue },
+      { label: 'primary', chroma: .1101, hue: hue },
       { label: 'secondary', chroma: .0357, hue: hue },
       { label: 'tertiary', chroma: .0605, hue: hue + 60},
       { label: 'success', chroma: .1783, hue: 143 },

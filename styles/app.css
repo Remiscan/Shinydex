@@ -634,9 +634,9 @@ dex-icon:not([data-caught="true"]):not(:hover, :focus, :active) {
 
 [data-replaces="dex-icon"][data-caught="true"],
 dex-icon[data-caught="true"] {
-  --surface-color: var(--secondary-container);
-  --state-tint: var(--on-secondary-container);
-  --surface-tint: var(--secondary);
+  --surface-color: var(--primary-container);
+  --state-tint: var(--on-primary-container);
+  --surface-tint: var(--primary);
   --elevation-opacity: 0;
 }
 

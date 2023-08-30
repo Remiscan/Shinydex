@@ -121,8 +121,8 @@ sprite-viewer a.icon-button.bouton-retour {
 }
 
 .forme-name.caught {
-  --surface-color: var(--secondary);
-  --text-color: var(--on-secondary);
+  --surface-color: var(--primary-container);
+  --text-color: var(--on-primary-container);
   padding-left: var(--padding-inline);
 }
 .forme-name > .icon {
