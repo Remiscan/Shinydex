@@ -158,7 +158,7 @@ echo '/'.'*'; ?>*/
 }
 
 :root {
-  --bg-color: rgb(var(--surface-container-low));
+  --bg-color: rgb(var(--surface));
   --accent-color: rgb(var(--primary));
   --soft-accent-color: rgb(var(--primary-container));
   --nav-text-color: rgb(var(--on-surface-variant));

@@ -91,7 +91,7 @@ $httpLanguage = $translation->getLanguage();
 
   <body data-section-actuelle="mes-chromatiques" class="background welcome">
     <!-- Écran de chargement -->
-    <div id="load-screen" style="grid-row: 1 / 3; grid-column: 1 / 2; position: absolute; z-index: 1000;width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: var(--bg-color, rgb(34, 34, 34)); --surface-color: var(--surface-container-low);">
+    <div id="load-screen" style="grid-row: 1 / 3; grid-column: 1 / 2; position: absolute; z-index: 1000;width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: var(--bg-color, rgb(34, 34, 34)); --surface-color: var(--surface);">
       <load-spinner id="spinner" style="--size: 3em;"></load-spinner>
       <p style="margin-top: 20px; display: none;" id="load-screen-message"></p>
     </div>
