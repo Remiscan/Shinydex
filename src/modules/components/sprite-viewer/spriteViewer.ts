@@ -62,7 +62,7 @@ export class spriteViewer extends HTMLElement {
     const dexNumberContainer = dexInfos.querySelector('.info-dexid')!;
     if (caughtFormsList.size > 0) dexInfos.classList.add('caught');
     else                          dexInfos.classList.remove('caught');
-    dexNumberContainer.innerHTML = pad(String(pokemon.dexid), 3);
+    dexNumberContainer.innerHTML = pad(String(pokemon.dexid), 4);
 
     // On réordonne les formes (normale d'abord, les autres ensuite)
     const formes = pokemon.formes.slice().sort((a, b) => {
