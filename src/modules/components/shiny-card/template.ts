@@ -4,7 +4,7 @@ import '../pokemon-sprite/pokemonSprite.js';
 
 const template = document.createElement('template');
 template.innerHTML = /*html*/`
-  <div class="container surface surface-container-lowest interactive">
+  <div class="container surface surface-container-highest interactive">
     <pokemon-sprite size="112" shiny="true" class="surface surface-container-low"></pokemon-sprite>
 
     <div class="menu surface surface-container-low">

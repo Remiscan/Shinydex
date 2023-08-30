@@ -102,11 +102,12 @@ a[data-nav-section="chromatiques-ami"] {
   padding: 0;
   --distance-to-parent-border: 4px;
   border-radius: var(--sub-border-radius);
+  --surface-opacity: 1;
+  --state-tint: 0, 0, 0, 0;
 }
 
 a[data-nav-section="chromatiques-ami"]:not(:hover, :active) {
   --surface-opacity: 1;
-  /*--elevation-opacity: var(--elevation-2-opacity);*/
 }
 
 a[data-nav-section="chromatiques-ami"]::before {
@@ -114,4 +115,14 @@ a[data-nav-section="chromatiques-ami"]::before {
   height: 84px;
   bottom: 4px;
   left: 0;
+}
+
+a[data-nav-section="chromatiques-ami"] > .material-icons {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  --state-tint: var(--on-surface);
+  --state-opacity: inherit;
 }

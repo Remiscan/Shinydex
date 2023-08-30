@@ -111,7 +111,7 @@ main > section {
   --padding: 16px;
   border-radius: calc(var(--padding) + var(--border-radius) / 1.12);
   padding: var(--padding);
-  --surface-color: var(--surface-container-low);
+  --surface-color: var(--surface);
 }
 
 #mes-chromatiques > .section-contenu,
@@ -139,7 +139,7 @@ main > section {
 }
 
 #filter-menu {
-  --from: -1rem;
+  --from-y: -1rem;
 }
 
 filter-menu {
@@ -148,12 +148,14 @@ filter-menu {
 }
 
 #user-search {
-  --from: -1rem;
+  --from-x: -1rem;
+  --from-y: 0;
 }
 
 .user-search-card {
   margin-top: var(--section-title-height);
   margin-left: 112px;
+  margin-right: auto;
 }
 
 #google-one-tap-container {

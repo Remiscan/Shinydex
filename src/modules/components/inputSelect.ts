@@ -6,15 +6,15 @@
 
 
 import { backFromTopLayer, closeTopLayer, openTopLayer, toTopLayer } from '../topLayer.js';
-import { TextField } from './textField.js';
 import { TranslatedString, getString, translationObserver } from '../translation.js';
+import { TextField } from './textField.js';
 
 
 
 const template = document.createElement('template');
 template.innerHTML = /*html*/`
   <form>
-    <label class="text-field surface surface-container interactive" part="container">
+    <label class="text-field surface surface-container-highest interactive" part="container">
       <span class="leading-icon">
         <slot name="leading-icon"></slot>
       </span>

@@ -143,7 +143,7 @@ $httpLanguage = $translation->getLanguage();
     </nav>
 
     <!-- Contenu de l'appli -->
-    <main class="surface surface-container-low">
+    <main class="surface surface-default">
 
       <!-- FAB -->
       <button type="button" class="surface interactive fab elevation-3-shadow only-icon" data-label="fab-pokemon">
@@ -226,7 +226,7 @@ $httpLanguage = $translation->getLanguage();
         <h2 class="title-medium" data-string="add-friend-hint"></h2>
 
         <form name="user-search" class="search-form">
-          <input type="text" name="username" class="surface surface-bright interactive body-large"
+          <input type="text" name="username" class="surface surface-container-lowest interactive body-large"
             inputmode="search" enterkeyhint="search" role="searchbox" autocomplete="off"
             minlength="1" maxlength="20"
             data-placeholder="add-friend-placeholder">

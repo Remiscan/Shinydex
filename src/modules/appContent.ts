@@ -157,7 +157,7 @@ export async function populateFromData(section: PopulatableSection, ids: string[
           card = document.createElement('div') as HTMLElement;
           card.setAttribute('data-replaces', elementName);
           card.setAttribute('data-huntid', huntid);
-          card.classList.add('surface', 'surface-container-lowest');
+          card.classList.add('surface', 'surface-container-highest');
         } else {
           card = document.createElement(elementName) as shinyCard | huntCard;
           card.setAttribute('huntid', huntid);
@@ -279,7 +279,7 @@ export function initPokedex() {
 
   const genBlockTemplate = document.createElement('template');
   genBlockTemplate.innerHTML = /*html*/`
-    <div class="pokedex-gen surface surface-default"></div>
+    <div class="pokedex-gen surface surface-container-low"></div>
   `;
 
   const pokedex = new DocumentFragment();

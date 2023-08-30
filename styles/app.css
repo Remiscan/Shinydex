@@ -619,17 +619,20 @@ dex-icon {
 
 div[data-replaces="dex-icon"] {
   content-visibility: auto;
-  contain-intrinsic-height: 44px 44px;
+  contain-intrinsic-size: 44px 44px;
 }
 
+[data-replaces="dex-icon"]:not([data-caught="true"]),
 dex-icon:not([data-caught="true"]) {
   --surface-opacity: 0;
 }
 
+[data-replaces="dex-icon"]:not([data-caught="true"]):not(:hover, :focus, :active),
 dex-icon:not([data-caught="true"]):not(:hover, :focus, :active) {
   --elevation-opacity: 0;
 }
 
+[data-replaces="dex-icon"][data-caught="true"],
 dex-icon[data-caught="true"] {
   --surface-color: var(--secondary-container);
   --state-tint: var(--on-secondary-container);
@@ -678,9 +681,9 @@ body:not([data-filters~="chromatiques-ami"]) filter-menu[section="chromatiques-a
   display: none;
 }
 
-#filter-menu,
-#user-search {
-  --from: 1rem;
+#filter-menu {
+  --from-x: 0;
+  --from-y: 1rem;
 }
 
 filter-menu,
@@ -700,6 +703,10 @@ filter-menu,
   padding: 16px;
 }
 
+.message-tuto > * {
+  max-width: 65ch;
+}
+
 .message-tuto ul {
   margin: 8px 0 0 0;
   padding: 0 0 0 16px;
@@ -713,6 +720,11 @@ filter-menu,
   border-color: rgb(var(--success));
 }
 
+#user-search {
+  --from-x: 1rem;
+  --from-y: 0;
+}
+
 .user-search-card {
   height: fit-content;
   box-sizing: border-box;
@@ -723,6 +735,7 @@ filter-menu,
   max-height: calc(100% - 16px);
   margin-inline: auto;
   margin-top: auto;
+  margin-right: 8px;
   overflow: hidden auto;
   padding: 16px;
   box-sizing: border-box;

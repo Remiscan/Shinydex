@@ -166,9 +166,13 @@ const sections: Section[] = [
     nom: 'filter-menu',
     rememberPosition: false,
     openAnimation: (section: Element, event: Event) => {
-      const from = getComputedStyle(section).getPropertyValue('--from');
+      const styles = getComputedStyle(section);
+      const from = {
+        x: styles.getPropertyValue('--from-x'),
+        y: styles.getPropertyValue('--from-y')
+      };
       return section.animate([
-        { opacity: 0, transform: `translate3D(0, ${from}, 0)` },
+        { opacity: 0, transform: `translate3D(${from.x}, ${from.y}, 0)` },
         { opacity: 1, transform: 'translate3D(0, 0, 0)' }
       ], {
         easing: Params.easingDecelerate,
@@ -177,10 +181,14 @@ const sections: Section[] = [
       });
     },
     closeAnimation: (section: Element, event: Event) => {
-      const from = getComputedStyle(section).getPropertyValue('--from');
+      const styles = getComputedStyle(section);
+      const from = {
+        x: styles.getPropertyValue('--from-x'),
+        y: styles.getPropertyValue('--from-y')
+      };
       return section.animate([
         { opacity: 1, transform: 'translate3D(0, 0, 0)' },
-        { opacity: 0, transform: `translate3D(0, ${from}, 0)` }
+        { opacity: 0, transform: `translate3D(${from.x}, ${from.y}, 0)` }
       ], {
         easing: Params.easingAccelerate,
         duration: 75,
@@ -197,9 +205,13 @@ const sections: Section[] = [
     nom: 'user-search',
     rememberPosition: false,
     openAnimation: (section: Element, event: Event) => {
-      const from = getComputedStyle(section).getPropertyValue('--from');
+      const styles = getComputedStyle(section);
+      const from = {
+        x: styles.getPropertyValue('--from-x'),
+        y: styles.getPropertyValue('--from-y')
+      };
       return section.animate([
-        { opacity: 0, transform: `translate3D(0, ${from}, 0)` },
+        { opacity: 0, transform: `translate3D(${from.x}, ${from.y}, 0)` },
         { opacity: 1, transform: 'translate3D(0, 0, 0)' }
       ], {
         easing: Params.easingDecelerate,
@@ -208,10 +220,14 @@ const sections: Section[] = [
       });
     },
     closeAnimation: (section: Element, event: Event) => {
-      const from = getComputedStyle(section).getPropertyValue('--from');
+      const styles = getComputedStyle(section);
+      const from = {
+        x: styles.getPropertyValue('--from-x'),
+        y: styles.getPropertyValue('--from-y')
+      };
       return section.animate([
         { opacity: 1, transform: 'translate3D(0, 0, 0)' },
-        { opacity: 0, transform: `translate3D(0, ${from}, 0)` }
+        { opacity: 0, transform: `translate3D(${from.x}, ${from.y}, 0)` }
       ], {
         easing: Params.easingAccelerate,
         duration: 75,

@@ -51,6 +51,7 @@ legend.invisible {
   flex-direction: column;
   gap: 8px;
   flex-basis: 120px;
+  margin: auto;
 }
 
 .edit-notice {
