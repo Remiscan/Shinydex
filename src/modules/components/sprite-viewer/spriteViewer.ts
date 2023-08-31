@@ -34,9 +34,6 @@ export class spriteViewer extends HTMLElement {
   async updateSprites(dexid: string) {
     const pokemon = new Pokemon(pokemonData[Number(dexid)]);
 
-    // On place le numéro et nom
-    this.querySelector('.info-dexid')!.innerHTML = pad(String(pokemon.dexid), 3);
-
     const container = document.querySelector(`#pokedex`);
     if (!(container instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
 
@@ -59,6 +56,13 @@ export class spriteViewer extends HTMLElement {
         caughtFormsList.add(shiny.forme);
       }
     })));
+
+    // On place le numéro
+    const dexInfos = this.querySelector('.sprite-viewer-dex-info')!;
+    const dexNumberContainer = dexInfos.querySelector('.info-dexid')!;
+    if (caughtFormsList.size > 0) dexInfos.classList.add('caught');
+    else                          dexInfos.classList.remove('caught');
+    dexNumberContainer.innerHTML = pad(String(pokemon.dexid), 4);
 
     // On réordonne les formes (normale d'abord, les autres ensuite)
     const formes = pokemon.formes.slice().sort((a, b) => {
@@ -84,11 +88,11 @@ export class spriteViewer extends HTMLElement {
       templateS.innerHTML = /*html*/`
         <div class="dex-sprite" data-forme="${forme.dbid}">
           <picture ${(typeof forme.noShiny != 'undefined' && forme.noShiny) ? 'class="no-shiny"' : ''}>
-            <pokemon-sprite dexid="${pokemon.dexid}" shiny="true" forme="${forme.dbid}" size="${this.size}" lazy="true"></pokemon-sprite>
+            <pokemon-sprite dexid="${pokemon.dexid}" shiny="true" forme="${forme.dbid}" size="${this.size}" lazy="false"></pokemon-sprite>
             ${(typeof forme.noShiny != 'undefined' && forme.noShiny) ? '<span class="label-large">N\'existe pas<br>en chromatique</span>' : ''}
           </picture>
-          <span class="forme-name surface variant label-medium ${caught ? 'caught' : ''}">
-            <span class="forme-name-arrow surface variant"></span>
+          <span class="forme-name surface surface-container-high label-medium ${caught ? 'caught' : ''}">
+            <span class="forme-name-arrow surface"></span>
             ${caught ? '<span class="icon" data-icon="ball/poke"></span>' : ''}
             ${pokemon.getFormeName(forme.dbid, true)}
           </span>
@@ -102,8 +106,8 @@ export class spriteViewer extends HTMLElement {
           <picture>
             <pokemon-sprite dexid="${pokemon.dexid}" shiny="false" forme="${forme.dbid}" size="${this.size}" lazy="true"></pokemon-sprite>
           </picture>
-          <span class="forme-name surface variant label-medium ${caught ? 'caught' : ''}">
-            <span class="forme-name-arrow surface variant"></span>
+          <span class="forme-name surface surface-container-high label-medium ${caught ? 'caught' : ''}">
+            <span class="forme-name-arrow surface"></span>
             ${caught ? '<span class="icon" data-icon="ball/poke"></span>' : ''}
             ${pokemon.getFormeName(forme.dbid, true)}
           </span>
@@ -120,6 +124,8 @@ export class spriteViewer extends HTMLElement {
 
       listeShiny.appendChild(dexSpriteS);
       listeRegular.appendChild(dexSpriteR);
+
+      this.dispatchEvent(new Event('contentready'));
     }
   }
 

@@ -3,9 +3,11 @@ import { Settings } from './Settings.js';
 import { FrontendShiny } from './ShinyBackend.js';
 import { callBackend } from './callBackend.js';
 import { FilterMenu } from './components/filter-menu/filterMenu.js';
+import { spriteViewer } from './components/sprite-viewer/spriteViewer.js';
 import { clearElementStorage, lazyLoadSection, unLazyLoadSection, virtualizedSections } from './lazyLoading.js';
 import { friendShinyStorage } from './localForage.js';
 import { Notif } from './notification.js';
+import { scrollObserver } from './theme.js';
 import { TranslatedString, getString } from './translation.js';
 
 
@@ -118,7 +120,7 @@ const sections: Section[] = [
     historique: true,
     closePrevious: true,
     makePreviousInert: false,
-    preload: ['./images/app-icons/icon.svg'],
+    preload: [],
     fab: null,
     element: document.getElementById('a-propos')!
   }, {
@@ -165,24 +167,32 @@ const sections: Section[] = [
     nom: 'filter-menu',
     rememberPosition: false,
     openAnimation: (section: Element, event: Event) => {
-      const from = getComputedStyle(section).getPropertyValue('--from');
+      const styles = getComputedStyle(section);
+      const from = {
+        x: styles.getPropertyValue('--from-x'),
+        y: styles.getPropertyValue('--from-y')
+      };
       return section.animate([
-        { opacity: 0, transform: `translate3D(0, ${from}, 0)` },
+        { opacity: 0, transform: `translate3D(${from.x}, ${from.y}, 0)` },
         { opacity: 1, transform: 'translate3D(0, 0, 0)' }
       ], {
         easing: Params.easingDecelerate,
-        duration: 200,
+        duration: 100,
         fill: 'both'
       });
     },
     closeAnimation: (section: Element, event: Event) => {
-      const from = getComputedStyle(section).getPropertyValue('--from');
+      const styles = getComputedStyle(section);
+      const from = {
+        x: styles.getPropertyValue('--from-x'),
+        y: styles.getPropertyValue('--from-y')
+      };
       return section.animate([
         { opacity: 1, transform: 'translate3D(0, 0, 0)' },
-        { opacity: 0, transform: `translate3D(0, ${from}, 0)` }
+        { opacity: 0, transform: `translate3D(${from.x}, ${from.y}, 0)` }
       ], {
         easing: Params.easingAccelerate,
-        duration: 150,
+        duration: 75,
         fill: 'both'
       });
     },
@@ -196,24 +206,32 @@ const sections: Section[] = [
     nom: 'user-search',
     rememberPosition: false,
     openAnimation: (section: Element, event: Event) => {
-      const from = getComputedStyle(section).getPropertyValue('--from');
+      const styles = getComputedStyle(section);
+      const from = {
+        x: styles.getPropertyValue('--from-x'),
+        y: styles.getPropertyValue('--from-y')
+      };
       return section.animate([
-        { opacity: 0, transform: `translate3D(0, ${from}, 0)` },
+        { opacity: 0, transform: `translate3D(${from.x}, ${from.y}, 0)` },
         { opacity: 1, transform: 'translate3D(0, 0, 0)' }
       ], {
         easing: Params.easingDecelerate,
-        duration: 200,
+        duration: 100,
         fill: 'both'
       });
     },
     closeAnimation: (section: Element, event: Event) => {
-      const from = getComputedStyle(section).getPropertyValue('--from');
+      const styles = getComputedStyle(section);
+      const from = {
+        x: styles.getPropertyValue('--from-x'),
+        y: styles.getPropertyValue('--from-y')
+      };
       return section.animate([
         { opacity: 1, transform: 'translate3D(0, 0, 0)' },
-        { opacity: 0, transform: `translate3D(0, ${from}, 0)` }
+        { opacity: 0, transform: `translate3D(${from.x}, ${from.y}, 0)` }
       ], {
         easing: Params.easingAccelerate,
-        duration: 150,
+        duration: 75,
         fill: 'both'
       });
     },
@@ -316,6 +334,8 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
         const scrolledElement = section.element.querySelector('.section-contenu')!;
         lastPosition.set(sectionActuelle, scrolledElement.scrollTop);
       }
+      const scrollDetector = ancienneSection.element.querySelector('.scroll-detector');
+      if (scrollDetector) scrollObserver.unobserve(scrollDetector);
 
       // On anime la disparition de l'ancienne section
       const anim = section.closeAnimation(section.element, event, data);
@@ -358,7 +378,7 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
   document.body.dataset.sectionActuelle = sectionsString;
 
   const linkedNouvellesSections = getLinkedSections(nouvelleSection.nom);
-  await Promise.all(linkedNouvellesSections.map(section => {
+  await Promise.all(linkedNouvellesSections.map(async section => {
     // On prépare la nouvelle section si besoin
     switch (section.nom) {
       case 'chromatiques-ami': {
@@ -371,7 +391,8 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
           // Populate section with friend's username
           section.element.querySelectorAll('[data-type="username"]').forEach(e => e.innerHTML = data.username);
 
-          // Populate section with friend's Pokémon (don't await this before navigating)
+          // Populate section with friend's Pokémon
+          // ⚠️ (don't await this before navigating)
           callBackend('get-friend-data', { username: data.username, scope: 'full' }, false)
           .then(async response => {
             if ('matches' in response && response.matches === true) {
@@ -397,10 +418,23 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
       } break;
 
       case 'sprite-viewer': {
-        const viewer = section.element.querySelector('sprite-viewer')!;
+        const viewer = section.element.querySelector('sprite-viewer');
+        if (!(viewer instanceof spriteViewer)) throw new TypeError('Expecting SpriteViewer');
+
+        const readinessChecker = new Promise(resolve => {
+          viewer.addEventListener('contentready', () => {
+            resolve(true);
+            nouvelleSection.element.setAttribute('data-ready', 'true');
+          });
+        });
+
         viewer.setAttribute('dexid', data.dexid || '');
         viewer.setAttribute('shiny', 'true');
-        viewer.setAttribute('size', navigator.onLine ? '512' : '112')
+        viewer.setAttribute('size', navigator.onLine ? '512' : '112');
+
+        // On attend que le sprite viewer soit bien peuplé pour lancer l'animation d'apparition
+        // (si le peuplement prend + de 300ms, on lance l'animation quand même)
+        await Promise.any([readinessChecker, new Promise(resolve => setTimeout(resolve, 300))]);
       } break;
 
       case 'filter-menu': {
@@ -435,6 +469,9 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
       if (apparitionSection) wait(apparitionSection);
     }
 
+    const scrollDetector = nouvelleSection.element.querySelector('.scroll-detector');
+    if (scrollDetector) scrollObserver.observe(scrollDetector);
+
     // On virtualise la nouvelle section si elle peut l'être
     const virtualize = virtualizedSections.includes(section.nom);
     if (virtualize) lazyLoadSection(section.nom);
@@ -444,11 +481,13 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
   switch (ancienneSection.nom) {
     case 'sprite-viewer': {
       ancienneSection.element.querySelector('sprite-viewer')?.removeAttribute('dexid');
+      ancienneSection.element.removeAttribute('data-ready');
     } break;
 
     case 'chromatiques-ami': {
       if (nouvelleSection.closePrevious) {
         friendShinyStorage.clear();
+        ancienneSection.element.removeAttribute('data-ready');
         ancienneSection.element.querySelectorAll('friend-shiny-card, [data-replaces="friend-shiny-card"]').forEach(card => {
           (card as Element & {obsolete: boolean}).obsolete = true;
           card.remove();

@@ -16,6 +16,8 @@ export const metaThemeColors = {
 
 
 
+const CIElightnesses = [1, .99, .98, .96, .95, .94, .92, .9, .87, .8, .7, .6, .5, .4, .3, .24, .22, .2, .17, .12, .1, .06, .04, 0];
+
 class Palette extends DefPalette {
   toCSS() {
     let css = ``;
@@ -24,7 +26,7 @@ class Palette extends DefPalette {
       for (let k = 0; k < colors.length; k++) {
         const color = colors[k];
         // @ts-ignore
-        const lightness = this.lightnesses[k];
+        const lightness = CIElightnesses[k];
         css += `--${label}-${String(100 * lightness).replace(/[^0-9]/g, '_')}:${color.rgb.slice(4, -1)};`;
       }
     }
@@ -34,9 +36,19 @@ class Palette extends DefPalette {
 
 
 
-export function updateMetaThemeColorTag() {
-  const themeColor = `rgb(${String(getComputedStyle(document.documentElement).getPropertyValue('--background')).trim()})`;
-  document.querySelector("meta[name=theme-color]")!.setAttribute('content', themeColor);
+export function updateMetaThemeColorTag(color: string = 'surface') {
+  const metaTags = [
+    document.querySelector("meta[name=theme-color]"),                                  // for mobile layout
+    document.querySelector(`meta[name="theme-color"][id="medium-layout-theme-color"]`) // for medium and large layouts
+  ];
+
+  for (const tag of metaTags) {
+    if (!tag) continue;
+    const colorLabel = tag.getAttribute('data-forced-color') || color || tag.getAttribute('data-current-color') || 'surface';
+    const themeColor = `rgb(${String(getComputedStyle(document.documentElement).getPropertyValue(`--${colorLabel}`)).trim()})`;
+    tag.setAttribute('content', themeColor);
+    tag.setAttribute('data-current-color', colorLabel);
+  }
 }
 
 
@@ -44,7 +56,7 @@ export function updateMetaThemeColorTag() {
 /** Application du thème (clair ou sombre). */
 export function setTheme(askedTheme?: string) {
   let html = document.documentElement;
-  html.dataset.theme = askedTheme || '';
+  html.dataset.theme = askedTheme || html.dataset.theme || '';
 
   // Thème par défaut
   const defaultTheme = 'dark';
@@ -65,16 +77,24 @@ export function setTheme(askedTheme?: string) {
 
 // Material Design 3-like color palette generator
 const materialLikeGenerator = function(hue: number) {
+  // Compute the lightnesses used for palette generation
+  const OKLRCHlightnesses = [];
+  for (const ciel of CIElightnesses) {
+    const grey = new Couleur(`lch(${ciel * 100}% 0 0)`);
+    OKLRCHlightnesses.push(grey.valuesTo('oklrch')[0]);
+  }
+  OKLRCHlightnesses[0] = 1;
+
   return {
-    lightnesses: [1, .99, .95, .9, .8, .7, .6, .5, .4, .3, .2, .1, 0],
+    lightnesses: OKLRCHlightnesses,
     colors: [
-      { label: 'primary', chroma: .1305, hue: hue },
+      { label: 'primary', chroma: .1101, hue: hue },
       { label: 'secondary', chroma: .0357, hue: hue },
       { label: 'tertiary', chroma: .0605, hue: hue + 60},
       { label: 'success', chroma: .1783, hue: 143 },
       { label: 'error', chroma: .1783, hue: 28 },
-      { label: 'neutral', chroma: .0058, hue: hue },
-      { label: 'neutral-variant', chroma: .0178, hue: hue }
+      { label: 'neutral', chroma: .0132, hue: hue },
+      { label: 'neutral-variant', chroma: .0182, hue: hue }
     ]
   };
 };
@@ -94,3 +114,29 @@ export function computePaletteCss(hue: number): string {
   const palette = new MaterialLikePalette(hue);
   return palette.toCSS();
 }
+
+
+/**
+ * Observes when a section gets scrolled in, and adapts the theme-color
+ * and the section's title background color.
+ */
+export const scrollObserver = new IntersectionObserver((entries) => {
+  for (const entry of entries) {
+    const section = entry.target.closest('section');
+    if (!section) continue;
+
+    const sectionID = section.id;
+
+    if (!(document.body.matches(`[data-section-actuelle~="${sectionID}"]`))) continue;
+    const sectionTitre = section.querySelector('.section-titre');
+    if (entry.intersectionRatio >= 1) {
+      sectionTitre?.classList.add('at-top');
+      updateMetaThemeColorTag('surface');
+    } else {
+      sectionTitre?.classList.remove('at-top');
+      updateMetaThemeColorTag('surface-container');
+    }
+  }
+}, {
+  threshold: [1],
+});

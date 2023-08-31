@@ -18,6 +18,10 @@ input[name="search"] {
   padding: 0 calc(var(--reset-icon-column) + var(--filter-icon-column) + 4px) 0 56px;
 }
 
+input[name="search"]:focus {
+  box-shadow: var(--elevation-2-shadow);
+}
+
 [part="filter-icon"] {
   color: rgb(var(--on-surface));
   grid-column: filter-icon;

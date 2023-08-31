@@ -349,9 +349,6 @@ window.addEventListener('dataupdate', async (event: DataUpdateEvent) => {
 /////////////////////////////
 // LANCEMENT DE L'APPLICATION
 
-// Au rechargement de l'appli, indiquer qu'on est sur la section de départ
-history.replaceState({ section: 'mes-chromatiques' }, '');
-
 // Lancement de l'appli
 try {
   appStart();

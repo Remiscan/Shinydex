@@ -70,4 +70,5 @@ fieldset:first-child {
 
 input-select::part(container) {
   --elevation-opacity: var(--elevation-1-opacity);
+  --surface-tint: var(--on-surface);
 }

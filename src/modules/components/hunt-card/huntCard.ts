@@ -230,8 +230,11 @@ export class huntCard extends HTMLElement {
       this.updateAttribute('game', hunt.game);
 
       const caughtCheckBox = this.getInput('caught');
-      if (!this.checkFormUncaughtPartValidity()) caughtCheckBox?.setAttribute('disabled', '');
-      else                                       caughtCheckBox?.removeAttribute('disabled');
+      // In a setTimeout because it needs to happen after genereMethodes causes the input-select to auto-select a method
+      setTimeout(() => {
+        if (!this.checkFormUncaughtPartValidity()) caughtCheckBox?.setAttribute('disabled', '');
+        else                                       caughtCheckBox?.removeAttribute('disabled');
+      });
 
       if (this.#changeNonce !== nonce) return;
       await huntStorage.setItem(hunt.huntid, hunt);

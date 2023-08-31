@@ -1,7 +1,7 @@
-<header class="section-titre">
+<header class="section-titre surface surface-container at-top">
   <h1 class="title-large">Pokédex <shiny-stars></shiny-stars></h1>
 
-  <span class="compteur secondary">
+  <span class="compteur surface secondary">
     <span class="caught title-large"></span>
     <span class="title-medium">/</span>
     <span class="total title-medium"></span>
@@ -18,10 +18,15 @@
   </div>
 </header>
 
-<div class="section-contenu">
+<div class="section-contenu surface">
+
+  <!-- Détecteur de scroll -->
+  <div class="scroll-detector"></div>
+
   <!-- Spinner de chargement -->
   <load-spinner class="section-loader"></load-spinner>
 
   <!-- Liste des cartes de la section -->
   <div class="liste-cartes"></div>
+  
 </div>

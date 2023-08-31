@@ -3,8 +3,8 @@ import { RadioGroup } from './components/radioGroup.js';
 import { dataStorage } from './localForage.js';
 import { Notif } from './notification.js';
 import { computePaletteCss, setTheme, updateMetaThemeColorTag } from './theme.js';
-// @ts-expect-error
-import { queueable } from '../../../_common/js/per-function-async-queue.js';
+// @ts-ignore
+import { queueable } from '../../../_common/js/per-function-async-queue/mod.js';
 import { InputSelect } from './components/inputSelect.js';
 import { SupportedLang, isSupportedLang } from './jsonData.js';
 import { getCurrentLang, getString, translationObserver } from './translation.js';

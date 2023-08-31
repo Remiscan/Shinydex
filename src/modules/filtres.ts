@@ -1,11 +1,11 @@
-import { Pokemon } from './Pokemon.js';
-import { Shiny } from './Shiny.js';
-import { dataStorage, friendShinyStorage, friendStorage, huntStorage, localForageAPI, shinyStorage } from './localForage.js';
-// @ts-expect-error
-import { queueable } from '../../../_common/js/per-function-async-queue.js';
+// @ts-ignore
+import { queueable } from '../../../_common/js/per-function-async-queue/mod.js';
 import { Hunt } from './Hunt.js';
 import { noAccent } from './Params.js';
+import { Pokemon } from './Pokemon.js';
+import { Shiny } from './Shiny.js';
 import { isSupportedPokemonLang, pokemonData } from './jsonData.js';
+import { dataStorage, friendShinyStorage, friendStorage, huntStorage, localForageAPI, shinyStorage } from './localForage.js';
 import { getCurrentLang } from './translation.js';
 
 

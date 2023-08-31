@@ -22,6 +22,7 @@ $httpLanguage = $translation->getLanguage();
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
     <meta name="theme-color" content="#222222">
+    <meta name="theme-color" id="medium-layout-theme-color" media="screen and (min-width: 720px)" content="#222222" data-forced-color="surface-container">
 
     <title>Shinydex</title>
     <meta name="description" content="<?=$translation->get('meta-description')?>">
@@ -47,7 +48,7 @@ $httpLanguage = $translation->getLanguage();
         "input-switch-styles": "../_common/components/input-switch/styles.css",
         "input-switch-template": "../_common/components/input-switch/template.js",
         "colori": "../colori/lib/dist/colori.min.js",
-        "translation-observer": "../_common/js/translation-observer.js"
+        "translation-observer": "../_common/js/translation-observer/mod.js"
       }
     }
     </script>
@@ -91,13 +92,13 @@ $httpLanguage = $translation->getLanguage();
 
   <body data-section-actuelle="mes-chromatiques" class="background welcome">
     <!-- Écran de chargement -->
-    <div id="load-screen" style="grid-row: 1 / 3; grid-column: 1 / 2; position: absolute; z-index: 1000;width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: var(--bg-color, rgb(34, 34, 34));">
+    <div id="load-screen" style="grid-row: 1 / 3; grid-column: 1 / 2; position: absolute; z-index: 1000;width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: var(--bg-color, rgb(34, 34, 34)); --surface-color: var(--surface);">
       <load-spinner id="spinner" style="--size: 3em;"></load-spinner>
       <p style="margin-top: 20px; display: none;" id="load-screen-message"></p>
     </div>
 
     <!-- Barre de navigation -->
-    <nav class="bottom-bar surface primary elevation-2">
+    <nav class="bottom-bar surface surface-container">
       <search-box section="mes-chromatiques"></search-box>
       <search-box section="pokedex"></search-box>
       <search-box section="chasses-en-cours"></search-box>
@@ -143,10 +144,10 @@ $httpLanguage = $translation->getLanguage();
     </nav>
 
     <!-- Contenu de l'appli -->
-    <main class="surface primary">
+    <main class="surface surface-default">
 
       <!-- FAB -->
-      <button type="button" class="surface interactive fab shadow only-icon" data-label="fab-pokemon">
+      <button type="button" class="surface interactive fab elevation-3-shadow only-icon" data-label="fab-pokemon">
         <span class="material-icons" aria-hidden="true">add</span>
       </button>
 
@@ -204,29 +205,29 @@ $httpLanguage = $translation->getLanguage();
     </main>
 
     <!-- Sprite viewer -->
-    <section id="sprite-viewer" class="background">
+    <section id="sprite-viewer" class="surface">
       <sprite-viewer></sprite-viewer>
     </section>
 
     <!-- Obfuscator -->
-    <section id="obfuscator" class="background"></section>
+    <section id="obfuscator" class="surface"></section>
 
     <!-- Menu de filtres -->
     <section id="filter-menu">
-      <filter-menu data-section="mes-chromatiques" class="surface standard primary shadow elevation-3"></filter-menu>
-      <filter-menu data-section="chasses-en-cours" class="surface standard primary shadow elevation-3"></filter-menu>
-      <filter-menu data-section="corbeille" class="surface standard primary shadow elevation-3"></filter-menu>
-      <filter-menu data-section="partage" class="surface standard primary shadow elevation-3"></filter-menu>
-      <filter-menu data-section="chromatiques-ami" class="surface standard primary shadow elevation-3"></filter-menu>
+      <filter-menu data-section="mes-chromatiques" class="surface surface-container-high elevation-3-shadow"></filter-menu>
+      <filter-menu data-section="chasses-en-cours" class="surface surface-container-high elevation-3-shadow"></filter-menu>
+      <filter-menu data-section="corbeille" class="surface surface-container-high elevation-3-shadow"></filter-menu>
+      <filter-menu data-section="partage" class="surface surface-container-high elevation-3-shadow"></filter-menu>
+      <filter-menu data-section="chromatiques-ami" class="surface surface-container-high elevation-3-shadow"></filter-menu>
     </section>
 
     <!-- User search -->
     <section id="user-search">
-      <div class="user-search-card surface standard primary shadow elevation-3">
+      <div class="user-search-card surface elevation-3-shadow surface-container-high">
         <h2 class="title-medium" data-string="add-friend-hint"></h2>
 
         <form name="user-search" class="search-form">
-          <input type="text" name="username" class="surface variant elevation-3 interactive body-large"
+          <input type="text" name="username" class="surface surface-container-high interactive body-large"
             inputmode="search" enterkeyhint="search" role="searchbox" autocomplete="off"
             minlength="1" maxlength="20"
             data-placeholder="add-friend-placeholder">
@@ -235,7 +236,7 @@ $httpLanguage = $translation->getLanguage();
             <span class="material-icons" aria-hidden="true">close</span>
           </button>
 
-          <button type="submit" class="surface interactive filled tonal only-icon" data-label="submit-search">
+          <button type="submit" class="surface interactive filled tonal elevation-3 only-icon" data-label="submit-search">
             <span class="material-icons" aria-hidden="true">search</span>
           </button>
         </form>
