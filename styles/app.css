@@ -40,7 +40,7 @@ body {
 body {
   display: grid;
   --nav-bar-height: 80px;
-  --bottom-bar-height: calc(var(--nav-bar-height) + var(--section-title-height));
+  --bottom-bar-height: calc(var(--nav-bar-height) + var(--section-title-height) - 8px);
   grid-template-rows: 1fr var(--bottom-bar-height);
   grid-template-columns: 1fr;
   margin: 0;
@@ -73,7 +73,7 @@ nav {
   grid-column: 1 / 2;
   display: grid;
   --nombre-sections: 4;
-  grid-template-rows: var(--section-title-height) 1fr;
+  grid-template-rows: calc(var(--section-title-height) - 8px) 1fr;
   grid-template-columns: repeat(var(--nombre-sections), 1fr);
   align-items: center;
   z-index: var(--z-nav);
@@ -84,18 +84,17 @@ nav > search-box::part(form) {
   grid-column: 1 / -1;
   padding-inline: 8px;
   margin: auto;
+  margin-bottom: 0;
   width: 100%;
   box-sizing: border-box;
+  height: 48px;
 }
 
 nav > search-box::part(input) {
   --surface-color: var(--surface-container-high);
-  --elevation-opacity: var(--elevation-3-opacity);
+  --elevation-opacity: var(--elevation-2-opacity);
+  height: 100%;
 }
-
-/*nav > search-box::part(input) {
-  --elevation-opacity: var(--elevation-5-opacity);
-}*/
 
 .nav-link {
   display: flex;
@@ -769,7 +768,7 @@ filter-menu,
 .search-form[name="user-search"] input[role="searchbox"] {
   grid-column: input-start / input-end;
   padding-left: 16px;
-  --elevation-opacity: var(--elevation-5-opacity);
+  --elevation-opacity: var(--elevation-3-opacity);
 }
 
 .search-form[name="user-search"] button[type="submit"] {
