@@ -121,12 +121,16 @@ sprite-viewer a.icon-button.bouton-retour {
   padding-left: var(--padding-inline);
 }
 
+.sprite-viewer-dex-info.caught {
+  padding-left: calc(3 * var(--padding-inline));
+}
+
 .sprite-viewer-dex-info > .icon,
 .forme-name > .icon {
   margin: -7px;
 }
 
-.sprite-viewer-dex-info:not(.caught) > .icon {
+.sprite-viewer-dex-info/*:not(.caught)*/ > .icon {
   display: none;
 }
 
