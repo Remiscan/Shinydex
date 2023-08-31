@@ -131,7 +131,7 @@ main > section {
   max-width: calc(100% - 112px);
   max-height: 50vh;
   top: 100%;
-  left: 112px;
+  left: calc(112px - 16px);
 }
 
 .snackbar {
