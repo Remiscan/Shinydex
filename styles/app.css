@@ -294,20 +294,11 @@ body[data-section-actuelle~="pokedex"] main {
   max-width: 100%;
   box-sizing: border-box;
   overflow: hidden;
-  /*transition: --surface-opacity .2s linear;
-  transition-timing-function: var(--easing-standard);*/
-}
-
-@property --surface-opacity {
-  syntax: "<number>";
-  inherits: false;
-  initial-value: 1; /* unitless */
+  background-color: rgb(var(--surface-container));
 }
 
 .section-titre.at-top {
-  --surface-opacity: 0;
-  /*transition-delay: 0s;
-  transition-duration: 0s;*/
+  background-color: rgb(var(--surface));
 }
 
 .section-titre h1 {

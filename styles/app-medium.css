@@ -78,8 +78,8 @@ main > section {
   grid-template-rows: var(--section-title-height) auto var(--sections-gap);
 }
 
-.section-titre {
-  --surface-opacity: 0;
+.section-titre.at-top {
+  background-color: rgb(var(--surface-container));
 }
 
 .section-titre search-box {
