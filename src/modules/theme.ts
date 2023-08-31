@@ -67,6 +67,7 @@ export function setTheme(askedTheme?: string) {
 
 // Material Design 3-like color palette generator
 const materialLikeGenerator = function(hue: number) {
+  // Compute the lightnesses used for palette generation
   const OKLRCHlightnesses = [];
   for (const ciel of CIElightnesses) {
     const grey = new Couleur(`lch(${ciel * 100}% 0 0)`);

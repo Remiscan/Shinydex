@@ -57,6 +57,10 @@ echo '/'.'*'; ?>*/
   --inverse-tertiary: var(--tertiary-80);
   --shadow: var(--neutral-0);
   --scrim: var(--neutral-0);
+
+  /* Custom variables */
+
+  --search-bar: var(--surface-container-lowest);
 }
 
 :root[data-theme="dark"] {

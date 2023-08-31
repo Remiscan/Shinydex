@@ -226,7 +226,7 @@ $httpLanguage = $translation->getLanguage();
         <h2 class="title-medium" data-string="add-friend-hint"></h2>
 
         <form name="user-search" class="search-form">
-          <input type="text" name="username" class="surface surface-container-lowest interactive body-large"
+          <input type="text" name="username" class="surface surface-container-high interactive body-large"
             inputmode="search" enterkeyhint="search" role="searchbox" autocomplete="off"
             minlength="1" maxlength="20"
             data-placeholder="add-friend-placeholder">

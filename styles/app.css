@@ -88,6 +88,11 @@ nav > search-box::part(form) {
   box-sizing: border-box;
 }
 
+nav > search-box::part(input) {
+  --surface-color: var(--surface-container-high);
+  --elevation-opacity: var(--elevation-3-opacity);
+}
+
 /*nav > search-box::part(input) {
   --elevation-opacity: var(--elevation-5-opacity);
 }*/
@@ -757,6 +762,7 @@ filter-menu,
 .search-form[name="user-search"] input[role="searchbox"] {
   grid-column: input-start / input-end;
   padding-left: 16px;
+  --elevation-opacity: var(--elevation-5-opacity);
 }
 
 .search-form[name="user-search"] button[type="submit"] {
