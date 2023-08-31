@@ -7,6 +7,7 @@ import { spriteViewer } from './components/sprite-viewer/spriteViewer.js';
 import { clearElementStorage, lazyLoadSection, unLazyLoadSection, virtualizedSections } from './lazyLoading.js';
 import { friendShinyStorage } from './localForage.js';
 import { Notif } from './notification.js';
+import { scrollObserver } from './theme.js';
 import { TranslatedString, getString } from './translation.js';
 
 
@@ -333,6 +334,8 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
         const scrolledElement = section.element.querySelector('.section-contenu')!;
         lastPosition.set(sectionActuelle, scrolledElement.scrollTop);
       }
+      const scrollDetector = ancienneSection.element.querySelector('.scroll-detector');
+      if (scrollDetector) scrollObserver.unobserve(scrollDetector);
 
       // On anime la disparition de l'ancienne section
       const anim = section.closeAnimation(section.element, event, data);
@@ -465,6 +468,9 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
       const apparitionSection = section?.openAnimation(section.element, event, data);
       if (apparitionSection) wait(apparitionSection);
     }
+
+    const scrollDetector = nouvelleSection.element.querySelector('.scroll-detector');
+    if (scrollDetector) scrollObserver.observe(scrollDetector);
 
     // On virtualise la nouvelle section si elle peut l'être
     const virtualize = virtualizedSections.includes(section.nom);

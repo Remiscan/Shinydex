@@ -8,7 +8,7 @@ import { FilterMenu } from './components/filter-menu/filterMenu.js';
 import { PopulatableSection } from './filtres.js';
 import { dataStorage, huntStorage, shinyStorage } from './localForage.js';
 import { Notif } from './notification.js';
-import { setTheme } from './theme.js';
+import { scrollObserver, setTheme } from './theme.js';
 import { getString } from './translation.js';
 import { upgradeStorage } from './upgradeStorage.js';
 
@@ -101,6 +101,9 @@ export async function appStart() {
       console.log(message, tempsChargement);
     }
   };
+
+  // Au rechargement de l'appli, indiquer qu'on est sur la section de départ
+  history.replaceState({ section: 'mes-chromatiques' }, '');
 
   // ---
 
@@ -214,6 +217,9 @@ export async function appStart() {
   // ÉTAPE 4 : on affiche l'application
 
   logPerf('Étape 4');
+
+  const scrollDetector = document.querySelector('#mes-chromatiques .scroll-detector');
+  if (scrollDetector) scrollObserver.observe(scrollDetector);
 
   // Préparation du thème
   try {

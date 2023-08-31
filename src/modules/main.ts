@@ -346,29 +346,8 @@ window.addEventListener('dataupdate', async (event: DataUpdateEvent) => {
 
 
 
-///////////////////////////////////////////////////////////////////
-// DÉTECTE LE SCROLL DES SECTIONS POUR AJUSTER L'APPARENCE DU TITRE
-for (const section of [...document.querySelectorAll('section')]) {
-  const sectionTitre = section.querySelector('.section-titre');
-  const sectionContenu = section.querySelector('.section-contenu');
-
-  let scrolling = false;
-  sectionContenu?.addEventListener('scroll', event => {
-    if (scrolling) return;
-    scrolling = true;
-    if (sectionContenu.scrollTop) sectionTitre?.classList.remove('at-top');
-    else                          sectionTitre?.classList.add('at-top');
-    requestAnimationFrame(() => scrolling = false);
-  }, { passive: true });
-}
-
-
-
 /////////////////////////////
 // LANCEMENT DE L'APPLICATION
-
-// Au rechargement de l'appli, indiquer qu'on est sur la section de départ
-history.replaceState({ section: 'mes-chromatiques' }, '');
 
 // Lancement de l'appli
 try {

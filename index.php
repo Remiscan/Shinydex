@@ -22,6 +22,7 @@ $httpLanguage = $translation->getLanguage();
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
     <meta name="theme-color" content="#222222">
+    <meta name="theme-color" id="medium-layout-theme-color" media="screen and (min-width: 720px)" content="#222222" data-forced-color="surface-container">
 
     <title>Shinydex</title>
     <meta name="description" content="<?=$translation->get('meta-description')?>">

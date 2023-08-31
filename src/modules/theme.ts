@@ -36,9 +36,19 @@ class Palette extends DefPalette {
 
 
 
-export function updateMetaThemeColorTag() {
-  const themeColor = `rgb(${String(getComputedStyle(document.documentElement).getPropertyValue('--surface-container')).trim()})`;
-  document.querySelector("meta[name=theme-color]")!.setAttribute('content', themeColor);
+export function updateMetaThemeColorTag(color: string = 'surface') {
+  const metaTags = [
+    document.querySelector("meta[name=theme-color]"),                                  // for mobile layout
+    document.querySelector(`meta[name="theme-color"][id="medium-layout-theme-color"]`) // for medium and large layouts
+  ];
+
+  for (const tag of metaTags) {
+    if (!tag) continue;
+    const colorLabel = tag.getAttribute('data-forced-color') || color || tag.getAttribute('data-current-color') || 'surface';
+    const themeColor = `rgb(${String(getComputedStyle(document.documentElement).getPropertyValue(`--${colorLabel}`)).trim()})`;
+    tag.setAttribute('content', themeColor);
+    tag.setAttribute('data-current-color', colorLabel);
+  }
 }
 
 
@@ -104,3 +114,29 @@ export function computePaletteCss(hue: number): string {
   const palette = new MaterialLikePalette(hue);
   return palette.toCSS();
 }
+
+
+/**
+ * Observes when a section gets scrolled in, and adapts the theme-color
+ * and the section's title background color.
+ */
+export const scrollObserver = new IntersectionObserver((entries) => {
+  for (const entry of entries) {
+    const section = entry.target.closest('section');
+    if (!section) continue;
+
+    const sectionID = section.id;
+
+    if (!(document.body.matches(`[data-section-actuelle~="${sectionID}"]`))) continue;
+    const sectionTitre = section.querySelector('.section-titre');
+    if (entry.intersectionRatio >= 1) {
+      sectionTitre?.classList.add('at-top');
+      updateMetaThemeColorTag('surface');
+    } else {
+      sectionTitre?.classList.remove('at-top');
+      updateMetaThemeColorTag('surface-container');
+    }
+  }
+}, {
+  threshold: [1],
+});

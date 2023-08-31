@@ -383,6 +383,13 @@ a.icon-button.bouton-retour {
   will-change: scroll-position;
 }
 
+.scroll-detector {
+  width: 1px;
+  height: 1px;
+  position: absolute;
+  top: 0;
+}
+
 .liste-cartes {
   width: 100%;
   flex: none;
