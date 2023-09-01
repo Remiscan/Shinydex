@@ -1010,18 +1010,27 @@ form[name="app-settings"] > *:last-child {
 
 .lien-source {
   color: var(--accent-color);
+  align-items: center;
+  display: inline-flex;
 }
 
 @media (any-pointer: coarse) {
   .lien-source {
-    height: 30px;
-    line-height: 30px;
+    min-height: 30px;
   }
 }
 
 .lien-source .material-icons {
   vertical-align: middle;
   margin-right: 4px;
+}
+
+.lien-source > span:nth-of-type(2) {
+  text-decoration: underline;
+}
+
+.lien-source:has(span:nth-of-type(2)) {
+  text-decoration: none;
 }
 
 
