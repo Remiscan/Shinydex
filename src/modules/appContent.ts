@@ -7,6 +7,7 @@ import { shinyCard } from './components/shiny-card/shinyCard.js';
 import { PopulatableSection, ShinyFilterData, computeFilters, computeOrders, isOrdre, orderCards, populatableSections, updateCounters } from './filtres.js';
 import { clearElementStorage, lazyLoadSection, virtualizedSections } from './lazyLoading.js';
 import { friendShinyStorage, friendStorage, huntStorage, localForageAPI, shinyStorage } from './localForage.js';
+import { getString } from './translation.js';
 
 
 
@@ -288,6 +289,11 @@ export function initPokedex() {
   for (const gen of generations) {
     const genBlock = genBlockTemplate.content.cloneNode(true) as DocumentFragment;
     const genContainer = genBlock.querySelector('.pokedex-gen')!;
+
+    const genHeader = document.createElement('h2');
+    genHeader.className = 'pokedex-gen-header title-medium surface surface-container-high';
+    genHeader.innerHTML = `<span data-string="pokedex-gen-title">${getString('pokedex-gen-title')}</span> ${gen.num}`;
+    genContainer?.appendChild(genHeader);
 
     for (let i = gen.start; i <= gen.end; i++) {
       const pkmnIcon = document.createElement('div');

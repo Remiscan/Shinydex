@@ -601,15 +601,27 @@ section.loading .message-vide {
   gap: 8px;
   justify-content: space-evenly;
   align-items: flex-start;
+  overflow: hidden;
   /*content-visibility: auto;
   contain-intrinsic-height: calc(var(--rows) * 44px + (var(--rows) - 1) * 8px);*/
+}
+
+.pokedex-gen-header {
+  grid-column: 1 / -1;
+  padding: 4px 4px 2px;
+  justify-content: center;
+  align-items: center;
+  --distance-to-parent-border: 8px;
+  border-radius: var(--sub-border-radius);
+  --text-color: var(--on-surface-variant);
 }
 
 div[data-replaces="dex-icon"],
 dex-icon {
   display: grid;
   place-items: center;
-  border-radius: calc(.5 * var(--border-radius));
+  --distance-to-parent-border: 8px;
+  border-radius: var(--sub-border-radius);
   position: relative;
   width: 44px;
   height: 44px;
