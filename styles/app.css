@@ -1010,6 +1010,8 @@ form[name="app-settings"] > *:last-child {
 
 .lien-source {
   color: var(--accent-color);
+  height: 30px;
+  line-height: 30px;
 }
 
 .lien-source .material-icons {
