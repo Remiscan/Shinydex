@@ -166,7 +166,7 @@ picture.no-shiny > span {
   top: 0;
   left: 0;
   z-index: 2;
-  background-color: rgb(var(--background), .8);
+  background-color: rgb(var(--surface), .8);
   text-transform: none;
   text-align: center;
 }
