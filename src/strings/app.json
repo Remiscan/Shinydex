@@ -211,6 +211,10 @@
     "resource-pokesprite": "Icônes d'objets et autres : pokesprite",
     "resource-gen9-sprites": "Sprites des Pokémon 9G : Serebii",
 
+    "section-changelog-long-title": "Nouveautés",
+    "open-changelog-label": "Voir l'historique des nouveautés",
+    "close-changelog-label": "Fermer",
+
     "fab-pokemon": "Ajouter un Pokémon chromatique",
     "fab-friend": "Ajouter un ami",
     "button-back": "Retourner sur la page précédente",
@@ -525,6 +529,10 @@
     "resource-home-icons": "Balls and other icons: Pokémon Home via @mattyoukhana",
     "resource-pokesprite": "Item icons and other icons: pokesprite",
     "resource-gen9-sprites": "Pokémon 9G sprites: Serebii",
+
+    "section-changelog-long-title": "Changelog",
+    "open-changelog-label": "See the changelog",
+    "close-changelog-label": "Close",
 
     "fab-pokemon": "Add a shiny Pokémon",
     "fab-friend": "Add a friend",

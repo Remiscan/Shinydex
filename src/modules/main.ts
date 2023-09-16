@@ -64,7 +64,7 @@ for (const bouton of Array.from(document.querySelectorAll('.bouton-retour'))) {
 document.getElementById('obfuscator')!.addEventListener('click', () => history.back());
 
 // Ferme les sections suivantes si on clique en-dehors de leur contenu
-const sectionsToCloseWhenClickingOutside = ['filter-menu', 'user-search', 'top-layer'];
+const sectionsToCloseWhenClickingOutside = ['filter-menu', 'user-search', 'top-layer', 'changelog'];
 for (const sectionName of sectionsToCloseWhenClickingOutside) {
   const section = document.getElementById(sectionName);
   section?.addEventListener('click', event => {

@@ -267,6 +267,7 @@ body[data-section-actuelle~="a-propos"] #a-propos,
 body[data-section-actuelle~="sprite-viewer"] #sprite-viewer[data-ready],
 body[data-section-actuelle~="filter-menu"] #filter-menu,
 body[data-section-actuelle~="user-search"] #user-search,
+body[data-section-actuelle~="changelog"] #changelog,
 body[data-section-actuelle~="top-layer"] #top-layer,
 body[data-section-actuelle~="obfuscator"] #obfuscator {
   display: grid;
@@ -701,7 +702,8 @@ body:not([data-filters~="chromatiques-ami"]) filter-menu[section="chromatiques-a
 }
 
 filter-menu,
-.user-search-card {
+.user-search-card,
+.changelog-card {
   margin-bottom: calc(var(--bottom-bar-height) + 8px);
 }
 
@@ -739,17 +741,17 @@ filter-menu,
   --from-y: 0;
 }
 
-.user-search-card {
+.user-search-card,
+.changelog-card {
   height: fit-content;
   box-sizing: border-box;
   border-radius: var(--border-radius);
   position: sticky;
   z-index: var(--z-filter-menu);
   max-width: min(100% - 16px, 600px);
-  max-height: calc(100% - 16px);
+  max-height: calc(100% - 2 * var(--bottom-bar-height) - 16px);
   margin-inline: auto;
   margin-top: auto;
-  margin-right: 8px;
   overflow: hidden auto;
   padding: 16px;
   box-sizing: border-box;
@@ -758,6 +760,10 @@ filter-menu,
   flex-direction: column;
   gap: 16px;
   min-width: 350px;
+}
+
+.user-search-card {
+  margin-right: 8px;
 }
 
 .search-form[name="user-search"] {
@@ -890,7 +896,8 @@ h2:not(:first-child) {
   grid-column: 2;
 }
 
-[data-action="check-update"] {
+[data-action="check-update"],
+[data-nav-section="changelog"] {
   margin: 0;
 }
 
@@ -979,6 +986,19 @@ form[name="app-settings"] > *:last-child {
   padding-bottom: 0;
 }
 
+#changelog {
+  --from-x: 0;
+  --from-y: 1rem;
+}
+
+.changelog-card {
+  margin: auto;
+}
+
+.changelog-card > ul {
+  margin: 0;
+}
+
 
 
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -1048,6 +1068,7 @@ form[name="app-settings"] > *:last-child {
 #sprite-viewer,
 #filter-menu,
 #user-search,
+#changelog,
 #top-layer,
 #obfuscator {
   grid-column: 1 / -1;
@@ -1064,13 +1085,15 @@ form[name="app-settings"] > *:last-child {
 
 #top-layer,
 #filter-menu,
-#user-search {
+#user-search,
+#changelog {
   background-color: transparent;
   z-index: var(--z-obfuscator);
 }
 
 #filter-menu,
-#user-search {
+#user-search,
+#changelog {
   background: rgb(var(--surface), .5);
 }
 

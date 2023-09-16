@@ -158,6 +158,10 @@ filter-menu {
   margin-right: auto;
 }
 
+.changelog-card {
+  margin: auto;
+}
+
 #google-one-tap-container {
   margin: 10px 8px 6px 8px; /* 16px - (6px 8px 10px 8px) */
 }
