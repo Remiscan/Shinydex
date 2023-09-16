@@ -12,7 +12,7 @@ template.innerHTML = `
 
 <button type="button" id="sprite-viewer-fab" class="surface interactive fab elevation-3-shadow">
   <span class="material-icons" aria-hidden="true">add</span>
-  <span class="label-large fab-label">Test</span>
+  <span class="label-large fab-label"></span>
 </button>
 
 <div class="sprite-viewer-dex-info surface surface-container-high label-medium">
