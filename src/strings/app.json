@@ -219,6 +219,7 @@
 
     "fab-pokemon": "Ajouter un Pokémon chromatique",
     "fab-friend": "Ajouter un ami",
+    "sprite-viewer-fab": "Chasser {{name}}",
     "button-back": "Retourner sur la page précédente",
     "button-close": "Fermer",
     "install-app": "Installer l'application",
@@ -540,6 +541,7 @@
 
     "fab-pokemon": "Add a shiny Pokémon",
     "fab-friend": "Add a friend",
+    "sprite-viewer-fab": "Hunt {{name}}",
     "button-back": "Go back to previous page",
     "button-close": "Close",
     "install-app": "Install the app",

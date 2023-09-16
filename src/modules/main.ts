@@ -79,31 +79,41 @@ for (const sectionName of sectionsToCloseWhenClickingOutside) {
 // FAB (filtres et nouvelle chasse)
 
 // Active le FAB
-document.querySelector('.fab')!.addEventListener('click', async () => {
-  // Crée une nouvelle chasse
-  if (['mes-chromatiques', 'pokedex', 'chasses-en-cours'].includes(sectionActuelle)) {
-    if (sectionActuelle !== 'chasses-en-cours') {
-      await navigate('chasses-en-cours', new Event('navigate'));
-    }
-
-    // Créer une nouvelle chasse ici
-    const hunt = await Hunt.getOrMake();
-    await huntStorage.setItem(hunt.huntid, hunt);
-
-    window.dispatchEvent(new CustomEvent('dataupdate', {
-      detail: {
-        sections: ['chasses-en-cours'],
-        ids: [hunt.huntid],
-        sync: false
+const fabs = document.querySelectorAll('.fab');
+for (const fab of fabs) {
+  fab.addEventListener('click', async (event) => {
+    // Crée une nouvelle chasse
+    if (['mes-chromatiques', 'pokedex', 'chasses-en-cours', 'sprite-viewer'].includes(sectionActuelle)) {
+      let dexid: number | undefined;
+      if (sectionActuelle === 'sprite-viewer') {
+        event?.preventDefault();
+        dexid = Number(document.querySelector('#sprite-viewer sprite-viewer')?.getAttribute('dexid')) ?? undefined;
       }
-    }));
-  }
 
-  // Ajoute un nouvel ami
-  else if (sectionActuelle === 'partage') {
-    await navigate('user-search', new Event('click'), {});
-  }
-});
+      if (sectionActuelle !== 'chasses-en-cours') {
+        await navigate('chasses-en-cours', new Event('navigate'));
+      }
+  
+      // Créer une nouvelle chasse ici
+      const hunt = await Hunt.getOrMake();
+      if (dexid) hunt.dexid = dexid;
+      await huntStorage.setItem(hunt.huntid, hunt);
+  
+      window.dispatchEvent(new CustomEvent('dataupdate', {
+        detail: {
+          sections: ['chasses-en-cours'],
+          ids: [hunt.huntid],
+          sync: false
+        }
+      }));
+    }
+  
+    // Ajoute un nouvel ami
+    else if (sectionActuelle === 'partage') {
+      await navigate('user-search', new Event('click'), {});
+    }
+  });
+}
 
 
 

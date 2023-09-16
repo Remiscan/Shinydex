@@ -147,7 +147,7 @@ $httpLanguage = $translation->getLanguage();
     <main class="surface surface-default">
 
       <!-- FAB -->
-      <button type="button" class="surface interactive fab elevation-3-shadow only-icon" data-label="fab-pokemon">
+      <button type="button" id="main-fab" class="surface interactive fab elevation-3-shadow only-icon" data-label="fab-pokemon">
         <span class="material-icons" aria-hidden="true">add</span>
       </button>
 

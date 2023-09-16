@@ -1,4 +1,4 @@
-import { pad, wait } from '../../Params.js';
+import { capitalizeFirstLetter, pad, wait } from '../../Params.js';
 import { Pokemon } from '../../Pokemon.js';
 import { Shiny } from '../../Shiny.js';
 import { SupportedLang, pokemonData } from '../../jsonData.js';
@@ -63,6 +63,14 @@ export class spriteViewer extends HTMLElement {
     if (caughtFormsList.size > 0) dexInfos.classList.add('caught');
     else                          dexInfos.classList.remove('caught');
     dexNumberContainer.innerHTML = pad(String(pokemon.dexid), 4);
+
+    // On place le nom dans le FAB
+    const fab = this.querySelector('#sprite-viewer-fab');
+    const labelContainer = fab?.querySelector('.fab-label');
+    if (labelContainer) {
+      const label = getString('sprite-viewer-fab').replace('{{name}}', capitalizeFirstLetter(pokemon.getName()));
+      labelContainer.innerHTML = label;
+    }
 
     // On réordonne les formes (normale d'abord, les autres ensuite)
     const formes = pokemon.formes.slice().sort((a, b) => {

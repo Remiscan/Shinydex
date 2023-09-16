@@ -65,6 +65,7 @@ sprite-viewer a.icon-button.bouton-retour {
   justify-content: center;
   align-items: center;
   margin: auto;
+  padding-bottom: calc(56px + 2 * 16px);
 }
 
 .dex-sprite {
@@ -185,4 +186,12 @@ sprite-viewer[size="112"] :is(
   .two-sprites .dex-sprite
 ) {
   --sprite-size: 112px;
+}
+
+#sprite-viewer-fab {
+  position: fixed;
+  bottom: 56px;
+  left: 50%;
+  translate: -50%;
+  margin-inline: 0;
 }

@@ -413,7 +413,7 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
 
   // Only animate new section(s) if the one we're closing was NOT displayed over it,
   // i.e. if it closed its previous section.
-  const animateNewSection = ancienneSection.closePrevious;
+  const animateNewSection = ancienneSection.closePrevious || (ancienneSection.nom === 'sprite-viewer' && !['mes-chromatiques', 'pokedex'].includes(nouvelleSection.nom));
 
   // On affiche la nouvelle section
   sectionActuelle = sectionCible;

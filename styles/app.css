@@ -410,7 +410,7 @@ section.loading .compteur {
   100% { transform: translate3D(0, calc(-1px * var(--notification-container-height, 0)), 0) scale(1); }
 }
 
-.fab {
+#main-fab {
   display: none;
   grid-column: 1 / 2;
   grid-row: 1 / 2;
@@ -427,29 +427,29 @@ section.loading .compteur {
   --elevation-opacity: 0;
 }
 
-.fab > .material-icons {
+#main-fab > .material-icons {
   backface-visibility: hidden;
 }
 
-.fab.notif {
+#main-fab.notif {
   --decalage: calc(-1 * var(--bottom-bar-height));
   transition: transform .15s var(--easing-decelerate);
 }
 
 @supports (selector(:has(*))) {
-  body[data-section-actuelle~="mes-chromatiques"]:has(#mes-chromatiques:not(.loading)) .fab,
-  body[data-section-actuelle~="pokedex"]:has(#pokedex:not(.loading)) .fab,
-  body[data-section-actuelle~="chasses-en-cours"]:not([data-section-actuelle~="corbeille"]):has(#chasses-en-cours:not(.loading)) .fab,
-  body[data-section-actuelle~="partage"]:has(#partage:not(.loading)) .fab {
+  body[data-section-actuelle~="mes-chromatiques"]:has(#mes-chromatiques:not(.loading)) #main-fab,
+  body[data-section-actuelle~="pokedex"]:has(#pokedex:not(.loading)) #main-fab,
+  body[data-section-actuelle~="chasses-en-cours"]:not([data-section-actuelle~="corbeille"]):has(#chasses-en-cours:not(.loading)) #main-fab,
+  body[data-section-actuelle~="partage"]:has(#partage:not(.loading)) #main-fab {
     display: flex;
   }
 }
 
 @supports not (selector(:has(*))) {
-  body[data-section-actuelle~="mes-chromatiques"] .fab,
-  body[data-section-actuelle~="pokedex"] .fab,
-  body[data-section-actuelle~="chasses-en-cours"]:not([data-section-actuelle~="corbeille"]) .fab,
-  body[data-section-actuelle~="partage"] .fab {
+  body[data-section-actuelle~="mes-chromatiques"] #main-fab,
+  body[data-section-actuelle~="pokedex"] #main-fab,
+  body[data-section-actuelle~="chasses-en-cours"]:not([data-section-actuelle~="corbeille"]) #main-fab,
+  body[data-section-actuelle~="partage"] #main-fab {
     display: flex;
   }
 }
