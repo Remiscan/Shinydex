@@ -172,14 +172,6 @@ picture.no-shiny > span {
   text-align: center;
 }
 
-@media (min-width: 1140px) {
-  .dex-sprite,
-  .single-sprite .dex-sprite,
-  .two-sprites .dex-sprite {
-    --sprite-size: calc(min(400px, 80vw));
-  }
-}
-
 sprite-viewer[size="112"] :is(
   .dex-sprite,
   .single-sprite .dex-sprite,
@@ -196,4 +188,26 @@ sprite-viewer[size="112"] :is(
   margin-inline: 0;
   width: max-content;
   max-width: calc(100% - 16px);
+}
+
+@media (min-width: 720px) {
+  .sprite-list {
+    padding-top: calc(56px + 2 * 16px);
+    padding-bottom: 0;
+  }
+
+  #sprite-viewer-fab {
+    left: 0;
+    top: 0;
+    translate: unset;
+    margin: 16px;
+  }
+}
+
+@media (min-width: 1140px) {
+  .dex-sprite,
+  .single-sprite .dex-sprite,
+  .two-sprites .dex-sprite {
+    --sprite-size: calc(min(400px, 80vw));
+  }
 }
