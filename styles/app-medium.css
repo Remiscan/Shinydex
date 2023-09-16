@@ -102,7 +102,7 @@ main > section {
   top: calc(var(--section-title-height) - 16px);
   right: unset;
   left: calc(.5 * 112px - .5 * 56px - 16px);
-  margin: 16px 0;
+  margin: 16px;
   --z-fab: 30;
   --notification-container-height: 0;
 }
