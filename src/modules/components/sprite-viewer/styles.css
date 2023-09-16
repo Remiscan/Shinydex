@@ -188,6 +188,7 @@ sprite-viewer[size="112"] :is(
   margin-inline: 0;
   width: max-content;
   max-width: calc(100% - 16px);
+  z-index: 2;
 }
 
 @media (min-width: 720px) {
