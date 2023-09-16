@@ -47,6 +47,7 @@ export class Hunt extends Shiny implements huntedPokemon {
     return !(
       this.dexid > 0
       && this.game != ''
+      && this.game != 'null'
     );
   }
 
