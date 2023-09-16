@@ -516,6 +516,10 @@ load-spinner {
   --dismiss-column: 48px;
 }
 
+.snackbar.no-action.no-dismiss.loading {
+  padding-right: 0;
+}
+
 .snackbar load-spinner {
   --size: 40px;
   --bg-color: rgb(var(--inverse-surface));

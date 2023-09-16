@@ -243,6 +243,14 @@ $httpLanguage = $translation->getLanguage();
       </div>
     </section>
 
+    <!-- Changelog -->
+    <section id="changelog">
+      <div class="changelog-card surface elevation-3-shadow surface-container-high">
+        <h2 class="title-large" data-string="section-changelog-long-title"></h2>
+        <?php include './pages/changelog.html'; ?>
+      </div>
+    </section>
+
     <!-- Misc top layer -->
     <section id="top-layer"></section>
 

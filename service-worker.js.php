@@ -50,9 +50,12 @@ const dataStorage = localforage.createInstance({
 });
 
 const cachePrefix = 'shinydex-sw';
+const spritesCachePrefix = `${cachePrefix}-sprites`;
+const spritesCacheVersion = 3;
+
 const currentCacheName = `${cachePrefix}-<?=$maxVersion?>`;
+const currentSpritesCacheName = `${spritesCachePrefix}-${spritesCacheVersion}`;
 const liveFileVersions = JSON.parse(`<?=json_encode($fileVersions, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES)?>`);
-const spritesCacheName = 'shinydex-sw-sprites-v2';
 
 
 
@@ -98,7 +101,7 @@ self.addEventListener('fetch', function(event) {
       if (isSmallSprite) {
         // If it's a small sprite, respond from cache, and if not cached, from network and then cache it.
         event.respondWith(
-          caches.open(spritesCacheName)
+          caches.open(currentSpritesCacheName)
           .then(cache => cache.match(event.request)                       // 1. Look if the small sprite is in cache
             .then(matching => matching || fetch(event.request))           // 2. If not, fetch it online
             .then(response => cache.put(event.request, response.clone())  // 3. Store the fetched small sprite in cache
@@ -112,7 +115,7 @@ self.addEventListener('fetch', function(event) {
         const smallSpriteUrl = event.request.url.replace(new RegExp('webp/[0-9]+?/'), 'webp/112/');
         event.respondWith(
           fetch(event.request)                            // 1. Fetch the big sprite online
-          .catch(error => caches.open(spritesCacheName)       // 2. If not found, look in the cache for the corresponding
+          .catch(error => caches.open(currentSpritesCacheName)       // 2. If not found, look in the cache for the corresponding
             .then(cache => cache.match(smallSpriteUrl))   //    small sprite and return it
           )
           .catch(error => console.log(error, event.request))
@@ -178,13 +181,11 @@ self.addEventListener('message', async function(event) {
 
     case 'delete-all-sprites': {
       event.waitUntil(
-        caches.open(spritesCacheName)
-        .then(cache => cache.keys()
-          .then(keys => Promise.all(keys.map(key => cache.delete(key))))
-        )
+        caches.delete(currentSpritesCacheName)
         .catch(error => console.error(error))
+        .then(() => caches.open(currentSpritesCacheName))
       )
-    }
+    } break;
   }
 });
 
@@ -262,16 +263,20 @@ async function installFiles(event = null) {
       return;
     }));
 
+    // Also initialize the sprites cache
+    const appSettings = await dataStorage.getItem('app-settings');
+    const spritesCachesList = (await caches.keys()).filter(name => name.startsWith(spritesCachePrefix));
+    const shouldCacheAllSprites =
+      'cache-all-sprites' in appSettings && appSettings['cache-all-sprites'] &&
+      spritesCachesList.length > 0 && !(spritesCachesList.includes(currentSpritesCacheName));
+    await caches.open(currentSpritesCacheName);
+    if (shouldCacheAllSprites === true) {
+      await dataStorage.setItem('should-update-sprites-cache', shouldCacheAllSprites);
+    }
+
     console.log(`[${action}] File installation complete!`);
     deleteOldCaches(currentCacheName, action);
     dataStorage.setItem('file-versions', liveFileVersions);
-
-    // Also initialize the sprites cache
-    await caches.open(spritesCacheName);
-    const shouldCacheAllSprites = await dataStorage.getItem('cache-all-sprites');
-    if (shouldCacheAllSprites === true) {
-      cacheAllSprites(undefined, { priority: 'low' });
-    }
   }
 
   // If there was an error while installing the new files, delete them
@@ -310,7 +315,7 @@ async function cacheAllSprites(source, fetchOptions = {}) {
     const allSpritesNumber = allSprites.length;
     const totalSize = Number(response['size']) || 0;
 
-    const cache = await caches.open(spritesCacheName);
+    const cache = await caches.open(currentSpritesCacheName);
     const spritesAlreadyCached = (await cache.keys()).map(key => key.url);
     const spritesAlreadyCachedNumber = spritesAlreadyCached.length;
 
@@ -371,7 +376,7 @@ async function deleteOldCaches(newCacheName, action) {
     console.log(`[${action}] Deleting old cached files`);
     await Promise.all(
       allCaches.map(cache => {
-        if (cache.startsWith(cachePrefix) && newCacheName !== cache && spritesCacheName !== cache) return caches.delete(cache);
+        if (cache.startsWith(cachePrefix) && newCacheName !== cache && currentSpritesCacheName !== cache) return caches.delete(cache);
         else return Promise.resolve();
       })
     );

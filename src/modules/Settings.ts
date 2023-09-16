@@ -127,8 +127,17 @@ export class Settings {
               if (progressContainer && val) progressContainer.innerHTML = val;
             });
 
-            // If the option is turned on, check if there are new sprites to cache on app launch
-            //cacheAllSprites(true, { priority: 'low' }); // don't, causes slow loading of other stuff while waiting for this
+            // If:
+            // - the option is turned on,
+            // - the sprites cache version changed according to last service worker install,
+            // then check if there are new sprites to cache on app launch.
+            // Don't do it on all app launches, because it causes causes slow loading of other stuff.
+            dataStorage.getItem('should-update-sprites-cache')
+            .then(shouldUpdateCache => {
+              if (shouldUpdateCache) return cacheAllSprites(true, { priority: 'low' });
+              else return true;
+            })
+            .then(result => dataStorage.setItem('should-update-sprites-cache', !(result ?? false)));
           }
         } else {
           cacheAllSprites(value);
@@ -220,23 +229,40 @@ export class Settings {
  * @param bool - true to fill the cache, false to empty it.
  * @returns true if there was no error, false if there was one.
  */
+let downloadNotification: Notif;
 export async function cacheAllSprites(bool: boolean, fetchOptions: RequestInit & { priority?: string } = {}): Promise<boolean> {
   const worker = (await navigator.serviceWorker.ready).active;
   if (!worker) throw new Error('No service worker available to cache all sprites');
 
   const input = document.querySelector('[name="cache-all-sprites"]');
 
+  if (downloadNotification) {
+    downloadNotification.dismissable = true;
+    downloadNotification.remove();
+  }
+  downloadNotification = new Notif(getString('updating-sprites-cache'), undefined, '', undefined, false);
+
   try {
     if (input && 'disabled' in input) input.disabled = true;
 
     const progressContainer = document.querySelector('[data-sprites-progress]');
-    if (!bool) {
+    let notificationMessageContainer: HTMLElement | null | undefined;
+
+    // If we're updating the sprites cache, display a notification so the user knows why the app is lagging
+    if (bool) {
+      await downloadNotification.prompt();
+      downloadNotification.element?.classList.add('loading');
+      notificationMessageContainer = downloadNotification.element?.querySelector('.snackbar-message');
+    }
+    
+    // If we're deleting the sprites cache
+    else {
       if (progressContainer) progressContainer.innerHTML = '';
       worker.postMessage({ 'action': 'delete-all-sprites' });
       return true;
     }
 
-    if (progressContainer) progressContainer.innerHTML = 'Préparation...';
+    if (progressContainer) progressContainer.innerHTML = getString('preparing-sprites-cache');
 
     let progress = 0, totalSize = 0, size = 0, unit = 'octets', unitPower = 0;
     await new Promise((resolve, reject) => {
@@ -252,7 +278,12 @@ export async function cacheAllSprites(bool: boolean, fetchOptions: RequestInit &
           unit = unitPower === 6 ? 'Mo' : unitPower === 3 ? 'ko' : 'octets';
           const displayedSize = (size / (10 ** unitPower)).toFixed(2);
 
-          progressContainer.innerHTML = `${progress}% : ${displayedSize} ${unit}`;
+          const progressMessage = `${progress}% : ${displayedSize} ${unit}`;
+          progressContainer.innerHTML = progressMessage;
+          if (notificationMessageContainer) {
+            const newNotificationMessage = notificationMessageContainer.innerHTML.replace(/\((.*?)\)/, `(${progressMessage})`);
+            notificationMessageContainer.innerHTML = newNotificationMessage;
+          }
 
           if (progress === 100) resolve(true);
           else if (progressWithErrors === 100) resolve(false);
@@ -274,6 +305,9 @@ export async function cacheAllSprites(bool: boolean, fetchOptions: RequestInit &
   } finally {
     if (input && 'disabled' in input) input.disabled = false;
     else input?.removeAttribute('disabled');
+
+    downloadNotification.dismissable = true;
+    downloadNotification.remove();
   }
 }
 

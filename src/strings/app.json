@@ -20,6 +20,7 @@
 
     "section-pokedex-short-title": "Pokédex <shiny-stars></shiny-stars>",
     "section-pokedex-long-title": "Pokédex <shiny-stars></shiny-stars>",
+    "pokedex-gen-title": "Génération",
 
     "section-chasses-en-cours-short-title": "Chasses",
     "section-chasses-en-cours-long-title": "Chasses en cours",
@@ -186,6 +187,8 @@
     "parametres-local-data": "Gestion des données sur votre appareil",
     "param-cache-icons-title": "Télécharger les images des Pokémon",
     "param-cache-icons-desc": "pour voir les images des Pokémon sans connexion internet.",
+    "updating-sprites-cache": "Téléchargement des images des Pokémon (préparation...)",
+    "preparing-sprites-cache": "Préparation...",
     "param-export-title": "Exporter les données",
     "param-export-desc": "au format JSON.",
     "param-export-label": "Exporter",
@@ -201,6 +204,7 @@
     "app-version": "Version de l'application",
     "check-update": "Rechercher une mise à jour",
     "report-issue": "Signaler un problème",
+    "report-misc": "Contacter le développeur",
     "confidentiality-policy-title": "Politique de confidentialité",
     "confidentiality-policy": "<p>Lorsque vous utilisez l'application sans être connecté à un compte, elle stocke sur votre appareil les informations que vous saisissez sur vos Pokémon.</p><p>Au moment où vous vous connectez avec un compte Google, Google nous donne accès à quelques informations publiques sur votre compte : noms, photo de profil, adresse e-mail, ainsi qu'une chaîne de caractères servant d'identifiant unique. Nous utilisons cet identifiant unique pour vous créer un compte sur le Shinydex et le relier à votre compte Google. Nous ne sauvegardons aucune autre information de votre compte Google. Votre adresse e-mail est sauvegardée sur votre appareil (mais ne nous est pas communiquée) pour vous indiquer avec quel compte Google vous vous êtes connecté.</p><p>Une fois connecté, les informations de vos Pokémon sont sauvegardées dans une base de données en ligne. Si vous choisissez de rendre votre profil public et que vous choisissez un pseudo, alors les autres personnes connaissant ce pseudo pourront avoir accès aux informations de vos Pokémon.</p><p>Aucune information n'est partagée avec un autre service que le Shinydex.</p>",
     "used-resources-title": "Ressources utilisées",
@@ -208,6 +212,10 @@
     "resource-home-icons": "Icônes des Balls et autres : Pokémon Home via @mattyoukhana",
     "resource-pokesprite": "Icônes d'objets et autres : pokesprite",
     "resource-gen9-sprites": "Sprites des Pokémon 9G : Serebii",
+
+    "section-changelog-long-title": "Nouveautés",
+    "open-changelog-label": "Voir l'historique des nouveautés",
+    "close-changelog-label": "Fermer",
 
     "fab-pokemon": "Ajouter un Pokémon chromatique",
     "fab-friend": "Ajouter un ami",
@@ -333,6 +341,7 @@
 
     "section-pokedex-short-title": "Pokédex <shiny-stars></shiny-stars>",
     "section-pokedex-long-title": "Pokédex <shiny-stars></shiny-stars>",
+    "pokedex-gen-title": "Generation",
 
     "section-chasses-en-cours-short-title": "Hunts",
     "section-chasses-en-cours-long-title": "Current hunts",
@@ -499,6 +508,8 @@
     "parametres-local-data": "On-device data management",
     "param-cache-icons-title": "Download all Pokémon sprites",
     "param-cache-icons-desc": "to see Pokémon sprites when there is no internet connection.",
+    "updating-sprites-cache": "Downloading Pokémon sprites (preparing...)",
+    "preparing-sprites-cache": "Preparing...",
     "param-export-title": "Export your data",
     "param-export-desc": "in JSON format.",
     "param-export-label": "Export",
@@ -514,6 +525,7 @@
     "app-version": "Application version",
     "check-update": "Search for an update",
     "report-issue": "Report an issue",
+    "report-misc": "Contact the developer",
     "confidentiality-policy-title": "Confidentiality policy",
     "confidentiality-policy": "<p>When you use the app without signing in, it stores on your device all data you enter about your Pokémon.</p><p>When you sign in with a Google account, Google gives us some public information about your account: names, profile picture, email address, and a character string used as a unique identifier. We use that unique identifier to create a Shinydex account for you and link it to your Google account. We do not save any data from your Google account. Your email address is stored on your device (but is not sent to us) to display which Google account you used to sign in.</p><p>Once you're signed in, data about your Pokémon is saved in an online database. If you choose to make your profile public and if you choose a username, then anyone who knows that username can see your Pokémon data.</p><p>No data is shared with any other service.</p>",
     "used-resources-title": "Used resources",
@@ -521,6 +533,10 @@
     "resource-home-icons": "Balls and other icons: Pokémon Home via @mattyoukhana",
     "resource-pokesprite": "Item icons and other icons: pokesprite",
     "resource-gen9-sprites": "Pokémon 9G sprites: Serebii",
+
+    "section-changelog-long-title": "Changelog",
+    "open-changelog-label": "See the changelog",
+    "close-changelog-label": "Close",
 
     "fab-pokemon": "Add a shiny Pokémon",
     "fab-friend": "Add a friend",
