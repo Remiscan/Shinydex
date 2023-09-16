@@ -999,6 +999,10 @@ form[name="app-settings"] > *:last-child {
   margin: 0;
 }
 
+.changelog-card li + li {
+  margin-top: .4em;
+}
+
 
 
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
