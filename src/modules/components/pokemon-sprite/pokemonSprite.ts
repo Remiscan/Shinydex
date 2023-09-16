@@ -232,7 +232,7 @@ export class pokemonSprite extends HTMLElement {
     const formeIndex = pkmn?.formes
       .map(form => form.dbid)
       .findIndex(id => id === params.forme);
-    const forme = pkmn?.formes[formeIndex ?? 0];
+    const forme = pkmn?.formes[Math.max(formeIndex, 0)];
 
     const basePath = '/shinydex/images/pokemon-sprites/webp';
 
