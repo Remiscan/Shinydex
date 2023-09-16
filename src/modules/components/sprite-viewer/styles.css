@@ -194,4 +194,6 @@ sprite-viewer[size="112"] :is(
   left: 50%;
   translate: -50%;
   margin-inline: 0;
+  width: max-content;
+  max-width: calc(100% - 16px);
 }
