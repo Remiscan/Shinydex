@@ -132,7 +132,11 @@ const sections: Section[] = [
         originX = event.clientX;
         originY = event.clientY;
       } else {
-        const rect = document.querySelector(`#pokedex .pkmnicon[data-dexid="${data.dexid}"]`)!.getBoundingClientRect();
+        const dexIcon = document.querySelector(`#pokedex .pkmnicon[data-dexid="${data.dexid}"]`);
+        const rect = dexIcon ? dexIcon.getBoundingClientRect() : {
+          x: window.innerWidth / 2,
+          y: window.innerHeight / 2
+        };
         originX = rect.x;
         originY = rect.y;
       }
