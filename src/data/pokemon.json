@@ -26340,6 +26340,19 @@
                 },
                 "noShiny": false,
                 "hasBackside": false
+            },
+            {
+                "form": 1,
+                "gender": "mo",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "bloodmoon",
+                "name": {
+                    "fr": "{{name}} Lune Vermeille",
+                    "en": "Bloodmoon {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false
             }
         ]
     },
@@ -28891,6 +28904,225 @@
                 "name": {
                     "fr": "",
                     "en": ""
+                },
+                "noShiny": false,
+                "hasBackside": false
+            }
+        ]
+    },
+    {
+        "dexid": 1011,
+        "name": {
+            "fr": "pomdramour",
+            "en": "dipplin"
+        },
+        "formes": [
+            {
+                "form": 0,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "",
+                "name": {
+                    "fr": "",
+                    "en": ""
+                },
+                "noShiny": false,
+                "hasBackside": false
+            }
+        ]
+    },
+    {
+        "dexid": 1012,
+        "name": {
+            "fr": "poltchageist",
+            "en": "poltchageist"
+        },
+        "formes": [
+            {
+                "form": 0,
+                "gender": "uk",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "",
+                "name": {
+                    "fr": "{{name}} Forme Imitation",
+                    "en": "Counterfeit Form {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false
+            },
+            {
+                "form": 1,
+                "gender": "uk",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "artisan",
+                "name": {
+                    "fr": "{{name}} Forme Onéreuse",
+                    "en": "Artisan Form {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false
+            }
+        ]
+    },
+    {
+        "dexid": 1013,
+        "name": {
+            "fr": "théffroyable",
+            "en": "sinistcha"
+        },
+        "formes": [
+            {
+                "form": 0,
+                "gender": "uk",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "",
+                "name": {
+                    "fr": "{{name}} Forme Médiocre",
+                    "en": "Unremarkable Form {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false
+            },
+            {
+                "form": 1,
+                "gender": "uk",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "masterpiece",
+                "name": {
+                    "fr": "{{name}} Forme Exceptionnelle",
+                    "en": "Masterpiece Form {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false
+            }
+        ]
+    },
+    {
+        "dexid": 1014,
+        "name": {
+            "fr": "félicanis",
+            "en": "okidogi"
+        },
+        "formes": [
+            {
+                "form": 0,
+                "gender": "mo",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "",
+                "name": {
+                    "fr": "",
+                    "en": ""
+                },
+                "noShiny": false,
+                "hasBackside": false
+            }
+        ]
+    },
+    {
+        "dexid": 1015,
+        "name": {
+            "fr": "fortusimia",
+            "en": "munkidori"
+        },
+        "formes": [
+            {
+                "form": 0,
+                "gender": "mo",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "",
+                "name": {
+                    "fr": "",
+                    "en": ""
+                },
+                "noShiny": false,
+                "hasBackside": false
+            }
+        ]
+    },
+    {
+        "dexid": 1016,
+        "name": {
+            "fr": "favianos",
+            "en": "fezandipiti"
+        },
+        "formes": [
+            {
+                "form": 0,
+                "gender": "mo",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "",
+                "name": {
+                    "fr": "",
+                    "en": ""
+                },
+                "noShiny": false,
+                "hasBackside": false
+            }
+        ]
+    },
+    {
+        "dexid": 1017,
+        "name": {
+            "fr": "ogerpon",
+            "en": "ogerpon"
+        },
+        "formes": [
+            {
+                "form": 0,
+                "gender": "fo",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "",
+                "name": {
+                    "fr": "{{name}} au Masque Turquoise",
+                    "en": "Teal Mask {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false
+            },
+            {
+                "form": 1,
+                "gender": "fo",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "wellspring",
+                "name": {
+                    "fr": "{{name}} au Masque du Puits",
+                    "en": "Wellspring Mask {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false
+            },
+            {
+                "form": 2,
+                "gender": "fo",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "hearthflame",
+                "name": {
+                    "fr": "{{name}} au Masque du Fourneau",
+                    "en": "Hearthflame Mask {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false
+            },
+            {
+                "form": 3,
+                "gender": "fo",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "cornerstone",
+                "name": {
+                    "fr": "{{name}} au Masque de la Pierre",
+                    "en": "Cornerstone Mask {{name}}"
                 },
                 "noShiny": false,
                 "hasBackside": false

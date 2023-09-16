@@ -351,6 +351,11 @@ class Forme extends Sprite {
           $noms = ['', '{{name}}, le Cavalier du Froid', '{{name}}, le Cavalier d\'Effroi'];
           $nomsEN = ['', 'Ice Rider {{name}}', 'Shadow Rider {{name}}'];
         break;
+        case 901: // Ursaking
+          $ids = ['', 'bloodmoon'];
+          $noms = ['', '{{name}} Lune Vermeille'];
+          $nomsEN = ['', 'Bloodmoon {{name}}'];
+        break;
         case 902: // Paragruel
           $ids = ['', ''];
           $noms = ['', ''];
@@ -385,6 +390,21 @@ class Forme extends Sprite {
           $ids = ['', 'roaming'];
           $noms = ['{{name}} Forme Coffre', '{{name}} Forme Marche'];
           $nomsEN = ['Chest Form {{name}}', 'Roaming Form {{name}}'];
+        break;
+        case 1012: // Poltchageist
+          $ids = ['', 'artisan'];
+          $noms = ['{{name}} Forme Imitation', '{{name}} Forme Onéreuse'];
+          $nomsEN = ['Counterfeit Form {{name}}', 'Artisan Form {{name}}'];
+        break;
+        case 1013: // Théffroyable
+          $ids = ['', 'masterpiece'];
+          $noms = ['{{name}} Forme Médiocre', '{{name}} Forme Exceptionnelle'];
+          $nomsEN = ['Unremarkable Form {{name}}', 'Masterpiece Form {{name}}'];
+        break;
+        case 1017: // Ogerpon
+          $ids = ['', 'wellspring', 'hearthflame', 'cornerstone'];
+          $noms = ['{{name}} au Masque Turquoise', '{{name}} au Masque du Puits', '{{name}} au Masque du Fourneau', '{{name}} au Masque de la Pierre'];
+          $nomsEN = ['Teal Mask {{name}}', 'Wellspring Mask {{name}}', 'Hearthflame Mask {{name}}', 'Cornerstone Mask {{name}}'];
         break;
         default:
           $done = false;
