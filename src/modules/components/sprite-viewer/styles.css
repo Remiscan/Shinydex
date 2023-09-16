@@ -32,15 +32,6 @@ sprite-viewer[shiny="true"] .sprite-list.regular {
   display: none;
 }
 
-.sprite-viewer-dex-info {
-  grid-row: 2;
-  grid-column: 2;
-  justify-self: start;
-  align-self: center;
-  margin-left: 16px;
-  height: var(--height);
-}
-
 .info-dexid::before {
   content: '#';
   opacity: .7;
@@ -101,6 +92,16 @@ sprite-viewer a.icon-button.bouton-retour {
   align-items: center;
   gap: calc(2.5 * var(--padding-inline));
   box-sizing: border-box;
+}
+
+.sprite-viewer-dex-info {
+  grid-row: 2;
+  grid-column: 2;
+  justify-self: start;
+  align-self: center;
+  margin-left: 16px;
+  height: var(--height);
+  --height: calc(2.25em / .75);
 }
 
 .forme-name {
