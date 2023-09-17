@@ -864,6 +864,7 @@ h2:not(:first-child) {
 .param-nom,
 .param-description {
   max-width: 40ch;
+  text-wrap: balance;
 }
 
 .param-nom {
