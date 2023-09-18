@@ -267,7 +267,7 @@ async function installFiles(event = null) {
     const appSettings = await dataStorage.getItem('app-settings');
     const spritesCachesList = (await caches.keys()).filter(name => name.startsWith(spritesCachePrefix));
     const shouldCacheAllSprites =
-      'cache-all-sprites' in appSettings && appSettings['cache-all-sprites'] &&
+      appSettings && 'cache-all-sprites' in appSettings && appSettings['cache-all-sprites'] &&
       spritesCachesList.length > 0 && !(spritesCachesList.includes(currentSpritesCacheName));
     await caches.open(currentSpritesCacheName);
     if (shouldCacheAllSprites === true) {
