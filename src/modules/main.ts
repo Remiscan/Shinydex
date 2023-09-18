@@ -2,6 +2,7 @@ import '../../../_common/components/input-slider/input-slider.js';
 import '../../../_common/components/input-switch/input-switch.js';
 import { Friend } from './Friend.js';
 import { Hunt } from './Hunt.js';
+import { Params, setCurrentLayout } from './Params.js';
 import { populator } from './appContent.js';
 import { appStart, checkUpdate } from './appLifeCycle.js';
 import * as Auth from './auth.js';
@@ -270,6 +271,10 @@ importInput.addEventListener('change', async event => {
   });
 }
 
+// Met à jour l'identifiant du layout actuel quand la fenêtre change de taille
+window.addEventListener('resize', setCurrentLayout);
+window.addEventListener('orientationchange', setCurrentLayout);
+
 
 
 ///////////////////////////////////////
@@ -361,6 +366,7 @@ window.addEventListener('dataupdate', async (event: DataUpdateEvent) => {
 
 // Lancement de l'appli
 try {
+  setCurrentLayout();
   appStart();
 } catch (error) {
   // Réagir ici à une erreur critique qui empêche le chargement de l'appli.

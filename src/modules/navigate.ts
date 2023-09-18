@@ -321,18 +321,16 @@ const backOnEscape = (event: KeyboardEvent) => {
 
 const getLinkedSections = (section: Section['nom']): Section[] => {
   let linkedSections = [section];
-  // Return linked sections even on mobile, the effect won't be noticed
-  // and using window.innerWidth here would trigger a forced reflow and cause lag.
-  /*if (window.innerWidth >= Params.layoutPClarge) {*/
-  switch (section) {
-    case 'mes-chromatiques': linkedSections.push('pokedex'); break;
-    case 'pokedex':          linkedSections.push('mes-chromatiques'); break;
-    case 'chasses-en-cours': linkedSections.push('corbeille'); break;
-    case 'corbeille':        linkedSections.push('chasses-en-cours'); break;
-    case 'parametres':       linkedSections.push('a-propos'); break;
-    case 'a-propos':         linkedSections.push('parametres'); break;
+  if (Params.currentLayout === 'large') {
+    switch (section) {
+      case 'mes-chromatiques': linkedSections.push('pokedex'); break;
+      case 'pokedex':          linkedSections.push('mes-chromatiques'); break;
+      case 'chasses-en-cours': linkedSections.push('corbeille'); break;
+      case 'corbeille':        linkedSections.push('chasses-en-cours'); break;
+      case 'parametres':       linkedSections.push('a-propos'); break;
+      case 'a-propos':         linkedSections.push('parametres'); break;
+    }
   }
-  /*}*/
   return linkedSections.map(nom => sections.find(s => s.nom === nom)!);
 }
 
