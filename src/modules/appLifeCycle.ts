@@ -36,6 +36,7 @@ async function initServiceWorker() {
     });
 
     registration.addEventListener('updatefound', () => {
+      const oldWorker = registration.active;
       const newWorker = registration.installing;
       let updating = false;
 
@@ -72,8 +73,11 @@ async function initServiceWorker() {
           
           const updateNotif = new Notif(getString('notif-update-installed'), Notif.maxDelay, getString('notif-update-installed-label'), updateHandler, false);
           window.dispatchEvent(new Event('updateinstalled'));
-          const userActed = await updateNotif.prompt();
-          if (userActed) updateNotif.element?.classList.add('loading');
+
+          if (oldWorker !== null) {
+            const userActed = await updateNotif.prompt();
+            if (userActed) updateNotif.element?.classList.add('loading');
+          }
         }
 
         else if (newWorker.state == 'activated') {
