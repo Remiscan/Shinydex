@@ -35,6 +35,7 @@ body {
   height: 100%;
   overflow-x: hidden;
   overflow-y: hidden;
+  scrollbar-color: rgb(var(--on-surface-variant)) transparent;
 }
 
 body {
