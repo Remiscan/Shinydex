@@ -97,6 +97,10 @@ form[data-edit] pokemon-sprite {
   flex-basis: 12ch;
 }
 
+[name="forme"].single-choice {
+  display: none;
+}
+
 [name="game"] {
   flex-grow: 3;
   flex-basis: 20ch;

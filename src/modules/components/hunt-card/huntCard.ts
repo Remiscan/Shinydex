@@ -708,10 +708,16 @@ export class huntCard extends HTMLElement {
     const k = allNames.findIndex(p => p == value.toLowerCase());
     if (k == -1) return 'Pokémon inexistant';
 
+    const pkmn = new Pokemon(pokemonData[k]);
+    const formes = pkmn.formes.slice()
+                              .sort((a: Forme, b: Forme) => { if (a.name['fr'] == '') return -1; else return 0;})
+                              .filter(f => f.catchable);
+
+    // Initially auto select a valid form in any case
+    if (formes.findIndex(f => f.dbid === formeToSelect ?? '') < 0) formeToSelect = '';
+    if (formes.findIndex(f => f.dbid === '') < 0) formeToSelect = formes[0].dbid;
     select.setAttribute('value', formeToSelect ?? ''); // set initial value before regenerating the options
 
-    const pkmn = new Pokemon(pokemonData[k]);
-    const formes = pkmn.formes.slice().sort((a: Forme, b: Forme) => { if (a.name['fr'] == '') return -1; else return 0;});
     let availableChoices = 0;
     for (const forme of formes) {
       if ('noShiny' in forme && forme.noShiny == true) continue;
@@ -720,6 +726,11 @@ export class huntCard extends HTMLElement {
     }
     if (availableChoices > 0) {
       select.setAttribute('default-label', getString('forme-select-label'));
+    }
+    if (availableChoices <= 1) {
+      select.classList.add('single-choice');
+    } else {
+      select.classList.remove('single-choice');
     }
   }
 
