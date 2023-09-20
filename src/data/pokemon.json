@@ -21642,7 +21642,7 @@
                 },
                 "noShiny": false,
                 "hasBackside": false,
-                "catchable": true
+                "catchable": false
             }
         ]
     },

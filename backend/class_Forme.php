@@ -274,7 +274,7 @@ class Forme extends Sprite {
           $ids = ['', '10', '', '', '100'];
           $noms = ['{{name}} Forme 50%', '{{name}} Forme 10%', '', '', '{{name}} Forme 100%'];
           $nomsEN = ['50% Forme {{name}}', '10% Forme {{name}}', '', '', '100% Forme {{name}}'];
-          $catchable = [true, false];
+          $catchable = [true, false, false, false, false];
         break;
         case 720: // Hoopa
           $ids = ['', 'unbound'];
