@@ -134,12 +134,12 @@ sprite-viewer a.icon-button.bouton-retour {
 .sprite-viewer-dex-info > .icon,
 .forme-name > .icon {
   margin: -7px;
+  flex-shrink: 0;
 }
 
 .not-caught-indicator {
   display: grid;
   place-items: center;
-  flex-shrink: 0;
 }
 
 .not-caught-indicator svg {
