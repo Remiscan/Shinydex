@@ -125,7 +125,7 @@ class Forme extends Sprite {
           $ids = ['', 'attack', 'defense', 'speed'];
           $noms = ['{{name}} Forme Normale', '{{name}} Forme Attaque', '{{name}} Forme Défense', '{{name}} Forme Vitesse'];
           $nomsEN = ['Normal Forme {{name}}', 'Attack Forme {{name}}', 'Defense Forme {{name}}', 'Speed Forme {{name}}'];
-          $catchable = [true, false, false, false];
+          $catchable = [true, true, true, true];
         break;
         case 412: // Cheniti
         case 413: // Cheniselle
@@ -149,15 +149,20 @@ class Forme extends Sprite {
           $ids = ['', 'heat', 'wash', 'frost', 'fan', 'mow'];
           $noms = ['', '{{name}} Chaleur', '{{name}} Lavage', '{{name}} Froid', '{{name}} Hélice', '{{name}} Tonte'];
           $nomsEN = ['', 'Heat {{name}}', 'Wash {{name}}', 'Frost {{name}}', 'Fan {{name}}', 'Mow {{name}}'];
-          $catchable = [true, false, false, false, false, false];
+          $catchable = [true, true, true, true, true, true];
         break;
         case 483: // Dialga
         case 484: // Palkia
-        case 487: // Giratina
           $ids = ['', 'origin'];
           $noms = ['{{name}} Forme Alternative', '{{name}} Forme Originelle'];
           $nomsEN = ['Altered Forme {{name}}', 'Origin Forme {{name}}'];
           $catchable = [true, false];
+        break;
+        case 487: // Giratina
+          $ids = ['', 'origin'];
+          $noms = ['{{name}} Forme Alternative', '{{name}} Forme Originelle'];
+          $nomsEN = ['Altered Forme {{name}}', 'Origin Forme {{name}}'];
+          $catchable = [true, true];
         break;
         case 492: // Shaymin
           $ids = ['', 'sky'];
@@ -196,7 +201,7 @@ class Forme extends Sprite {
           $ids = ['', 'therian'];
           $noms = ['{{name}} Avatar', '{{name}} Totémique'];
           $nomsEN = ['Incarnate Forme {{name}}', 'Therian Forme {{name}}'];
-          $catchable = [true, false];
+          $catchable = [true, true];
         break;
         case 646: // Kyurem
           $ids = ['', 'white', 'black'];
@@ -208,7 +213,7 @@ class Forme extends Sprite {
           $ids = ['', 'resolute'];
           $noms = ['{{name}} Aspect Normal', '{{name}} Aspect Décidé'];
           $nomsEN = ['Ordinary Form {{name}}', 'Resolute Form {{name}}'];
-          $catchable = [true, false];
+          $catchable = [true, true];
         break;
         case 648: // Meloetta
           $ids = ['', 'pirouette'];
@@ -273,8 +278,8 @@ class Forme extends Sprite {
         case 718: // Zygarde
           $ids = ['', '10', '', '', '100'];
           $noms = ['{{name}} Forme 50%', '{{name}} Forme 10%', '', '', '{{name}} Forme 100%'];
-          $nomsEN = ['50% Forme {{name}}', '10% Forme {{name}}', '', '', '100% Forme {{name}}'];
-          $catchable = [true, false, false, false, false];
+          $nomsEN = ['50% Forme {{name}}', '10% Forme {{name}}', '', '', 'Complete Forme {{name}}'];
+          $catchable = [true, true, false, false, false];
         break;
         case 720: // Hoopa
           $ids = ['', 'unbound'];
@@ -302,6 +307,7 @@ class Forme extends Sprite {
           $ids = ['', '', '', '', '', '', '', 'red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'];
           $noms = ['{{name}} Forme Météore', '', '', '', '', '', '', '{{name}} Forme Noyau (Rouge)', '{{name}} Forme Noyau (Orange)', '{{name}} Forme Noyau (Jaune)', '{{name}} Forme Noyau (Vert)', '{{name}} Forme Noyau (Bleu)', '{{name}} Forme Noyau (Indigo)', '{{name}} Forme Noyau (Violet)'];
           $nomsEN = ['Meteor Form {{name}}', '', '', '', '', '', '', 'Red Core {{name}}', 'Orange Core {{name}}', 'Yellow Core {{name}}', 'Green Core {{name}}', 'Blue Core {{name}}', 'Indigo Core {{name}}', 'Violet Core {{name}}'];
+          $catchable = [false, false, false, false, false, false, false, true, true, true, true, true, true, true];
         break;
         case 778: // Mimiqui
           $ids = ['', 'busted'];

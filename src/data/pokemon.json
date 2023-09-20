@@ -11738,7 +11738,7 @@
                 },
                 "noShiny": false,
                 "hasBackside": false,
-                "catchable": false
+                "catchable": true
             },
             {
                 "form": 2,
@@ -11752,7 +11752,7 @@
                 },
                 "noShiny": false,
                 "hasBackside": false,
-                "catchable": false
+                "catchable": true
             },
             {
                 "form": 3,
@@ -11766,7 +11766,7 @@
                 },
                 "noShiny": false,
                 "hasBackside": false,
-                "catchable": false
+                "catchable": true
             }
         ]
     },
@@ -14521,7 +14521,7 @@
                 },
                 "noShiny": false,
                 "hasBackside": false,
-                "catchable": false
+                "catchable": true
             },
             {
                 "form": 2,
@@ -14535,7 +14535,7 @@
                 },
                 "noShiny": false,
                 "hasBackside": false,
-                "catchable": false
+                "catchable": true
             },
             {
                 "form": 3,
@@ -14549,7 +14549,7 @@
                 },
                 "noShiny": false,
                 "hasBackside": false,
-                "catchable": false
+                "catchable": true
             },
             {
                 "form": 4,
@@ -14563,7 +14563,7 @@
                 },
                 "noShiny": false,
                 "hasBackside": false,
-                "catchable": false
+                "catchable": true
             },
             {
                 "form": 5,
@@ -14577,7 +14577,7 @@
                 },
                 "noShiny": false,
                 "hasBackside": false,
-                "catchable": false
+                "catchable": true
             }
         ]
     },
@@ -14803,7 +14803,7 @@
                 },
                 "noShiny": false,
                 "hasBackside": false,
-                "catchable": false
+                "catchable": true
             }
         ]
     },
@@ -18947,7 +18947,7 @@
                 },
                 "noShiny": false,
                 "hasBackside": false,
-                "catchable": false
+                "catchable": true
             }
         ]
     },
@@ -18984,7 +18984,7 @@
                 },
                 "noShiny": false,
                 "hasBackside": false,
-                "catchable": false
+                "catchable": true
             }
         ]
     },
@@ -19067,7 +19067,7 @@
                 },
                 "noShiny": false,
                 "hasBackside": false,
-                "catchable": false
+                "catchable": true
             }
         ]
     },
@@ -19155,7 +19155,7 @@
                 },
                 "noShiny": false,
                 "hasBackside": false,
-                "catchable": false
+                "catchable": true
             }
         ]
     },
@@ -21628,7 +21628,7 @@
                 },
                 "noShiny": false,
                 "hasBackside": false,
-                "catchable": false
+                "catchable": true
             },
             {
                 "form": 4,
@@ -21638,7 +21638,7 @@
                 "dbid": "100",
                 "name": {
                     "fr": "{{name}} Forme 100%",
-                    "en": "100% Forme {{name}}"
+                    "en": "Complete Forme {{name}}"
                 },
                 "noShiny": false,
                 "hasBackside": false,
@@ -23294,7 +23294,7 @@
                 },
                 "noShiny": false,
                 "hasBackside": false,
-                "catchable": true
+                "catchable": false
             },
             {
                 "form": 7,
@@ -27875,7 +27875,7 @@
                 },
                 "noShiny": false,
                 "hasBackside": false,
-                "catchable": false
+                "catchable": true
             }
         ]
     },
