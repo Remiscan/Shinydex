@@ -158,13 +158,23 @@ export function filterSection(section: FiltrableSection, filters: FilterList = n
 /** 
  * Displays the Pokédex icons corresponding to the passed IDs as caught, others as uncaught.
  */
-export function filterPokedex(dexids: Set<number>) {
+export function filterPokedex(dexids: dexidSet, caughtFormsMap: formesMap) {
   const generations = Pokemon.generations;
   const dexidMax = generations[generations.length - 1].end;
+
   for (let i = 1; i <= dexidMax; i++) {
     const icon = document.querySelector(`#pokedex [dexid="${i}"], #pokedex [data-replaces="dex-icon"][data-dexid="${i}"]`);
-    if (dexids.has(i)) icon?.setAttribute('data-caught', 'true');
-    else               icon?.setAttribute('data-caught', 'false');
+    if (dexids.has(i)) {
+      icon?.setAttribute('data-caught', 'true');
+      const caughtForms = caughtFormsMap.get(i) ?? new Set();
+      if (caughtForms.has('')) {
+        caughtForms.add('emptystring');
+        caughtForms.delete('');
+      }
+      icon?.setAttribute('data-caught-forms', [...caughtForms.values()].join(' '));
+    } else {
+      icon?.setAttribute('data-caught', 'false');
+    }
   }
 }
 
@@ -176,7 +186,8 @@ export type ShinyFilterData = {
   species: string,
   dexid: number,
   name: string,
-  game: string
+  game: string,
+  form: string
 };
 
 export type FilterMap = Map<string, ShinyFilterData>;
@@ -227,13 +238,16 @@ export function computeShinyFilters(shiny: Shiny): ShinyFilterData {
     dexid: shiny.dexid,
     name: noAccent(shiny.name || species || '').toLowerCase(),
     game: shiny.game,
+    form: shiny.forme
   };
 }
 
 
 
 /** Counts the number of cards that are displayed in a section. */
-function countVisibleCards(section: PopulatableSection): [number, number, Set<number>] {
+type dexidSet = Set<number>;
+type formesMap = Map< number, Set<string> >;
+function countVisibleCards(section: PopulatableSection): [number, number, dexidSet, formesMap] {
   const container = document.querySelector(`#${section}`);
   if (!(container instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
 
@@ -255,7 +269,8 @@ function countVisibleCards(section: PopulatableSection): [number, number, Set<nu
   };
 
   let displayedCount = 0;
-  const dexids: Set<number> = new Set();
+  const dexids: dexidSet = new Set();
+  const caughtFormsMap: formesMap = new Map();
   allCards.forEach(card => {
     const cardFilters = {
       mine: card.getAttribute('data-mine') ?? '',
@@ -264,11 +279,13 @@ function countVisibleCards(section: PopulatableSection): [number, number, Set<nu
     if (sectionFilters.mine.has(cardFilters.mine) && sectionFilters.legit.has(cardFilters.legit)) {
       displayedCount++;
       const dexid = Number(card.getAttribute('data-dexid'));
+      const forme = card?.getAttribute('data-form') ?? '';
+      caughtFormsMap.set(dexid, new Set([...caughtFormsMap.get(dexid) ?? [], forme]));
       if (!isNaN(dexid) && dexid > 0) dexids.add(dexid);
     }
   });
 
-  return [displayedCount, totalCount, dexids];
+  return [displayedCount, totalCount, dexids, caughtFormsMap];
 }
 
 
@@ -281,7 +298,7 @@ export function updateCounters(section: PopulatableSection): void {
   const container = document.querySelector(`#${section}`);
   if (!(container instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
 
-  const [displayedCount, totalCount, dexids] = countVisibleCards(section);
+  const [displayedCount, totalCount, dexids, caughtForms] = countVisibleCards(section);
 
   // Display "section is empty" message
   if (totalCount > 0) container.classList.remove('vide');
@@ -301,7 +318,7 @@ export function updateCounters(section: PopulatableSection): void {
   if (section === 'mes-chromatiques') {
     const dexidsCounter = document.querySelector('#pokedex .compteur > .caught');
     if (dexidsCounter) dexidsCounter.innerHTML = String(dexids.size);
-    filterPokedex(dexids);
+    filterPokedex(dexids, caughtForms);
   }
 }
 

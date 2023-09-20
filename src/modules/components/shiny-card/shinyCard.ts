@@ -84,6 +84,7 @@ export class shinyCard extends HTMLElement {
     {
       const sprite = this.shadow.querySelector('pokemon-sprite')!;
       sprite.setAttribute('forme', shiny.forme);
+      this.setAttribute('data-form', shiny.forme);
     }
 
     // Surnom

@@ -72,9 +72,15 @@ export class spriteViewer extends HTMLElement {
       labelContainer.innerHTML = label;
     }
 
-    // On réordonne les formes (normale d'abord, les autres ensuite)
-    const formes = pokemon.formes.slice().sort((a, b) => {
+    // On réordonne les formes (normale d'abord, puis catchable, puis les autres)
+    const formes = pokemon.formes.slice()
+    .sort((a, b) => {
       if (a.name['fr'] === '') return -1;
+      else return 0;
+    })
+    .sort((a, b) => {
+      if (a.catchable && !b.catchable) return -1;
+      else if (!a.catchable && b.catchable) return 1;
       else return 0;
     });
 
@@ -91,6 +97,22 @@ export class spriteViewer extends HTMLElement {
 
     for (const forme of formes) {
       const caught = caughtFormsList.has(forme.dbid);
+      const formeNameTemplate = /*html*/`
+        <span class="forme-name surface surface-container-high label-medium ${caught ? 'caught' : forme.catchable ? 'catchable' : ''}">
+          <span class="forme-name-arrow surface"></span>
+          ${
+            caught ? '<span class="icon" data-icon="ball/poke"></span>' :
+            forme.catchable ? `
+            <span class="icon not-caught-indicator">
+              <svg width="18" height="18" viewBox="0 0 18 18">
+                <circle cx="50%" cy="50%" r="9" fill="transparent" stroke-width="1" stroke-dasharray="3 2"/>
+              </svg>
+            </span>
+            ` : ''
+          }
+          ${pokemon.getFormeName(forme.dbid, true)}
+        </span>
+      `;
 
       const templateS = document.createElement('template');
       templateS.innerHTML = /*html*/`
@@ -99,11 +121,7 @@ export class spriteViewer extends HTMLElement {
             <pokemon-sprite dexid="${pokemon.dexid}" shiny="true" forme="${forme.dbid}" size="${this.size}" lazy="false"></pokemon-sprite>
             ${(typeof forme.noShiny != 'undefined' && forme.noShiny) ? '<span class="label-large">N\'existe pas<br>en chromatique</span>' : ''}
           </picture>
-          <span class="forme-name surface surface-container-high label-medium ${caught ? 'caught' : ''}">
-            <span class="forme-name-arrow surface"></span>
-            ${caught ? '<span class="icon" data-icon="ball/poke"></span>' : ''}
-            ${pokemon.getFormeName(forme.dbid, true)}
-          </span>
+          ${formeNameTemplate}
         </div>
       `;
       const dexSpriteS = templateS.content.cloneNode(true) as DocumentFragment;
@@ -114,11 +132,7 @@ export class spriteViewer extends HTMLElement {
           <picture>
             <pokemon-sprite dexid="${pokemon.dexid}" shiny="false" forme="${forme.dbid}" size="${this.size}" lazy="true"></pokemon-sprite>
           </picture>
-          <span class="forme-name surface surface-container-high label-medium ${caught ? 'caught' : ''}">
-            <span class="forme-name-arrow surface"></span>
-            ${caught ? '<span class="icon" data-icon="ball/poke"></span>' : ''}
-            ${pokemon.getFormeName(forme.dbid, true)}
-          </span>
+          ${formeNameTemplate}
         </div>
       `;
       const dexSpriteR = templateR.content.cloneNode(true) as DocumentFragment;

@@ -62,7 +62,7 @@ virtualizedSections.forEach(section => {
       filterKeys = ['caught'];
       elementAttribute = 'dexid';
       replacementClasses = ['surface'];
-      keptAttributes = ['data-caught'];
+      keptAttributes = ['data-caught', 'data-caught-forms'];
       rootMargin = 256;
       break;
 
@@ -124,6 +124,9 @@ virtualizedSections.forEach(section => {
             replacement.setAttribute('style', entry.target.getAttribute('style') ?? '');
             for (const filter of filterKeys) {
               replacement.setAttribute(`data-${filter}`, entry.target.getAttribute(`data-${filter}`) ?? '');
+            }
+            for (const attr of keptAttributes) {
+              replacement.setAttribute(attr, entry.target.getAttribute(attr) ?? '');
             }
 
             entry.target.parentElement?.replaceChild(replacement, entry.target);

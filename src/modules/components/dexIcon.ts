@@ -1,4 +1,5 @@
 import { Pokemon } from '../Pokemon.js';
+import { pokemonData } from '../jsonData.js';
 import { navigate } from '../navigate.js';
 import { Notif } from '../notification.js';
 import { getString, translationObserver } from '../translation.js';
@@ -38,7 +39,26 @@ export class dexIcon extends HTMLElement {
         button?.setAttribute('data-dexid', String(this.dexid));
         button?.setAttribute('data-label', `pokemon/${this.dexid}`);
         button?.setAttribute('aria-label', Pokemon.names()[this.dexid]);
-      }
+
+        const catchableForms = pokemonData[this.dexid].formes.filter(f => f.catchable);
+        let caughtFormsIndicatorsTemplate = ``;
+        for (const forme of catchableForms) {
+          const formid = forme.dbid === '' ? 'emptystring' : forme.dbid;
+          caughtFormsIndicatorsTemplate += `<span class="caught-form-indicator" data-form="${formid}"></span>`;
+        }
+        if (button) button.innerHTML = caughtFormsIndicatorsTemplate;
+      } // don't break
+
+      case 'data-caught-forms': {
+        const button = this.querySelector('button');
+        const caughtFormsIndicators = button?.querySelectorAll('.caught-form-indicator') ?? [];
+        const caughtForms = new Set(newValue?.split(' ') ?? []);
+        for (const indicator of caughtFormsIndicators) {
+          const form = indicator.getAttribute('data-form') ?? '';
+          if (caughtForms.has(form)) indicator.setAttribute('data-caught', 'true');
+          else                       indicator.setAttribute('data-caught', 'false');
+        }
+      } break;
     }
   }
 
@@ -65,7 +85,7 @@ export class dexIcon extends HTMLElement {
     button?.removeEventListener('click', this.clickHandler);
   }
 
-  static get observedAttributes() { return ['dexid']; }
+  static get observedAttributes() { return ['dexid', 'data-caught-forms']; }
 
   attributeChangedCallback(attr: string, oldValue: string | null, newValue: string | null) {
     if (oldValue === newValue) return;

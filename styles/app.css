@@ -658,6 +658,71 @@ dex-icon[data-caught="true"] {
 
 dex-icon .pkmnicon {
   outline-offset: -1px;
+  display: flex;
+  flex-direction: row;
+  align-content: start;
+  justify-content: center;
+  gap: 3px;
+  flex-wrap: wrap;
+  padding: 2px;
+  overflow: hidden;
+}
+
+dex-icon .caught-form-indicator {
+  --size: 6px;
+  width: var(--size);
+  height: var(--size);
+  background: rgb(var(--color));
+  border-radius: calc(.5 * var(--size));
+  box-shadow: 0 0 0 2px rgb(var(--surface-color));
+  flex-shrink: 0;
+  --color: var(--primary);
+}
+
+dex-icon .caught-form-indicator:not([data-caught="true"]) {
+  --color: var(--surface-color);
+  border: 1px solid rgb(var(--secondary));
+  box-sizing: border-box;
+}
+
+/* Only display a maximum of 7 caught forms indicators. */
+dex-icon .caught-form-indicator:nth-of-type(7) ~ .caught-form-indicator {
+  display: none;
+}
+
+/* If there are more than 7 catchable forms, replace the 7th indicator by an ellipsis */
+dex-icon:has(.caught-form-indicator:nth-of-type(8)) .caught-form-indicator:nth-of-type(7) {
+  border: none;
+  --color: var(--surface-color);
+  display: grid;
+  overflow: hidden;
+  align-content: center;
+  justify-content: center;
+  width: auto;
+}
+
+dex-icon:has(.caught-form-indicator:nth-of-type(8)) .caught-form-indicator:nth-of-type(7)::before {
+  content: '⋯';
+  padding-inline: 2px;
+  color: rgb(var(--secondary));
+}
+
+/* If there are more than 7 catchable forms and they're all caught, adjust the ellipsis colors */
+dex-icon:has(.caught-form-indicator:nth-of-type(8)):not(:has(.caught-form-indicator:not([data-caught="true"]))) .caught-form-indicator:nth-of-type(7) {
+  --color: var(--primary);
+}
+
+dex-icon:has(.caught-form-indicator:nth-of-type(8)):not(:has(.caught-form-indicator:not([data-caught="true"]))) .caught-form-indicator:nth-of-type(7)::before {
+  color: rgb(var(--primary));
+}
+
+/* Don't display the caught forms indicators if there's only one catchable form. */
+dex-icon:not(:has(.caught-form-indicator:nth-of-type(2))) .caught-form-indicator {
+  display: none !important;
+}
+
+dex-icon:not([data-caught="true"]) .caught-form-indicator {
+  display: none !important;
 }
 
 dex-icon:not([data-caught="true"]) .pkmnicon {

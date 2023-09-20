@@ -12,6 +12,7 @@ class Forme extends Sprite {
   public $candy = 0;
   public $noShiny = false;
   public $hasBackside = false;
+  public $catchable = true;
 
   function __construct(Sprite $sprite, int $dexid) {
     // Formes à ne pas compter
@@ -60,6 +61,7 @@ class Forme extends Sprite {
     // Cas par cas selon le Pokémon
     
     if ($spriteid == 'gigamax') {
+      $this->catchable = false;
       switch($dexid) {
         case 892: // Shifours
           switch($this->form) {
@@ -95,11 +97,13 @@ class Forme extends Sprite {
           $ids = ['', 'manaphy'];
           $noms = ['Œuf', 'Œuf de Manaphy'];
           $nomsEN = ['Egg', 'Manaphy Egg'];
+          $catchable = [false, false];
         break;
         case 25: // Pikachu
           $ids = ['', 'original-cap', 'hoenn-cap', 'sinnoh-cap', 'unys-cap', 'kalos-cap', 'alola-cap', 'partner-cap', '', 'world-cap'];
           $noms = ['', '{{name}} Casquette Originale', '{{name}} Casquette de Hoenn', '{{name}} Casquette de Sinnoh', '{{name}} Casquette d\'Unys', '{{name}} Casquette de Kalos', '{{name}} Casquette d\'Alola', '{{name}} Casquette de Partenaire', '', '{{name}} Casquette Monde'];
           $nomsEN = ['', 'Original Cap {{name}}', 'Hoenn Cap {{name}}', 'Sinnoh Cap {{name}}', 'Unova Cap {{name}}', 'Kalos Cap {{name}}', 'Alola Cap {{name}}', 'Partner Cap {{name}}', '', 'World Cap {{name}}'];
+          $catchable = [true, false, false, false, false, false, false, false, false, false];
         break;
         case 128: // Tauros
           $ids = ['', 'paldea', 'paldea-blaze', 'paldea-aqua'];
@@ -115,11 +119,13 @@ class Forme extends Sprite {
           $ids = ['', 'sunny', 'rainy', 'snowy'];
           $noms = ['', '{{name}} Forme Solaire', '{{name}} Forme Eau de Pluie', '{{name}} Forme Blizzard'];
           $nomsEN = ['', 'Sunny Form {{name}}', 'Rainy Form {{name}}', 'Snowy Form {{name}}'];
+          $catchable = [true, false, false, false];
         break;
         case 386: //Deoxys
           $ids = ['', 'attack', 'defense', 'speed'];
           $noms = ['{{name}} Forme Normale', '{{name}} Forme Attaque', '{{name}} Forme Défense', '{{name}} Forme Vitesse'];
           $nomsEN = ['Normal Forme {{name}}', 'Attack Forme {{name}}', 'Defense Forme {{name}}', 'Speed Forme {{name}}'];
+          $catchable = [true, false, false, false];
         break;
         case 412: // Cheniti
         case 413: // Cheniselle
@@ -131,6 +137,7 @@ class Forme extends Sprite {
           $ids = ['', 'sunny'];
           $noms = ['{{name}} Temps Couvert', '{{name}} Temps Ensoleillé'];
           $nomsEN = ['Overcast Form {{name}}', 'Sunshine Form {{name}}'];
+          $catchable = [true, false];
         break;
         case 422: // Sancoki
         case 423: // Tritosor
@@ -142,6 +149,7 @@ class Forme extends Sprite {
           $ids = ['', 'heat', 'wash', 'frost', 'fan', 'mow'];
           $noms = ['', '{{name}} Chaleur', '{{name}} Lavage', '{{name}} Froid', '{{name}} Hélice', '{{name}} Tonte'];
           $nomsEN = ['', 'Heat {{name}}', 'Wash {{name}}', 'Frost {{name}}', 'Fan {{name}}', 'Mow {{name}}'];
+          $catchable = [true, false, false, false, false, false];
         break;
         case 483: // Dialga
         case 484: // Palkia
@@ -149,17 +157,20 @@ class Forme extends Sprite {
           $ids = ['', 'origin'];
           $noms = ['{{name}} Forme Alternative', '{{name}} Forme Originelle'];
           $nomsEN = ['Altered Forme {{name}}', 'Origin Forme {{name}}'];
+          $catchable = [true, false];
         break;
         case 492: // Shaymin
           $ids = ['', 'sky'];
           $noms = ['{{name}} Forme Terrestre', '{{name}} Forme Céleste'];
           $nomsEN = ['Land Forme {{name}}', 'Sky Forme {{name}}'];
+          $catchable = [true, false];
         break;
         case 493: // Arceus
         case 773: // Silvallié
           $ids = ['', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy'];
           $noms = ['{{name}} Type Normal', '{{name}} Type Combat', '{{name}} Type Vol', '{{name}} Type Poison', '{{name}} Type Sol', '{{name}} Type Roche', '{{name}} Type Insecte', '{{name}} Type Spectre', '{{name}} Type Acier', '{{name}} Type Feu', '{{name}} Type Eau', '{{name}} Type Plante', '{{name}} Type Électrik', '{{name}} Type Psy', '{{name}} Type Glace', '{{name}} Type Dragon', '{{name}} Type Ténèbres', '{{name}} Type Fée'];
           $nomsEN = ['Normal-type {{name}}', 'Fighting-type {{name}}', 'Flying-type {{name}}', 'Poison-type {{name}}', 'Ground-type {{name}}', 'Rock-type {{name}}', 'Bug-type {{name}}', 'Ghost-type {{name}}', 'Steel-type {{name}}', 'Fire-type {{name}}', 'Water-type {{name}}', 'Grass-type {{name}}', 'Electric-type {{name}}', 'Psychic-type {{name}}', 'Ice-type {{name}}', 'Dragon-type {{name}}', 'Dark-type {{name}}', 'Fairy-type {{name}}'];
+          $catchable = [true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false];
         break;
         case 550: // Bargantua
           $ids = ['red', 'blue', 'white'];
@@ -170,6 +181,7 @@ class Forme extends Sprite {
           $ids = ['', 'zen', 'galar', 'galar-zen'];
           $noms = ['{{name}} Mode Standard', '{{name}} Mode Transe', '{{name}} de Galar', '{{name}} de Galar - Mode Transe'];
           $nomsEN = ['Standard Mode {{name}}', 'Zen Mode {{name}}', 'Standard Mode Galarian {{name}}', 'Zen Mode Galarian {{name}}'];
+          $catchable = [true, false, true, false];
         break;
         case 585: // Vivaldaim
         case 586: // Haydaim
@@ -184,31 +196,37 @@ class Forme extends Sprite {
           $ids = ['', 'therian'];
           $noms = ['{{name}} Avatar', '{{name}} Totémique'];
           $nomsEN = ['Incarnate Forme {{name}}', 'Therian Forme {{name}}'];
+          $catchable = [true, false];
         break;
         case 646: // Kyurem
           $ids = ['', 'white', 'black'];
           $noms = ['', '{{name}} Blanc', '{{name}} Noir'];
           $nomsEN = ['', 'White {{name}}', 'Black {{name}}'];
+          $catchable = [true, false, false];
         break;
         case 647: // Keldeo
           $ids = ['', 'resolute'];
           $noms = ['{{name}} Aspect Normal', '{{name}} Aspect Décidé'];
           $nomsEN = ['Ordinary Form {{name}}', 'Resolute Form {{name}}'];
+          $catchable = [true, false];
         break;
         case 648: // Meloetta
           $ids = ['', 'pirouette'];
           $noms = ['{{name}} Forme Chant', '{{name}} Forme Danse'];
           $nomsEN = ['Aria Forme {{name}}', 'Pirouette Forme {{name}}'];
+          $catchable = [true, false];
         break;
         case 649: // Genesect
           $ids = ['', 'douse', 'shock', 'burn', 'chill'];
           $noms = ['', '{{name}} Module Aqua', '{{name}} Module Choc', '{{name}} Module Pyro', '{{name}} Module Cryo'];
           $nomsEN = ['', 'Douse Drive {{name}}', 'Shock Drive {{name}}', 'Burn Drive {{name}}', 'Chill Drive {{name}}'];
+          $catchable = [true, false, false, false, false];
         break;
         case 658: // Amphinobi
           $ids = ['', '', 'ash'];
           $noms = ['', '', '{{name}} Forme Sacha'];
           $nomsEN = ['', '', 'Ash-{{name}}'];
+          $catchable = [true, false, false];
         break;
         case 666: // Prismillon
           $ids = ['icysnow', 'polar', 'tundra', 'continental', 'garden', 'elegant', 'meadow', 'modern', 'marine', 'archipelago', 'highplains', 'sandstorm', 'river', 'monsoon', 'savanna', 'sun', 'ocean', 'jungle', 'fancy', 'pokeball'];
@@ -238,6 +256,7 @@ class Forme extends Sprite {
           $ids = ['', 'blade'];
           $noms = ['{{name}} Forme Parade', '{{name}} Forme Assaut'];
           $nomsEN = ['Shield Forme {{name}}', 'Blade Forme {{name}}'];
+          $catchable = [true, false];
         break;
         case 710: // Pitrouille
         case 711: // Banshitrouye
@@ -249,16 +268,19 @@ class Forme extends Sprite {
           $ids = ['', 'active'];
           $noms = ['{{name}} Mode Paisible', '{{name}} Mode Déchaîné'];
           $nomsEN = ['Neutral Mode {{name}}', 'Active Mode {{name}}'];
+          $catchable = [true, false];
         break;
         case 718: // Zygarde
           $ids = ['', '10', '', '', '100'];
           $noms = ['{{name}} Forme 50%', '{{name}} Forme 10%', '', '', '{{name}} Forme 100%'];
           $nomsEN = ['50% Forme {{name}}', '10% Forme {{name}}', '', '', '100% Forme {{name}}'];
+          $catchable = [true, false];
         break;
         case 720: // Hoopa
           $ids = ['', 'unbound'];
           $noms = ['{{name}} Forme Enchaîné', '{{name}} Forme Déchaîné'];
           $nomsEN = ['{{name}} Confined', '{{name}} Unbound'];
+          $catchable = [true, false];
         break;
         case 741: // Plumeline
           $ids = ['flamenco', 'pau', 'pompom', 'sensu'];
@@ -274,6 +296,7 @@ class Forme extends Sprite {
           $ids = ['', 'school'];
           $noms = ['{{name}} Forme Solitaire', '{{name}} Forme Banc'];
           $nomsEN = ['Solo Form {{name}}', 'School Form {{name}}'];
+          $catchable = [true, false];
         break;
         case 774: // Météno
           $ids = ['', '', '', '', '', '', '', 'red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'];
@@ -284,11 +307,13 @@ class Forme extends Sprite {
           $ids = ['', 'busted'];
           $noms = ['{{name}} Forme Déguisée', '{{name}} Forme Démasquée'];
           $nomsEN = ['Disguised Form {{name}}', 'Busted Form {{name}}'];
+          $catchable = [true, false];
         break;
         case 800: // Necrozma
           $ids = ['', 'solgaleo', 'lunala', 'ultra'];
           $noms = ['', '{{name}} Crinières du Couchant', '{{name}} Ailes de l\'Aurore', 'Ultra-{{name}}'];
           $nomsEN = ['', 'Dusk Mane {{name}}', 'Dawn Wings {{name}}', 'Ultra {{name}}'];
+          $catchable = [true, false, false, false];
         break;
         case 801: // Magearna
           $ids = ['', 'original'];
@@ -299,6 +324,7 @@ class Forme extends Sprite {
           $ids = ['', 'gobe', 'chu'];
           $noms = ['', '{{name}} Forme Gobe-Tout', '{{name}} Forme Gobe-Chu'];
           $nomsEN = ['', 'Gulping Form {{name}}', 'Gorging Form {{name}}'];
+          $catchable = [true, false, false];
         break;
         case 849: // Salarsen
           $ids = ['aigue', 'grave'];
@@ -315,26 +341,31 @@ class Forme extends Sprite {
           $ids = ['gel', 'degel'];
           $noms = ['{{name}} Tête de Gel', '{{name}} Tête Dégel'];
           $nomsEN = ['Ice Face {{name}}', 'Noice Face {{name}}'];
+          $catchable = [true, false];
         break;
         case 877: // Morpeko
           $ids = ['full', 'hangry'];
           $noms = ['{{name}} Mode Rassasié', '{{name}} Mode Affamé'];
           $nomsEN = ['Full Belly Mode {{name}}', 'Hangry Mode {{name}}'];
+          $catchable = [true, false];
         break;
         case 888: // Zacian
           $ids = ['', 'sword'];
           $noms = ['{{name}} Forme Héros Aguerri', '{{name}} Forme Épée Suprême'];
           $nomsEN = ['Hero of Many Battles {{name}}', 'Crowned Sword {{name}}'];
+          $catchable = [true, false];
         break;
         case 889: // Zamazenta
           $ids = ['', 'shield'];
           $noms = ['{{name}} Forme Héros Aguerri', '{{name}} Forme Bouclier Suprême'];
           $nomsEN = ['Hero of Many Battles {{name}}', 'Crowned Shield {{name}}'];
+          $catchable = [true, false];
         break;
         case 890: // Éthernatos
           $ids = ['', 'infini'];
           $noms = ['', '{{name}} Infinimax'];
           $nomsEN = ['', 'Eternamax {{name}}'];
+          $catchable = [true, false];
         break;
         case 892: // Shifours
           $ids = ['', 'water'];
@@ -350,6 +381,7 @@ class Forme extends Sprite {
           $ids = ['', 'ice', 'ghost'];
           $noms = ['', '{{name}}, le Cavalier du Froid', '{{name}}, le Cavalier d\'Effroi'];
           $nomsEN = ['', 'Ice Rider {{name}}', 'Shadow Rider {{name}}'];
+          $catchable = [true, false, false];
         break;
         case 901: // Ursaking
           $ids = ['', 'bloodmoon'];
@@ -375,6 +407,7 @@ class Forme extends Sprite {
           $ids = ['', 'hero'];
           $noms = ['{{name}} Forme Ordinaire', '{{name}} Forme Super'];
           $nomsEN = ['Zero Form {{name}}', 'Hero Form {{name}}'];
+          $catchable = [true, false];
         break;
         case 978: // Nigirigon
           $ids = ['', 'droopy', 'stretch'];
@@ -405,6 +438,7 @@ class Forme extends Sprite {
           $ids = ['', 'wellspring', 'hearthflame', 'cornerstone'];
           $noms = ['{{name}} au Masque Turquoise', '{{name}} au Masque du Puits', '{{name}} au Masque du Fourneau', '{{name}} au Masque de la Pierre'];
           $nomsEN = ['Teal Mask {{name}}', 'Wellspring Mask {{name}}', 'Hearthflame Mask {{name}}', 'Cornerstone Mask {{name}}'];
+          $catchable = [true, false, false, false];
         break;
         default:
           $done = false;
@@ -433,6 +467,7 @@ class Forme extends Sprite {
           'fr' => $noms[$sprite->form],
           'en' => $nomsEN[$sprite->form]
         ];
+        if (isset($catchable)) $this->catchable = $catchable[$sprite->form] ?? true;
       }
       
       else {
@@ -459,6 +494,7 @@ class Forme extends Sprite {
             'fr' => 'Méga-{{name}}',
             'en' => 'Mega {{name}}'
           ];
+          $this->catchable = false;
         }
         // Méga-évolutions X et Y
         else if (self::has('megaX', $dexid) && in_array($sprite->form, [1, 2])) {
@@ -476,6 +512,7 @@ class Forme extends Sprite {
               'en' => 'Mega {{name}} Y'
             ];
           }
+          $this->catchable = false;
         }
         // Primo-résurgences
         else if (self::has('primal', $dexid) && $sprite->form == 1) {
@@ -484,6 +521,7 @@ class Forme extends Sprite {
             'fr' => 'Primo-{{name}}',
             'en' => 'Primal {{name}}'
           ];
+          $this->catchable = false;
         }
         // Formes d'Alola
         else if (self::has('alolan', $dexid) && self::isAlolan($sprite, $dexid)) {
@@ -523,6 +561,7 @@ class Forme extends Sprite {
             'fr' => 'Forme inconnue',
             'en' => 'Unknown form'
           ];
+          $this->catchable = false;
         }
       }
 

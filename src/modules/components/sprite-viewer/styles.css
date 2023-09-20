@@ -120,6 +120,10 @@ sprite-viewer a.icon-button.bouton-retour {
 .forme-name.caught {
   --surface-color: var(--secondary-container);
   --text-color: var(--on-secondary-container);
+}
+
+.forme-name.caught,
+.forme-name.catchable {
   padding-left: var(--padding-inline);
 }
 
@@ -130,6 +134,19 @@ sprite-viewer a.icon-button.bouton-retour {
 .sprite-viewer-dex-info > .icon,
 .forme-name > .icon {
   margin: -7px;
+}
+
+.not-caught-indicator {
+  display: grid;
+  place-items: center;
+}
+
+.not-caught-indicator svg {
+  overflow: visible;
+}
+
+.not-caught-indicator circle {
+  stroke: currentColor;
 }
 
 .sprite-viewer-dex-info/*:not(.caught)*/ > .icon {
@@ -194,7 +211,7 @@ sprite-viewer[size="112"] :is(
 
 @media (min-width: 720px) {
   .sprite-list {
-    padding-top: calc(56px + 2 * 16px);
+    /*padding-top: calc(56px + 2 * 16px);*/
     padding-bottom: 0;
   }
 

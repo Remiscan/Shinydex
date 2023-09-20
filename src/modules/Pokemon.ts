@@ -93,6 +93,7 @@ export class Forme {
   candy: number = 0;
   hasBackside?: boolean;
   noShiny?: boolean;
+  catchable?: boolean = true;
 
   constructor(forme: object = {}) {
     if ('dbid' in forme) this.dbid = String(forme.dbid);
@@ -108,6 +109,7 @@ export class Forme {
     if ('candy' in forme) this.candy = Number(forme.candy) || 0;
     if ('hasBackside' in forme) this.hasBackside = Boolean(forme.hasBackside);
     if ('noShiny' in forme) this.noShiny = Boolean(forme.noShiny);
+    if ('catchable' in forme) this.catchable = Boolean(forme.catchable);
   }
 };
 
