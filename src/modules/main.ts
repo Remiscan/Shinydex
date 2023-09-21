@@ -2,7 +2,7 @@ import '../../../_common/components/input-slider/input-slider.js';
 import '../../../_common/components/input-switch/input-switch.js';
 import { Friend } from './Friend.js';
 import { Hunt } from './Hunt.js';
-import { Params, setCurrentLayout } from './Params.js';
+import { setCurrentLayout } from './Params.js';
 import { populator } from './appContent.js';
 import { appStart, checkUpdate } from './appLifeCycle.js';
 import * as Auth from './auth.js';
@@ -28,6 +28,8 @@ import { navLinkBubble, navigate, sectionActuelle } from './navigate.js';
 import { Notif, warnBeforeDestruction } from './notification.js';
 import { immediateSync, requestSync } from './syncBackup.js';
 import { getString } from './translation.js';
+import './storage.js';
+import sqlite from './storage.js';
 
 
 
@@ -368,6 +370,8 @@ window.addEventListener('dataupdate', async (event: DataUpdateEvent) => {
 try {
   setCurrentLayout();
   appStart();
+  const results = await sqlite.executeSql('SELECT * FROM shiny_pokemon');
+  console.log(results);
 } catch (error) {
   // Réagir ici à une erreur critique qui empêche le chargement de l'appli.
 }

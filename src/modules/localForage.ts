@@ -61,5 +61,5 @@ const friendShinyStorage = localforage.createInstance({
   driver: localforage.INDEXEDDB
 });
 
-export { shinyStorage, dataStorage, huntStorage, friendStorage, friendShinyStorage };
+export { dataStorage, friendShinyStorage, friendStorage, huntStorage, shinyStorage };
 
