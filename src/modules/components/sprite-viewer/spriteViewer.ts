@@ -44,8 +44,9 @@ export class spriteViewer extends HTMLElement {
 
     const caughtFormsList: Set<string> = new Set();
     await shinyStorage.keys().then(keys => Promise.all(keys.map(async key => {
-      const shiny = new Shiny(await shinyStorage.getItem(key));
-      if (shiny.dexid !== Number(dexid)) return;
+      let shiny = await shinyStorage.getItem(key);
+      if (typeof shiny !== 'object' || shiny == null || !('dexid' in shiny) || shiny.dexid !== Number(dexid)) return;
+      shiny = new Shiny(shiny);
 
       // On vérifie si le Shiny correspond aux filtres sélectionnés
       const shinyFilters = {
