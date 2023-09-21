@@ -2,7 +2,7 @@ import { callBackend } from './callBackend.js';
 import { RadioGroup } from './components/radioGroup.js';
 import { dataStorage } from './localForage.js';
 import { Notif } from './notification.js';
-import { computePaletteCss, setTheme, updateMetaThemeColorTag } from './theme.js';
+import { setTheme, updateMetaThemeColorTag, updateThemeHue } from './theme.js';
 // @ts-ignore
 import { queueable } from '../../../_common/js/per-function-async-queue/mod.js';
 import { InputSelect } from './components/inputSelect.js';
@@ -111,11 +111,12 @@ export class Settings {
       } break;
 
       case 'theme-hue': {
-        const css = computePaletteCss(value);
+        const palette = updateThemeHue(value);
+        const css = palette.toCSS();
         const container = document.querySelector('style#palette');
         if (!(container instanceof HTMLStyleElement)) throw new TypeError(`Expecting HTMLStyleElement`);
         container.innerHTML = `:root { ${css} }`;
-        updateMetaThemeColorTag();
+        updateMetaThemeColorTag(palette);
       } break;
 
       case 'cache-all-sprites': {

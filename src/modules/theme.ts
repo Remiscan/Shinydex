@@ -5,14 +5,8 @@ import DefPalette from '../../../colori/palette/palette.js';
 
 
 
-const gradient = Couleur.interpolateInSteps('oklch(70% 0.19 1)', 'oklch(70% 0.19 360)', 25, { interpolationSpace: 'oklch', hueInterpolationMethod: 'longer' });
-const gradientString = `linear-gradient(to right, ${gradient.map((c: Couleur) => c.rgb).join(', ')})`;
-(document.querySelector('form[name="app-settings"] [name="theme-hue"]') as HTMLElement)?.style.setProperty('--gradient', gradientString);
-
-export const metaThemeColors = {
-  light: null,
-  dark: null
-};
+let currentPalette: MaterialLikePalette;
+let currentTheme: 'light' | 'dark';
 
 
 
@@ -36,17 +30,21 @@ class Palette extends DefPalette {
 
 
 
-export function updateMetaThemeColorTag(color: string = 'surface') {
+export function updateMetaThemeColorTag(palette: MaterialLikePalette = currentPalette, color: string = 'surface') {
   const metaTags = [
     document.querySelector("meta[name=theme-color]"),                                  // for mobile layout
     document.querySelector(`meta[name="theme-color"][id="medium-layout-theme-color"]`) // for medium and large layouts
   ];
+  if (!(palette instanceof MaterialLikePalette)) return;
 
   for (const tag of metaTags) {
     if (!tag) continue;
     const colorLabel = tag.getAttribute('data-forced-color') || color || tag.getAttribute('data-current-color') || 'surface';
-    const themeColor = `rgb(${String(getComputedStyle(document.documentElement).getPropertyValue(`--${colorLabel}`)).trim()})`;
-    tag.setAttribute('content', themeColor);
+    const themeColorLightness = colorLabel === 'surface-container' ? (currentTheme === 'dark' ? .12 : .94)
+                                                                   : (currentTheme === 'dark' ? .06 : .99);
+    // @ts-expect-error
+    const themeColorExpr = palette.colors.get('neutral')[CIElightnesses.findIndex(l => l === themeColorLightness)].rgb;
+    tag.setAttribute('content', themeColorExpr);
     tag.setAttribute('data-current-color', colorLabel);
   }
 }
@@ -62,12 +60,21 @@ export function setTheme(askedTheme?: string) {
   const defaultTheme = 'dark';
 
   // Thème préféré selon l'OS
-  let osTheme;
+  let osTheme: 'light' | 'dark' | undefined;
   if (window.matchMedia('(prefers-color-scheme: dark)').matches) osTheme = 'dark';
   else if (window.matchMedia('(prefers-color-scheme: light)').matches) osTheme = 'light';
 
   // Thème appliqué (askedTheme > osTheme > defaultTheme)
-  const theme = ['light', 'dark'].includes(askedTheme || '') ? askedTheme : (osTheme || defaultTheme);
+  let theme: 'light' | 'dark' = 'light';
+  switch (askedTheme) {
+    case 'light':
+    case 'dark':
+      theme = askedTheme;
+      break;
+    default:
+      theme = osTheme || defaultTheme;
+  }
+  currentTheme = theme ?? 'light';
   
   updateMetaThemeColorTag();
   window.dispatchEvent(new CustomEvent('themechange', { detail: { theme } }));
@@ -109,10 +116,11 @@ class MaterialLikePalette extends Palette {
 }
 
 
-/** Computes the color palette CSS based on the selected hue. */
-export function computePaletteCss(hue: number): string {
+/** Computes the color palette based on the selected hue. */
+export function updateThemeHue(hue: number): MaterialLikePalette {
   const palette = new MaterialLikePalette(hue);
-  return palette.toCSS();
+  currentPalette = palette;
+  return palette;
 }
 
 
@@ -131,10 +139,10 @@ export const scrollObserver = new IntersectionObserver((entries) => {
     const sectionTitre = section.querySelector('.section-titre');
     if (entry.intersectionRatio >= 1) {
       sectionTitre?.classList.add('at-top');
-      updateMetaThemeColorTag('surface');
+      updateMetaThemeColorTag(currentPalette, 'surface');
     } else {
       sectionTitre?.classList.remove('at-top');
-      updateMetaThemeColorTag('surface-container');
+      updateMetaThemeColorTag(currentPalette, 'surface-container');
     }
   }
 }, {
