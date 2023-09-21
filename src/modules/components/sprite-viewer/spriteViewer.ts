@@ -1,8 +1,6 @@
 import { capitalizeFirstLetter, pad, wait } from '../../Params.js';
 import { Pokemon } from '../../Pokemon.js';
-import { Shiny } from '../../Shiny.js';
 import { SupportedLang, pokemonData } from '../../jsonData.js';
-import { shinyStorage } from '../../localForage.js';
 import { getString, translationObserver } from '../../translation.js';
 // @ts-expect-error
 import sheet from './styles.css' assert { type: 'css' };
@@ -125,8 +123,15 @@ export class spriteViewer extends HTMLElement {
       const dexSpriteR = templateR.content.cloneNode(true) as DocumentFragment;
 
       // Load regular sprites after shiny sprites
+      let spritesLoaded = 0;
       dexSpriteS.querySelector('pokemon-sprite')?.addEventListener('load', async () => {
-        await wait(200);
+        spritesLoaded++;
+        if (spritesLoaded >= formes.length) {
+          this.dispatchEvent(new Event('allspritesloaded', { bubbles: false }));
+          await wait(300);
+          [...listeRegular.querySelectorAll(`pokemon-sprite`)].map(sprite => sprite.shadowRoot?.querySelector('img')?.setAttribute('loading', 'eager'));
+        }
+        
         listeRegular.querySelector(`.dex-sprite[data-forme="${forme.dbid}"] pokemon-sprite`)
         ?.shadowRoot?.querySelector('img')?.setAttribute('loading', 'eager');
       }, { once: true });

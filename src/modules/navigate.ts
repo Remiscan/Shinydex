@@ -465,11 +465,24 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
         if (!(viewer instanceof spriteViewer)) throw new TypeError('Expecting SpriteViewer');
 
         const readinessChecker = new Promise(resolve => {
-          viewer.addEventListener('contentready', () => {
+          let contentreadyHandler: (event: Event) => void;
+          viewer.addEventListener('contentready', contentreadyHandler = () => {
             resolve(true);
-            nouvelleSection.element.setAttribute('data-ready', 'true');
+            viewer.removeEventListener('contentready', contentreadyHandler);
           });
-        });
+        }).then(() => console.log('sprite-viewer contentready done'));
+
+        const spritesLoadChecker = new Promise(resolve => {
+          let spriteloadHandler: (event: Event) => void;
+          viewer.addEventListener('allspritesloaded', spriteloadHandler = _event => {
+            resolve(true);
+            viewer.removeEventListener('spriteload', spriteloadHandler);
+          });
+          wait(3000).then(() => {
+            resolve(false);
+            viewer.removeEventListener('spriteload', spriteloadHandler)
+          });
+        }).then(() => console.log('sprite-viewer sprites loading done'));
 
         const dexIcon = document.querySelector(`
           #pokedex dex-icon[dexid="${data.dexid}"], 
@@ -484,7 +497,10 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
 
         // On attend que le sprite viewer soit bien peuplé pour lancer l'animation d'apparition
         // (si le peuplement prend + de 300ms, on lance l'animation quand même)
-        await Promise.any([readinessChecker, new Promise(resolve => setTimeout(resolve, 300))]);
+        await Promise.any([
+          Promise.all([readinessChecker, spritesLoadChecker]),
+          new Promise(resolve => setTimeout(resolve, 300))]
+        ).then(() => nouvelleSection.element.setAttribute('data-ready', 'true'));
       } break;
 
       case 'filter-menu': {
