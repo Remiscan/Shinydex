@@ -37,26 +37,12 @@ export class spriteViewer extends HTMLElement {
     const container = document.querySelector(`#pokedex`);
     if (!(container instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
 
-    const sectionFilters = {
-      mine: new Set(container.getAttribute('data-filter-mine')?.split(' ') ?? []),
-      legit: new Set(container.getAttribute('data-filter-legit')?.split(' ') ?? [])
-    };
-
-    const caughtFormsList: Set<string> = new Set();
-    await shinyStorage.keys().then(keys => Promise.all(keys.map(async key => {
-      let shiny = await shinyStorage.getItem(key);
-      if (typeof shiny !== 'object' || shiny == null || !('dexid' in shiny) || shiny.dexid !== Number(dexid)) return;
-      shiny = new Shiny(shiny);
-
-      // On vérifie si le Shiny correspond aux filtres sélectionnés
-      const shinyFilters = {
-        mine: String(shiny.mine),
-        legit: String(shiny.legit)
-      };
-      if (sectionFilters.mine.has(shinyFilters.mine) && sectionFilters.legit.has(shinyFilters.legit)) {
-        caughtFormsList.add(shiny.forme);
-      }
-    })));
+    const caughtFormsList: Set<string> = new Set(this.getAttribute('data-caught-forms')?.split(' ') ?? []);
+    if (caughtFormsList.has('')) caughtFormsList.delete('');
+    if (caughtFormsList.has('emptystring')) {
+      caughtFormsList.add('');
+      caughtFormsList.delete('emptystring');
+    }
 
     // On place le numéro
     const dexInfos = this.querySelector('.sprite-viewer-dex-info')!;

@@ -471,6 +471,13 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
           });
         });
 
+        const dexIcon = document.querySelector(`
+          #pokedex dex-icon[dexid="${data.dexid}"], 
+          #pokedex [data-replaces="dex-icon"][data-dexid="${data.dexid}"]
+        `);
+        const caughtFormsList = dexIcon?.getAttribute('data-caught-forms') ?? '';
+
+        viewer.setAttribute('data-caught-forms', caughtFormsList);
         viewer.setAttribute('dexid', data.dexid || '');
         viewer.setAttribute('shiny', 'true');
         viewer.setAttribute('size', navigator.onLine ? '512' : '112');
