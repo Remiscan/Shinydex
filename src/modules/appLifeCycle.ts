@@ -297,6 +297,14 @@ export async function appStart() {
 
   // ÉTAPE 7 : on vérifie si l'application peut être installée
 
+  // Make storage persistent
+  if (navigator.storage && navigator.storage.persist) {
+    let persistent = await navigator.storage.persisted();
+    if (!persistent) {
+      persistent = await navigator.storage.persist();
+    }
+    console.log(`${persistent ? '[:)]' : '[:(]'} Storage ${persistent ? 'is' : 'is NOT'} persistent.`);
+  }
   checkInstall();
 
   // ---
