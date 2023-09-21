@@ -159,23 +159,21 @@ export function filterSection(section: FiltrableSection, filters: FilterList = n
  * Displays the Pokédex icons corresponding to the passed IDs as caught, others as uncaught.
  */
 export function filterPokedex(dexids: dexidSet, caughtFormsMap: formesMap) {
-  const generations = Pokemon.generations;
-  const dexidMax = generations[generations.length - 1].end;
-
-  for (let i = 1; i <= dexidMax; i++) {
-    const icon = document.querySelector(`#pokedex [dexid="${i}"], #pokedex [data-replaces="dex-icon"][data-dexid="${i}"]`);
+  const allDexIcons = document.querySelectorAll(`#pokedex [dexid], #pokedex [data-replaces="dex-icon"][data-dexid]`);
+  allDexIcons.forEach(icon => {
+    const i = Number(icon.getAttribute('dexid') ?? icon.getAttribute('data-dexid') ?? 0);
     if (dexids.has(i)) {
-      icon?.setAttribute('data-caught', 'true');
+      icon.setAttribute('data-caught', 'true');
       const caughtForms = caughtFormsMap.get(i) ?? new Set();
       if (caughtForms.has('')) {
         caughtForms.add('emptystring');
         caughtForms.delete('');
       }
-      icon?.setAttribute('data-caught-forms', [...caughtForms.values()].join(' '));
+      icon.setAttribute('data-caught-forms', [...caughtForms.values()].join(' '));
     } else {
-      icon?.setAttribute('data-caught', 'false');
+      icon.setAttribute('data-caught', 'false');
     }
-  }
+  });
 }
 
 
@@ -195,7 +193,7 @@ export type FilterMap = Map<string, ShinyFilterData>;
 /**
  * Computes the filters corresponding to each card in a section.
  */
-export async function computeFilters(section: FiltrableSection | OrderableSection): Promise<FilterMap> {
+export async function computeFilters(section: FiltrableSection | OrderableSection, data: Array<Shiny|Hunt> | null = null): Promise<FilterMap> {
   let dataStore: localForageAPI;
   if (!isFiltrableSection(section)) return new Map();
 
@@ -213,13 +211,12 @@ export async function computeFilters(section: FiltrableSection | OrderableSectio
       throw new Error(`Section ${section} can't be filtered`);
   }
 
-  const keys = await dataStore.keys();
   const filterMap: FilterMap = new Map();
-
-  await Promise.all(keys.map(async key => {
-    const shiny = new Shiny(await dataStore.getItem(key));
-    filterMap.set(key, computeShinyFilters(shiny));
-  }));
+  if (!data) {
+    const keys = await dataStore.keys();
+    data = (await Promise.all(keys.map(key => dataStore.getItem(key)))).map(s => new Shiny(s));
+  }
+  data.forEach(s => filterMap.set(s.huntid, computeShinyFilters(s)));
 
   return filterMap;
 }
@@ -388,7 +385,7 @@ async function orderPokemon(pokemonList: Shiny[] | Hunt[], order: ordre): Promis
  * i.e. when knowing the properties of the card itself isn't enough to quantize its order among all cards.
  */
 export type OrderMap = Map<ordre, string[]>;
-export async function computeOrders(section: OrderableSection): Promise<OrderMap> {
+export async function computeOrders(section: OrderableSection, data: Array<Shiny|Hunt> | null = null): Promise<OrderMap> {
   let dataStore: localForageAPI;
   let dataClass: (typeof Shiny) | (typeof Hunt);
 
@@ -417,7 +414,6 @@ export async function computeOrders(section: OrderableSection): Promise<OrderMap
       throw new Error(`Section ${section} can't be ordered`);
   }
 
-  const keys = await dataStore.keys();
   const orderMap: OrderMap = new Map();
 
   await Promise.all(supportedOrdres.map(async order => {
@@ -429,14 +425,15 @@ export async function computeOrders(section: OrderableSection): Promise<OrderMap
       case 'chasses-en-cours':
       case 'corbeille':
       case 'chromatiques-ami':
-        const list = (await Promise.all(
-          keys.map(key => dataStore.getItem(key))
-        )).map(data => new dataClass(data));
-      
-        orderedKeys = await orderPokemon(list, order);
+        if (!data) {
+          const keys = await dataStore.keys();
+          data = (await Promise.all(keys.map(key => dataStore.getItem(key)))).map(s => new dataClass(s));
+        }
+        orderedKeys = await orderPokemon(data, order);
         break;
       
       case 'partage':
+        const keys = await dataStore.keys();
         const lang = getCurrentLang();
         orderedKeys = keys.sort((a, b) => a.localeCompare(b, lang));
         break;

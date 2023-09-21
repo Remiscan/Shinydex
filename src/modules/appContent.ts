@@ -34,12 +34,14 @@ async function populateHandler(section: PopulatableSection, _ids?: string[]): Pr
   const sectionElement = document.querySelector(`#${section}`);
   const isCurrentSection = document.body.matches(`[data-section-actuelle~="${section}"]`);
 
-  const orderMap = await computeOrders(section);
-  const currentOrder = sectionElement?.getAttribute('data-order') ?? '';
-  const reversed = sectionElement?.getAttribute('data-order-reversed') === 'true';
-
   const allIds = await dataStore.keys();
   const ids = _ids ?? allIds;
+
+  const allData: Shiny[] | Hunt[] = await Promise.all(allIds.map(id => dataStore.getItem(id)));
+
+  const orderMap = await computeOrders(section, allData);
+  const currentOrder = sectionElement?.getAttribute('data-order') ?? '';
+  const reversed = sectionElement?.getAttribute('data-order-reversed') === 'true';
 
   // Populate cards in the order currently selected
   let orderedIds = ids;
@@ -51,7 +53,20 @@ async function populateHandler(section: PopulatableSection, _ids?: string[]): Pr
     ];
   }
 
-  const populated = await populateFromData(section, orderedIds);
+  let populated: PromiseSettledResult<string>[];
+  switch (section) {
+    case 'partage':
+      populated = await populateFriendsList(orderedIds);
+      break;
+
+    case 'mes-chromatiques':
+    case 'chasses-en-cours':
+    case 'chromatiques-ami':
+    case 'corbeille': {
+      const orderedData = orderedIds.map(id => allData.find(d => d.huntid === id) ?? id);
+      populated = await populateFromData(section, orderedData);
+    } break;
+  }
 
   // Order all cards (newly populated + older cards) in the order currently selected
   if (isOrdre(currentOrder)) {
@@ -82,9 +97,7 @@ export const populator = Object.fromEntries(populatableSections.map(section => {
 
 
 
-export async function populateFromData(section: PopulatableSection, ids: string[]): Promise<PromiseSettledResult<string>[]> {
-  if (section === 'partage') return populateFriendsList(ids);
-
+export async function populateFromData(section: PopulatableSection, dataList: Array<Shiny | string> | Array<Hunt | string>): Promise<PromiseSettledResult<string>[]> {
   const sectionElement = document.querySelector(`#${section}`)!;
   const conteneur = (sectionElement.querySelector(`.liste-cartes`) ?? sectionElement.querySelector(`.section-contenu`))!;
   const virtualize = virtualizedSections.includes(section);
@@ -113,6 +126,8 @@ export async function populateFromData(section: PopulatableSection, ids: string[
       dataStore = huntStorage;
       dataClass = Hunt;
       break;
+    default:
+      throw new Error(`Section ${section} can not be populated`);
   }
 
   /* Que faire selon l'état des données du Pokémon ?
@@ -128,18 +143,20 @@ export async function populateFromData(section: PopulatableSection, ids: string[
 
   // Traitons les cartes :
 
-  const cardsToCreate: HTMLElement[] = [];
+  const cardsToCreate: Element[] = [];
+  const allCards = [...document.querySelectorAll(`${elementName}[huntid], div[data-replaces="${elementName}"][data-huntid]`)];
+  const allCardsIds = allCards.map(c => c.getAttribute('huntid') ?? c.getAttribute('data-huntid'));
   const filterMap = await computeFilters(section);
 
-  const results = await Promise.allSettled(ids.map(async huntid => {
-    const pkmn = await dataStore.getItem(huntid);
+  const results = await Promise.allSettled(dataList.map(async pkmn => {
+    const huntid = typeof pkmn === 'string' ? pkmn : pkmn.huntid;
     const pkmnInDB = pkmn != null && typeof pkmn === 'object';
     const pkmnObj = new dataClass(pkmnInDB ? pkmn : {});
     const pkmnInDBButDeleted = pkmnInDB && 'deleted' in pkmnObj && pkmnObj.deleted
     const ignoreCondition = section === 'corbeille' ? !pkmnInDBButDeleted : pkmnInDBButDeleted;
 
-    let card: HTMLElement | null = document.querySelector(`${elementName}[huntid="${huntid}"]`) ??
-                                   document.querySelector(`div[data-replaces="${elementName}"][data-huntid="${huntid}"]`);
+    const cardIndex = allCardsIds.findIndex(id => id === huntid);
+    let card: Element | undefined = allCards[cardIndex];
 
     // ABSENT DE LA BDD ou PRÉSENT MAIS À IGNORER = Supprimer (manuellement)
     if (!pkmnInDB || ignoreCondition) {
