@@ -10,6 +10,8 @@ declare const localforage: localForageAPI;
 
 
 export async function upgradeStorage(): Promise<void> {
+  console.log('Upgrading storage format...');
+  
   // Update the structure of stored shiny Pokémon
   const shinyKeys = await shinyStorage.keys();
   for (const key of shinyKeys) {

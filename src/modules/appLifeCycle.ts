@@ -153,7 +153,9 @@ export async function appStart() {
 
   // On met à jour la structure de la BDD locale si nécessaire
   try {
-    if (lastStorageUpgrade < cacheVersion * 1000) await upgradeStorage();
+    // @ts-expect-error
+    const upgradeStorageModuleVersion = Number(fileVersions['./dist/modules/upgradeStorage.js']) * 1000 ?? 0;
+    if (lastStorageUpgrade < upgradeStorageModuleVersion) await upgradeStorage();
   } catch (error) {
     const message = getString('error-updating-data-format');
     console.error(message, error);
