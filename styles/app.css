@@ -672,10 +672,14 @@ dex-icon .caught-form-indicator {
   --size: 6px;
   width: var(--size);
   height: var(--size);
-  background: rgb(var(--color));
   border-radius: calc(.5 * var(--size));
-  box-shadow: 0 0 0 2px rgb(var(--surface-color));
+  background-color: rgb(var(--color));
+  background-image: linear-gradient(to right, rgb(var(--state-tint, var(--on-primary)), var(--state-opacity, 0)) 0% 100%);
+  box-shadow:
+    0 0 0 2px rgb(var(--state-tint, var(--on-primary)), var(--state-opacity, 0)),
+    0 0 0 2px rgb(var(--surface-color));
   flex-shrink: 0;
+  transition: none;
   --color: var(--primary);
 }
 
@@ -713,7 +717,7 @@ dex-icon:has(.caught-form-indicator:nth-of-type(8)):not(:has(.caught-form-indica
 }
 
 dex-icon:has(.caught-form-indicator:nth-of-type(8)):not(:has(.caught-form-indicator:not([data-caught="true"]))) .caught-form-indicator:nth-of-type(7)::before {
-  color: rgb(var(--primary));
+  color: rgb(var(--surface-color));
 }
 
 /* Don't display the caught forms indicators if there's only one catchable form. */
