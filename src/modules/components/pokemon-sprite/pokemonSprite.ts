@@ -201,7 +201,6 @@ export class pokemonSprite extends HTMLElement {
     const img = this.shadow.querySelector('img')!;
     const url = this.getSpriteUrl();
     const isSheet = this.params.size === pokemonSprite.sheetSize;
-    const name = Pokemon.names()[Number(this.params.dexid)];
     
     // On affiche le nouveau sprite uniquement si aucune nouvelle demande n'a été faite entre temps
     if (currentChange === this.lastChange) {
