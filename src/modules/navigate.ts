@@ -496,10 +496,10 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
         viewer.setAttribute('size', navigator.onLine ? '512' : '112');
 
         // On attend que le sprite viewer soit bien peuplé pour lancer l'animation d'apparition
-        // (si le peuplement prend + de 300ms, on lance l'animation quand même)
+        // (si le peuplement prend + de 500ms, on lance l'animation quand même)
         await Promise.any([
           Promise.all([readinessChecker, spritesLoadChecker]),
-          new Promise(resolve => setTimeout(resolve, 300))]
+          new Promise(resolve => setTimeout(resolve, 500))]
         ).then(() => nouvelleSection.element.setAttribute('data-ready', 'true'));
       } break;
 
