@@ -123,18 +123,22 @@ export class spriteViewer extends HTMLElement {
       const dexSpriteR = templateR.content.cloneNode(true) as DocumentFragment;
 
       // Load regular sprites after shiny sprites
+      const thisRegularSprite = dexSpriteR.querySelector('pokemon-sprite');
       let spritesLoaded = 0;
-      dexSpriteS.querySelector('pokemon-sprite')?.addEventListener('load', async () => {
+      const loadHandler = async (event: Event) => {
         spritesLoaded++;
+        thisRegularSprite?.setAttribute('lazy', 'false');
         if (spritesLoaded >= formes.length) {
           this.dispatchEvent(new Event('allspritesloaded', { bubbles: false }));
-          await wait(300);
-          [...listeRegular.querySelectorAll(`pokemon-sprite`)].map(sprite => sprite.shadowRoot?.querySelector('img')?.setAttribute('loading', 'eager'));
         }
-        
-        listeRegular.querySelector(`.dex-sprite[data-forme="${forme.dbid}"] pokemon-sprite`)
-        ?.shadowRoot?.querySelector('img')?.setAttribute('loading', 'eager');
-      }, { once: true });
+      };
+
+      const thisShinySprite = dexSpriteS.querySelector('pokemon-sprite');
+      new Promise((resolve, reject) => {
+        thisShinySprite?.addEventListener('load', resolve);
+        thisShinySprite?.addEventListener('error', resolve);
+      })
+      .then(event => loadHandler(event as Event));
 
       listeShiny.appendChild(dexSpriteS);
       listeRegular.appendChild(dexSpriteR);

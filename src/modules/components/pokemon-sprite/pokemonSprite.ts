@@ -1,5 +1,4 @@
 import { pad, wait } from '../../Params.js';
-import { Pokemon } from '../../Pokemon.js';
 import { pokemonData } from '../../jsonData.js';
 import { TranslatedString, getString, translationObserver } from '../../translation.js';
 // @ts-expect-error
@@ -97,7 +96,7 @@ export class pokemonSprite extends HTMLElement {
   lastChange: number = 0;
 
   loadHandler = (event: Event) => {
-    this.dispatchEvent(new Event('load', { bubbles: false }));
+    this.dispatchEvent(new Event(event.type, { bubbles: false }));
   };
 
   
@@ -320,6 +319,7 @@ export class pokemonSprite extends HTMLElement {
 
     const img = this.shadow.querySelector('img');
     img?.addEventListener('load', this.loadHandler);
+    img?.addEventListener('error', this.loadHandler);
 
     this.setSpriteUrl();
   }
@@ -329,6 +329,7 @@ export class pokemonSprite extends HTMLElement {
 
     const img = this.shadow.querySelector('img');
     img?.removeEventListener('load', this.loadHandler);
+    img?.removeEventListener('error', this.loadHandler);
   }
 
   static get observedAttributes() {
