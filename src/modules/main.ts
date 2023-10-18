@@ -349,9 +349,9 @@ declare global {
 window.addEventListener('dataupdate', async (event: DataUpdateEvent) => {
   // On peuple l'application avec les nouvelles données
   const { sections, ids, sync } = event.detail;
-  if (Array.isArray(ids) && ids.length === 0) return;
   console.log(`Populating sections [${(sections ?? []).join(', ')}] with IDs [${(ids ?? ['all']).join(', ')}] ${sync ? 'with sync' : ''}`);
   for (const section of sections) {
+    if (section !== 'chromatiques-ami' && Array.isArray(ids) && ids.length === 0) continue;
     await populator[section](ids);
   }
 
