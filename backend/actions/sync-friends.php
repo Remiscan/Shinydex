@@ -30,10 +30,7 @@ $friends_to_delete_online = [];
 $friends_to_insert_local = [];
 $friends_to_delete_local = [];
 
-$user_profile = $db->prepare('SELECT * FROM `shinydex_users` WHERE `uuid` = :userid LIMIT 1');
-$user_profile->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
-$user_profile->execute();
-$user_profile = $user_profile->fetchAll(PDO::FETCH_ASSOC);
+$user_profile = $user->getDBEntry('shinydex', $userID);
 $online_friends = json_decode($user_profile['friends'] ?? '[]');
 $online_profile_lastUpdate = $user_profile['lastUpdate'] ?? 0;
 
@@ -44,7 +41,7 @@ foreach($local_friends as $username) {
     if ($local_profile_lastUpdate > $online_profile_lastUpdate) {
       $friends_to_insert_online[] = $username;
     } else {
-      $friends_to_remove_local[] = $username;
+      $friends_to_delete_local[] = $username;
     }
   }
 }
@@ -54,7 +51,7 @@ foreach($online_friends as $username) {
 
   if ($is_local_key === false) {
     if ($local_profile_lastUpdate > $online_profile_lastUpdate) {
-      $friends_to_remove_online[] = $username;
+      $friends_to_delete_online[] = $username;
     } else {
       $friends_to_insert_local[] = $username;
     }
@@ -72,6 +69,8 @@ $recent_friends_list = array_merge(
 /**
  * Step 3: Update online database with newer local data.
  */
+
+$results = [];
 
 // If the friends list sent by the frontend is more recent, push it to the DB
 if ($local_profile_lastUpdate > $online_profile_lastUpdate) {
