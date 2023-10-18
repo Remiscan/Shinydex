@@ -19,8 +19,6 @@ import sheet from './styles.css' assert { type: 'css' };
 
 
 
-let currentCardId: string | null;
-
 const previewSheet = new CSSStyleSheet();
 {
   let previewSheetCss = ``;
@@ -107,27 +105,21 @@ export class friendCard extends HTMLElement {
    */
   toggleMenu() {
     const username = this.getAttribute('username');
-
-    // On ferme la carte déjà ouverte
-    if (currentCardId != null)
-      document.querySelector(`[username="${currentCardId}"]`)!.removeAttribute('open');
-
+    const currentState = this.getAttribute('open') === 'true';
     const menuButtons = [...this.shadow.querySelectorAll('.menu button')];
 
-    // Si la carte demandée n'est pas celle qu'on vient de fermer, on l'ouvre
-    if (username != currentCardId) {
+    if (!currentState) {
       this.setAttribute('open', 'true');
       menuButtons.forEach(button => {
         button.removeAttribute('disabled');
         button.setAttribute('tabindex', '0');
       });
-      currentCardId = username;
     } else {
+      this.removeAttribute('open');
       menuButtons.forEach(button => {
         button.setAttribute('disabled', '');
         button.setAttribute('tabindex', '-1');
       });
-      currentCardId = null;
     }
   }
 

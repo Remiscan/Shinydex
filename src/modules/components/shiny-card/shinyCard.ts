@@ -302,7 +302,6 @@ export class shinyCard extends HTMLElement {
     const currentState = this.getAttribute('open') === 'true';
     const menuButtons = [...this.shadow.querySelectorAll('.menu button')];
 
-    // Si la carte demandée n'est pas celle qu'on vient de fermer, on l'ouvre
     if (!currentState) {
       this.setAttribute('open', 'true');
       menuButtons.forEach(button => {
