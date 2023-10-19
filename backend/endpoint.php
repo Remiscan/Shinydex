@@ -33,6 +33,8 @@ switch ($request) {
   // Need user to be signed in
   case 'sign-out':
   case 'sync-pokemon':
+  case 'sync-pokemon-step-1':
+  case 'sync-pokemon-step-2':
   case 'sync-friends':
   case 'delete-user-data':
   case 'update-user-profile':

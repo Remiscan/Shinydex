@@ -395,7 +395,7 @@ async function deleteOldCaches(newCacheName, action) {
  * Compares and syncs Pokémon data between local storage and online database.
  */
 async function syncPokemon() {
-  // Get local data
+  // Get full local data
   await Promise.all([shinyStorage.ready(), huntStorage.ready()]);
   const localData = await Promise.all(
     (await shinyStorage.keys())
@@ -414,13 +414,25 @@ async function syncPokemon() {
   ))
   .filter(pkmn => pkmn != null);
 
-  // Send local data to the backend
+  // ************************************************************************** //
+
+  // First request: 
+  // - send { huntid, lasUpdate } to backend to compare with database,
+  // - get back newer full data from the database,
+  // - store that data locally.
+
+  // Send partial local data to the backend
+  // (it will send back the list of huntids it wants the full data of)
   const formData = new FormData();
-  formData.append('local-data', JSON.stringify(localData));
-  formData.append('deleted-local-data', JSON.stringify(deletedLocalData));
+  formData.append('local-data', JSON.stringify(localData.map(s => { return { huntid: s.huntid, lastUpdate: s.lastUpdate }; })));
+  formData.append('deleted-local-data', JSON.stringify(deletedLocalData.map(s => { return { huntid: s.huntid, lastUpdate: s.lastUpdate }; })));
   formData.append('session-code-verifier', await dataStorage.getItem('session-code-verifier'));
 
-  const response = await fetch('/shinydex/backend/endpoint.php?request=sync-pokemon&date=' + Date.now(), {
+  // Get from the backend:
+  // - full data that needs to be inserted / updated / restored / deleted locally
+  // - huntids that need to be inserted / updated / restored in the database
+  // - success or error notification
+  const response = await fetch('/shinydex/backend/endpoint.php?request=sync-pokemon-step-1&date=' + Date.now(), {
     method: 'POST',
     body: formData
   });
@@ -428,24 +440,28 @@ async function syncPokemon() {
     throw new Error('[:(] Erreur ' + response.status + ' lors de la requête');
 
   let data;
-  let response2 = response.clone();
+  let responseCopy = response.clone();
   try {
     data = await response.json();
   } catch {
-    data = await response2.text();
+    data = await responseCopy.text();
     throw new Error(`Invalid json: ${data}`);
   }
   
   console.log('[sync-backup] Response from server:', data);
-
   if ('error' in data) throw new Error(data.error);
 
   // Update local data with newer online data
   const toSet = [...data['to_insert_local'], ...data['to_update_local']];
   await Promise.all(
-    toSet.map(shiny => {
+    toSet.map(async shiny => {
       const feShiny = new FrontendShiny(shiny);
-      return shinyStorage.setItem(String(shiny.huntid), feShiny);
+      const storedHunt = await huntStorage.getItem(shiny.huntid);
+      const shouldDeleteHunt = storedHunt && 'deleted' in storedHunt && storedHunt.deleted;
+      return Promise.all([
+        shinyStorage.setItem(String(shiny.huntid), feShiny),
+        shouldDeleteHunt ? huntStorage.removeItem(shiny.huntid) : Promise.resolve()
+      ]);
     })
   );
 
@@ -457,6 +473,7 @@ async function syncPokemon() {
         storedShiny.lastUpdate = shiny.lastUpdate;
         storedShiny.deleted = true;
         storedShiny.destroy = true;
+        storedShiny.caught = true;
         await huntStorage.setItem(shiny.huntid, storedShiny);
         return shinyStorage.removeItem(shiny.huntid);
       } else {
@@ -469,20 +486,49 @@ async function syncPokemon() {
     })
   );
 
-  const toRestore = [...data['to_restore_local']];
-  await Promise.all(
-    toRestore.map(shiny => huntStorage.removeItem(shiny.huntid))
-  );
-
   // List of inserted / updated / deleted huntids
   const modifiedHuntids = new Set([
     ...data['to_insert_local'].map(shiny => String(shiny.huntid)),
     ...data['to_update_local'].map(shiny => String(shiny.huntid)),
     ...data['to_delete_local'].map(shiny => String(shiny.huntid)),
-    ...data['to_restore_local'].map(shiny => String(shiny.huntid)),
   ]);
 
-  const results = data['results'];
+  // ************************************************************************** //
+
+  // Second request:
+  // - send full data to the backend to insert into the database
+
+  // Send full data to the backend
+  const formData2 = new FormData();
+  formData2.append('inserts', JSON.stringify(localData.filter(s => data['to_insert_online_ids'].includes(s.huntid))));
+  formData2.append('updates', JSON.stringify(localData.filter(s => data['to_update_online_ids'].includes(s.huntid))));
+  formData2.append('restores', JSON.stringify(localData.filter(s => data['to_restore_online_ids'].includes(s.huntid)).map(s => s.huntid)));
+  formData2.append('session-code-verifier', await dataStorage.getItem('session-code-verifier'));
+
+  // Get from the backend:
+  // - success or error notification
+  const response2 = await fetch('/shinydex/backend/endpoint.php?request=sync-pokemon-step-2&date=' + Date.now(), {
+    method: 'POST',
+    body: formData2
+  });
+  if (response2.status != 200)
+    throw new Error('[:(] Erreur ' + response2.status + ' lors de la requête');
+
+  let data2;
+  let responseCopy2 = response2.clone();
+  try {
+    data2 = await response2.json();
+  } catch {
+    data2 = await responseCopy2.text();
+    throw new Error(`Invalid json: ${data2}`);
+  }
+  
+  console.log('[sync-backup] Response from server:', data2);
+  if ('error' in data2) throw new Error(data2.error);
+
+  // ************************************************************************** //
+
+  const results = [...data['results'], ...data2['results']];
   return [modifiedHuntids, results];
 }
 
