@@ -1132,7 +1132,7 @@ form[name="app-settings"] > *:last-child {
 .app-icon > svg {
   width: 120px;
   height: 120px;
-  --background-top: rgb(var(--primary-60));
+  --background-top: rgb(var(--icon-top-bg-color));
 }
 
 .lien-source {

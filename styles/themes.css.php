@@ -10,6 +10,7 @@ echo '/'.'*'; ?>*/
   --text-color: rgb(33, 33, 33);
   --dark-coeff: 0;
   --pkmnicon-brightness: .85;
+  --icon-top-bg-color: var(--primary-70);
 
   --primary: var(--primary-40);
   --on-primary: var(--primary-100);
@@ -64,6 +65,7 @@ echo '/'.'*'; ?>*/
   --text-color: rgb(255, 255, 255);
   --dark-coeff: 1;
   --pkmnicon-brightness: .65;
+  --icon-top-bg-color: var(--primary-60);
 
   --primary: var(--primary-80);
   --on-primary: var(--primary-20);
