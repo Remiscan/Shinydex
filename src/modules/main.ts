@@ -21,6 +21,7 @@ import './components/shinyStars.js';
 import './components/sprite-viewer/spriteViewer.js';
 import './components/syncLine.js';
 import './components/syncProgress.js';
+import 'remiscan-logo';
 import { export2json, json2import } from './exportToJSON.js';
 import { PopulatableSection } from './filtres.js';
 import { dataStorage, friendStorage, huntStorage, shinyStorage } from './localForage.js';

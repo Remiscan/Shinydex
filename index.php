@@ -48,7 +48,11 @@ $httpLanguage = $translation->getLanguage();
         "input-switch-styles": "../_common/components/input-switch/styles.css",
         "input-switch-template": "../_common/components/input-switch/template.js",
         "colori": "../colori/lib/dist/colori.min.js",
-        "translation-observer": "../_common/js/translation-observer/mod.js"
+        "translation-observer": "../_common/js/translation-observer/mod.js",
+        "remiscan-logo": "/_common/components/remiscan-logo/remiscan-logo.js",
+        "remiscan-logo-svg": "/_common/components/remiscan-logo/logo.svg",
+        "remiscan-logo-svg-horizontal": "/_common/components/remiscan-logo/logo-horizontal.svg",
+        "remiscan-logo-svg-square": "/_common/components/remiscan-logo/logo-square.svg"
       }
     }
     </script>

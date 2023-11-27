@@ -1135,6 +1135,16 @@ form[name="app-settings"] > *:last-child {
   --background-top: rgb(var(--icon-top-bg-color));
 }
 
+.link-to-remiscan {
+  display: flex;
+  align-items: center;
+  gap: 1ch;
+}
+
+remiscan-logo {
+  --text-color: rgb(var(--primary)) !important;
+}
+
 .lien-source {
   color: var(--accent-color);
   align-items: center;
