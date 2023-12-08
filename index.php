@@ -35,8 +35,7 @@ $httpLanguage = $translation->getLanguage();
     <link rel="icon" type="image/svg+xml" href="./images/app-icons/favicon.svg">
     <link rel="apple-touch-icon" href="./images/app-icons/apple-touch-icon.png">
     <link rel="manifest" href="./manifest.json">
-
-    <link rel="preconnect" href="https://remiscan.fr">
+    <link rel="canonical" href="https://remiscan.fr/shinydex/">
 
     <script>window.tempsChargementDebut = performance.now();</script>
     <script defer src="../_common/polyfills/adoptedStyleSheets.min.js"></script>
