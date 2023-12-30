@@ -42,6 +42,7 @@
         "./dist/modules/appLifeCycle.js",
         "./dist/modules/auth.js",
         "./dist/modules/callBackend.js",
+        "./dist/modules/components/bottomSheet.js",
         "./dist/modules/components/checkBox.js",
         "./dist/modules/components/corbeille-card/corbeilleCard.js",
         "./dist/modules/components/customInput.js",

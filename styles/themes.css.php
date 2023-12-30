@@ -177,7 +177,6 @@ echo '/'.'*'; ?>*/
     linear-gradient(to bottom, rgb(var(--state-tint, var(--on-primary)), var(--state-opacity, 0)) 0% 100%),
     linear-gradient(to bottom, rgb(var(--surface-tint, var(--primary)), var(--elevation-opacity, 0)) 0% 100%);
   color: rgb(var(--text-color, var(--on-surface)));
-  transition: box-shadow .3s var(--easing-standard);
 }
 
 .surface-default {
@@ -319,6 +318,7 @@ echo '/'.'*'; ?>*/
 .elevation-4-shadow,
 .elevation-5-shadow {
   box-shadow: var(--elevation-shadow, none);
+  transition: box-shadow .3s var(--easing-standard);
 }
 
 .elevation-1-shadow {
