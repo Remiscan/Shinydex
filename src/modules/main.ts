@@ -159,27 +159,15 @@ for (const fab of fabs) {
       }));
 
       addFriendSheet.close();
-
       new Notif(getString('notif-added-friend').replace('{user}', username)).prompt();
     } else {
-      errorContainer.innerHTML = getString('error-no-profile');
+      addFriendSheet.close();
+      new Notif(getString('error-no-profile').replace('{user}', username)).prompt();
     }
-  });
-
-  form.addEventListener('input', () => {
-    form.classList.remove('invalid');
-    errorContainer.innerHTML = '';
-  });
-
-  form.addEventListener('reset', () => {
-    form.classList.remove('invalid');
-    errorContainer.innerHTML = '';
   });
 
   addFriendSheet?.dialog?.addEventListener('close', () => {
     form.reset();
-    form.classList.remove('invalid');
-    errorContainer.innerHTML = '';
   });
 }
 

@@ -823,17 +823,6 @@ section:not([data-filter-legit~="false"]) [data-legit="false"] {
   border-radius: 24px;
 }
 
-.user-search-error {
-  display: flex;
-  color: rgb(var(--error));
-  padding-top: 16px;
-  text-wrap: pretty;
-}
-
-.user-search-error::after {
-  content: ' ';
-}
-
 form[name="user-profile"] {
   display: flex;
   padding: 8px;

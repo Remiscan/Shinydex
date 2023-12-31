@@ -243,8 +243,6 @@ $httpLanguage = $translation->getLanguage();
           <span class="material-icons" aria-hidden="true">search</span>
         </button>
       </form>
-
-      <span class="user-search-error body-medium"></span>
     </bottom-sheet>
 
     <!-- Changelog -->
