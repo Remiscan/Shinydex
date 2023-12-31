@@ -65,7 +65,7 @@ sheet.replaceSync(/*css*/`
     --starting-position: 200px;
     --minimum-full-height: 400px;
     --duration-enter: 500ms;
-    --duration-exit: 200ms;
+    --duration-exit: 400ms;
     --easing: var(--easing-emphasized-decelerate);
     --margin-top: 72px;
     touch-action: none;
@@ -116,7 +116,7 @@ sheet.replaceSync(/*css*/`
     opacity: 0;
     background: rgb(0, 0, 0, .33);
     --duration-enter: 500ms;
-    --duration-exit: 200ms;
+    --duration-exit: 400ms;
     --duration: var(--duration-exit);
     --easing: var(--easing-emphasized-standard);
     transition:
