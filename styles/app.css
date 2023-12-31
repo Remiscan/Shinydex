@@ -809,7 +809,6 @@ section:not([data-filter-legit~="false"]) [data-legit="false"] {
 .search-form[name="user-search"] input[role="searchbox"] {
   grid-column: input-start / input-end;
   padding-left: 16px;
-  --elevation-opacity: var(--elevation-3-opacity);
 }
 
 .search-form[name="user-search"] button[type="reset"] {
