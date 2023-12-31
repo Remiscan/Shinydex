@@ -29,8 +29,8 @@ const defaultAnimation = (section: Element, event: Event) => section.animate([
   { transform: 'translate3D(0, 20px, 0)', opacity: '0' },
   { transform: 'translate3D(0, 0, 0)', opacity: '1' }
 ], {
-  easing: Params.easingDecelerate,
-  duration: 200,
+  easing: Params.easingEmphasizedDecelerate,
+  duration: 500,
   fill: 'both'
 });
 
