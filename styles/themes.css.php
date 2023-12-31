@@ -116,7 +116,8 @@ echo '/'.'*'; ?>*/
 }
 /*<?php themeSheetEnd(closeComment: true); ?>*/
 
-:root {
+:root,
+::backdrop {
   --primary-fixed: var(--primary-90);
   --primary-fixed-dim: var(--primary-80);
   --on-primary-fixed: var(--primary-10);
@@ -157,9 +158,7 @@ echo '/'.'*'; ?>*/
   --state-focus-opacity: .12;
   --state-active-opacity: .12;
   --state-dragged-opacity: .16;
-}
 
-:root {
   --bg-color: rgb(var(--surface));
   --accent-color: rgb(var(--primary));
   --soft-accent-color: rgb(var(--primary-container));

@@ -269,9 +269,6 @@ body[data-section-actuelle~="chromatiques-ami"] #chromatiques-ami,
 body[data-section-actuelle~="parametres"] #parametres,
 body[data-section-actuelle~="a-propos"] #a-propos,
 body[data-section-actuelle~="sprite-viewer"] #sprite-viewer[data-ready],
-body[data-section-actuelle~="filter-menu"] #filter-menu,
-body[data-section-actuelle~="user-search"] #user-search,
-body[data-section-actuelle~="changelog"] #changelog,
 body[data-section-actuelle~="top-layer"] #top-layer,
 body[data-section-actuelle~="obfuscator"] #obfuscator {
   display: grid;
@@ -761,23 +758,16 @@ section:not([data-filter-legit~="false"]) [data-legit="false"] {
   display: none;
 }
 
-body:not([data-filters~="mes-chromatiques"]) filter-menu[section="mes-chromatiques"],
-body:not([data-filters~="chasses-en-cours"]) filter-menu[section="chasses-en-cours"],
-body:not([data-filters~="corbeille"]) filter-menu[section="corbeille"],
-body:not([data-filters~="partage"]) filter-menu[section="partage"],
-body:not([data-filters~="chromatiques-ami"]) filter-menu[section="chromatiques-ami"] {
+#filter-menu:not([data-section~="mes-chromatiques"]):not([data-section~="pokedex"]) filter-menu[section="mes-chromatiques"],
+#filter-menu:not([data-section~="chasses-en-cours"]) filter-menu[section="chasses-en-cours"],
+#filter-menu:not([data-section~="corbeille"]) filter-menu[section="corbeille"],
+#filter-menu:not([data-section~="partage"]) filter-menu[section="partage"],
+#filter-menu:not([data-section~="chromatiques-ami"]) filter-menu[section="chromatiques-ami"] {
   display: none;
 }
 
 #filter-menu {
-  --from-x: 0;
-  --from-y: 1rem;
-}
-
-filter-menu,
-.user-search-card,
-.changelog-card {
-  margin-bottom: calc(var(--bottom-bar-height) + 8px);
+  --starting-position: 100%;
 }
 
 
@@ -809,38 +799,7 @@ filter-menu,
   border-color: rgb(var(--success));
 }
 
-#user-search {
-  --from-x: 1rem;
-  --from-y: 0;
-}
-
-.user-search-card,
-.changelog-card {
-  height: fit-content;
-  box-sizing: border-box;
-  border-radius: var(--border-radius);
-  position: sticky;
-  z-index: var(--z-filter-menu);
-  max-width: min(100% - 16px, 600px);
-  max-height: calc(100% - 2 * var(--bottom-bar-height) - 16px);
-  margin-inline: auto;
-  margin-top: auto;
-  overflow: hidden auto;
-  padding: 16px;
-  box-sizing: border-box;
-  border-radius: var(--border-radius);
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  min-width: 350px;
-}
-
-.user-search-card {
-  margin-right: 8px;
-}
-
 .search-form[name="user-search"] {
-  height: 48px;
   margin-block: -4px;
   --reset-icon-column: 40px;
   grid-template-columns: [input-start search-icon] 56px 1fr [reset-icon] var(--reset-icon-column) [input-end] 4px [submit-button] auto;
@@ -855,6 +814,20 @@ filter-menu,
 
 .search-form[name="user-search"] button[type="submit"] {
   grid-column: submit-button;
+  height: 48px;
+  width: 48px;
+  border-radius: 24px;
+}
+
+.user-search-error {
+  display: flex;
+  color: rgb(var(--error));
+  padding-top: 16px;
+  text-wrap: pretty;
+}
+
+.user-search-error::after {
+  content: ' ';
 }
 
 form[name="user-profile"] {
@@ -971,7 +944,7 @@ h2:not(:first-child) {
 }
 
 [data-action="check-update"],
-[data-nav-section="changelog"] {
+[data-action="open-changelog"] {
   margin: 0;
 }
 
@@ -1184,9 +1157,6 @@ remiscan-logo {
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
 #sprite-viewer,
-#filter-menu,
-#user-search,
-#changelog,
 #top-layer,
 #obfuscator {
   grid-column: 1 / -1;
@@ -1201,18 +1171,9 @@ remiscan-logo {
   z-index: var(--z-obfuscator);
 }
 
-#top-layer,
-#filter-menu,
-#user-search,
-#changelog {
+#top-layer {
   background-color: transparent;
   z-index: var(--z-obfuscator);
-}
-
-#filter-menu,
-#user-search,
-#changelog {
-  background: rgb(var(--surface), .5);
 }
 
 body[data-section-actuelle~="top-layer"] #top-layer {
@@ -1234,6 +1195,25 @@ body[data-section-actuelle~="top-layer"] #top-layer {
     transform: translate(-50%, -50%);
   }
 }*/
+
+
+
+/**
+ * Bottom sheet
+ */
+
+bottom-sheet {
+  --margin-top: var(--section-title-height);
+}
+
+#changelog {
+  --starting-position: 400px;
+}
+
+bottom-sheet h2 {
+  margin-bottom: 1em;
+  text-wrap: balance;
+}
 
 
 

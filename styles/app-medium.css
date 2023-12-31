@@ -126,6 +126,10 @@ main > section {
   padding-top: var(--padding);
 }
 
+bottom-sheet {
+  --margin-top: 72px;
+}
+
 .notification-container {
   width: fit-content;
   max-width: calc(100% - 112px);
@@ -136,30 +140,6 @@ main > section {
 
 .snackbar {
   width: fit-content;
-}
-
-#filter-menu {
-  --from-y: -1rem;
-}
-
-filter-menu {
-  margin-top: var(--section-title-height);
-  margin-bottom: auto;
-}
-
-#user-search {
-  --from-x: -1rem;
-  --from-y: 0;
-}
-
-.user-search-card {
-  margin-top: var(--section-title-height);
-  margin-left: 112px;
-  margin-right: auto;
-}
-
-.changelog-card {
-  margin: auto;
 }
 
 #google-one-tap-container {

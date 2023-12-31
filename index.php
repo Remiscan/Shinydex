@@ -216,46 +216,45 @@ $httpLanguage = $translation->getLanguage();
     <section id="obfuscator" class="surface"></section>
 
     <!-- Menu de filtres -->
-    <section id="filter-menu">
-      <filter-menu data-section="mes-chromatiques" class="surface surface-container-high elevation-3-shadow"></filter-menu>
-      <filter-menu data-section="chasses-en-cours" class="surface surface-container-high elevation-3-shadow"></filter-menu>
-      <filter-menu data-section="corbeille" class="surface surface-container-high elevation-3-shadow"></filter-menu>
-      <filter-menu data-section="partage" class="surface surface-container-high elevation-3-shadow"></filter-menu>
-      <filter-menu data-section="chromatiques-ami" class="surface surface-container-high elevation-3-shadow"></filter-menu>
-    </section>
+    <bottom-sheet id="filter-menu" drag modal>
+      <filter-menu data-section="mes-chromatiques"></filter-menu>
+      <filter-menu data-section="chasses-en-cours"></filter-menu>
+      <filter-menu data-section="corbeille"></filter-menu>
+      <filter-menu data-section="partage"></filter-menu>
+      <filter-menu data-section="chromatiques-ami"></filter-menu>
+    </bottom-sheet>
 
     <!-- User search -->
-    <section id="user-search">
-      <div class="user-search-card surface elevation-3-shadow surface-container-high">
-        <h2 class="title-medium" data-string="add-friend-hint"></h2>
+    <bottom-sheet id="user-search" drag modal>
+      <h2 class="title-large" data-string="add-friend-hint"></h2>
 
-        <form name="user-search" class="search-form">
-          <input type="text" name="username" class="surface surface-container-high interactive body-large"
-            inputmode="search" enterkeyhint="search" role="searchbox" autocomplete="off"
-            minlength="1" maxlength="20"
-            data-placeholder="add-friend-placeholder">
+      <form name="user-search" class="search-form">
+        <input type="text" name="username" class="surface surface-container-high interactive body-large"
+          inputmode="search" enterkeyhint="search" role="searchbox" autocomplete="off"
+          minlength="1" maxlength="20"
+          data-placeholder="add-friend-placeholder"
+        >
 
-          <button type="reset" class="surface interactive icon-button only-icon reset-icon" data-label="reset-search">
-            <span class="material-icons" aria-hidden="true">close</span>
-          </button>
+        <button type="reset" class="surface interactive icon-button only-icon reset-icon" data-label="reset-search">
+          <span class="material-icons" aria-hidden="true">close</span>
+        </button>
 
-          <button type="submit" class="surface interactive filled tonal elevation-3 only-icon" data-label="submit-search">
-            <span class="material-icons" aria-hidden="true">search</span>
-          </button>
-        </form>
-      </div>
-    </section>
+        <button type="submit" class="surface interactive filled tonal elevation-3 only-icon" data-label="submit-search">
+          <span class="material-icons" aria-hidden="true">search</span>
+        </button>
+      </form>
+
+      <span class="user-search-error body-medium"></span>
+    </bottom-sheet>
 
     <!-- Changelog -->
-    <section id="changelog">
-      <div class="changelog-card surface elevation-3-shadow surface-container-high">
-        <h2 class="title-large" data-string="section-changelog-long-title"></h2>
-        <?php include './pages/changelog.html'; ?>
-      </div>
-    </section>
+    <bottom-sheet id="changelog" drag modal>
+      <h2 class="title-large" data-string="section-changelog-long-title"></h2>
+      <?php include './pages/changelog.html'; ?>
+    </bottom-sheet>
 
     <!-- Misc top layer -->
-    <section id="top-layer"></section>
+    <section id="top-layer" popover></section>
 
     <!-- Notifications -->
     <div class="notification-container"></div>

@@ -12,9 +12,9 @@ template.innerHTML = /*html*/`
       <span class="material-icons">close</span>
     </button>
 
-    <a class="icon-button surface interactive" data-nav-section="filter-menu" href="#" part="filter-icon" data-label="open-filter-menu">
+    <button type="button" class="icon-button surface interactive" data-action="open-filter-menu" part="filter-icon" data-label="open-filter-menu">
       <span class="material-icons">filter_list</span>
-    </a>
+    </button>
   </form>
 `;
 

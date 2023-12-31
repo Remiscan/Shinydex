@@ -8,10 +8,11 @@ import { Pokemon } from '../../Pokemon.js';
 import { isFiltrableSection, isSearchableSection } from '../../filtres.js';
 // @ts-expect-error
 import commonSheet from '../../../../styles/common.css' assert { type: 'css' };
+import { getString } from '../../translation.js';
+import { BottomSheet } from '../bottomSheet.js';
 // @ts-expect-error
 import sheet from './styles.css' assert { type: 'css' };
 import template from './template.js';
-import { getString } from '../../translation.js';
 
 
 
@@ -128,21 +129,28 @@ export class SearchBox extends HTMLElement {
         label?.setAttribute('aria-label', placeholder);
         label?.setAttribute('data-label', `search-${value}`);
 
-        const filterMenuLink = this.shadow.querySelector('[data-nav-section="filter-menu"]');
         let sectionToFilter = value;
         if (value === 'pokedex') sectionToFilter = 'mes-chromatiques';
         if (isFiltrableSection(sectionToFilter ?? '')) {
           this.removeAttribute('no-filters');
-          filterMenuLink?.setAttribute('data-nav-data', JSON.stringify({ section: sectionToFilter, altSection: value }));
         } else {
           this.setAttribute('no-filters', '');
-          filterMenuLink?.removeAttribute('data-nav-data');
         }
       } break;
 
       case 'lang':
         translationObserver.translate(this, value ?? '');
         break;
+    }
+  }
+
+
+  openFilterMenu = (event: Event) => {
+    event.stopPropagation();
+    const filterMenuSheet = document.querySelector('#filter-menu');
+    if (filterMenuSheet instanceof BottomSheet) {
+      filterMenuSheet.setAttribute('data-section', this.section ?? '');
+      filterMenuSheet.show();
     }
   }
 
@@ -166,6 +174,9 @@ export class SearchBox extends HTMLElement {
     form?.addEventListener('input', this.searchInputHandler);
     form?.addEventListener('reset', this.searchInputHandler);
     form?.addEventListener('submit', this.searchInputHandler);
+
+    const filterButton = this.shadow.querySelector('[data-action="open-filter-menu"]');
+    filterButton?.addEventListener('click', this.openFilterMenu);
   }
 
   disconnectedCallback() {
@@ -175,6 +186,9 @@ export class SearchBox extends HTMLElement {
     form?.removeEventListener('input', this.searchInputHandler);
     form?.removeEventListener('reset', this.searchInputHandler);
     form?.removeEventListener('submit', this.searchInputHandler);
+
+    const filterButton = this.shadow.querySelector('[data-action="open-filter-menu"]');
+    filterButton?.removeEventListener('click', this.openFilterMenu);
   }
 
   static get observedAttributes() {

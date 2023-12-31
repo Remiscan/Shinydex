@@ -8,7 +8,7 @@ import { populator } from './appContent.js';
 import { appStart, checkUpdate } from './appLifeCycle.js';
 import * as Auth from './auth.js';
 import { callBackend } from './callBackend.js';
-import './components/bottomSheet.js';
+import { BottomSheet } from './components/bottomSheet.js';
 import './components/corbeille-card/corbeilleCard.js';
 import './components/dexIcon.js';
 import './components/filter-menu/filterMenu.js';
@@ -38,8 +38,7 @@ import { getString } from './translation.js';
 
 // Active les liens de navigation
 const navLinksList = [
-  ...document.querySelectorAll('[data-nav-section]'),
-  ...[...document.querySelectorAll('search-box')].map(sb => sb.shadowRoot?.querySelector('[part="filter-icon"]'))
+  ...document.querySelectorAll('[data-nav-section]')
 ];
 for (const link of navLinksList) {
   if (!(link instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
@@ -67,7 +66,7 @@ for (const bouton of Array.from(document.querySelectorAll('.bouton-retour'))) {
 document.getElementById('obfuscator')!.addEventListener('click', () => history.back());
 
 // Ferme les sections suivantes si on clique en-dehors de leur contenu
-const sectionsToCloseWhenClickingOutside = ['filter-menu', 'user-search', 'top-layer', 'changelog'];
+const sectionsToCloseWhenClickingOutside = ['top-layer'];
 for (const sectionName of sectionsToCloseWhenClickingOutside) {
   const section = document.getElementById(sectionName);
   section?.addEventListener('click', event => {
@@ -113,7 +112,10 @@ for (const fab of fabs) {
   
     // Ajoute un nouvel ami
     else if (sectionActuelle === 'partage') {
-      await navigate('user-search', new Event('click'), {});
+      //await navigate('user-search', new Event('click'), {});
+      event.stopPropagation();
+      const userSearchSheet = document.querySelector('#user-search');
+      if (userSearchSheet instanceof BottomSheet) userSearchSheet.show();
     }
   });
 }
@@ -126,6 +128,9 @@ for (const fab of fabs) {
 // Active le bouton de recherche d'utilisateur
 {
   const form = document.querySelector('form[name="user-search"]') as HTMLFormElement;
+  const addFriendSheet = form.closest('bottom-sheet') as BottomSheet;
+  const errorContainer = document.querySelector('form[name="user-search"] + .user-search-error') as HTMLElement;
+
   form.addEventListener('submit', async event => {
     event.preventDefault();
 
@@ -153,10 +158,28 @@ for (const fab of fabs) {
         }
       }));
 
+      addFriendSheet.close();
+
       new Notif(getString('notif-added-friend').replace('{user}', username)).prompt();
     } else {
-      new Notif(getString('error-no-profile')).prompt();
+      errorContainer.innerHTML = getString('error-no-profile');
     }
+  });
+
+  form.addEventListener('input', () => {
+    form.classList.remove('invalid');
+    errorContainer.innerHTML = '';
+  });
+
+  form.addEventListener('reset', () => {
+    form.classList.remove('invalid');
+    errorContainer.innerHTML = '';
+  });
+
+  addFriendSheet?.dialog?.addEventListener('close', () => {
+    form.reset();
+    form.classList.remove('invalid');
+    errorContainer.innerHTML = '';
   });
 }
 
@@ -270,6 +293,17 @@ importInput.addEventListener('change', async event => {
 
     button.disabled = false;
     button.tabIndex = 0;
+  });
+}
+
+// Détecte le clic sur le bouton d'ouverture du changelog
+{
+  const button = document.querySelector('[data-action="open-changelog"]');
+  if (!(button instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
+  button.addEventListener('click', event => {
+    event.stopPropagation();
+    const changelogSheet = document.querySelector('#changelog');
+    if (changelogSheet instanceof BottomSheet) changelogSheet.show();
   });
 }
 

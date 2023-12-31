@@ -112,7 +112,7 @@ export class syncLine extends HTMLElement {
       else if (newValue == 'success') {
         this.loadingAnim.pause();
 
-        const offset = ((this.loadingAnim.currentTime || 0) % loadingDuration < .5 * loadingDuration) ? '0' : `-${2 * this.longueur}px`;
+        const offset = (Number(this.loadingAnim.currentTime || 0) % loadingDuration < .5 * loadingDuration) ? '0' : `-${2 * this.longueur}px`;
         this.successAnim = progressLine.animate([
           { strokeDashoffset: offset, stroke: 'rgb(var(--success))' }
         ], {
@@ -129,7 +129,7 @@ export class syncLine extends HTMLElement {
       else if (newValue == 'failure') {
         this.loadingAnim.pause();
 
-        const offset = ((this.loadingAnim.currentTime || 0) % loadingDuration < .5 * loadingDuration) ? '0' : `-${2 * this.longueur}px`;
+        const offset = (Number(this.loadingAnim.currentTime || 0) % loadingDuration < .5 * loadingDuration) ? '0' : `-${2 * this.longueur}px`;
         this.failureAnim = progressLine.animate([
           { strokeDashoffset: offset, stroke: 'rgb(var(--error))' }
         ], {
@@ -146,7 +146,7 @@ export class syncLine extends HTMLElement {
       else if (newValue == 'lazy') {
         this.loadingAnim.pause();
 
-        const offset = ((this.loadingAnim.currentTime || 0) % loadingDuration < .5 * loadingDuration) ? `-${this.longueur}px` : `-${this.longueur}px`;
+        const offset = (Number(this.loadingAnim.currentTime || 0) % loadingDuration < .5 * loadingDuration) ? `-${this.longueur}px` : `-${this.longueur}px`;
         this.lazyAnim = progressLine.animate([
           { strokeDashoffset: offset }
         ], {

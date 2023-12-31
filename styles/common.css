@@ -219,6 +219,7 @@ button.fab:active {
 button.icon-button {
   width: 40px;
   height: 40px;
+  padding: 0;
   --surface-opacity: 0;
   --elevation-opacity: 0;
   --state-tint: var(--on-surface);

@@ -168,123 +168,6 @@ const sections: Section[] = [
     fab: null,
     element: document.getElementById('sprite-viewer')!
   }, {
-    nom: 'filter-menu',
-    rememberPosition: false,
-    openAnimation: (section: Element, event: Event) => {
-      const styles = getComputedStyle(section);
-      const from = {
-        x: styles.getPropertyValue('--from-x'),
-        y: styles.getPropertyValue('--from-y')
-      };
-      return section.animate([
-        { opacity: 0, transform: `translate3D(${from.x}, ${from.y}, 0)` },
-        { opacity: 1, transform: 'translate3D(0, 0, 0)' }
-      ], {
-        easing: Params.easingDecelerate,
-        duration: 100,
-        fill: 'both'
-      });
-    },
-    closeAnimation: (section: Element, event: Event) => {
-      const styles = getComputedStyle(section);
-      const from = {
-        x: styles.getPropertyValue('--from-x'),
-        y: styles.getPropertyValue('--from-y')
-      };
-      return section.animate([
-        { opacity: 1, transform: 'translate3D(0, 0, 0)' },
-        { opacity: 0, transform: `translate3D(${from.x}, ${from.y}, 0)` }
-      ], {
-        easing: Params.easingAccelerate,
-        duration: 75,
-        fill: 'both'
-      });
-    },
-    historique: true,
-    closePrevious: false,
-    makePreviousInert: true,
-    preload: [],
-    fab: null,
-    element: document.getElementById('filter-menu')!
-  }, {
-    nom: 'user-search',
-    rememberPosition: false,
-    openAnimation: (section: Element, event: Event) => {
-      const styles = getComputedStyle(section);
-      const from = {
-        x: styles.getPropertyValue('--from-x'),
-        y: styles.getPropertyValue('--from-y')
-      };
-      return section.animate([
-        { opacity: 0, transform: `translate3D(${from.x}, ${from.y}, 0)` },
-        { opacity: 1, transform: 'translate3D(0, 0, 0)' }
-      ], {
-        easing: Params.easingDecelerate,
-        duration: 100,
-        fill: 'both'
-      });
-    },
-    closeAnimation: (section: Element, event: Event) => {
-      const styles = getComputedStyle(section);
-      const from = {
-        x: styles.getPropertyValue('--from-x'),
-        y: styles.getPropertyValue('--from-y')
-      };
-      return section.animate([
-        { opacity: 1, transform: 'translate3D(0, 0, 0)' },
-        { opacity: 0, transform: `translate3D(${from.x}, ${from.y}, 0)` }
-      ], {
-        easing: Params.easingAccelerate,
-        duration: 75,
-        fill: 'both'
-      });
-    },
-    historique: true,
-    closePrevious: false,
-    makePreviousInert: true,
-    preload: [],
-    fab: null,
-    element: document.getElementById('user-search')!
-  }, {
-    nom: 'changelog',
-    rememberPosition: false,
-    openAnimation: (section: Element, event: Event) => {
-      const styles = getComputedStyle(section);
-      const from = {
-        x: styles.getPropertyValue('--from-x'),
-        y: styles.getPropertyValue('--from-y')
-      };
-      return section.animate([
-        { opacity: 0, transform: `translate3D(${from.x}, ${from.y}, 0)` },
-        { opacity: 1, transform: 'translate3D(0, 0, 0)' }
-      ], {
-        easing: Params.easingDecelerate,
-        duration: 100,
-        fill: 'both'
-      });
-    },
-    closeAnimation: (section: Element, event: Event) => {
-      const styles = getComputedStyle(section);
-      const from = {
-        x: styles.getPropertyValue('--from-x'),
-        y: styles.getPropertyValue('--from-y')
-      };
-      return section.animate([
-        { opacity: 1, transform: 'translate3D(0, 0, 0)' },
-        { opacity: 0, transform: `translate3D(${from.x}, ${from.y}, 0)` }
-      ], {
-        easing: Params.easingAccelerate,
-        duration: 75,
-        fill: 'both'
-      });
-    },
-    historique: true,
-    closePrevious: false,
-    makePreviousInert: true,
-    preload: [],
-    fab: null,
-    element: document.getElementById('changelog')!
-  }, {
     nom: 'obfuscator',
     rememberPosition: false,
     openAnimation: (section: Element, event: Event, data: any) => {
@@ -503,11 +386,11 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
         ).then(() => nouvelleSection.element.setAttribute('data-ready', 'true'));
       } break;
 
-      case 'filter-menu': {
+      /*case 'filter-menu': {
         const menu = document.querySelector(`filter-menu[section="${data.section ?? ancienneSection.nom}"]`);
         if (!(menu instanceof FilterMenu)) throw new TypeError(`Expecting FilterMenu`);
         menu.open();
-      } break;
+      } break;*/
 
       default: {
         document.body.removeAttribute('data-filters');

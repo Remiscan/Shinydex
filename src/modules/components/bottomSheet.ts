@@ -1,6 +1,4 @@
 // @ts-expect-error
-import materialIconsSheet from '../../../ext/material_icons.css' assert { type: 'css' };
-// @ts-expect-error
 import themesSheet from '../../../styles/themes.css.php' assert { type: 'css' };
 
 
@@ -22,11 +20,19 @@ const observer = new IntersectionObserver((entries) => {
       switch (entry.target.id) {
         case 'end': bottomSheet.fullyOpen = true; break;
         case 'start': bottomSheet.fullyClosed = false; break;
+        case 'content-top': {
+          bottomSheet.contentAtTop = true;
+          dialog.classList.add('at-top');
+        } break;
       }
     } else {
       switch (entry.target.id) {
         case 'end': bottomSheet.fullyOpen = false; break;
         case 'start': bottomSheet.fullyClosed = true; break;
+        case 'content-top': {
+          bottomSheet.contentAtTop = false;
+          dialog.classList.remove('at-top');
+        } break;
       }
     }
   }
@@ -42,10 +48,11 @@ template.innerHTML = /*html*/`
     <div class="container">
       <button type="button" aria-hidden="true" class="handle"></button>
       <div part="contents">
+        <span class="flag" id="content-top"></span>
         <slot></slot>
       </div>
-      <span id="start"></span>
-      <span id="end"></span>
+      <span class="flag" id="start"></span>
+      <span class="flag" id="end"></span>
     </div>
   </dialog>
 `;
@@ -57,6 +64,11 @@ sheet.replaceSync(/*css*/`
   :host {
     --starting-position: 200px;
     --minimum-full-height: 400px;
+    --duration-enter: 500ms;
+    --duration-exit: 200ms;
+    --easing: var(--easing-emphasized-standard);
+    --margin-top: 72px;
+    touch-action: none;
   }
 
   :host(:not([modal])) {
@@ -72,17 +84,21 @@ sheet.replaceSync(/*css*/`
     border: none;
     border-radius: 28px 28px 0 0;
     width: 100%;
-    margin-top: 72px;
+    max-width: 100%;
+    max-height: calc(100% - var(--margin-top));
+    margin-top: var(--margin-top);
     margin-bottom: 0;
     margin-inline: auto;
     padding: 0;
     top: unset;
     bottom: 0;
     overflow: hidden;
+    --duration: var(--duration-exit);
+    --_duration: calc(var(--duration) * var(--duration-ratio, 1));
     transition:
-      transform .2s var(--easing-standard),
-      display .2s var(--easing-standard) allow-discrete,
-      overlay .2s var(--easing-standard) allow-discrete;
+      transform var(--_duration) var(--easing),
+      display var(--_duration) var(--easing) allow-discrete,
+      overlay var(--_duration) var(--easing) allow-discrete;
   }
 
   :host(:not([modal])) dialog {
@@ -98,11 +114,15 @@ sheet.replaceSync(/*css*/`
 
   dialog::backdrop {
     opacity: 0;
-    background-color: rgb(var(--surface), .5);
+    background: rgb(0, 0, 0, .33);
+    --duration-enter: 500ms;
+    --duration-exit: 200ms;
+    --duration: var(--duration-exit);
+    --easing: var(--easing-emphasized-standard);
     transition:
-      opacity .2s var(--easing-standard),
-      display .2s var(--easing-standard) allow-discrete,
-      overlay .2s var(--easing-standard) allow-discrete;
+      opacity var(--duration) var(--easing),
+      display var(--duration) var(--easing) allow-discrete,
+      overlay var(--duration) var(--easing) allow-discrete;
   }
 
   dialog:not([open]) {
@@ -110,7 +130,13 @@ sheet.replaceSync(/*css*/`
     transform: translateY(100%);
   }
 
+  dialog:not([open]),
+  dialog:not([open])::backdrop {
+    pointer-events: none;
+  }
+
   dialog[open] {
+    --duration: var(--duration-enter);
     transform: translateY(
       clamp(0px, 100% - var(--starting-position) + clamp(-100%, var(--dragged-distance, 0px), 100%), 100%)
     );
@@ -124,6 +150,7 @@ sheet.replaceSync(/*css*/`
 
   dialog[open]::backdrop {
     opacity: 1;
+    --duration: var(--duration-enter);
   }
 
   @starting-style {
@@ -180,8 +207,10 @@ sheet.replaceSync(/*css*/`
 
   [part="contents"] {
     padding: 24px;
-    overflow-y: hidden;
+    overflow: hidden;
+    touch-action: none;
     scrollbar-gutter: stable;
+    position: relative;
   }
 
   :host([drag]) [part="contents"] {
@@ -192,19 +221,31 @@ sheet.replaceSync(/*css*/`
     overflow-y: auto;
   }
 
-  #start, #end {
+  dialog.fully-open:not(.dragging).at-top [part="contents"] {
+    touch-action: pan-down;
+  }
+
+  dialog.fully-open:not(.dragging):not(.at-top) [part="contents"] {
+    touch-action: pan-y;
+  }
+
+  .flag {
     display: inline-block;
     height: 1px;
     width: 1px;
     position: absolute;
   }
 
-  #end {
-    bottom: 0;
+  #content-top {
+    top: 0;
   }
 
   #start {
     top: calc(var(--starting-position) - 1px);
+  }
+
+  #end {
+    bottom: 0;
   }
 `);
 
@@ -216,6 +257,7 @@ export class BottomSheet extends HTMLElement {
   startingPosition = 200;
   fullyOpen = false;
   fullyClosed = false;
+  contentAtTop = true;
 
   get dialog() {
     return this.shadow.querySelector('dialog');
@@ -229,31 +271,40 @@ export class BottomSheet extends HTMLElement {
 	  super();
     this.shadow = this.attachShadow({ mode: 'open' });
     this.shadow.appendChild(template.content.cloneNode(true));
-    this.shadow.adoptedStyleSheets = [materialIconsSheet, themesSheet, sheet];
+    this.shadow.adoptedStyleSheets = [themesSheet, sheet];
   }
 
   show() {
     const dialog = this.dialog;
-    const container = this.dialog?.querySelector('.container');
+    const container = dialog?.querySelector('.container');
+    const contents = dialog?.querySelector('[part="contents"]');
     if (dialog) {
+      dialog.style.removeProperty('--duration-ratio');
+      dialog.style.removeProperty('--easing');
+      contents?.scrollTo(0, 0);
+
       if (this.modal) dialog.showModal();
       else            dialog.show();
 
       container?.addEventListener('pointerdown', this.pointerDownHandler);
-      window.addEventListener('click', this.closeHandler);
+      window.addEventListener('click', this.closeRequestHandler);
     }
   }
 
   close() {
-    const dialog = this.dialog;
-    const container = this.dialog?.querySelector('.container');
-
-    dialog?.close();
-    container?.removeEventListener('pointerdown', this.pointerDownHandler);
-    window.removeEventListener('click', this.closeHandler);
+    this.dialog?.close();
   }
 
-  closeHandler = (event: Event) => {
+  closeEventHandler = () => {
+    const dialog = this.dialog;
+    const container = this.dialog?.querySelector('.container');
+    
+    dialog?.classList.remove('fully-open');
+    container?.removeEventListener('pointerdown', this.pointerDownHandler);
+    window.removeEventListener('click', this.closeRequestHandler);
+  }
+
+  closeRequestHandler = (event: Event) => {
     const container = this.dialog?.querySelector('.container');
     const eventPath = event.composedPath();
     if (!container || !(eventPath.includes(container))) {
@@ -270,15 +321,19 @@ export class BottomSheet extends HTMLElement {
     const dialog = this.dialog;
     const container = this.dialog?.querySelector('.container');
 
-    container?.setPointerCapture(downEvent.pointerId);
-
     dialog.style.removeProperty('--dragged-distance');
-    dialog.style.removeProperty('transition-timing-function');
+    dialog.style.removeProperty('--duration-ratio');
+    dialog.style.removeProperty('--easing');
 
     const startCoords = { x: downEvent.clientX, y: downEvent.clientY };
     let lastDistance = 0;
     let lastDirection = 0;
-    const maxDistance = this.dialog.offsetHeight;
+
+    const dialogRect = dialog.getBoundingClientRect();
+    const maxDistance = dialogRect.height;
+    const startRect = dialog.querySelector('#start')?.getBoundingClientRect();
+    const startDistance = (startRect?.bottom ?? dialogRect.top) - dialogRect.top;
+    
     const clickSafetyMargin = 10; // px
     const minOpeningDistance = 50; // px
     let frameReady = true;
@@ -290,6 +345,9 @@ export class BottomSheet extends HTMLElement {
 
       if (!(moveEvent instanceof PointerEvent)) return;
 
+      moveEvent.preventDefault();
+      if (!this.moving) container?.setPointerCapture(downEvent.pointerId);
+
       const currentCoords = { x: moveEvent.clientX, y: moveEvent.clientY };
       const currentDistance = currentCoords.y - startCoords.y;
       const currentDirection = Math.sign(currentDistance - lastDistance);
@@ -300,50 +358,82 @@ export class BottomSheet extends HTMLElement {
       lastDistance = currentDistance;
       lastDirection = currentDirection;
 
-      // Safety margin to differentiate a click and a drag
-      if (!this.moving && Math.abs(currentDistance) > clickSafetyMargin) {
-        this.moving = true;
-        dialog.classList.add('dragging');
-      }
+      const fullyOpen = dialog.classList.contains('fully-open');
 
-      dialog.style.setProperty('--dragged-distance', `${currentDistance}px`);
+      const ignoreCondition = (fullyOpen && !this.contentAtTop && currentDirection === 1)
+                            ||(fullyOpen && currentDirection === -1);
+
+      if (!ignoreCondition) {
+        // Safety margin to differentiate a click and a drag
+        if (!this.moving && Math.abs(currentDistance) > clickSafetyMargin) {
+          this.moving = true;
+          dialog.classList.add('dragging');
+        }
+
+        dialog.style.setProperty('--dragged-distance', `${currentDistance}px`);
+      }
 
       requestAnimationFrame(() => { frameReady = true });
     }
 
-    const pointerUpHandler = () => {
+    const pointerUpHandler = (upEvent: Event) => {
       dialog.classList.remove('dragging');
 
       container?.removeEventListener('pointermove', pointerMoveHandler);
       container?.removeEventListener('pointerup', pointerUpHandler);
       container?.removeEventListener('pointercancel', pointerUpHandler);
+      container?.releasePointerCapture(downEvent.pointerId);
+
+      /*let totalDistance = maxDistance;
+      let remainingDistance =  maxDistance;*/
+
+      const dragDuration = Date.now() - time;
+      const violentDrag = dragDuration < 100 && Math.abs(lastDistance) > minOpeningDistance;
 
       // If moved enough towards the top, treat as a successful opening
       if (lastDirection === -1 && Math.abs(lastDistance) > minOpeningDistance) {
         // Calculate the remaining animation time based on the current speed
         //const remainingDurationRatio = Math.round(100 * .001 * (Date.now() - time) * (1 - Math.abs(lastDistance)) / Math.abs(lastDistance)) / 100;
+        /*totalDistance = maxDistance - startDistance;
+        remainingDistance = totalDistance - Math.abs(lastDistance);*/
 
-        dialog.style.setProperty('transition-timing-function', 'var(--easing-decelerate)');
         dialog.classList.add('fully-open');
-        dialog.style.removeProperty('--dragged-distance');
       }
 
       // If moved enough towards the bottom, treat as a successful closing / size reset
       else if (lastDirection === +1 && Math.abs(lastDistance) > minOpeningDistance) {
+        // If we're going from fully open to partially open
         if (dialog.classList.contains('fully-open') && !this.fullyClosed) {
-          dialog.classList.remove('fully-open');
-          dialog.style.removeProperty('--dragged-distance');
-        } else {
-          this.close();
-          dialog.classList.remove('fully-open');
-          dialog.style.removeProperty('--dragged-distance');
+          /*totalDistance = maxDistance - startDistance;
+          remainingDistance = totalDistance - Math.abs(lastDistance);*/
+          if (violentDrag) this.close();
         }
+
+        // If we're going from fully open to fully closed
+        else if (dialog.classList.contains('fully-open') && this.fullyClosed) {
+          /*totalDistance = maxDistance;
+          remainingDistance = totalDistance - Math.abs(lastDistance);*/
+          this.close();
+        }
+        
+        // If we're going from partially open to fully closed
+        else {
+          /*totalDistance = startDistance;
+          remainingDistance = totalDistance - Math.abs(lastDistance);*/
+          this.close();
+        }
+
+        dialog.classList.remove('fully-open');
       }
 
       // If not moved enough, restore previous position
-      else {
-        dialog.style.removeProperty('--dragged-distance');
-      }
+      else {}
+
+      dialog.style.removeProperty('--dragged-distance');
+      dialog.style.setProperty('--easing', 'var(--easing-emphasized-decelerate)');
+      /*dialog.style.setProperty('--duration-ratio', String(
+        Math.round(100 * .001 * (Date.now() - time) * remainingDistance / totalDistance) / 100
+      ));*/
       
       this.moving = false;
     }
@@ -355,17 +445,29 @@ export class BottomSheet extends HTMLElement {
 
 
   connectedCallback() {
+    const topTrigger = this.shadow.querySelector('#content-top');
+    if (topTrigger) observer.observe(topTrigger);
+
     const startTrigger = this.shadow.querySelector('#start');
-    const endTrigger = this.shadow.querySelector('#end');
     if (startTrigger) observer.observe(startTrigger);
+
+    const endTrigger = this.shadow.querySelector('#end');
     if (endTrigger) observer.observe(endTrigger);
+
+    this.dialog?.addEventListener('close', this.closeEventHandler);
   }
 
   disconnectedCallback() {
+    const topTrigger = this.shadow.querySelector('#content-top');
+    if (topTrigger) observer.unobserve(topTrigger);
+
     const startTrigger = this.shadow.querySelector('#start');
-    const endTrigger = this.shadow.querySelector('#end');
     if (startTrigger) observer.unobserve(startTrigger);
+
+    const endTrigger = this.shadow.querySelector('#end');
     if (endTrigger) observer.unobserve(endTrigger);
+
+    this.dialog?.removeEventListener('close', this.closeEventHandler);
   }
 }
 

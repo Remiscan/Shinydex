@@ -95,7 +95,6 @@
         "./dist/modules/ShinyBackend.js",
         "./dist/modules/syncBackup.js",
         "./dist/modules/theme.js",
-        "./dist/modules/topLayer.js",
         "./dist/modules/translation.js",
         "./dist/modules/upgradeStorage.js",
         "./dist/strings/app.json",
