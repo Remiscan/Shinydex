@@ -812,6 +812,10 @@ section:not([data-filter-legit~="false"]) [data-legit="false"] {
   --elevation-opacity: var(--elevation-3-opacity);
 }
 
+.search-form[name="user-search"] button[type="reset"] {
+  margin-left: -4px;
+}
+
 .search-form[name="user-search"] button[type="submit"] {
   grid-column: submit-button;
   height: 48px;

@@ -44,7 +44,7 @@ const observer = new IntersectionObserver((entries) => {
 
 const template = document.createElement('template');
 template.innerHTML = /*html*/`
-  <dialog class="surface surface-container-low">
+  <dialog class="surface surface-container-low" part="dialog">
     <div class="container">
       <button type="button" aria-hidden="true" class="handle"></button>
       <div part="contents">
@@ -97,6 +97,7 @@ sheet.replaceSync(/*css*/`
     --_duration: var(--duration, var(--duration-exit));
     transition:
       transform var(--_duration) var(--easing),
+      opacity var(--_duration) var(--easing),
       display var(--_duration) var(--easing) allow-discrete,
       overlay var(--_duration) var(--easing) allow-discrete;
   }
@@ -247,6 +248,50 @@ sheet.replaceSync(/*css*/`
 
   #end {
     bottom: 0;
+  }
+
+  @media (min-height: 800px) and (min-width: 720px) {
+    dialog {
+      transform: translateY(2rem);
+      opacity: 0;
+      border-radius: 28px;
+      inset: 0;
+      margin: auto;
+    }
+
+    dialog:not([open]) {
+      transform: translateY(2rem);
+    }
+
+    :host([drag]) .container {
+      grid-template-rows: 1fr;
+    }
+
+    :host([drag]) .handle {
+      display: none;
+    }
+
+    dialog[open],
+    dialog[open].fully-open {
+      transform: translateY(0px);
+      opacity: 1;
+    }
+
+    @starting-style {
+      dialog[open] {
+        transform: translateY(2rem);
+        opacity: 0;
+      }
+    }
+
+    [part="contents"] {
+      overflow-y: auto;
+      touch-action: auto !important;
+    }
+
+    :host([drag]) [part="contents"] {
+      padding-top: 24px;
+    }
   }
 `);
 
