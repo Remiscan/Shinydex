@@ -395,7 +395,7 @@ export class BottomSheet extends HTMLElement {
       let easing = 'var(--easing-decelerate)';
 
       const dragDuration = Date.now() - time;
-      const violentDrag = dragDuration < 100 && Math.abs(lastDistance) > 2 * minOpeningDistance;
+      const violentDrag = (dragDuration < 100 && Math.abs(lastDistance) > 2 * minOpeningDistance) || Math.abs(lastDistance) > .5 * maxDistance;
 
       // If moved enough towards the top, treat as a successful opening
       if (lastDirection === -1 && Math.abs(lastDistance) > minOpeningDistance) {
@@ -420,7 +420,7 @@ export class BottomSheet extends HTMLElement {
         else if (dialog.classList.contains('fully-open') && this.fullyClosed) {
           totalDistance = maxDistance;
           remainingDistance = totalDistance - Math.abs(lastDistance);
-          easing = 'linear';
+          easing = 'var(--easing-accelerate)';
           this.close();
         }
         
@@ -428,7 +428,7 @@ export class BottomSheet extends HTMLElement {
         else {
           totalDistance = startDistance;
           remainingDistance = totalDistance - Math.abs(lastDistance);
-          easing = 'linear';
+          easing = 'var(--easing-accelerate)';
           this.close();
         }
 
