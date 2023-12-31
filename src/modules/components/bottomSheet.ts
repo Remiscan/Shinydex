@@ -66,7 +66,7 @@ sheet.replaceSync(/*css*/`
     --minimum-full-height: 400px;
     --duration-enter: 500ms;
     --duration-exit: 200ms;
-    --easing: var(--easing-emphasized-standard);
+    --easing: var(--easing-emphasized-decelerate);
     --margin-top: 72px;
     touch-action: none;
   }
@@ -93,8 +93,8 @@ sheet.replaceSync(/*css*/`
     top: unset;
     bottom: 0;
     overflow: hidden;
-    --duration: var(--duration-exit);
-    --_duration: calc(var(--duration) * var(--duration-ratio, 1));
+    --_easing: var(--easing, var(--easing-emphasized-accelerate));
+    --_duration: var(--duration, var(--duration-exit));
     transition:
       transform var(--_duration) var(--easing),
       display var(--_duration) var(--easing) allow-discrete,
@@ -136,7 +136,8 @@ sheet.replaceSync(/*css*/`
   }
 
   dialog[open] {
-    --duration: var(--duration-enter);
+    --_duration: var(--duration, var(--duration-enter));
+    var(--easing, var(--easing-emphasized-decelerate));
     transform: translateY(
       clamp(0px, 100% - var(--starting-position) + clamp(-100%, var(--dragged-distance, 0px), 100%), 100%)
     );
@@ -279,7 +280,8 @@ export class BottomSheet extends HTMLElement {
     const container = dialog?.querySelector('.container');
     const contents = dialog?.querySelector('[part="contents"]');
     if (dialog) {
-      dialog.style.removeProperty('--duration-ratio');
+      dialog.style.removeProperty('--dragged-distance');
+      dialog.style.removeProperty('--duration');
       dialog.style.removeProperty('--easing');
       contents?.scrollTo(0, 0);
 
@@ -308,6 +310,9 @@ export class BottomSheet extends HTMLElement {
     const container = this.dialog?.querySelector('.container');
     const eventPath = event.composedPath();
     if (!container || !(eventPath.includes(container))) {
+      this.dialog?.style.removeProperty('--dragged-distance');
+      this.dialog?.style.removeProperty('--duration');
+      this.dialog?.style.removeProperty('--easing');
       this.close();
     }
   }
@@ -322,7 +327,7 @@ export class BottomSheet extends HTMLElement {
     const container = this.dialog?.querySelector('.container');
 
     dialog.style.removeProperty('--dragged-distance');
-    dialog.style.removeProperty('--duration-ratio');
+    dialog.style.removeProperty('--duration');
     dialog.style.removeProperty('--easing');
 
     const startCoords = { x: downEvent.clientX, y: downEvent.clientY };
@@ -384,18 +389,20 @@ export class BottomSheet extends HTMLElement {
       container?.removeEventListener('pointercancel', pointerUpHandler);
       container?.releasePointerCapture(downEvent.pointerId);
 
-      /*let totalDistance = maxDistance;
-      let remainingDistance =  maxDistance;*/
+      let totalDistance = maxDistance;
+      let remainingDistance =  maxDistance;
+      let duration = null;
+      let easing = 'var(--easing-decelerate)';
 
       const dragDuration = Date.now() - time;
-      const violentDrag = dragDuration < 100 && Math.abs(lastDistance) > minOpeningDistance;
+      const violentDrag = dragDuration < 100 && Math.abs(lastDistance) > 2 * minOpeningDistance;
 
       // If moved enough towards the top, treat as a successful opening
       if (lastDirection === -1 && Math.abs(lastDistance) > minOpeningDistance) {
         // Calculate the remaining animation time based on the current speed
         //const remainingDurationRatio = Math.round(100 * .001 * (Date.now() - time) * (1 - Math.abs(lastDistance)) / Math.abs(lastDistance)) / 100;
-        /*totalDistance = maxDistance - startDistance;
-        remainingDistance = totalDistance - Math.abs(lastDistance);*/
+        totalDistance = maxDistance - startDistance;
+        remainingDistance = totalDistance - Math.abs(lastDistance);
 
         dialog.classList.add('fully-open');
       }
@@ -404,22 +411,24 @@ export class BottomSheet extends HTMLElement {
       else if (lastDirection === +1 && Math.abs(lastDistance) > minOpeningDistance) {
         // If we're going from fully open to partially open
         if (dialog.classList.contains('fully-open') && !this.fullyClosed) {
-          /*totalDistance = maxDistance - startDistance;
-          remainingDistance = totalDistance - Math.abs(lastDistance);*/
+          totalDistance = maxDistance - startDistance;
+          remainingDistance = totalDistance - Math.abs(lastDistance);
           if (violentDrag) this.close();
         }
 
         // If we're going from fully open to fully closed
         else if (dialog.classList.contains('fully-open') && this.fullyClosed) {
-          /*totalDistance = maxDistance;
-          remainingDistance = totalDistance - Math.abs(lastDistance);*/
+          totalDistance = maxDistance;
+          remainingDistance = totalDistance - Math.abs(lastDistance);
+          easing = 'linear';
           this.close();
         }
         
         // If we're going from partially open to fully closed
         else {
-          /*totalDistance = startDistance;
-          remainingDistance = totalDistance - Math.abs(lastDistance);*/
+          totalDistance = startDistance;
+          remainingDistance = totalDistance - Math.abs(lastDistance);
+          easing = 'linear';
           this.close();
         }
 
@@ -427,13 +436,17 @@ export class BottomSheet extends HTMLElement {
       }
 
       // If not moved enough, restore previous position
-      else {}
+      else {
+        duration = 500;
+      }
 
       dialog.style.removeProperty('--dragged-distance');
-      dialog.style.setProperty('--easing', 'var(--easing-emphasized-decelerate)');
-      /*dialog.style.setProperty('--duration-ratio', String(
-        Math.round(100 * .001 * (Date.now() - time) * remainingDistance / totalDistance) / 100
-      ));*/
+      dialog.style.setProperty('--duration', `${
+        duration ?? Math.min(750, 
+          (Date.now() - time) * Math.abs(remainingDistance / lastDistance)
+        )
+      }ms`);
+      dialog.style.setProperty('--easing', easing);
       
       this.moving = false;
     }
