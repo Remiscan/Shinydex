@@ -239,7 +239,7 @@ $httpLanguage = $translation->getLanguage();
           <span class="material-icons" aria-hidden="true">close</span>
         </button>
 
-        <button type="submit" class="surface interactive filled tonal elevation-3 only-icon" data-label="submit-search">
+        <button type="submit" class="surface interactive filled tonal only-icon" data-label="submit-search">
           <span class="material-icons" aria-hidden="true">search</span>
         </button>
       </form>
