@@ -208,12 +208,9 @@ $httpLanguage = $translation->getLanguage();
     </main>
 
     <!-- Sprite viewer -->
-    <section id="sprite-viewer" class="surface">
+    <dialog id="sprite-viewer" class="surface">
       <sprite-viewer></sprite-viewer>
-    </section>
-
-    <!-- Obfuscator -->
-    <section id="obfuscator" class="surface"></section>
+    </dialog>
 
     <!-- Menu de filtres -->
     <bottom-sheet id="filter-menu" drag modal>
@@ -250,9 +247,6 @@ $httpLanguage = $translation->getLanguage();
       <h2 class="title-large" data-string="section-changelog-long-title"></h2>
       <?php include './pages/changelog.html'; ?>
     </bottom-sheet>
-
-    <!-- Misc top layer -->
-    <section id="top-layer" popover></section>
 
     <!-- Notifications -->
     <div class="notification-container"></div>

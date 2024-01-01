@@ -253,6 +253,13 @@ section {
   overflow-anchor: none;
   height: 100%;
   overflow: hidden;
+  transition:
+    transform .5s var(--easing-emphasized-decelerate),
+    opacity .5s var(--easing-emphasized-decelerate);
+  transform: translateY(var(--translate, 0px));
+  opacity: var(--opacity, 1);
+  --translate-from: 20px;
+  --opacity-from: 0;
 }
 
 main > section {
@@ -267,11 +274,15 @@ body[data-section-actuelle~="corbeille"] #corbeille,
 body[data-section-actuelle~="partage"] #partage,
 body[data-section-actuelle~="chromatiques-ami"] #chromatiques-ami,
 body[data-section-actuelle~="parametres"] #parametres,
-body[data-section-actuelle~="a-propos"] #a-propos,
-body[data-section-actuelle~="sprite-viewer"] #sprite-viewer[data-ready],
-body[data-section-actuelle~="top-layer"] #top-layer,
-body[data-section-actuelle~="obfuscator"] #obfuscator {
+body[data-section-actuelle~="a-propos"] #a-propos {
   display: grid;
+  --translate: 0px;
+  --opacity: 1;
+
+  @starting-style {
+    --translate: var(--translate-from);
+    --opacity: var(--opacity-from);
+  }
 }
 
 /*body[data-section-actuelle~="mes-chromatiques"] main,
@@ -1156,7 +1167,43 @@ remiscan-logo {
 }
 
 #sprite-viewer {
+  overflow-anchor: none;
+  overflow: hidden;
+  border: none;
+  inset: 0;
+  max-width: 100%;
+  max-height: 100%;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
   z-index: var(--z-sprite-viewer);
+  --scale-from: .7;
+  --opacity-from: 0;
+  --easing: var(--easing-emphasized-accelerate);
+  --duration: .15s;
+  transition:
+    transform var(--duration) var(--easing),
+    opacity var(--duration) var(--easing),
+    display var(--duration) linear allow-discrete;
+  transform: scale(var(--scale-from));
+  opacity: var(--opacity-from);
+}
+
+#sprite-viewer[open] {
+  --easing: var(--easing-emphasized-decelerate);
+  --duration: .2s;
+  transform: scale(1);
+  opacity: 1;
+
+  @starting-style {
+    transform: scale(var(--scale-from));
+    opacity: var(--opacity-from);
+  }
+}
+
+#sprite-viewer::backdrop {
+  opacity: 0;
 }
 
 #obfuscator {
