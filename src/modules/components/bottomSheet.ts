@@ -97,7 +97,7 @@ sheet.replaceSync(/*css*/`
     --_duration: var(--duration, var(--duration-exit));
     transition:
       transform var(--_duration) var(--easing),
-      opacity var(--_duration) var(--easing),
+      opacity var(--_duration) var(--easing-emphasized-standard),
       display var(--_duration) var(--easing) allow-discrete,
       overlay var(--_duration) var(--easing) allow-discrete;
   }
