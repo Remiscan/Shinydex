@@ -8,7 +8,7 @@ import template from './template.js';
 
 
 
-export class spriteViewer extends HTMLElement {
+export class SpriteViewer extends HTMLElement {
   ready: boolean = true;
   toggle: () => void = () => {};
   mode: 'shiny' | 'regular' = 'shiny';
@@ -20,11 +20,29 @@ export class spriteViewer extends HTMLElement {
   }
 
 
-  reset() {
-    this.setAttribute('shiny', 'true');
-    const switchSR = this.querySelector('shiny-switch');
-    if (switchSR == null || !('checked' in switchSR)) throw new TypeError(`Expecting ShinySwitch`);
-    switchSR.checked = true;
+  open() {
+    const dialog = this.closest('dialog#sprite-viewer');
+    if (!(dialog instanceof HTMLDialogElement)) throw new TypeError('Expecting HTMLDialogElement');
+    dialog.showModal();
+    dialog.addEventListener('close', this.dialogCloseHandler);
+  }
+
+
+  close() {
+    const dialog = this.closest('dialog#sprite-viewer');
+    if (!(dialog instanceof HTMLDialogElement)) throw new TypeError('Expecting HTMLDialogElement');
+    dialog.close();
+    dialog.removeEventListener('close', this.dialogCloseHandler);
+  }
+
+
+  dialogCloseHandler = async (event: Event) => {
+    const dialog = event.target;
+    await Promise.any([
+      wait(160),
+      new Promise(resolve => dialog?.addEventListener('transitionend', resolve, { once: true }))
+    ]);
+    this.removeAttribute('dexid');
   }
 
 
@@ -192,11 +210,11 @@ export class spriteViewer extends HTMLElement {
       document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
     }
     this.ready = true;
-    for (const attr of spriteViewer.observedAttributes) {
+    for (const attr of SpriteViewer.observedAttributes) {
       this.update(attr);
     }
 
-    const form = this.querySelector('form[name="switch-shiny-regular"]');
+    const form = this.querySelector('form');
     if (!(form instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
     form.addEventListener('change', this.toggleShinyRegular);
 
@@ -209,7 +227,7 @@ export class spriteViewer extends HTMLElement {
   disconnectedCallback() {
     translationObserver.unserve(this);
 
-    const form = this.querySelector('form[name="switch-shiny-regular"]');
+    const form = this.querySelector('form');
     if (!(form instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
     form.removeEventListener('change', this.toggleShinyRegular);
 
@@ -231,4 +249,4 @@ export class spriteViewer extends HTMLElement {
   }
 }
 
-if (!customElements.get('sprite-viewer')) customElements.define('sprite-viewer', spriteViewer);
+if (!customElements.get('sprite-viewer')) customElements.define('sprite-viewer', SpriteViewer);

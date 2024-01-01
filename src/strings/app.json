@@ -226,7 +226,7 @@
     "install-app": "Installer l'application",
     "shiny-switch": "Passer de la forme chromatique à la forme normale et inversement",
     
-    "add-friend-hint": "Saisissez un pseudo pour ajouter un ami",
+    "add-friend-hint": "Ajouter un ami",
     "add-friend-placeholder": "Rechercher un pseudo",
     "remove-friend": "Retirer de mes amis",
     "see-friends-pokemon": "Voir ses Pokémon",
@@ -549,7 +549,7 @@
     "install-app": "Install the app",
     "shiny-switch": "Switch from shiny form to normal form and back",
 
-    "add-friend-hint": "Type a username to add a friend",
+    "add-friend-hint": "Add a friend",
     "add-friend-placeholder": "Search for a username",
     "remove-friend": "Remove from my friends",
     "see-friends-pokemon": "See his Pokémon",

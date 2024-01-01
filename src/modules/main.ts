@@ -30,6 +30,7 @@ import { navLinkBubble, navigate, sectionActuelle } from './navigate.js';
 import { Notif, warnBeforeDestruction } from './notification.js';
 import { immediateSync, requestSync } from './syncBackup.js';
 import { getString } from './translation.js';
+import { SpriteViewer } from './components/sprite-viewer/spriteViewer.js';
 
 
 
@@ -62,19 +63,6 @@ for (const bouton of Array.from(document.querySelectorAll('.bouton-retour'))) {
   });
 }
 
-// L'obfuscator ramène en arrière quand on clique dessus
-document.getElementById('obfuscator')!.addEventListener('click', () => history.back());
-
-// Ferme les sections suivantes si on clique en-dehors de leur contenu
-const sectionsToCloseWhenClickingOutside = ['top-layer'];
-for (const sectionName of sectionsToCloseWhenClickingOutside) {
-  const section = document.getElementById(sectionName);
-  section?.addEventListener('click', event => {
-    if (event.target !== section) return;
-    history.back();
-  });
-}
-
 
 
 ///////////////////////////////////
@@ -84,12 +72,20 @@ for (const sectionName of sectionsToCloseWhenClickingOutside) {
 const fabs = document.querySelectorAll('.fab');
 for (const fab of fabs) {
   fab.addEventListener('click', async (event) => {
+    const isSpriteViewerFab = fab.id === 'sprite-viewer-fab';
     // Crée une nouvelle chasse
-    if (['mes-chromatiques', 'pokedex', 'chasses-en-cours', 'sprite-viewer'].includes(sectionActuelle)) {
+    if (['mes-chromatiques', 'pokedex', 'chasses-en-cours'].includes(sectionActuelle) || isSpriteViewerFab) {
       let dexid: number | undefined;
-      if (sectionActuelle === 'sprite-viewer') {
+      if (isSpriteViewerFab) {
         event?.preventDefault();
-        dexid = Number(document.querySelector('#sprite-viewer sprite-viewer')?.getAttribute('dexid')) ?? undefined;
+        const dialog = document.querySelector('#sprite-viewer');
+        if (!(dialog instanceof HTMLDialogElement)) throw new TypeError('Expecting HTMLDialogElement');
+
+        const viewer = dialog.querySelector('sprite-viewer');
+        if (!(viewer instanceof SpriteViewer)) throw new TypeError('Expecting SpriteViewer');
+
+        dexid = Number(viewer.getAttribute('dexid')) ?? undefined;
+        viewer.close();
       }
 
       if (sectionActuelle !== 'chasses-en-cours') {
@@ -129,7 +125,6 @@ for (const fab of fabs) {
 {
   const form = document.querySelector('form[name="user-search"]') as HTMLFormElement;
   const addFriendSheet = form.closest('bottom-sheet') as BottomSheet;
-  const errorContainer = document.querySelector('form[name="user-search"] + .user-search-error') as HTMLElement;
 
   form.addEventListener('submit', async event => {
     event.preventDefault();

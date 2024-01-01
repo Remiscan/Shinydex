@@ -8,23 +8,16 @@ sprite-viewer {
   overflow: hidden;
 }
 
-.bouton-retour {
-  justify-self: center;
-  align-self: center;
+sprite-viewer form {
   grid-row: 2;
   grid-column: 2;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  margin-inline: 16px;
 }
 
-form[name="switch-shiny-regular"] {
-  grid-row: 2;
-  grid-column: 2;
-  width: fit-content;
-  height: fit-content;
+label[for="shiny-switch"] {
   justify-self: end;
-  align-self: center;
-  margin-right: 16px;
-  display: grid;
-  place-items: center;
 }
 
 sprite-viewer[shiny="false"] .sprite-list.shiny,
@@ -95,11 +88,8 @@ sprite-viewer a.icon-button.bouton-retour {
 }
 
 .sprite-viewer-dex-info {
-  grid-row: 2;
-  grid-column: 2;
   justify-self: start;
   align-self: center;
-  margin-left: 16px;
   height: var(--height);
   --height: calc(2.25em / .75);
 }

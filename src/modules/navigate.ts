@@ -1,9 +1,7 @@
 import { Params, loadAllImages, wait } from './Params.js';
-import { Settings } from './Settings.js';
 import { FrontendShiny } from './ShinyBackend.js';
 import { callBackend } from './callBackend.js';
 import { FilterMenu } from './components/filter-menu/filterMenu.js';
-import { spriteViewer } from './components/sprite-viewer/spriteViewer.js';
 import { clearElementStorage, lazyLoadSection, unLazyLoadSection, virtualizedSections } from './lazyLoading.js';
 import { friendShinyStorage } from './localForage.js';
 import { Notif } from './notification.js';
@@ -14,185 +12,56 @@ import { TranslatedString, getString } from './translation.js';
 
 interface Section {
   nom: string;
-  rememberPosition: boolean;
-  openAnimation: (el: HTMLElement, ev: Event, data?: any) => (Animation | null);
-  closeAnimation: (el: HTMLElement, ev: Event, data?: any) => (Animation | null);
-  historique: boolean;
-  closePrevious: boolean;
-  makePreviousInert: boolean;
   preload: string[];
   fab: string | null;
   element: HTMLElement;
 }
 
-const defaultAnimation = (section: Element, event: Event) => section.animate([
-  { transform: 'translate3D(0, 20px, 0)', opacity: '0' },
-  { transform: 'translate3D(0, 0, 0)', opacity: '1' }
-], {
-  easing: Params.easingEmphasizedDecelerate,
-  duration: 500,
-  fill: 'both'
-});
-
 const sections: Section[] = [
   {
     nom: 'mes-chromatiques',
-    rememberPosition: true,
-    openAnimation: defaultAnimation,
-    closeAnimation: () => null,
-    historique: true,
-    closePrevious: true,
-    makePreviousInert: false,
     preload: [`./images/iconsheet.webp`],
     fab: 'add',
     element: document.getElementById('mes-chromatiques')!
   }, {
     nom: 'pokedex',
-    rememberPosition: true,
-    openAnimation: defaultAnimation,
-    closeAnimation: () => null,
-    historique: true,
-    closePrevious: true,
-    makePreviousInert: false,
     preload: [`./images/pokemonsheet.webp`],
     fab: 'add',
     element: document.getElementById('pokedex')!
   }, {
     nom: 'chasses-en-cours',
-    rememberPosition: true,
-    openAnimation: defaultAnimation,
-    closeAnimation: () => null,
-    historique: true,
-    closePrevious: true,
-    makePreviousInert: false,
     preload: [`./images/iconsheet.webp`],
     fab: 'add',
     element: document.getElementById('chasses-en-cours')!
   }, {
     nom: 'corbeille',
-    rememberPosition: true,
-    openAnimation: defaultAnimation,
-    closeAnimation: () => null,
-    historique: true,
-    closePrevious: true,
-    makePreviousInert: false,
     preload: [`./images/iconsheet.webp`],
     fab: null,
     element: document.getElementById('corbeille')!
   }, {
     nom: 'partage',
-    rememberPosition: true,
-    openAnimation: defaultAnimation,
-    closeAnimation: () => null,
-    historique: true,
-    closePrevious: true,
-    makePreviousInert: false,
     preload: [`./images/iconsheet.webp`],
     fab: 'person_add',
     element: document.getElementById('partage')!
   }, {
     nom: 'chromatiques-ami',
-    rememberPosition: false,
-    openAnimation: defaultAnimation,
-    closeAnimation: () => null,
-    historique: true,
-    closePrevious: true,
-    makePreviousInert: false,
     preload: [`./images/iconsheet.webp`],
     fab: null,
     element: document.getElementById('chromatiques-ami')!
   }, {
     nom: 'parametres',
-    rememberPosition: true,
-    openAnimation: defaultAnimation,
-    closeAnimation: () => null,
-    historique: true,
-    closePrevious: true,
-    makePreviousInert: false,
     preload: [],
     fab: null,
     element: document.getElementById('parametres')!
   }, {
     nom: 'a-propos',
-    rememberPosition: true,
-    openAnimation: defaultAnimation,
-    closeAnimation: () => null,
-    historique: true,
-    closePrevious: true,
-    makePreviousInert: false,
     preload: [],
     fab: null,
     element: document.getElementById('a-propos')!
-  }, {
-    nom: 'sprite-viewer',
-    rememberPosition: false,
-    openAnimation: (section: HTMLElement, event: Event, data: any) => {
-      let originX, originY;
-      if (event instanceof MouseEvent && event.clientX && event.clientY) {
-        originX = event.clientX;
-        originY = event.clientY;
-      } else {
-        const dexIcon = document.querySelector(`#pokedex .pkmnicon[data-dexid="${data.dexid}"]`);
-        const rect = dexIcon ? dexIcon.getBoundingClientRect() : {
-          x: window.innerWidth / 2,
-          y: window.innerHeight / 2
-        };
-        originX = rect.x;
-        originY = rect.y;
-      }
-      section.style.transformOrigin = originX + 'px ' + originY + 'px';
-
-      return section.animate([
-        { opacity: 0, transform: 'scale(.7) translateZ(0)' },
-        { opacity: 1, transform: 'scale(1) translateZ(0)' }
-      ], {
-        easing: Params.easingDecelerate,
-        duration: 200,
-        fill: 'both'
-      });;
-    },
-    closeAnimation: (section: Element, event: Event) => {
-      return section.animate([
-        { opacity: 1, transform: 'scale(1) translateZ(0)' },
-        { opacity: 0, transform: 'scale(.7) translateZ(0)' }
-      ], {
-        easing: Params.easingAccelerate,
-        duration: 150,
-        fill: 'both'
-      });
-    },
-    historique: true,
-    closePrevious: false,
-    makePreviousInert: true,
-    preload: [],
-    fab: null,
-    element: document.getElementById('sprite-viewer')!
-  }, {
-    nom: 'obfuscator',
-    rememberPosition: false,
-    openAnimation: (section: Element, event: Event, data: any) => {
-      return section.animate([
-        { opacity: 0 },
-        { opacity: data?.opacity ?? .75 }
-      ], {
-        easing: Params.easingStandard,
-        duration: 200,
-        fill: 'both'
-      });
-    },
-    closeAnimation: (section: Element, event: Event) => {
-      return null;
-    },
-    historique: true,
-    closePrevious: false,
-    makePreviousInert: true,
-    preload: [],
-    fab: null,
-    element: document.getElementById('obfuscator')!
   }
 ];
 export let sectionActuelle = 'mes-chromatiques';
-const lastPosition: Map<string, number> = new Map(sections.filter(section => section.rememberPosition).map(section => [section.nom, 0]));
+const lastPosition: Map<string, number> = new Map(sections.map(section => [section.nom, 0]));
 
 
 const backOnEscape = (event: KeyboardEvent) => {
@@ -232,11 +101,8 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
     return Promise.resolve();
   }
 
-  if (sectionCible === 'sprite-viewer' && !(navigator.onLine)) {
-    if (!(await Settings.get('cache-all-sprites'))) return new Notif(getString('error-no-connection')).prompt();
-  }
-
-  const ancienneSection = sections.find(section => section.nom === sectionActuelle)!;
+  const ancienneSection = sections.find(section => section.nom === sectionActuelle);
+  if (!ancienneSection) throw getString('error-no-section');
   const nouvelleSection = sections.find(section => section.nom === sectionCible);
   if (!nouvelleSection) throw getString('error-no-section');
 
@@ -250,22 +116,15 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
     const linkedAnciennesSections = getLinkedSections(ancienneSection.nom);
     await Promise.all(linkedAnciennesSections.map(async section => {
       // On dé-virtualise la section précédente si elle l'était
-      if (nouvelleSection.closePrevious) {
-        const virtualized = virtualizedSections.includes(section.nom);
-        if (virtualized) unLazyLoadSection(section.nom);
-      }
+      const virtualized = virtualizedSections.includes(section.nom);
+      if (virtualized) unLazyLoadSection(section.nom);
 
       // On enregistre la position du scroll sur l'ancienne section
-      if (section.rememberPosition) {
-        const scrolledElement = section.element.querySelector('.section-contenu')!;
-        lastPosition.set(sectionActuelle, scrolledElement.scrollTop);
-      }
+      const scrolledElement = section.element.querySelector('.section-contenu')!;
+      lastPosition.set(sectionActuelle, scrolledElement.scrollTop);
+
       const scrollDetector = ancienneSection.element.querySelector('.scroll-detector');
       if (scrollDetector) scrollObserver.unobserve(scrollDetector);
-
-      // On anime la disparition de l'ancienne section
-      const anim = section.closeAnimation(section.element, event, data);
-      if (anim) await wait(anim);
     }));
   }
 
@@ -275,33 +134,14 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
     sp.removeAttribute('finished');
   });
 
-  if (nouvelleSection.historique && event.type !== 'popstate') history.pushState({ section: sectionCible, data: data }, '');
-
-  // On rend l'ancienne section inerte si la nouvelle section s'affiche par-dessus
-  const main = document.querySelector('main');
-  const bottomBar = document.querySelector('nav.bottom-bar');
-  if (!nouvelleSection.closePrevious) {
-    if (nouvelleSection.makePreviousInert) {
-      main?.setAttribute('inert', '');
-      bottomBar?.setAttribute('inert', '');
-    }
-    window.addEventListener('keydown', backOnEscape); // On ferme la section en appuyant sur Échap
-  } else {
-    main?.removeAttribute('inert');
-    bottomBar?.removeAttribute('inert');
-  }
+  if (event.type !== 'popstate') history.pushState({ section: sectionCible, data: data }, '');
 
   // On anime le FAB si besoin
   animateFabIcon(ancienneSection, nouvelleSection);
 
-  // Only animate new section(s) if the one we're closing was NOT displayed over it,
-  // i.e. if it closed its previous section.
-  const animateNewSection = ancienneSection.closePrevious || (ancienneSection.nom === 'sprite-viewer' && !['mes-chromatiques', 'pokedex'].includes(nouvelleSection.nom));
-
   // On affiche la nouvelle section
   sectionActuelle = sectionCible;
-  const sectionsString = `${nouvelleSection.closePrevious ? '' : ancienneSection.nom} ${nouvelleSection.nom}`;
-  document.body.dataset.sectionActuelle = sectionsString;
+  document.body.dataset.sectionActuelle = nouvelleSection.nom;
 
   const linkedNouvellesSections = getLinkedSections(nouvelleSection.nom);
   await Promise.all(linkedNouvellesSections.map(async section => {
@@ -343,55 +183,6 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
         }
       } break;
 
-      case 'sprite-viewer': {
-        const viewer = section.element.querySelector('sprite-viewer');
-        if (!(viewer instanceof spriteViewer)) throw new TypeError('Expecting SpriteViewer');
-
-        const readinessChecker = new Promise(resolve => {
-          let contentreadyHandler: (event: Event) => void;
-          viewer.addEventListener('contentready', contentreadyHandler = () => {
-            resolve(true);
-            viewer.removeEventListener('contentready', contentreadyHandler);
-          });
-        }).then(() => console.log('sprite-viewer contentready done'));
-
-        const spritesLoadChecker = new Promise(resolve => {
-          let spriteloadHandler: (event: Event) => void;
-          viewer.addEventListener('allspritesloaded', spriteloadHandler = _event => {
-            resolve(true);
-            viewer.removeEventListener('spriteload', spriteloadHandler);
-          });
-          wait(3000).then(() => {
-            resolve(false);
-            viewer.removeEventListener('spriteload', spriteloadHandler)
-          });
-        }).then(() => console.log('sprite-viewer sprites loading done'));
-
-        const dexIcon = document.querySelector(`
-          #pokedex dex-icon[dexid="${data.dexid}"], 
-          #pokedex [data-replaces="dex-icon"][data-dexid="${data.dexid}"]
-        `);
-        const caughtFormsList = dexIcon?.getAttribute('data-caught-forms') ?? '';
-
-        viewer.setAttribute('data-caught-forms', caughtFormsList);
-        viewer.setAttribute('dexid', data.dexid || '');
-        viewer.setAttribute('shiny', 'true');
-        viewer.setAttribute('size', navigator.onLine ? '512' : '112');
-
-        // On attend que le sprite viewer soit bien peuplé pour lancer l'animation d'apparition
-        // (si le peuplement prend + de 500ms, on lance l'animation quand même)
-        await Promise.any([
-          Promise.all([readinessChecker, spritesLoadChecker]),
-          new Promise(resolve => setTimeout(resolve, 500))]
-        ).then(() => nouvelleSection.element.setAttribute('data-ready', 'true'));
-      } break;
-
-      /*case 'filter-menu': {
-        const menu = document.querySelector(`filter-menu[section="${data.section ?? ancienneSection.nom}"]`);
-        if (!(menu instanceof FilterMenu)) throw new TypeError(`Expecting FilterMenu`);
-        menu.open();
-      } break;*/
-
       default: {
         document.body.removeAttribute('data-filters');
       }
@@ -411,12 +202,6 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
       const scrolledElement = section.element.querySelector('.section-contenu')!;
       scrolledElement.scroll(0, lastPosition.get(sectionCible) || 0);
     }*/
-    
-    // On anime l'apparition de la nouvelle section
-    if (animateNewSection) {
-      const apparitionSection = section?.openAnimation(section.element, event, data);
-      if (apparitionSection) wait(apparitionSection);
-    }
 
     const scrollDetector = nouvelleSection.element.querySelector('.scroll-detector');
     if (scrollDetector) scrollObserver.observe(scrollDetector);
@@ -434,27 +219,25 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
     } break;
 
     case 'chromatiques-ami': {
-      if (nouvelleSection.closePrevious) {
-        friendShinyStorage.clear();
-        ancienneSection.element.removeAttribute('data-ready');
-        ancienneSection.element.querySelectorAll('friend-shiny-card, [data-replaces="friend-shiny-card"]').forEach(card => {
-          (card as Element & {obsolete: boolean}).obsolete = true;
-          card.remove();
-          clearElementStorage('chromatiques-ami', card.getAttribute('huntid') ?? card.getAttribute('data-huntid') ?? '');
-        });
-        ancienneSection.element.querySelectorAll('.compteur').forEach(compteur => compteur.innerHTML = '');
-        ancienneSection.element.removeAttribute('data-username');
+      friendShinyStorage.clear();
+      ancienneSection.element.removeAttribute('data-ready');
+      ancienneSection.element.querySelectorAll('friend-shiny-card, [data-replaces="friend-shiny-card"]').forEach(card => {
+        (card as Element & {obsolete: boolean}).obsolete = true;
+        card.remove();
+        clearElementStorage('chromatiques-ami', card.getAttribute('huntid') ?? card.getAttribute('data-huntid') ?? '');
+      });
+      ancienneSection.element.querySelectorAll('.compteur').forEach(compteur => compteur.innerHTML = '');
+      ancienneSection.element.removeAttribute('data-username');
 
-        const filterMenu = document.querySelector('filter-menu[section="chromatiques-ami"]');
-        if (!(filterMenu instanceof FilterMenu)) throw new TypeError('Expecting FilterMenu');
-        filterMenu.reset();
+      const filterMenu = document.querySelector('filter-menu[section="chromatiques-ami"]');
+      if (!(filterMenu instanceof FilterMenu)) throw new TypeError('Expecting FilterMenu');
+      filterMenu.reset();
 
-        const searchBoxes = document.querySelectorAll('search-box[section="chromatiques-ami"]');
-        searchBoxes.forEach(searchBox => {
-          const form = searchBox.shadowRoot?.querySelector('form');
-          if (form instanceof HTMLFormElement) form.reset();
-        });
-      }
+      const searchBoxes = document.querySelectorAll('search-box[section="chromatiques-ami"]');
+      searchBoxes.forEach(searchBox => {
+        const form = searchBox.shadowRoot?.querySelector('form');
+        if (form instanceof HTMLFormElement) form.reset();
+      });
     } break;
   }
 
