@@ -1181,7 +1181,7 @@ remiscan-logo {
   --scale-from: .7;
   --opacity-from: 0;
   --easing: var(--easing-emphasized-accelerate);
-  --duration: .15s;
+  --duration: .2s;
   transition:
     transform var(--duration) var(--easing),
     opacity var(--duration) var(--easing),
@@ -1192,7 +1192,7 @@ remiscan-logo {
 
 #sprite-viewer[open] {
   --easing: var(--easing-emphasized-decelerate);
-  --duration: .2s;
+  --duration: .5s;
   transform: scale(1);
   opacity: 1;
 

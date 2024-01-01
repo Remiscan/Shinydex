@@ -39,7 +39,7 @@ export class SpriteViewer extends HTMLElement {
   dialogCloseHandler = async (event: Event) => {
     const dialog = event.target;
     await Promise.any([
-      wait(160),
+      wait(210),
       new Promise(resolve => dialog?.addEventListener('transitionend', resolve, { once: true }))
     ]);
     this.removeAttribute('dexid');
