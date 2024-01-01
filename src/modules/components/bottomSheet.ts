@@ -408,10 +408,8 @@ export class BottomSheet extends HTMLElement {
       lastDistance = currentDistance;
       lastDirection = currentDirection;
 
-      const fullyOpen = dialog.classList.contains('fully-open');
-
-      const ignoreCondition = (fullyOpen && !this.contentAtTop && currentDirection === 1)
-                            ||(fullyOpen && currentDirection === -1);
+      const ignoreCondition = (this.fullyOpen && !this.contentAtTop && currentDirection === 1)
+                            ||(this.fullyOpen && currentDirection === -1);
 
       if (!ignoreCondition) {
         // Safety margin to differentiate a click and a drag
