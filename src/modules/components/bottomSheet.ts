@@ -334,7 +334,6 @@ export class BottomSheet extends HTMLElement {
       else            dialog.show();
 
       container?.addEventListener('pointerdown', this.pointerDownHandler);
-      window.addEventListener('click', this.closeRequestHandler);
     }
   }
 
@@ -342,16 +341,15 @@ export class BottomSheet extends HTMLElement {
     this.dialog?.close();
   }
 
-  closeEventHandler = () => {
+  closeSideEffects = () => {
     const dialog = this.dialog;
     const container = this.dialog?.querySelector('.container');
     
     dialog?.classList.remove('fully-open');
     container?.removeEventListener('pointerdown', this.pointerDownHandler);
-    window.removeEventListener('click', this.closeRequestHandler);
   }
 
-  closeRequestHandler = (event: Event) => {
+  sendCloseRequest = (event: Event) => {
     const container = this.dialog?.querySelector('.container');
     const eventPath = event.composedPath();
     if (!container || !(eventPath.includes(container))) {
@@ -362,6 +360,10 @@ export class BottomSheet extends HTMLElement {
     }
   }
 
+  preventCloseRequest = (event: Event) => {
+    event.stopPropagation();
+  }
+
   pointerDownHandler = (downEvent: Event) => {
     if (this.moving) return;
     if (!(downEvent instanceof PointerEvent)) return;
@@ -370,6 +372,8 @@ export class BottomSheet extends HTMLElement {
 
     const dialog = this.dialog;
     const container = this.dialog?.querySelector('.container');
+
+    container?.setPointerCapture(downEvent.pointerId);
 
     dialog.style.removeProperty('--dragged-distance');
     dialog.style.removeProperty('--duration');
@@ -395,8 +399,7 @@ export class BottomSheet extends HTMLElement {
 
       if (!(moveEvent instanceof PointerEvent)) return;
 
-      moveEvent.preventDefault();
-      if (!this.moving) container?.setPointerCapture(downEvent.pointerId);
+      //if (!this.moving) container?.setPointerCapture(downEvent.pointerId);
 
       const currentCoords = { x: moveEvent.clientX, y: moveEvent.clientY };
       const currentDistance = currentCoords.y - startCoords.y;
@@ -433,7 +436,7 @@ export class BottomSheet extends HTMLElement {
       container?.releasePointerCapture(downEvent.pointerId);
 
       let totalDistance = maxDistance;
-      let remainingDistance =  maxDistance;
+      let remainingDistance = maxDistance;
       let duration = null;
       let easing = 'var(--easing-decelerate)';
 
@@ -510,7 +513,12 @@ export class BottomSheet extends HTMLElement {
     const endTrigger = this.shadow.querySelector('#end');
     if (endTrigger) observer.observe(endTrigger);
 
-    this.dialog?.addEventListener('close', this.closeEventHandler);
+    const dialog = this.dialog;
+    const container = this.dialog?.querySelector('.container');
+
+    dialog?.addEventListener('close', this.closeSideEffects);
+    dialog?.addEventListener('click', this.sendCloseRequest);
+    container?.addEventListener('click', this.preventCloseRequest);
   }
 
   disconnectedCallback() {
@@ -523,7 +531,12 @@ export class BottomSheet extends HTMLElement {
     const endTrigger = this.shadow.querySelector('#end');
     if (endTrigger) observer.unobserve(endTrigger);
 
-    this.dialog?.removeEventListener('close', this.closeEventHandler);
+    const dialog = this.dialog;
+    const container = this.dialog?.querySelector('.container');
+
+    dialog?.removeEventListener('close', this.closeSideEffects);
+    dialog?.removeEventListener('click', this.sendCloseRequest);
+    container?.removeEventListener('click', this.preventCloseRequest);
   }
 }
 
