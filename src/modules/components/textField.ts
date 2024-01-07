@@ -24,6 +24,7 @@ template.innerHTML = /*html*/`
         <span class="error-icon">error</span>
       </span>
     </label>
+    <datalist></datalist>
   </form>
 `;
 
@@ -198,6 +199,34 @@ export class TextField extends CustomInput {
 
     const form = this.shadow.querySelector('form');
     form?.removeEventListener('submit', this.formSubmitHandler);
+  }
+
+
+  static get observedAttributes() {
+    return [...super.observedAttributes, 'datalist-options'];
+  }
+
+  attributeChangedCallback(attr: string, oldValue: string | null, newValue: string | null): void {
+    super.attributeChangedCallback(attr, oldValue, newValue);
+
+    switch (attr) {
+      case 'list': {
+        const datalist = this.shadow.querySelector('datalist');
+        if (newValue) datalist?.setAttribute('id', newValue);
+        else          datalist?.removeAttribute('id');
+      } break;
+
+      case 'datalist-options': {
+        const datalist = this.shadow.querySelector('datalist');
+        const options = JSON.parse(newValue ?? '[]');
+        if (datalist) {
+          datalist.innerHTML = '';
+          for (const { value, label } of options) {
+            datalist.innerHTML += `<option value="${value}">${label}</option>`;
+          }
+        }
+      } break;
+    }
   }
 }
 

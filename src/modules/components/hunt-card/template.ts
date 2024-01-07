@@ -21,7 +21,7 @@ template.innerHTML = /*html*/`
 
         <text-field name="dexid" required list="datalist-pokedex" autocomplete="off" spellcheck="false" data-placeholder="species-placeholder">
           <span slot="label" data-string="species-label"></span>
-          <datalist id="datalist-pokedex"></datalist>
+          <datalist is="dex-datalist" id="datalist-pokedex"></datalist>
         </text-field>
 
         <input-select name="forme" default-value="" required>

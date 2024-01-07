@@ -1,4 +1,3 @@
-import { DexDatalist } from '../../DexDatalist.js';
 import { Hunt } from '../../Hunt.js';
 import { Forme, Pokemon } from '../../Pokemon.js';
 import { Count, Shiny } from '../../Shiny.js';
@@ -18,11 +17,12 @@ import themesSheet from '../../../../styles/themes.css.php' assert { type: 'css'
 import iconSheet from '../../../../images/iconsheet.css' assert { type: 'css' };
 // @ts-expect-error
 import commonSheet from '../../../../styles/common.css' assert { type: 'css' };
-import { capitalizeFirstLetter } from '../../Params.js';
 import { gameStrings, isSupportedGameID, isSupportedLang, isSupportedMethodID, methodStrings, pokemonData } from '../../jsonData.js';
 import { CheckBox } from '../checkBox.js';
+import { DexDatalist } from '../dexDatalist.js';
 // @ts-expect-error
 import sheet from './styles.css' assert { type: 'css' };
+import { noAccent } from '../../Params.js';
 
 
 
@@ -194,14 +194,20 @@ export class huntCard extends HTMLElement {
     // - Si on revient aux mêmes 2 caractères qu'au départ, on garde la même liste
     if (string.length == 2 && this.#previousSpeciesString.length == 3) return;
     this.#previousSpeciesString = string;
-    const datalist = new DexDatalist(string);
 
-    const element = datalist.toElement();
-    element.setAttribute('id', 'datalist-pokedex');
+    const datalist = this.#shadow.querySelector('datalist');
+    if (datalist instanceof DexDatalist) {
+      datalist.setAttribute('input', string);
+      inputEspece.setAttribute('datalist-options', JSON.stringify(datalist.suggestions));
 
-    const previousDatalist = inputEspece.shadow.querySelector('datalist#datalist-pokedex');
-    if (previousDatalist) previousDatalist.remove();
-    inputEspece.shadow.appendChild(element);
+      const especeIndex = datalist.suggestions.findIndex(v => v.value === string);
+      if (especeIndex >= 0) {
+        inputEspece.value = datalist.suggestions[especeIndex].label;
+        inputEspece.dispatchEvent(new Event('change', { bubbles: true }));
+        datalist.setAttribute('input', '');
+        inputEspece.setAttribute('datalist-options', '[]');
+      }
+    }
   }
 
 
@@ -224,7 +230,7 @@ export class huntCard extends HTMLElement {
 
       const hunt = await this.formToHunt(formData);
       
-      this.genereFormes(Pokemon.names()[hunt.dexid], hunt.forme);
+      this.genereFormes(hunt.dexid, hunt.forme);
       this.genereMethodes(hunt.game, hunt.method)
       this.updateAttribute('method', hunt.method);
       this.updateAttribute('game', hunt.game);
@@ -430,13 +436,13 @@ export class huntCard extends HTMLElement {
           let name = '';
           if (value > 0) {
             const allNames = Pokemon.names();
-            name = capitalizeFirstLetter(allNames[value]);
+            name = allNames[value];
           }
 
           if (input instanceof TextField) input.value = name;
           else input?.setAttribute('value', name);
 
-          this.genereFormes(name, hunt.forme);
+          this.genereFormes(hunt.dexid, hunt.forme);
         } break;
 
         case 'game': {
@@ -567,7 +573,8 @@ export class huntCard extends HTMLElement {
       switch (prop) {
         case 'dexid': {
           const allNames = Pokemon.names();
-          const dexid = allNames.findIndex(s => s === String(value).toLowerCase());
+          const normalizeString = (str: string) => noAccent(str.toLowerCase());
+          const dexid = allNames.findIndex(s => normalizeString(s) === normalizeString(String(value)));
           hunt.dexid = dexid > 0 ? dexid : 0;
         } break;
 
@@ -697,25 +704,21 @@ export class huntCard extends HTMLElement {
    * Génère la liste des formes à partir du Pokémon entré.
    * Ne doit PAS être async, pour préserver l'ordre d'exécution dans huntToForm.
    */
-  genereFormes(value: string, formeToSelect?: string) {
+  genereFormes(dexid: number, formeToSelect?: string) {
     const select = this.getInput('forme');
     if (!select) throw new TypeError(`Expecting InputSelect`);
 
     select.querySelectorAll('option').forEach(option => option.remove());
     select.removeAttribute('default-label');
 
-    const allNames = Pokemon.names();
-    const k = allNames.findIndex(p => p == value.toLowerCase());
-    if (k == -1) return 'Pokémon inexistant';
-
-    const pkmn = new Pokemon(pokemonData[k]);
+    const pkmn = new Pokemon(pokemonData[dexid]);
     const formes = pkmn.formes.slice()
                               .sort((a: Forme, b: Forme) => { if (a.name['fr'] == '') return -1; else return 0;})
                               .filter(f => f.catchable);
 
     // Initially auto select a valid form in any case
     if (formes.findIndex(f => f.dbid === formeToSelect ?? '') < 0) formeToSelect = '';
-    if (formes.findIndex(f => f.dbid === '') < 0) formeToSelect = formes[0].dbid;
+    if (formes.findIndex(f => f.dbid === '') < 0) formeToSelect = formes[0]?.dbid ?? '';
     select.setAttribute('value', formeToSelect ?? ''); // set initial value before regenerating the options
 
     let availableChoices = 0;
