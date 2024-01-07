@@ -118,7 +118,6 @@ pokemon-sprite:not([dexid]) ~ * {
 [data-type="species"] {
   grid-row: species;
   grid-column: name;
-  text-transform: capitalize;
   opacity: .8;
   display: flex;
   justify-content: start;

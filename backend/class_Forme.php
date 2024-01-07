@@ -446,6 +446,12 @@ class Forme extends Sprite {
           $nomsEN = ['Teal Mask {{name}}', 'Wellspring Mask {{name}}', 'Hearthflame Mask {{name}}', 'Cornerstone Mask {{name}}'];
           $catchable = [true, false, false, false];
         break;
+        case 1024: // Térapagos
+          $ids = ['', 'terastal', 'stellar'];
+          $noms = ['', '{{name}} Forme Téracristal', '{{name}} Forme Stellaire'];
+          $nomsEN = ['', 'Terastal Form {{name}}', 'Stellar Form {{name}}'];
+          $catchable = [true, false, false];
+        break;
         default:
           $done = false;
       }

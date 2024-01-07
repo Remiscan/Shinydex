@@ -1,5 +1,5 @@
 import { appStrings, isSupportedPokemonLang, pokemonData } from './jsonData.js';
-import { capitalizeFirstLetter, pad } from './Params.js';
+import { pad } from './Params.js';
 
 
 
@@ -75,7 +75,7 @@ const generations: Generation[] = [
   { num: 6, start: 650, end: 721 },
   { num: 7, start: 722, end: 809 },
   { num: 8, start: 810, end: 905 },
-  { num: 9, start: 906, end: 1017}
+  { num: 9, start: 906, end: 1024}
 ];
 
 
@@ -221,7 +221,6 @@ export class Pokemon {
     if (!isSupportedPokemonLang(lang)) throw new Error('language-not-supported');
     const forme = this.formes.find(f => f.dbid === id);
     let name = this.getName(lang);
-    name = capitalizeFirstLetter(name);
     if (withName) return forme?.name[lang].replace('{{name}}', name) || name;
     else          return forme?.name[lang].replace('{{name}}', '').trim() || appStrings[lang]?.['forme-base'];
   }

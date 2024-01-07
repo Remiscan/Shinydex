@@ -1,4 +1,4 @@
-import { capitalizeFirstLetter, pad, wait } from '../../Params.js';
+import { pad, wait } from '../../Params.js';
 import { Pokemon } from '../../Pokemon.js';
 import { SupportedLang, pokemonData } from '../../jsonData.js';
 import { getString, translationObserver } from '../../translation.js';
@@ -71,7 +71,7 @@ export class SpriteViewer extends HTMLElement {
     const fab = this.querySelector('#sprite-viewer-fab');
     const labelContainer = fab?.querySelector('.fab-label');
     if (labelContainer) {
-      const label = getString('sprite-viewer-fab').replace('{{name}}', capitalizeFirstLetter(pokemon.getName()));
+      const label = getString('sprite-viewer-fab').replace('{{name}}', pokemon.getName());
       labelContainer.innerHTML = label;
     }
 
