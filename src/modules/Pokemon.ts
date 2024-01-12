@@ -75,7 +75,7 @@ const generations: Generation[] = [
   { num: 6, start: 650, end: 721 },
   { num: 7, start: 722, end: 809 },
   { num: 8, start: 810, end: 905 },
-  { num: 9, start: 906, end: 1024}
+  { num: 9, start: 906, end: 1025}
 ];
 
 
