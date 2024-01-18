@@ -333,6 +333,8 @@ export class BottomSheet extends HTMLElement {
       if (this.modal) dialog.showModal();
       else            dialog.show();
 
+      dialog?.addEventListener('click', this.sendCloseRequest);
+      container?.addEventListener('click', this.preventCloseRequest);
       container?.addEventListener('pointerdown', this.pointerDownHandler);
     }
   }
@@ -346,6 +348,8 @@ export class BottomSheet extends HTMLElement {
     const container = this.dialog?.querySelector('.container');
     
     dialog?.classList.remove('fully-open');
+    dialog?.removeEventListener('click', this.sendCloseRequest);
+    container?.removeEventListener('click', this.preventCloseRequest);
     container?.removeEventListener('pointerdown', this.pointerDownHandler);
   }
 
@@ -369,6 +373,7 @@ export class BottomSheet extends HTMLElement {
     if (!(downEvent instanceof PointerEvent)) return;
     if (!(this.dialog instanceof HTMLDialogElement)) return;
     if (downEvent.button !== 0) return; // Only act on left mouse click, touch or pen contact
+    if (downEvent.pointerType === 'mouse') return;
 
     const dialog = this.dialog;
     const container = this.dialog?.querySelector('.container');
@@ -514,11 +519,7 @@ export class BottomSheet extends HTMLElement {
     if (endTrigger) observer.observe(endTrigger);
 
     const dialog = this.dialog;
-    const container = this.dialog?.querySelector('.container');
-
     dialog?.addEventListener('close', this.closeSideEffects);
-    dialog?.addEventListener('click', this.sendCloseRequest);
-    container?.addEventListener('click', this.preventCloseRequest);
   }
 
   disconnectedCallback() {
@@ -532,11 +533,7 @@ export class BottomSheet extends HTMLElement {
     if (endTrigger) observer.unobserve(endTrigger);
 
     const dialog = this.dialog;
-    const container = this.dialog?.querySelector('.container');
-
     dialog?.removeEventListener('close', this.closeSideEffects);
-    dialog?.removeEventListener('click', this.sendCloseRequest);
-    container?.removeEventListener('click', this.preventCloseRequest);
   }
 }
 
