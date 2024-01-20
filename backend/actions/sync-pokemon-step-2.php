@@ -74,6 +74,7 @@ foreach($to_insert_online as $key => $shiny) {
     `name`,
     `ball`,
     `gene`,
+    `originalTrainer`,
 
     `notes`
   ) VALUES (
@@ -93,6 +94,7 @@ foreach($to_insert_online as $key => $shiny) {
     :nickname,
     :ball,
     :gene,
+    :originalTrainer,
 
     :notes
   )");
@@ -113,6 +115,7 @@ foreach($to_insert_online as $key => $shiny) {
   $insert->bindParam(':nickname', $shiny['name'], PDO::PARAM_STR, 50);
   $insert->bindParam(':ball', $shiny['ball'], PDO::PARAM_STR, 50);
   $insert->bindParam(':gene', $shiny['gene'], PDO::PARAM_STR, 50);
+  $insert->bindParam(':originalTrainer', $shiny['originalTrainer'], PDO::PARAM_INT, 1);
 
   $insert->bindParam(':notes', $shiny['notes']);
 
@@ -135,6 +138,7 @@ foreach($to_update_online as $key => $shiny) {
     `name` = :nickname,
     `ball` = :ball,
     `gene` = :gene,
+    `originalTrainer` = :originalTrainer,
 
     `notes` = :notes
   WHERE `huntid` = :huntid AND `userid` = :userid');
@@ -155,6 +159,7 @@ foreach($to_update_online as $key => $shiny) {
   $update->bindParam(':nickname', $shiny['name'], PDO::PARAM_STR, 50);
   $update->bindParam(':ball', $shiny['ball'], PDO::PARAM_STR, 50);
   $update->bindParam(':gene', $shiny['gene'], PDO::PARAM_STR, 50);
+  $update->bindParam(':originalTrainer', $shiny['originalTrainer'], PDO::PARAM_INT, 1);
 
   $update->bindParam(':notes', $shiny['notes']);
 
