@@ -331,6 +331,7 @@ button.icon-button.menu-hint::before {
 .shiny-charm > .icon {
   margin: -5px;
   margin-left: -10px;
+  margin-top: -10px;
 }
 
 .shiny-rate-text {
