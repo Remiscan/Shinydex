@@ -329,9 +329,10 @@ button.icon-button.menu-hint::before {
 }
 
 .shiny-charm > .icon {
-  margin: -5px;
-  margin-left: -10px;
+  margin-bottom: -5px;
+  margin-left: -14px;
   margin-top: -10px;
+  margin-right: -7px;
 }
 
 .shiny-rate-text {
