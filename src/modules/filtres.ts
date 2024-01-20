@@ -172,6 +172,7 @@ export function filterPokedex(dexids: dexidSet, caughtFormsMap: formesMap) {
       icon.setAttribute('data-caught-forms', [...caughtForms.values()].join(' '));
     } else {
       icon.setAttribute('data-caught', 'false');
+      icon.setAttribute('data-caught-forms', '');
     }
   });
 }
