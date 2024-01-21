@@ -232,6 +232,8 @@ template.innerHTML = /*html*/`
           <span slot="label" data-string="capture-date"></span>
         </text-field>
 
+        <check-box name="catchTime-unknown" data-string="capture-date-unknown"></check-box>
+
         <input-select name="ball" default-value="poke" icons="leading">
           <span slot="leading-icon" class="icon" data-icon="ball"></span>
           <span slot="label" data-string="capture-ball"></span>

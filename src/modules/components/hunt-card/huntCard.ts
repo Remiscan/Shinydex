@@ -527,6 +527,11 @@ export class huntCard extends HTMLElement {
           
           if (input instanceof TextField) input.value = date;
           else input?.setAttribute('value', date);
+
+          const dateUnknown = !(value > 825289200000);
+          const unknownInput = this.getInput('catchTime-unknown');
+          if (unknownInput instanceof CheckBox) unknownInput.checked = dateUnknown;
+          else if (unknownInput && unknownInput.tagName === 'CHECK-BOX') unknownInput.setAttribute('checked', String(dateUnknown));
         } break;
 
         case 'caught': {
@@ -628,10 +633,11 @@ export class huntCard extends HTMLElement {
         } break;
 
         case 'catchTime': {
+          const unknown = formData.get('catchTime-unknown') === 'false' ? false : true;
           const timeCapture = hunt.catchTime || 0;
           const oldDate = (new Date(timeCapture)).toISOString().split('T')[0];
           const newTime = value !== oldDate ? (new Date(String(value))).getTime() : timeCapture;
-          if (!isNaN(newTime)) hunt.catchTime = newTime;
+          if (!isNaN(newTime)) hunt.catchTime = unknown ? 825289200000 : newTime;
         } break;
       }
     }
