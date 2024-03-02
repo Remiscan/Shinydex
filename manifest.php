@@ -11,7 +11,6 @@ header('Content-Type: application/json');
 	"short_name": "Shinydex",
 	"description": "<?=$translation->get('meta-description')?>",
 	"lang": "<?=$httpLanguage?>",
-	"id": "fr.remiscan.shinydex",
 	"display": "standalone",
 	"launch_handler": {
 		"client_mode": "auto"
