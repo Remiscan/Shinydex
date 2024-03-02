@@ -1,17 +1,7 @@
 <?php
 $commonDir = '../_common';
 require_once $commonDir.'/php/Translation.php';
-$translation = new Translation(<<<STRINGS
-{
-  "fr": {
-    "meta-description": "Recensez votre collection de Pokémon chromatiques, et partagez-la avec vos amis."
-  },
-    
-  "en": {
-    "meta-description": "Keep track of your shiny Pokémon collection, and share it with friends."
-  }
-}
-STRINGS);
+$translation = new Translation(file_get_contents(__DIR__.'/dist/strings/meta.json'));
 $httpLanguage = $translation->getLanguage();
 ?>
 <!doctype html>
@@ -34,7 +24,7 @@ $httpLanguage = $translation->getLanguage();
     
     <link rel="icon" type="image/svg+xml" href="./images/app-icons/favicon.svg">
     <link rel="apple-touch-icon" href="./images/app-icons/apple-touch-icon.png">
-    <link rel="manifest" href="./manifest.json">
+    <link rel="manifest" href="./manifest.php">
     <link rel="canonical" href="https://remiscan.fr/shinydex/">
     <base href="https://<?=$_SERVER['SERVER_NAME']?>/shinydex/">
 
