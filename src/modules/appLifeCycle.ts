@@ -106,9 +106,6 @@ export async function appStart() {
     }
   };
 
-  // Au rechargement de l'appli, indiquer qu'on est sur la section de départ
-  history.replaceState({ section: 'mes-chromatiques' }, '');
-
   // ---
 
   // ÉTAPE 1 : on vérifie si l'application est installée localement
@@ -140,6 +137,10 @@ export async function appStart() {
     const message = getString('error-verifying-data');
     console.error(error);
     new Notif(message).prompt();
+  } finally {
+    // Au rechargement de l'appli, indiquer qu'on est sur la section de départ
+    // (après Settings.restore, notamment pour que charger la page chromatiques-ami affiche bien le pseudo)
+    history.replaceState({}, '');
   }
 
   // ---

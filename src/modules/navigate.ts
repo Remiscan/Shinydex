@@ -12,6 +12,10 @@ import { TranslatedString, getString } from './translation.js';
 
 interface Section {
   nom: string;
+  urls: {
+    fr: string,
+    en: string
+  };
   preload: string[];
   fab: string | null;
   element: HTMLElement;
@@ -20,41 +24,73 @@ interface Section {
 const sections: Section[] = [
   {
     nom: 'mes-chromatiques',
+    urls: {
+      fr: '',
+      en: '',
+    },
     preload: [`./images/iconsheet.webp`],
     fab: 'add',
     element: document.getElementById('mes-chromatiques')!
   }, {
     nom: 'pokedex',
+    urls: {
+      fr: 'pokedex',
+      en: 'pokedex',
+    },
     preload: [`./images/pokemonsheet.webp`],
     fab: 'add',
     element: document.getElementById('pokedex')!
   }, {
     nom: 'chasses-en-cours',
+    urls: {
+      fr: 'chasses',
+      en: 'hunts',
+    },
     preload: [`./images/iconsheet.webp`],
     fab: 'add',
     element: document.getElementById('chasses-en-cours')!
   }, {
     nom: 'corbeille',
+    urls: {
+      fr: 'corbeille',
+      en: 'deleted',
+    },
     preload: [`./images/iconsheet.webp`],
     fab: null,
     element: document.getElementById('corbeille')!
   }, {
     nom: 'partage',
+    urls: {
+      fr: 'amis',
+      en: 'friends',
+    },
     preload: [`./images/iconsheet.webp`],
     fab: 'person_add',
     element: document.getElementById('partage')!
   }, {
     nom: 'chromatiques-ami',
+    urls: {
+      fr: 'ami',
+      en: 'friend',
+    },
     preload: [`./images/iconsheet.webp`],
     fab: null,
     element: document.getElementById('chromatiques-ami')!
   }, {
     nom: 'parametres',
+    urls: {
+      fr: 'parametres',
+      en: 'settings',
+    },
     preload: [],
     fab: null,
     element: document.getElementById('parametres')!
   }, {
     nom: 'a-propos',
+    urls: {
+      fr: 'a-propos',
+      en: 'about',
+    },
     preload: [],
     fab: null,
     element: document.getElementById('a-propos')!
@@ -92,19 +128,23 @@ const getLinkedSections = (section: Section['nom']): Section[] => {
  * @param sectionCible - ID de la section demandée.
  * @param event - L'évènement qui a déclenché la navigation.
  */
-export async function navigate(sectionCible: string, event: Event, data?: any) {
-  if (sectionActuelle === sectionCible) {
+export async function navigate(event: CustomEvent) {
+  const url = new URL(location.href);
+  const sectionCible = url.pathname.split('/')[2];
+  const lang = document.documentElement.lang as keyof Section['urls'];
+
+  const ancienneSection = sections.find(section => section.nom === sectionActuelle);
+  if (!ancienneSection) throw getString('error-no-section');
+  const nouvelleSection = sections.find(section => Object.values(section.urls).includes(sectionCible));
+  if (!nouvelleSection) throw getString('error-no-section');
+
+  if (ancienneSection.nom === nouvelleSection.nom) {
     // If trying to navigate to the already open section, scroll back to top
     const section = sections.find(section => section.nom === sectionActuelle)!;
     const scrolledElement = section.element.querySelector('.section-contenu')!;
     scrolledElement.scroll(0, 0);
     return Promise.resolve();
   }
-
-  const ancienneSection = sections.find(section => section.nom === sectionActuelle);
-  if (!ancienneSection) throw getString('error-no-section');
-  const nouvelleSection = sections.find(section => section.nom === sectionCible);
-  if (!nouvelleSection) throw getString('error-no-section');
 
   // Pré-chargement des images de la nouvelle section
   await Promise.all([loadAllImages(nouvelleSection.preload || [])]);
@@ -134,13 +174,13 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
     sp.removeAttribute('finished');
   });
 
-  if (event.type !== 'popstate') history.pushState({ section: sectionCible, data: data }, '');
+  //if (event.type !== 'popstate') history.pushState({ section: sectionCible, data: data }, '');
 
   // On anime le FAB si besoin
   animateFabIcon(ancienneSection, nouvelleSection);
 
   // On affiche la nouvelle section
-  sectionActuelle = sectionCible;
+  sectionActuelle = nouvelleSection.nom;
   document.body.dataset.sectionActuelle = nouvelleSection.nom;
 
   const linkedNouvellesSections = getLinkedSections(nouvelleSection.nom);
@@ -148,18 +188,19 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
     // On prépare la nouvelle section si besoin
     switch (section.nom) {
       case 'chromatiques-ami': {
-        if (data.username !== section.element.getAttribute('data-username')) {
-          section.element.setAttribute('data-username', data.username);
+        const username = url.pathname.split('/')[3];
+        //if (username !== section.element.getAttribute('data-username')) {
+          section.element.setAttribute('data-username', username);
 
           section.element.classList.add('loading');
           section.element.classList.remove('vide', 'vide-filtres', 'vide-recherche');
 
           // Populate section with friend's username
-          section.element.querySelectorAll('[data-type="username"]').forEach(e => e.innerHTML = data.username);
+          section.element.querySelectorAll('[data-type="username"]').forEach(e => e.innerHTML = username);
 
           // Populate section with friend's Pokémon
           // ⚠️ (don't await this before navigating)
-          callBackend('get-friend-data', { username: data.username, scope: 'full' }, false)
+          callBackend('get-friend-data', { username: username, scope: 'full' }, false)
           .then(async response => {
             if ('matches' in response && response.matches === true) {
               await Promise.all(
@@ -180,7 +221,7 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
               new Notif(getString('error-no-profile')).prompt();
             }
           });
-        }
+        //}
       } break;
 
       default: {
@@ -189,12 +230,9 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
     }
 
     // On prépare les liens de retour de la nouvelle section s'il y en a
-    if (event.type !== 'popstate') {
-      const container = (sectionCible === 'obfuscator' && data.filters) ? document.querySelector(`filter-menu`)! : nouvelleSection.element;
-      for (const a of [...container.querySelectorAll('a.bouton-retour')]) {
-        if (!(a instanceof HTMLAnchorElement)) throw new TypeError(`Expecting HTMLAnchorElement`);
-        a.href = `./${ancienneSection.nom}`;
-      }
+    for (const a of [...nouvelleSection.element.querySelectorAll('a.bouton-retour')]) {
+      if (!(a instanceof HTMLAnchorElement)) throw new TypeError(`Expecting HTMLAnchorElement`);
+      a.href = `./${ancienneSection.nom}`;
     }
 
     // On restaure la position de scroll précédemment enregistrée
@@ -241,6 +279,7 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
     } break;
   }
 
+  window.dispatchEvent(new Event('navigationend'));
   return;
 }
 
@@ -329,7 +368,86 @@ async function animateFabIcon(ancienneSection: Section, nouvelleSection: Section
 }
 
 
-// Permet la navigation avec le bouton retour du navigateur
+/**
+ * Crée l'URL d'une page.
+ */
+export function getPageUrl(page: string, subPage: string = ''): URL {
+  const lang = document.documentElement.lang as keyof Section['urls'];
+  const requestedSection = sections.find(s => s.nom === page);
+  const requestedPath = requestedSection?.urls[lang] ?? requestedSection?.urls['en'] ?? '';
+  const suffix = subPage
+    ? `/${subPage}`
+    : ''
+  return new URL(`${requestedPath}${suffix}`, `${location.origin}/shinydex/`);
+}
+
+
+/**
+ * Déclenche un changement d'URL, qui déclenchera lui-même une navigation.
+ */
+export async function goToPage(
+  page: string,
+  subPage: string = '',
+  data: unknown = {},
+  options: { type?: 'push'|'replace' } = {}
+) {
+  return new Promise(resolve => {
+    const url = getPageUrl(page, subPage).pathname;
+    window.addEventListener('navigationend', resolve, { once: true });
+    switch (options.type) {
+      case 'replace':
+        history.replaceState(data, '', url);
+        break;
+      case 'push':
+      default:
+        history.pushState(data, '', url);
+    }
+  });
+}
+
+
+
+///////////////////////////////////////////////
+// Déclenche une navigation au changement d'URL
+const pushState = history.pushState;
+const replaceState = history.replaceState;
+
+history.pushState = function(...args: Parameters<History['pushState']>) {
+  const override = pushState.apply(this, args);
+  window.dispatchEvent(new Event('pushstate'));
+  window.dispatchEvent(new CustomEvent('locationchange', {
+    detail: {
+      cause: 'pushstate',
+      url: args[2],
+      ...args[0]
+    }
+  }));
+  return override;
+};
+
+history.replaceState = function(...args: Parameters<History['replaceState']>) {
+  const override = replaceState.apply(this, args);
+  window.dispatchEvent(new Event('replacestate'));
+  window.dispatchEvent(new CustomEvent('locationchange', {
+    detail: {
+      cause: 'replacestate',
+      url: args[2],
+      ...args[0]
+    }
+  }));
+  return override;
+};
+
 window.addEventListener('popstate', event => {
-  navigate(event.state?.section || 'mes-chromatiques', event, event.state?.data);
-}, false);
+  window.dispatchEvent(new CustomEvent('locationchange', {
+    detail: {
+      cause: 'popstate',
+      ...event.state?.data
+    }
+  }));
+});
+
+window.addEventListener('locationchange', event => {
+  if (!(event instanceof CustomEvent)) return;
+  navigate(event);
+});

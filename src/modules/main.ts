@@ -21,16 +21,16 @@ import './components/search-box/searchBox.js';
 import './components/shiny-card/shinyCard.js';
 import './components/shinyStars.js';
 import './components/sprite-viewer/spriteViewer.js';
+import { SpriteViewer } from './components/sprite-viewer/spriteViewer.js';
 import './components/syncLine.js';
 import './components/syncProgress.js';
 import { export2json, json2import } from './exportToJSON.js';
 import { PopulatableSection } from './filtres.js';
 import { dataStorage, friendStorage, huntStorage, shinyStorage } from './localForage.js';
-import { navLinkBubble, navigate, sectionActuelle } from './navigate.js';
+import { goToPage, navLinkBubble, sectionActuelle } from './navigate.js';
 import { Notif, warnBeforeDestruction } from './notification.js';
 import { immediateSync, requestSync } from './syncBackup.js';
 import { getString } from './translation.js';
-import { SpriteViewer } from './components/sprite-viewer/spriteViewer.js';
 
 
 
@@ -45,7 +45,7 @@ for (const link of navLinksList) {
   if (!(link instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
   link.addEventListener('click', event => {
     event.preventDefault();
-    navigate(link.dataset.navSection || '', event, JSON.parse(link.dataset.navData || '{}'));
+    goToPage(link.dataset.navSection ?? '', '', JSON.parse(link.dataset.navData || '{}'));
   });
 }
 
@@ -89,7 +89,7 @@ for (const fab of fabs) {
       }
 
       if (sectionActuelle !== 'chasses-en-cours') {
-        await navigate('chasses-en-cours', new Event('navigate'));
+        await goToPage('chasses-en-cours');
       }
   
       // Créer une nouvelle chasse ici

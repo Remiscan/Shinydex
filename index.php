@@ -36,6 +36,7 @@ $httpLanguage = $translation->getLanguage();
     <link rel="apple-touch-icon" href="./images/app-icons/apple-touch-icon.png">
     <link rel="manifest" href="./manifest.json">
     <link rel="canonical" href="https://remiscan.fr/shinydex/">
+    <base href="https://<?=$_SERVER['SERVER_NAME']?>/shinydex/">
 
     <script>window.tempsChargementDebut = performance.now();</script>
     <script defer src="../_common/polyfills/adoptedStyleSheets.min.js"></script>

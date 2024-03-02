@@ -12,7 +12,7 @@ import commonSheet from '../../../../styles/common.css' assert { type: 'css' };
 import { Friend } from '../../Friend.js';
 import { noAccent } from '../../Params.js';
 import { updateUserProfile } from '../../Settings.js';
-import { navigate } from '../../navigate.js';
+import { goToPage } from '../../navigate.js';
 import { warnBeforeDestruction } from '../../notification.js';
 // @ts-expect-error
 import sheet from './styles.css' assert { type: 'css' };
@@ -54,7 +54,7 @@ export class friendCard extends HTMLElement {
   };
   navHandler = (event: Event) => {
     event.preventDefault();
-    navigate('chromatiques-ami', event, { username: this.username });
+    goToPage(`chromatiques-ami`, this.username);
   }
 
 
