@@ -12,6 +12,7 @@ echo '/'.'*'; ?>*/
   --pkmnicon-brightness: .85;
   --icon-top-bg-color: var(--primary-70);
   --pokemon-sprite-anti-spoilers-brightness: 0;
+  --pokemon-sprite-anti-spoilers-opacity: .3;
 
   --primary: var(--primary-40);
   --on-primary: var(--primary-100);
@@ -68,6 +69,7 @@ echo '/'.'*'; ?>*/
   --pkmnicon-brightness: .65;
   --icon-top-bg-color: var(--primary-60);
   --pokemon-sprite-anti-spoilers-brightness: 100;
+  --pokemon-sprite-anti-spoilers-opacity: .3;
 
   --primary: var(--primary-80);
   --on-primary: var(--primary-20);

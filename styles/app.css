@@ -10,7 +10,7 @@ html {
   --sub-border-radius: calc(1.12 * (var(--border-radius) - var(--distance-to-parent-border, 4px))); /* 12% optical adjustment */
   --section-title-height: 64px;
   --nav-bar-height: 80px;
-  --anti-spoilers-filter: grayscale() brightness(var(--pokemon-sprite-anti-spoilers-brightness)) opacity(.3);
+  --anti-spoilers-filter: grayscale() brightness(var(--pokemon-sprite-anti-spoilers-brightness)) opacity(var(--pokemon-sprite-anti-spoilers-opacity));
 
   /* Élévation */
   --z-top-layer: 60;
@@ -750,7 +750,7 @@ dex-icon:not([data-caught="true"]) .caught-form-indicator {
 }
 
 dex-icon:not([data-caught="true"]) .pkmnicon {
-  filter: grayscale(.5) opacity(.5);
+  filter: grayscale(.5) opacity(.6);
 }
 
 .pkmnicon {
