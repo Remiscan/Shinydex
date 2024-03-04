@@ -1,4 +1,4 @@
-import { friendStorage, localForageAPI } from '../../localForage.js';
+import { friendStorage, localForageAPI, shinyStorage } from '../../localForage.js';
 import { getString, translationObserver } from '../../translation.js';
 import template from './template.js';
 // @ts-expect-error
@@ -92,6 +92,10 @@ export class friendCard extends HTMLElement {
         const element = sprites[i];
         element.setAttribute('dexid', String(pokemon.dexid));
         element.setAttribute('forme', pokemon.forme);
+        shinyStorage.iterate(shiny => {
+          if (shiny.dexid === pokemon.dexid && shiny.forme === pokemon.forme) return true;
+        })
+        .then(isCaught => element.setAttribute('data-caught', String(isCaught)));
       }
     }
 

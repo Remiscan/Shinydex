@@ -85,6 +85,11 @@ export class shinyCard extends HTMLElement {
       const sprite = this.shadow.querySelector('pokemon-sprite')!;
       sprite.setAttribute('forme', shiny.forme);
       this.setAttribute('data-form', shiny.forme);
+
+      shinyStorage.iterate(s => {
+        if (s.dexid === shiny.dexid && s.forme === shiny.forme) return true;
+      })
+      .then(isCaught => sprite.setAttribute('data-caught', String(isCaught)));
     }
 
     // Surnom

@@ -24,6 +24,8 @@ export class Settings {
   'theme': Theme = 'system';
   'theme-hue': number = 255;
   'cache-all-sprites': boolean = false;
+  'anti-spoilers-pokedex': boolean = false;
+  'anti-spoilers-friends': boolean = false;
 
   constructor(data?: FormData | object) {
     if (!data) return;
@@ -40,6 +42,12 @@ export class Settings {
 
       const formCacheAllSprites = String(data.get('cache-all-sprites'));
       this['cache-all-sprites'] = formCacheAllSprites === 'true';
+
+      const antiSpoilersPokedex = String(data.get('anti-spoilers-pokedex'));
+      this['anti-spoilers-pokedex'] = antiSpoilersPokedex === 'true';
+
+      const antiSpoilersFriends = String(data.get('anti-spoilers-friends'));
+      this['anti-spoilers-friends'] = antiSpoilersFriends === 'true';
     } else {
       if ('lang' in data && typeof data['lang'] === 'string' && isSupportedLang(data['lang'])) {
         this['lang'] = data['lang'];
@@ -55,6 +63,14 @@ export class Settings {
 
       if ('cache-all-sprites' in data) {
         this['cache-all-sprites'] = Boolean(data['cache-all-sprites']);
+      }
+
+      if ('anti-spoilers-pokedex' in data) {
+        this['anti-spoilers-pokedex'] = Boolean(data['anti-spoilers-pokedex']);
+      }
+
+      if ('anti-spoilers-friends' in data) {
+        this['anti-spoilers-friends'] = Boolean(data['anti-spoilers-friends']);
       }
     }
   }
@@ -144,6 +160,16 @@ export class Settings {
           cacheAllSprites(value);
         }
       } break;
+
+      case 'anti-spoilers-pokedex':
+        if (value) document.documentElement.setAttribute('data-anti-spoilers-pokedex', '');
+        else       document.documentElement.removeAttribute('data-anti-spoilers-pokedex');
+        break;
+
+      case 'anti-spoilers-friends':
+        if (value) document.documentElement.setAttribute('data-anti-spoilers-friends', '');
+        else       document.documentElement.removeAttribute('data-anti-spoilers-friends');
+        break;
     }
   }
 
@@ -190,8 +216,10 @@ export class Settings {
         break;
 
       case 'cache-all-sprites':
-        if (['true', 'false', true, false].includes(value)) currentSettings['cache-all-sprites'] = String(value) === 'true';
-        break; 
+      case 'anti-spoilers-pokedex':
+      case 'anti-spoilers-friends':
+        if (['true', 'false', true, false].includes(value)) currentSettings[setting] = String(value) === 'true';
+        break;
     }
 
     if (toForm) Settings.#toForm(setting, currentSettings[setting]);

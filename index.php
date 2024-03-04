@@ -5,7 +5,7 @@ $translation = new Translation(file_get_contents(__DIR__.'/dist/strings/meta.jso
 $httpLanguage = $translation->getLanguage();
 ?>
 <!doctype html>
-<html lang="<?=$httpLanguage?>">
+<html lang="<?=$httpLanguage?>" anti-spoilers-pokedex anti-spoilers-friends>
 
   <head>
     <meta charset="utf-8">
