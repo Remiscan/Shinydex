@@ -528,11 +528,11 @@ hunt-card {
   100% { transform: translateY(0); opacity: 1; }
 }
 
-body.welcome [data-replaces="shiny-card"] {
+body.welcome [data-replaces] {
   opacity: 0;
 }
 
-body.welcome shiny-card {
+body.welcome :is(shiny-card, .pokedex-gen, hunt-card, corbeille-card, friend-card, friend-shiny-card) {
   animation: intro .35s var(--easing-standard);
   --delay: calc(var(--order) * 50ms);
   animation-delay: var(--delay, 0ms);

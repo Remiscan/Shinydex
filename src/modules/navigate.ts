@@ -21,7 +21,7 @@ interface Section {
   element: HTMLElement;
 }
 
-const sections: Section[] = [
+export const sections: Section[] = [
   {
     nom: 'mes-chromatiques',
     urls: {
