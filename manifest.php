@@ -47,18 +47,6 @@ header('Content-Type: application/json');
 	"background_color": "#222222",
 	"shortcuts": [
 		{
-			"name": "<?=$translation->get('shortcut-mes-chromatiques-name')?>",
-			"short_name": "<?=$translation->get('shortcut-mes-chromatiques-short-name')?>",
-			"url": "<?=$translation->get('shortcut-mes-chromatiques-url')?>",
-			"description": "<?=$translation->get('shortcut-mes-chromatiques-description')?>",
-			"icons": [
-				{
-					"src": "/shinydex/images/app-icons/shortcuts/mes-chromatiques.png",
-					"sizes": "96x96"
-				}
-			]
-		},
-		{
 			"name": "<?=$translation->get('shortcut-pokedex-name')?>",
 			"short_name": "<?=$translation->get('shortcut-pokedex-short-name')?>",
 			"url": "<?=$translation->get('shortcut-pokedex-url')?>",
