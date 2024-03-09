@@ -92,7 +92,7 @@ pokemon-sprite:not([dexid]) ~ * {
   grid-column: identity;
   display: grid;
   grid-template-rows: [name] 32px [species] auto;
-  grid-template-columns: [ball] 32px [name] fit-content(100%) [icons] auto;
+  grid-template-columns: [ball] 32px [name] auto [icons] auto 1fr;
   position: relative;
   left: -16px;
   align-items: center;
@@ -124,7 +124,9 @@ pokemon-sprite:not([dexid]) ~ * {
   position: relative;
   left: 8px;
   top: -6px;
+  overflow: hidden;
   white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 [data-type="forme"]::first-letter {
