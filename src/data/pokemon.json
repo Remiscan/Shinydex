@@ -14683,7 +14683,7 @@
                 },
                 "noShiny": false,
                 "hasBackside": false,
-                "catchable": false
+                "catchable": true
             }
         ]
     },
@@ -14720,7 +14720,7 @@
                 },
                 "noShiny": false,
                 "hasBackside": false,
-                "catchable": false
+                "catchable": true
             }
         ]
     },

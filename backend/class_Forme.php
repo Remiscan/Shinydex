@@ -156,7 +156,7 @@ class Forme extends Sprite {
           $ids = ['', 'origin'];
           $noms = ['{{name}} Forme Alternative', '{{name}} Forme Originelle'];
           $nomsEN = ['Altered Forme {{name}}', 'Origin Forme {{name}}'];
-          $catchable = [true, false];
+          $catchable = [true, true];
         break;
         case 487: // Giratina
           $ids = ['', 'origin'];
