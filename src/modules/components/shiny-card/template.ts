@@ -21,6 +21,7 @@ template.innerHTML = /*html*/`
       <span data-type="ball" class="icon"></span>
       <span data-type="name" class="title-large"></span>
       <span data-type="species"></span>
+      <span data-type="forme"></span>
 
       <span class="identity-icons">
         <span data-type="gene" class="icon"></span>

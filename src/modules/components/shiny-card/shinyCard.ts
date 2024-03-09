@@ -13,6 +13,8 @@ import iconSheet from '../../../../images/iconsheet.css' assert { type: 'css' };
 import themesSheet from '../../../../styles/themes.css.php' assert { type: 'css' };
 // @ts-expect-error
 import commonSheet from '../../../../styles/common.css' assert { type: 'css' };
+import { Pokemon } from '../../Pokemon.js';
+import { pokemonData } from '../../jsonData.js';
 import { getCurrentLang, getString } from '../../translation.js';
 // @ts-expect-error
 import sheet from './styles.css' assert { type: 'css' };
@@ -68,13 +70,37 @@ export class shinyCard extends HTMLElement {
     this.setAttribute('last-update', String(shiny.lastUpdate));
 
     const lang = getCurrentLang();
+    const pkmn = new Pokemon(pokemonData[shiny.dexid]);
+
+    const formeQuery = `pokemon/${shiny.dexid}/forme/${shiny.forme}`;
+    const formeName = getString(formeQuery as TranslatedString, lang);
+    const formeData = pkmn.formes.find(f => f.dbid === shiny.forme);
+    const isInterestingForme = (
+      formeName !== getString(`pokemon/1/forme/${shiny.forme}` as TranslatedString, lang) &&
+      formeData?.catchable && 
+      pkmn.formes.filter(f => f.catchable).length > 1
+    );
 
     // Espèce
     {
       const element = this.shadow.querySelector('[data-type="species"]')!;
-      const species = getString(`pokemon/${shiny.dexid}` as TranslatedString, lang);
-      element.setAttribute('data-string', `pokemon/${shiny.dexid}`);
-      element.innerHTML = species;
+
+      let stringQuery = '';
+      // Si pas de surnom ET nom de forme intéressant :
+      // - le surnom sera affiché en première ligne (voir plus bas)
+      // - le nom de forme avec nom d'espèce sera affiché en deuxième ligne
+      if (shiny.name && isInterestingForme) {
+        stringQuery = `${formeQuery}/name`;
+      }
+      // Sinon :
+      // - le nom d'espèce sera affiché en première ligne
+      // - le nom de forme sans nom d'espèce sera affiché en deuxième ligne (voir plus bas)
+      else {
+        stringQuery = `pokemon/${shiny.dexid}`;
+      }
+
+      element.setAttribute('data-string', stringQuery);
+      element.innerHTML = getString(stringQuery as TranslatedString, lang);
 
       const sprite = this.shadow.querySelector('pokemon-sprite')!;
       sprite.setAttribute('dexid', String(shiny.dexid));
@@ -82,6 +108,15 @@ export class shinyCard extends HTMLElement {
 
     // Forme
     {
+      const element = this.shadow.querySelector('[data-type="forme"]')!;
+      if (isInterestingForme) {
+        element.setAttribute('data-string', formeQuery);
+        element.innerHTML = getString(formeQuery as TranslatedString, lang);
+      } else {
+        element.removeAttribute('data-string');
+        element.innerHTML = '';
+      }
+
       const sprite = this.shadow.querySelector('pokemon-sprite')!;
       sprite.setAttribute('forme', shiny.forme);
       this.setAttribute('data-form', shiny.forme);

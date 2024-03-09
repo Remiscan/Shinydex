@@ -115,21 +115,24 @@ pokemon-sprite:not([dexid]) ~ * {
 
 /* Name & species */
 
-[data-type="species"] {
+[data-type="species"],
+[data-type="forme"] {
   grid-row: species;
   grid-column: name;
   opacity: .8;
-  display: flex;
-  justify-content: start;
-  align-items: center;
+  display: block;
   position: relative;
   left: 8px;
-  top: -8px;
+  top: -6px;
   white-space: nowrap;
 }
 
+[data-type="forme"]::first-letter {
+  text-transform: uppercase;
+}
+
 [data-type="name"],
-[data-type="name"]:empty + [data-type="species"] {
+[data-type="name"]:empty ~ [data-type="species"] {
   grid-row: name;
   grid-column: name;
   opacity: 1;
@@ -145,7 +148,13 @@ pokemon-sprite:not([dexid]) ~ * {
   overflow: hidden;
 }
 
-[data-type="name"]:empty {
+[data-type="name"]:empty ~ [data-type="forme"],
+[data-type="name"]:not(:empty) ~ [data-type="species"] {
+  grid-column: name / -1;
+}
+
+[data-type="name"]:empty,
+[data-type="name"]:not(:empty) ~ [data-type="forme"] {
   display: none;
 }
 
