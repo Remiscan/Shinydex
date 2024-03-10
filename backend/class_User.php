@@ -24,8 +24,9 @@ class User {
   ];
 
   public readonly string $userID;
+  public readonly bool $public;
   private string|null $token = null;
-  private readonly BDD $db;
+  public readonly BDD $db;
   public readonly JWT $jwt;
 
   private static function db() { return new BDD(); }
@@ -47,6 +48,7 @@ class User {
     }
 
     $this->userID = $user['uuid'];
+    $this->public = (bool) $user['public'];
     $this->token = $_COOKIE['user'] ?? null;
     $this->db = self::db();
     $this->jwt = self::jwt();
@@ -198,7 +200,7 @@ class User {
     $this->validateToken();
 
     // Remove all user data from all database tables
-    foreach(['shinydex_pokemon', 'shinydex_deleted_pokemon', 'shinydex_user_sessions'] as $table) {
+    foreach(['shinydex_pokemon', 'shinydex_deleted_pokemon', 'shinydex_user_sessions', 'shinydex_push_subscriptions', 'shinydex_friends'] as $table) {
       $userID = $this->userID;
       $delete = $this->db->prepare("DELETE FROM $table WHERE `userid` = :userid");
       $delete->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
@@ -244,6 +246,8 @@ class User {
       $refreshToken = $_COOKIE['refresh'];
       $signedRefreshToken = bin2hex($jwt->sign($refreshToken));
 
+      $db->beginTransaction();
+
       $session_data = $db->prepare("SELECT * FROM shinydex_user_sessions WHERE `token` = :token LIMIT 1");
       $session_data->bindParam(':token', $signedRefreshToken, PDO::PARAM_STR, 512);
       $session_data->execute();
@@ -267,12 +271,15 @@ class User {
       $consume_token->bindParam(':token', $signedRefreshToken, PDO::PARAM_STR, 512);
       $consume_token->execute();
 
+      $db->commit();
+
       if (!$consume_token) {
         throw new \Exception('Failed to consume refresh token');
       }
 
       return new User('shinydex', $userID);
     } catch (\Throwable $error) {
+      $db->rollback();
       self::forceSignOut();
       throw $error;
     }
@@ -335,5 +342,182 @@ class User {
 
     // Delete refresh token from app
     setcookie('refresh', '', $cookieOptions);
+  }
+
+
+  // ----- FRIENDS ----- //
+
+
+  /** Gets the list of the current user's friends. */
+  public function getFriends(): array {
+    $db = self::db();
+
+    $select = $db->prepare("SELECT * FROM shinydex_users WHERE uuid IN (
+      SELECT f.friend_userid FROM shinydex_friends AS f WHERE f.userid = :userid
+    )");
+
+    $userID = $this->userID;
+    $select->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
+    $select->execute();
+    return $select->fetchAll(PDO::FETCH_ASSOC) ?? [];
+  }
+
+
+  /** Adds a friend to the current user. */
+  public function addFriend(string $username) {
+    $insert = $this->db->prepare("INSERT INTO shinydex_friends (userid, friend_userid)
+      SELECT :userid, shinydex_users.uuid FROM shinydex_users WHERE shinydex_users.username = :friend_username
+    ");
+
+    $userID = $this->userID;
+    $insert->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
+    $insert->bindParam(':friend_username', $username, PDO::PARAM_STR, 20);
+    $result = $insert->execute();
+    if (!$result) throw new \Exception("Error while adding a friend");
+  }
+
+
+  /** Remove a friend from the current user. */
+  public function removeFriend(string $username) {
+    $delete = $this->db->prepare("DELETE FROM shinydex_friends
+      WHERE userid = :userid AND friend_userid = (
+        SELECT uuid FROM shinydex_users WHERE username = :friend_username
+      )
+    ");
+
+    $userID = $this->userID;
+    $delete->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
+    $delete->bindParam(':friend_username', $username, PDO::PARAM_STR, 20);
+    $result = $delete->execute();
+    if (!$result) throw new \Exception("Error while removing a friend");
+  }
+
+
+  // ----- PUSH SUBSCRIPTIONS ----- //
+
+
+  /**
+   * Gets all of the user's Push subscriptions.
+   * Optionally only those that match a given $endpoint.
+   */
+  public function getPushSubscriptions(?string $endpoint = null): array {
+    $condition = "`userid` = :userid";
+    if (!is_null($endpoint)) $condition .= " AND `subscription_endpoint` = :subscription_endpoint";
+
+    $push_subscription = $this->db->prepare("SELECT * FROM `shinydex_push_subscriptions` WHERE
+      $condition
+    ORDER BY id DESC");
+
+    $userID = $this->userID;
+    $push_subscription->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
+    if (!is_null($endpoint)) {
+      $push_subscription->bindParam(':subscription_endpoint', $endpoint);
+    }
+
+    $push_subscription->execute();
+    return $push_subscription->fetchAll(PDO::FETCH_ASSOC) ?? [];
+  }
+
+
+  /** Saves a Push subscription in the database. */
+  public function subscribeToPush(array $subscription) {
+    if (!isset($subscription['endpoint'])) throw new \Exception('Incorrectly formatted subscription');
+    $endpoint = $subscription['endpoint'];
+    unset($subscription['endpoint']); // to avoid storing the endpoint twice in the DB
+
+    // Get the existing subscription with the same endpoint if it exists,
+    // to determine whether to update or insert the subscription into the DB
+    $existing_subscriptions = $this->getPushSubscriptions($endpoint);
+    $should_update = count($existing_subscriptions) > 0;
+
+    if ($should_update) {
+      $upsert = $this->db->prepare('UPDATE `shinydex_push_subscriptions` SET 
+        `subscription_params` = :subscription_params
+      WHERE
+        `userid` = :userid AND
+        `subscription_endpoint` = :subscription_endpoint'
+      );
+    } else {
+      $upsert = $this->db->prepare("INSERT INTO `shinydex_push_subscriptions` (
+        `userid`,
+        `subscription_endpoint`,
+        `subscription_params`
+      ) VALUES (
+        :userid,
+        :subscription_endpoint,
+        :subscription_params
+      )");
+    }
+    
+    $userID = $this->userID;
+    $upsert->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
+    $upsert->bindParam(':subscription_endpoint', $endpoint);
+    $subscription_params = json_encode($subscription);
+    $upsert->bindParam(':subscription_params', $subscription_params);
+  
+    $result = $upsert->execute();
+    if (!$result) {
+      $error_message = $should_update
+        ? 'Error while updating Push subscription'
+        : 'Error while creating Push subscription';
+      throw new \Exception($error_message);
+    }
+  }
+
+
+  /** Deletes a Push subscription from the database. */
+  public function unsubscribeFromPush(array $subscription) {
+    if (!isset($subscription['endpoint'])) throw new \Exception('Incorrectly formatted subscription');
+    $endpoint = $subscription['endpoint'];
+
+    $delete = $this->db->prepare("DELETE FROM `shinydex_push_subscriptions` WHERE
+      `userid` = :userid AND `subscription_endpoint` = :subscription_endpoint
+    ");
+
+    $userID = $this->userID;
+    $delete->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
+    $delete->bindParam(':subscription_endpoint', $endpoint);
+
+    $result = $delete->execute();
+    if (!$result) throw new \Exception("Error while deleting Push subscription");
+  }
+
+
+  /** Deletes a bunch of Push subscriptions from the database (called when their endpoints are somehow invalid). */
+  static public function deleteSubscriptions(array $endpoints) {
+    $endpoints_query_string = [];
+    for ($i = 0; $i < count($endpoints); $i++) {
+      $endpoints_query_string[] = "?";
+    }
+    $endpoints_query_string = join(',', $endpoints_query_string);
+
+    $delete = $this->db->prepare("DELETE FROM `shinydex_push_subscriptions` WHERE
+      `subscription_endpoint` IN ($endpoints_query_string)
+    ");
+
+    $result = $delete->execute($endpoints);
+    if (!$result) throw new \Exception("Error while deleting Push subscriptions");
+  }
+
+
+  /** Gets all the Push subscriptions of the users that have added the current user as a friend. */
+  public function getAllFriendsPushSuscriptions() {
+    $select = $this->db->prepare("SELECT s.* FROM `shinydex_push_subscriptions` AS s
+      WHERE s.userid IN (
+        SELECT f.friend_userid FROM shinydex_friends AS f
+        WHERE f.userid = :userid
+      )
+    ");
+
+    $select->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
+    $select->execute();
+    $select = $select->fetchAll(PDO::FETCH_ASSOC);
+
+    return array_map(function($sub) {
+      return [
+        'endpoint' => $sub['subscription_endpoint'],
+        ...json_decode($sub['subscription_params'], true)
+      ];
+    }, $select);
   }
 }

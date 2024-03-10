@@ -36,19 +36,19 @@
       "label": "build cache.json"
     }, {
       "type": "shell",
-      "command": "sudo php build/webp-pokemon-sprites.php",
+      "command": "php build/webp-pokemon-sprites.php",
       "label": "build .webp Pokémon sprites"
     }, {
       "type": "shell",
-      "command": "sudo php build/pokemonsheet.php",
+      "command": "php build/pokemonsheet.php",
       "label": "build Pokémon sprite sheet"
     }, {
       "type": "shell",
-      "command": "sudo php build/iconsheet.php",
+      "command": "php build/iconsheet.php",
       "label": "build icon sheet"
     }, {
       "type": "shell",
-      "command": "sudo php build/pokemon-data.php",
+      "command": "php build/pokemon-data.php",
       "label": "build Pokémon data JSON"
     }, {
       "type": "shell",

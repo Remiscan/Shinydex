@@ -908,6 +908,10 @@ h2:not(:first-child) {
   --description-row: auto;
 }
 
+.un-parametre:not(.with-description) .param-description {
+  display: none;
+}
+
 .un-parametre.theme {
   grid-template-columns: auto 1fr;
 }
@@ -969,7 +973,7 @@ body:not([data-last-sync]) #parametres [data-last-sync],
 body:not([data-last-sync="failure"]) #parametres [data-last-sync="failure"],
 body:not([data-last-sync="success"]) #parametres [data-last-sync="success"],
 body:not([data-last-sync="loading"]) #parametres [data-last-sync="loading"],
-form[name="app-settings"]:not([data-public-profile="true"]) [data-public-profile] {
+form:not([data-public-profile="true"]) [data-public-profile] {
   display: none;
 }
 

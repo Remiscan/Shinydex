@@ -38,6 +38,9 @@ switch ($request) {
   case 'sync-friends':
   case 'delete-user-data':
   case 'update-user-profile':
+  case 'get-vapid-public-key':
+  case 'save-push-subscription':
+  case 'delete-push-subscription':
     $sessionNeeded = true;
     break;
   

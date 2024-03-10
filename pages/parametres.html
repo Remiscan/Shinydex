@@ -20,6 +20,32 @@
 
   <!-- Formulaire des paramètres -->
   <form name="app-settings">
+    <h2 class="title-medium" data-string="parametres-generaux"></h2>
+
+    <p class="un-parametre with-description">
+      <span class="param-nom body-large" data-string="param-lang-title"></span>
+      <span class="param-description body-medium" data-string="param-lang-desc"></span>
+      <span class="param">
+        <input-select name="lang">
+          <span slot="label" data-string="param-lang-label"></span>
+          <option value="fr">Français</option>
+          <option value="en">English</option>
+        </input-select>
+      </span>
+    </p>
+
+    <p class="un-parametre with-description" data-logged-in>
+      <span class="param-nom body-large" data-string="param-enable-notifications-title"></span>
+      <span class="param-description body-medium" data-string="param-enable-notifications-desc"></span>
+      <span class="param">
+        <label for="enable-notifications">
+          <input-switch name="enable-notifications" id="enable-notifications" icons="checked"></input-switch>
+        </label>
+      </span>
+    </p>
+
+    <!---->
+
     <h2 class="title-medium" data-string="parametres-apparence"></h2>
 
     <p class="un-parametre theme">
@@ -38,18 +64,6 @@
       <span class="param-nom body-large" data-string="param-hue"></span>
       <span class="param">
         <input-slider name="theme-hue" min="1" max="360" step="1" value="320"></input-slider>
-      </span>
-    </p>
-
-    <p class="un-parametre with-description">
-      <span class="param-nom body-large" data-string="param-lang-title"></span>
-      <span class="param-description body-medium" data-string="param-lang-desc"></span>
-      <span class="param">
-        <input-select name="lang">
-          <span slot="label" data-string="param-lang-label"></span>
-          <option value="fr">Français</option>
-          <option value="en">English</option>
-        </input-select>
       </span>
     </p>
 

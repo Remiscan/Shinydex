@@ -10,6 +10,7 @@ if (!isset($_POST['username'])) {
 // Get the corresponding user's profile data if they exist
 $username = $_POST['username'];
 $db = new BDD();
+
 $user_data = $db->prepare("SELECT * FROM shinydex_users WHERE `username` = :username LIMIT 1");
 $user_data->bindParam(':username', $username, PDO::PARAM_STR, 36);
 $user_data->execute();

@@ -32,6 +32,14 @@ declare var google: {
 
 
 export let loggedIn = false;
+let authInitialized = false;
+
+export async function ready() {
+  if (authInitialized) return true;
+  else return new Promise(resolve => {
+    window.addEventListener('authinitialized', resolve);
+  });
+}
 
 
 
@@ -306,4 +314,7 @@ export async function init() {
   });
 
   window.addEventListener('error', event => console.log('error caught', event));
+
+  authInitialized = true;
+  window.dispatchEvent(new Event('authinitialized'));
 }

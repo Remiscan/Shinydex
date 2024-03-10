@@ -179,9 +179,21 @@ foreach($to_restore_online_ids as $key => $huntid) {
 
 
 /**
- * Step 4: Send results to the frontend.
+ * Step 4: Send push notifications to every user that has the current user as a friend
+ *         telling them which shiny Pokémon the current user added.
+ */
+$friends_push_subscriptions = $user->getAllFriendsPushSuscriptions();
+// ---- //
+// TODO //
+// ---- //
+
+
+
+/**
+ * Step 5: Send results to the frontend.
  */
 
 echo json_encode(array(
-  'results' => $results
+  'results' => $results,
+  'push_subs' => $friends_push_subscriptions
 ), JSON_PRETTY_PRINT);

@@ -155,17 +155,20 @@
 
     "section-parametres-short-title": "Paramètres",
     "section-parametres-long-title": "Paramètres",
+    "parametres-generaux": "Application",
+    "param-lang-title": "Langue de l'appli",
+    "param-lang-desc": "Langue / Language",
+    "param-lang-label": "Langue",
+    "lang-changed-notif-message": "Relancez l'application pour appliquer le changement de langue.",
+    "lang-changed-notif-label": "Relancer",
+    "param-enable-notifications-title": "Activer les notifications",
+    "param-enable-notifications-desc": "pour recevoir une notification lorsqu'un de vos amis ajoute un Pokémon chromatique.",
     "parametres-apparence": "Apparence",
     "param-theme": "Thème",
     "param-theme-system": "Système",
     "param-theme-light": "Clair",
     "param-theme-dark": "Sombre",
     "param-hue": "Teinte",
-    "param-lang-title": "Langue de l'appli",
-    "param-lang-desc": "Langue / Language",
-    "param-lang-label": "Langue",
-    "lang-changed-notif-message": "Relancez l'application pour appliquer le changement de langue.",
-    "lang-changed-notif-label": "Relancer",
     "parametres-anti-spoilers": "Protection anti-spoilers",
     "param-anti-spoilers-pokedex-title": "Dans le Pokédex",
     "param-anti-spoilers-pokedex-desc": "Cache les couleurs des Pokémon chromatiques que vous n'avez pas capturés dans le Pokédex (sauf si vous cliquez sur l'icône d'un Pokémon).",
@@ -327,7 +330,9 @@
     "notif-modifications-will-be-lost": "Les modifications seront perdues et cette chasse sera supprimée.",
     "notif-hunt-will-be-deleted": "Cette chasse sera supprimée.",
     "notif-save-edits": "Sauvegarder ces modifications ?",
-    "notif-shiny-will-be-deleted": "Ce Pokémon chromatique sera supprimé et déplacé dans la corbeille."
+    "notif-shiny-will-be-deleted": "Ce Pokémon chromatique sera supprimé et déplacé dans la corbeille.",
+    "notif-notifications-permission-denied": "La permission d'envoyer des notifications est refusée au Shinydex par les paramètres de votre navigateur.",
+    "notif-notifications-not-supported": "Les Notifications Push ne sont pas supportées par votre navigateur."
   },
 
   "en": {
@@ -486,17 +491,20 @@
 
     "section-parametres-short-title": "Settings",
     "section-parametres-long-title": "Settings",
+    "parametres-generaux": "App settings",
+    "param-lang-title": "App language",
+    "param-lang-desc": "Langue / Language",
+    "param-lang-label": "Language",
+    "lang-changed-notif-message": "Restart the app to apply the language change.",
+    "lang-changed-notif-label": "Restart",
+    "param-enable-notifications-title": "Enable notifications",
+    "param-enable-notifications-desc": "to get a notification when one of your friends adds a shiny Pokémon.",
     "parametres-apparence": "Display settings",
     "param-theme": "Theme",
     "param-theme-system": "System",
     "param-theme-light": "Light",
     "param-theme-dark": "Dark",
     "param-hue": "Hue",
-    "param-lang-title": "App language",
-    "param-lang-desc": "Langue / Language",
-    "param-lang-label": "Language",
-    "lang-changed-notif-message": "Restart the app to apply the language change.",
-    "lang-changed-notif-label": "Restart",
     "parametres-anti-spoilers": "Anti-spoilers guard",
     "param-anti-spoilers-pokedex-title": "In the Pokédex",
     "param-anti-spoilers-pokedex-desc": "Hide the colors of shiny Pokémon you haven't caught in the Pokédex (except if you click on a Pokémon's icon).",
@@ -658,6 +666,8 @@
     "notif-modifications-will-be-lost": "Unsaved changes will be lost and this hunt will be deleted.",
     "notif-hunt-will-be-deleted": "This hunt will be deleted.",
     "notif-save-edits": "Save these changes?",
-    "notif-shiny-will-be-deleted": "this shiny Pokémon will be deleted and moved to the recycle bin."
+    "notif-shiny-will-be-deleted": "this shiny Pokémon will be deleted and moved to the recycle bin.",
+    "notif-notifications-permission-denied": "The permission for the Shinydex to send you notifications is denied by your browser settings.",
+    "notif-notifications-not-supported": "Push Notifications are not supported by your web browser."
   }
 }

@@ -14,7 +14,8 @@
         "phpseclib/phpseclib": "~2.0||^3.0.2",
         "guzzlehttp/guzzle": "~5.3.3||~6.0||~7.0",
         "guzzlehttp/psr7": "^1.8.4||^2.2.1",
-        "adhocore/jwt": "^1.1"
+        "adhocore/jwt": "^1.1",
+        "minishlink/web-push": "^8.0"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^3.0",
