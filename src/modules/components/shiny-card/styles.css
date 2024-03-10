@@ -122,7 +122,7 @@ pokemon-sprite:not([dexid]) ~ * {
   opacity: .8;
   display: block;
   position: relative;
-  left: 8px;
+  left: calc(.5ch * 22/16);
   top: -6px;
   overflow: hidden;
   white-space: nowrap;
