@@ -440,12 +440,14 @@ export class InputSelect extends TextField {
       right: viewport.width - rect.left
     };
 
+    const supportsPopover = CSS.supports('selector(:popover-open)');
+
     const selectorStyles = {
-      'top': available.bottom >= available.top ? rect.bottom + 1 : null,
-      'bottom': available.top > available.bottom ? viewport.height - rect.top + 1 : null,
+      'top': supportsPopover && available.bottom >= available.top ? rect.bottom + 1 : null,
+      'bottom': supportsPopover && available.top > available.bottom ? viewport.height - rect.top + 1 : null,
       'max-height': available.bottom >= available.top ? available.bottom - 9 : available.top - 9,
-      'left': available.right >= available.left ? rect.left + 1 : null,
-      'right': available.left > available.right ? viewport.width - rect.right + 1 : null,
+      'left': supportsPopover && available.right >= available.left ? rect.left + 1 : null,
+      'right': supportsPopover && available.left > available.right ? viewport.width - rect.right + 1 : null,
       'max-width': available.right >= available.left ? available.right + rect.width : available.left + rect.width,
       'min-width': rect.width,
     };

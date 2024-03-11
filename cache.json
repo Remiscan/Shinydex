@@ -10,6 +10,7 @@
         "../_common/polyfills/adoptedStyleSheets.min.js",
         "../_common/polyfills/es-module-shims.js",
         "../_common/polyfills/element-internals.js",
+        "../_common/polyfills/popover.min.js",
         "../_common/components/input-slider/input-slider.js",
         "../_common/components/input-switch/input-switch.js",
         "../_common/js/per-function-async-queue/mod.js",

@@ -901,7 +901,6 @@ h2:not(:first-child) {
   padding-block: 8px;
   text-align: left;
   align-items: center;
-  container-type: inline-size;
 }
 
 .un-parametre.with-description {
@@ -1010,6 +1009,10 @@ label[for="pick-import-file"],
 
 .un-parametre.theme input[type="radio"] + label {
   margin: 0;
+}
+
+.un-parametre.hue {
+  container-type: inline-size;
 }
 
 input-slider[name="theme-hue"] {
