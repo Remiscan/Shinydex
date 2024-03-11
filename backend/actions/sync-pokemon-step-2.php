@@ -1,4 +1,5 @@
 <?php
+require_once $_SERVER['DOCUMENT_ROOT'].'/shinydex/backend/func_sendPushNotification.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/shinydex/backend/class_BDD.php';
 $db = new BDD();
 $userID = $user->userID;
@@ -182,10 +183,28 @@ foreach($to_restore_online_ids as $key => $huntid) {
  * Step 4: Send push notifications to every user that has the current user as a friend
  *         telling them which shiny Pokémon the current user added.
  */
-$friends_push_subscriptions = $user->getAllFriendsPushSuscriptions();
-// ---- //
-// TODO //
-// ---- //
+$push_reports_reasons = [];
+if (count($to_insert_online) > 0) {
+  $friends_push_subscriptions = $user->getAllFriendsPushSuscriptions();
+  foreach ($friends_push_subscriptions as $subscription) {
+    $report = sendPushNotification($subscription, [
+      'new_shiny_pokemon' => array_map(fn($shiny) => [
+        'dexid' => $shiny['dexid'],
+        'forme' => $shiny['forme'],
+        'game' => $shiny['game'],
+        'method' => $shiny['method'],
+      ], $to_insert_online),
+      'username' => $user->username,
+    ]);
+
+    $endpoint = $report->getRequest()->getUri()->__toString();
+    if (!($report->isSuccess())) {
+      $push_reports_reasons[] = $report->getReason();
+    } else {
+      $push_reports_reasons[] = $report->getReason();
+    }
+  }
+}
 
 
 
@@ -195,5 +214,5 @@ $friends_push_subscriptions = $user->getAllFriendsPushSuscriptions();
 
 echo json_encode(array(
   'results' => $results,
-  'push_subs' => $friends_push_subscriptions
+  'push_reports_reasons' => $push_reports_reasons,
 ), JSON_PRETTY_PRINT);

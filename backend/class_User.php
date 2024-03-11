@@ -25,6 +25,7 @@ class User {
 
   public readonly string $userID;
   public readonly bool $public;
+  public readonly string|null $username;
   private string|null $token = null;
   public readonly BDD $db;
   public readonly JWT $jwt;
@@ -49,6 +50,7 @@ class User {
 
     $this->userID = $user['uuid'];
     $this->public = (bool) $user['public'];
+    $this->username = $user['username'];
     $this->token = $_COOKIE['user'] ?? null;
     $this->db = self::db();
     $this->jwt = self::jwt();
@@ -509,6 +511,7 @@ class User {
       )
     ");
 
+    $userID = $this->userID;
     $select->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
     $select->execute();
     $select = $select->fetchAll(PDO::FETCH_ASSOC);

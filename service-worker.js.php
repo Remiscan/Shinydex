@@ -218,6 +218,24 @@ self.addEventListener('periodicsync', function(event) {
 });
 
 
+// PUSH
+self.addEventListener('push', function(event) {
+  if (!(self.Notification) || self.Notification.permission !== 'granted') return;
+  if (!event.data) return;
+
+  event.waitUntil(
+    sendNotification(event.data.json())
+  );
+});
+
+
+// NOTIFICATION CLICK
+self.addEventListener('notificationclick', function(event) {
+  event.notification.close();
+  clients.openWindow(`${self.location.origin}/shinydex/${event.notification.data.path}`);
+});
+
+
 
 ///// FUNCTIONS
 
@@ -640,5 +658,92 @@ async function syncBackup(message = true) {
     }
     
     return false;
+  }
+}
+
+
+/**
+ * Sends a Notification.
+ */
+async function sendNotification(data) {
+  try {
+    await dataStorage.ready();
+    const settings = await dataStorage.getItem('app-settings');
+    const lang = settings.lang ?? 'en';
+    const antiSpoilers = Boolean(settings['anti-spoilers-friends']);
+
+    const cache = await caches.open('shinydex-sw-1710183427');
+    const pokemonDataResponse = await cache.match('/shinydex/dist/data/pokemon.json');
+    const pokemonData = await pokemonDataResponse.json();
+
+    const pad = (s, long) => {
+      let chaine = s;
+      while (chaine.length < long)
+        chaine = `0${chaine}`;
+      return chaine;
+    }
+
+    const getSprite = (dexid, forme) => {
+      if (!forme) return '';
+
+      // Alcremie shiny forms are all the same
+      const formToConsider = (dexid === 869) ? 0 : forme.form;
+  
+      const spriteCaracs = [
+        pad(dexid.toString(), 4),
+        pad(formToConsider.toString(), 3),
+        forme.gender,
+        forme.gigamax ? 'g' : 'n',
+        pad(forme.candy.toString(), 8),
+      ];
+  
+      return `${self.location.origin}/shinydex/images/pokemon-sprites/webp/112/poke_capture_${spriteCaracs.join('_')}_f_r.webp`;
+    }
+
+    const title = {
+      'fr': data.new_shiny_pokemon.length > 1
+        ? `Nouveaux Pokémon chromatiques !`
+        : `Nouveau Pokémon chromatique !`,
+      'en': `New shiny Pokémon!`,
+    };
+
+    let body, image;
+    if (data.new_shiny_pokemon.length === 1) {
+      const shiny = data.new_shiny_pokemon[0];
+      const pokemon = pokemonData[shiny['dexid']];
+      const pokemonName = pokemon?.name[lang] ?? pokemon?.name['en'];
+      const forme = pokemon?.formes.find(f => f.dbid === shiny['forme']);
+      const formeName = forme?.name[lang] ?? forme?.name['en'];
+      const pokemonNameWithForme = forme
+        ? formeName.replace('{{name}}', pokemonName)
+        : pokemonName;
+      body = {
+        'fr': `${data.username} a capturé un ${pokemonNameWithForme || pokemonName} chromatique.`,
+        'en': `${data.username} caught a shiny ${pokemonNameWithForme || pokemonName}.`
+      };
+      image = getSprite(shiny['dexid'], forme) || undefined;
+    } else {
+      body = {
+        'fr': `${data.username} a capturé ${data.new_shiny_pokemon.length} Pokémon chromatiques.`,
+        'en': `${data.username} caught ${data.new_shiny_pokemon.length} shiny Pokémon.`
+      };
+    }
+
+    const path = {
+      'fr': `ami/${data.username}`,
+      'en': `friend/${data.username}`
+    };
+
+    return self.registration.showNotification(title[lang], {
+      body: body[lang],
+      badge: `${self.location.origin}/shinydex/images/app-icons/badge.png`,
+      icon: antiSpoilers ? undefined : image,
+      lang: lang ?? 'en',
+      data: {
+        path: path[lang] ?? path[en],
+      },
+    });
+  } catch (error) {
+    console.error(`[push] Erreur lors de l'envoi d'une notification`, error, data);
   }
 }
