@@ -94,7 +94,7 @@ pokemon-sprite {
   margin: calc(-1 * .5 * (1 - var(--sprite-scale)) * 112px);
 }
 
-pokemon-sprite:not([data-caught="true"])::part(image) {
+pokemon-sprite:not([data-caught="true"])[dexid]:not([dexid="0"])::part(image) {
   filter: var(--anti-spoilers-filter);
 }
 

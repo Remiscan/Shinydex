@@ -760,8 +760,8 @@ dex-icon:not([data-caught="true"]) .pkmnicon {
   margin: 0;
 }
 
-:root[data-anti-spoilers-pokedex] #pokedex dex-icon:not([data-caught="true"]) .pkmnicon,
-:root[data-anti-spoilers-friends] :is(#partage, #chromatiques-ami) pokemon-sprite:not([data-caught="true"])::part(image) {
+:root[data-anti-spoilers-pokedex] #pokedex dex-icon:not([data-caught="true"])[dexid]:not([dexid="0"]) .pkmnicon,
+:root[data-anti-spoilers-friends] :is(#partage, #chromatiques-ami) pokemon-sprite:not([data-caught="true"])[dexid]:not([dexid="0"])::part(image) {
   filter: var(--anti-spoilers-filter);
 }
 

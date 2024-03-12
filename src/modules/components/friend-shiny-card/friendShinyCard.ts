@@ -19,7 +19,7 @@ sheet.replaceSync(/*css*/`
     }
   }
 
-  pokemon-sprite:not([data-caught="true"])::part(image) {
+  pokemon-sprite:not([data-caught="true"])[dexid]:not([dexid="0"])::part(image) {
     filter: var(--anti-spoilers-filter);
   }
 `);
