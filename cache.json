@@ -75,8 +75,6 @@
         "./dist/modules/components/sprite-viewer/spriteViewer.js",
         "./dist/modules/components/sprite-viewer/template.js",
         "./dist/modules/components/sprite-viewer/styles.css",
-        "./dist/modules/components/settings-form/settingsForm.js",
-        "./dist/modules/components/settings-form/settingsEntry.js",
         "./dist/modules/components/textArea.js",
         "./dist/modules/components/search-box/searchBox.js",
         "./dist/modules/components/search-box/template.js",
