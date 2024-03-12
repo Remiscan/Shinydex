@@ -200,15 +200,32 @@ class User {
   /** Deletes the user and their data. */
   public function deleteAllData() {
     $this->validateToken();
+    $userID = $this->userID;
 
-    // Remove all user data from all database tables
-    foreach(['shinydex_pokemon', 'shinydex_deleted_pokemon', 'shinydex_user_sessions', 'shinydex_push_subscriptions', 'shinydex_friends'] as $table) {
-      $userID = $this->userID;
-      $delete = $this->db->prepare("DELETE FROM $table WHERE `userid` = :userid");
+    $db = $this->db;
+    try {
+      $db->beginTransaction();
+
+      // Remove all user data from all database tables
+      foreach(['shinydex_pokemon', 'shinydex_deleted_pokemon', 'shinydex_user_sessions', 'shinydex_push_subscriptions', 'shinydex_friends'] as $table) {
+        $delete = $db->prepare("DELETE FROM $table WHERE `userid` = :userid");
+        $delete->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
+        $delete->execute();
+      }
+
+      // Remove all friendship relations where the current user is the friend
+      $delete = $db->prepare("DELETE FROM shinydex_friends WHERE `friend_userid` = :userid");
       $delete->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
       $delete->execute();
+
+      // Remove user account
+      $this->deleteDBEntry();
+
+      $db->commit();
+    } catch (\Throwable $error) {
+      $db->rollback();
+      throw $error;
     }
-    $this->deleteDBEntry();
 
     self::forceSignOut();
   }
@@ -487,13 +504,15 @@ class User {
 
   /** Deletes a bunch of Push subscriptions from the database (called when their endpoints are somehow invalid). */
   static public function deleteSubscriptions(array $endpoints) {
+    if (count($endpoints) === 0) return;
     $endpoints_query_string = [];
     for ($i = 0; $i < count($endpoints); $i++) {
       $endpoints_query_string[] = "?";
     }
     $endpoints_query_string = join(',', $endpoints_query_string);
 
-    $delete = $this->db->prepare("DELETE FROM `shinydex_push_subscriptions` WHERE
+    $db = self::db();
+    $delete = $db->prepare("DELETE FROM `shinydex_push_subscriptions` WHERE
       `subscription_endpoint` IN ($endpoints_query_string)
     ");
 

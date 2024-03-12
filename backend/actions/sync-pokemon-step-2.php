@@ -7,212 +7,237 @@ $jwt = User::jwt();
 
 
 
-/** 
- * Step 1: Get local data from JavaScript
- */
-
-if (!isset($_POST['inserts']) || !isset($_POST['updates']) || !isset($_POST['restores'])) {
-  respondError('Local data not received');
-}
-
-$to_insert_online = json_decode($_POST['inserts'], true);
-$to_update_online = json_decode($_POST['updates'], true);
-$to_restore_online_ids = json_decode($_POST['restores'], true);
+try {
+  $db->beginTransaction();
 
 
 
-/**
- * Step 2: Verify the sync session code.
- */
+  /** 
+   * Step 1: Get local data from JavaScript
+   */
 
-$allIds = array_merge(
-  array_map(fn($s) => $s['huntid'], $to_insert_online),
-  array_map(fn($s) => $s['huntid'], $to_update_online),
-  $to_restore_online_ids
-);
-asort($allIds);
-$potential_sync_session_code = base64_encode(
-  join(',', $allIds)
-);
+  if (!isset($_POST['inserts']) || !isset($_POST['updates']) || !isset($_POST['restores'])) {
+    respondError('Local data not received');
+  }
 
-if ($jwt->sign($potential_sync_session_code) !== ($_COOKIE['sync-session-code'] ?? 'null')) {
-  respondError('Invalid sync session');
-}
-
-$cookieOptions = [
-  'expires' => time() - 3600, // in the past, so the browser immediately deletes the cookie
-  'secure' => true,
-  'samesite' => 'Strict',
-  'path' => '/shinydex/',
-  'httponly' => true
-];
-
-setcookie('sync-session-code', '', $cookieOptions);
+  $to_insert_online = json_decode($_POST['inserts'], true);
+  $to_update_online = json_decode($_POST['updates'], true);
+  $to_restore_online_ids = json_decode($_POST['restores'], true);
 
 
 
-/**
- * Step 3: Update online database with newer local data.
- */
+  /**
+   * Step 2: Verify the sync session code.
+   */
 
-$results = [];
+  $allIds = array_merge(
+    array_map(fn($s) => $s['huntid'], $to_insert_online),
+    array_map(fn($s) => $s['huntid'], $to_update_online),
+    $to_restore_online_ids
+  );
+  asort($allIds);
+  $potential_sync_session_code = base64_encode(
+    join(',', $allIds)
+  );
 
-foreach($to_insert_online as $key => $shiny) {
-  $insert = $db->prepare("INSERT INTO `shinydex_pokemon` (
-    `huntid`,
-    `userid`,
-    `creationTime`,
-    `lastUpdate`,
+  if ($jwt->sign($potential_sync_session_code) !== ($_COOKIE['sync-session-code'] ?? 'null')) {
+    respondError('Invalid sync session');
+  }
 
-    `dexid`,
-    `forme`,
-    `game`,
-    `method`,
-    `count`,
-    `charm`,
+  $cookieOptions = [
+    'expires' => time() - 3600, // in the past, so the browser immediately deletes the cookie
+    'secure' => true,
+    'samesite' => 'Strict',
+    'path' => '/shinydex/',
+    'httponly' => true
+  ];
 
-    `catchTime`,
-    `name`,
-    `ball`,
-    `gene`,
-    `originalTrainer`,
-
-    `notes`
-  ) VALUES (
-    :huntid,
-    :userid,
-    :creationTime,
-    :lastUpdate,
-
-    :dexid,
-    :forme,
-    :game,
-    :method,
-    :count,
-    :charm,
-
-    :catchTime,
-    :nickname,
-    :ball,
-    :gene,
-    :originalTrainer,
-
-    :notes
-  )");
-
-  $insert->bindParam(':huntid', $shiny['huntid'], PDO::PARAM_STR, 36);
-  $insert->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
-  $insert->bindParam(':creationTime', $shiny['lastUpdate'], PDO::PARAM_STR, 13);
-  $insert->bindParam(':lastUpdate', $shiny['lastUpdate'], PDO::PARAM_STR, 13);
-
-  $insert->bindParam(':dexid', $shiny['dexid'], PDO::PARAM_INT, 4);
-  $insert->bindParam(':forme', $shiny['forme'], PDO::PARAM_STR, 50);
-  $insert->bindParam(':game', $shiny['game'], PDO::PARAM_STR, 50);
-  $insert->bindParam(':method', $shiny['method'], PDO::PARAM_STR, 50);
-  $insert->bindParam(':count', $shiny['count']);
-  $insert->bindParam(':charm', $shiny['charm'], PDO::PARAM_INT, 1);
-
-  $insert->bindParam(':catchTime', $shiny['catchTime'], PDO::PARAM_STR, 13);
-  $insert->bindParam(':nickname', $shiny['name'], PDO::PARAM_STR, 50);
-  $insert->bindParam(':ball', $shiny['ball'], PDO::PARAM_STR, 50);
-  $insert->bindParam(':gene', $shiny['gene'], PDO::PARAM_STR, 50);
-  $insert->bindParam(':originalTrainer', $shiny['originalTrainer'], PDO::PARAM_INT, 1);
-
-  $insert->bindParam(':notes', $shiny['notes']);
-
-  $results[] = $insert->execute();
-}
-
-
-foreach($to_update_online as $key => $shiny) {
-  $update = $db->prepare('UPDATE `shinydex_pokemon` SET 
-    `lastUpdate` = :lastUpdate,
-
-    `dexid` = :dexid,
-    `forme` = :forme,
-    `game` = :game,
-    `method` = :method,
-    `count` = :count,
-    `charm` = :charm,
-
-    `catchTime` = :catchTime,
-    `name` = :nickname,
-    `ball` = :ball,
-    `gene` = :gene,
-    `originalTrainer` = :originalTrainer,
-
-    `notes` = :notes
-  WHERE `huntid` = :huntid AND `userid` = :userid');
-
-  $update->bindParam(':huntid', $shiny['huntid'], PDO::PARAM_STR, 36);
-  $update->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
-
-  $update->bindParam(':lastUpdate', $shiny['lastUpdate'], PDO::PARAM_STR, 13);
-
-  $update->bindParam(':dexid', $shiny['dexid'], PDO::PARAM_INT, 4);
-  $update->bindParam(':forme', $shiny['forme'], PDO::PARAM_STR, 50);
-  $update->bindParam(':game', $shiny['game'], PDO::PARAM_STR, 50);
-  $update->bindParam(':method', $shiny['method'], PDO::PARAM_STR, 50);
-  $update->bindParam(':count', $shiny['count']);
-  $update->bindParam(':charm', $shiny['charm'], PDO::PARAM_INT, 1);
-
-  $update->bindParam(':catchTime', $shiny['catchTime'], PDO::PARAM_STR, 13);
-  $update->bindParam(':nickname', $shiny['name'], PDO::PARAM_STR, 50);
-  $update->bindParam(':ball', $shiny['ball'], PDO::PARAM_STR, 50);
-  $update->bindParam(':gene', $shiny['gene'], PDO::PARAM_STR, 50);
-  $update->bindParam(':originalTrainer', $shiny['originalTrainer'], PDO::PARAM_INT, 1);
-
-  $update->bindParam(':notes', $shiny['notes']);
-
-  $results[] = $update->execute();
-}
-
-
-foreach($to_restore_online_ids as $key => $huntid) {
-  $delete = $db->prepare('DELETE FROM shinydex_deleted_pokemon WHERE huntid = :huntid AND userid = :userid');
-
-  $delete->bindParam(':huntid', $huntid, PDO::PARAM_STR, 36);
-  $delete->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
-
-  $results[] = $delete->execute();
-}
+  setcookie('sync-session-code', '', $cookieOptions);
 
 
 
-/**
- * Step 4: Send push notifications to every user that has the current user as a friend
- *         telling them which shiny Pokémon the current user added.
- */
-$push_reports_reasons = [];
-if (count($to_insert_online) > 0) {
-  $friends_push_subscriptions = $user->getAllFriendsPushSuscriptions();
-  foreach ($friends_push_subscriptions as $subscription) {
-    $report = sendPushNotification($subscription, [
-      'new_shiny_pokemon' => array_map(fn($shiny) => [
-        'dexid' => $shiny['dexid'],
-        'forme' => $shiny['forme'],
-        'game' => $shiny['game'],
-        'method' => $shiny['method'],
-      ], $to_insert_online),
-      'username' => $user->username,
-    ]);
+  /**
+   * Step 3: Update online database with newer local data.
+   */
 
-    $endpoint = $report->getRequest()->getUri()->__toString();
-    if (!($report->isSuccess())) {
-      $push_reports_reasons[] = $report->getReason();
-    } else {
-      $push_reports_reasons[] = $report->getReason();
+  $results = [];
+
+  foreach($to_insert_online as $key => $shiny) {
+    $insert = $db->prepare("INSERT INTO `shinydex_pokemon` (
+      `huntid`,
+      `userid`,
+      `creationTime`,
+      `lastUpdate`,
+
+      `dexid`,
+      `forme`,
+      `game`,
+      `method`,
+      `count`,
+      `charm`,
+
+      `catchTime`,
+      `name`,
+      `ball`,
+      `gene`,
+      `originalTrainer`,
+
+      `notes`
+    ) VALUES (
+      :huntid,
+      :userid,
+      :creationTime,
+      :lastUpdate,
+
+      :dexid,
+      :forme,
+      :game,
+      :method,
+      :count,
+      :charm,
+
+      :catchTime,
+      :nickname,
+      :ball,
+      :gene,
+      :originalTrainer,
+
+      :notes
+    )");
+
+    $insert->bindParam(':huntid', $shiny['huntid'], PDO::PARAM_STR, 36);
+    $insert->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
+    $insert->bindParam(':creationTime', $shiny['lastUpdate'], PDO::PARAM_STR, 13);
+    $insert->bindParam(':lastUpdate', $shiny['lastUpdate'], PDO::PARAM_STR, 13);
+
+    $insert->bindParam(':dexid', $shiny['dexid'], PDO::PARAM_INT, 4);
+    $insert->bindParam(':forme', $shiny['forme'], PDO::PARAM_STR, 50);
+    $insert->bindParam(':game', $shiny['game'], PDO::PARAM_STR, 50);
+    $insert->bindParam(':method', $shiny['method'], PDO::PARAM_STR, 50);
+    $insert->bindParam(':count', $shiny['count']);
+    $insert->bindParam(':charm', $shiny['charm'], PDO::PARAM_INT, 1);
+
+    $insert->bindParam(':catchTime', $shiny['catchTime'], PDO::PARAM_STR, 13);
+    $insert->bindParam(':nickname', $shiny['name'], PDO::PARAM_STR, 50);
+    $insert->bindParam(':ball', $shiny['ball'], PDO::PARAM_STR, 50);
+    $insert->bindParam(':gene', $shiny['gene'], PDO::PARAM_STR, 50);
+    $insert->bindParam(':originalTrainer', $shiny['originalTrainer'], PDO::PARAM_INT, 1);
+
+    $insert->bindParam(':notes', $shiny['notes']);
+
+    $results[] = $insert->execute();
+  }
+
+
+  foreach($to_update_online as $key => $shiny) {
+    $update = $db->prepare('UPDATE `shinydex_pokemon` SET 
+      `lastUpdate` = :lastUpdate,
+
+      `dexid` = :dexid,
+      `forme` = :forme,
+      `game` = :game,
+      `method` = :method,
+      `count` = :count,
+      `charm` = :charm,
+
+      `catchTime` = :catchTime,
+      `name` = :nickname,
+      `ball` = :ball,
+      `gene` = :gene,
+      `originalTrainer` = :originalTrainer,
+
+      `notes` = :notes
+    WHERE `huntid` = :huntid AND `userid` = :userid');
+
+    $update->bindParam(':huntid', $shiny['huntid'], PDO::PARAM_STR, 36);
+    $update->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
+
+    $update->bindParam(':lastUpdate', $shiny['lastUpdate'], PDO::PARAM_STR, 13);
+
+    $update->bindParam(':dexid', $shiny['dexid'], PDO::PARAM_INT, 4);
+    $update->bindParam(':forme', $shiny['forme'], PDO::PARAM_STR, 50);
+    $update->bindParam(':game', $shiny['game'], PDO::PARAM_STR, 50);
+    $update->bindParam(':method', $shiny['method'], PDO::PARAM_STR, 50);
+    $update->bindParam(':count', $shiny['count']);
+    $update->bindParam(':charm', $shiny['charm'], PDO::PARAM_INT, 1);
+
+    $update->bindParam(':catchTime', $shiny['catchTime'], PDO::PARAM_STR, 13);
+    $update->bindParam(':nickname', $shiny['name'], PDO::PARAM_STR, 50);
+    $update->bindParam(':ball', $shiny['ball'], PDO::PARAM_STR, 50);
+    $update->bindParam(':gene', $shiny['gene'], PDO::PARAM_STR, 50);
+    $update->bindParam(':originalTrainer', $shiny['originalTrainer'], PDO::PARAM_INT, 1);
+
+    $update->bindParam(':notes', $shiny['notes']);
+
+    $results[] = $update->execute();
+  }
+
+
+  foreach($to_restore_online_ids as $key => $huntid) {
+    $delete = $db->prepare('DELETE FROM shinydex_deleted_pokemon WHERE huntid = :huntid AND userid = :userid');
+
+    $delete->bindParam(':huntid', $huntid, PDO::PARAM_STR, 36);
+    $delete->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
+
+    $results[] = $delete->execute();
+  }
+
+
+
+  /**
+   * Step 4: Send push notifications to every user that has the current user as a friend
+   *         telling them which shiny Pokémon the current user added.
+   */
+  $push_reports_reasons = [];
+  $notifications = [];
+  if (count($to_insert_online) > 0) {
+    $friends_push_subscriptions = $user->getAllFriendsPushSuscriptions();
+    foreach ($friends_push_subscriptions as $subscription) {
+      $notifications[] = [
+        'subscription' => $subscription,
+        'payload' => [
+          'new_shiny_pokemon' => array_map(fn($shiny) => [
+            'dexid' => $shiny['dexid'],
+            'forme' => $shiny['forme'],
+            'game' => $shiny['game'],
+            'method' => $shiny['method'],
+          ], $to_insert_online),
+          'username' => $user->username,
+        ]
+      ];
     }
   }
+
+  $reports = sendManyNotifications($notifications);
+  $expired_subscription_endpoints = [];
+  foreach ($reports as $report) {
+    if ($report->isSubscriptionExpired()) {
+      $endpoint = $report->getRequest()->getUri()->__toString();
+      $expired_subscription_endpoints[] = $endpoint;
+    }
+  }
+  User::deleteSubscriptions($expired_subscription_endpoints);
+
+
+
+  $db->commit();
+
+
+
+  /**
+   * Step 5: Send results to the frontend.
+   */
+
+  echo json_encode(array(
+    'results' => $results,
+  ), JSON_PRETTY_PRINT);
+
+
+
+} catch (\Throwable $error) {
+  $db->rollback();
+
+  echo json_encode(array(
+    'error' => $error->getMessage()
+  ));
 }
-
-
-
-/**
- * Step 5: Send results to the frontend.
- */
-
-echo json_encode(array(
-  'results' => $results,
-  'push_reports_reasons' => $push_reports_reasons,
-), JSON_PRETTY_PRINT);

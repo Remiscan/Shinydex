@@ -22,3 +22,18 @@ function sendPushNotification(array $subscription, array $content): MessageSentR
 		json_encode($content)
 	);
 }
+
+function sendManyNotifications(array $notifications) {
+	if (count($notifications) === 0) return [];
+
+	global $webPush;
+	foreach ($notifications as $notification) {
+		$subscription = Subscription::create($notification['subscription']);
+		$webPush->queueNotification(
+			$subscription,
+			json_encode($notification['payload'])
+		);
+	}
+
+	return $webPush->flush();
+}
