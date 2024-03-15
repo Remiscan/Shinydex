@@ -672,7 +672,7 @@ async function sendNotification(data) {
     const lang = settings.lang ?? 'en';
     const antiSpoilers = Boolean(settings['anti-spoilers-friends']);
 
-    const cache = await caches.open('shinydex-sw-1710183427');
+    const cache = await caches.open(currentCacheName);
     const pokemonDataResponse = await cache.match('/shinydex/dist/data/pokemon.json');
     const pokemonData = await pokemonDataResponse.json();
 
