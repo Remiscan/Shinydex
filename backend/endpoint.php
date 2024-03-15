@@ -10,8 +10,19 @@ function respond(mixed $data) {
   echo json_encode($data, JSON_UNESCAPED_SLASHES);
 }
 
-function respondError(string $message) {
-  echo json_encode(['error' => $message], JSON_UNESCAPED_SLASHES);
+function respondError(mixed $error) {
+  if ($error instanceof \Throwable) {
+    $returns = [
+      'error' => $error->getMessage(),
+      'details' => $error->__toString()
+    ];
+  } else {
+    $returns = [
+      'error' => $error
+    ];
+  }
+
+  echo json_encode($returns, JSON_UNESCAPED_SLASHES);
   exit;
 }
 

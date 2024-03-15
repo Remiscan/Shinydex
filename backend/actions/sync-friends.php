@@ -6,8 +6,6 @@ $userID = $user->userID;
 
 
 try {
-  //$db->beginTransaction();
-
 
 
 
@@ -80,13 +78,8 @@ try {
 
   $results = [];
 
-  foreach ($friends_to_insert_online as $username) {
-    $user->addFriend($username);
-  }
-
-  foreach ($friends_to_delete_online as $username) {
-    $user->removeFriend($username);
-  }
+  $user->addFriends($friends_to_insert_online);
+  $user->removeFriends($friends_to_delete_online);
 
 
 
@@ -95,26 +88,21 @@ try {
    */
 
   $friends_pokemon = [];
-  $number_of_pokemon_to_get = 10;
 
   // Get each friend's partial Pokémon data
-  $get_friends_pokemon = $db->prepare("WITH grouped_pokemon AS (
-    SELECT
-      p.dexid,
-      p.forme,
-      p.userid,
-      u.username,
-      ROW_NUMBER() OVER (
-        PARTITION BY p.userid
-        ORDER BY CAST(p.catchTime AS int) DESC, CAST(p.creationTime AS int) DESC
-      ) AS rownumber
-    FROM shinydex_pokemon AS p
-    JOIN shinydex_users AS u ON p.userid = u.uuid
-    WHERE p.userid IN (
-      SELECT f.friend_userid FROM shinydex_friends AS f
-      WHERE f.userid = :userid
-    )
-  ) SELECT * FROM grouped_pokemon WHERE rownumber <= $number_of_pokemon_to_get");
+  $query = "WITH grouped_pokemon AS (
+              SELECT p.dexid, p.forme, u.username, ROW_NUMBER() OVER (
+                PARTITION BY p.userid
+                ORDER BY CAST(p.catchTime AS int) DESC, CAST(p.creationTime AS int) DESC
+              ) AS rownumber
+            FROM shinydex_pokemon AS p
+            JOIN shinydex_users AS u ON p.userid = u.uuid
+            WHERE p.userid IN (
+              SELECT f.friend_userid FROM shinydex_friends AS f
+              WHERE f.userid = :userid
+            )
+          ) SELECT * FROM grouped_pokemon WHERE rownumber <= 10";
+  $get_friends_pokemon = $db->prepare($query);
 
   $get_friends_pokemon->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
   $get_friends_pokemon->execute();
@@ -122,13 +110,14 @@ try {
 
   // Associate each username to an array of Pokémon with partial data
   foreach ($get_friends_pokemon as $pokemon) {
-    if (!isset($friends_pokemon[$pokemon['username']])) $friends_pokemon[$pokemon['username']] = [];
-    $friends_pokemon[$pokemon['username']][] = ['dexid' => $pokemon['dexid'], 'forme' => $pokemon['forme']];
+    if (!isset($friends_pokemon[$pokemon['username']])) {
+      $friends_pokemon[$pokemon['username']] = [];
+    }
+    $friends_pokemon[$pokemon['username']][] = [
+      'dexid' => $pokemon['dexid'],
+      'forme' => $pokemon['forme']
+    ];
   }
-
-
-
-  //$db->commit();
 
 
 
@@ -148,6 +137,5 @@ try {
 
 
 } catch (\Throwable $e) {
-  //$db->rollback();
-  respondError($e->getMessage());
+  respondError($e);
 }

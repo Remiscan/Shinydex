@@ -29,15 +29,8 @@ try {
    * including his deleted Pokémon.
    */
 
-  $online_data = $db->prepare('SELECT * FROM `shinydex_pokemon` WHERE `userid` = :userid ORDER BY id DESC');
-  $online_data->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
-  $online_data->execute();
-  $online_data = $online_data->fetchAll(PDO::FETCH_ASSOC);
-
-  $online_deleted_data = $db->prepare('SELECT * FROM `shinydex_deleted_pokemon` WHERE `userid` = :userid ORDER BY id DESC');
-  $online_deleted_data->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
-  $online_deleted_data->execute();
-  $online_deleted_data = $online_deleted_data->fetchAll(PDO::FETCH_ASSOC);
+  $online_data = $user->getPokemon();
+  $online_deleted_data = $user->getDeletedPokemon();
 
 
 
@@ -151,33 +144,7 @@ try {
    * Step 4: Update online database with newer local data.
    */
 
-  $results = [];
-
-
-  foreach($to_delete_online as $key => $shiny) {
-    $insert = $db->prepare("INSERT INTO `shinydex_deleted_pokemon` (
-      `huntid`,
-      `userid`,
-      `lastUpdate`
-    ) VALUES (
-      :huntid,
-      :userid,
-      :lastUpdate
-    )");
-
-    $insert->bindParam(':huntid', $shiny['huntid'], PDO::PARAM_STR, 36);
-    $insert->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
-    $insert->bindParam(':lastUpdate', $shiny['lastUpdate'], PDO::PARAM_STR, 13);
-
-    $results[] = $insert->execute();
-
-    $delete = $db->prepare('DELETE FROM shinydex_pokemon WHERE huntid = :huntid AND userid = :userid');
-
-    $delete->bindParam(':huntid', $shiny['huntid'], PDO::PARAM_STR, 36);
-    $delete->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
-
-    $results[] = $delete->execute();
-  }
+  $results = $user->deleteManyPokemon($to_delete_online);
 
 
 
@@ -240,8 +207,5 @@ try {
 
 } catch (\Throwable $error) {
   $db->rollback();
-
-  echo json_encode(array(
-    'error' => $error->getMessage()
-  ));
+  respondError($error);
 }

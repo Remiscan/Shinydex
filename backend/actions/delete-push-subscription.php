@@ -15,5 +15,5 @@ try {
 	$user->unsubscribeFromPush($subscription);
 	respond(['success' => true]);
 } catch (\Throwable $error) {
-	respondError($error->getMessage());
+	respondError($error);
 }

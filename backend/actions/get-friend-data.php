@@ -7,25 +7,36 @@ if (!isset($_POST['username'])) {
   respondError('Missing username in POST body');
 }
 
-// Get the corresponding user's profile data if they exist
+// Get the corresponding user's Pokémon data
 $username = $_POST['username'];
 $db = new BDD();
 
-$user_data = $db->prepare("SELECT * FROM shinydex_users WHERE `username` = :username LIMIT 1");
-$user_data->bindParam(':username', $username, PDO::PARAM_STR, 36);
-$user_data->execute();
-$user_data = $user_data->fetch(PDO::FETCH_ASSOC);
-if (!$user_data || !isset($user_data['public']) || !$user_data['public']) {
+switch ($scope) {
+  case 'full':
+    $query = $db->prepare("SELECT shinydex_pokemon.* FROM shinydex_users
+      INNER JOIN shinydex_pokemon ON shinydex_users.uuid = shinydex_pokemon.userid
+      WHERE shinydex_users.username = :username AND shinydex_users.public = 1
+      ORDER BY CAST(shinydex_pokemon.catchTime as INTEGER) DESC
+    ");
+    break;
+
+  case 'partial':
+  default:
+    $query = $db->prepare("SELECT shinydex_pokemon.dexid, shinydex_pokemon.forme FROM shinydex_users
+      INNER JOIN shinydex_pokemon ON shinydex_users.uuid = shinydex_pokemon.userid
+      WHERE shinydex_users.username = :username AND shinydex_users.public = 1
+      ORDER BY CAST(shinydex_pokemon.catchTime as INTEGER) DESC LIMIT 10
+    ");
+}
+
+$query->bindParam(':username', $username, PDO::PARAM_STR, 36);
+$query->execute();
+$pokemon = $query->fetchAll(PDO::FETCH_ASSOC);
+
+if (!$pokemon) {
   respond(['matches' => false]);
   exit;
 }
-
-// Get the corresponding user's Pokémon data
-$requestedUserID = $user_data['uuid'];
-$pokemon = $db->prepare('SELECT * FROM `shinydex_pokemon` WHERE `userid` = :userid ORDER BY CAST(`catchTime` as INTEGER) DESC');
-$pokemon->bindParam(':userid', $requestedUserID, PDO::PARAM_STR, 36);
-$pokemon->execute();
-$pokemon = $pokemon->fetchAll(PDO::FETCH_ASSOC);
 
 
 

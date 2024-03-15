@@ -15,5 +15,5 @@ try {
 	$user->subscribeToPush($subscription);
 	respond(['success' => true]);
 } catch (\Throwable $error) {
-	respondError($error->getMessage());
+	respondError($error);
 }
