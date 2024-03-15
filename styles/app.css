@@ -23,11 +23,11 @@ html {
   --z-notification: 20; /* Material elevation 2 */
 }
 
-html:not([data-anti-spoilers-pokedex]) #pokedex {
+body[data-anti-spoilers-pokedex="off"] #pokedex {
   --anti-spoilers-filter: none;
 }
 
-html:not([data-anti-spoilers-friends]) :is(#partage, #chromatiques-ami) {
+body[data-anti-spoilers-friends="off"] :is(#partage, #chromatiques-ami) {
   --anti-spoilers-filter: none;
 }
 
@@ -760,8 +760,8 @@ dex-icon:not([data-caught="true"]) .pkmnicon {
   margin: 0;
 }
 
-:root[data-anti-spoilers-pokedex] #pokedex dex-icon:not([data-caught="true"])[dexid]:not([dexid="0"]) .pkmnicon,
-:root[data-anti-spoilers-friends] :is(#partage, #chromatiques-ami) pokemon-sprite:not([data-caught="true"])[dexid]:not([dexid="0"])::part(image) {
+body[data-anti-spoilers-pokedex="on"] #pokedex dex-icon:not([data-caught="true"])[dexid]:not([dexid="0"]) .pkmnicon,
+body[data-anti-spoilers-friends="on"] :is(#partage, #chromatiques-ami) pokemon-sprite:not([data-caught="true"])[dexid]:not([dexid="0"])::part(image) {
   filter: var(--anti-spoilers-filter);
 }
 
@@ -1101,6 +1101,15 @@ form[name="app-settings"] > *:last-child {
 
 .changelog-card li + li {
   margin-top: .4em;
+}
+
+body:not([data-notifications="off"]) [data-notifications-off],
+body:not([data-notifications="on"]) [data-notifications-on] {
+  display: none;
+}
+
+button[data-notifications-off][data-action="toggle-notifications"] {
+  opacity: .7;
 }
 
 

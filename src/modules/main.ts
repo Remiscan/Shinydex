@@ -290,6 +290,15 @@ importInput.addEventListener('change', async event => {
   });
 }
 
+// Détecte le clic sur le bouton de toggle des notifications dans le header de la liste d'amis
+{
+  const buttons = document.querySelectorAll('[data-action="toggle-notifications"]');
+  const input = document.querySelector('form[name="app-settings"] [name="enable-notifications"]');
+  for (const button of buttons) {
+    button.addEventListener('click', () => (input as HTMLElement)?.click());
+  }
+}
+
 // Met à jour l'identifiant du layout actuel quand la fenêtre change de taille
 window.addEventListener('resize', setCurrentLayout);
 window.addEventListener('orientationchange', setCurrentLayout);

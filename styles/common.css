@@ -80,6 +80,10 @@ button.only-text {
   padding: 0 24px;
 }
 
+button.icon-to-the-right {
+  padding: 0 16px 0 24px;
+}
+
 /* Elevated */
 
 button.elevated {

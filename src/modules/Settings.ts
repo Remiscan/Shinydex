@@ -172,13 +172,11 @@ export class Settings {
       } break;
 
       case 'anti-spoilers-pokedex':
-        if (value) document.documentElement.setAttribute('data-anti-spoilers-pokedex', '');
-        else       document.documentElement.removeAttribute('data-anti-spoilers-pokedex');
+        document.body.setAttribute('data-anti-spoilers-pokedex', value ? 'on' : 'off');
         break;
 
       case 'anti-spoilers-friends':
-        if (value) document.documentElement.setAttribute('data-anti-spoilers-friends', '');
-        else       document.documentElement.removeAttribute('data-anti-spoilers-friends');
+        document.body.setAttribute('data-anti-spoilers-friends', value ? 'on' : 'off');
         break;
 
       case 'enable-notifications':
@@ -253,6 +251,8 @@ export class Settings {
               unsubscribeFromPush();
             }
           }
+
+          document.body.setAttribute('data-notifications', value ? 'on' : 'off');
         });
         break;
     }
@@ -314,7 +314,7 @@ export class Settings {
   }
 
 
-  static async get(id: string): Promise<any> {
+  static async get(id: keyof Settings): Promise<any> {
     await dataStorage.ready();
     const currentSettings = new Settings(await dataStorage.getItem('app-settings'));
 

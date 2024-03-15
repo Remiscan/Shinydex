@@ -86,7 +86,12 @@ main > section {
   display: contents;
 }
 
-.titre-icones {
+:not(#partage) > header > .titre-icones,
+.titre-icones > a[data-nav-section] {
+  display: none;
+}
+
+.titre-icones:not(:has(:not(a[data-nav-section]))) {
   display: none;
 }
 
