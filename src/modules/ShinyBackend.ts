@@ -76,7 +76,7 @@ export class FrontendShiny implements feShiny {
   count: Count = new Count({ encounters: 0 });
   charm: boolean = false;
 
-  catchTime: number = 0;
+  catchTime: number = 825289200001;
   name: string = '';
   ball: string = '';
   gene: string = '';
