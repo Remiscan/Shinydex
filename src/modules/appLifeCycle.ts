@@ -196,8 +196,7 @@ export async function appStart() {
       easing: Params.easingStandard,
       fill: 'forwards'
     });
-    await wait(byeLoad);
-    loadScreen.remove();
+    wait(byeLoad).then(() => loadScreen.remove());
 
     const sectionsToPopulate: PopulatableSection[] = ['mes-chromatiques', 'chasses-en-cours', 'corbeille', 'partage'];
 
