@@ -129,9 +129,12 @@ const getLinkedSections = (section: Section['nom']): Section[] => {
  * @param event - L'évènement qui a déclenché la navigation.
  */
 export async function navigate(event: CustomEvent) {
+  if (event.detail.cause !== 'replacestate') {
+    document.body.classList.remove('welcome');
+  }
+
   const url = new URL(location.href);
   const sectionCible = url.pathname.split('/')[2];
-  const lang = document.documentElement.lang as keyof Section['urls'];
 
   const ancienneSection = sections.find(section => section.nom === sectionActuelle);
   if (!ancienneSection) throw getString('error-no-section');
