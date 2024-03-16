@@ -16,6 +16,7 @@ import './components/friend-card/friendCard.js';
 import './components/friend-shiny-card/friendShinyCard.js';
 import './components/hunt-card/huntCard.js';
 import './components/loadSpinner.js';
+import './components/notifSwitch.js';
 import './components/radioGroup.js';
 import './components/search-box/searchBox.js';
 import './components/shiny-card/shinyCard.js';
@@ -154,7 +155,38 @@ for (const fab of fabs) {
       }));
 
       addFriendSheet.close();
+      
+      // Notify that the user was successfully added as friend
       new Notif(getString('notif-added-friend').replace('{user}', username)).prompt();
+
+      // Check if notifications are enabled or were previously dismissed by the user
+      const appSettings = await dataStorage.getItem('app-settings');
+      const arePushNotificationsEnabled = appSettings['enable-notifications'];
+      const werePushNotificationsDismissed = await dataStorage.getItem('dismissed-push-notif-prompt');
+
+      // If they are not enabled and were not previously dismissed, ask to enable them
+      if (!arePushNotificationsEnabled && !werePushNotificationsDismissed) {
+        const notifEnablePush = new Notif(
+          getString('notif-notifications-prompt'),
+          Notif.maxDelay,
+          getString('notif-notifications-prompt-action'),
+          () => {}, true
+        );
+        const userResponse = await notifEnablePush.prompt();
+
+        // If the user says yes, actually enable them
+        if (userResponse) {
+          const input = document.querySelector('form[name="app-settings"] [name="enable-notifications"]');
+          (input as HTMLElement)?.click();
+          notifEnablePush.dismissable = true;
+          notifEnablePush.remove();
+        }
+        
+        // If the user says no, store that he dismissed the prompt to avoid asking again in the future
+        else {
+          await dataStorage.setItem('dismissed-push-notif-prompt', true);
+        }
+      }
     } else {
       addFriendSheet.close();
       new Notif(getString('error-no-profile').replace('{user}', username)).prompt();

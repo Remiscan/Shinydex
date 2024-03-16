@@ -68,6 +68,7 @@
         "./dist/modules/components/hunt-card/template.js",
         "./dist/modules/components/hunt-card/styles.css",
         "./dist/modules/components/loadSpinner.js",
+        "./dist/modules/components/notifSwitch.js",
         "./dist/modules/components/shinySwitch.js",
         "./dist/modules/components/dexDatalist.js",
         "./dist/modules/components/radioGroup.js",

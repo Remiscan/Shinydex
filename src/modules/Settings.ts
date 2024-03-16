@@ -250,9 +250,16 @@ export class Settings {
             else {
               unsubscribeFromPush();
             }
+
+            // On réinitialise le flag de dismissal des notifications, pour les proposer à nouveau au prochain ajout d'ami
+            dataStorage.setItem('dismissed-push-notif-prompt', false);
           }
 
           document.body.setAttribute('data-notifications', value ? 'on' : 'off');
+          document.querySelectorAll('[name="enable-notifications"]').forEach(input => {
+            if ('checked' in input) input.checked = Boolean(value);
+            else input.setAttribute('checked', String(Boolean(value)));
+          });
         });
         break;
     }

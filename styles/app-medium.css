@@ -86,10 +86,6 @@ main > section {
   display: contents;
 }
 
-.section-titre h1:has(+ search-box) {
-  margin-right: 8px;
-}
-
 :not(#partage) > header > .titre-icones,
 .titre-icones > a[data-nav-section] {
   display: none;

@@ -1116,6 +1116,10 @@ button[data-notifications-off][data-action="toggle-notifications"] {
   opacity: .7;
 }
 
+notif-switch {
+  font-size: 1rem;
+}
+
 
 
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
