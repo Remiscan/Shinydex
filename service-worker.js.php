@@ -224,7 +224,12 @@ self.addEventListener('push', function(event) {
   if (!event.data) return;
 
   event.waitUntil(
-    sendNotification(event.data.json())
+    dataStorage.getItem('app-settings')
+    .then(appSettings => {
+      if (appSettings['enable-notifications']) {
+        return showNotification(event.data.json());
+      }
+    })
   );
 });
 
@@ -665,7 +670,7 @@ async function syncBackup(message = true) {
 /**
  * Sends a Notification.
  */
-async function sendNotification(data) {
+async function showNotification(data) {
   try {
     await dataStorage.ready();
     const settings = await dataStorage.getItem('app-settings');
