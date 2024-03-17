@@ -91,13 +91,13 @@ try {
 
   // Get each friend's partial Pokémon data
   $query = "WITH grouped_pokemon AS (
-              SELECT p.dexid, p.forme, u.username, ROW_NUMBER() OVER (
+              SELECT u.username, p.dexid, p.forme, ROW_NUMBER() OVER (
                 PARTITION BY p.userid
                 ORDER BY CAST(p.catchTime AS int) DESC, CAST(p.creationTime AS int) DESC
               ) AS rownumber
-            FROM shinydex_pokemon AS p
-            JOIN shinydex_users AS u ON p.userid = u.uuid
-            WHERE p.userid IN (
+            FROM shinydex_users AS u
+            LEFT JOIN shinydex_pokemon AS p ON u.uuid = p.userid
+            WHERE u.uuid IN (
               SELECT f.friend_userid FROM shinydex_friends AS f
               WHERE f.userid = :userid
             )
@@ -110,13 +110,15 @@ try {
 
   // Associate each username to an array of Pokémon with partial data
   foreach ($get_friends_pokemon as $pokemon) {
-    if (!isset($friends_pokemon[$pokemon['username']])) {
-      $friends_pokemon[$pokemon['username']] = [];
+    $username = $pokemon['username'];
+    if (!isset($friends_pokemon[$username])) {
+      $friends_pokemon[$username] = [];
     }
-    $friends_pokemon[$pokemon['username']][] = [
-      'dexid' => $pokemon['dexid'],
-      'forme' => $pokemon['forme']
-    ];
+    unset($pokemon['userid']);
+    unset($pokemon['username']);
+    if (!is_null($pokemon['dexid'])) {
+      $friends_pokemon[$username][] = $pokemon;
+    }
   }
 
 
@@ -129,9 +131,6 @@ try {
     'results' => $results,
     'friends_to_delete_local' => $friends_to_delete_local,
     'friends_pokemon' => $friends_pokemon,
-    'local_friends' => $local_friends,
-    'online_friends' => $user->getFriends(),
-    'userid' => $userID
   ), JSON_PRETTY_PRINT);
 
 
