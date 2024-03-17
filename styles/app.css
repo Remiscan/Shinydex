@@ -811,10 +811,6 @@ section:not([data-filter-legit~="false"]) [data-legit="false"] {
   padding: 16px;
 }
 
-.message-tuto > * {
-  max-width: 65ch;
-}
-
 .message-tuto ul {
   margin: 8px 0 0 0;
   padding: 0 0 0 16px;
