@@ -10,6 +10,9 @@ echo '/'.'*'; ?>*/
   --text-color: rgb(33, 33, 33);
   --dark-coeff: 0;
   --pkmnicon-brightness: .85;
+  --icon-top-bg-color: var(--primary-70);
+  --pokemon-sprite-anti-spoilers-brightness: 0;
+  --pokemon-sprite-anti-spoilers-opacity: .3;
 
   --primary: var(--primary-40);
   --on-primary: var(--primary-100);
@@ -64,6 +67,9 @@ echo '/'.'*'; ?>*/
   --text-color: rgb(255, 255, 255);
   --dark-coeff: 1;
   --pkmnicon-brightness: .65;
+  --icon-top-bg-color: var(--primary-60);
+  --pokemon-sprite-anti-spoilers-brightness: 100;
+  --pokemon-sprite-anti-spoilers-opacity: .3;
 
   --primary: var(--primary-80);
   --on-primary: var(--primary-20);
@@ -114,7 +120,8 @@ echo '/'.'*'; ?>*/
 }
 /*<?php themeSheetEnd(closeComment: true); ?>*/
 
-:root {
+:root,
+::backdrop {
   --primary-fixed: var(--primary-90);
   --primary-fixed-dim: var(--primary-80);
   --on-primary-fixed: var(--primary-10);
@@ -155,9 +162,7 @@ echo '/'.'*'; ?>*/
   --state-focus-opacity: .12;
   --state-active-opacity: .12;
   --state-dragged-opacity: .16;
-}
 
-:root {
   --bg-color: rgb(var(--surface));
   --accent-color: rgb(var(--primary));
   --soft-accent-color: rgb(var(--primary-container));
@@ -175,7 +180,6 @@ echo '/'.'*'; ?>*/
     linear-gradient(to bottom, rgb(var(--state-tint, var(--on-primary)), var(--state-opacity, 0)) 0% 100%),
     linear-gradient(to bottom, rgb(var(--surface-tint, var(--primary)), var(--elevation-opacity, 0)) 0% 100%);
   color: rgb(var(--text-color, var(--on-surface)));
-  transition: box-shadow .3s var(--easing-standard);
 }
 
 .surface-default {
@@ -317,6 +321,7 @@ echo '/'.'*'; ?>*/
 .elevation-4-shadow,
 .elevation-5-shadow {
   box-shadow: var(--elevation-shadow, none);
+  transition: box-shadow .3s var(--easing-standard);
 }
 
 .elevation-1-shadow {

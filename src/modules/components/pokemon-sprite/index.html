@@ -1,14 +1,23 @@
 <style>
   html {
     color-scheme: light dark;
+    --link-pokemonsheet: url(/shinydex/images/pokemonsheet.webp);
   }
 </style>
 
-<script defer src="../../../ext/localforage.min.js"></script>
+<script defer src="../../../../ext/localforage.min.js"></script>
 
-<script defer src="../../../../_common/polyfills/adoptedStyleSheets.min.js"></script>
+<script defer src="../../../../../_common/polyfills/adoptedStyleSheets.min.js"></script>
 <script>window.esmsInitOptions = { polyfillEnable: ['css-modules', 'json-modules'] }</script>
-<script defer src="../../../../_common/polyfills/es-module-shims.js"></script>
+<script defer src="../../../../../_common/polyfills/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "translation-observer": "../../../../../_common/js/translation-observer/mod.js"
+  }
+}
+</script>
 
 <script type="module">
   import './pokemonSprite.js';

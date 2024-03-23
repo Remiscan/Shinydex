@@ -8,37 +8,21 @@ sprite-viewer {
   overflow: hidden;
 }
 
-.bouton-retour {
-  justify-self: center;
-  align-self: center;
+sprite-viewer form {
   grid-row: 2;
   grid-column: 2;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  margin-inline: 16px;
 }
 
-form[name="switch-shiny-regular"] {
-  grid-row: 2;
-  grid-column: 2;
-  width: fit-content;
-  height: fit-content;
+label[for="shiny-switch"] {
   justify-self: end;
-  align-self: center;
-  margin-right: 16px;
-  display: grid;
-  place-items: center;
 }
 
 sprite-viewer[shiny="false"] .sprite-list.shiny,
 sprite-viewer[shiny="true"] .sprite-list.regular {
   display: none;
-}
-
-.sprite-viewer-dex-info {
-  grid-row: 2;
-  grid-column: 2;
-  justify-self: start;
-  align-self: center;
-  margin-left: 16px;
-  height: var(--height);
 }
 
 .info-dexid::before {
@@ -65,6 +49,7 @@ sprite-viewer a.icon-button.bouton-retour {
   justify-content: center;
   align-items: center;
   margin: auto;
+  padding-bottom: calc(56px + 2 * 16px);
 }
 
 .dex-sprite {
@@ -102,6 +87,13 @@ sprite-viewer a.icon-button.bouton-retour {
   box-sizing: border-box;
 }
 
+.sprite-viewer-dex-info {
+  justify-self: start;
+  align-self: center;
+  height: var(--height);
+  --height: calc(2.25em / .75);
+}
+
 .forme-name {
   min-width: 35px;
   max-width: calc(var(--sprite-size) - 10px);
@@ -118,6 +110,10 @@ sprite-viewer a.icon-button.bouton-retour {
 .forme-name.caught {
   --surface-color: var(--secondary-container);
   --text-color: var(--on-secondary-container);
+}
+
+.forme-name.caught,
+.forme-name.catchable {
   padding-left: var(--padding-inline);
 }
 
@@ -128,6 +124,20 @@ sprite-viewer a.icon-button.bouton-retour {
 .sprite-viewer-dex-info > .icon,
 .forme-name > .icon {
   margin: -7px;
+  flex-shrink: 0;
+}
+
+.not-caught-indicator {
+  display: grid;
+  place-items: center;
+}
+
+.not-caught-indicator svg {
+  overflow: visible;
+}
+
+.not-caught-indicator circle {
+  stroke: currentColor;
 }
 
 .sprite-viewer-dex-info/*:not(.caught)*/ > .icon {
@@ -171,18 +181,43 @@ picture.no-shiny > span {
   text-align: center;
 }
 
-@media (min-width: 1140px) {
-  .dex-sprite,
-  .single-sprite .dex-sprite,
-  .two-sprites .dex-sprite {
-    --sprite-size: calc(min(400px, 80vw));
-  }
-}
-
 sprite-viewer[size="112"] :is(
   .dex-sprite,
   .single-sprite .dex-sprite,
   .two-sprites .dex-sprite
 ) {
   --sprite-size: 112px;
+}
+
+#sprite-viewer-fab {
+  position: fixed;
+  bottom: 56px;
+  left: 50%;
+  translate: -50%;
+  margin-inline: 0;
+  width: max-content;
+  max-width: calc(100% - 16px);
+  z-index: 2;
+}
+
+@media (min-width: 720px) {
+  .sprite-list {
+    /*padding-top: calc(56px + 2 * 16px);*/
+    padding-bottom: 0;
+  }
+
+  #sprite-viewer-fab {
+    left: 0;
+    top: 0;
+    translate: unset;
+    margin: 16px;
+  }
+}
+
+@media (min-width: 1140px) {
+  .dex-sprite,
+  .single-sprite .dex-sprite,
+  .two-sprites .dex-sprite {
+    --sprite-size: calc(min(400px, 80vw));
+  }
 }

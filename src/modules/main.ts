@@ -1,11 +1,14 @@
+import 'remiscan-logo';
 import '../../../_common/components/input-slider/input-slider.js';
 import '../../../_common/components/input-switch/input-switch.js';
 import { Friend } from './Friend.js';
 import { Hunt } from './Hunt.js';
+import { setCurrentLayout } from './Params.js';
 import { populator } from './appContent.js';
 import { appStart, checkUpdate } from './appLifeCycle.js';
 import * as Auth from './auth.js';
 import { callBackend } from './callBackend.js';
+import { BottomSheet } from './components/bottomSheet.js';
 import './components/corbeille-card/corbeilleCard.js';
 import './components/dexIcon.js';
 import './components/filter-menu/filterMenu.js';
@@ -13,17 +16,19 @@ import './components/friend-card/friendCard.js';
 import './components/friend-shiny-card/friendShinyCard.js';
 import './components/hunt-card/huntCard.js';
 import './components/loadSpinner.js';
+import './components/notifSwitch.js';
 import './components/radioGroup.js';
 import './components/search-box/searchBox.js';
 import './components/shiny-card/shinyCard.js';
 import './components/shinyStars.js';
 import './components/sprite-viewer/spriteViewer.js';
+import { SpriteViewer } from './components/sprite-viewer/spriteViewer.js';
 import './components/syncLine.js';
 import './components/syncProgress.js';
 import { export2json, json2import } from './exportToJSON.js';
 import { PopulatableSection } from './filtres.js';
 import { dataStorage, friendStorage, huntStorage, shinyStorage } from './localForage.js';
-import { navLinkBubble, navigate, sectionActuelle } from './navigate.js';
+import { goToPage, navLinkBubble, sectionActuelle } from './navigate.js';
 import { Notif, warnBeforeDestruction } from './notification.js';
 import { immediateSync, requestSync } from './syncBackup.js';
 import { getString } from './translation.js';
@@ -35,14 +40,13 @@ import { getString } from './translation.js';
 
 // Active les liens de navigation
 const navLinksList = [
-  ...document.querySelectorAll('[data-nav-section]'),
-  ...[...document.querySelectorAll('search-box')].map(sb => sb.shadowRoot?.querySelector('[part="filter-icon"]'))
+  ...document.querySelectorAll('[data-nav-section]')
 ];
 for (const link of navLinksList) {
   if (!(link instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
   link.addEventListener('click', event => {
     event.preventDefault();
-    navigate(link.dataset.navSection || '', event, JSON.parse(link.dataset.navData || '{}'));
+    goToPage(link.dataset.navSection ?? '', '', JSON.parse(link.dataset.navData || '{}'));
   });
 }
 
@@ -60,50 +64,58 @@ for (const bouton of Array.from(document.querySelectorAll('.bouton-retour'))) {
   });
 }
 
-// L'obfuscator ramène en arrière quand on clique dessus
-document.getElementById('obfuscator')!.addEventListener('click', () => history.back());
-
-// Ferme les sections suivantes si on clique en-dehors de leur contenu
-const sectionsToCloseWhenClickingOutside = ['filter-menu', 'user-search', 'top-layer', 'changelog'];
-for (const sectionName of sectionsToCloseWhenClickingOutside) {
-  const section = document.getElementById(sectionName);
-  section?.addEventListener('click', event => {
-    if (event.target !== section) return;
-    history.back();
-  });
-}
-
 
 
 ///////////////////////////////////
 // FAB (filtres et nouvelle chasse)
 
 // Active le FAB
-document.querySelector('.fab')!.addEventListener('click', async () => {
-  // Crée une nouvelle chasse
-  if (['mes-chromatiques', 'pokedex', 'chasses-en-cours'].includes(sectionActuelle)) {
-    if (sectionActuelle !== 'chasses-en-cours') {
-      await navigate('chasses-en-cours', new Event('navigate'));
-    }
+const fabs = document.querySelectorAll('.fab');
+for (const fab of fabs) {
+  fab.addEventListener('click', async (event) => {
+    const isSpriteViewerFab = fab.id === 'sprite-viewer-fab';
+    // Crée une nouvelle chasse
+    if (['mes-chromatiques', 'pokedex', 'chasses-en-cours'].includes(sectionActuelle) || isSpriteViewerFab) {
+      let dexid: number | undefined;
+      if (isSpriteViewerFab) {
+        event?.preventDefault();
+        const dialog = document.querySelector('#sprite-viewer');
+        if (!(dialog instanceof HTMLDialogElement)) throw new TypeError('Expecting HTMLDialogElement');
 
-    // Créer une nouvelle chasse ici
-    const hunt = await Hunt.getOrMake();
-    await huntStorage.setItem(hunt.huntid, hunt);
+        const viewer = dialog.querySelector('sprite-viewer');
+        if (!(viewer instanceof SpriteViewer)) throw new TypeError('Expecting SpriteViewer');
 
-    window.dispatchEvent(new CustomEvent('dataupdate', {
-      detail: {
-        sections: ['chasses-en-cours'],
-        ids: [hunt.huntid],
-        sync: false
+        dexid = Number(viewer.getAttribute('dexid')) ?? undefined;
+        viewer.close();
       }
-    }));
-  }
 
-  // Ajoute un nouvel ami
-  else if (sectionActuelle === 'partage') {
-    await navigate('user-search', new Event('click'), {});
-  }
-});
+      if (sectionActuelle !== 'chasses-en-cours') {
+        await goToPage('chasses-en-cours');
+      }
+  
+      // Créer une nouvelle chasse ici
+      const hunt = await Hunt.getOrMake();
+      if (dexid) hunt.dexid = dexid;
+      await huntStorage.setItem(hunt.huntid, hunt);
+  
+      window.dispatchEvent(new CustomEvent('dataupdate', {
+        detail: {
+          sections: ['chasses-en-cours'],
+          ids: [hunt.huntid],
+          sync: false
+        }
+      }));
+    }
+  
+    // Ajoute un nouvel ami
+    else if (sectionActuelle === 'partage') {
+      //await navigate('user-search', new Event('click'), {});
+      event.stopPropagation();
+      const userSearchSheet = document.querySelector('#user-search');
+      if (userSearchSheet instanceof BottomSheet) userSearchSheet.show();
+    }
+  });
+}
 
 
 
@@ -113,6 +125,8 @@ document.querySelector('.fab')!.addEventListener('click', async () => {
 // Active le bouton de recherche d'utilisateur
 {
   const form = document.querySelector('form[name="user-search"]') as HTMLFormElement;
+  const addFriendSheet = form.closest('bottom-sheet') as BottomSheet;
+
   form.addEventListener('submit', async event => {
     event.preventDefault();
 
@@ -140,10 +154,47 @@ document.querySelector('.fab')!.addEventListener('click', async () => {
         }
       }));
 
+      addFriendSheet.close();
+      
+      // Notify that the user was successfully added as friend
       new Notif(getString('notif-added-friend').replace('{user}', username)).prompt();
+
+      // Check if notifications are enabled or were previously dismissed by the user
+      const appSettings = await dataStorage.getItem('app-settings');
+      const arePushNotificationsEnabled = appSettings['enable-notifications'];
+      const werePushNotificationsDismissed = await dataStorage.getItem('dismissed-push-notif-prompt');
+
+      // If they are not enabled and were not previously dismissed, ask to enable them
+      if (!arePushNotificationsEnabled && !werePushNotificationsDismissed) {
+        const notifEnablePush = new Notif(
+          getString('notif-notifications-prompt'),
+          Notif.maxDelay,
+          getString('notif-notifications-prompt-action'),
+          () => {}, true
+        );
+        const userResponse = await notifEnablePush.prompt();
+
+        // If the user says yes, actually enable them
+        if (userResponse) {
+          const input = document.querySelector('form[name="app-settings"] [name="enable-notifications"]');
+          (input as HTMLElement)?.click();
+          notifEnablePush.dismissable = true;
+          notifEnablePush.remove();
+        }
+        
+        // If the user says no, store that he dismissed the prompt to avoid asking again in the future
+        else {
+          await dataStorage.setItem('dismissed-push-notif-prompt', true);
+        }
+      }
     } else {
-      new Notif(getString('error-no-profile')).prompt();
+      addFriendSheet.close();
+      new Notif(getString('error-no-profile').replace('{user}', username)).prompt();
     }
+  });
+
+  addFriendSheet?.dialog?.addEventListener('close', () => {
+    form.reset();
   });
 }
 
@@ -260,6 +311,30 @@ importInput.addEventListener('change', async event => {
   });
 }
 
+// Détecte le clic sur le bouton d'ouverture du changelog
+{
+  const button = document.querySelector('[data-action="open-changelog"]');
+  if (!(button instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
+  button.addEventListener('click', event => {
+    event.stopPropagation();
+    const changelogSheet = document.querySelector('#changelog');
+    if (changelogSheet instanceof BottomSheet) changelogSheet.show();
+  });
+}
+
+// Détecte le clic sur le bouton de toggle des notifications dans le header de la liste d'amis
+{
+  const buttons = document.querySelectorAll('[data-action="toggle-notifications"]');
+  const input = document.querySelector('form[name="app-settings"] [name="enable-notifications"]');
+  for (const button of buttons) {
+    button.addEventListener('click', () => (input as HTMLElement)?.click());
+  }
+}
+
+// Met à jour l'identifiant du layout actuel quand la fenêtre change de taille
+window.addEventListener('resize', setCurrentLayout);
+window.addEventListener('orientationchange', setCurrentLayout);
+
 
 
 ///////////////////////////////////////
@@ -334,9 +409,9 @@ declare global {
 window.addEventListener('dataupdate', async (event: DataUpdateEvent) => {
   // On peuple l'application avec les nouvelles données
   const { sections, ids, sync } = event.detail;
-  if (Array.isArray(ids) && ids.length === 0) return;
   console.log(`Populating sections [${(sections ?? []).join(', ')}] with IDs [${(ids ?? ['all']).join(', ')}] ${sync ? 'with sync' : ''}`);
   for (const section of sections) {
+    if (section !== 'chromatiques-ami' && Array.isArray(ids) && ids.length === 0) continue;
     await populator[section](ids);
   }
 
@@ -351,6 +426,7 @@ window.addEventListener('dataupdate', async (event: DataUpdateEvent) => {
 
 // Lancement de l'appli
 try {
+  setCurrentLayout();
   appStart();
 } catch (error) {
   // Réagir ici à une erreur critique qui empêche le chargement de l'appli.

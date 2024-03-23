@@ -80,6 +80,10 @@ button.only-text {
   padding: 0 24px;
 }
 
+button.icon-to-the-right {
+  padding: 0 16px 0 24px;
+}
+
 /* Elevated */
 
 button.elevated {
@@ -219,6 +223,7 @@ button.fab:active {
 button.icon-button {
   width: 40px;
   height: 40px;
+  padding: 0;
   --surface-opacity: 0;
   --elevation-opacity: 0;
   --state-tint: var(--on-surface);
@@ -331,15 +336,17 @@ input[role="searchbox"] {
 /* Switch */
 
 input-switch,
-shiny-switch {
-  --off-track-color: rgb(var(--surface-variant));
+shiny-switch,
+notif-switch {
+  --off-track-color: rgb(var(--surface-container));
   --on-track-color: rgb(var(--primary));
   --off-thumb-color: rgb(var(--outline));
   --on-thumb-color: rgb(var(--on-primary));
 }
 
 input-switch::part(button),
-shiny-switch::part(button) {
+shiny-switch::part(button),
+notif-switch::part(button) {
   --interaction-ring-color: rgb(var(--on-surface));
 }
 
@@ -350,13 +357,16 @@ shiny-switch::part(icon-checked) {
   fill: var(--on-track-color);
 }
 
-input-switch[disabled] {
+input-switch[disabled],
+shiny-switch[disabled],
+notif-switch[disabled] {
   opacity: .7;
   cursor: not-allowed;
 }
 
 label:has(> input-switch),
-label:has(> shiny-switch) {
+label:has(> shiny-switch),
+label:has(> notif-switch) {
   min-height: var(--tap-safe-size);
   min-width: var(--tap-safe-size);
   justify-content: center;
@@ -366,7 +376,8 @@ label:has(> shiny-switch) {
 
 @supports not selector(label:has(a)) {
   label > input-switch::before,
-  label > shiny-switch::before {
+  label > shiny-switch::before,
+  label > notif-switch::before {
     content: '';
     display: flex;
     width: 100%;

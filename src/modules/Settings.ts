@@ -2,11 +2,13 @@ import { callBackend } from './callBackend.js';
 import { RadioGroup } from './components/radioGroup.js';
 import { dataStorage } from './localForage.js';
 import { Notif } from './notification.js';
-import { computePaletteCss, setTheme, updateMetaThemeColorTag } from './theme.js';
+import { setTheme, updateMetaThemeColorTag, updateThemeHue } from './theme.js';
 // @ts-ignore
 import { queueable } from '../../../_common/js/per-function-async-queue/mod.js';
+import * as Auth from './auth.js';
 import { InputSelect } from './components/inputSelect.js';
 import { SupportedLang, isSupportedLang } from './jsonData.js';
+import { getCurrentPushSubscription, subscribeToPush, unsubscribeFromPush } from './pushSubscription.js';
 import { getCurrentLang, getString, translationObserver } from './translation.js';
 
 
@@ -24,6 +26,9 @@ export class Settings {
   'theme': Theme = 'system';
   'theme-hue': number = 255;
   'cache-all-sprites': boolean = false;
+  'anti-spoilers-pokedex': boolean = false;
+  'anti-spoilers-friends': boolean = false;
+  'enable-notifications': boolean = false;
 
   constructor(data?: FormData | object) {
     if (!data) return;
@@ -40,6 +45,15 @@ export class Settings {
 
       const formCacheAllSprites = String(data.get('cache-all-sprites'));
       this['cache-all-sprites'] = formCacheAllSprites === 'true';
+
+      const antiSpoilersPokedex = String(data.get('anti-spoilers-pokedex'));
+      this['anti-spoilers-pokedex'] = antiSpoilersPokedex === 'true';
+
+      const antiSpoilersFriends = String(data.get('anti-spoilers-friends'));
+      this['anti-spoilers-friends'] = antiSpoilersFriends === 'true';
+
+      const notifications = String(data.get('enable-notifications'));
+      this['enable-notifications'] = notifications === 'true';
     } else {
       if ('lang' in data && typeof data['lang'] === 'string' && isSupportedLang(data['lang'])) {
         this['lang'] = data['lang'];
@@ -55,6 +69,18 @@ export class Settings {
 
       if ('cache-all-sprites' in data) {
         this['cache-all-sprites'] = Boolean(data['cache-all-sprites']);
+      }
+
+      if ('anti-spoilers-pokedex' in data) {
+        this['anti-spoilers-pokedex'] = Boolean(data['anti-spoilers-pokedex']);
+      }
+
+      if ('anti-spoilers-friends' in data) {
+        this['anti-spoilers-friends'] = Boolean(data['anti-spoilers-friends']);
+      }
+
+      if ('enable-notifications' in data) {
+        this['enable-notifications'] = Boolean(data['enable-notifications']);
       }
     }
   }
@@ -111,11 +137,12 @@ export class Settings {
       } break;
 
       case 'theme-hue': {
-        const css = computePaletteCss(value);
+        const palette = updateThemeHue(value);
+        const css = palette.toCSS();
         const container = document.querySelector('style#palette');
         if (!(container instanceof HTMLStyleElement)) throw new TypeError(`Expecting HTMLStyleElement`);
         container.innerHTML = `:root { ${css} }`;
-        updateMetaThemeColorTag();
+        updateMetaThemeColorTag(palette);
       } break;
 
       case 'cache-all-sprites': {
@@ -143,6 +170,98 @@ export class Settings {
           cacheAllSprites(value);
         }
       } break;
+
+      case 'anti-spoilers-pokedex':
+        document.body.setAttribute('data-anti-spoilers-pokedex', value ? 'on' : 'off');
+        break;
+
+      case 'anti-spoilers-friends':
+        document.body.setAttribute('data-anti-spoilers-friends', value ? 'on' : 'off');
+        break;
+
+      case 'enable-notifications':
+        Auth.ready()
+        .then(() => {
+          // Si le navigateur ne supporte pas les notifs Push : on prévient l'utilisateur et on désactive le paramètre
+          if (!('Notification' in window) || !('PushManager' in window)) {
+            if (!initial) new Notif(getString('notif-notifications-not-supported')).prompt();
+            return Settings.set('enable-notifications', false, { apply: false, toForm: true });
+          }
+
+          // Au lancement de l'appli
+          if (initial) {
+            getCurrentPushSubscription()
+            .then(currentSubscription => {
+              // Si le paramètre est activé
+              if (value) {
+                // Si une souscription existe
+                if (currentSubscription) {
+                  // Si la permission est refusée : on dé-souscrit et on désactive le paramètre
+                  if (Notification.permission === 'denied') {
+                    unsubscribeFromPush();
+                    return Settings.set('enable-notifications', false, { apply: false, toForm: true });
+                  }
+                }
+
+                // Si pas de souscription actuelle : on désactive le paramètre
+                else return Settings.set('enable-notifications', false, { apply: false, toForm: true });
+              }
+
+              // Si le paramètre est désactivé
+              else {
+                // Si une souscription existe : on dé-souscrit
+                if (currentSubscription) unsubscribeFromPush();
+              }
+            })
+          }
+
+          // Au changement manuel de paramètre
+          else {
+            // Si l'utilisateur veut souscrire
+            if (value) {
+              // Si la permission est déjà accordée : on souscrit pour lui
+              if (Notification.permission === "granted") {
+                subscribeToPush();
+              }
+              
+              // Si la permission est déjà refusée : on le prévient, on désactive le paramètre et on dé-souscrit
+              else if (Notification.permission === 'denied') {
+                new Notif(getString('notif-notifications-permission-denied')).prompt();
+                unsubscribeFromPush();
+                return Settings.set('enable-notifications', false, { apply: false, toForm: true });
+              }
+              
+              // Si la permission est en attende, on la demande
+              else {
+                Notification.requestPermission()
+                .then((permission) => {
+                  // Si elle est accordée : on souscrit
+                  if (permission === "granted") subscribeToPush();
+                  // Sinon : on désactive le paramètre et on dé-souscrit
+                  else {
+                    unsubscribeFromPush();
+                    return Settings.set('enable-notifications', false, { apply: false, toForm: true });
+                  }
+                });
+              }
+            }
+            
+            // Si l'utilisateur veur dé-souscrire : on dé-souscrit
+            else {
+              unsubscribeFromPush();
+            }
+
+            // On réinitialise le flag de dismissal des notifications, pour les proposer à nouveau au prochain ajout d'ami
+            dataStorage.setItem('dismissed-push-notif-prompt', false);
+          }
+
+          document.body.setAttribute('data-notifications', value ? 'on' : 'off');
+          document.querySelectorAll('[name="enable-notifications"]').forEach(input => {
+            if ('checked' in input) input.checked = Boolean(value);
+            else input.setAttribute('checked', String(Boolean(value)));
+          });
+        });
+        break;
     }
   }
 
@@ -189,8 +308,11 @@ export class Settings {
         break;
 
       case 'cache-all-sprites':
-        if (['true', 'false', true, false].includes(value)) currentSettings['cache-all-sprites'] = String(value) === 'true';
-        break; 
+      case 'anti-spoilers-pokedex':
+      case 'anti-spoilers-friends':
+      case 'enable-notifications':
+        if (['true', 'false', true, false].includes(value)) currentSettings[setting] = String(value) === 'true';
+        break;
     }
 
     if (toForm) Settings.#toForm(setting, currentSettings[setting]);
@@ -199,7 +321,7 @@ export class Settings {
   }
 
 
-  static async get(id: string): Promise<any> {
+  static async get(id: keyof Settings): Promise<any> {
     await dataStorage.ready();
     const currentSettings = new Settings(await dataStorage.getItem('app-settings'));
 

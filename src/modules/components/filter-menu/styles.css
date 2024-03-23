@@ -4,22 +4,10 @@
   display: grid;
   grid-template-rows: auto auto;
   grid-template-columns: 1fr;
-  height: fit-content;
-  box-sizing: border-box;
-  border-radius: var(--border-radius);
-  position: sticky;
-  z-index: var(--z-filter-menu);
-  max-width: min(100% - 16px, 600px);
-  max-height: calc(100% - 16px);
-  margin: auto;
-  overflow-x: hidden;
-  overflow-y: auto;
 }
 
 form[name="search-options"] {
-  padding: 16px;
   box-sizing: border-box;
-  border-radius: var(--border-radius);
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -66,9 +54,4 @@ fieldset:first-child {
 
 .caught-filter {
   display: var(--caught-filter-display, none);
-}
-
-input-select::part(container) {
-  --elevation-opacity: var(--elevation-1-opacity);
-  --surface-tint: var(--on-surface);
 }

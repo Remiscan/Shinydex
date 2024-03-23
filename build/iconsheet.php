@@ -30,13 +30,15 @@ function buildIconSheet(int $columns = 24, int $iconSize = 32, string $format = 
     $totalIcons += count($iconFiles);
   }
 
+  $safetyMargin = 1; // px between items
+
   $totalSize = [
-    'width' => $columns * $iconSize,
-    'height' => (intdiv($totalIcons, $columns) + 1) * $iconSize
+    'width' => $columns * ($iconSize + $safetyMargin),
+    'height' => (intdiv($totalIcons, $columns) + 1) * ($iconSize + $safetyMargin)
   ];
 
   // Current position
-  $x = $iconSize; // leave the first cell empty
+  $x = $iconSize + $safetyMargin; // leave the first cell empty
   $y = 0;
 
   $imagePath = __DIR__.'/../images/iconsheet.'.$format;
@@ -161,10 +163,10 @@ function buildIconSheet(int $columns = 24, int $iconSize = 32, string $format = 
       if ($logs) echo "icon $id added to sheet\n";
 
       // Increment current position
-      $x += $iconSize;
+      $x += $iconSize + $safetyMargin;
       if ($x + $iconSize > $totalSize['width']) {
-        $x = $x % $totalSize['width'];
-        $y += $iconSize;
+        $x = 0;
+        $y += $iconSize + $safetyMargin;
       }
     }
   }

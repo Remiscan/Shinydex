@@ -1,4 +1,4 @@
-import { friendStorage, localForageAPI } from '../../localForage.js';
+import { friendStorage, localForageAPI, shinyStorage } from '../../localForage.js';
 import { getString, translationObserver } from '../../translation.js';
 import template from './template.js';
 // @ts-expect-error
@@ -12,14 +12,12 @@ import commonSheet from '../../../../styles/common.css' assert { type: 'css' };
 import { Friend } from '../../Friend.js';
 import { noAccent } from '../../Params.js';
 import { updateUserProfile } from '../../Settings.js';
-import { navigate } from '../../navigate.js';
+import { goToPage } from '../../navigate.js';
 import { warnBeforeDestruction } from '../../notification.js';
 // @ts-expect-error
 import sheet from './styles.css' assert { type: 'css' };
 
 
-
-let currentCardId: string | null;
 
 const previewSheet = new CSSStyleSheet();
 {
@@ -56,7 +54,7 @@ export class friendCard extends HTMLElement {
   };
   navHandler = (event: Event) => {
     event.preventDefault();
-    navigate('chromatiques-ami', event, { username: this.username });
+    goToPage(`chromatiques-ami`, this.username);
   }
 
 
@@ -94,6 +92,10 @@ export class friendCard extends HTMLElement {
         const element = sprites[i];
         element.setAttribute('dexid', String(pokemon.dexid));
         element.setAttribute('forme', pokemon.forme);
+        shinyStorage.iterate(shiny => {
+          if (shiny.dexid === pokemon.dexid && shiny.forme === pokemon.forme) return true;
+        })
+        .then(isCaught => element.setAttribute('data-caught', String(isCaught)));
       }
     }
 
@@ -107,27 +109,21 @@ export class friendCard extends HTMLElement {
    */
   toggleMenu() {
     const username = this.getAttribute('username');
-
-    // On ferme la carte déjà ouverte
-    if (currentCardId != null)
-      document.querySelector(`[username="${currentCardId}"]`)!.removeAttribute('open');
-
+    const currentState = this.getAttribute('open') === 'true';
     const menuButtons = [...this.shadow.querySelectorAll('.menu button')];
 
-    // Si la carte demandée n'est pas celle qu'on vient de fermer, on l'ouvre
-    if (username != currentCardId) {
+    if (!currentState) {
       this.setAttribute('open', 'true');
       menuButtons.forEach(button => {
         button.removeAttribute('disabled');
         button.setAttribute('tabindex', '0');
       });
-      currentCardId = username;
     } else {
+      this.removeAttribute('open');
       menuButtons.forEach(button => {
         button.setAttribute('disabled', '');
         button.setAttribute('tabindex', '-1');
       });
-      currentCardId = null;
     }
   }
 

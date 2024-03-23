@@ -7,6 +7,7 @@ import { callBackend } from './callBackend.js';
 import { FilterMenu } from './components/filter-menu/filterMenu.js';
 import { PopulatableSection } from './filtres.js';
 import { dataStorage, huntStorage, shinyStorage } from './localForage.js';
+import { sections } from './navigate.js';
 import { Notif } from './notification.js';
 import { scrollObserver, setTheme } from './theme.js';
 import { getString } from './translation.js';
@@ -36,6 +37,7 @@ async function initServiceWorker() {
     });
 
     registration.addEventListener('updatefound', () => {
+      const oldWorker = registration.active;
       const newWorker = registration.installing;
       let updating = false;
 
@@ -72,8 +74,11 @@ async function initServiceWorker() {
           
           const updateNotif = new Notif(getString('notif-update-installed'), Notif.maxDelay, getString('notif-update-installed-label'), updateHandler, false);
           window.dispatchEvent(new Event('updateinstalled'));
-          const userActed = await updateNotif.prompt();
-          if (userActed) updateNotif.element?.classList.add('loading');
+
+          if (oldWorker !== null) {
+            const userActed = await updateNotif.prompt();
+            if (userActed) updateNotif.element?.classList.add('loading');
+          }
         }
 
         else if (newWorker.state == 'activated') {
@@ -101,9 +106,6 @@ export async function appStart() {
       console.log(message, tempsChargement);
     }
   };
-
-  // Au rechargement de l'appli, indiquer qu'on est sur la section de départ
-  history.replaceState({ section: 'mes-chromatiques' }, '');
 
   // ---
 
@@ -136,6 +138,10 @@ export async function appStart() {
     const message = getString('error-verifying-data');
     console.error(error);
     new Notif(message).prompt();
+  } finally {
+    // Au rechargement de l'appli, indiquer qu'on est sur la section de départ
+    // (après Settings.restore, notamment pour que charger la page chromatiques-ami affiche bien le pseudo)
+    history.replaceState({}, '');
   }
 
   // ---
@@ -149,7 +155,9 @@ export async function appStart() {
 
   // On met à jour la structure de la BDD locale si nécessaire
   try {
-    if (lastStorageUpgrade < cacheVersion * 1000) await upgradeStorage();
+    // @ts-expect-error
+    const upgradeStorageModuleVersion = Number(fileVersions['./dist/modules/upgradeStorage.js']) * 1000 ?? 0;
+    if (lastStorageUpgrade < upgradeStorageModuleVersion) await upgradeStorage();
   } catch (error) {
     const message = getString('error-updating-data-format');
     console.error(message, error);
@@ -188,23 +196,42 @@ export async function appStart() {
       easing: Params.easingStandard,
       fill: 'forwards'
     });
-    await wait(byeLoad);
-    loadScreen.remove();
+    wait(byeLoad).then(() => loadScreen.remove());
 
     const sectionsToPopulate: PopulatableSection[] = ['mes-chromatiques', 'chasses-en-cours', 'corbeille', 'partage'];
+
     await Promise.all([
       initPokedex(),
-      ...sectionsToPopulate.map(async section => {
-        await populator[section]();
-        if (section === 'mes-chromatiques') {
-          const visibleCardsOnScreen = Math.ceil(
-            ((document.querySelector('#mes-chromatiques > .section-contenu') as HTMLElement)?.offsetHeight ?? 0) / 128
-          );
-          await wait(50 * visibleCardsOnScreen + 350);
-          document.body.classList.remove('welcome');
-        }
-      })
+      ...sectionsToPopulate.map(section => populator[section]())
     ]);
+
+    let startSection = sections.find(s => {
+      return Object.values(s.urls)
+        .includes(new URL(location.href).pathname.split('/')[2]);
+    }) ?? sections[0];
+    let cardSupposedHeight = -1;
+    switch (startSection.nom) {
+      case 'mes-chromatiques':
+      case 'corbeille':
+      case 'chromatiques-ami':
+        cardSupposedHeight = 128;
+        break;
+      case 'chasses-en-cours':
+        cardSupposedHeight = 192;
+        break;
+      case 'partage':
+        cardSupposedHeight = 126;
+        break;
+      case 'pokedex':
+        cardSupposedHeight = Math.ceil(151 / (startSection.element.offsetWidth / 44)) * 44;
+        break;
+    }
+
+    const visibleCardsOnScreen = cardSupposedHeight <= 10
+      ? 0
+      : Math.ceil(startSection.element.offsetHeight / cardSupposedHeight);
+    await wait(50 * visibleCardsOnScreen + 350);
+    document.body.classList.remove('welcome');
     logPerf('populate');
   } catch (error) {
     const message = getString('error-preparing-content');
@@ -291,6 +318,14 @@ export async function appStart() {
 
   // ÉTAPE 7 : on vérifie si l'application peut être installée
 
+  // Make storage persistent
+  if (navigator.storage && navigator.storage.persist) {
+    let persistent = await navigator.storage.persisted();
+    if (!persistent) {
+      persistent = await navigator.storage.persist();
+    }
+    console.log(`${persistent ? '[:)]' : '[:(]'} Storage ${persistent ? 'is' : 'is NOT'} persistent.`);
+  }
   checkInstall();
 
   // ---

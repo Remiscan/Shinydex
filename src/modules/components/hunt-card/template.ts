@@ -21,7 +21,7 @@ template.innerHTML = /*html*/`
 
         <text-field name="dexid" required list="datalist-pokedex" autocomplete="off" spellcheck="false" data-placeholder="species-placeholder">
           <span slot="label" data-string="species-label"></span>
-          <datalist id="datalist-pokedex"></datalist>
+          <datalist is="dex-datalist" id="datalist-pokedex"></datalist>
         </text-field>
 
         <input-select name="forme" default-value="" required>
@@ -231,6 +231,8 @@ template.innerHTML = /*html*/`
         <text-field name="catchTime" type="date">
           <span slot="label" data-string="capture-date"></span>
         </text-field>
+
+        <check-box name="catchTime-unknown" data-string="capture-date-unknown"></check-box>
 
         <input-select name="ball" default-value="poke" icons="leading">
           <span slot="leading-icon" class="icon" data-icon="ball"></span>

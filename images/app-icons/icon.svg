@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="51.2 51.2 409.6 409.6" width="512" height="512">
   <style>
     svg {
-      --background-top: rgb(86.36, 146.81, 222.81);
+      --background-top: rgb(122.86, 174.15, 239.73); /* hue 255, primary-70 */
       --background-bottom: white;
       --unown-color: #292929;
       --ball-center-color: white;
@@ -37,6 +37,7 @@
 
   @media (prefers-color-scheme: dark) {
     svg {
+      --background-top: rgb(96.97, 147.09, 210.85); /* hue 255, primary-60 */
       --background-bottom: #e2e2e2;
       --ball-center-color: #e2e2e2;
     }

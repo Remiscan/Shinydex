@@ -1,5 +1,4 @@
 import { pad, wait } from '../../Params.js';
-import { Pokemon } from '../../Pokemon.js';
 import { pokemonData } from '../../jsonData.js';
 import { TranslatedString, getString, translationObserver } from '../../translation.js';
 // @ts-expect-error
@@ -97,7 +96,7 @@ export class pokemonSprite extends HTMLElement {
   lastChange: number = 0;
 
   loadHandler = (event: Event) => {
-    this.dispatchEvent(new Event('load', { bubbles: false }));
+    this.dispatchEvent(new Event(event.type, { bubbles: false }));
   };
 
   
@@ -201,7 +200,6 @@ export class pokemonSprite extends HTMLElement {
     const img = this.shadow.querySelector('img')!;
     const url = this.getSpriteUrl();
     const isSheet = this.params.size === pokemonSprite.sheetSize;
-    const name = Pokemon.names()[Number(this.params.dexid)];
     
     // On affiche le nouveau sprite uniquement si aucune nouvelle demande n'a été faite entre temps
     if (currentChange === this.lastChange) {
@@ -232,7 +230,7 @@ export class pokemonSprite extends HTMLElement {
     const formeIndex = pkmn?.formes
       .map(form => form.dbid)
       .findIndex(id => id === params.forme);
-    const forme = pkmn?.formes[formeIndex ?? 0];
+    const forme = pkmn?.formes[Math.max(formeIndex, 0)];
 
     const basePath = '/shinydex/images/pokemon-sprites/webp';
 
@@ -321,6 +319,7 @@ export class pokemonSprite extends HTMLElement {
 
     const img = this.shadow.querySelector('img');
     img?.addEventListener('load', this.loadHandler);
+    img?.addEventListener('error', this.loadHandler);
 
     this.setSpriteUrl();
   }
@@ -330,6 +329,7 @@ export class pokemonSprite extends HTMLElement {
 
     const img = this.shadow.querySelector('img');
     img?.removeEventListener('load', this.loadHandler);
+    img?.removeEventListener('error', this.loadHandler);
   }
 
   static get observedAttributes() {

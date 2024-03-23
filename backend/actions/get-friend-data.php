@@ -7,55 +7,59 @@ if (!isset($_POST['username'])) {
   respondError('Missing username in POST body');
 }
 
-// Get the corresponding user's profile data if they exist
+// Get the corresponding user's Pokémon data
 $username = $_POST['username'];
 $db = new BDD();
-$user_data = $db->prepare("SELECT * FROM shinydex_users WHERE `username` = :username LIMIT 1");
-$user_data->bindParam(':username', $username, PDO::PARAM_STR, 36);
-$user_data->execute();
-$user_data = $user_data->fetch(PDO::FETCH_ASSOC);
-if (!$user_data || !isset($user_data['public']) || !$user_data['public']) {
-  respond(['matches' => false]);
-  exit;
+
+switch ($scope) {
+  case 'full':
+    $query = "SELECT shinydex_users.username, shinydex_pokemon.*
+              FROM shinydex_users
+              LEFT JOIN shinydex_pokemon ON shinydex_users.uuid = shinydex_pokemon.userid
+              WHERE shinydex_users.username = :username AND shinydex_users.public = 1
+              ORDER BY CAST(shinydex_pokemon.catchTime as INTEGER) DESC";
+    break;
+
+  case 'partial':
+  default:
+    $query = "SELECT shinydex_users.username, shinydex_pokemon.dexid, shinydex_pokemon.forme
+              FROM shinydex_users
+              LEFT JOIN shinydex_pokemon ON shinydex_users.uuid = shinydex_pokemon.userid
+              WHERE shinydex_users.username = :username AND shinydex_users.public = 1
+              ORDER BY CAST(shinydex_pokemon.catchTime as INTEGER) DESC LIMIT 10";
 }
 
-// Get the corresponding user's Pokémon data
-$requestedUserID = $user_data['uuid'];
-$pokemon = $db->prepare('SELECT * FROM `shinydex_pokemon` WHERE `userid` = :userid ORDER BY CAST(`catchTime` as INTEGER) DESC');
-$pokemon->bindParam(':userid', $requestedUserID, PDO::PARAM_STR, 36);
-$pokemon->execute();
-$pokemon = $pokemon->fetchAll(PDO::FETCH_ASSOC);
+$query = $db->prepare($query);
+
+$query->bindParam(':username', $username, PDO::PARAM_STR, 36);
+$query->execute();
+$pokemon = $query->fetchAll(PDO::FETCH_ASSOC);
 
 
 
 // Send data to the frontend
 
+if (!$pokemon) {
+  respond(['matches' => false]);
+  exit;
+}
+
 /** Removes the user id from each Pokémon in an array of Pokémon. */
 function removeUserID(array $arr): array {
   foreach ($arr as $k => $shiny) {
     unset($shiny['userid']);
+    unset($shiny['username']);
     $arr[$k] = $shiny;
   }
   return $arr;
 }
 
-$response = ['matches' => true];
-
-switch ($scope) {
-  case 'full':
-    $response['pokemon'] = removeUserID($pokemon);
-    break;
-
-  case 'partial':
-  default:
-    $number_of_pokemon_to_get = 10;
-    $response['pokemon'] = array_map(
-      fn($pkmn) => [
-        'dexid' => $pkmn['dexid'],
-        'forme' => $pkmn['forme']
-      ],
-      array_slice($pokemon, 0, $number_of_pokemon_to_get)
-    );
-}
-
-respond($response);
+respond([
+  'matches' => true,
+  'pokemon' => removeUserID(
+    array_filter(
+      $pokemon,
+      fn($p) => !is_null($p['dexid'])
+    )
+    ),
+]);

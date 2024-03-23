@@ -218,6 +218,29 @@ self.addEventListener('periodicsync', function(event) {
 });
 
 
+// PUSH
+self.addEventListener('push', function(event) {
+  if (!(self.Notification) || self.Notification.permission !== 'granted') return;
+  if (!event.data) return;
+
+  event.waitUntil(
+    dataStorage.getItem('app-settings')
+    .then(appSettings => {
+      if (appSettings['enable-notifications']) {
+        return showNotification(event.data.json());
+      }
+    })
+  );
+});
+
+
+// NOTIFICATION CLICK
+self.addEventListener('notificationclick', function(event) {
+  event.notification.close();
+  clients.openWindow(`${self.location.origin}/shinydex/${event.notification.data.path}`);
+});
+
+
 
 ///// FUNCTIONS
 
@@ -267,7 +290,7 @@ async function installFiles(event = null) {
     const appSettings = await dataStorage.getItem('app-settings');
     const spritesCachesList = (await caches.keys()).filter(name => name.startsWith(spritesCachePrefix));
     const shouldCacheAllSprites =
-      'cache-all-sprites' in appSettings && appSettings['cache-all-sprites'] &&
+      appSettings && 'cache-all-sprites' in appSettings && appSettings['cache-all-sprites'] &&
       spritesCachesList.length > 0 && !(spritesCachesList.includes(currentSpritesCacheName));
     await caches.open(currentSpritesCacheName);
     if (shouldCacheAllSprites === true) {
@@ -395,7 +418,7 @@ async function deleteOldCaches(newCacheName, action) {
  * Compares and syncs Pokémon data between local storage and online database.
  */
 async function syncPokemon() {
-  // Get local data
+  // Get full local data
   await Promise.all([shinyStorage.ready(), huntStorage.ready()]);
   const localData = await Promise.all(
     (await shinyStorage.keys())
@@ -414,13 +437,25 @@ async function syncPokemon() {
   ))
   .filter(pkmn => pkmn != null);
 
-  // Send local data to the backend
+  // ************************************************************************** //
+
+  // First request: 
+  // - send { huntid, lasUpdate } to backend to compare with database,
+  // - get back newer full data from the database,
+  // - store that data locally.
+
+  // Send partial local data to the backend
+  // (it will send back the list of huntids it wants the full data of)
   const formData = new FormData();
-  formData.append('local-data', JSON.stringify(localData));
-  formData.append('deleted-local-data', JSON.stringify(deletedLocalData));
+  formData.append('local-data', JSON.stringify(localData.map(s => { return { huntid: s.huntid, lastUpdate: s.lastUpdate }; })));
+  formData.append('deleted-local-data', JSON.stringify(deletedLocalData.map(s => { return { huntid: s.huntid, lastUpdate: s.lastUpdate }; })));
   formData.append('session-code-verifier', await dataStorage.getItem('session-code-verifier'));
 
-  const response = await fetch('/shinydex/backend/endpoint.php?request=sync-pokemon&date=' + Date.now(), {
+  // Get from the backend:
+  // - full data that needs to be inserted / updated / restored / deleted locally
+  // - huntids that need to be inserted / updated / restored in the database
+  // - success or error notification
+  const response = await fetch('/shinydex/backend/endpoint.php?request=sync-pokemon-step-1&date=' + Date.now(), {
     method: 'POST',
     body: formData
   });
@@ -428,24 +463,28 @@ async function syncPokemon() {
     throw new Error('[:(] Erreur ' + response.status + ' lors de la requête');
 
   let data;
-  let response2 = response.clone();
+  let responseCopy = response.clone();
   try {
     data = await response.json();
   } catch {
-    data = await response2.text();
+    data = await responseCopy.text();
     throw new Error(`Invalid json: ${data}`);
   }
   
   console.log('[sync-backup] Response from server:', data);
-
   if ('error' in data) throw new Error(data.error);
 
   // Update local data with newer online data
   const toSet = [...data['to_insert_local'], ...data['to_update_local']];
   await Promise.all(
-    toSet.map(shiny => {
+    toSet.map(async shiny => {
       const feShiny = new FrontendShiny(shiny);
-      return shinyStorage.setItem(String(shiny.huntid), feShiny);
+      const storedHunt = await huntStorage.getItem(shiny.huntid);
+      const shouldDeleteHunt = storedHunt && 'deleted' in storedHunt && storedHunt.deleted;
+      return Promise.all([
+        shinyStorage.setItem(String(shiny.huntid), feShiny),
+        shouldDeleteHunt ? huntStorage.removeItem(shiny.huntid) : Promise.resolve()
+      ]);
     })
   );
 
@@ -457,6 +496,7 @@ async function syncPokemon() {
         storedShiny.lastUpdate = shiny.lastUpdate;
         storedShiny.deleted = true;
         storedShiny.destroy = true;
+        storedShiny.caught = true;
         await huntStorage.setItem(shiny.huntid, storedShiny);
         return shinyStorage.removeItem(shiny.huntid);
       } else {
@@ -469,20 +509,49 @@ async function syncPokemon() {
     })
   );
 
-  const toRestore = [...data['to_restore_local']];
-  await Promise.all(
-    toRestore.map(shiny => huntStorage.removeItem(shiny.huntid))
-  );
-
   // List of inserted / updated / deleted huntids
   const modifiedHuntids = new Set([
     ...data['to_insert_local'].map(shiny => String(shiny.huntid)),
     ...data['to_update_local'].map(shiny => String(shiny.huntid)),
     ...data['to_delete_local'].map(shiny => String(shiny.huntid)),
-    ...data['to_restore_local'].map(shiny => String(shiny.huntid)),
   ]);
 
-  const results = data['results'];
+  // ************************************************************************** //
+
+  // Second request:
+  // - send full data to the backend to insert into the database
+
+  // Send full data to the backend
+  const formData2 = new FormData();
+  formData2.append('inserts', JSON.stringify(localData.filter(s => data['to_insert_online_ids'].includes(s.huntid))));
+  formData2.append('updates', JSON.stringify(localData.filter(s => data['to_update_online_ids'].includes(s.huntid))));
+  formData2.append('restores', JSON.stringify(localData.filter(s => data['to_restore_online_ids'].includes(s.huntid)).map(s => s.huntid)));
+  formData2.append('session-code-verifier', await dataStorage.getItem('session-code-verifier'));
+
+  // Get from the backend:
+  // - success or error notification
+  const response2 = await fetch('/shinydex/backend/endpoint.php?request=sync-pokemon-step-2&date=' + Date.now(), {
+    method: 'POST',
+    body: formData2
+  });
+  if (response2.status != 200)
+    throw new Error('[:(] Erreur ' + response2.status + ' lors de la requête');
+
+  let data2;
+  let responseCopy2 = response2.clone();
+  try {
+    data2 = await response2.json();
+  } catch {
+    data2 = await responseCopy2.text();
+    throw new Error(`Invalid json: ${data2}`);
+  }
+  
+  console.log('[sync-backup] Response from server:', data2);
+  if ('error' in data2) throw new Error(data2.error);
+
+  // ************************************************************************** //
+
+  const results = [...data['results'], ...data2['results']];
   return [modifiedHuntids, results];
 }
 
@@ -594,5 +663,92 @@ async function syncBackup(message = true) {
     }
     
     return false;
+  }
+}
+
+
+/**
+ * Sends a Notification.
+ */
+async function showNotification(data) {
+  try {
+    await dataStorage.ready();
+    const settings = await dataStorage.getItem('app-settings');
+    const lang = settings.lang ?? 'en';
+    const antiSpoilers = Boolean(settings['anti-spoilers-friends']);
+
+    const cache = await caches.open(currentCacheName);
+    const pokemonDataResponse = await cache.match('/shinydex/dist/data/pokemon.json');
+    const pokemonData = await pokemonDataResponse.json();
+
+    const pad = (s, long) => {
+      let chaine = s;
+      while (chaine.length < long)
+        chaine = `0${chaine}`;
+      return chaine;
+    }
+
+    const getSprite = (dexid, forme) => {
+      if (!forme) return '';
+
+      // Alcremie shiny forms are all the same
+      const formToConsider = (dexid === 869) ? 0 : forme.form;
+  
+      const spriteCaracs = [
+        pad(dexid.toString(), 4),
+        pad(formToConsider.toString(), 3),
+        forme.gender,
+        forme.gigamax ? 'g' : 'n',
+        pad(forme.candy.toString(), 8),
+      ];
+  
+      return `${self.location.origin}/shinydex/images/pokemon-sprites/webp/112/poke_capture_${spriteCaracs.join('_')}_f_r.webp`;
+    }
+
+    const title = {
+      'fr': data.new_shiny_pokemon.length > 1
+        ? `Nouveaux Pokémon chromatiques !`
+        : `Nouveau Pokémon chromatique !`,
+      'en': `New shiny Pokémon!`,
+    };
+
+    let body, image;
+    if (data.new_shiny_pokemon.length === 1) {
+      const shiny = data.new_shiny_pokemon[0];
+      const pokemon = pokemonData[shiny['dexid']];
+      const pokemonName = pokemon?.name[lang] ?? pokemon?.name['en'];
+      const forme = pokemon?.formes.find(f => f.dbid === shiny['forme']);
+      const formeName = forme?.name[lang] ?? forme?.name['en'];
+      const pokemonNameWithForme = forme
+        ? formeName.replace('{{name}}', pokemonName)
+        : pokemonName;
+      body = {
+        'fr': `${data.username} a capturé un ${pokemonNameWithForme || pokemonName} chromatique.`,
+        'en': `${data.username} caught a shiny ${pokemonNameWithForme || pokemonName}.`
+      };
+      image = getSprite(shiny['dexid'], forme) || undefined;
+    } else {
+      body = {
+        'fr': `${data.username} a capturé ${data.new_shiny_pokemon.length} Pokémon chromatiques.`,
+        'en': `${data.username} caught ${data.new_shiny_pokemon.length} shiny Pokémon.`
+      };
+    }
+
+    const path = {
+      'fr': `ami/${data.username}`,
+      'en': `friend/${data.username}`
+    };
+
+    return self.registration.showNotification(title[lang], {
+      body: body[lang],
+      badge: `${self.location.origin}/shinydex/images/app-icons/badge.png`,
+      icon: antiSpoilers ? undefined : image,
+      lang: lang ?? 'en',
+      data: {
+        path: path[lang] ?? path[en],
+      },
+    });
+  } catch (error) {
+    console.error(`[push] Erreur lors de l'envoi d'une notification`, error, data);
   }
 }

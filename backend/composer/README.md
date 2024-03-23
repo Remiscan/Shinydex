@@ -1,1 +1,2 @@
-rsync had trouble syncing the whole folder, had to copy it manually
+- rsync had trouble syncing the whole folder, had to copy it manually
+- To run composer, run `php composer.phar arguments_here` in this folder

@@ -10,8 +10,19 @@ function respond(mixed $data) {
   echo json_encode($data, JSON_UNESCAPED_SLASHES);
 }
 
-function respondError(string $message) {
-  echo json_encode(['error' => $message], JSON_UNESCAPED_SLASHES);
+function respondError(mixed $error) {
+  if ($error instanceof \Throwable) {
+    $returns = [
+      'error' => $error->getMessage(),
+      'details' => $error->__toString()
+    ];
+  } else {
+    $returns = [
+      'error' => $error
+    ];
+  }
+
+  echo json_encode($returns, JSON_UNESCAPED_SLASHES);
   exit;
 }
 
@@ -33,9 +44,14 @@ switch ($request) {
   // Need user to be signed in
   case 'sign-out':
   case 'sync-pokemon':
+  case 'sync-pokemon-step-1':
+  case 'sync-pokemon-step-2':
   case 'sync-friends':
   case 'delete-user-data':
   case 'update-user-profile':
+  case 'get-vapid-public-key':
+  case 'save-push-subscription':
+  case 'delete-push-subscription':
     $sessionNeeded = true;
     break;
   

@@ -1,0 +1,49 @@
+{
+	"fr": {
+		"meta-description": "Recensez votre collection de Pokémon chromatiques, et partagez-la avec vos amis.",
+
+		"shortcut-mes-chromatiques-name": "Mes Pokémon chromatiques",
+		"shortcut-mes-chromatiques-short-name": "Mes Pokémon",
+		"shortcut-mes-chromatiques-description": "Liste de vos Pokémon chromatiques.",
+		"shortcut-mes-chromatiques-url": "/shinydex/",
+
+		"shortcut-pokedex-name": "Pokédex chromatique",
+		"shortcut-pokedex-short-name": "Pokédex",
+		"shortcut-pokedex-description": "Liste de tous les Pokémon chromatiques.",
+		"shortcut-pokedex-url": "/shinydex/pokedex",
+
+		"shortcut-chasses-en-cours-name": "Chasses en cours",
+		"shortcut-chasses-en-cours-short-name": "Chasses",
+		"shortcut-chasses-en-cours-description": "Pokémon chromatiques que vous chassez en ce moment.",
+		"shortcut-chasses-en-cours-url": "/shinydex/chasses",
+
+		"shortcut-partage-name": "Liste d'amis",
+		"shortcut-partage-short-name": "Amis",
+		"shortcut-partage-description": "Liste de vos amis et de leurs Pokémon chromatiques.",
+		"shortcut-partage-url": "/shinydex/amis"
+	},
+		
+	"en": {
+		"meta-description": "Keep track of your shiny Pokémon collection, and share it with friends.",
+
+		"shortcut-mes-chromatiques-name": "My shiny Pokémon",
+		"shortcut-mes-chromatiques-short-name": "My Pokémon",
+		"shortcut-mes-chromatiques-description": "List of the shiny Pokémon you caught.",
+		"shortcut-mes-chromatiques-url": "/shinydex/",
+
+		"shortcut-pokedex-name": "Shiny Pokédex",
+		"shortcut-pokedex-short-name": "Pokédex",
+		"shortcut-pokedex-description": "List of every shiny Pokémon.",
+		"shortcut-pokedex-url": "/shinydex/pokedex",
+
+		"shortcut-chasses-en-cours-name": "Current hunts",
+		"shortcut-chasses-en-cours-short-name": "Hunts",
+		"shortcut-chasses-en-cours-description": "Shiny Pokémon you're trying to find.",
+		"shortcut-chasses-en-cours-url": "/shinydex/hunts",
+
+		"shortcut-partage-name": "Liste d'amis",
+		"shortcut-partage-short-name": "Amis",
+		"shortcut-partage-description": "List of your friends and their shiny Pokémon.",
+		"shortcut-partage-url": "/shinydex/friends"
+	}
+}

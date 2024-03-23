@@ -20,7 +20,7 @@ $public = $_POST['public'] ?? null;
 try {
   $user->updateDBEntry($username, $public);
 } catch (\Throwable $error) {
-  respondError($error->getMessage());
+  respondError($error);
 }
 
 respond(

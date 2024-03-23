@@ -92,7 +92,7 @@ pokemon-sprite:not([dexid]) ~ * {
   grid-column: identity;
   display: grid;
   grid-template-rows: [name] 32px [species] auto;
-  grid-template-columns: [ball] 32px [name] fit-content(100%) [icons] auto;
+  grid-template-columns: [ball] 32px [name] auto [icons] auto 1fr;
   position: relative;
   left: -16px;
   align-items: center;
@@ -115,22 +115,26 @@ pokemon-sprite:not([dexid]) ~ * {
 
 /* Name & species */
 
-[data-type="species"] {
+[data-type="species"],
+[data-type="forme"] {
   grid-row: species;
   grid-column: name;
-  text-transform: capitalize;
   opacity: .8;
-  display: flex;
-  justify-content: start;
-  align-items: center;
+  display: block;
   position: relative;
-  left: 8px;
-  top: -8px;
+  left: calc(.5ch * 22/16);
+  top: -6px;
+  overflow: hidden;
   white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+[data-type="forme"]::first-letter {
+  text-transform: uppercase;
 }
 
 [data-type="name"],
-[data-type="name"]:empty + [data-type="species"] {
+[data-type="name"]:empty ~ [data-type="species"] {
   grid-row: name;
   grid-column: name;
   opacity: 1;
@@ -146,7 +150,13 @@ pokemon-sprite:not([dexid]) ~ * {
   overflow: hidden;
 }
 
-[data-type="name"]:empty {
+[data-type="name"]:empty ~ [data-type="forme"],
+[data-type="name"]:not(:empty) ~ [data-type="species"] {
+  grid-column: name / -1;
+}
+
+[data-type="name"]:empty,
+[data-type="name"]:not(:empty) ~ [data-type="forme"] {
   display: none;
 }
 
@@ -330,8 +340,10 @@ button.icon-button.menu-hint::before {
 }
 
 .shiny-charm > .icon {
-  margin: -5px;
-  margin-left: -10px;
+  margin-bottom: -5px;
+  margin-left: -14px;
+  margin-top: -10px;
+  margin-right: -7px;
 }
 
 .shiny-rate-text {

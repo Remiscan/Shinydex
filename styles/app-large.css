@@ -34,6 +34,13 @@ body[data-section-actuelle~="chromatiques-ami"] #partage,*/
 body[data-section-actuelle~="parametres"] #a-propos,
 body[data-section-actuelle~="a-propos"] #parametres {
   display: grid;
+  --translate: 0px;
+  --opacity: 1;
+  
+  @starting-style {
+    --translate: var(--translate-from);
+    --opacity: var(--opacity-from);
+  }
 }
 
 body[data-section-actuelle~="partage"] #chromatiques-ami:not([data-pseudo]) {

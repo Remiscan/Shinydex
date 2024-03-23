@@ -1,8 +1,6 @@
 import { pad, wait } from '../../Params.js';
 import { Pokemon } from '../../Pokemon.js';
-import { Shiny } from '../../Shiny.js';
 import { SupportedLang, pokemonData } from '../../jsonData.js';
-import { shinyStorage } from '../../localForage.js';
 import { getString, translationObserver } from '../../translation.js';
 // @ts-expect-error
 import sheet from './styles.css' assert { type: 'css' };
@@ -10,7 +8,7 @@ import template from './template.js';
 
 
 
-export class spriteViewer extends HTMLElement {
+export class SpriteViewer extends HTMLElement {
   ready: boolean = true;
   toggle: () => void = () => {};
   mode: 'shiny' | 'regular' = 'shiny';
@@ -22,11 +20,29 @@ export class spriteViewer extends HTMLElement {
   }
 
 
-  reset() {
-    this.setAttribute('shiny', 'true');
-    const switchSR = this.querySelector('shiny-switch');
-    if (switchSR == null || !('checked' in switchSR)) throw new TypeError(`Expecting ShinySwitch`);
-    switchSR.checked = true;
+  open() {
+    const dialog = this.closest('dialog#sprite-viewer');
+    if (!(dialog instanceof HTMLDialogElement)) throw new TypeError('Expecting HTMLDialogElement');
+    dialog.showModal();
+    dialog.addEventListener('close', this.dialogCloseHandler);
+  }
+
+
+  close() {
+    const dialog = this.closest('dialog#sprite-viewer');
+    if (!(dialog instanceof HTMLDialogElement)) throw new TypeError('Expecting HTMLDialogElement');
+    dialog.close();
+    dialog.removeEventListener('close', this.dialogCloseHandler);
+  }
+
+
+  dialogCloseHandler = async (event: Event) => {
+    const dialog = event.target;
+    await Promise.any([
+      wait(210),
+      new Promise(resolve => dialog?.addEventListener('transitionend', resolve, { once: true }))
+    ]);
+    this.removeAttribute('dexid');
   }
 
 
@@ -37,25 +53,12 @@ export class spriteViewer extends HTMLElement {
     const container = document.querySelector(`#pokedex`);
     if (!(container instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
 
-    const sectionFilters = {
-      mine: new Set(container.getAttribute('data-filter-mine')?.split(' ') ?? []),
-      legit: new Set(container.getAttribute('data-filter-legit')?.split(' ') ?? [])
-    };
-
-    const caughtFormsList: Set<string> = new Set();
-    await shinyStorage.keys().then(keys => Promise.all(keys.map(async key => {
-      const shiny = new Shiny(await shinyStorage.getItem(key));
-      if (shiny.dexid !== Number(dexid)) return;
-
-      // On vérifie si le Shiny correspond aux filtres sélectionnés
-      const shinyFilters = {
-        mine: String(shiny.mine),
-        legit: String(shiny.legit)
-      };
-      if (sectionFilters.mine.has(shinyFilters.mine) && sectionFilters.legit.has(shinyFilters.legit)) {
-        caughtFormsList.add(shiny.forme);
-      }
-    })));
+    const caughtFormsList: Set<string> = new Set(this.getAttribute('data-caught-forms')?.split(' ') ?? []);
+    if (caughtFormsList.has('')) caughtFormsList.delete('');
+    if (caughtFormsList.has('emptystring')) {
+      caughtFormsList.add('');
+      caughtFormsList.delete('emptystring');
+    }
 
     // On place le numéro
     const dexInfos = this.querySelector('.sprite-viewer-dex-info')!;
@@ -64,9 +67,23 @@ export class spriteViewer extends HTMLElement {
     else                          dexInfos.classList.remove('caught');
     dexNumberContainer.innerHTML = pad(String(pokemon.dexid), 4);
 
-    // On réordonne les formes (normale d'abord, les autres ensuite)
-    const formes = pokemon.formes.slice().sort((a, b) => {
+    // On place le nom dans le FAB
+    const fab = this.querySelector('#sprite-viewer-fab');
+    const labelContainer = fab?.querySelector('.fab-label');
+    if (labelContainer) {
+      const label = getString('sprite-viewer-fab').replace('{{name}}', pokemon.getName());
+      labelContainer.innerHTML = label;
+    }
+
+    // On réordonne les formes (normale d'abord, puis catchable, puis les autres)
+    const formes = pokemon.formes.slice()
+    .sort((a, b) => {
       if (a.name['fr'] === '') return -1;
+      else return 0;
+    })
+    .sort((a, b) => {
+      if (a.catchable && !b.catchable) return -1;
+      else if (!a.catchable && b.catchable) return 1;
       else return 0;
     });
 
@@ -83,6 +100,22 @@ export class spriteViewer extends HTMLElement {
 
     for (const forme of formes) {
       const caught = caughtFormsList.has(forme.dbid);
+      const formeNameTemplate = /*html*/`
+        <span class="forme-name surface surface-container-high label-medium ${caught ? 'caught' : forme.catchable ? 'catchable' : ''}">
+          <span class="forme-name-arrow surface"></span>
+          ${
+            caught ? '<span class="icon" data-icon="ball/poke"></span>' :
+            forme.catchable ? `
+            <span class="icon not-caught-indicator">
+              <svg width="18" height="18" viewBox="0 0 18 18">
+                <circle cx="50%" cy="50%" r="9" fill="transparent" stroke-width="1" stroke-dasharray="3 2"/>
+              </svg>
+            </span>
+            ` : ''
+          }
+          ${pokemon.getFormeName(forme.dbid, true)}
+        </span>
+      `;
 
       const templateS = document.createElement('template');
       templateS.innerHTML = /*html*/`
@@ -91,11 +124,7 @@ export class spriteViewer extends HTMLElement {
             <pokemon-sprite dexid="${pokemon.dexid}" shiny="true" forme="${forme.dbid}" size="${this.size}" lazy="false"></pokemon-sprite>
             ${(typeof forme.noShiny != 'undefined' && forme.noShiny) ? '<span class="label-large">N\'existe pas<br>en chromatique</span>' : ''}
           </picture>
-          <span class="forme-name surface surface-container-high label-medium ${caught ? 'caught' : ''}">
-            <span class="forme-name-arrow surface"></span>
-            ${caught ? '<span class="icon" data-icon="ball/poke"></span>' : ''}
-            ${pokemon.getFormeName(forme.dbid, true)}
-          </span>
+          ${formeNameTemplate}
         </div>
       `;
       const dexSpriteS = templateS.content.cloneNode(true) as DocumentFragment;
@@ -106,21 +135,28 @@ export class spriteViewer extends HTMLElement {
           <picture>
             <pokemon-sprite dexid="${pokemon.dexid}" shiny="false" forme="${forme.dbid}" size="${this.size}" lazy="true"></pokemon-sprite>
           </picture>
-          <span class="forme-name surface surface-container-high label-medium ${caught ? 'caught' : ''}">
-            <span class="forme-name-arrow surface"></span>
-            ${caught ? '<span class="icon" data-icon="ball/poke"></span>' : ''}
-            ${pokemon.getFormeName(forme.dbid, true)}
-          </span>
+          ${formeNameTemplate}
         </div>
       `;
       const dexSpriteR = templateR.content.cloneNode(true) as DocumentFragment;
 
       // Load regular sprites after shiny sprites
-      dexSpriteS.querySelector('pokemon-sprite')?.addEventListener('load', async () => {
-        await wait(200);
-        listeRegular.querySelector(`.dex-sprite[data-forme="${forme.dbid}"] pokemon-sprite`)
-        ?.shadowRoot?.querySelector('img')?.setAttribute('loading', 'eager');
-      }, { once: true });
+      const thisRegularSprite = dexSpriteR.querySelector('pokemon-sprite');
+      let spritesLoaded = 0;
+      const loadHandler = async (event: Event) => {
+        spritesLoaded++;
+        thisRegularSprite?.setAttribute('lazy', 'false');
+        if (spritesLoaded >= formes.length) {
+          this.dispatchEvent(new Event('allspritesloaded', { bubbles: false }));
+        }
+      };
+
+      const thisShinySprite = dexSpriteS.querySelector('pokemon-sprite');
+      new Promise((resolve, reject) => {
+        thisShinySprite?.addEventListener('load', resolve);
+        thisShinySprite?.addEventListener('error', resolve);
+      })
+      .then(event => loadHandler(event as Event));
 
       listeShiny.appendChild(dexSpriteS);
       listeRegular.appendChild(dexSpriteR);
@@ -174,11 +210,11 @@ export class spriteViewer extends HTMLElement {
       document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
     }
     this.ready = true;
-    for (const attr of spriteViewer.observedAttributes) {
+    for (const attr of SpriteViewer.observedAttributes) {
       this.update(attr);
     }
 
-    const form = this.querySelector('form[name="switch-shiny-regular"]');
+    const form = this.querySelector('form');
     if (!(form instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
     form.addEventListener('change', this.toggleShinyRegular);
 
@@ -191,7 +227,7 @@ export class spriteViewer extends HTMLElement {
   disconnectedCallback() {
     translationObserver.unserve(this);
 
-    const form = this.querySelector('form[name="switch-shiny-regular"]');
+    const form = this.querySelector('form');
     if (!(form instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
     form.removeEventListener('change', this.toggleShinyRegular);
 
@@ -213,4 +249,4 @@ export class spriteViewer extends HTMLElement {
   }
 }
 
-if (!customElements.get('sprite-viewer')) customElements.define('sprite-viewer', spriteViewer);
+if (!customElements.get('sprite-viewer')) customElements.define('sprite-viewer', SpriteViewer);

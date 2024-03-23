@@ -20,8 +20,9 @@ declare global {
 //////////////////////
 // Constantes globales
 export const Params = {
-  layoutPC: 720,
-  layoutPClarge: 1140,
+  layoutMedium: 720,
+  layoutLarge: 1140,
+  currentLayout: 'mobile', // 'mobile', 'medium', 'large'
   
   easingStandard: 'cubic-bezier(.2, 0, 0, 1)',
   easingDecelerate: 'cubic-bezier(0, 0, 0, 1)',
@@ -139,3 +140,12 @@ export function getCookie(name: string): string {
 export const appIsReady = new Promise(resolve => {
   window.addEventListener('appready', resolve);
 });
+
+/////////////////////////////////////
+// Définit la taille du layout actuel
+export function setCurrentLayout() {
+  const width = window.innerWidth;
+  Params.currentLayout = width >= Params.layoutLarge ? 'large' :
+                         width >= Params.layoutMedium ? 'medium' :
+                         'mobile';
+}

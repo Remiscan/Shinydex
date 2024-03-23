@@ -10,6 +10,7 @@ html {
   --sub-border-radius: calc(1.12 * (var(--border-radius) - var(--distance-to-parent-border, 4px))); /* 12% optical adjustment */
   --section-title-height: 64px;
   --nav-bar-height: 80px;
+  --anti-spoilers-filter: grayscale() brightness(var(--pokemon-sprite-anti-spoilers-brightness)) opacity(var(--pokemon-sprite-anti-spoilers-opacity));
 
   /* Élévation */
   --z-top-layer: 60;
@@ -22,11 +23,22 @@ html {
   --z-notification: 20; /* Material elevation 2 */
 }
 
+body[data-anti-spoilers-pokedex="off"] #pokedex {
+  --anti-spoilers-filter: none;
+}
+
+body[data-anti-spoilers-friends="off"] :is(#partage, #chromatiques-ami) {
+  --anti-spoilers-filter: none;
+}
+
 p {
   margin: 0;
 }
 p + p {
   margin-top: 16px;
+}
+span.nowrap {
+  white-space: nowrap;
 }
 
 html,
@@ -35,6 +47,7 @@ body {
   height: 100%;
   overflow-x: hidden;
   overflow-y: hidden;
+  scrollbar-color: rgb(var(--on-surface-variant)) transparent;
 }
 
 body {
@@ -249,6 +262,17 @@ section {
   overflow-anchor: none;
   height: 100%;
   overflow: hidden;
+  transition:
+    transform .5s var(--easing-emphasized-decelerate),
+    opacity .5s var(--easing-emphasized-decelerate);
+  transform: translateY(var(--translate, 0px));
+  opacity: var(--opacity, 1);
+  --translate-from: 20px;
+  --opacity-from: 0;
+}
+
+body.welcome section {
+  transition: none;
 }
 
 main > section {
@@ -263,14 +287,15 @@ body[data-section-actuelle~="corbeille"] #corbeille,
 body[data-section-actuelle~="partage"] #partage,
 body[data-section-actuelle~="chromatiques-ami"] #chromatiques-ami,
 body[data-section-actuelle~="parametres"] #parametres,
-body[data-section-actuelle~="a-propos"] #a-propos,
-body[data-section-actuelle~="sprite-viewer"] #sprite-viewer[data-ready],
-body[data-section-actuelle~="filter-menu"] #filter-menu,
-body[data-section-actuelle~="user-search"] #user-search,
-body[data-section-actuelle~="changelog"] #changelog,
-body[data-section-actuelle~="top-layer"] #top-layer,
-body[data-section-actuelle~="obfuscator"] #obfuscator {
+body[data-section-actuelle~="a-propos"] #a-propos {
   display: grid;
+  --translate: 0px;
+  --opacity: 1;
+
+  @starting-style {
+    --translate: var(--translate-from);
+    --opacity: var(--opacity-from);
+  }
 }
 
 /*body[data-section-actuelle~="mes-chromatiques"] main,
@@ -410,7 +435,7 @@ section.loading .compteur {
   100% { transform: translate3D(0, calc(-1px * var(--notification-container-height, 0)), 0) scale(1); }
 }
 
-.fab {
+#main-fab {
   display: none;
   grid-column: 1 / 2;
   grid-row: 1 / 2;
@@ -427,29 +452,29 @@ section.loading .compteur {
   --elevation-opacity: 0;
 }
 
-.fab > .material-icons {
+#main-fab > .material-icons {
   backface-visibility: hidden;
 }
 
-.fab.notif {
+#main-fab.notif {
   --decalage: calc(-1 * var(--bottom-bar-height));
   transition: transform .15s var(--easing-decelerate);
 }
 
 @supports (selector(:has(*))) {
-  body[data-section-actuelle~="mes-chromatiques"]:has(#mes-chromatiques:not(.loading)) .fab,
-  body[data-section-actuelle~="pokedex"]:has(#pokedex:not(.loading)) .fab,
-  body[data-section-actuelle~="chasses-en-cours"]:not([data-section-actuelle~="corbeille"]):has(#chasses-en-cours:not(.loading)) .fab,
-  body[data-section-actuelle~="partage"]:has(#partage:not(.loading)) .fab {
+  body[data-section-actuelle~="mes-chromatiques"]:has(#mes-chromatiques:not(.loading)) #main-fab,
+  body[data-section-actuelle~="pokedex"]:has(#pokedex:not(.loading)) #main-fab,
+  body[data-section-actuelle~="chasses-en-cours"]:not([data-section-actuelle~="corbeille"]):has(#chasses-en-cours:not(.loading)) #main-fab,
+  body[data-section-actuelle~="partage"]:has(#partage:not(.loading)) #main-fab {
     display: flex;
   }
 }
 
 @supports not (selector(:has(*))) {
-  body[data-section-actuelle~="mes-chromatiques"] .fab,
-  body[data-section-actuelle~="pokedex"] .fab,
-  body[data-section-actuelle~="chasses-en-cours"]:not([data-section-actuelle~="corbeille"]) .fab,
-  body[data-section-actuelle~="partage"] .fab {
+  body[data-section-actuelle~="mes-chromatiques"] #main-fab,
+  body[data-section-actuelle~="pokedex"] #main-fab,
+  body[data-section-actuelle~="chasses-en-cours"]:not([data-section-actuelle~="corbeille"]) #main-fab,
+  body[data-section-actuelle~="partage"] #main-fab {
     display: flex;
   }
 }
@@ -507,11 +532,11 @@ hunt-card {
   100% { transform: translateY(0); opacity: 1; }
 }
 
-body.welcome [data-replaces="shiny-card"] {
+body.welcome [data-replaces] {
   opacity: 0;
 }
 
-body.welcome shiny-card {
+body.welcome :is(shiny-card, .pokedex-gen, hunt-card, corbeille-card, friend-card, friend-shiny-card) {
   animation: intro .35s var(--easing-standard);
   --delay: calc(var(--order) * 50ms);
   animation-delay: var(--delay, 0ms);
@@ -657,10 +682,79 @@ dex-icon[data-caught="true"] {
 
 dex-icon .pkmnicon {
   outline-offset: -1px;
+  display: flex;
+  flex-direction: row;
+  align-content: start;
+  justify-content: center;
+  gap: 3px;
+  flex-wrap: wrap;
+  padding: 2px;
+  overflow: hidden;
+}
+
+dex-icon .caught-form-indicator {
+  --size: 6px;
+  width: var(--size);
+  height: var(--size);
+  border-radius: calc(.5 * var(--size));
+  background-color: rgb(var(--color));
+  background-image: linear-gradient(to right, rgb(var(--state-tint, var(--on-primary)), var(--state-opacity, 0)) 0% 100%);
+  box-shadow:
+    0 0 0 2px rgb(var(--state-tint, var(--on-primary)), var(--state-opacity, 0)),
+    0 0 0 2px rgb(var(--surface-color));
+  flex-shrink: 0;
+  transition: none;
+  --color: var(--primary);
+}
+
+dex-icon .caught-form-indicator:not([data-caught="true"]) {
+  --color: var(--surface-color);
+  border: 1px solid rgb(var(--secondary));
+  box-sizing: border-box;
+}
+
+/* Only display a maximum of 7 caught forms indicators. */
+dex-icon .caught-form-indicator:nth-of-type(7) ~ .caught-form-indicator {
+  display: none;
+}
+
+/* If there are more than 7 catchable forms, replace the 7th indicator by an ellipsis */
+dex-icon:has(.caught-form-indicator:nth-of-type(8)) .caught-form-indicator:nth-of-type(7) {
+  border: none;
+  --color: var(--surface-color);
+  display: grid;
+  overflow: hidden;
+  align-content: center;
+  justify-content: center;
+  width: auto;
+}
+
+dex-icon:has(.caught-form-indicator:nth-of-type(8)) .caught-form-indicator:nth-of-type(7)::before {
+  content: '⋯';
+  padding-inline: 2px;
+  color: rgb(var(--secondary));
+}
+
+/* If there are more than 7 catchable forms and they're all caught, adjust the ellipsis colors */
+dex-icon:has(.caught-form-indicator:nth-of-type(8)):not(:has(.caught-form-indicator:not([data-caught="true"]))) .caught-form-indicator:nth-of-type(7) {
+  --color: var(--primary);
+}
+
+dex-icon:has(.caught-form-indicator:nth-of-type(8)):not(:has(.caught-form-indicator:not([data-caught="true"]))) .caught-form-indicator:nth-of-type(7)::before {
+  color: rgb(var(--surface-color));
+}
+
+/* Don't display the caught forms indicators if there's only one catchable form. */
+dex-icon:not(:has(.caught-form-indicator:nth-of-type(2))) .caught-form-indicator {
+  display: none !important;
+}
+
+dex-icon:not([data-caught="true"]) .caught-form-indicator {
+  display: none !important;
 }
 
 dex-icon:not([data-caught="true"]) .pkmnicon {
-  filter: grayscale(.95) brightness(var(--pkmnicon-brightness));
+  filter: grayscale(.5) opacity(.6);
 }
 
 .pkmnicon {
@@ -668,6 +762,11 @@ dex-icon:not([data-caught="true"]) .pkmnicon {
   border-radius: 0;
   padding: 0;
   margin: 0;
+}
+
+body[data-anti-spoilers-pokedex="on"] #pokedex dex-icon:not([data-caught="true"])[dexid]:not([dexid="0"]) .pkmnicon,
+body[data-anti-spoilers-friends="on"] :is(#partage, #chromatiques-ami) pokemon-sprite:not([data-caught="true"])[dexid]:not([dexid="0"])::part(image) {
+  filter: var(--anti-spoilers-filter);
 }
 
 
@@ -688,23 +787,16 @@ section:not([data-filter-legit~="false"]) [data-legit="false"] {
   display: none;
 }
 
-body:not([data-filters~="mes-chromatiques"]) filter-menu[section="mes-chromatiques"],
-body:not([data-filters~="chasses-en-cours"]) filter-menu[section="chasses-en-cours"],
-body:not([data-filters~="corbeille"]) filter-menu[section="corbeille"],
-body:not([data-filters~="partage"]) filter-menu[section="partage"],
-body:not([data-filters~="chromatiques-ami"]) filter-menu[section="chromatiques-ami"] {
+#filter-menu:not([data-section~="mes-chromatiques"]):not([data-section~="pokedex"]) filter-menu[section="mes-chromatiques"],
+#filter-menu:not([data-section~="chasses-en-cours"]) filter-menu[section="chasses-en-cours"],
+#filter-menu:not([data-section~="corbeille"]) filter-menu[section="corbeille"],
+#filter-menu:not([data-section~="partage"]) filter-menu[section="partage"],
+#filter-menu:not([data-section~="chromatiques-ami"]) filter-menu[section="chromatiques-ami"] {
   display: none;
 }
 
 #filter-menu {
-  --from-x: 0;
-  --from-y: 1rem;
-}
-
-filter-menu,
-.user-search-card,
-.changelog-card {
-  margin-bottom: calc(var(--bottom-bar-height) + 8px);
+  --starting-position: 100%;
 }
 
 
@@ -717,10 +809,6 @@ filter-menu,
   border: 1px solid rgb(var(--outline));
   border-radius: var(--border-radius);
   padding: 16px;
-}
-
-.message-tuto > * {
-  max-width: 65ch;
 }
 
 .message-tuto ul {
@@ -736,38 +824,7 @@ filter-menu,
   border-color: rgb(var(--success));
 }
 
-#user-search {
-  --from-x: 1rem;
-  --from-y: 0;
-}
-
-.user-search-card,
-.changelog-card {
-  height: fit-content;
-  box-sizing: border-box;
-  border-radius: var(--border-radius);
-  position: sticky;
-  z-index: var(--z-filter-menu);
-  max-width: min(100% - 16px, 600px);
-  max-height: calc(100% - 2 * var(--bottom-bar-height) - 16px);
-  margin-inline: auto;
-  margin-top: auto;
-  overflow: hidden auto;
-  padding: 16px;
-  box-sizing: border-box;
-  border-radius: var(--border-radius);
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  min-width: 350px;
-}
-
-.user-search-card {
-  margin-right: 8px;
-}
-
 .search-form[name="user-search"] {
-  height: 48px;
   margin-block: -4px;
   --reset-icon-column: 40px;
   grid-template-columns: [input-start search-icon] 56px 1fr [reset-icon] var(--reset-icon-column) [input-end] 4px [submit-button] auto;
@@ -777,11 +834,17 @@ filter-menu,
 .search-form[name="user-search"] input[role="searchbox"] {
   grid-column: input-start / input-end;
   padding-left: 16px;
-  --elevation-opacity: var(--elevation-3-opacity);
+}
+
+.search-form[name="user-search"] button[type="reset"] {
+  margin-left: -4px;
 }
 
 .search-form[name="user-search"] button[type="submit"] {
   grid-column: submit-button;
+  height: 48px;
+  width: 48px;
+  border-radius: 24px;
 }
 
 form[name="user-profile"] {
@@ -838,11 +901,14 @@ h2:not(:first-child) {
   padding-block: 8px;
   text-align: left;
   align-items: center;
-  container-type: inline-size;
 }
 
 .un-parametre.with-description {
   --description-row: auto;
+}
+
+.un-parametre:not(.with-description) .param-description {
+  display: none;
 }
 
 .un-parametre.theme {
@@ -864,6 +930,7 @@ h2:not(:first-child) {
 .param-nom,
 .param-description {
   max-width: 40ch;
+  text-wrap: balance;
 }
 
 .param-nom {
@@ -897,7 +964,7 @@ h2:not(:first-child) {
 }
 
 [data-action="check-update"],
-[data-nav-section="changelog"] {
+[data-action="open-changelog"] {
   margin: 0;
 }
 
@@ -905,7 +972,7 @@ body:not([data-last-sync]) #parametres [data-last-sync],
 body:not([data-last-sync="failure"]) #parametres [data-last-sync="failure"],
 body:not([data-last-sync="success"]) #parametres [data-last-sync="success"],
 body:not([data-last-sync="loading"]) #parametres [data-last-sync="loading"],
-form[name="app-settings"]:not([data-public-profile="true"]) [data-public-profile] {
+form:not([data-public-profile="true"]) [data-public-profile] {
   display: none;
 }
 
@@ -944,10 +1011,43 @@ label[for="pick-import-file"],
   margin: 0;
 }
 
+.un-parametre.hue {
+  container-type: inline-size;
+}
+
 input-slider[name="theme-hue"] {
   --block-size: var(--tap-safe-size);
   --inline-size: 80cqw;
   --thumb-width: 14px;
+  --gradient: linear-gradient(to right,
+    rgb(247.96, 97.23, 151.34),
+    rgb(253.39, 97.31, 120.03),
+    rgb(254.49, 101.16, 85.65),
+    rgb(251.07, 108.63, 41.31),
+    rgb(238.4, 122.56, 0),
+    rgb(222.22, 135.9, 0),
+    rgb(206.64, 146.5, 0),
+    rgb(186.98, 157, 0),
+    rgb(163.09, 166.77, 0),
+    rgb(132.7, 176.15, 0),
+    rgb(86.78, 184.85, 54.34),
+    rgb(0, 189.54, 99.32),
+    rgb(0, 189.7, 135.55),
+    rgb(0, 186.22, 162.56),
+    rgb(0, 184.76, 184.64),
+    rgb(0, 181.5, 204.43),
+    rgb(0, 176.63, 221.19),
+    rgb(0, 171.4, 246.38),
+    rgb(58.48, 163.02, 255),
+    rgb(102.7, 154.09, 255),
+    rgb(134.32, 145.04, 255),
+    rgb(160.81, 133.94, 255),
+    rgb(186, 122.04, 251.63),
+    rgb(206.78, 113.63, 232.59),
+    rgb(223.99, 106.36, 209.25),
+    rgb(237.61, 100.73, 182.63),
+    rgb(247.43, 97.38, 153.54)
+  );
 }
 
 input-slider[name="theme-hue"]::part(slider-track) {
@@ -1003,6 +1103,19 @@ form[name="app-settings"] > *:last-child {
   margin-top: .4em;
 }
 
+body:not([data-notifications="off"]) [data-notifications-off],
+body:not([data-notifications="on"]) [data-notifications-on] {
+  display: none;
+}
+
+button[data-notifications-off][data-action="toggle-notifications"] {
+  opacity: .7;
+}
+
+notif-switch {
+  font-size: 1rem;
+}
+
 
 
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -1029,13 +1142,24 @@ form[name="app-settings"] > *:last-child {
 .app-icon > svg {
   width: 120px;
   height: 120px;
-  --background-top: rgb(var(--primary-60));
+  --background-top: rgb(var(--icon-top-bg-color));
+}
+
+.link-to-remiscan {
+  display: flex;
+  align-items: center;
+  gap: 1ch;
+}
+
+remiscan-logo {
+  --text-color: rgb(var(--primary)) !important;
 }
 
 .lien-source {
   color: var(--accent-color);
   align-items: center;
   display: inline-flex;
+  width: fit-content;
 }
 
 @media (any-pointer: coarse) {
@@ -1070,9 +1194,6 @@ form[name="app-settings"] > *:last-child {
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
 #sprite-viewer,
-#filter-menu,
-#user-search,
-#changelog,
 #top-layer,
 #obfuscator {
   grid-column: 1 / -1;
@@ -1080,25 +1201,52 @@ form[name="app-settings"] > *:last-child {
 }
 
 #sprite-viewer {
+  overflow-anchor: none;
+  overflow: hidden;
+  border: none;
+  inset: 0;
+  max-width: 100%;
+  max-height: 100%;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
   z-index: var(--z-sprite-viewer);
+  --scale-from: .7;
+  --opacity-from: 0;
+  --easing: var(--easing-emphasized-accelerate);
+  --duration: .2s;
+  transition:
+    transform var(--duration) var(--easing),
+    opacity var(--duration) var(--easing),
+    display var(--duration) linear allow-discrete;
+  transform: scale(var(--scale-from));
+  opacity: var(--opacity-from);
+}
+
+#sprite-viewer[open] {
+  --easing: var(--easing-emphasized-decelerate);
+  --duration: .5s;
+  transform: scale(1);
+  opacity: 1;
+
+  @starting-style {
+    transform: scale(var(--scale-from));
+    opacity: var(--opacity-from);
+  }
+}
+
+#sprite-viewer::backdrop {
+  opacity: 0;
 }
 
 #obfuscator {
   z-index: var(--z-obfuscator);
 }
 
-#top-layer,
-#filter-menu,
-#user-search,
-#changelog {
+#top-layer {
   background-color: transparent;
   z-index: var(--z-obfuscator);
-}
-
-#filter-menu,
-#user-search,
-#changelog {
-  background: rgb(var(--surface), .5);
 }
 
 body[data-section-actuelle~="top-layer"] #top-layer {
@@ -1120,6 +1268,25 @@ body[data-section-actuelle~="top-layer"] #top-layer {
     transform: translate(-50%, -50%);
   }
 }*/
+
+
+
+/**
+ * Bottom sheet
+ */
+
+bottom-sheet {
+  --margin-top: var(--section-title-height);
+}
+
+#changelog {
+  --starting-position: 400px;
+}
+
+bottom-sheet h2 {
+  margin-bottom: 1em;
+  text-wrap: balance;
+}
 
 
 

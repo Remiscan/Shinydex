@@ -18,6 +18,10 @@ sheet.replaceSync(/*css*/`
       display: none;
     }
   }
+
+  pokemon-sprite:not([data-caught="true"])[dexid]:not([dexid="0"])::part(image) {
+    filter: var(--anti-spoilers-filter);
+  }
 `);
 
 

@@ -5,7 +5,6 @@
 
 
 
-import { backFromTopLayer, closeTopLayer, openTopLayer, toTopLayer } from '../topLayer.js';
 import { TranslatedString, getString, translationObserver } from '../translation.js';
 import { TextField } from './textField.js';
 
@@ -21,39 +20,30 @@ template.innerHTML = /*html*/`
       <span class="label body-medium">
         <slot name="label"></slot>
       </span>
-      <span
-        tabindex="0"
+      <button
+        type="button"
         part="button"
         role="combobox"
         aria-haspopup="listbox"
         aria-expanded="false"
         aria-controls="options-list"
-      ></span>
+      ></button>
       <span class="material-icons trailing-icon" aria-hidden="true">
         <slot name="trailing-icon"></slot>
         <span class="error-icon">error</span>
       </span>
-      <div
-        role="listbox"
-        id="options-list"
-        class="surface surface-container-high elevation-3-shadow select-menu"
-        style="
-          padding: 4px;
-          display: flex;
-          flex-direction: column;
-          flex-wrap: no-wrap;
-          gap: 4px;
-          position: fixed;
-          box-sizing: border-box;
-          overflow: auto;
-        "
-        hidden
-      >
-      </div>
       <datalist hidden>
         <slot></slot>
       </datalist>
     </label>
+
+    <div
+      popover
+      role="listbox"
+      id="options-list"
+      class="surface surface-container-high elevation-3-shadow select-menu"
+    >
+    </div>
   </form>
 `;
 
@@ -104,6 +94,22 @@ sheet.replaceSync(/*css*/`
     font-family: 'Material Icons';
     font-size: 24px;
     margin-block: -12px;
+  }
+
+  [role="listbox"] {
+    padding: 4px;
+    flex-direction: column;
+    flex-wrap: no-wrap;
+    gap: 4px;
+    box-sizing: border-box;
+    overflow: auto;
+    border: none;
+    margin: 0;
+    inset: unset;
+  }
+
+  [role="listbox"]:popover-open {
+    display: flex;
   }
 
   [hidden] {
@@ -320,6 +326,7 @@ export class InputSelect extends TextField {
 
   // Opens the options list in the top layer, and listens for its changes.
   buttonClickHandler = (event: Event) => {
+    event.stopPropagation();
     if (!this.isOpen) this.open(false);
     else this.close(false);
   };
@@ -327,6 +334,8 @@ export class InputSelect extends TextField {
 
   // Enables keyboard navigation in the options list.
   buttonKeydownHandler = (event: Event) => {
+    event.stopPropagation();
+
     const button = event.target;
     if (!(button instanceof HTMLElement)) return;
     if (!(event instanceof KeyboardEvent)) return;
@@ -383,12 +392,14 @@ export class InputSelect extends TextField {
 
   // Prevents focus from leaving the button when clicking on an option.
   optionPointerdownHandler = (event: Event) => {
+    event.stopPropagation();
     this.#ignoreBlur = true;
   }
 
 
   // Selects a value and closes the menu on a click on an option.
   optionsListClickHandler = (event: Event) => {
+    event.stopPropagation();
     if (!(event.target instanceof HTMLElement) || !(event.currentTarget instanceof HTMLElement)) return;
     const option = event.target?.closest('[role="option"]');
     if (!(option instanceof HTMLElement)) return;
@@ -429,12 +440,14 @@ export class InputSelect extends TextField {
       right: viewport.width - rect.left
     };
 
+    const supportsPopover = CSS.supports('selector(:popover-open)');
+
     const selectorStyles = {
-      'top': available.bottom >= available.top ? rect.bottom + 1 : null,
-      'bottom': available.top > available.bottom ? viewport.height - rect.top + 1 : null,
+      'top': supportsPopover && available.bottom >= available.top ? rect.bottom + 1 : null,
+      'bottom': supportsPopover && available.top > available.bottom ? viewport.height - rect.top + 1 : null,
       'max-height': available.bottom >= available.top ? available.bottom - 9 : available.top - 9,
-      'left': available.right >= available.left ? rect.left + 1 : null,
-      'right': available.left > available.right ? viewport.width - rect.right + 1 : null,
+      'left': supportsPopover && available.right >= available.left ? rect.left + 1 : null,
+      'right': supportsPopover && available.left > available.right ? viewport.width - rect.right + 1 : null,
       'max-width': available.right >= available.left ? available.right + rect.width : available.left + rect.width,
       'min-width': rect.width,
     };
@@ -461,9 +474,7 @@ export class InputSelect extends TextField {
     this.button?.setAttribute('aria-expanded', 'true')
 
     // Promote the radio-group to the top layer and open it.
-    toTopLayer(optionsList);
-    optionsList.removeAttribute('hidden');
-    openTopLayer();
+    optionsList.showPopover();
 
     // Focus the selected option
     const selectedOption = optionsList.querySelector('[role="option"][aria-selected="true"]');
@@ -490,9 +501,7 @@ export class InputSelect extends TextField {
     optionsList.removeEventListener('click', this.optionsListClickHandler);
     this.allOptions.forEach(option => option.removeEventListener('pointerdown', this.optionPointerdownHandler));
 
-    closeTopLayer();
-    optionsList.setAttribute('hidden', '');
-    backFromTopLayer(optionsList);
+    optionsList.hidePopover();
 
     this.shadow.querySelector('label')?.classList.remove('focused');
     this.button?.setAttribute('aria-expanded', 'false');

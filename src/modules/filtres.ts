@@ -158,14 +158,23 @@ export function filterSection(section: FiltrableSection, filters: FilterList = n
 /** 
  * Displays the Pokédex icons corresponding to the passed IDs as caught, others as uncaught.
  */
-export function filterPokedex(dexids: Set<number>) {
-  const generations = Pokemon.generations;
-  const dexidMax = generations[generations.length - 1].end;
-  for (let i = 1; i <= dexidMax; i++) {
-    const icon = document.querySelector(`#pokedex [dexid="${i}"], #pokedex [data-replaces="dex-icon"][data-dexid="${i}"]`);
-    if (dexids.has(i)) icon?.setAttribute('data-caught', 'true');
-    else               icon?.setAttribute('data-caught', 'false');
-  }
+export function filterPokedex(dexids: dexidSet, caughtFormsMap: formesMap) {
+  const allDexIcons = document.querySelectorAll(`#pokedex [dexid], #pokedex [data-replaces="dex-icon"][data-dexid]`);
+  allDexIcons.forEach(icon => {
+    const i = Number(icon.getAttribute('dexid') ?? icon.getAttribute('data-dexid') ?? 0);
+    if (dexids.has(i)) {
+      icon.setAttribute('data-caught', 'true');
+      const caughtForms = caughtFormsMap.get(i) ?? new Set();
+      if (caughtForms.has('')) {
+        caughtForms.add('emptystring');
+        caughtForms.delete('');
+      }
+      icon.setAttribute('data-caught-forms', [...caughtForms.values()].join(' '));
+    } else {
+      icon.setAttribute('data-caught', 'false');
+      icon.setAttribute('data-caught-forms', '');
+    }
+  });
 }
 
 
@@ -176,7 +185,8 @@ export type ShinyFilterData = {
   species: string,
   dexid: number,
   name: string,
-  game: string
+  game: string,
+  form: string
 };
 
 export type FilterMap = Map<string, ShinyFilterData>;
@@ -184,7 +194,7 @@ export type FilterMap = Map<string, ShinyFilterData>;
 /**
  * Computes the filters corresponding to each card in a section.
  */
-export async function computeFilters(section: FiltrableSection | OrderableSection): Promise<FilterMap> {
+export async function computeFilters(section: FiltrableSection | OrderableSection, data: Array<Shiny|Hunt> | null = null): Promise<FilterMap> {
   let dataStore: localForageAPI;
   if (!isFiltrableSection(section)) return new Map();
 
@@ -202,13 +212,12 @@ export async function computeFilters(section: FiltrableSection | OrderableSectio
       throw new Error(`Section ${section} can't be filtered`);
   }
 
-  const keys = await dataStore.keys();
   const filterMap: FilterMap = new Map();
-
-  await Promise.all(keys.map(async key => {
-    const shiny = new Shiny(await dataStore.getItem(key));
-    filterMap.set(key, computeShinyFilters(shiny));
-  }));
+  if (!data) {
+    const keys = await dataStore.keys();
+    data = (await Promise.all(keys.map(key => dataStore.getItem(key)))).map(s => new Shiny(s));
+  }
+  data.forEach(s => filterMap.set(s.huntid, computeShinyFilters(s)));
 
   return filterMap;
 }
@@ -227,13 +236,16 @@ export function computeShinyFilters(shiny: Shiny): ShinyFilterData {
     dexid: shiny.dexid,
     name: noAccent(shiny.name || species || '').toLowerCase(),
     game: shiny.game,
+    form: shiny.forme
   };
 }
 
 
 
 /** Counts the number of cards that are displayed in a section. */
-function countVisibleCards(section: PopulatableSection): [number, number, Set<number>] {
+type dexidSet = Set<number>;
+type formesMap = Map< number, Set<string> >;
+function countVisibleCards(section: PopulatableSection): [number, number, dexidSet, formesMap] {
   const container = document.querySelector(`#${section}`);
   if (!(container instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
 
@@ -255,7 +267,8 @@ function countVisibleCards(section: PopulatableSection): [number, number, Set<nu
   };
 
   let displayedCount = 0;
-  const dexids: Set<number> = new Set();
+  const dexids: dexidSet = new Set();
+  const caughtFormsMap: formesMap = new Map();
   allCards.forEach(card => {
     const cardFilters = {
       mine: card.getAttribute('data-mine') ?? '',
@@ -264,11 +277,13 @@ function countVisibleCards(section: PopulatableSection): [number, number, Set<nu
     if (sectionFilters.mine.has(cardFilters.mine) && sectionFilters.legit.has(cardFilters.legit)) {
       displayedCount++;
       const dexid = Number(card.getAttribute('data-dexid'));
+      const forme = card?.getAttribute('data-form') ?? '';
+      caughtFormsMap.set(dexid, new Set([...caughtFormsMap.get(dexid) ?? [], forme]));
       if (!isNaN(dexid) && dexid > 0) dexids.add(dexid);
     }
   });
 
-  return [displayedCount, totalCount, dexids];
+  return [displayedCount, totalCount, dexids, caughtFormsMap];
 }
 
 
@@ -281,7 +296,7 @@ export function updateCounters(section: PopulatableSection): void {
   const container = document.querySelector(`#${section}`);
   if (!(container instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
 
-  const [displayedCount, totalCount, dexids] = countVisibleCards(section);
+  const [displayedCount, totalCount, dexids, caughtForms] = countVisibleCards(section);
 
   // Display "section is empty" message
   if (totalCount > 0) container.classList.remove('vide');
@@ -301,7 +316,7 @@ export function updateCounters(section: PopulatableSection): void {
   if (section === 'mes-chromatiques') {
     const dexidsCounter = document.querySelector('#pokedex .compteur > .caught');
     if (dexidsCounter) dexidsCounter.innerHTML = String(dexids.size);
-    filterPokedex(dexids);
+    filterPokedex(dexids, caughtForms);
   }
 }
 
@@ -371,7 +386,7 @@ async function orderPokemon(pokemonList: Shiny[] | Hunt[], order: ordre): Promis
  * i.e. when knowing the properties of the card itself isn't enough to quantize its order among all cards.
  */
 export type OrderMap = Map<ordre, string[]>;
-export async function computeOrders(section: OrderableSection): Promise<OrderMap> {
+export async function computeOrders(section: OrderableSection, data: Array<Shiny|Hunt> | null = null): Promise<OrderMap> {
   let dataStore: localForageAPI;
   let dataClass: (typeof Shiny) | (typeof Hunt);
 
@@ -400,7 +415,6 @@ export async function computeOrders(section: OrderableSection): Promise<OrderMap
       throw new Error(`Section ${section} can't be ordered`);
   }
 
-  const keys = await dataStore.keys();
   const orderMap: OrderMap = new Map();
 
   await Promise.all(supportedOrdres.map(async order => {
@@ -412,14 +426,15 @@ export async function computeOrders(section: OrderableSection): Promise<OrderMap
       case 'chasses-en-cours':
       case 'corbeille':
       case 'chromatiques-ami':
-        const list = (await Promise.all(
-          keys.map(key => dataStore.getItem(key))
-        )).map(data => new dataClass(data));
-      
-        orderedKeys = await orderPokemon(list, order);
+        if (!data) {
+          const keys = await dataStore.keys();
+          data = (await Promise.all(keys.map(key => dataStore.getItem(key)))).map(s => new dataClass(s));
+        }
+        orderedKeys = await orderPokemon(data, order);
         break;
       
       case 'partage':
+        const keys = await dataStore.keys();
         const lang = getCurrentLang();
         orderedKeys = keys.sort((a, b) => a.localeCompare(b, lang));
         break;

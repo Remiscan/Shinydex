@@ -1,9 +1,7 @@
 import { Params, loadAllImages, wait } from './Params.js';
-import { Settings } from './Settings.js';
 import { FrontendShiny } from './ShinyBackend.js';
 import { callBackend } from './callBackend.js';
 import { FilterMenu } from './components/filter-menu/filterMenu.js';
-import { spriteViewer } from './components/sprite-viewer/spriteViewer.js';
 import { clearElementStorage, lazyLoadSection, unLazyLoadSection, virtualizedSections } from './lazyLoading.js';
 import { friendShinyStorage } from './localForage.js';
 import { Notif } from './notification.js';
@@ -14,298 +12,92 @@ import { TranslatedString, getString } from './translation.js';
 
 interface Section {
   nom: string;
-  rememberPosition: boolean;
-  openAnimation: (el: HTMLElement, ev: Event, data?: any) => (Animation | null);
-  closeAnimation: (el: HTMLElement, ev: Event, data?: any) => (Animation | null);
-  historique: boolean;
-  closePrevious: boolean;
-  makePreviousInert: boolean;
+  urls: {
+    fr: string,
+    en: string
+  };
   preload: string[];
   fab: string | null;
   element: HTMLElement;
 }
 
-const defaultAnimation = (section: Element, event: Event) => section.animate([
-  { transform: 'translate3D(0, 20px, 0)', opacity: '0' },
-  { transform: 'translate3D(0, 0, 0)', opacity: '1' }
-], {
-  easing: Params.easingDecelerate,
-  duration: 200,
-  fill: 'both'
-});
-
-const sections: Section[] = [
+export const sections: Section[] = [
   {
     nom: 'mes-chromatiques',
-    rememberPosition: true,
-    openAnimation: defaultAnimation,
-    closeAnimation: () => null,
-    historique: true,
-    closePrevious: true,
-    makePreviousInert: false,
+    urls: {
+      fr: '',
+      en: '',
+    },
     preload: [`./images/iconsheet.webp`],
     fab: 'add',
     element: document.getElementById('mes-chromatiques')!
   }, {
     nom: 'pokedex',
-    rememberPosition: true,
-    openAnimation: defaultAnimation,
-    closeAnimation: () => null,
-    historique: true,
-    closePrevious: true,
-    makePreviousInert: false,
+    urls: {
+      fr: 'pokedex',
+      en: 'pokedex',
+    },
     preload: [`./images/pokemonsheet.webp`],
     fab: 'add',
     element: document.getElementById('pokedex')!
   }, {
     nom: 'chasses-en-cours',
-    rememberPosition: true,
-    openAnimation: defaultAnimation,
-    closeAnimation: () => null,
-    historique: true,
-    closePrevious: true,
-    makePreviousInert: false,
+    urls: {
+      fr: 'chasses',
+      en: 'hunts',
+    },
     preload: [`./images/iconsheet.webp`],
     fab: 'add',
     element: document.getElementById('chasses-en-cours')!
   }, {
     nom: 'corbeille',
-    rememberPosition: true,
-    openAnimation: defaultAnimation,
-    closeAnimation: () => null,
-    historique: true,
-    closePrevious: true,
-    makePreviousInert: false,
+    urls: {
+      fr: 'corbeille',
+      en: 'deleted',
+    },
     preload: [`./images/iconsheet.webp`],
     fab: null,
     element: document.getElementById('corbeille')!
   }, {
     nom: 'partage',
-    rememberPosition: true,
-    openAnimation: defaultAnimation,
-    closeAnimation: () => null,
-    historique: true,
-    closePrevious: true,
-    makePreviousInert: false,
+    urls: {
+      fr: 'amis',
+      en: 'friends',
+    },
     preload: [`./images/iconsheet.webp`],
     fab: 'person_add',
     element: document.getElementById('partage')!
   }, {
     nom: 'chromatiques-ami',
-    rememberPosition: false,
-    openAnimation: defaultAnimation,
-    closeAnimation: () => null,
-    historique: true,
-    closePrevious: true,
-    makePreviousInert: false,
+    urls: {
+      fr: 'ami',
+      en: 'friend',
+    },
     preload: [`./images/iconsheet.webp`],
     fab: null,
     element: document.getElementById('chromatiques-ami')!
   }, {
     nom: 'parametres',
-    rememberPosition: true,
-    openAnimation: defaultAnimation,
-    closeAnimation: () => null,
-    historique: true,
-    closePrevious: true,
-    makePreviousInert: false,
+    urls: {
+      fr: 'parametres',
+      en: 'settings',
+    },
     preload: [],
     fab: null,
     element: document.getElementById('parametres')!
   }, {
     nom: 'a-propos',
-    rememberPosition: true,
-    openAnimation: defaultAnimation,
-    closeAnimation: () => null,
-    historique: true,
-    closePrevious: true,
-    makePreviousInert: false,
+    urls: {
+      fr: 'a-propos',
+      en: 'about',
+    },
     preload: [],
     fab: null,
     element: document.getElementById('a-propos')!
-  }, {
-    nom: 'sprite-viewer',
-    rememberPosition: false,
-    openAnimation: (section: HTMLElement, event: Event, data: any) => {
-      let originX, originY;
-      if (event instanceof MouseEvent && event.clientX && event.clientY) {
-        originX = event.clientX;
-        originY = event.clientY;
-      } else {
-        const rect = document.querySelector(`#pokedex .pkmnicon[data-dexid="${data.dexid}"]`)!.getBoundingClientRect();
-        originX = rect.x;
-        originY = rect.y;
-      }
-      section.style.transformOrigin = originX + 'px ' + originY + 'px';
-
-      return section.animate([
-        { opacity: 0, transform: 'scale(.7) translateZ(0)' },
-        { opacity: 1, transform: 'scale(1) translateZ(0)' }
-      ], {
-        easing: Params.easingDecelerate,
-        duration: 200,
-        fill: 'both'
-      });;
-    },
-    closeAnimation: (section: Element, event: Event) => {
-      return section.animate([
-        { opacity: 1, transform: 'scale(1) translateZ(0)' },
-        { opacity: 0, transform: 'scale(.7) translateZ(0)' }
-      ], {
-        easing: Params.easingAccelerate,
-        duration: 150,
-        fill: 'both'
-      });
-    },
-    historique: true,
-    closePrevious: false,
-    makePreviousInert: true,
-    preload: [],
-    fab: null,
-    element: document.getElementById('sprite-viewer')!
-  }, {
-    nom: 'filter-menu',
-    rememberPosition: false,
-    openAnimation: (section: Element, event: Event) => {
-      const styles = getComputedStyle(section);
-      const from = {
-        x: styles.getPropertyValue('--from-x'),
-        y: styles.getPropertyValue('--from-y')
-      };
-      return section.animate([
-        { opacity: 0, transform: `translate3D(${from.x}, ${from.y}, 0)` },
-        { opacity: 1, transform: 'translate3D(0, 0, 0)' }
-      ], {
-        easing: Params.easingDecelerate,
-        duration: 100,
-        fill: 'both'
-      });
-    },
-    closeAnimation: (section: Element, event: Event) => {
-      const styles = getComputedStyle(section);
-      const from = {
-        x: styles.getPropertyValue('--from-x'),
-        y: styles.getPropertyValue('--from-y')
-      };
-      return section.animate([
-        { opacity: 1, transform: 'translate3D(0, 0, 0)' },
-        { opacity: 0, transform: `translate3D(${from.x}, ${from.y}, 0)` }
-      ], {
-        easing: Params.easingAccelerate,
-        duration: 75,
-        fill: 'both'
-      });
-    },
-    historique: true,
-    closePrevious: false,
-    makePreviousInert: true,
-    preload: [],
-    fab: null,
-    element: document.getElementById('filter-menu')!
-  }, {
-    nom: 'user-search',
-    rememberPosition: false,
-    openAnimation: (section: Element, event: Event) => {
-      const styles = getComputedStyle(section);
-      const from = {
-        x: styles.getPropertyValue('--from-x'),
-        y: styles.getPropertyValue('--from-y')
-      };
-      return section.animate([
-        { opacity: 0, transform: `translate3D(${from.x}, ${from.y}, 0)` },
-        { opacity: 1, transform: 'translate3D(0, 0, 0)' }
-      ], {
-        easing: Params.easingDecelerate,
-        duration: 100,
-        fill: 'both'
-      });
-    },
-    closeAnimation: (section: Element, event: Event) => {
-      const styles = getComputedStyle(section);
-      const from = {
-        x: styles.getPropertyValue('--from-x'),
-        y: styles.getPropertyValue('--from-y')
-      };
-      return section.animate([
-        { opacity: 1, transform: 'translate3D(0, 0, 0)' },
-        { opacity: 0, transform: `translate3D(${from.x}, ${from.y}, 0)` }
-      ], {
-        easing: Params.easingAccelerate,
-        duration: 75,
-        fill: 'both'
-      });
-    },
-    historique: true,
-    closePrevious: false,
-    makePreviousInert: true,
-    preload: [],
-    fab: null,
-    element: document.getElementById('user-search')!
-  }, {
-    nom: 'changelog',
-    rememberPosition: false,
-    openAnimation: (section: Element, event: Event) => {
-      const styles = getComputedStyle(section);
-      const from = {
-        x: styles.getPropertyValue('--from-x'),
-        y: styles.getPropertyValue('--from-y')
-      };
-      return section.animate([
-        { opacity: 0, transform: `translate3D(${from.x}, ${from.y}, 0)` },
-        { opacity: 1, transform: 'translate3D(0, 0, 0)' }
-      ], {
-        easing: Params.easingDecelerate,
-        duration: 100,
-        fill: 'both'
-      });
-    },
-    closeAnimation: (section: Element, event: Event) => {
-      const styles = getComputedStyle(section);
-      const from = {
-        x: styles.getPropertyValue('--from-x'),
-        y: styles.getPropertyValue('--from-y')
-      };
-      return section.animate([
-        { opacity: 1, transform: 'translate3D(0, 0, 0)' },
-        { opacity: 0, transform: `translate3D(${from.x}, ${from.y}, 0)` }
-      ], {
-        easing: Params.easingAccelerate,
-        duration: 75,
-        fill: 'both'
-      });
-    },
-    historique: true,
-    closePrevious: false,
-    makePreviousInert: true,
-    preload: [],
-    fab: null,
-    element: document.getElementById('changelog')!
-  }, {
-    nom: 'obfuscator',
-    rememberPosition: false,
-    openAnimation: (section: Element, event: Event, data: any) => {
-      return section.animate([
-        { opacity: 0 },
-        { opacity: data?.opacity ?? .75 }
-      ], {
-        easing: Params.easingStandard,
-        duration: 200,
-        fill: 'both'
-      });
-    },
-    closeAnimation: (section: Element, event: Event) => {
-      return null;
-    },
-    historique: true,
-    closePrevious: false,
-    makePreviousInert: true,
-    preload: [],
-    fab: null,
-    element: document.getElementById('obfuscator')!
   }
 ];
 export let sectionActuelle = 'mes-chromatiques';
-const lastPosition: Map<string, number> = new Map(sections.filter(section => section.rememberPosition).map(section => [section.nom, 0]));
+const lastPosition: Map<string, number> = new Map(sections.map(section => [section.nom, 0]));
 
 
 const backOnEscape = (event: KeyboardEvent) => {
@@ -317,7 +109,7 @@ const backOnEscape = (event: KeyboardEvent) => {
 
 const getLinkedSections = (section: Section['nom']): Section[] => {
   let linkedSections = [section];
-  if (window.innerWidth >= Params.layoutPClarge) {
+  if (Params.currentLayout === 'large') {
     switch (section) {
       case 'mes-chromatiques': linkedSections.push('pokedex'); break;
       case 'pokedex':          linkedSections.push('mes-chromatiques'); break;
@@ -336,22 +128,26 @@ const getLinkedSections = (section: Section['nom']): Section[] => {
  * @param sectionCible - ID de la section demandée.
  * @param event - L'évènement qui a déclenché la navigation.
  */
-export async function navigate(sectionCible: string, event: Event, data?: any) {
-  if (sectionActuelle === sectionCible) {
+export async function navigate(event: CustomEvent) {
+  if (event.detail.cause !== 'replacestate') {
+    document.body.classList.remove('welcome');
+  }
+
+  const url = new URL(location.href);
+  const sectionCible = url.pathname.split('/')[2];
+
+  const ancienneSection = sections.find(section => section.nom === sectionActuelle);
+  if (!ancienneSection) throw getString('error-no-section');
+  const nouvelleSection = sections.find(section => Object.values(section.urls).includes(sectionCible));
+  if (!nouvelleSection) throw getString('error-no-section');
+
+  if (ancienneSection.nom === nouvelleSection.nom) {
     // If trying to navigate to the already open section, scroll back to top
     const section = sections.find(section => section.nom === sectionActuelle)!;
     const scrolledElement = section.element.querySelector('.section-contenu')!;
     scrolledElement.scroll(0, 0);
     return Promise.resolve();
   }
-
-  if (sectionCible === 'sprite-viewer' && !(navigator.onLine)) {
-    if (!(await Settings.get('cache-all-sprites'))) return new Notif(getString('error-no-connection')).prompt();
-  }
-
-  const ancienneSection = sections.find(section => section.nom === sectionActuelle)!;
-  const nouvelleSection = sections.find(section => section.nom === sectionCible);
-  if (!nouvelleSection) throw getString('error-no-section');
 
   // Pré-chargement des images de la nouvelle section
   await Promise.all([loadAllImages(nouvelleSection.preload || [])]);
@@ -363,22 +159,15 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
     const linkedAnciennesSections = getLinkedSections(ancienneSection.nom);
     await Promise.all(linkedAnciennesSections.map(async section => {
       // On dé-virtualise la section précédente si elle l'était
-      if (nouvelleSection.closePrevious) {
-        const virtualized = virtualizedSections.includes(section.nom);
-        if (virtualized) unLazyLoadSection(section.nom);
-      }
+      const virtualized = virtualizedSections.includes(section.nom);
+      if (virtualized) unLazyLoadSection(section.nom);
 
       // On enregistre la position du scroll sur l'ancienne section
-      if (section.rememberPosition) {
-        const scrolledElement = section.element.querySelector('.section-contenu')!;
-        lastPosition.set(sectionActuelle, scrolledElement.scrollTop);
-      }
+      const scrolledElement = section.element.querySelector('.section-contenu')!;
+      lastPosition.set(sectionActuelle, scrolledElement.scrollTop);
+
       const scrollDetector = ancienneSection.element.querySelector('.scroll-detector');
       if (scrollDetector) scrollObserver.unobserve(scrollDetector);
-
-      // On anime la disparition de l'ancienne section
-      const anim = section.closeAnimation(section.element, event, data);
-      if (anim) await wait(anim);
     }));
   }
 
@@ -388,51 +177,33 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
     sp.removeAttribute('finished');
   });
 
-  if (nouvelleSection.historique && event.type !== 'popstate') history.pushState({ section: sectionCible, data: data }, '');
-
-  // On rend l'ancienne section inerte si la nouvelle section s'affiche par-dessus
-  const main = document.querySelector('main');
-  const bottomBar = document.querySelector('nav.bottom-bar');
-  if (!nouvelleSection.closePrevious) {
-    if (nouvelleSection.makePreviousInert) {
-      main?.setAttribute('inert', '');
-      bottomBar?.setAttribute('inert', '');
-    }
-    window.addEventListener('keydown', backOnEscape); // On ferme la section en appuyant sur Échap
-  } else {
-    main?.removeAttribute('inert');
-    bottomBar?.removeAttribute('inert');
-  }
+  //if (event.type !== 'popstate') history.pushState({ section: sectionCible, data: data }, '');
 
   // On anime le FAB si besoin
   animateFabIcon(ancienneSection, nouvelleSection);
 
-  // Only animate new section(s) if the one we're closing was NOT displayed over it,
-  // i.e. if it closed its previous section.
-  const animateNewSection = ancienneSection.closePrevious;
-
   // On affiche la nouvelle section
-  sectionActuelle = sectionCible;
-  const sectionsString = `${nouvelleSection.closePrevious ? '' : ancienneSection.nom} ${nouvelleSection.nom}`;
-  document.body.dataset.sectionActuelle = sectionsString;
+  sectionActuelle = nouvelleSection.nom;
+  document.body.dataset.sectionActuelle = nouvelleSection.nom;
 
   const linkedNouvellesSections = getLinkedSections(nouvelleSection.nom);
   await Promise.all(linkedNouvellesSections.map(async section => {
     // On prépare la nouvelle section si besoin
     switch (section.nom) {
       case 'chromatiques-ami': {
-        if (data.username !== section.element.getAttribute('data-username')) {
-          section.element.setAttribute('data-username', data.username);
+        const username = url.pathname.split('/')[3];
+        //if (username !== section.element.getAttribute('data-username')) {
+          section.element.setAttribute('data-username', username);
 
           section.element.classList.add('loading');
           section.element.classList.remove('vide', 'vide-filtres', 'vide-recherche');
 
           // Populate section with friend's username
-          section.element.querySelectorAll('[data-type="username"]').forEach(e => e.innerHTML = data.username);
+          section.element.querySelectorAll('[data-type="username"]').forEach(e => e.innerHTML = username);
 
           // Populate section with friend's Pokémon
           // ⚠️ (don't await this before navigating)
-          callBackend('get-friend-data', { username: data.username, scope: 'full' }, false)
+          callBackend('get-friend-data', { username: username, scope: 'full' }, false)
           .then(async response => {
             if ('matches' in response && response.matches === true) {
               await Promise.all(
@@ -453,33 +224,7 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
               new Notif(getString('error-no-profile')).prompt();
             }
           });
-        }
-      } break;
-
-      case 'sprite-viewer': {
-        const viewer = section.element.querySelector('sprite-viewer');
-        if (!(viewer instanceof spriteViewer)) throw new TypeError('Expecting SpriteViewer');
-
-        const readinessChecker = new Promise(resolve => {
-          viewer.addEventListener('contentready', () => {
-            resolve(true);
-            nouvelleSection.element.setAttribute('data-ready', 'true');
-          });
-        });
-
-        viewer.setAttribute('dexid', data.dexid || '');
-        viewer.setAttribute('shiny', 'true');
-        viewer.setAttribute('size', navigator.onLine ? '512' : '112');
-
-        // On attend que le sprite viewer soit bien peuplé pour lancer l'animation d'apparition
-        // (si le peuplement prend + de 300ms, on lance l'animation quand même)
-        await Promise.any([readinessChecker, new Promise(resolve => setTimeout(resolve, 300))]);
-      } break;
-
-      case 'filter-menu': {
-        const menu = document.querySelector(`filter-menu[section="${data.section ?? ancienneSection.nom}"]`);
-        if (!(menu instanceof FilterMenu)) throw new TypeError(`Expecting FilterMenu`);
-        menu.open();
+        //}
       } break;
 
       default: {
@@ -488,12 +233,9 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
     }
 
     // On prépare les liens de retour de la nouvelle section s'il y en a
-    if (event.type !== 'popstate') {
-      const container = (sectionCible === 'obfuscator' && data.filters) ? document.querySelector(`filter-menu`)! : nouvelleSection.element;
-      for (const a of [...container.querySelectorAll('a.bouton-retour')]) {
-        if (!(a instanceof HTMLAnchorElement)) throw new TypeError(`Expecting HTMLAnchorElement`);
-        a.href = `./${ancienneSection.nom}`;
-      }
+    for (const a of [...nouvelleSection.element.querySelectorAll('a.bouton-retour')]) {
+      if (!(a instanceof HTMLAnchorElement)) throw new TypeError(`Expecting HTMLAnchorElement`);
+      a.href = `./${ancienneSection.nom}`;
     }
 
     // On restaure la position de scroll précédemment enregistrée
@@ -501,12 +243,6 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
       const scrolledElement = section.element.querySelector('.section-contenu')!;
       scrolledElement.scroll(0, lastPosition.get(sectionCible) || 0);
     }*/
-    
-    // On anime l'apparition de la nouvelle section
-    if (animateNewSection) {
-      const apparitionSection = section?.openAnimation(section.element, event, data);
-      if (apparitionSection) wait(apparitionSection);
-    }
 
     const scrollDetector = nouvelleSection.element.querySelector('.scroll-detector');
     if (scrollDetector) scrollObserver.observe(scrollDetector);
@@ -524,30 +260,29 @@ export async function navigate(sectionCible: string, event: Event, data?: any) {
     } break;
 
     case 'chromatiques-ami': {
-      if (nouvelleSection.closePrevious) {
-        friendShinyStorage.clear();
-        ancienneSection.element.removeAttribute('data-ready');
-        ancienneSection.element.querySelectorAll('friend-shiny-card, [data-replaces="friend-shiny-card"]').forEach(card => {
-          (card as Element & {obsolete: boolean}).obsolete = true;
-          card.remove();
-          clearElementStorage('chromatiques-ami', card.getAttribute('huntid') ?? card.getAttribute('data-huntid') ?? '');
-        });
-        ancienneSection.element.querySelectorAll('.compteur').forEach(compteur => compteur.innerHTML = '');
-        ancienneSection.element.removeAttribute('data-username');
+      friendShinyStorage.clear();
+      ancienneSection.element.removeAttribute('data-ready');
+      ancienneSection.element.querySelectorAll('friend-shiny-card, [data-replaces="friend-shiny-card"]').forEach(card => {
+        (card as Element & {obsolete: boolean}).obsolete = true;
+        card.remove();
+        clearElementStorage('chromatiques-ami', card.getAttribute('huntid') ?? card.getAttribute('data-huntid') ?? '');
+      });
+      ancienneSection.element.querySelectorAll('.compteur').forEach(compteur => compteur.innerHTML = '');
+      ancienneSection.element.removeAttribute('data-username');
 
-        const filterMenu = document.querySelector('filter-menu[section="chromatiques-ami"]');
-        if (!(filterMenu instanceof FilterMenu)) throw new TypeError('Expecting FilterMenu');
-        filterMenu.reset();
+      const filterMenu = document.querySelector('filter-menu[section="chromatiques-ami"]');
+      if (!(filterMenu instanceof FilterMenu)) throw new TypeError('Expecting FilterMenu');
+      filterMenu.reset();
 
-        const searchBoxes = document.querySelectorAll('search-box[section="chromatiques-ami"]');
-        searchBoxes.forEach(searchBox => {
-          const form = searchBox.shadowRoot?.querySelector('form');
-          if (form instanceof HTMLFormElement) form.reset();
-        });
-      }
+      const searchBoxes = document.querySelectorAll('search-box[section="chromatiques-ami"]');
+      searchBoxes.forEach(searchBox => {
+        const form = searchBox.shadowRoot?.querySelector('form');
+        if (form instanceof HTMLFormElement) form.reset();
+      });
     } break;
   }
 
+  window.dispatchEvent(new Event('navigationend'));
   return;
 }
 
@@ -636,7 +371,86 @@ async function animateFabIcon(ancienneSection: Section, nouvelleSection: Section
 }
 
 
-// Permet la navigation avec le bouton retour du navigateur
+/**
+ * Crée l'URL d'une page.
+ */
+export function getPageUrl(page: string, subPage: string = ''): URL {
+  const lang = document.documentElement.lang as keyof Section['urls'];
+  const requestedSection = sections.find(s => s.nom === page);
+  const requestedPath = requestedSection?.urls[lang] ?? requestedSection?.urls['en'] ?? '';
+  const suffix = subPage
+    ? `/${subPage}`
+    : ''
+  return new URL(`${requestedPath}${suffix}`, `${location.origin}/shinydex/`);
+}
+
+
+/**
+ * Déclenche un changement d'URL, qui déclenchera lui-même une navigation.
+ */
+export async function goToPage(
+  page: string,
+  subPage: string = '',
+  data: unknown = {},
+  options: { type?: 'push'|'replace' } = {}
+) {
+  return new Promise(resolve => {
+    const url = getPageUrl(page, subPage).pathname;
+    window.addEventListener('navigationend', resolve, { once: true });
+    switch (options.type) {
+      case 'replace':
+        history.replaceState(data, '', url);
+        break;
+      case 'push':
+      default:
+        history.pushState(data, '', url);
+    }
+  });
+}
+
+
+
+///////////////////////////////////////////////
+// Déclenche une navigation au changement d'URL
+const pushState = history.pushState;
+const replaceState = history.replaceState;
+
+history.pushState = function(...args: Parameters<History['pushState']>) {
+  const override = pushState.apply(this, args);
+  window.dispatchEvent(new Event('pushstate'));
+  window.dispatchEvent(new CustomEvent('locationchange', {
+    detail: {
+      cause: 'pushstate',
+      url: args[2],
+      ...args[0]
+    }
+  }));
+  return override;
+};
+
+history.replaceState = function(...args: Parameters<History['replaceState']>) {
+  const override = replaceState.apply(this, args);
+  window.dispatchEvent(new Event('replacestate'));
+  window.dispatchEvent(new CustomEvent('locationchange', {
+    detail: {
+      cause: 'replacestate',
+      url: args[2],
+      ...args[0]
+    }
+  }));
+  return override;
+};
+
 window.addEventListener('popstate', event => {
-  navigate(event.state?.section || 'mes-chromatiques', event, event.state?.data);
-}, false);
+  window.dispatchEvent(new CustomEvent('locationchange', {
+    detail: {
+      cause: 'popstate',
+      ...event.state?.data
+    }
+  }));
+});
+
+window.addEventListener('locationchange', event => {
+  if (!(event instanceof CustomEvent)) return;
+  navigate(event);
+});

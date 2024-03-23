@@ -1,17 +1,7 @@
 <?php
 $commonDir = '../_common';
 require_once $commonDir.'/php/Translation.php';
-$translation = new Translation(<<<STRINGS
-{
-  "fr": {
-    "meta-description": "Recensez votre collection de Pokémon chromatiques, et partagez-la avec vos amis."
-  },
-    
-  "en": {
-    "meta-description": "Keep track of your shiny Pokémon collection, and share it with friends."
-  }
-}
-STRINGS);
+$translation = new Translation(file_get_contents(__DIR__.'/dist/strings/meta.json'));
 $httpLanguage = $translation->getLanguage();
 ?>
 <!doctype html>
@@ -34,21 +24,26 @@ $httpLanguage = $translation->getLanguage();
     
     <link rel="icon" type="image/svg+xml" href="./images/app-icons/favicon.svg">
     <link rel="apple-touch-icon" href="./images/app-icons/apple-touch-icon.png">
-    <link rel="manifest" href="./manifest.json">
-
-    <link rel="preconnect" href="https://remiscan.fr">
+    <link rel="manifest" href="./manifest.php">
+    <link rel="canonical" href="https://remiscan.fr/shinydex/">
+    <base href="https://<?=$_SERVER['SERVER_NAME']?>/shinydex/">
 
     <script>window.tempsChargementDebut = performance.now();</script>
     <script defer src="../_common/polyfills/adoptedStyleSheets.min.js"></script>
     <script>window.esmsInitOptions = { polyfillEnable: ['css-modules', 'json-modules'] }</script>
     <script defer src="../_common/polyfills/es-module-shims.js"></script>
+    <script defer src="../_common/polyfills/popover.min.js"></script>
     <script type="importmap">
     {
       "imports": {
         "input-switch-styles": "../_common/components/input-switch/styles.css",
         "input-switch-template": "../_common/components/input-switch/template.js",
         "colori": "../colori/lib/dist/colori.min.js",
-        "translation-observer": "../_common/js/translation-observer/mod.js"
+        "translation-observer": "../_common/js/translation-observer/mod.js",
+        "remiscan-logo": "/_common/components/remiscan-logo/remiscan-logo.js",
+        "remiscan-logo-svg": "/_common/components/remiscan-logo/logo.svg",
+        "remiscan-logo-svg-horizontal": "/_common/components/remiscan-logo/logo-horizontal.svg",
+        "remiscan-logo-svg-square": "/_common/components/remiscan-logo/logo-square.svg"
       }
     }
     </script>
@@ -90,7 +85,7 @@ $httpLanguage = $translation->getLanguage();
     <link rel="stylesheet" href="./styles/app-large.css" media="screen and (min-width: 1140px)">
   </head>
 
-  <body data-section-actuelle="mes-chromatiques" class="background welcome">
+  <body data-section-actuelle="mes-chromatiques" class="background welcome" data-anti-spoilers-pokedex="on" data-anti-spoilers-friends="on">
     <!-- Écran de chargement -->
     <div id="load-screen" style="grid-row: 1 / 3; grid-column: 1 / 2; position: absolute; z-index: 1000;width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: var(--bg-color, rgb(34, 34, 34)); --surface-color: var(--surface);">
       <load-spinner id="spinner" style="--size: 3em;"></load-spinner>
@@ -147,7 +142,7 @@ $httpLanguage = $translation->getLanguage();
     <main class="surface surface-default">
 
       <!-- FAB -->
-      <button type="button" class="surface interactive fab elevation-3-shadow only-icon" data-label="fab-pokemon">
+      <button type="button" id="main-fab" class="surface interactive fab elevation-3-shadow only-icon" data-label="fab-pokemon">
         <span class="material-icons" aria-hidden="true">add</span>
       </button>
 
@@ -205,54 +200,45 @@ $httpLanguage = $translation->getLanguage();
     </main>
 
     <!-- Sprite viewer -->
-    <section id="sprite-viewer" class="surface">
+    <dialog id="sprite-viewer" class="surface">
       <sprite-viewer></sprite-viewer>
-    </section>
-
-    <!-- Obfuscator -->
-    <section id="obfuscator" class="surface"></section>
+    </dialog>
 
     <!-- Menu de filtres -->
-    <section id="filter-menu">
-      <filter-menu data-section="mes-chromatiques" class="surface surface-container-high elevation-3-shadow"></filter-menu>
-      <filter-menu data-section="chasses-en-cours" class="surface surface-container-high elevation-3-shadow"></filter-menu>
-      <filter-menu data-section="corbeille" class="surface surface-container-high elevation-3-shadow"></filter-menu>
-      <filter-menu data-section="partage" class="surface surface-container-high elevation-3-shadow"></filter-menu>
-      <filter-menu data-section="chromatiques-ami" class="surface surface-container-high elevation-3-shadow"></filter-menu>
-    </section>
+    <bottom-sheet id="filter-menu" drag modal>
+      <filter-menu data-section="mes-chromatiques"></filter-menu>
+      <filter-menu data-section="chasses-en-cours"></filter-menu>
+      <filter-menu data-section="corbeille"></filter-menu>
+      <filter-menu data-section="partage"></filter-menu>
+      <filter-menu data-section="chromatiques-ami"></filter-menu>
+    </bottom-sheet>
 
     <!-- User search -->
-    <section id="user-search">
-      <div class="user-search-card surface elevation-3-shadow surface-container-high">
-        <h2 class="title-medium" data-string="add-friend-hint"></h2>
+    <bottom-sheet id="user-search" drag modal>
+      <h2 class="title-large" data-string="add-friend-hint"></h2>
 
-        <form name="user-search" class="search-form">
-          <input type="text" name="username" class="surface surface-container-high interactive body-large"
-            inputmode="search" enterkeyhint="search" role="searchbox" autocomplete="off"
-            minlength="1" maxlength="20"
-            data-placeholder="add-friend-placeholder">
+      <form name="user-search" class="search-form">
+        <input type="text" name="username" class="surface surface-container-high interactive body-large"
+          inputmode="search" enterkeyhint="search" role="searchbox" autocomplete="off" autofocus
+          minlength="1" maxlength="20"
+          data-placeholder="add-friend-placeholder"
+        >
 
-          <button type="reset" class="surface interactive icon-button only-icon reset-icon" data-label="reset-search">
-            <span class="material-icons" aria-hidden="true">close</span>
-          </button>
+        <button type="reset" class="surface interactive icon-button only-icon reset-icon" data-label="reset-search">
+          <span class="material-icons" aria-hidden="true">close</span>
+        </button>
 
-          <button type="submit" class="surface interactive filled tonal elevation-3 only-icon" data-label="submit-search">
-            <span class="material-icons" aria-hidden="true">search</span>
-          </button>
-        </form>
-      </div>
-    </section>
+        <button type="submit" class="surface interactive filled tonal only-icon" data-label="submit-search">
+          <span class="material-icons" aria-hidden="true">search</span>
+        </button>
+      </form>
+    </bottom-sheet>
 
     <!-- Changelog -->
-    <section id="changelog">
-      <div class="changelog-card surface elevation-3-shadow surface-container-high">
-        <h2 class="title-large" data-string="section-changelog-long-title"></h2>
-        <?php include './pages/changelog.html'; ?>
-      </div>
-    </section>
-
-    <!-- Misc top layer -->
-    <section id="top-layer"></section>
+    <bottom-sheet id="changelog" drag modal>
+      <h2 class="title-large" data-string="section-changelog-long-title"></h2>
+      <?php include './pages/changelog.html'; ?>
+    </bottom-sheet>
 
     <!-- Notifications -->
     <div class="notification-container"></div>
