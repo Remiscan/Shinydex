@@ -34,10 +34,10 @@ export class corbeilleCard extends shinyCard {
   }
 
 
-  async dataToContent() {
+  async dataToContent(getPkmn = this.dataStore.getItem(this.huntid)) {
     let hunt: Hunt;
     try {
-      hunt = new Hunt(await this.dataStore.getItem(this.huntid));
+      hunt = new Hunt(await getPkmn);
     } catch (e) {
       console.error('Échec de création de la Hunt', e);
       throw e;

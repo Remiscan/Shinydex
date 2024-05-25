@@ -153,6 +153,13 @@
     "section-chromatiques-ami-long-title": "<span class=\"nowrap\">Pokémon <shiny-stars></shiny-stars></span> de <span data-type=\"username\"></span>",
     "section-chromatiques-ami-message-vide": "<span data-type=\"username\"></span> n'a enregistré aucun Pokémon chromatique.</span>",
 
+    "section-flux-short-title": "Flux",
+    "section-flux-long-title": "Flux public",
+    "section-flux-message-vide": "Pas de connexion internet.",
+    "aujourdhui": "aujourd'hui",
+    "hier": "hier",
+    "demain": "demain",
+
     "section-parametres-short-title": "Paramètres",
     "section-parametres-long-title": "Paramètres",
     "parametres-generaux": "Application",
@@ -490,6 +497,13 @@
 
     "section-chromatiques-ami-long-title": "<span><span data-type=\"username\"></span>'s</span> <span class=\"nowrap\">Pokémon <shiny-stars></shiny-stars></span>",
     "section-chromatiques-ami-message-vide": "<span data-type=\"username\"></span> did not save any shiny Pokémon.</span>",
+
+    "section-flux-short-title": "Feed",
+    "section-flux-long-title": "Feed",
+    "section-flux-message-vide": "No internet connection.",
+    "aujourdhui": "today",
+    "hier": "yesterday",
+    "demain": "tomorrow",
 
     "section-parametres-short-title": "Settings",
     "section-parametres-long-title": "Settings",

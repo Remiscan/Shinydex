@@ -5,6 +5,7 @@ import { cleanUpRecycleBin, initPokedex, populator } from './appContent.js';
 import * as Auth from './auth.js';
 import { callBackend } from './callBackend.js';
 import { FilterMenu } from './components/filter-menu/filterMenu.js';
+import { initFeedLoader } from './feed.js';
 import { PopulatableSection } from './filtres.js';
 import { dataStorage, huntStorage, shinyStorage } from './localForage.js';
 import { sections } from './navigate.js';
@@ -199,6 +200,8 @@ export async function appStart() {
     wait(byeLoad).then(() => loadScreen.remove());
 
     const sectionsToPopulate: PopulatableSection[] = ['mes-chromatiques', 'chasses-en-cours', 'corbeille', 'partage'];
+
+    initFeedLoader();
 
     await Promise.all([
       initPokedex(),

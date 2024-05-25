@@ -21,11 +21,8 @@
         "kind": "build"
       }
     }, {
-      "type": "deno",
-      "command": "run",
-      "args": [
-        "--allow-run", "--allow-read", "--allow-write=./dist", "build/auto.build.js"
-      ],
+      "type": "shell",
+      "command": "deno run --allow-run --allow-read --allow-write=./dist build/auto.build.js",
       "label": "[auto] TS helper (sync ./src and ./dist)",
       "runOptions": {
         "runOn": "folderOpen"

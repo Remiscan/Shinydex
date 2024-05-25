@@ -85,7 +85,7 @@ nav {
   grid-row: 2 / 3;
   grid-column: 1 / 2;
   display: grid;
-  --nombre-sections: 4;
+  --nombre-sections: 5;
   grid-template-rows: calc(var(--section-title-height) - 8px) 1fr;
   grid-template-columns: repeat(var(--nombre-sections), 1fr);
   align-items: center;
@@ -190,6 +190,7 @@ body[data-section-actuelle~="mes-chromatiques"] .nav-link[data-nav-section="mes-
 body[data-section-actuelle~="pokedex"] .nav-link[data-nav-section="pokedex"],
 body[data-section-actuelle~="chasses-en-cours"] .nav-link[data-nav-section="chasses-en-cours"],
 body[data-section-actuelle~="partage"] .nav-link[data-nav-section="partage"],
+body[data-section-actuelle~="flux"] .nav-link[data-nav-section="flux"],
 body[data-section-actuelle~="corbeille"] .nav-link[data-nav-section="corbeille"],
 body[data-section-actuelle~="parametres"] .nav-link[data-nav-section="parametres"],
 body[data-section-actuelle~="a-propos"] .nav-link[data-nav-section="a-propos"] {
@@ -210,6 +211,7 @@ body:not([data-section-actuelle~="pokedex"]) nav search-box[section="pokedex"]::
 body:not([data-section-actuelle~="chasses-en-cours"]) nav search-box[section="chasses-en-cours"]::part(form),
 body:not([data-section-actuelle~="corbeille"]) nav search-box[section="corbeille"]::part(form),
 body:not([data-section-actuelle~="partage"]) nav search-box[section="partage"]::part(form),
+body:not([data-section-actuelle~="flux"]) nav search-box[section="flux"]::part(form),
 body:not([data-section-actuelle~="chromatiques-ami"]) nav search-box[section="chromatiques-ami"]::part(form) {
   display: none;
 }
@@ -285,6 +287,7 @@ body[data-section-actuelle~="pokedex"] #pokedex,
 body[data-section-actuelle~="chasses-en-cours"] #chasses-en-cours,
 body[data-section-actuelle~="corbeille"] #corbeille,
 body[data-section-actuelle~="partage"] #partage,
+body[data-section-actuelle~="flux"] #flux,
 body[data-section-actuelle~="chromatiques-ami"] #chromatiques-ami,
 body[data-section-actuelle~="parametres"] #parametres,
 body[data-section-actuelle~="a-propos"] #a-propos {

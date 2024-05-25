@@ -1,0 +1,29 @@
+<header class="section-titre surface surface-container at-top">
+	<h1 class="title-large" data-string="section-flux-long-title"></h1>
+
+	<div class="titre-icones"> 
+		<!-- Bouton paramètres -->
+		<a class="icon-button surface interactive" data-nav-section="parametres" href="./parametres" data-label="section-parametres-short-title">
+			<span class="material-icons" aria-hidden="true">settings</span>
+			<sync-progress aria-hidden="true"></sync-progress>
+		</a>
+	</div>
+</header>
+
+<div class="section-contenu surface">
+	
+	<!-- Détecteur de scroll -->
+	<div class="scroll-detector"></div>
+
+	<!-- Message affiché quand pas de connexion -->
+	<div class="message-vide">
+		<span class="material-icons" aria-hidden="true">error_outline</span>
+		<span data-string="section-flux-message-vide"></span>
+	</div>
+
+	<!-- Liste des cartes de la section -->
+	<div class="liste-cartes" role="list">
+		<load-spinner data-max-date></load-spinner>
+	</div>
+	
+  </div>

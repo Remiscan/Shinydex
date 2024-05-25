@@ -58,10 +58,10 @@ export class shinyCard extends HTMLElement {
   /**
    * Met à jour le contenu de la carte à partir des données sauvegardées.
    */
-  async dataToContent() {
+  async dataToContent(getPkmn = this.dataStore.getItem(this.huntid)) {
     let shiny: Shiny;
     try {
-      shiny = new Shiny(await this.dataStore.getItem(this.huntid));
+      shiny = new Shiny(await getPkmn);
     } catch (e) {
       console.error('Échec de création du Shiny', e);
       throw e;

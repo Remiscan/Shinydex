@@ -126,6 +126,11 @@ $httpLanguage = $translation->getLanguage();
         <span class="label-medium" data-string="section-partage-short-title"></span>
       </a>
 
+      <a class="nav-link lien-section surface interactive" data-nav-section="flux" href="./flux">
+        <span class="material-icons surface" aria-hidden="true">newspaper</span>
+        <span class="label-medium" data-string="section-flux-short-title"></span>
+      </a>
+
       <a class="nav-link lien-section surface interactive only-pc" data-nav-section="parametres" href="./parametres">
         <span class="material-icons surface" aria-hidden="true">settings</span>
         <sync-progress></sync-progress>
@@ -174,6 +179,11 @@ $httpLanguage = $translation->getLanguage();
       <!-- Chromatiques d'un ami -->
       <section id="chromatiques-ami">
         <?php include './pages/chromatiques-ami.html'; ?>
+      </section>
+
+      <!-- Flux -->
+      <section id="flux" class="vide">
+        <?php include './pages/flux.html'; ?>
       </section>
 
       <!-- Paramètres -->

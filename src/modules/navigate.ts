@@ -68,6 +68,15 @@ export const sections: Section[] = [
     fab: 'person_add',
     element: document.getElementById('partage')!
   }, {
+    nom: 'flux',
+    urls: {
+      fr: 'flux',
+      en: 'feed',
+    },
+    preload: [`./images/iconsheet.webp`],
+    fab: null,
+    element: document.getElementById('flux')!
+  }, {
     nom: 'chromatiques-ami',
     urls: {
       fr: 'ami',
@@ -226,6 +235,11 @@ export async function navigate(event: CustomEvent) {
           });
         //}
       } break;
+
+      case 'flux': {
+        if (navigator.onLine) section.element.classList.add('vide');
+        else section.element.classList.remove('vide');
+      }
 
       default: {
         document.body.removeAttribute('data-filters');

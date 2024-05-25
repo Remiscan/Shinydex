@@ -1,5 +1,5 @@
 /** Structure d'un Pokémon shiny tel que stocké dans la BDD en ligne. */
-interface BackendShiny {
+export interface BackendShiny {
   id: number,
   huntid: string,
   userid: string,
