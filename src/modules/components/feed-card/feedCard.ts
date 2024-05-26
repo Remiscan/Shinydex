@@ -18,6 +18,10 @@ export class feedCard extends HTMLElement {
 	username: string = '';
 	static maxShinyDisplayed = 3;
 
+	get congratsButton() {
+		return this.shadow.querySelector('[data-action="feliciter"]') as HTMLButtonElement | null;
+	}
+
 
 	navHandler = (event: Event) => {
 		event.preventDefault();
@@ -64,7 +68,15 @@ export class feedCard extends HTMLElement {
 			scalar: .4,
 			disableForReducedMotion: true
 		});
+
+		const button = this.congratsButton
+		if (button) {
+			button.disabled = true;
+			const iconContainer = button.querySelector('.material-icons');
+			if (iconContainer) iconContainer.innerHTML = 'check';
+		}
 	}
+	boundSendCongratulations = this.sendCongratulations.bind(this);
 
 
 	static make(username: string, shinyList: BackendShiny[]): feedCard {
@@ -134,8 +146,7 @@ export class feedCard extends HTMLElement {
 		const navLinks = this.shadow.querySelectorAll<HTMLAnchorElement>('a[data-nav-section]');
 		navLinks.forEach(link => link.addEventListener('click', this.navHandler));
 
-		const congratsButton = this.shadow.querySelector('[data-action="feliciter"]');
-		congratsButton?.addEventListener('click', this.sendCongratulations);
+		this.congratsButton?.addEventListener('click', this.boundSendCongratulations);
 	}
 
 	disconnectedCallback() {
@@ -144,8 +155,7 @@ export class feedCard extends HTMLElement {
 		const navLinks = this.shadow.querySelectorAll<HTMLAnchorElement>('a[data-nav-section]');
 		navLinks.forEach(link => link.removeEventListener('click', this.navHandler));
 
-		const congratsButton = this.shadow.querySelector('[data-action="feliciter"]');
-		congratsButton?.removeEventListener('click', this.sendCongratulations);
+		this.congratsButton?.removeEventListener('click', this.boundSendCongratulations);
 	}
 }
 
