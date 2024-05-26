@@ -1,16 +1,12 @@
 import { noAccent } from '../../Params.js';
 import { TranslatedString, translationObserver } from '../../translation.js';
-// @ts-expect-error
 import materialIconsSheet from '../../../../ext/material_icons.css' assert { type: 'css' };
-// @ts-expect-error
 import themesSheet from '../../../../styles/themes.css.php' assert { type: 'css' };
 import { Pokemon } from '../../Pokemon.js';
 import { isFiltrableSection, isSearchableSection } from '../../filtres.js';
-// @ts-expect-error
 import commonSheet from '../../../../styles/common.css' assert { type: 'css' };
 import { getString } from '../../translation.js';
 import { BottomSheet } from '../bottomSheet.js';
-// @ts-expect-error
 import sheet from './styles.css' assert { type: 'css' };
 import template from './template.js';
 

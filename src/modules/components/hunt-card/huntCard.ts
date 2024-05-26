@@ -9,18 +9,13 @@ import { pokemonSprite } from '../pokemon-sprite/pokemonSprite.js';
 import { TextArea } from '../textArea.js';
 import { TextField } from '../textField.js';
 import template from './template.js';
-// @ts-expect-error
 import materialIconsSheet from '../../../../ext/material_icons.css' assert { type: 'css' };
-// @ts-expect-error
 import themesSheet from '../../../../styles/themes.css.php' assert { type: 'css' };
-// @ts-expect-error
 import iconSheet from '../../../../images/iconsheet.css' assert { type: 'css' };
-// @ts-expect-error
 import commonSheet from '../../../../styles/common.css' assert { type: 'css' };
 import { gameStrings, isSupportedGameID, isSupportedLang, isSupportedMethodID, methodStrings, pokemonData } from '../../jsonData.js';
 import { CheckBox } from '../checkBox.js';
 import { DexDatalist } from '../dexDatalist.js';
-// @ts-expect-error
 import sheet from './styles.css' assert { type: 'css' };
 import { noAccent } from '../../Params.js';
 

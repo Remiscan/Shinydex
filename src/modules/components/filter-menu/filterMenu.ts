@@ -1,15 +1,11 @@
 import { FilterList, filterSection, isFiltrableSection, orderCards, saveFilters } from '../../filtres.js';
 import { dataStorage } from '../../localForage.js';
-// @ts-expect-error
 import materialIconsSheet from '../../../../ext/material_icons.css' assert { type: 'css' };
-// @ts-expect-error
 import themesSheet from '../../../../styles/themes.css.php' assert { type: 'css' };
-// @ts-expect-error
 import commonSheet from '../../../../styles/common.css' assert { type: 'css' };
 import { translationObserver } from '../../translation.js';
 import { CheckBox } from '../checkBox.js';
 import { InputSelect } from '../inputSelect.js';
-// @ts-expect-error
 import sheet from './styles.css' assert { type: 'css' };
 import template from './template.js';
 

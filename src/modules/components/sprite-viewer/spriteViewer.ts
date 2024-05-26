@@ -2,7 +2,6 @@ import { pad, wait } from '../../Params.js';
 import { Pokemon } from '../../Pokemon.js';
 import { SupportedLang, pokemonData } from '../../jsonData.js';
 import { getString, translationObserver } from '../../translation.js';
-// @ts-expect-error
 import sheet from './styles.css' assert { type: 'css' };
 import template from './template.js';
 

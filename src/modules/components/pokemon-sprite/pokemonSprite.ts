@@ -1,7 +1,6 @@
 import { pad, wait } from '../../Params.js';
 import { pokemonData } from '../../jsonData.js';
 import { TranslatedString, getString, translationObserver } from '../../translation.js';
-// @ts-expect-error
 import pokemonSheet from '../../../../images/pokemonsheet.css' assert { type: 'css' };
 
 

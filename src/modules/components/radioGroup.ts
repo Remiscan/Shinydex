@@ -1,11 +1,8 @@
 import { sheet as checkboxSheet } from './checkBox.js';
 import { translationObserver } from '../translation.js';
 import CustomInput from './customInput.js';
-// @ts-expect-error
 import materialIconsSheet from '../../../ext/material_icons.css' assert { type: 'css' };
-// @ts-expect-error
 import themesSheet from '../../../styles/themes.css.php' assert { type: 'css' };
-// @ts-expect-error
 import commonSheet from '../../../styles/common.css' assert { type: 'css' };
 
 

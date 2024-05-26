@@ -1,20 +1,15 @@
 import { friendStorage, localForageAPI, shinyStorage } from '../../localForage.js';
 import { getString, translationObserver } from '../../translation.js';
 import template from './template.js';
-// @ts-expect-error
 import materialIconsSheet from '../../../../ext/material_icons.css' assert { type: 'css' };
-// @ts-expect-error
 import iconSheet from '../../../../images/iconsheet.css' assert { type: 'css' };
-// @ts-expect-error
 import themesSheet from '../../../../styles/themes.css.php' assert { type: 'css' };
-// @ts-expect-error
 import commonSheet from '../../../../styles/common.css' assert { type: 'css' };
 import { Friend } from '../../Friend.js';
 import { noAccent } from '../../Params.js';
 import { updateUserProfile } from '../../Settings.js';
 import { goToPage } from '../../navigate.js';
 import { warnBeforeDestruction } from '../../notification.js';
-// @ts-expect-error
 import sheet from './styles.css' assert { type: 'css' };
 
 

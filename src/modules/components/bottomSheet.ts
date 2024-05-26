@@ -1,4 +1,3 @@
-// @ts-expect-error
 import themesSheet from '../../../styles/themes.css.php' assert { type: 'css' };
 
 
