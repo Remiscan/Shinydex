@@ -1,3 +1,13 @@
 :host {
 	display: block;
+	content-visibility: auto;
+	contain-intrinsic-block-size: auto 200px;
+}
+
+h2 {
+	margin-inline: 8px;
+}
+
+::slotted(time) {
+	opacity: .8;
 }

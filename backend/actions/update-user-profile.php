@@ -4,12 +4,13 @@
  * Step 1: Get profile data from JavaScript
  */
 
-if (!isset($_POST['username']) && !isset($_POST['public'])) {
+if (!isset($_POST['username']) && !isset($_POST['public']) && !isset($_POST['appearInFeed'])) {
   respondError('Profile data not received');
 }
 
 $username = $_POST['username'] ?? null;
 $public = $_POST['public'] ?? null;
+$appearInFeed = $_POST['appearInFeed'] ?? null;
 
 
 
@@ -18,7 +19,11 @@ $public = $_POST['public'] ?? null;
  */
 
 try {
-  $user->updateDBEntry($username, $public);
+  $user->updateDBEntry(
+    username: $username,
+    public: $public,
+    appearInFeed: $appearInFeed
+  );
 } catch (\Throwable $error) {
   respondError($error);
 }

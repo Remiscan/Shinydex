@@ -442,6 +442,7 @@ export async function cacheAllSprites(bool: boolean, fetchOptions: RequestInit &
 type UserProfileData = {
   username?: string|null;
   public?: boolean;
+  appearInFeed?: boolean;
   lastUpdate?: number;
 }
 
@@ -450,6 +451,7 @@ let updateUserProfile = async (data: UserProfileData = {}) => {
   const userProfile = (await dataStorage.getItem('user-profile')) ?? {};
   if (data.username) userProfile.username = data.username;
   if (data.public) userProfile.public = data.public;
+  if (data.appearInFeed) userProfile.appearInFeed = data.appearInFeed;
   if (data.lastUpdate) userProfile.lastUpdate = data.lastUpdate;
   await dataStorage.setItem('user-profile', userProfile);
 };
@@ -483,6 +485,38 @@ export function initVisibilityChangeHandler() {
 
   input.addEventListener('change', event => {
     updateUserVisibility(Boolean(input.checked))
+    .catch(error => {
+      input.disabled = true;
+      console.error(error);
+    });
+  });
+}
+
+
+/** Asks the backend to update the user's presence in the public feed. */
+export async function updateUserPresenceInFeed(visibility: boolean) {
+  const settingsForm = document.querySelector('form[name="app-settings"]');
+  if (!(settingsForm instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
+  
+  try {
+    await callBackend('update-user-profile', { appearInFeed: String(visibility) }, true);
+    await updateUserProfile({ appearInFeed: visibility });
+  } catch (error) {
+    throw new Error(getString('error-changing-presence-in-feed'), { cause: error ?? undefined })
+  }
+}
+
+
+/** Handles changes to the presence in feed input. */
+export function initFeedPresenceChangeHandler() {
+  const settingsForm = document.querySelector('form[name="app-settings"]');
+  if (!(settingsForm instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
+
+  const input = settingsForm.querySelector('[name="appear-in-feed"]');
+  if (!input || !('disabled' in input) || !('checked' in input)) throw new TypeError(`Expecting InputSwitch`);
+
+  input.addEventListener('change', event => {
+    updateUserPresenceInFeed(Boolean(input.checked))
     .catch(error => {
       input.disabled = true;
       console.error(error);

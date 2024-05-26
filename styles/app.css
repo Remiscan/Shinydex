@@ -1190,6 +1190,14 @@ remiscan-logo {
 !!!!! PARTAGE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
+#flux .liste-cartes {
+  gap: 16px;
+}
+
+#flux .liste-cartes load-spinner {
+  margin-inline: auto;
+}
+
 
 
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

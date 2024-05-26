@@ -173,7 +173,7 @@ class User {
 
 
   /** Updates the user's profile in the database. */
-  public function updateDBEntry(string|null $username, string|null $public) {
+  public function updateDBEntry(string|null $username, string|null $public, string|null $appearInFeed) {
     $this->validateToken();
 
     $userID = $this->userID;
@@ -182,6 +182,8 @@ class User {
       $fieldsToUpdate[] = 'username';
     if ($public != null)
       $fieldsToUpdate[] = 'public';
+    if ($appearInFeed != null)
+      $fieldsToUpdate[] = 'appearInFeed';
     if (count($fieldsToUpdate) === 0) return;
     $now = floor(1000 * microtime(true));
 
@@ -199,6 +201,10 @@ class User {
     if ($public != null) {
       $public = ($public === 'true');
       $update->bindParam(':public', $public, PDO::PARAM_BOOL);
+    }
+    if ($appearInFeed != null) {
+      $appearInFeed = ($appearInFeed === 'true');
+      $update->bindParam(':appearInFeed', $appearInFeed, PDO::PARAM_BOOL);
     }
 
     $result = $update->execute();

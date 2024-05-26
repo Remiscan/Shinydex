@@ -1,5 +1,5 @@
 import { Params, Uint8ArrayToHexString, sha256 } from './Params.js';
-import { initUsernameChangeHandler, initVisibilityChangeHandler, updateUserProfile } from './Settings.js';
+import { initFeedPresenceChangeHandler, initUsernameChangeHandler, initVisibilityChangeHandler, updateUserProfile } from './Settings.js';
 import { callBackend } from './callBackend.js';
 import { dataStorage } from './localForage.js';
 import { Notif, template as notifTemplate } from './notification.js';
@@ -160,7 +160,8 @@ async function signIn(provider: SignInProvider, token: string = '', { notify = t
       const userProfile = {
         username: responseBody.username ?? null,
         public: Boolean(responseBody.public ?? 0),
-        lastUpdate: Number(responseBody.lastUpdate ?? 0)
+        lastUpdate: Number(responseBody.lastUpdate ?? 0),
+        appearInFeed: Boolean(responseBody.appearInFeed ?? 0),
       };
       await updateUserProfile(userProfile);
 
@@ -189,6 +190,17 @@ async function signIn(provider: SignInProvider, token: string = '', { notify = t
         initVisibilityChangeHandler();
         settingsForm.setAttribute('data-public-profile', String(userProfile.public));
         document.body.setAttribute('data-public-profile', String(userProfile.public));
+      } catch (error) {
+        console.error(error);
+      }
+
+      // Presence in public feed
+      try {
+        const input = settingsForm.querySelector('[name="appear-in-feed"]');
+        if (input && 'checked' in input) input.checked = userProfile.appearInFeed;
+        else if (userProfile.appearInFeed) input?.setAttribute('checked', 'true');
+        else input?.removeAttribute('checked');
+        initFeedPresenceChangeHandler();
       } catch (error) {
         console.error(error);
       }

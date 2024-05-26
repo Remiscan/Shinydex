@@ -8,11 +8,14 @@ template.innerHTML = /*html*/`
 		<slot></slot>
 	</div>
 
-	<a href="#" class="icon-button surface surface-container-low interactive" data-nav-section="chromatiques-ami" data-string="see-friends-pokemon"></a>
+	<a href="#" class="surface interactive label-large user-link" data-nav-section="chromatiques-ami" data-string="see-friends-pokemon"></a>
 
 	<button type="button" class="surface interactive filled tonal" data-action="feliciter">
+		<span class="material-icons" aria-hidden="true">celebration</span>
 		<span class="label-large" data-string="feliciter"></span>
 	</button>
+
+	<wavy-divider scroll-animated></wavy-divider>
 `;
 
 export default template;

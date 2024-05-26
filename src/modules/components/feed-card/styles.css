@@ -1,11 +1,18 @@
 :host {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
-	grid-template-rows: auto auto auto;
+	grid-template-rows: auto auto auto auto;
+	row-gap: 16px;
+	column-gap: 12px;
+	content-visibility: auto;
+	contain-intrinsic-block-size: auto 200px;
 }
 
 h3 {
 	grid-column: 1 / -1;
+	margin-inline: 8px;
+	text-wrap: balance;
+	display: inline;
 }
 
 .shiny-list {
@@ -13,12 +20,28 @@ h3 {
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
+	margin-top: -6px;
 }
 
-.lien-profil {
-
+.shiny-list ~ :is(a, button) {
+	width: 100%;
+	--surface-color: var(--secondary-container);
+	color: rgb(var(--on-secondary-container));
+	--state-tint: var(--on-secondary-container);
+	border-radius: 50px;
+	text-decoration: none;
 }
 
-[data-action="feliciter"] {
+.user-link {
+	display: grid;
+	place-content: center;
+}
 
+::slotted(friend-shiny-card) {
+	display: grid !important;
+}
+
+wavy-divider {
+	grid-column: 1 / -1;
+	color: rgb(var(--outline-variant));
 }

@@ -78,6 +78,7 @@ try {
   if ($accountID) $response['account'] = $accountID;
   $response['username'] = $dbEntry['username'] ?? null;
   $response['public'] = $dbEntry['public'] ?? false;
+  $response['appearInFeed'] = $dbEntry['appearInFeed'] ?? false;
   $response['lastUpdate'] = $dbEntry['lastUpdate'] ?? '0';
 
   $response['success'] = 'Connection successful';
