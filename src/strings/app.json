@@ -159,6 +159,11 @@
     "aujourdhui": "aujourd'hui",
     "hier": "hier",
     "demain": "demain",
+    "feliciter": "Féliciter",
+    "titre-flux-singulier": "<slot name=\"username\"></slot> a capturé un <slot name=\"pokemon-name\"></slot> chromatique !",
+    "titre-flux-pluriel": "<slot name=\"username\"></slot> a capturé <slot name=\"pokemon-quantity\"></slot> Pokémon chromatiques !",
+    "titre-flux-tres-pluriel": "<slot name=\"username\"></slot> a capturé plus de <slot name=\"pokemon-quantity\"></slot> Pokémon chromatiques !",
+    "voir-son-profil": "Voir son profil",
 
     "section-parametres-short-title": "Paramètres",
     "section-parametres-long-title": "Paramètres",
@@ -499,11 +504,15 @@
     "section-chromatiques-ami-message-vide": "<span data-type=\"username\"></span> did not save any shiny Pokémon.</span>",
 
     "section-flux-short-title": "Feed",
-    "section-flux-long-title": "Feed",
+    "section-flux-long-title": "Public feed",
     "section-flux-message-vide": "No internet connection.",
     "aujourdhui": "today",
     "hier": "yesterday",
     "demain": "tomorrow",
+    "feliciter": "Congratulate",
+    "titre-flux-singulier": "<slot name=\"username\"></slot> caught a shiny <slot name=\"pokemon-name\"></slot>!",
+    "titre-flux-pluriel": "<slot name=\"username\"></slot> caught <slot name=\"pokemon-quantity\"></slot> shiny Pokémon!",
+    "voir-son-profil": "See his profile",
 
     "section-parametres-short-title": "Settings",
     "section-parametres-long-title": "Settings",

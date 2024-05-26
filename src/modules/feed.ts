@@ -1,11 +1,12 @@
+import { queueable } from "../../../_common/js/per-function-async-queue/mod.js";
 import { callBackend } from "./callBackend.js";
+import { feedCard } from "./components/feed-card/feedCard.js";
+import './components/feed-day/feedDay.js';
 import { loadSpinner } from "./components/loadSpinner.js";
-import { shinyCard } from "./components/shiny-card/shinyCard.js";
 import { dataStorage } from "./localForage.js";
-import { dateDifference, formatRelativeNumberOfDays } from "./Params.js";
-import { Settings } from "./Settings.js";
-import { Shiny } from "./Shiny.js";
+import { dateDifference, Params } from "./Params.js";
 import { BackendShiny } from "./ShinyBackend.js";
+import { formatRelativeNumberOfDays } from "./translation.js";
 
 
 
@@ -18,9 +19,8 @@ const feedLoaderObserver = new IntersectionObserver((entries: IntersectionObserv
 		if (!maxDate) return;
 
 		getFeedData(maxDate as ISODay)
-		.then(data => {
-
-		});
+		.then(data => populateFeedData(data))
+		.catch(error => {});
 	}
 }, {
 	threshold: [0],
@@ -56,36 +56,59 @@ export function initFeedLoader(maxDate: ISODay = timestamp2ISODay(Date.now())) {
 
 
 /** Récupère les données du flux. */
-export async function getFeedData(maxDate: ISODay = timestamp2ISODay(Date.now())) {
+export async function _getFeedData(maxDate: ISODay = timestamp2ISODay(Date.now())) {
 	const userProfile = await dataStorage.getItem('user-profile');
 	const data = await callBackend('get-feed-data', { maxDate, username: userProfile?.username ?? undefined });
 	return data.entries;
 }
+const getFeedData = queueable(_getFeedData, 1050);
 
 
 /** Crée le template d'une journée dans le flux. */
-function makeFeedDay([day, userList]: FeedDataEntry) {
-	const dateDiff = dateDifference(new Date(Date.now()), new Date(day));
-	const template = document.createElement('template');
-	template.innerHTML = /*html*/`
-		<h2>${formatRelativeNumberOfDays(dateDiff)}</h2>
-		${Object.entries(userList).map(([username, shinyList]) => /*html*/`
-			<feed-card>
-				<span slot="username">${username}</span>
-			</feed-card>
-		`)}
-	`;
-	return template;
+function makeFeedDay(...[day, userList]: FeedDataEntry) {
+	const container = document.createElement('feed-day');
+
+	const dateContainer = document.createElement('time');
+	dateContainer.setAttribute('datetime', day);
+	dateContainer.setAttribute('slot', 'relative-date');
+	dateContainer.innerHTML = formatRelativeNumberOfDays(
+		dateDifference(new Date(Date.now()), new Date(day))
+	);
+	container.appendChild(dateContainer);
+
+	for (const [username, shinyList] of Object.entries(userList)) {
+		const card = feedCard.make(username, shinyList);
+		container.appendChild(card);
+	}
+	
+	return container;
 }
 
 
 
 function populateFeedData(data: FeedData) {
-	for (const [date, userList] of Object.entries(data)) {
-		for (const [username, shinyList] of Object.entries(userList)) {
-			const feedCard = document.createElement('feed-card');
-			feedCard.dataset.username = username;
-			feedCard.populate(shinyList);
-		}
+	const feedSection = document.getElementById('flux');
+	const feedContentContainer = feedSection?.querySelector('.liste-cartes');
+	if (!feedContentContainer) return;
+
+	const feedContent = new DocumentFragment();
+
+	for (const [day, userList] of Object.entries(data)) {
+		const dayContent = makeFeedDay(day as ISODay, userList);
+		feedContent.appendChild(dayContent);
 	}
+
+	const previousMinDate = Object.keys(data).at(-1);
+	if (previousMinDate) {
+		const _pMinDate = new Date(previousMinDate);
+		const newMaxDate = new Date(_pMinDate.getTime() - Params.msPerDay);
+
+		const loader = document.createElement('load-spinner');
+		loader.setAttribute('data-max-date', newMaxDate.toISOString().slice(0, 10));
+		feedContent.appendChild(loader);
+		feedLoaderObserver.observe(loader);
+	}
+	
+	feedContentContainer.querySelectorAll('load-spinner').forEach(loader => loader.remove());
+	feedContentContainer.appendChild(feedContent);
 }

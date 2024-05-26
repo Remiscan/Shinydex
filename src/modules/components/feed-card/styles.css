@@ -1,0 +1,24 @@
+:host {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	grid-template-rows: auto auto auto;
+}
+
+h3 {
+	grid-column: 1 / -1;
+}
+
+.shiny-list {
+	grid-column: 1 / -1;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.lien-profil {
+
+}
+
+[data-action="feliciter"] {
+
+}

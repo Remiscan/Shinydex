@@ -1,7 +1,3 @@
-import { getString } from "./translation";
-
-
-
 declare global {
   interface CSSStyleSheet {
     replaceSync: (text: string) => void
@@ -35,7 +31,9 @@ export const Params = {
   spriteSize: 112,
   defaultLang: 'fr',
 
-  codeVerifier: ''
+  codeVerifier: '',
+
+  msPerDay: 1000 * 60 * 60 * 24,
 };
 
 
@@ -85,26 +83,7 @@ export function timestamp2date(timestamp: number): string {
 export function dateDifference(a: Date, b: Date) {
   const date1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
   const date2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
-  const msPerDay = 1000 * 60 * 60 * 24;
-
-  return Math.floor((date2 - date1) / msPerDay);
-}
-
-
-/////////////////////////////////////////////////
-// Exprime de manière relative un nombre de jours
-export function formatRelativeNumberOfDays(days: number): string {
-  if (days === 0) return getString('aujourdhui');
-  if (days === -1) return getString('hier');
-  if (days === 1) return getString('demain');
-  const formatter = new Intl.RelativeTimeFormat();
-  if (Math.abs(days) < 7)
-    return formatter.format(days, "day");
-  if (Math.abs(days) < 31)
-    return formatter.format(Math.sign(days) * (Math.abs(days) % 7), "week");
-  if (Math.abs(days) < 365)
-    return formatter.format(Math.sign(days) * (Math.abs(days) % 31), "month");
-  return formatter.format(Math.sign(days) * (Math.abs(days) % 365), "year");
+  return Math.floor((date2 - date1) / Params.msPerDay);
 }
 
 

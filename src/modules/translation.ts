@@ -1,8 +1,8 @@
 // @ts-expect-error
 import { TranslationObserver as TODef } from 'translation-observer';
 import { SupportedLang, appStrings, gameStrings, isSupportedLang, methodStrings, pokemonData } from './jsonData.js';
-import { Pokemon } from './Pokemon.js';
 import { Params } from './Params.js';
+import { Pokemon } from './Pokemon.js';
 
 
 
@@ -111,3 +111,21 @@ class TranslationObserver extends TODef {
 }
 
 export const translationObserver = new TranslationObserver();
+
+
+
+/////////////////////////////////////////////////
+// Exprime de manière relative un nombre de jours
+export function formatRelativeNumberOfDays(days: number): string {
+  if (days === 0) return getString('aujourdhui');
+  if (days === -1) return getString('hier');
+  if (days === 1) return getString('demain');
+  const formatter = new Intl.RelativeTimeFormat();
+  if (Math.abs(days) < 7)
+    return formatter.format(days, "day");
+  if (Math.abs(days) < 31)
+    return formatter.format(Math.sign(days) * Math.floor((Math.abs(days) / 7)), "week");
+  if (Math.abs(days) < 365)
+    return formatter.format(Math.sign(days) * Math.floor((Math.abs(days) / 31)), "month");
+  return formatter.format(Math.sign(days) * Math.floor((Math.abs(days) / 365)), "year");
+}

@@ -237,8 +237,8 @@ export async function navigate(event: CustomEvent) {
       } break;
 
       case 'flux': {
-        if (navigator.onLine) section.element.classList.add('vide');
-        else section.element.classList.remove('vide');
+        if (navigator.onLine) section.element.classList.remove('vide');
+        else section.element.classList.add('vide');
       }
 
       default: {
