@@ -1,6 +1,7 @@
 import materialIconsSheet from '../../../../ext/material_icons.css' assert { type: 'css' };
 import commonSheet from '../../../../styles/common.css' assert { type: 'css' };
 import themesSheet from '../../../../styles/themes.css.php' assert { type: 'css' };
+import { callBackend } from '../../callBackend.js';
 import { goToPage } from '../../navigate.js';
 import { BackendShiny } from '../../ShinyBackend.js';
 import { translationObserver } from '../../translation.js';
@@ -75,6 +76,10 @@ export class feedCard extends HTMLElement {
 			const iconContainer = button.querySelector('.material-icons');
 			if (iconContainer) iconContainer.innerHTML = 'check';
 		}
+
+		await callBackend('send-congratulation', {
+			username: this.username,
+		});
 	}
 	boundSendCongratulations = this.sendCongratulations.bind(this);
 
@@ -88,16 +93,26 @@ export class feedCard extends HTMLElement {
 
 		card.setAttribute('type', feedCardType);
 		card.setAttribute('username', username);
+		if (shinyList.length > feedCard.maxShinyDisplayed) {
+			card.setAttribute('data-too-many', '');
+		}
 
-		const usernameContainer = document.createElement('span');
-		usernameContainer.setAttribute('slot', 'username');
-		usernameContainer.innerHTML = username;
-		card.appendChild(usernameContainer);
+		if (username) {
+			const usernameContainer = document.createElement('span');
+			usernameContainer.setAttribute('slot', 'username');
+			usernameContainer.innerHTML = username;
+			card.appendChild(usernameContainer);
+		}
 
 		const quantityContainer = document.createElement('span');
 		quantityContainer.setAttribute('slot', 'pokemon-quantity');
 		quantityContainer.innerHTML = String(shinyList.length);
 		card.appendChild(quantityContainer);
+
+		const howManyMoreContainer = document.createElement('span');
+		howManyMoreContainer.setAttribute('slot', 'how-many-more');
+		howManyMoreContainer.innerHTML = String(shinyList.length - feedCard.maxShinyDisplayed);
+		card.appendChild(howManyMoreContainer);
 
 		let count = 0;
 		for (const pkmn of shinyList) {
@@ -105,7 +120,7 @@ export class feedCard extends HTMLElement {
 			shinyCard.dataToContent(Promise.resolve(pkmn));
 			card.appendChild(shinyCard);
 			count++;
-			//if (count >= this.maxShinyDisplayed) break;
+			if (count >= this.maxShinyDisplayed) break;
 		}
 
 		return card;

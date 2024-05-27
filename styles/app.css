@@ -535,16 +535,42 @@ hunt-card {
   100% { transform: translateY(0); opacity: 1; }
 }
 
+@keyframes intro-horizontal {
+  0% { transform: translateX(-60px); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
 body.welcome [data-replaces] {
   opacity: 0;
 }
 
-body.welcome :is(shiny-card, .pokedex-gen, hunt-card, corbeille-card, friend-card, friend-shiny-card) {
+body.welcome :is(
+  shiny-card,
+  .pokedex-gen,
+  hunt-card,
+  corbeille-card,
+  friend-card,
+  friend-shiny-card,
+  feed-card
+) {
   animation: intro .35s var(--easing-standard);
   --delay: calc(var(--order) * 50ms);
   animation-delay: var(--delay, 0ms);
   animation-fill-mode: backwards;
 }
+
+body.welcome :is(
+  #flux friend-shiny-card
+) {
+  animation: none;
+}
+
+/*body.welcome feed-card::part(wavy-divider) {
+  animation: intro-horizontal .35s var(--easing-standard);
+  --delay: calc(.35s + var(--order) * 50ms);
+  animation-delay: var(--delay, 0ms);
+  animation-fill-mode: backwards;
+}*/
 
 .vide {
   height: 100%;

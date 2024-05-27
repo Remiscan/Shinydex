@@ -30,6 +30,7 @@ function respondError(mixed $error) {
 
 $request = $_GET['request'] ?? 'null';
 $sessionNeeded = false;
+$sessionOptional = false;
 switch ($request) {
   // Do not need user to be signed in
   case 'get-file-versions':
@@ -40,6 +41,12 @@ switch ($request) {
   case 'check-username-available':
   case 'sign-in':
     $sessionNeeded = false;
+    break;
+
+  // Do not need user to be signed in, but improve experience if they are
+  case 'send-congratulation':
+    $sessionNeeded = false;
+    $sessionOptional = true;
     break;
 
   // Need user to be signed in
@@ -60,29 +67,34 @@ switch ($request) {
     respondError('No such action');
 }
 
-if ($sessionNeeded) {
-  // Get stored code challenge
-  if (!isset($_COOKIE['code-challenge'])) {
-    respondError('Missing code challenge');
-  }
-  $codeChallenge = $_COOKIE['code-challenge'];
+if ($sessionNeeded || $sessionOptional) {
+  try {
+    // Get stored code challenge
+    if (!isset($_COOKIE['code-challenge'])) {
+      throw new \Exception('Missing code challenge');
+    }
+    $codeChallenge = $_COOKIE['code-challenge'];
 
-  // Get code verifier sent by frontend
-  if (!isset($_POST['session-code-verifier'])) {
-    respondError('Missing code verifier in POST body');
-  }
-  $codeVerifier = $_POST['session-code-verifier'];
+    // Get code verifier sent by frontend
+    if (!isset($_POST['session-code-verifier'])) {
+      throw new \Exception('Missing code verifier in POST body');
+    }
+    $codeVerifier = $_POST['session-code-verifier'];
 
-  // Validate code verifier
-  $potentialCodeChallenge = hash('sha256', $codeVerifier);
-  if ($potentialCodeChallenge !== $codeChallenge) {
-    respondError('Code verifier does not correspond');
-  }
+    // Validate code verifier
+    $potentialCodeChallenge = hash('sha256', $codeVerifier);
+    if ($potentialCodeChallenge !== $codeChallenge) {
+      throw new \Exception('Code verifier does not correspond');
+    }
 
-  // Get user associated to current session or refresh token
-  // (from current session, so that there is no need to sign in again for a time after signing in)
-  // (from refresh token, so that if the session expires while the user is using the app, they will be signed in automatically again)
-  $user = User::getFromAnyToken();
+    // Get user associated to current session or refresh token
+    // (from current session, so that there is no need to sign in again for a time after signing in)
+    // (from refresh token, so that if the session expires while the user is using the app, they will be signed in automatically again)
+    $user = User::getFromAnyToken();
+  } catch (\Throwable $error) {
+    $user = null;
+    if ($sessionNeeded) respondError($error->getMessage());
+  }
 }
 
 

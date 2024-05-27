@@ -1,12 +1,16 @@
 const template = document.createElement('template');
 template.innerHTML = /*html*/`
 	<h3 class="title-medium" data-string="titre-flux-singulier">
-		<slot name="username"></slot>
+		<slot name="username">
+			<span data-string="an-anonymous-user"></span>
+		</slot>
 	</h3>
 
 	<div class="shiny-list">
 		<slot></slot>
 	</div>
+
+	<span class="how-many-more body-large" data-string="how-many-more-message"></span>
 
 	<a href="#" class="surface interactive label-large user-link" data-nav-section="chromatiques-ami" data-string="see-friends-pokemon"></a>
 
@@ -15,7 +19,7 @@ template.innerHTML = /*html*/`
 		<span class="label-large" data-string="feliciter"></span>
 	</button>
 
-	<wavy-divider scroll-animated></wavy-divider>
+	<wavy-divider scroll-animated part="wavy-divider"></wavy-divider>
 `;
 
 export default template;

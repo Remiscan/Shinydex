@@ -164,6 +164,8 @@
     "titre-flux-pluriel": "<slot name=\"username\"></slot> a capturé <slot name=\"pokemon-quantity\"></slot> Pokémon chromatiques !",
     "titre-flux-tres-pluriel": "<slot name=\"username\"></slot> a capturé plus de <slot name=\"pokemon-quantity\"></slot> Pokémon chromatiques !",
     "section-flux-rafraichir": "Rafraîchir le flux",
+    "an-anonymous-user": "Un utilisateur anonyme",
+    "how-many-more-message": "et <slot name=\"how-many-more\"></slot> de plus !",
 
     "section-parametres-short-title": "Paramètres",
     "section-parametres-long-title": "Paramètres",
@@ -516,6 +518,8 @@
     "titre-flux-singulier": "<slot name=\"username\"></slot> caught a shiny Pokémon!",
     "titre-flux-pluriel": "<slot name=\"username\"></slot> caught <slot name=\"pokemon-quantity\"></slot> shiny Pokémon!",
     "section-flux-rafraichir": "Refresh the feed",
+    "an-anonymous-user": "An anonymous user",
+    "how-many-more-message": "and <slot name=\"how-many-more\"></slot> more!",
 
     "section-parametres-short-title": "Settings",
     "section-parametres-long-title": "Settings",
