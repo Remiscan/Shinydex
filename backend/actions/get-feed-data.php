@@ -55,7 +55,9 @@ try {
 				ORDER BY 
 					day DESC, 
 					uuid ASC, 
-					catchTime DESC";
+					CAST(catchTime AS int) DESC,
+					CAST(creationTime AS int) DESC,
+					id DESC";
 
 	$query = $db->prepare($query);
 

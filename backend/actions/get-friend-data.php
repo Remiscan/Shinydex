@@ -24,12 +24,12 @@ switch ($scope) {
   case 'partial':
   default:
     $query = "SELECT u.username, p.dexid, p.forme
-              FROM shinydex_users as u
+              FROM shinydex_users AS u
               LEFT JOIN shinydex_pokemon AS p
               ON u.uuid = p.userid
               WHERE u.username = :username AND u.public = 1
               ORDER BY
-                CAST(p.catchTime as INTEGER) DESC,
+                CAST(p.catchTime AS int) DESC,
                 CAST(p.creationTime AS int) DESC,
                 p.id DESC
               LIMIT 10";
