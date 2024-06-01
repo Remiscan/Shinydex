@@ -26,6 +26,7 @@ export class shinyCard extends HTMLElement {
   shadow: ShadowRoot;
   huntid: string = '';
   needsRefresh = true;
+  rendering = true;
 
   clickHandler: (e: Event) => void = () => {};
 
@@ -56,7 +57,8 @@ export class shinyCard extends HTMLElement {
   async dataToContent(getPkmn = this.dataStore.getItem(this.huntid)) {
     let shiny: Shiny;
     try {
-      shiny = new Shiny(await getPkmn);
+      const pkmn = await getPkmn;
+      shiny = pkmn instanceof Shiny ? pkmn : new Shiny(pkmn);
     } catch (e) {
       console.error('Échec de création du Shiny', e);
       throw e;
@@ -327,6 +329,9 @@ export class shinyCard extends HTMLElement {
     for (const [filter, value] of Object.entries(filters)) {
       this.setAttribute(`data-${filter}`, String(value));
     }
+
+    this.rendering = false;
+    this.dispatchEvent(new Event('rendering-complete'));
   }
 
 
@@ -400,6 +405,17 @@ export class shinyCard extends HTMLElement {
   }
 
 
+  getRenderingComplete() {
+    return new Promise(resolve => {
+      if (!this.rendering) return resolve(true);
+      this.addEventListener('rendering-complete', resolve, { once: true });
+    });
+  }
+  get renderingComplete() {
+    return this.getRenderingComplete();
+  }
+
+
   connectedCallback() {
     translationObserver.serve(this, { method: 'attribute' });
 
@@ -458,6 +474,7 @@ export class shinyCard extends HTMLElement {
         this.huntid = newValue;
         this.dataToContent();
         this.needsRefresh = false;
+        this.style.setProperty('--unique-name', `${this.tagName.toLowerCase()}-${this.huntid}`);
       } break;
 
       case 'lang':

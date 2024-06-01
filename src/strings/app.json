@@ -166,6 +166,8 @@
     "section-flux-rafraichir": "Rafraîchir le flux",
     "an-anonymous-user": "Un utilisateur anonyme",
     "how-many-more-message": "et <slot name=\"how-many-more\"></slot> de plus !",
+    "notif-congratulations-singular": "{last_username} te félicite pour tes captures récentes !",
+    "notif-congratulations-plural": "{usernames} et {last_username} te félicitent pour tes captures récentes !",
 
     "section-parametres-short-title": "Paramètres",
     "section-parametres-long-title": "Paramètres",
@@ -520,6 +522,8 @@
     "section-flux-rafraichir": "Refresh the feed",
     "an-anonymous-user": "An anonymous user",
     "how-many-more-message": "and <slot name=\"how-many-more\"></slot> more!",
+    "notif-congratulations-singular": "{username} congratulates you on your recent captures!",
+    "notif-congratulations-plural": "{usernames} and {last_username} congratulate you on your recent captures!",
 
     "section-parametres-short-title": "Settings",
     "section-parametres-long-title": "Settings",

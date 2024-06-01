@@ -1,4 +1,5 @@
 <?php
+$db = new BDD();
 
 // Get requested maxDate from the frontend
 if (!isset($_POST['maxDate'])) {
@@ -8,57 +9,87 @@ if (!isset($_POST['maxDate'])) {
 // Get the list of Pokémon caught by each user during the last 30 days that have had catches
 
 $maxDate = $_POST['maxDate'];
+$minDate = $_POST['minDate'] ?? '0000-00-00';
 
-$minDate = $_POST['minDate'] ?? null;
-$minDateCondition = $minDate ? "DATE(FROM_UNIXTIME(catchTime / 1000)) >= :minDate" : 1;
+$userID = !is_null($user) ? $user->userID : null;
+$otherUsersCondition = $userID
+	? "u.uuid != :userid"
+	: 1;
+$userCondition = $userID
+	? "c.userid = :userid"
+	: 1;
 
-$username = $_POST['username'] ?? null;
-$usernameCondition = /*$username ? "u.username != \"$username\"" :*/ 1;
+try {
+	$query = "SELECT 
+				t.*,
+				CASE WHEN c.huntid IS NOT NULL THEN TRUE ELSE FALSE END AS congratulated
+			  FROM (
+				SELECT 
+					DATE(FROM_UNIXTIME(s.catchTime/1000)) AS day,
+					u.uuid,
+					u.username,
+					s.*,
+					ROW_NUMBER() OVER(PARTITION BY DATE(FROM_UNIXTIME(s.catchTime/1000)) ORDER BY s.catchTime DESC) as rn_day,
+					DENSE_RANK() OVER(ORDER BY DATE(FROM_UNIXTIME(s.catchTime/1000)) DESC) as dr_day
+				FROM 
+					shinydex_users u
+				JOIN (
+					SELECT 
+						p.*,
+						ROW_NUMBER() OVER(PARTITION BY p.userid, DATE(FROM_UNIXTIME(p.catchTime/1000)) ORDER BY p.catchTime DESC) as rn
+					FROM 
+						shinydex_pokemon p
+					WHERE 
+						DATE(FROM_UNIXTIME(p.catchTime/1000)) BETWEEN :minDate AND :maxDate
+				) s
+				ON 
+					u.uuid = s.userid
+				WHERE 
+					s.rn <= 4
+					AND $otherUsersCondition
+			  ) t
+			  LEFT JOIN 
+				shinydex_congratulations c
+			  ON 
+				t.huntid = c.huntid
+				AND $userCondition
+			  WHERE 
+				t.dr_day <= 10
+			  ORDER BY 
+				day DESC, 
+				username ASC, 
+				catchTime DESC";
 
-$db = new BDD();
+	$query = $db->prepare($query);
 
-$query = "SELECT u.username, u.public, u.appearInFeed, p.*, DATE(FROM_UNIXTIME(p.catchTime / 1000)) as day
-			FROM shinydex_users AS u
-			JOIN shinydex_pokemon AS p ON u.uuid = p.userid
-			JOIN (
-				SELECT MIN(day) as min_date, MAX(day) as max_date FROM (
-					SELECT catchTime, DATE(FROM_UNIXTIME(catchTime / 1000)) as day
-					FROM shinydex_pokemon
-					WHERE DATE(FROM_UNIXTIME(catchTime / 1000)) <= :maxDate AND $minDateCondition
-					GROUP BY DATE(FROM_UNIXTIME(catchTime / 1000))
-					ORDER BY DATE(FROM_UNIXTIME(catchTime / 1000)) DESC
-					LIMIT 10
-				) AS dates
-			) AS d ON DATE(FROM_UNIXTIME(p.catchTime / 1000)) BETWEEN d.min_date AND d.max_date
-			WHERE $usernameCondition AND u.public = 1 AND u.appearInFeed = 1
-			ORDER BY DATE(FROM_UNIXTIME(p.catchTime / 1000)) DESC, u.username ASC, p.catchTime DESC";
+	$query->bindParam(':maxDate', $maxDate, PDO::PARAM_STR, 10);
+	$query->bindParam(':minDate', $minDate, PDO::PARAM_STR, 10);
+	if ($userID) $query->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
+	$query->execute();
+	$pokemon = $query->fetchAll(PDO::FETCH_ASSOC);
 
-$query = $db->prepare($query);
+	// Organize the results by day and by username
+	$results = [];
+	foreach ($pokemon as $shiny) {
+		$username = $shiny['username'];
+		$date = $shiny['day'];
 
-$query->bindParam(':maxDate', $maxDate, PDO::PARAM_STR, 10);
-if ($minDate) $query->bindParam(':minDate', $minDate, PDO::PARAM_STR, 10);
-$query->execute();
-$pokemon = $query->fetchAll(PDO::FETCH_ASSOC);
+		unset($shiny['username']);
+		unset($shiny['day']);
+		unset($shiny['userid']);
 
-// Organize the results by day and by username
-$results = [];
-foreach ($pokemon as $shiny) {
-	$username = $shiny['username'];
-	$date = $shiny['day'];
+		if (!isset($results[$date])) $results[$date] = [];
+		if (!isset($results[$date][$username])) $results[$date][$username] = [];
 
-	unset($shiny['username']);
-	unset($shiny['day']);
-	unset($shiny['userid']);
-
-	if (!isset($results[$date])) $results[$date] = [];
-	if (!isset($results[$date][$username])) $results[$date][$username] = [];
-
-	if (count($results[$date][$username]) < 4) {
-		$results[$date][$username][] = $shiny;
+		if (count($results[$date][$username]) < 4) {
+			$results[$date][$username][] = $shiny;
+		}
 	}
-}
 
-// Send data to the frontend
-respond([
-  'entries' => $results
-]);
+	// Send data to the frontend
+	respond([
+		'entries' => $results
+	]);
+} catch (\Throwable $error) {
+	respondError($error);
+}

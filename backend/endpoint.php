@@ -37,13 +37,13 @@ switch ($request) {
   case 'get-all-sprites':
   case 'check-public-user-exists':
   case 'get-friend-data':
-  case 'get-feed-data':
   case 'check-username-available':
   case 'sign-in':
     $sessionNeeded = false;
     break;
 
   // Do not need user to be signed in, but improve experience if they are
+  case 'get-feed-data':
   case 'send-congratulation':
     $sessionNeeded = false;
     $sessionOptional = true;
@@ -60,6 +60,7 @@ switch ($request) {
   case 'get-vapid-public-key':
   case 'save-push-subscription':
   case 'delete-push-subscription':
+  case 'get-congratulations':
     $sessionNeeded = true;
     break;
   

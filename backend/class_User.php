@@ -547,7 +547,7 @@ class User {
     $results = [];
 
 
-    // - Store partial data in about deleted Pokémon
+    // - Store partial data about deleted Pokémon
 
     $placeholders = [];
     $values = [];
@@ -563,11 +563,20 @@ class User {
     $insert = $this->db->prepare($query);
   
     $results[] = $insert->execute($values);
+
+
+    // - Delete stored congratulations of deleted Pokémon
+
+    $placeholders = implode(',', array_map(fn($e) => '?', $pokemon));
+
+    $query = "DELETE FROM shinydex_congratulations
+              WHERE huntid IN ($placeholders)";
+    $delete = $this->db->prepare($query);
+
+    $results[] = $delete->execute($values);
     
 
     // - Delete full data of deleted Pokémon
-
-    $placeholders = implode(',', array_map(fn($e) => '?', $pokemon));
 
     $query = "DELETE FROM shinydex_pokemon
               WHERE userid = ? AND huntid IN ($placeholders)";
@@ -678,6 +687,29 @@ class User {
     $result = $delete->execute();
     if (!$result) throw new \Exception("Error while removing a friend");
     return $result;
+  }
+
+
+  // ----- CONGRATULATIONS ----- //
+
+
+  public function getCongratulations(string|null $lastCongratulationDate) {
+    $congratulationTimeCondition = !is_null($lastCongratulationDate)
+      ? "c.date > '$lastCongratulationDate'"
+      : 1;
+
+    $query="SELECT u.username, c.date FROM shinydex_congratulations AS c
+            JOIN (SELECT huntid, userid FROM shinydex_pokemon) AS s
+              ON s.huntid = c.huntid
+            LEFT JOIN (SELECT uuid, username FROM shinydex_users) AS u
+              ON u.uuid = c.userid
+            WHERE s.userid = :userid AND $congratulationTimeCondition";
+    $select = $this->db->prepare($query);
+
+    $userID = $this->userID;
+    $select->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
+    $select->execute();
+    return $select->fetchAll(PDO::FETCH_ASSOC) ?? [];
   }
 
 

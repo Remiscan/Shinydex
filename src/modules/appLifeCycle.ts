@@ -5,7 +5,7 @@ import { cleanUpRecycleBin, initPokedex, populator } from './appContent.js';
 import * as Auth from './auth.js';
 import { callBackend } from './callBackend.js';
 import { FilterMenu } from './components/filter-menu/filterMenu.js';
-import { initFeedLoader } from './feed.js';
+import { getAndNotifyCongratulations, initFeedLoader } from './feed.js';
 import { PopulatableSection } from './filtres.js';
 import { dataStorage, huntStorage, shinyStorage } from './localForage.js';
 import { sections } from './navigate.js';
@@ -201,8 +201,6 @@ export async function appStart() {
 
     const sectionsToPopulate: PopulatableSection[] = ['mes-chromatiques', 'chasses-en-cours', 'corbeille', 'partage'];
 
-    initFeedLoader();
-
     await Promise.all([
       initPokedex(),
       ...sectionsToPopulate.map(section => populator[section]())
@@ -301,11 +299,22 @@ export async function appStart() {
 
   logPerf('Étape 6');
 
-  if (navigator.onLine) {
-    Auth.init();
-  } else {
-    window.addEventListener('online', event => Auth.init(), { once: true });
+  const afterSignIn = async () => {
+    getAndNotifyCongratulations();
   }
+
+  if (navigator.onLine) {
+    Auth.init()
+    .then(afterSignIn);
+  } else {
+    window.addEventListener('online', event => {
+      Auth.init()
+      .then(afterSignIn)
+    }, { once: true });
+  }
+
+  // Active le flux public
+  initFeedLoader();
 
   // Affiche l'état de la dernière synchronisation dans les paramètres
   const lastSyncState = await dataStorage.getItem('last-sync-state');

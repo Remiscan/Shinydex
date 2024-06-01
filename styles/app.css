@@ -75,6 +75,11 @@ body:not(
   display: none !important;
 }
 
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
 
 
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -90,6 +95,7 @@ nav {
   grid-template-columns: repeat(var(--nombre-sections), 1fr);
   align-items: center;
   z-index: var(--z-nav);
+  view-transition-name: nav;
 }
 
 nav > search-box::part(form) {
@@ -257,6 +263,7 @@ main {
   overflow-y: hidden;
   position: relative;
   height: 100%;
+  view-transition-name: main;
 }
 
 section {
@@ -324,6 +331,7 @@ body[data-section-actuelle~="pokedex"] main {
   box-sizing: border-box;
   overflow: hidden;
   background-color: rgb(var(--surface-container));
+  view-transition-name: section-titre;
 }
 
 .section-titre.at-top {
@@ -453,6 +461,7 @@ section.loading .compteur {
               box-shadow .3s var(--easing-standard);
   --decalage: 0;
   --elevation-opacity: 0;
+  view-transition-name: fab;
 }
 
 #main-fab > .material-icons {
@@ -1213,8 +1222,12 @@ remiscan-logo {
 
 
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!!!! PARTAGE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!! FLUX PUBLIC !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+
+#flux .section-contenu {
+  --unique-name: flux-section-contenu;
+}
 
 #flux .liste-cartes {
   gap: 16px;
@@ -1222,6 +1235,31 @@ remiscan-logo {
 
 #flux .liste-cartes load-spinner {
   margin-inline: auto;
+}
+
+#flux.view-transition :is(
+  .section-contenu,
+  [style~="--unique-name:"]
+) {
+  view-transition-name: var(--unique-name);
+}
+
+[data-action="refresh-feed"]:not(.loading) load-spinner,
+[data-action="refresh-feed"].loading .material-icons {
+  display: none;
+}
+
+#flux.vide:has(feed-day) .message-vide {
+  flex-grow: 0;
+  display: flex;
+  flex-direction: row;
+  width: unset;
+  align-items: center;
+  margin-block: 12px;
+}
+
+#flux.vide .liste-cartes load-spinner {
+  display: none;
 }
 
 
@@ -1341,6 +1379,7 @@ bottom-sheet h2 {
   top: calc(100% - var(--bottom-bar-height));
   transform: translateY(calc(-1px * var(--notification-container-height, 0)));
   transition: transform .3s var(--easing-standard);
+  view-transition-name: notification-container;
 }
 
 .notification-container.no-animation {

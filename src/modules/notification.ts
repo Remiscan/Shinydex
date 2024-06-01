@@ -89,7 +89,9 @@ export class Notif {
   /** Deletes the notification. */
   remove() {
     if (this.element && this.dismissable) {
-      const closingAnimation = this.element.animate([
+      const element = this.element;
+      element.dispatchEvent(new Event('notification-removing'));
+      const closingAnimation = element.animate([
         { opacity: 1 },
         { opacity: 0 }
       ], {
@@ -99,7 +101,8 @@ export class Notif {
       });
       closingAnimation?.addEventListener('finish', () => {
         notificationContainer?.classList.add('no-animation');
-        this.element?.remove();
+        element.dispatchEvent(new Event('notification-removed'));
+        element.remove();
         requestAnimationFrame(() => requestAnimationFrame(() => notificationContainer?.classList.remove('no-animation')));
       });
     }

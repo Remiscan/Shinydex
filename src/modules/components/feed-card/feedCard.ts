@@ -3,8 +3,10 @@ import commonSheet from '../../../../styles/common.css' assert { type: 'css' };
 import themesSheet from '../../../../styles/themes.css.php' assert { type: 'css' };
 import { callBackend } from '../../callBackend.js';
 import { goToPage } from '../../navigate.js';
+import { Shiny } from '../../Shiny.js';
 import { BackendShiny } from '../../ShinyBackend.js';
 import { translationObserver } from '../../translation.js';
+import { confetti, sendConfetti } from '../confetti.js';
 import { friendShinyCard } from '../friend-shiny-card/friendShinyCard.js';
 import '../wavyDivider.js';
 import sheet from './styles.css' assert { type: 'css' };
@@ -14,10 +16,21 @@ import Couleur from 'colori';
 
 
 
+export type ISODay = `${number}${number}${number}${number}-${number}${number}-${number}${number}`;
+export interface BackendCongratulatedShiny extends BackendShiny {
+	congratulated: boolean;
+}
+
+
+
 export class feedCard extends HTMLElement {
 	shadow: ShadowRoot;
 	username: string = '';
+	minCatchTime: number = +Infinity;
+	maxCatchTime: number = -Infinity;
+	firstHuntid: string = '';
 	static maxShinyDisplayed = 3;
+	rendering = false;
 
 	get congratsButton() {
 		return this.shadow.querySelector('[data-action="feliciter"]') as HTMLButtonElement | null;
@@ -40,52 +53,37 @@ export class feedCard extends HTMLElement {
 
 	async sendCongratulations(event: Event) {
 		if (!(event instanceof MouseEvent)) return;
-		// @ts-ignore
-		await import('../../../../ext/confetti.min.js');
 
-		const baseColor = new Couleur(`rgb(${getComputedStyle(document.documentElement).getPropertyValue('--primary')})`);
+		this.disableCongratsButton();
 
-		// @ts-ignore
-		confetti({
+		sendConfetti({
 			spread: 360,
-			startVelocity: 15,
-			ticks: 75,
-			gravity: .1,
 			origin: {
 				x: event.clientX / window.innerWidth,
 				y: event.clientY / window.innerHeight
 			},
-			shapes: [
-				// @ts-ignore
-				confetti.shapeFromPath({ path: 'M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9z' })
-			],
-			colors: [
-				baseColor.hex,
-				baseColor.replace('okh', baseColor.okh - 120).hex,
-				baseColor.replace('okh', baseColor.okh - 60).hex,
-				baseColor.replace('okh', baseColor.okh + 60).hex,
-				baseColor.replace('okh', baseColor.okh + 120).hex,
-			],
-			scalar: .4,
-			disableForReducedMotion: true
-		});
+		}),
 
-		const button = this.congratsButton
+		await callBackend('send-congratulation', {
+			huntid: this.firstHuntid,
+		}, true);
+	}
+	boundSendCongratulations = this.sendCongratulations.bind(this);
+
+
+	disableCongratsButton() {
+		const button = this.congratsButton;
 		if (button) {
 			button.disabled = true;
 			const iconContainer = button.querySelector('.material-icons');
 			if (iconContainer) iconContainer.innerHTML = 'check';
 		}
-
-		await callBackend('send-congratulation', {
-			username: this.username,
-		});
 	}
-	boundSendCongratulations = this.sendCongratulations.bind(this);
 
 
-	static make(username: string, shinyList: BackendShiny[]): feedCard {
+	static make(username: string, shinyList: BackendCongratulatedShiny[]): feedCard {
 		const card = document.createElement('feed-card') as feedCard;
+		card.rendering = true;
 
 		let feedCardType = 'pluriel';
 		if (shinyList.length === 1)
@@ -115,20 +113,49 @@ export class feedCard extends HTMLElement {
 		card.appendChild(howManyMoreContainer);
 
 		let count = 0;
+		let canCongratulate = true;
+		let shinyCards: friendShinyCard[] = [];
 		for (const pkmn of shinyList) {
+			const shiny = new Shiny(pkmn);
+			if (shiny.catchTime < card.minCatchTime) card.minCatchTime = shiny.catchTime;
+			if (shiny.catchTime > card.maxCatchTime) card.maxCatchTime = shiny.catchTime;
+			if (count === 0) {
+				card.firstHuntid = shiny.huntid;
+				if (pkmn.congratulated) canCongratulate = false;
+			}
 			const shinyCard = document.createElement('friend-shiny-card') as friendShinyCard;
-			shinyCard.dataToContent(Promise.resolve(pkmn));
+			shinyCard.dataToContent(Promise.resolve(shiny));
 			card.appendChild(shinyCard);
+			shinyCards.push(shinyCard);
 			count++;
 			if (count >= this.maxShinyDisplayed) break;
 		}
+
+		if (!canCongratulate) card.setAttribute('disabled-congratulation', '');
+
+		Promise.all(shinyCards.map(c => c.renderingComplete))
+		.then(() => {
+			card.rendering = false;
+			card.dispatchEvent(new Event('rendering-complete'));
+		});
 
 		return card;
 	}
 
 
+	getRenderingComplete() {
+		return new Promise(resolve => {
+		  if (!this.rendering) return resolve(true);
+		  this.addEventListener('rendering-complete', resolve, { once: true });
+		});
+	  }
+	  get renderingComplete() {
+		return this.getRenderingComplete();
+	  }
+
+
 	static get observedAttributes() {
-		return ['lang', 'type', 'username'];
+		return ['lang', 'type', 'username', 'disabled-congratulation'];
 	}
 
 
@@ -150,6 +177,10 @@ export class feedCard extends HTMLElement {
 
 			case 'username': {
 				this.username = newValue ?? '';
+			} break;
+
+			case 'disabled-congratulation': {
+				this.disableCongratsButton();
 			} break;
 		}
 	}

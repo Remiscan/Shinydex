@@ -158,3 +158,17 @@ bottom-sheet {
 *::-webkit-scrollbar-track {
   background: transparent;
 }
+
+:active-view-transition main::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: var(--sections-gap);
+  background-color: rgb(var(--surface-container));
+  view-transition-name: main-after;
+}
+
+::view-transition-group(main-after) {
+  z-index: 5;
+}

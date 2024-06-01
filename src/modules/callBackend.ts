@@ -18,7 +18,7 @@ let callBackend = async (request: string, data: BackendRequestData = {}, signedI
   dataKeys.forEach(key => formData.append(key, data[key]));
 
   // Send the request to the backend
-  console.log(`Sending request to backend: ${request}`);
+  console.log(`[REQUEST =>] Sending request to backend: ${request}`);
   const response = await fetch(`/shinydex/backend/endpoint.php?request=${request}&date=${Date.now()}`, {
     method: method,
     body: method === 'POST' ? formData : undefined
@@ -30,6 +30,7 @@ let callBackend = async (request: string, data: BackendRequestData = {}, signedI
   const clonedResponse = response.clone();
   try {
     const responseData = await response.json();
+    console.log('[=> RESPONSE]', responseData);
     if ('error' in responseData) {
       throw new Error(responseData.error);
     }
