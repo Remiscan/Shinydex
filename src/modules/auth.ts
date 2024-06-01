@@ -291,10 +291,12 @@ async function initGoogleSignIn(signInButtonContainer: HTMLElement) {
 
 
 
-export async function init() {
+export async function init(): Promise<boolean> {
   // Try to sign-in automatically
+  let signedIn = false;
   try {
     await signIn('shinydex', '', { notify: false });
+    signedIn = true;
   } catch (error) {
     console.log('Could not sign-in automatically');
 
@@ -329,4 +331,6 @@ export async function init() {
 
   authInitialized = true;
   window.dispatchEvent(new Event('authinitialized'));
+
+  return signedIn;
 }

@@ -299,17 +299,17 @@ export async function appStart() {
 
   logPerf('Étape 6');
 
-  const afterSignIn = async () => {
-    getAndNotifyCongratulations();
+  const afterAuthInit = async (signedIn: boolean) => {
+    if (signedIn) getAndNotifyCongratulations();
   }
 
   if (navigator.onLine) {
     Auth.init()
-    .then(afterSignIn);
+    .then(afterAuthInit);
   } else {
     window.addEventListener('online', event => {
       Auth.init()
-      .then(afterSignIn)
+      .then(afterAuthInit)
     }, { once: true });
   }
 

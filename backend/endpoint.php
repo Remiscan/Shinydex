@@ -92,6 +92,8 @@ if ($sessionNeeded || $sessionOptional) {
     // (from current session, so that there is no need to sign in again for a time after signing in)
     // (from refresh token, so that if the session expires while the user is using the app, they will be signed in automatically again)
     $user = User::getFromAnyToken();
+
+    if (is_null($user)) throw new \Exception('No token was available to sign the user in');
   } catch (\Throwable $error) {
     $user = null;
     if ($sessionNeeded) respondError($error->getMessage());

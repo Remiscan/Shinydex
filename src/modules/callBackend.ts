@@ -40,7 +40,7 @@ let callBackend = async (request: string, data: BackendRequestData = {}, signedI
     if (error instanceof Error) {
       throw new Error(error.message, { cause });
     } else {
-      console.error(await clonedResponse.text());
+      console.error(cause);
       throw error;
     }
   }
