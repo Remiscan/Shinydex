@@ -567,13 +567,13 @@ class User {
 
     // - Delete stored congratulations of deleted Pokémon
 
-    $placeholders = implode(',', array_map(fn($e) => '?', $pokemon));
+    $placeholders = implode(',', array_map(fn($p) => '?', $pokemon));
 
     $query = "DELETE FROM shinydex_congratulations
               WHERE huntid IN ($placeholders)";
     $delete = $this->db->prepare($query);
 
-    $results[] = $delete->execute($values);
+    $results[] = $delete->execute(array_map(fn($p) => $p['huntid'], $pokemon));
     
 
     // - Delete full data of deleted Pokémon
