@@ -34,15 +34,14 @@ const feedLoaderObserver = new IntersectionObserver((entries: IntersectionObserv
 
 
 
-/** Date d'un jour, de la forme `2024-05-25`. */
-type Username = string;
-
 type FeedData = {
-	[key: ISODay]: {
-		[key: Username]: BackendCongratulatedShiny[]
-	}
+	[key: ISODay]: Array<{
+		'username': string | null,
+		total: number,
+		entries: BackendCongratulatedShiny[],
+	}>
 }
-type FeedDataEntry = [key: keyof FeedData, userList: FeedData[keyof FeedData]];
+type FeedDayEntry = [key: keyof FeedData, userList: FeedData[keyof FeedData]];
 
 
 function timestamp2ISODay(timestamp: number): ISODay {
@@ -75,7 +74,7 @@ const getFeedData = queueable(_getFeedData, 1050);
 
 
 /** Crée le template d'une journée dans le flux. */
-function makeFeedDay(...[day, userList]: FeedDataEntry) {
+function makeFeedDay(...[day, userList]: FeedDayEntry) {
 	const container = document.createElement('feed-day');
 	container.dataset.datetime = day;
 
@@ -92,8 +91,9 @@ function makeFeedDay(...[day, userList]: FeedDataEntry) {
 	container.appendChild(dateContainer);
 
 	let index = 0;
-	for (const [username, shinyList] of Object.entries(userList)) {
-		const card = feedCard.make(day, username, shinyList);
+	for (const userData of userList) {
+		const { username, total, entries: shinyList } = userData;
+		const card = feedCard.make(day, username ?? '', shinyList, total);
 		card.style.setProperty('--unique-name', `${uniqueName}-user-${username || `anonymous-${index}`}`);
 		container.appendChild(card);
 		index++;

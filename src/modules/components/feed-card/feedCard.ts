@@ -7,7 +7,7 @@ import { dateDifference } from '../../Params.js';
 import { Shiny } from '../../Shiny.js';
 import { BackendShiny } from '../../ShinyBackend.js';
 import { formatRelativeNumberOfDays, getString, translationObserver } from '../../translation.js';
-import { confetti, sendConfetti } from '../confetti.js';
+import { sendConfetti } from '../confetti.js';
 import { friendShinyCard } from '../friend-shiny-card/friendShinyCard.js';
 import '../wavyDivider.js';
 import sheet from './styles.css' assert { type: 'css' };
@@ -80,7 +80,7 @@ export class feedCard extends HTMLElement {
 	}
 
 
-	static make(day: ISODay, username: string, shinyList: BackendCongratulatedShiny[]): feedCard {
+	static make(day: ISODay, username: string, shinyList: BackendCongratulatedShiny[], total: number): feedCard {
 		const card = document.createElement('feed-card') as feedCard;
 		card.rendering = true;
 
@@ -90,7 +90,7 @@ export class feedCard extends HTMLElement {
 
 		card.setAttribute('type', feedCardType);
 		card.setAttribute('username', username);
-		if (shinyList.length > feedCard.maxShinyDisplayed) {
+		if (total > feedCard.maxShinyDisplayed) {
 			card.setAttribute('data-too-many', '');
 		}
 
@@ -115,12 +115,12 @@ export class feedCard extends HTMLElement {
 
 		const quantityContainer = document.createElement('span');
 		quantityContainer.setAttribute('slot', 'pokemon-quantity');
-		quantityContainer.innerHTML = String(shinyList.length);
+		quantityContainer.innerHTML = String(total);
 		card.appendChild(quantityContainer);
 
 		const howManyMoreContainer = document.createElement('span');
 		howManyMoreContainer.setAttribute('slot', 'how-many-more');
-		howManyMoreContainer.innerHTML = String(shinyList.length - feedCard.maxShinyDisplayed);
+		howManyMoreContainer.innerHTML = String(total - feedCard.maxShinyDisplayed);
 		card.appendChild(howManyMoreContainer);
 
 		let count = 0;

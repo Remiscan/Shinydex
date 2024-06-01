@@ -24,6 +24,10 @@ h3 {
 	display: inline;
 }
 
+h3.title-medium {
+	line-height: 1.25rem;
+}
+
 .shiny-list {
 	grid-column: 1 / -1;
 	display: flex;

@@ -21,44 +21,41 @@ $userCondition = $userID
 
 try {
 	$query = "SELECT 
-				t.*,
-				CASE WHEN c.huntid IS NOT NULL THEN TRUE ELSE FALSE END AS congratulated
-			  FROM (
-				SELECT 
-					DATE(FROM_UNIXTIME(s.catchTime/1000)) AS day,
-					u.uuid,
-					u.username,
-					s.*,
-					ROW_NUMBER() OVER(PARTITION BY DATE(FROM_UNIXTIME(s.catchTime/1000)) ORDER BY s.catchTime DESC) as rn_day,
-					DENSE_RANK() OVER(ORDER BY DATE(FROM_UNIXTIME(s.catchTime/1000)) DESC) as dr_day
-				FROM 
-					shinydex_users u
-				JOIN (
+					t.*,
+					CASE WHEN c.huntid IS NOT NULL THEN TRUE ELSE FALSE END AS congratulated
+				FROM (
 					SELECT 
-						p.*,
-						ROW_NUMBER() OVER(PARTITION BY p.userid, DATE(FROM_UNIXTIME(p.catchTime/1000)) ORDER BY p.catchTime DESC) as rn
+						DATE(FROM_UNIXTIME(s.catchTime/1000)) AS day,
+						u.uuid,
+						u.username,
+						s.*,
+						DENSE_RANK() OVER(ORDER BY DATE(FROM_UNIXTIME(s.catchTime/1000)) DESC) as dr_day
 					FROM 
-						shinydex_pokemon p
+						shinydex_users u
+					JOIN (
+						SELECT 
+							p.*
+						FROM 
+							shinydex_pokemon p
+						WHERE 
+							DATE(FROM_UNIXTIME(p.catchTime/1000)) BETWEEN :minDate AND :maxDate
+					) s
+					ON 
+						u.uuid = s.userid
 					WHERE 
-						DATE(FROM_UNIXTIME(p.catchTime/1000)) BETWEEN :minDate AND :maxDate
-				) s
+						$otherUsersCondition
+				) t
+				LEFT JOIN 
+					shinydex_congratulations c
 				ON 
-					u.uuid = s.userid
+					t.huntid = c.huntid
+					AND $userCondition
 				WHERE 
-					s.rn <= 4
-					AND $otherUsersCondition
-			  ) t
-			  LEFT JOIN 
-				shinydex_congratulations c
-			  ON 
-				t.huntid = c.huntid
-				AND $userCondition
-			  WHERE 
-				t.dr_day <= 10
-			  ORDER BY 
-				day DESC, 
-				username ASC, 
-				catchTime DESC";
+					t.dr_day <= 10
+				ORDER BY 
+					day DESC, 
+					uuid ASC, 
+					catchTime DESC";
 
 	$query = $db->prepare($query);
 
@@ -71,19 +68,31 @@ try {
 	// Organize the results by day and by username
 	$results = [];
 	foreach ($pokemon as $shiny) {
+		$userid = $shiny['uuid'];
 		$username = $shiny['username'];
-		$date = $shiny['day'];
+		$day = $shiny['day'];
 
+		unset($shiny['userid']);
+		unset($shiny['uuid']);
 		unset($shiny['username']);
 		unset($shiny['day']);
-		unset($shiny['userid']);
 
-		if (!isset($results[$date])) $results[$date] = [];
-		if (!isset($results[$date][$username])) $results[$date][$username] = [];
+		if (!isset($results[$day])) $results[$day] = [];
+		if (!isset($results[$day][$userid])) $results[$day][$userid] = [
+			'username' => $username,
+			'total' => 0,
+			'entries' => []
+		];
 
-		if (count($results[$date][$username]) < 4) {
-			$results[$date][$username][] = $shiny;
+		if (count($results[$day][$userid]['entries']) < 3) {
+			$results[$day][$userid]['entries'][] = $shiny;
 		}
+
+		$results[$day][$userid]['total']++;
+	}
+
+	foreach ($results as $day => $userList) {
+		$results[$day] = array_values($userList);
 	}
 
 	// Send data to the frontend
