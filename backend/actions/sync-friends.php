@@ -93,14 +93,18 @@ try {
   $query = "WITH grouped_pokemon AS (
               SELECT u.username, p.dexid, p.forme, ROW_NUMBER() OVER (
                 PARTITION BY p.userid
-                ORDER BY CAST(p.catchTime AS int) DESC, CAST(p.creationTime AS int) DESC
+                ORDER BY
+                  CAST(p.catchTime AS int) DESC,
+                  CAST(p.creationTime AS int) DESC,
+                  p.id DESC
               ) AS rownumber
             FROM shinydex_users AS u
-            LEFT JOIN shinydex_pokemon AS p ON u.uuid = p.userid
+            LEFT JOIN shinydex_pokemon AS p
+            ON u.uuid = p.userid
             WHERE u.uuid IN (
               SELECT f.friend_userid FROM shinydex_friends AS f
               WHERE f.userid = :userid
-            )
+            ) AND u.public = 1
           ) SELECT * FROM grouped_pokemon WHERE rownumber <= 10";
   $get_friends_pokemon = $db->prepare($query);
 

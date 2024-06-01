@@ -13,20 +13,26 @@ $db = new BDD();
 
 switch ($scope) {
   case 'full':
-    $query = "SELECT shinydex_users.username, shinydex_pokemon.*
-              FROM shinydex_users
-              LEFT JOIN shinydex_pokemon ON shinydex_users.uuid = shinydex_pokemon.userid
-              WHERE shinydex_users.username = :username AND shinydex_users.public = 1
-              ORDER BY CAST(shinydex_pokemon.catchTime as INTEGER) DESC";
+    $query = "SELECT u.username, p.*
+              FROM shinydex_users AS u
+              LEFT JOIN shinydex_pokemon AS p
+              ON u.uuid = p.userid
+              WHERE u.username = :username AND u.public = 1
+              ORDER BY p.id DESC";
     break;
 
   case 'partial':
   default:
-    $query = "SELECT shinydex_users.username, shinydex_pokemon.dexid, shinydex_pokemon.forme
-              FROM shinydex_users
-              LEFT JOIN shinydex_pokemon ON shinydex_users.uuid = shinydex_pokemon.userid
-              WHERE shinydex_users.username = :username AND shinydex_users.public = 1
-              ORDER BY CAST(shinydex_pokemon.catchTime as INTEGER) DESC LIMIT 10";
+    $query = "SELECT u.username, p.dexid, p.forme
+              FROM shinydex_users as u
+              LEFT JOIN shinydex_pokemon AS p
+              ON u.uuid = p.userid
+              WHERE u.username = :username AND u.public = 1
+              ORDER BY
+                CAST(p.catchTime as INTEGER) DESC,
+                CAST(p.creationTime AS int) DESC,
+                p.id DESC
+              LIMIT 10";
 }
 
 $query = $db->prepare($query);
