@@ -1,5 +1,9 @@
 const template = document.createElement('template');
 template.innerHTML = /*html*/`
+	<h2 class="title-small">
+		<slot name="relative-date"></slot>
+	</h2>
+
 	<h3 class="title-medium" data-string="titre-flux-singulier">
 		<slot name="username">
 			<span data-string="an-anonymous-user"></span>

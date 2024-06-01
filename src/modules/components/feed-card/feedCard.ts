@@ -3,16 +3,15 @@ import commonSheet from '../../../../styles/common.css' assert { type: 'css' };
 import themesSheet from '../../../../styles/themes.css.php' assert { type: 'css' };
 import { callBackend } from '../../callBackend.js';
 import { goToPage } from '../../navigate.js';
+import { dateDifference } from '../../Params.js';
 import { Shiny } from '../../Shiny.js';
 import { BackendShiny } from '../../ShinyBackend.js';
-import { translationObserver } from '../../translation.js';
+import { formatRelativeNumberOfDays, getString, translationObserver } from '../../translation.js';
 import { confetti, sendConfetti } from '../confetti.js';
 import { friendShinyCard } from '../friend-shiny-card/friendShinyCard.js';
 import '../wavyDivider.js';
 import sheet from './styles.css' assert { type: 'css' };
 import template from './template.js';
-// @ts-expect-error
-import Couleur from 'colori';
 
 
 
@@ -81,7 +80,7 @@ export class feedCard extends HTMLElement {
 	}
 
 
-	static make(username: string, shinyList: BackendCongratulatedShiny[]): feedCard {
+	static make(day: ISODay, username: string, shinyList: BackendCongratulatedShiny[]): feedCard {
 		const card = document.createElement('feed-card') as feedCard;
 		card.rendering = true;
 
@@ -95,12 +94,24 @@ export class feedCard extends HTMLElement {
 			card.setAttribute('data-too-many', '');
 		}
 
+		const usernameContainer = document.createElement('span');
+		usernameContainer.setAttribute('slot', 'username');
 		if (username) {
-			const usernameContainer = document.createElement('span');
-			usernameContainer.setAttribute('slot', 'username');
 			usernameContainer.innerHTML = username;
-			card.appendChild(usernameContainer);
+		} else {
+			usernameContainer.innerHTML = getString('an-anonymous-user');
+			usernameContainer.dataset.string = 'an-anonymous-user';
 		}
+		card.appendChild(usernameContainer);
+
+		const dateContainer = document.createElement('time');
+		dateContainer.setAttribute('datetime', day);
+		dateContainer.setAttribute('slot', 'relative-date');
+		const relativeDate = formatRelativeNumberOfDays(
+			dateDifference(new Date(Date.now()), new Date(day))
+		);
+		dateContainer.innerHTML = relativeDate.slice(0, 1).toLocaleUpperCase() + relativeDate.slice(1);
+		card.appendChild(dateContainer);
 
 		const quantityContainer = document.createElement('span');
 		quantityContainer.setAttribute('slot', 'pokemon-quantity');

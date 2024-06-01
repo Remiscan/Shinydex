@@ -1262,6 +1262,10 @@ remiscan-logo {
   display: none;
 }
 
+feed-card + feed-card {
+  margin-top: 16px;
+}
+
 
 
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

@@ -93,7 +93,7 @@ function makeFeedDay(...[day, userList]: FeedDataEntry) {
 
 	let index = 0;
 	for (const [username, shinyList] of Object.entries(userList)) {
-		const card = feedCard.make(username, shinyList);
+		const card = feedCard.make(day, username, shinyList);
 		card.style.setProperty('--unique-name', `${uniqueName}-user-${username || `anonymous-${index}`}`);
 		container.appendChild(card);
 		index++;

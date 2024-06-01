@@ -14,7 +14,7 @@
       ]
     }, {
       "type": "shell",
-      "command": "tsc --incremental",
+      "command": "tsc --incremental && copyfiles -u 1 src/**/*.css dist",
       "problemMatcher": ["$tsc"],
       "label": "compile to JS",
       "group": {
