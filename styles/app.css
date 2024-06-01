@@ -95,7 +95,10 @@ nav {
   grid-template-columns: repeat(var(--nombre-sections), 1fr);
   align-items: center;
   z-index: var(--z-nav);
-  /*view-transition-name: nav;*/
+
+  :active-view-transition & {
+    view-transition-name: nav;
+  }
 }
 
 nav > search-box::part(form) {
