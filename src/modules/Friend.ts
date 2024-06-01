@@ -6,6 +6,8 @@ import { dataStorage, friendStorage } from './localForage.js';
 interface BackendPartialShiny {
   dexid: number,
   forme: string,
+  catchTime: number,
+  total: number,
 };
 
 
@@ -24,7 +26,9 @@ export class Friend {
     for (const pkmn of pokemonList) {
       this.pokemonList.push({
         dexid: 'dexid' in pkmn ? Number(pkmn.dexid) || 0 : 0,
-        forme: 'forme' in pkmn ? String(pkmn.forme) : ''
+        forme: 'forme' in pkmn ? String(pkmn.forme) : '',
+        catchTime: 'catchTime' in pkmn ? Number(pkmn.catchTime) : 0,
+        total: 'total' in pkmn ? Number(pkmn.total) : 0,
       });
     }
   }

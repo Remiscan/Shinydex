@@ -90,17 +90,24 @@ try {
   $friends_pokemon = [];
 
   // Get each friend's partial Pokémon data
-  $query = "WITH grouped_pokemon AS (
-              SELECT u.username, p.dexid, p.forme, ROW_NUMBER() OVER (
+  $query = "WITH pokemon_counts AS (
+              SELECT userid, COUNT(id) AS total
+              FROM shinydex_pokemon
+              GROUP BY userid
+            ),
+            grouped_pokemon AS (
+              SELECT u.username, p.dexid, p.forme, p.catchTime, pc.total, ROW_NUMBER() OVER (
                 PARTITION BY p.userid
                 ORDER BY
                   CAST(p.catchTime AS int) DESC,
                   CAST(p.creationTime AS int) DESC,
                   p.id DESC
-              ) AS rownumber
+            ) AS rownumber
             FROM shinydex_users AS u
             LEFT JOIN shinydex_pokemon AS p
             ON u.uuid = p.userid
+            LEFT JOIN pokemon_counts AS pc
+            ON u.uuid = pc.userid
             WHERE u.uuid IN (
               SELECT f.friend_userid FROM shinydex_friends AS f
               WHERE f.userid = :userid

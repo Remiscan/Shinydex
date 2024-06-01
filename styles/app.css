@@ -526,7 +526,7 @@ corbeille-card {
 div[data-replaces="friend-card"],
 friend-card {
   content-visibility: auto;
-  contain-intrinsic-height: 126px;
+  contain-intrinsic-height: calc(126px + 1rem);
 }
 
 div[data-replaces="shiny-card"],

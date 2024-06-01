@@ -1,5 +1,5 @@
 import { friendStorage, localForageAPI, shinyStorage } from '../../localForage.js';
-import { getString, translationObserver } from '../../translation.js';
+import { getCurrentLang, getString, translationObserver } from '../../translation.js';
 import template from './template.js';
 import materialIconsSheet from '../../../../ext/material_icons.css' assert { type: 'css' };
 import iconSheet from '../../../../images/iconsheet.css' assert { type: 'css' };
@@ -11,6 +11,7 @@ import { updateUserProfile } from '../../Settings.js';
 import { goToPage } from '../../navigate.js';
 import { warnBeforeDestruction } from '../../notification.js';
 import sheet from './styles.css' assert { type: 'css' };
+import { pokemonSprite } from '../pokemon-sprite/pokemonSprite.js';
 
 
 
@@ -22,7 +23,7 @@ const previewSheet = new CSSStyleSheet();
     const containerWidth = 8 + 4 + i * (.75 * 112) + (i-1) * 4 + 4 + maxArrowWidth + 4 + 8;
     previewSheetCss += `
       @container section-contenu (width < ${containerWidth}px) {
-        pokemon-sprite:nth-child(${i-1}) ~ pokemon-sprite {
+        .pokemon-sprite-container:nth-child(${i-1}) ~ .pokemon-sprite-container {
           display: none;
         }
       }
@@ -81,17 +82,30 @@ export class friendCard extends HTMLElement {
 
     // Recent Pokémon list
     {
-      const sprites = this.shadow.querySelectorAll('pokemon-sprite');
-      for (let i = 0; i < Math.min(friend.pokemonList.length, sprites.length); i++) {
+      const spritesContainers = this.shadow.querySelectorAll('.pokemon-sprite-container');
+      for (let i = 0; i < Math.min(friend.pokemonList.length, spritesContainers.length); i++) {
+        const container = spritesContainers[i];
         const pokemon = friend.pokemonList[i];
-        const element = sprites[i];
-        element.setAttribute('dexid', String(pokemon.dexid));
-        element.setAttribute('forme', pokemon.forme);
+  
+        const spriteElement = container.querySelector('pokemon-sprite') as pokemonSprite;
+        spriteElement.setAttribute('dexid', String(pokemon.dexid));
+        spriteElement.setAttribute('forme', pokemon.forme);
         shinyStorage.iterate(shiny => {
           if (shiny.dexid === pokemon.dexid && shiny.forme === pokemon.forme) return true;
         })
-        .then(isCaught => element.setAttribute('data-caught', String(isCaught)));
+        .then(isCaught => spriteElement.setAttribute('data-caught', String(isCaught)));
+
+        const dateContainer = container.querySelector('time') as HTMLTimeElement;
+        dateContainer.dateTime = String(pokemon.catchTime);
+        const lang = getCurrentLang();
+        const date = new Intl.DateTimeFormat(lang, {"day":"numeric", "month":"numeric", "year":"numeric"})
+                             .format(new Date(pokemon.catchTime));
+        dateContainer.innerHTML = date;
+        dateContainer.setAttribute('data-datetime', String(pokemon.catchTime));
       }
+
+      const compteurContainer = this.shadow.querySelector('.compteur') as HTMLElement;
+      compteurContainer.innerHTML = String(friend.pokemonList[0].total);
     }
 
     // Filters
