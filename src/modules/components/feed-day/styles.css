@@ -11,3 +11,9 @@ h2 {
 ::slotted(time) {
 	opacity: .8;
 }
+
+.user-list {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}

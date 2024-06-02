@@ -2,7 +2,8 @@
 	display: grid;
 	grid-template-columns: 1fr 1fr;
 	grid-template-rows: auto auto auto auto;
-	gap: 8px;
+	--gap: 8px;
+	gap: var(--gap);
 	content-visibility: auto;
 	contain-intrinsic-block-size: auto 200px;
 }
@@ -70,4 +71,5 @@ h3.title-medium {
 wavy-divider {
 	grid-column: 1 / -1;
 	color: rgb(var(--outline-variant));
+	margin-top: calc(16px - var(--gap));
 }

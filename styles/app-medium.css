@@ -132,7 +132,7 @@ main > section {
 }
 
 feed-card {
-  gap: 12px;
+  --gap: 12px;
 }
 
 bottom-sheet {
