@@ -3,7 +3,7 @@
     "shiny": "chromatique",
     "shiny-pokemon": "Pokémon chromatique",
 
-    "section-mes-chromatiques-short-title": "Pokémon&nbsp;<shiny-stars></shiny-stars>",
+    "section-mes-chromatiques-short-title": "Pokémon<shiny-stars></shiny-stars>",
     "section-mes-chromatiques-long-title": "<span class=\"nowrap\">Mes Pokémon <shiny-stars></shiny-stars></span>",
     "section-mes-chromatiques-message-vide": "Vous n'avez enregistré aucun Pokémon chromatique.",
     "section-message-vide-filtres": "Aucun Pokémon ne correspond à ces filtres.",
@@ -18,7 +18,7 @@
     "shiny-card-unknown-date": "Date inconnue",
     "legit-confirmed": "Légitimité confirmée",
 
-    "section-pokedex-short-title": "Pokédex&nbsp;<shiny-stars></shiny-stars>",
+    "section-pokedex-short-title": "Pokédex<shiny-stars></shiny-stars>",
     "section-pokedex-long-title": "<span class=\"nowrap\">Pokédex <shiny-stars></shiny-stars></span>",
     "pokedex-gen-title": "Génération",
 
