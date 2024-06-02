@@ -27,7 +27,15 @@ body[data-anti-spoilers-pokedex="off"] #pokedex {
   --anti-spoilers-filter: none;
 }
 
-body[data-anti-spoilers-friends="off"] :is(#partage, #chromatiques-ami) {
+body[data-anti-spoilers-friends="off"] :is(
+  #partage,
+  #chromatiques-ami[data-is-friend="true"],
+  #flux feed-card[data-is-friend="true"]
+) {
+  --anti-spoilers-filter: none;
+}
+
+body[data-anti-spoilers-public="off"] #flux feed-card[data-is-friend="false"] {
   --anti-spoilers-filter: none;
 }
 
@@ -985,6 +993,12 @@ h2:not(:first-child) {
   grid-row: description;
   grid-column: 1;
   color: rgb(var(--on-surface-variant));
+}
+
+.param-subtitle {
+  display: block;
+  margin-top: 8px;
+  max-width: 70ch;
 }
 
 .param {

@@ -4,7 +4,7 @@ import { sendConfetti } from "./components/confetti.js";
 import { BackendCongratulatedShiny, feedCard, ISODay } from "./components/feed-card/feedCard.js";
 import './components/feed-day/feedDay.js';
 import { loadSpinner } from "./components/loadSpinner.js";
-import { dataStorage } from "./localForage.js";
+import { dataStorage, friendStorage } from "./localForage.js";
 import { Notif } from "./notification.js";
 import { dateDifference, Params } from "./Params.js";
 import { formatRelativeNumberOfDays, getString, TranslatedString } from "./translation.js";
@@ -74,7 +74,7 @@ const getFeedData = queueable(_getFeedData, 1050);
 
 
 /** Crée le template d'une journée dans le flux. */
-function makeFeedDay(...[day, userList]: FeedDayEntry) {
+function makeFeedDay(day: ISODay, userList: FeedData[keyof FeedData], friends: Set<string>) {
 	const container = document.createElement('feed-day');
 	container.dataset.datetime = day;
 
@@ -93,7 +93,9 @@ function makeFeedDay(...[day, userList]: FeedDayEntry) {
 	let index = 0;
 	for (const userData of userList) {
 		const { username, total, entries: shinyList } = userData;
+		const isFriend = username && friends.has(username);
 		const card = feedCard.make(day, username ?? '', shinyList, total);
+		card.setAttribute('data-is-friend', String(isFriend));
 		card.style.setProperty('--unique-name', `${uniqueName}-user-${username || `anonymous-${index}`}`);
 		container.appendChild(card);
 		index++;
@@ -104,7 +106,7 @@ function makeFeedDay(...[day, userList]: FeedDayEntry) {
 
 
 /** Remplit le flux public avec les données reçues du backend. */
-function populateFeedData(data: FeedData, { position = 'bottom' } = {}) {
+function populateFeedData(data: FeedData, friends: Set<string>, { position = 'bottom' } = {}) {
 	const feedSection = document.getElementById('flux');
 	const feedContentContainer = feedSection?.querySelector('.liste-cartes');
 	if (!feedContentContainer) return;
@@ -112,7 +114,7 @@ function populateFeedData(data: FeedData, { position = 'bottom' } = {}) {
 	const feedContent = new DocumentFragment();
 
 	for (const [day, userList] of Object.entries(data)) {
-		const dayContent = makeFeedDay(day as ISODay, userList);
+		const dayContent = makeFeedDay(day as ISODay, userList, friends);
 		feedContent.appendChild(dayContent);
 	}
 
@@ -160,7 +162,8 @@ async function getAndPopulateFeed(maxDate: ISODay, minDate?: ISODay, { position 
 		const data = method === 'auto'
 			? await getFeedData(maxDate, minDate)
 			: await _getFeedData(maxDate, minDate);
-		populateFeedData(data, { position });
+		const friends = new Set(await friendStorage.keys());
+		populateFeedData(data, friends, { position });
 	} catch (error) {}
 }
 

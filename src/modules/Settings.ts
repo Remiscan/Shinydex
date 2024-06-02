@@ -28,6 +28,7 @@ export class Settings {
   'cache-all-sprites': boolean = false;
   'anti-spoilers-pokedex': boolean = false;
   'anti-spoilers-friends': boolean = false;
+  'anti-spoilers-public': boolean = false;
   'enable-notifications': boolean = false;
 
   constructor(data?: FormData | object) {
@@ -51,6 +52,9 @@ export class Settings {
 
       const antiSpoilersFriends = String(data.get('anti-spoilers-friends'));
       this['anti-spoilers-friends'] = antiSpoilersFriends === 'true';
+
+      const antiSpoilersPublic = String(data.get('anti-spoilers-public'));
+      this['anti-spoilers-public'] = antiSpoilersPublic === 'true';
 
       const notifications = String(data.get('enable-notifications'));
       this['enable-notifications'] = notifications === 'true';
@@ -77,6 +81,10 @@ export class Settings {
 
       if ('anti-spoilers-friends' in data) {
         this['anti-spoilers-friends'] = Boolean(data['anti-spoilers-friends']);
+      }
+
+      if ('anti-spoilers-public' in data) {
+        this['anti-spoilers-public'] = Boolean(data['anti-spoilers-public']);
       }
 
       if ('enable-notifications' in data) {
@@ -177,6 +185,10 @@ export class Settings {
 
       case 'anti-spoilers-friends':
         document.body.setAttribute('data-anti-spoilers-friends', value ? 'on' : 'off');
+        break;
+
+      case 'anti-spoilers-public':
+        document.body.setAttribute('data-anti-spoilers-public', value ? 'on' : 'off');
         break;
 
       case 'enable-notifications':
@@ -310,6 +322,7 @@ export class Settings {
       case 'cache-all-sprites':
       case 'anti-spoilers-pokedex':
       case 'anti-spoilers-friends':
+      case 'anti-spoilers-public':
       case 'enable-notifications':
         if (['true', 'false', true, false].includes(value)) currentSettings[setting] = String(value) === 'true';
         break;

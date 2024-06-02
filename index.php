@@ -85,7 +85,7 @@ $httpLanguage = $translation->getLanguage();
     <link rel="stylesheet" href="./styles/app-large.css" media="screen and (min-width: 1140px)">
   </head>
 
-  <body data-section-actuelle="mes-chromatiques" class="background welcome" data-anti-spoilers-pokedex="on" data-anti-spoilers-friends="on">
+  <body data-section-actuelle="mes-chromatiques" class="background welcome" data-anti-spoilers-pokedex="on" data-anti-spoilers-friends="on" data-anti-spoilers-public="on">
     <!-- Écran de chargement -->
     <div id="load-screen" style="grid-row: 1 / 3; grid-column: 1 / 2; position: absolute; z-index: 1000;width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: var(--bg-color, rgb(34, 34, 34)); --surface-color: var(--surface);">
       <load-spinner id="spinner" style="--size: 3em;"></load-spinner>

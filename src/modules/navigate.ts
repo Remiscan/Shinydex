@@ -1,9 +1,10 @@
 import { Params, loadAllImages, wait } from './Params.js';
 import { FrontendShiny } from './ShinyBackend.js';
 import { callBackend } from './callBackend.js';
+import { feedCard } from './components/feed-card/feedCard.js';
 import { FilterMenu } from './components/filter-menu/filterMenu.js';
 import { clearElementStorage, lazyLoadSection, unLazyLoadSection, virtualizedSections } from './lazyLoading.js';
-import { friendShinyStorage } from './localForage.js';
+import { friendShinyStorage, friendStorage } from './localForage.js';
 import { Notif } from './notification.js';
 import { scrollObserver } from './theme.js';
 import { TranslatedString, getString } from './translation.js';
@@ -207,6 +208,9 @@ export async function navigate(event: CustomEvent) {
           section.element.classList.add('loading');
           section.element.classList.remove('vide', 'vide-filtres', 'vide-recherche');
 
+          // Determine if the user is in your friends or not
+          section.element.setAttribute('data-is-friend', String((await friendStorage.getItem(username)) != null));
+
           // Populate section with friend's username
           section.element.querySelectorAll('[data-type="username"]').forEach(e => e.innerHTML = username);
 
@@ -239,6 +243,14 @@ export async function navigate(event: CustomEvent) {
       case 'flux': {
         if (navigator.onLine) section.element.classList.remove('vide');
         else section.element.classList.add('vide');
+
+        const feedCards = section.element.querySelectorAll<feedCard>('feed-card');
+        const friends = new Set(await friendStorage.keys());
+        feedCards.forEach(card => {
+          const username = card.username;
+          const isFriend = username && friends.has(username);
+          card.setAttribute('data-is-friend', String(isFriend));
+        });
       }
 
       default: {
