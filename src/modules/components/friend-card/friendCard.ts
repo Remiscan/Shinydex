@@ -105,7 +105,7 @@ export class friendCard extends HTMLElement {
       }
 
       const compteurContainer = this.shadow.querySelector('.compteur') as HTMLElement;
-      compteurContainer.innerHTML = String(friend.pokemonList[0].total);
+      compteurContainer.innerHTML = String(friend.pokemonList[0]?.total ?? '');
     }
 
     // Filters

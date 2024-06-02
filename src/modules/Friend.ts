@@ -94,7 +94,6 @@ export class Friend {
           await dataStorage.setItem('dismissed-push-notif-prompt', true);
         }
       }
-
       return true;
     } else {
       new Notif(getString('error-no-profile').replace('{user}', username)).prompt();
