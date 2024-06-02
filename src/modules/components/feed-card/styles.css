@@ -2,15 +2,14 @@
 	display: grid;
 	grid-template-columns: 1fr 1fr;
 	grid-template-rows: auto auto auto auto;
-	row-gap: 16px;
-	column-gap: 12px;
+	gap: 8px;
 	content-visibility: auto;
 	contain-intrinsic-block-size: auto 200px;
 }
 
 h2 {
 	margin-inline: 8px;
-	margin-bottom: -16px;
+	margin-bottom: -8px;
 }
 
 ::slotted(time) {
@@ -33,7 +32,7 @@ h3.title-medium {
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
-	margin-top: -6px;
+	margin-top: -2px;
 }
 
 .shiny-list ~ :is(a, button) {
@@ -51,8 +50,8 @@ h3.title-medium {
 
 .how-many-more {
 	grid-column: 1 / -1;
-	margin-inline: 8px;
-	margin-block: -8px;
+	padding-inline: 8px;
+	margin-block: -2px;
 }
 
 :host(:not([data-too-many])) .how-many-more {

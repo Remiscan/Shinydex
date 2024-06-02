@@ -131,6 +131,10 @@ main > section {
   padding-top: var(--padding);
 }
 
+feed-card {
+  gap: 12px;
+}
+
 bottom-sheet {
   --margin-top: 72px;
 }

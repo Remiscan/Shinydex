@@ -14,7 +14,7 @@ template.innerHTML = /*html*/`
 		<slot></slot>
 	</div>
 
-	<span class="how-many-more body-large" data-string="how-many-more-message"></span>
+	<span class="how-many-more body-medium" data-string="how-many-more-message"></span>
 
 	<a href="#" class="surface interactive label-large user-link" data-nav-section="chromatiques-ami" data-string="see-friends-pokemon"></a>
 
