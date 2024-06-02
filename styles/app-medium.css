@@ -86,7 +86,7 @@ main > section {
   display: contents;
 }
 
-:not(#partage, #flux) > header > .titre-icones,
+:not(#partage, #flux, #chromatiques-ami) > header > .titre-icones,
 .titre-icones > a[data-nav-section] {
   display: none;
 }

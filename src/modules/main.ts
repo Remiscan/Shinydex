@@ -32,6 +32,7 @@ import { goToPage, navLinkBubble, sectionActuelle } from './navigate.js';
 import { Notif, warnBeforeDestruction } from './notification.js';
 import { immediateSync, requestSync } from './syncBackup.js';
 import { getString } from './translation.js';
+import { friendCard } from './components/friend-card/friendCard.js';
 
 
 
@@ -134,67 +135,41 @@ for (const fab of fabs) {
     const username = String((new FormData(form)).get('username') ?? '');
     if (username.length === 0 || username.length > 30) return;
 
-    // Ask backend if that username matches a public user
-    const response = await callBackend('get-friend-data', { username, scope: 'partial' }, false);
-    if (sectionActuelle === 'user-search') {
-      history.back();
-    }
-
-    if ('matches' in response && response.matches === true) {
-      // Add the requested user to the friends list
-      const friend = new Friend(username, response.pokemon);
-      await friend.save();
-
-      // Populate friends list
-      window.dispatchEvent(new CustomEvent('dataupdate', {
-        detail: {
-          sections: ['partage'],
-          ids: [username],
-          sync: true
-        }
-      }));
-
-      addFriendSheet.close();
-      
-      // Notify that the user was successfully added as friend
-      new Notif(getString('notif-added-friend').replace('{user}', username)).prompt();
-
-      // Check if notifications are enabled or were previously dismissed by the user
-      const appSettings = await dataStorage.getItem('app-settings');
-      const arePushNotificationsEnabled = appSettings['enable-notifications'];
-      const werePushNotificationsDismissed = await dataStorage.getItem('dismissed-push-notif-prompt');
-
-      // If they are not enabled and were not previously dismissed, ask to enable them
-      if (!arePushNotificationsEnabled && !werePushNotificationsDismissed) {
-        const notifEnablePush = new Notif(
-          getString('notif-notifications-prompt'),
-          Notif.maxDelay,
-          getString('notif-notifications-prompt-action'),
-          () => {}, true
-        );
-        const userResponse = await notifEnablePush.prompt();
-
-        // If the user says yes, actually enable them
-        if (userResponse) {
-          const input = document.querySelector('form[name="app-settings"] [name="enable-notifications"]');
-          (input as HTMLElement)?.click();
-          notifEnablePush.dismissable = true;
-          notifEnablePush.remove();
-        }
-        
-        // If the user says no, store that he dismissed the prompt to avoid asking again in the future
-        else {
-          await dataStorage.setItem('dismissed-push-notif-prompt', true);
-        }
-      }
-    } else {
-      addFriendSheet.close();
-      new Notif(getString('error-no-profile').replace('{user}', username)).prompt();
-    }
+    addFriendSheet.close();
+    await Friend.addFriend(username);
   });
 
   addFriendSheet?.dialog?.addEventListener('close', () => {
     form.reset();
+  });
+}
+
+// Active les boutons d'ajout d'ami et de suppression d'ami sur un profil
+{
+  const profilAmi = document.querySelector('#chromatiques-ami') as HTMLElement;
+
+  const boutonAjout = profilAmi.querySelector('[data-action="add-friend"]');
+  boutonAjout?.addEventListener('click', async event => {
+    const username = profilAmi.dataset.username;
+    if (!username) return;
+    const result = await Friend.addFriend(username);
+    if (result) profilAmi.setAttribute('data-is-friend', 'true');
+  });
+
+  const boutonSuppression = profilAmi.querySelector('[data-action="remove-friend"]');
+  boutonSuppression?.addEventListener('click', async event => {
+    const username = profilAmi.dataset.username;
+    if (!username) return;
+
+    const userResponse = await warnBeforeDestruction(
+      event.target as Element,
+      getString('notif-remove-friend').replace('{username}', username)
+    );
+    if (userResponse) {
+      const friendCard = document.querySelector<friendCard>(`#partage friend-card[username="${username}"]`);
+      friendCard?.delete();
+      profilAmi.setAttribute('data-is-friend', 'false');
+    }
   });
 }
 

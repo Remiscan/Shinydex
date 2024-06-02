@@ -261,6 +261,7 @@
     "shiny-switch": "Passer de la forme chromatique à la forme normale et inversement",
     
     "add-friend-hint": "Ajouter un ami",
+    "add-as-friend": "Ajouter en ami",
     "add-friend-placeholder": "Rechercher un pseudo",
     "remove-friend": "Retirer de mes amis",
     "see-friends-pokemon": "Voir ses Pokémon",
@@ -620,6 +621,7 @@
     "shiny-switch": "Switch from shiny form to normal form and back",
 
     "add-friend-hint": "Add a friend",
+    "add-as-friend": "Add as friend",
     "add-friend-placeholder": "Search for a username",
     "remove-friend": "Remove from my friends",
     "see-friends-pokemon": "See his Pokémon",

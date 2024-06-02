@@ -902,6 +902,11 @@ form[name="user-profile"] {
   border-radius: var(--border-radius);
 }
 
+#chromatiques-ami[data-is-friend="true"] [data-action="add-friend"],
+#chromatiques-ami[data-is-friend="false"] [data-action="remove-friend"] {
+  display: none;
+}
+
 
 
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
