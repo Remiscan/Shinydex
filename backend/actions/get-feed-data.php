@@ -28,6 +28,7 @@ try {
 						DATE(FROM_UNIXTIME(s.catchTime/1000)) AS day,
 						u.uuid,
 						u.username,
+						u.public,
 						s.*,
 						DENSE_RANK() OVER(ORDER BY DATE(FROM_UNIXTIME(s.catchTime/1000)) DESC) as dr_day
 					FROM 
@@ -43,7 +44,8 @@ try {
 					ON 
 						u.uuid = s.userid
 					WHERE 
-						$otherUsersCondition
+						u.public = 1
+						AND $otherUsersCondition
 				) t
 				LEFT JOIN 
 					shinydex_congratulations c
