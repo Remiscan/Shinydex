@@ -20,7 +20,7 @@ $appearInFeed = $_POST['appearInFeed'] ?? null;
 
 try {
   $user->updateDBEntry(
-    username: $username,
+    username: trim($username),
     public: $public,
     appearInFeed: $appearInFeed
   );
