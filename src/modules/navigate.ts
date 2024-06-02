@@ -212,7 +212,7 @@ export async function navigate(event: CustomEvent) {
           section.element.setAttribute('data-is-friend', String((await friendStorage.getItem(username)) != null));
 
           // Populate section with friend's username
-          section.element.querySelectorAll('[data-type="username"]').forEach(e => e.innerHTML = username);
+          section.element.querySelectorAll<HTMLElement>('[data-type="username"]').forEach(e => e.innerText = username);
 
           // Populate section with friend's Pokémon
           // ⚠️ (don't await this before navigating)

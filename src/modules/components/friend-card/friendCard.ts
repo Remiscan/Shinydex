@@ -76,8 +76,8 @@ export class friendCard extends HTMLElement {
 
     // Username
     {
-      const elements = this.shadow.querySelectorAll('[data-type="username"]')!;
-      elements.forEach(element => element.innerHTML = friend.username);
+      const elements = this.shadow.querySelectorAll<HTMLElement>('[data-type="username"]')!;
+      elements.forEach(element => element.innerText = friend.username);
     }
 
     // Recent Pokémon list
@@ -105,7 +105,7 @@ export class friendCard extends HTMLElement {
       }
 
       const compteurContainer = this.shadow.querySelector('.compteur') as HTMLElement;
-      compteurContainer.innerHTML = String(friend.pokemonList[0]?.total ?? '');
+      compteurContainer.innerText = String(friend.pokemonList[0]?.total ?? '');
     }
 
     // Filters

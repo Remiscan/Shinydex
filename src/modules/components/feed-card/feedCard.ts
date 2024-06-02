@@ -97,7 +97,7 @@ export class feedCard extends HTMLElement {
 		const usernameContainer = document.createElement('span');
 		usernameContainer.setAttribute('slot', 'username');
 		if (username) {
-			usernameContainer.innerHTML = username;
+			usernameContainer.innerText = username;
 		} else {
 			usernameContainer.innerHTML = getString('an-anonymous-user');
 			usernameContainer.dataset.string = 'an-anonymous-user';
@@ -115,12 +115,12 @@ export class feedCard extends HTMLElement {
 
 		const quantityContainer = document.createElement('span');
 		quantityContainer.setAttribute('slot', 'pokemon-quantity');
-		quantityContainer.innerHTML = String(total);
+		quantityContainer.innerText = String(total);
 		card.appendChild(quantityContainer);
 
 		const howManyMoreContainer = document.createElement('span');
 		howManyMoreContainer.setAttribute('slot', 'how-many-more');
-		howManyMoreContainer.innerHTML = String(total - feedCard.maxShinyDisplayed);
+		howManyMoreContainer.innerText = String(total - feedCard.maxShinyDisplayed);
 		card.appendChild(howManyMoreContainer);
 
 		let count = 0;

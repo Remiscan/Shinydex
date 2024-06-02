@@ -126,8 +126,8 @@ export class shinyCard extends HTMLElement {
 
     // Surnom
     {
-      const element = this.shadow.querySelector('[data-type="name"]')!;
-      element.innerHTML = shiny.name;
+      const element = this.shadow.querySelector<HTMLElement>('[data-type="name"]')!;
+      element.innerText = shiny.name;
 
       const speciesElement = this.shadow.querySelector('[data-type="species"]')!;
       if (shiny.name) speciesElement.classList.remove('title-large');
@@ -225,9 +225,9 @@ export class shinyCard extends HTMLElement {
 
     // Notes
     {
-      const notes = shiny.notes || `<span class="empty" data-string="shiny-card-notes-empty">${getString('shiny-card-notes-empty', lang)}</span>`;
-      const element = this.shadow.querySelector('[data-type="notes"]')!;
-      element.innerHTML = notes;
+      const element = this.shadow.querySelector<HTMLElement>('[data-type="notes"]')!;
+      if (shiny.notes) element.innerText = shiny.notes;
+      else element.innerHTML = `<span class="empty" data-string="shiny-card-notes-empty">${getString('shiny-card-notes-empty', lang)}</span>`;
     }
 
     // Checkmark
@@ -265,10 +265,10 @@ export class shinyCard extends HTMLElement {
 
     // Méthode
     {
-      const element = this.shadow.querySelector('[data-type="method"]')!;
+      const element = this.shadow.querySelector<HTMLElement>('[data-type="method"]')!;
       const method = getString(`method/${shiny.method}` as TranslatedString, lang);
       element.setAttribute('data-string', `method/${shiny.method}`);
-      element.innerHTML = method;
+      element.innerText = method;
     }
 
     // Charme chroma et shiny rate
