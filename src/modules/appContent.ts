@@ -7,11 +7,18 @@ import { shinyCard } from './components/shiny-card/shinyCard.js';
 import { PopulatableSection, ShinyFilterData, computeFilters, computeOrders, isOrdre, orderCards, populatableSections, updateCounters } from './filtres.js';
 import { clearElementStorage, lazyLoadSection, virtualizedSections } from './lazyLoading.js';
 import { friendShinyStorage, friendStorage, huntStorage, localForageAPI, shinyStorage } from './localForage.js';
+import { animateCards } from './navigate.js';
 import { getString } from './translation.js';
 
 
 
-async function populateHandler(section: PopulatableSection, _ids?: string[]): Promise<PromiseSettledResult<string>[]> {
+type PopulatorOptions = {
+  animate?: boolean;
+}
+
+
+
+async function populateHandler(section: PopulatableSection, _ids?: string[], options: PopulatorOptions = {}): Promise<PromiseSettledResult<string>[]> {
   let dataStore: localForageAPI; // base de données
   switch (section) {
     case 'mes-chromatiques':
@@ -86,13 +93,15 @@ async function populateHandler(section: PopulatableSection, _ids?: string[]): Pr
     const virtualize = virtualizedSections.includes(section) && 
       (isCurrentSection || sectionElement?.getAttribute('data-lazy-loaded') === 'true');
     if (virtualize) lazyLoadSection(section);
+
+    if (options.animate) animateCards(section);
   });
 
   return populated;
 }
 
 export const populator = Object.fromEntries(populatableSections.map(section => {
-  return [section, (ids?: string[]) => populateHandler(section, ids)];
+  return [section, (ids?: string[], options?: PopulatorOptions) => populateHandler(section, ids, options)];
 }));
 
 

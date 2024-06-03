@@ -8,7 +8,7 @@ import { FilterMenu } from './components/filter-menu/filterMenu.js';
 import { getAndNotifyCongratulations, initFeedLoader } from './feed.js';
 import { PopulatableSection } from './filtres.js';
 import { dataStorage, huntStorage, shinyStorage } from './localForage.js';
-import { sections } from './navigate.js';
+import { animateCards, sections } from './navigate.js';
 import { Notif } from './notification.js';
 import { scrollObserver, setTheme } from './theme.js';
 import { getString } from './translation.js';
@@ -201,38 +201,18 @@ export async function appStart() {
 
     const sectionsToPopulate: PopulatableSection[] = ['mes-chromatiques', 'chasses-en-cours', 'corbeille', 'partage'];
 
-    await Promise.all([
-      initPokedex(),
-      ...sectionsToPopulate.map(section => populator[section]())
-    ]);
-
     let startSection = sections.find(s => {
       return Object.values(s.urls)
         .includes(new URL(location.href).pathname.split('/')[2]);
     }) ?? sections[0];
-    let cardSupposedHeight = -1;
-    switch (startSection.nom) {
-      case 'mes-chromatiques':
-      case 'corbeille':
-      case 'chromatiques-ami':
-        cardSupposedHeight = 128;
-        break;
-      case 'chasses-en-cours':
-        cardSupposedHeight = 192;
-        break;
-      case 'partage':
-        cardSupposedHeight = 126;
-        break;
-      case 'pokedex':
-        cardSupposedHeight = Math.ceil(151 / (startSection.element.offsetWidth / 44)) * 44;
-        break;
-    }
 
-    const visibleCardsOnScreen = cardSupposedHeight <= 10
-      ? 0
-      : Math.ceil(startSection.element.offsetHeight / cardSupposedHeight);
-    await wait(50 * visibleCardsOnScreen + 350);
-    document.body.classList.remove('welcome');
+    await Promise.all([
+      initPokedex(),
+      ...sectionsToPopulate.map(section => populator[section](undefined, {
+        animate: section === startSection.nom
+      }))
+    ]);
+
     logPerf('populate');
   } catch (error) {
     const message = getString('error-preparing-content');

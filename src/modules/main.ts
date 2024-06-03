@@ -370,6 +370,7 @@ navigator.serviceWorker.addEventListener('message', async event => {
 interface DataUpdateEvent extends CustomEvent {
   detail: {
     sections: PopulatableSection[];
+    animatedSections?: Set<PopulatableSection>;
     ids: string[];
     sync?: boolean;
   }
@@ -383,11 +384,11 @@ declare global {
 
 window.addEventListener('dataupdate', async (event: DataUpdateEvent) => {
   // On peuple l'application avec les nouvelles données
-  const { sections, ids, sync } = event.detail;
+  const { sections, animatedSections, ids, sync } = event.detail;
   console.log(`Populating sections [${(sections ?? []).join(', ')}] with IDs [${(ids ?? ['all']).join(', ')}] ${sync ? 'with sync' : ''}`);
   for (const section of sections) {
     if (section !== 'chromatiques-ami' && Array.isArray(ids) && ids.length === 0) continue;
-    await populator[section](ids);
+    await populator[section](ids, { animate: animatedSections?.has(section) });
   }
 
   // On demande une synchronisation des données

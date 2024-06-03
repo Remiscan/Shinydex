@@ -229,6 +229,7 @@ export async function navigate(event: CustomEvent) {
               window.dispatchEvent(new CustomEvent('dataupdate', {
                 detail: {
                   sections: ['chromatiques-ami'],
+                  animatedSections: new Set(['chromatiques-ami']),
                   ids: response.pokemon.map((shiny: any) => String(shiny.huntid)),
                   sync: false
                 }
@@ -394,6 +395,47 @@ async function animateFabIcon(ancienneSection: Section, nouvelleSection: Section
     animFabIcon.end?.cancel();
   }
   return;
+}
+
+
+/**
+ * Anime l'apparition des cartes d'une section.
+ */
+export async function animateCards(section: Section | string) {
+  if (typeof section === 'string') {
+    const foundSection = sections.find(s => s.nom === section);
+    if (!foundSection) return;
+    section = foundSection;
+  }
+
+  document.body.classList.add('welcome');
+
+  let cardSupposedHeight = -1;
+    switch (section.nom) {
+      case 'mes-chromatiques':
+      case 'corbeille':
+      case 'chromatiques-ami':
+        cardSupposedHeight = 128;
+        break;
+      case 'chasses-en-cours':
+        cardSupposedHeight = 192;
+        break;
+      case 'partage':
+        cardSupposedHeight = 126;
+        break;
+      case 'pokedex':
+        cardSupposedHeight = Math.ceil(151 / (section.element.offsetWidth / 44)) * 44;
+        break;
+      case 'feed':
+        cardSupposedHeight = 258;
+        break;
+    }
+
+    const visibleCardsOnScreen = cardSupposedHeight <= 10
+      ? 0
+      : Math.ceil(section.element.offsetHeight / cardSupposedHeight);
+    await wait(50 * visibleCardsOnScreen + 350);
+    document.body.classList.remove('welcome');
 }
 
 
