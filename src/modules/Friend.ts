@@ -46,12 +46,19 @@ export class Friend {
 
 
   static async addFriend(username: string): Promise<boolean> {
+    // Check if username is already in the friends list
+    const currentFriends = new Set(await friendStorage.keys());
+    if (currentFriends.has(username.trim())) {
+      new Notif(getString('notif-already-friend').replace('{user}', username)).prompt();
+      return true;
+    }
+
     // Ask backend if that username matches a public user
     const response = await callBackend('get-friend-data', { username, scope: 'partial' }, false);
 
     if ('matches' in response && response.matches === true) {
       // Add the requested user to the friends list
-      const friend = new Friend(username, response.pokemon);
+      const friend = new Friend(response.username, response.pokemon);
       await friend.save();
 
       // Populate friends list

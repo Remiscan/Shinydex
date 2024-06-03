@@ -8,7 +8,7 @@ if (!isset($_POST['username'])) {
 }
 
 // Get the corresponding user's Pokémon data
-$username = $_POST['username'];
+$username = trim($_POST['username']);
 $db = new BDD();
 
 switch ($scope) {
@@ -68,6 +68,7 @@ function removeUserID(array $arr): array {
 
 respond([
   'matches' => true,
+  'username' => $username,
   'pokemon' => removeUserID(
     array_filter(
       $pokemon,
