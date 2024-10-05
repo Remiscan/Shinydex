@@ -718,7 +718,7 @@ export class huntCard extends HTMLElement {
                               .filter(f => f.catchable);
 
     // Initially auto select a valid form in any case
-    if (formes.findIndex(f => f.dbid === formeToSelect ?? '') < 0) formeToSelect = '';
+    if (formes.findIndex(f => f.dbid === (formeToSelect ?? '')) < 0) formeToSelect = '';
     if (formes.findIndex(f => f.dbid === '') < 0) formeToSelect = formes[0]?.dbid ?? '';
     select.setAttribute('value', formeToSelect ?? ''); // set initial value before regenerating the options
 

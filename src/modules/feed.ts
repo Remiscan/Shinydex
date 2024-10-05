@@ -128,7 +128,8 @@ function populateFeedData(data: FeedData, friends: Set<string>, { position = 'bo
 
 		if ('startViewTransition' in document) {
 			feedSection!.classList.add('view-transition');
-			document.startViewTransition(replace)
+			const viewTransition = document.startViewTransition(replace);
+			viewTransition.finished
 			.then(() => feedSection!.classList.remove('view-transition'));
 		} else {
 			replace();
