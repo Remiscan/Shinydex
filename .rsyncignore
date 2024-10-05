@@ -6,6 +6,7 @@
 deploy
 backend/composer
 build
+images/preview
 src
 README.md
 tsconfig.json
