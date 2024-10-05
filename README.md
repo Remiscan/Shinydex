@@ -13,7 +13,7 @@ Share your collection with friends, and see their collections as well. You can a
 ![Friends list](https://github.com/Remiscan/Shinydex/blob/master/images/preview/friends-list.jpg?raw=true) ![Public feed](https://github.com/Remiscan/Shinydex/blob/master/images/preview/public-feed.jpg?raw=true)
 
 Other available features are:
-- anti-spoilers guard (will hide shiny colors from Pokémon you haven't caught yet),
+- anti-spoilers guard (hide shiny colors of Pokémon you haven't caught yet),
 - notifications when your friends catch a shiny Pokémon,
 - light and dark mode,
 - customize the app's color,
