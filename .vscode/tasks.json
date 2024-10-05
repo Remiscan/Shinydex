@@ -14,12 +14,16 @@
       ]
     }, {
       "type": "shell",
-      "command": "tsc --incremental && copyfiles -u 1 src/**/*.css dist && copyfiles -u 1 src/**/*.json dist && copyfiles -u 1 src/**/*.js dist",
+      "command": "tsc --incremental",
       "problemMatcher": ["$tsc"],
       "label": "compile to JS",
       "group": {
         "kind": "build"
       }
+    }, {
+      "type": "shell",
+      "command": "copyfiles -u 1 src/**/*.css dist && copyfiles -u 1 src/**/*.json dist && copyfiles -u 1 src/**/*.js dist",
+      "label": "copy non-compiled files"
     }, {
       "type": "shell",
       "command": "deno run --allow-run --allow-read --allow-write=./dist build/auto.build.js",
