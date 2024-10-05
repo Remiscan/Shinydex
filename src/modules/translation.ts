@@ -116,11 +116,11 @@ export const translationObserver = new TranslationObserver();
 
 /////////////////////////////////////////////////
 // Exprime de manière relative un nombre de jours
-export function formatRelativeNumberOfDays(days: number): string {
+export function formatRelativeNumberOfDays(days: number, locale: string = document.documentElement.lang ?? 'en'): string {
   if (days === 0) return getString('aujourdhui');
   if (days === -1) return getString('hier');
   if (days === 1) return getString('demain');
-  const formatter = new Intl.RelativeTimeFormat();
+  const formatter = new Intl.RelativeTimeFormat(locale);
   if (Math.abs(days) < 7)
     return formatter.format(days, "day");
   if (Math.abs(days) < 31)

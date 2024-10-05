@@ -105,12 +105,8 @@ export class feedCard extends HTMLElement {
 		card.appendChild(usernameContainer);
 
 		const dateContainer = document.createElement('time');
-		dateContainer.setAttribute('datetime', day);
 		dateContainer.setAttribute('slot', 'relative-date');
-		const relativeDate = formatRelativeNumberOfDays(
-			dateDifference(new Date(Date.now()), new Date(day))
-		);
-		dateContainer.innerHTML = relativeDate.slice(0, 1).toLocaleUpperCase() + relativeDate.slice(1);
+		this.populateRelativeDate(day, dateContainer);
 		card.appendChild(dateContainer);
 
 		const quantityContainer = document.createElement('span');
@@ -154,6 +150,14 @@ export class feedCard extends HTMLElement {
 	}
 
 
+	static populateRelativeDate(day: ISODay, container: HTMLElement, locale?: string) {
+		const numberOfDays = dateDifference(new Date(Date.now()), new Date(day));
+		container.setAttribute('datetime', day);
+		const relativeDate = formatRelativeNumberOfDays(numberOfDays, locale);
+		container.innerHTML = relativeDate.slice(0, 1).toLocaleUpperCase() + relativeDate.slice(1);
+	}
+
+
 	getRenderingComplete() {
 		return new Promise(resolve => {
 		  if (!this.rendering) return resolve(true);
@@ -176,6 +180,15 @@ export class feedCard extends HTMLElement {
 		switch (attr) {
 			case 'lang':
 				translationObserver.translate(this, newValue ?? '');
+
+				// We translate the relative date too
+				const dateContainer = this.querySelector('time');
+				if (dateContainer) {
+					const day: ISODay | null = dateContainer.getAttribute('datetime') as ISODay | null;
+					if (day) {
+						feedCard.populateRelativeDate(day, dateContainer, newValue ?? undefined);
+					}
+				}
 				break;
 
 			case 'type': {
