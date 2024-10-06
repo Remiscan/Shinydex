@@ -365,7 +365,7 @@
     "shiny": "shiny",
     "shiny-pokemon": "shiny Pokémon",
 
-    "section-mes-chromatiques-short-title": "Pokémon&nbsp;<shiny-stars></shiny-stars>",
+    "section-mes-chromatiques-short-title": "Pokémon<shiny-stars></shiny-stars>",
     "section-mes-chromatiques-long-title": "<span class=\"nowrap\">My Pokémon <shiny-stars></shiny-stars></span>",
     "section-mes-chromatiques-message-vide": "You did not add any Pokémon.",
     "section-message-vide-filtres": "No Pokémon corresponds to these filters.",
@@ -380,7 +380,7 @@
     "shiny-card-unknown-date": "Date unknown",
     "legit-confirmed": "Confirmed legitimity",
 
-    "section-pokedex-short-title": "Pokédex&nbsp;<shiny-stars></shiny-stars>",
+    "section-pokedex-short-title": "Pokédex<shiny-stars></shiny-stars>",
     "section-pokedex-long-title": "<span class=\"nowrap\">Pokédex <shiny-stars></shiny-stars></span>",
     "pokedex-gen-title": "Generation",
 
