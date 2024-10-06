@@ -5,14 +5,14 @@ import { huntStorage, localForageAPI, shinyStorage } from '../../localForage.js'
 import { Notif } from '../../notification.js';
 import { TranslatedString, translationObserver } from '../../translation.js';
 import template from './template.js';
-import materialIconsSheet from '../../../../ext/material_icons.css' assert { type: 'css' };
-import iconSheet from '../../../../images/iconsheet.css' assert { type: 'css' };
-import themesSheet from '../../../../styles/themes.css.php' assert { type: 'css' };
-import commonSheet from '../../../../styles/common.css' assert { type: 'css' };
+import materialIconsSheet from '../../../../ext/material_icons.css' with { type: 'css' };
+import iconSheet from '../../../../images/iconsheet.css' with { type: 'css' };
+import themesSheet from '../../../../styles/themes.css.php' with { type: 'css' };
+import commonSheet from '../../../../styles/common.css' with { type: 'css' };
 import { Pokemon } from '../../Pokemon.js';
 import { pokemonData } from '../../jsonData.js';
 import { getCurrentLang, getString } from '../../translation.js';
-import sheet from './styles.css' assert { type: 'css' };
+import sheet from './styles.css' with { type: 'css' };
 
 
 

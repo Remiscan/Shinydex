@@ -1,6 +1,6 @@
-import materialIconsSheet from '../../../../ext/material_icons.css' assert { type: 'css' };
-import commonSheet from '../../../../styles/common.css' assert { type: 'css' };
-import themesSheet from '../../../../styles/themes.css.php' assert { type: 'css' };
+import materialIconsSheet from '../../../../ext/material_icons.css' with { type: 'css' };
+import commonSheet from '../../../../styles/common.css' with { type: 'css' };
+import themesSheet from '../../../../styles/themes.css.php' with { type: 'css' };
 import { callBackend } from '../../callBackend.js';
 import { goToPage } from '../../navigate.js';
 import { dateDifference } from '../../Params.js';
@@ -10,7 +10,7 @@ import { formatRelativeNumberOfDays, getString, translationObserver } from '../.
 import { sendConfetti } from '../confetti.js';
 import { friendShinyCard } from '../friend-shiny-card/friendShinyCard.js';
 import '../wavyDivider.js';
-import sheet from './styles.css' assert { type: 'css' };
+import sheet from './styles.css' with { type: 'css' };
 import template from './template.js';
 
 

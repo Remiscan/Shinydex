@@ -1,9 +1,9 @@
-import materialIconsSheet from '../../../../ext/material_icons.css' assert { type: 'css' };
-import commonSheet from '../../../../styles/common.css' assert { type: 'css' };
-import themesSheet from '../../../../styles/themes.css.php' assert { type: 'css' };
+import materialIconsSheet from '../../../../ext/material_icons.css' with { type: 'css' };
+import commonSheet from '../../../../styles/common.css' with { type: 'css' };
+import themesSheet from '../../../../styles/themes.css.php' with { type: 'css' };
 import { translationObserver } from '../../translation.js';
 import '../feed-card/feedCard.js';
-import sheet from './styles.css' assert { type: 'css' };
+import sheet from './styles.css' with { type: 'css' };
 import template from './template.js';
 
 

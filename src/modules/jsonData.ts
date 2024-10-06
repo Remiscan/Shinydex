@@ -1,7 +1,7 @@
-import pokemonData from '../data/pokemon.json' assert { type: 'json' };
-import gameStrings from '../strings/games.json' assert { type: 'json' };
-import methodStrings from '../strings/methods.json' assert { type: 'json' };
-import appStrings from '../strings/app.json' assert { type: 'json' };
+import pokemonData from '../data/pokemon.json' with { type: 'json' };
+import gameStrings from '../strings/games.json' with { type: 'json' };
+import methodStrings from '../strings/methods.json' with { type: 'json' };
+import appStrings from '../strings/app.json' with { type: 'json' };
 
 
 

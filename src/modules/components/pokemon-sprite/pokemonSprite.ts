@@ -1,7 +1,7 @@
 import { pad, wait } from '../../Params.js';
 import { pokemonData } from '../../jsonData.js';
 import { TranslatedString, getString, translationObserver } from '../../translation.js';
-import pokemonSheet from '../../../../images/pokemonsheet.css' assert { type: 'css' };
+import pokemonSheet from '../../../../images/pokemonsheet.css' with { type: 'css' };
 
 
 

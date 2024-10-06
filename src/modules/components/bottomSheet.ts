@@ -1,4 +1,4 @@
-import themesSheet from '../../../styles/themes.css.php' assert { type: 'css' };
+import themesSheet from '../../../styles/themes.css.php' with { type: 'css' };
 
 
 
