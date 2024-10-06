@@ -419,6 +419,7 @@ a.icon-button.bouton-retour {
   container-name: section-contenu;
   container-type: inline-size;
   will-change: scroll-position;
+  position: relative; /* for the scroll detector */
 }
 
 .scroll-detector {
