@@ -8,7 +8,7 @@ import { FilterMenu } from './components/filter-menu/filterMenu.js';
 import { getAndNotifyCongratulations, initFeedLoader } from './feed.js';
 import { PopulatableSection } from './filtres.js';
 import { dataStorage, huntStorage, shinyStorage } from './localForage.js';
-import { animateCards, sections } from './navigate.js';
+import { sections } from './navigate.js';
 import { Notif } from './notification.js';
 import { scrollObserver, setTheme } from './theme.js';
 import { getString } from './translation.js';
@@ -177,11 +177,9 @@ export async function appStart() {
 
     const filterMenus = document.querySelectorAll('filter-menu');
     await Promise.all([...filterMenus].map(menu => {
-      if (!(menu instanceof FilterMenu)) throw new TypeError(`Expecting FilterMenu`);
-      const section = menu.getAttribute('data-section') ?? '';
-      menu.setAttribute('section', section);
-      menu.removeAttribute('data-section');
-      return menu.init();
+      return menu instanceof FilterMenu
+        ? menu.init()
+        : new Promise(resolve => menu.addEventListener('initialized', resolve, { once: true }));
     }));
     logPerf('init filters');
 

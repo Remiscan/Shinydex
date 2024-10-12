@@ -22,7 +22,7 @@
       }
     }, {
       "type": "shell",
-      "command": "copyfiles -u 1 src/**/*.css dist && copyfiles -u 1 src/**/*.json dist && copyfiles -u 1 src/**/*.js dist",
+      "command": "copyfiles -u 1 src/**/*.css dist && copyfiles -u 1 src/**/*.json dist && copyfiles -u 1 src/**/*.js dist && copyfiles -u 1 src/**/*.html dist",
       "label": "copy non-compiled files"
     }, {
       "type": "shell",

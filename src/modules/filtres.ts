@@ -43,6 +43,66 @@ export function isSearchableSection(string: string): string is SearchableSection
 }
 
 
+export type DataClass<Section extends PopulatableSection>
+  = Section extends 'mes-chromatiques' ? typeof Shiny
+  : Section extends 'chasses-en-cours' ? typeof Hunt
+  : Section extends 'corbeille' ? typeof Hunt
+  : Section extends 'chromatiques-ami' ? typeof Shiny
+  : undefined;
+
+const dataClassMap: { [S in PopulatableSection]: DataClass<S> } = {
+  'mes-chromatiques': Shiny,
+  'chasses-en-cours': Hunt,
+  'corbeille': Hunt,
+  'chromatiques-ami': Shiny,
+  'partage': undefined,
+};
+
+export function getDataClass<S extends PopulatableSection>(section: S): DataClass<S> {
+  return dataClassMap[section];
+}
+
+
+export type DataStore<Section extends PopulatableSection>
+  = Section extends 'mes-chromatiques' ? typeof shinyStorage
+  : Section extends 'chasses-en-cours' ? typeof huntStorage
+  : Section extends 'corbeille' ? typeof huntStorage
+  : Section extends 'chromatiques-ami' ? typeof friendShinyStorage
+  : Section extends 'partage' ? typeof friendStorage
+  : undefined;
+
+const dataStoreMap: { [S in PopulatableSection]: DataStore<S> } = {
+  'mes-chromatiques': shinyStorage,
+  'chasses-en-cours': huntStorage,
+  'corbeille': huntStorage,
+  'chromatiques-ami': friendShinyStorage,
+  'partage': friendStorage,
+}
+
+export function getDataStore<S extends PopulatableSection>(section: S): DataStore<S> {
+  return dataStoreMap[section];
+}
+
+
+export type CardTagName<Section extends PopulatableSection>
+  = Section extends 'mes-chromatiques' ? 'shiny-card'
+  : Section extends 'chasses-en-cours' ? 'hunt-card'
+  : Section extends 'corbeille' ? 'corbeille-card'
+  : Section extends 'chromatiques-ami' ? 'friend-shiny-card'
+  : Section extends 'partage' ? 'friend-card'
+  : undefined;
+
+const cardTagNameMap: { [S in PopulatableSection]: CardTagName<S> } = {
+  'mes-chromatiques': 'shiny-card',
+  'chasses-en-cours': 'hunt-card',
+  'corbeille': 'corbeille-card',
+  'chromatiques-ami': 'friend-shiny-card',
+  'partage': 'friend-card',
+}
+
+export function getCardTagName<S extends PopulatableSection>(section: S): CardTagName<S> {
+  return cardTagNameMap[section];
+}
 
 
 /** Liste de filtres appliqués à une section. */
@@ -195,27 +255,14 @@ export type FilterMap = Map<string, ShinyFilterData>;
  * Computes the filters corresponding to each card in a section.
  */
 export async function computeFilters(section: FiltrableSection | OrderableSection, data: Array<Shiny|Hunt> | null = null): Promise<FilterMap> {
-  let dataStore: localForageAPI;
   if (!isFiltrableSection(section)) return new Map();
 
-  switch (section) {
-    case 'mes-chromatiques':
-      dataStore = shinyStorage;
-      break;
-    case 'chromatiques-ami':
-      dataStore = friendShinyStorage;
-      break;
-    case 'corbeille':
-      dataStore = huntStorage;
-      break;
-    default:
-      throw new Error(`Section ${section} can't be filtered`);
-  }
+  const dataStore = getDataStore(section);
 
   const filterMap: FilterMap = new Map();
   if (!data) {
     const keys = await dataStore.keys();
-    data = (await Promise.all(keys.map(key => dataStore.getItem(key)))).map(s => new Shiny(s));
+    data = (await Promise.all(keys.map(async key => new Shiny(await dataStore.getItem(key)))));
   }
   data.forEach(s => filterMap.set(s.huntid, computeShinyFilters(s)));
 
@@ -387,33 +434,8 @@ async function orderPokemon(pokemonList: Shiny[] | Hunt[], order: ordre): Promis
  */
 export type OrderMap = Map<ordre, string[]>;
 export async function computeOrders(section: OrderableSection, data: Array<Shiny|Hunt> | null = null): Promise<OrderMap> {
-  let dataStore: localForageAPI;
-  let dataClass: (typeof Shiny) | (typeof Hunt);
-
-  // Determine variables that depend on the section
-  switch (section) {
-    case 'mes-chromatiques':
-      dataStore = shinyStorage;
-      dataClass = Shiny;
-      break;
-    case 'chasses-en-cours':
-      dataStore = huntStorage;
-      dataClass = Hunt;
-      break;
-    case 'chromatiques-ami':
-      dataStore = friendShinyStorage;
-      dataClass = Shiny;
-      break;
-    case 'corbeille':
-      dataStore = huntStorage;
-      dataClass = Hunt;
-      break;
-    case 'partage':
-      dataStore = friendStorage;
-      break;
-    default:
-      throw new Error(`Section ${section} can't be ordered`);
-  }
+  const dataStore = getDataStore(section);
+  const dataClass = getDataClass(section);
 
   const orderMap: OrderMap = new Map();
 
@@ -422,21 +444,25 @@ export async function computeOrders(section: OrderableSection, data: Array<Shiny
 
     // Actually order the keys associated to the requested section's data
     switch (section) {
+      case 'partage':
+        const keys = await dataStore.keys();
+        const lang = getCurrentLang();
+        orderedKeys = keys.sort((a, b) => a.localeCompare(b, lang));
+        break;
+
       case 'mes-chromatiques':
       case 'chasses-en-cours':
       case 'corbeille':
       case 'chromatiques-ami':
         if (!data) {
           const keys = await dataStore.keys();
-          data = (await Promise.all(keys.map(key => dataStore.getItem(key)))).map(s => new dataClass(s));
+          data = (await Promise.all(keys.map(async key => {
+            const item = await dataStore.getItem(key);
+            if (typeof dataClass === 'undefined') return item;
+            else return new dataClass(item);
+          })));
         }
         orderedKeys = await orderPokemon(data, order);
-        break;
-      
-      case 'partage':
-        const keys = await dataStore.keys();
-        const lang = getCurrentLang();
-        orderedKeys = keys.sort((a, b) => a.localeCompare(b, lang));
         break;
     }
 

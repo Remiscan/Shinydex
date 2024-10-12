@@ -28,11 +28,6 @@ $httpLanguage = $translation->getLanguage();
     <link rel="canonical" href="https://remiscan.fr/shinydex/">
     <base href="https://<?=$_SERVER['SERVER_NAME']?>/shinydex/">
 
-    <script>window.tempsChargementDebut = performance.now();</script>
-    <script defer src="../_common/polyfills/adoptedStyleSheets.min.js"></script>
-    <script>window.esmsInitOptions = { polyfillEnable: ['css-modules', 'json-modules'] }</script>
-    <script defer src="../_common/polyfills/es-module-shims.js"></script>
-    <script defer src="../_common/polyfills/popover.min.js"></script>
     <script type="importmap">
     {
       "imports": {
@@ -47,6 +42,12 @@ $httpLanguage = $translation->getLanguage();
       }
     }
     </script>
+
+    <script>window.tempsChargementDebut = performance.now();</script>
+    <script defer src="../_common/polyfills/adoptedStyleSheets.min.js"></script>
+    <script>window.esmsInitOptions = { polyfillEnable: ['css-modules', 'json-modules'] }</script>
+    <script defer src="../_common/polyfills/es-module-shims.js"></script>
+    <script defer src="../_common/polyfills/popover.min.js"></script>
     <script defer src="./ext/localforage.min.js"></script>
     <script type="module" src="./dist/modules/main.js"></script>
 
@@ -216,11 +217,11 @@ $httpLanguage = $translation->getLanguage();
 
     <!-- Menu de filtres -->
     <bottom-sheet id="filter-menu" drag modal>
-      <filter-menu data-section="mes-chromatiques"></filter-menu>
-      <filter-menu data-section="chasses-en-cours"></filter-menu>
-      <filter-menu data-section="corbeille"></filter-menu>
-      <filter-menu data-section="partage"></filter-menu>
-      <filter-menu data-section="chromatiques-ami"></filter-menu>
+      <filter-menu section="mes-chromatiques"></filter-menu>
+      <filter-menu section="chasses-en-cours"></filter-menu>
+      <filter-menu section="corbeille"></filter-menu>
+      <filter-menu section="partage"></filter-menu>
+      <filter-menu section="chromatiques-ami"></filter-menu>
     </bottom-sheet>
 
     <!-- User search -->

@@ -399,8 +399,13 @@ async function deleteOldCaches(newCacheName, action) {
     console.log(`[${action}] Deleting old cached files`);
     await Promise.all(
       allCaches.map(cache => {
-        if (cache.startsWith(cachePrefix) && newCacheName !== cache && currentSpritesCacheName !== cache) return caches.delete(cache);
-        else return Promise.resolve();
+        if (cache.startsWith(cachePrefix) && newCacheName !== cache && currentSpritesCacheName !== cache) {
+          console.log(`[${action}]`, 'deleting cache', cache);
+          return caches.delete(cache);
+        } else {
+          console.log(`[${action}]`, 'ignoring cache', cache);
+          return Promise.resolve();
+        }
       })
     );
     

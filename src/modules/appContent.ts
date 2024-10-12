@@ -4,9 +4,9 @@ import { Shiny } from './Shiny.js';
 import { friendCard } from './components/friend-card/friendCard.js';
 import { huntCard } from './components/hunt-card/huntCard.js';
 import { shinyCard } from './components/shiny-card/shinyCard.js';
-import { PopulatableSection, ShinyFilterData, computeFilters, computeOrders, isOrdre, orderCards, populatableSections, updateCounters } from './filtres.js';
+import { PopulatableSection, ShinyFilterData, computeFilters, computeOrders, getCardTagName, getDataClass, getDataStore, isOrdre, orderCards, populatableSections, updateCounters } from './filtres.js';
 import { clearElementStorage, lazyLoadSection, virtualizedSections } from './lazyLoading.js';
-import { friendShinyStorage, friendStorage, huntStorage, localForageAPI, shinyStorage } from './localForage.js';
+import { friendStorage, huntStorage, shinyStorage } from './localForage.js';
 import { animateCards } from './navigate.js';
 import { getString } from './translation.js';
 
@@ -19,24 +19,8 @@ type PopulatorOptions = {
 
 
 async function populateHandler(section: PopulatableSection, _ids?: string[], options: PopulatorOptions = {}): Promise<PromiseSettledResult<string>[]> {
-  let dataStore: localForageAPI; // base de données
-  switch (section) {
-    case 'mes-chromatiques':
-      dataStore = shinyStorage;
-      break;
-    case 'chasses-en-cours':
-      dataStore = huntStorage;
-      break;
-    case 'partage':
-      dataStore = friendStorage;
-      break;
-    case 'chromatiques-ami':
-      dataStore = friendShinyStorage;
-      break;
-    case 'corbeille':
-      dataStore = huntStorage;
-      break;
-  }
+  const dataStore = getDataStore(section);
+  const dataClass = getDataClass(section);
 
   const sectionElement = document.querySelector(`#${section}`);
   const isCurrentSection = document.body.matches(`[data-section-actuelle~="${section}"]`);
@@ -44,7 +28,11 @@ async function populateHandler(section: PopulatableSection, _ids?: string[], opt
   const allIds = await dataStore.keys();
   const ids = _ids ?? allIds;
 
-  const allData: Shiny[] | Hunt[] = await Promise.all(allIds.map(id => dataStore.getItem(id)));
+  const allData: Shiny[] | Hunt[] = await Promise.all(allIds.map(async id => {
+    const item = await dataStore.getItem(id);
+    if (typeof dataClass === 'undefined') return item;
+    else return new dataClass(item);
+  }));
 
   const orderMap = await computeOrders(section, allData);
   const currentOrder = sectionElement?.getAttribute('data-order') ?? '';
@@ -106,38 +94,17 @@ export const populator = Object.fromEntries(populatableSections.map(section => {
 
 
 
-export async function populateFromData(section: PopulatableSection, dataList: Array<Shiny | string> | Array<Hunt | string>): Promise<PromiseSettledResult<string>[]> {
+export async function populateFromData(
+  section: Exclude<PopulatableSection, 'partage'>,
+  dataList: Array<Shiny | string> | Array<Hunt | string>,
+): Promise<PromiseSettledResult<string>[]> {
   const sectionElement = document.querySelector(`#${section}`)!;
   const conteneur = (sectionElement.querySelector(`.liste-cartes`) ?? sectionElement.querySelector(`.section-contenu`))!;
   const virtualize = virtualizedSections.includes(section);
 
-  let elementName: string; // Nom de l'élément de carte
-  let dataStore: localForageAPI; // Base de données
-  let dataClass: (typeof Shiny) | (typeof Hunt);
-  switch (section) {
-    case 'mes-chromatiques':
-      elementName = 'shiny-card';
-      dataStore = shinyStorage;
-      dataClass = Shiny;
-      break;
-    case 'chasses-en-cours':
-      elementName = 'hunt-card';
-      dataStore = huntStorage;
-      dataClass = Hunt;
-      break;
-    case 'chromatiques-ami':
-      elementName = 'friend-shiny-card';
-      dataStore = friendShinyStorage;
-      dataClass = Shiny;
-      break;
-    case 'corbeille':
-      elementName = 'corbeille-card';
-      dataStore = huntStorage;
-      dataClass = Hunt;
-      break;
-    default:
-      throw new Error(`Section ${section} can not be populated`);
-  }
+  const elementName = getCardTagName(section);
+  const dataStore = getDataStore(section);
+  const dataClass = getDataClass(section);
 
   /* Que faire selon l'état des données du Pokémon ?
    * (à ignorer = "à supprimer" si section != corbeille, inverse sinon)
