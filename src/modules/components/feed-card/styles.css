@@ -64,6 +64,17 @@ h3.title-medium {
 	place-content: center;
 }
 
+:host(:not([username])),
+:host([username=""]) {
+	& .user-link {
+		display: none;
+	}
+
+	& [data-action="feliciter"] {
+		grid-column: 1 / -1;
+	}
+}
+
 ::slotted(friend-shiny-card) {
 	display: grid !important;
 }
