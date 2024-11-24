@@ -62,6 +62,13 @@ h3.title-medium {
 .user-link {
 	display: grid;
 	place-content: center;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	padding: 0px 24px 0px 16px;
+	box-sizing: border-box;
 }
 
 :host(:not([username])),

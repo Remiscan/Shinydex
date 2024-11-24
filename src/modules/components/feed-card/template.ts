@@ -16,7 +16,10 @@ template.innerHTML = /*html*/`
 
 	<span class="how-many-more body-medium" data-string="how-many-more-message"></span>
 
-	<a href="#" class="surface interactive label-large user-link" data-nav-section="chromatiques-ami" data-string="see-friends-pokemon"></a>
+	<a href="#" class="surface interactive user-link" data-nav-section="chromatiques-ami">
+		<span class="material-icons" aria-hidden="true">catching_pokemon</span>
+		<span class="label-large" data-string="see-friends-pokemon"></span>
+	</a>
 
 	<button type="button" class="surface interactive filled tonal" data-action="feliciter">
 		<span class="material-icons" aria-hidden="true">celebration</span>
