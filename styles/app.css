@@ -62,7 +62,7 @@ body {
   display: grid;
   --nav-bar-height: 80px;
   --bottom-bar-height: calc(var(--nav-bar-height) + var(--section-title-height) - 8px);
-  grid-template-rows: 1fr var(--bottom-bar-height);
+  grid-template-rows: 1fr var(--bottom-bar-height) env(safe-area-max-inset-bottom, 0px);
   grid-template-columns: 1fr;
   margin: 0;
   font-family: 'Roboto', system-ui;
@@ -95,7 +95,7 @@ body:not(
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
 nav {
-  grid-row: 2 / 3;
+  grid-row: 2 / 4;
   grid-column: 1 / 2;
   display: grid;
   --nombre-sections: 5;
@@ -103,6 +103,7 @@ nav {
   grid-template-columns: repeat(var(--nombre-sections), 1fr);
   align-items: center;
   z-index: var(--z-nav);
+  padding-bottom: env(safe-area-max-inset-bottom, 0px);
 
   :active-view-transition & {
     view-transition-name: nav;
