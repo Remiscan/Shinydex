@@ -36,6 +36,7 @@ const allMethodes: Methode[] = [
   { id: 'massoutbreak', jeux: allGames.filter(g => g.id == 'pla' || g.id == 'sv'), mine: true, charm: true },
   { id: 'massivemassoutbreak', jeux: allGames.filter(g => g.id == 'pla'), mine: true, charm: true },
   
+  { id: 'massoutbreakevent', jeux: allGames.filter(g => g.id == 'sv'), mine: true, charm: true },
   { id: 'wildevent', jeux: allGames.filter(g => g.id === 'go'), mine: true, charm: false },
   { id: 'wildalwaysshiny', jeux: allGames.filter(g => ['gs', 'hgss', 'bw2', 'pla'].includes(g.id)), mine: true, charm: false },
   { id: 'event', jeux: allGames.filter(g => g.gen > 1), mine: false, charm: false },
@@ -177,6 +178,9 @@ export class Shiny extends FrontendShiny {
 
   /**
    * @returns Les chances que le Pokémon avait d'être chromatique.
+   * 
+   * ---
+   * Ici "rate" signifie, par abus de langage, le dénominateur de la fraction définissant la probabilité.
    */
   get shinyRate(): number | null {
     try {
@@ -347,7 +351,8 @@ export class Shiny extends FrontendShiny {
           return Math.round(baseRate / (1 + diglettBonus));
         }
 
-        case 'massoutbreak': {
+        case 'massoutbreak':
+        case 'massoutbreakevent': {
           if (game.id === 'pla') bonusRolls = 25;
           else if (game.id === 'sv') bonusRolls = this.count['sv-outbreakCleared'] || 0;
           break;
@@ -387,7 +392,14 @@ export class Shiny extends FrontendShiny {
       }
 
       rolls += (charmRolls || 0) + (bonusRolls || 0);
-      const rate = Math.round(1 / (1 - (1 - 1 / baseRate) ** rolls));
+
+      let probability = 1 - (1 - 1 / baseRate) ** rolls;
+
+      if (game.id === 'sv' && methode.id === 'massoutbreakevent') {
+        probability = .005 + .995 * probability;
+      }
+
+      const rate = Math.round(1 / probability);
       return rate;
     } catch (error) {
       return null;

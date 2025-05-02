@@ -75,7 +75,7 @@ template.innerHTML = /*html*/`
           <span class="title-small" data-string="bonuses-sv"></span>
         </legend>
 
-        <input-select name="sv-outbreakCleared" default-value="0" data-method="massoutbreak">
+        <input-select name="sv-outbreakCleared" default-value="0" data-method="massoutbreak massoutbreakevent">
           <span slot="label" data-string="bonus-sv-outbreakCleared"></span>
           <option value="0" data-string="bonus-sv-outbreakCleared-0"></option>
           <option value="1" data-string="bonus-sv-outbreakCleared-1"></option>
