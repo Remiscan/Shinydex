@@ -206,6 +206,17 @@ sheet.replaceSync(/*css*/`
     display: none;
   }
 
+  .handle:focus,
+  .handle:focus-visible {
+    outline: none;
+  }
+
+  .handle:focus-visible::before {
+    outline: 5px auto Highlight;
+    outline: 5px auto -webkit-focus-ring-color;
+    outline-offset: 5px;
+  }
+
   [part="contents"] {
     padding: 24px;
     overflow: hidden;
