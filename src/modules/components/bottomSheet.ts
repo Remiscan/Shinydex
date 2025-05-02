@@ -212,6 +212,7 @@ sheet.replaceSync(/*css*/`
     touch-action: none;
     scrollbar-gutter: stable;
     position: relative;
+    outline: none;
   }
 
   :host([drag]) [part="contents"] {

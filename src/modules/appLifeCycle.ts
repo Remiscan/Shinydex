@@ -4,6 +4,7 @@ import { Settings } from './Settings.js';
 import { cleanUpRecycleBin, initPokedex, populator } from './appContent.js';
 import * as Auth from './auth.js';
 import { callBackend } from './callBackend.js';
+import { BottomSheet } from './components/bottomSheet.js';
 import { FilterMenu } from './components/filter-menu/filterMenu.js';
 import { getAndNotifyCongratulations, initFeedLoader } from './feed.js';
 import { PopulatableSection } from './filtres.js';
@@ -320,6 +321,17 @@ export async function appStart() {
 
   // ---
 
+  // ÉTAPE 8 : si le changelog a changé, on l'ouvre
+  
+  const shouldChangelogBeDisplayed = await dataStorage.getItem('changelog-may-open');
+  if (shouldChangelogBeDisplayed) {
+    const lastViewedChangelogHash = await dataStorage.getItem('last-viewed-changelog-hash');
+    const currentChangelogHash = document.querySelector<HTMLElement>('#changelog')?.dataset.changelogHash;
+    if (lastViewedChangelogHash !== currentChangelogHash) {
+      await openChangelog();
+    }
+  }
+
   // TERMINÉ :)
   return;
 }
@@ -442,4 +454,20 @@ function checkInstall() {
   window.addEventListener('appinstalled', e => {
     console.log('[app] Installation terminée !');
   });
+}
+
+
+
+/////////////////////
+// Ouvre le changelog
+export async function openChangelog() {
+  const changelogSheet = document.querySelector('#changelog');
+  if (changelogSheet instanceof BottomSheet) {
+    changelogSheet.show();
+    const changelogHash = changelogSheet.dataset.changelogHash;
+    if (changelogHash) {
+      await dataStorage.ready();
+      await dataStorage.setItem('last-viewed-changelog-hash', changelogHash);
+    }
+  }
 }

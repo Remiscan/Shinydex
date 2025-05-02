@@ -260,6 +260,7 @@ async function installFiles(event = null) {
 
   try {
     console.log(`[${action}] Installing files...`);
+    await dataStorage.setItem('changelog-may-open', true);
 
     await Promise.all(Object.keys(liveFileVersions).map(async file => {
       const oldVersion = localFileVersions[file] ?? 0;
