@@ -328,7 +328,10 @@ export async function appStart() {
     const lastViewedChangelogHash = await dataStorage.getItem('last-viewed-changelog-hash');
     const currentChangelogHash = document.querySelector<HTMLElement>('#changelog')?.dataset.changelogHash;
     if (lastViewedChangelogHash !== currentChangelogHash) {
-      await openChangelog();
+      await wait(500).then(() => {
+        openChangelog();
+        dataStorage.removeItem('changelog-may-open');
+      });
     }
   }
 
