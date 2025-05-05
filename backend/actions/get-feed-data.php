@@ -29,6 +29,7 @@ try {
 						u.uuid,
 						u.username,
 						u.public,
+						u.appearInFeed,
 						s.*,
 						DENSE_RANK() OVER(ORDER BY DATE(FROM_UNIXTIME(s.catchTime/1000)) DESC) as dr_day
 					FROM 
@@ -45,6 +46,7 @@ try {
 						u.uuid = s.userid
 					WHERE 
 						u.public = 1
+						AND u.appearInFeed = 1
 						AND $otherUsersCondition
 				) t
 				LEFT JOIN 
