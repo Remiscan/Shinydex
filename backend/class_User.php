@@ -828,8 +828,8 @@ class User {
   public function getAllFriendsPushSuscriptions() {
     $select = $this->db->prepare("SELECT s.* FROM `shinydex_push_subscriptions` AS s
       WHERE s.userid IN (
-        SELECT f.friend_userid FROM shinydex_friends AS f
-        WHERE f.userid = :userid
+        SELECT f.userid FROM shinydex_friends AS f
+        WHERE f.friend_userid = :userid
       )
     ");
 
