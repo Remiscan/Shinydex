@@ -186,6 +186,13 @@ self.addEventListener('message', async function(event) {
         .then(() => caches.open(currentSpritesCacheName))
       )
     } break;
+
+    case 'congratulate': {
+      event.waitUntil(
+        sendCongratulation(event.data.huntid)
+        .catch(error => console.error(error))
+      )
+    } break;
   }
 });
 
@@ -237,7 +244,13 @@ self.addEventListener('push', function(event) {
 // NOTIFICATION CLICK
 self.addEventListener('notificationclick', function(event) {
   event.notification.close();
-  clients.openWindow(`${self.location.origin}/shinydex/${event.notification.data.path}`);
+  if (event.action === 'congratulate' && event.notification.data.huntid) {
+    event.waitUntil(
+      sendCongratulation(event.notification.data.huntid)
+    );
+  } else {
+    clients.openWindow(`${self.location.origin}/shinydex/${event.notification.data.path}`);
+  }
 });
 
 
@@ -713,14 +726,14 @@ async function showNotification(data) {
 
     const title = {
       'fr': data.new_shiny_pokemon.length > 1
-        ? `Nouveaux Pokémon chromatiques !`
-        : `Nouveau Pokémon chromatique !`,
-      'en': `New shiny Pokémon!`,
+        ? `Nouveaux Pokémon chromatiques`
+        : `Nouveau Pokémon chromatique`,
+      'en': `New shiny Pokémon`,
     };
 
     let body, image;
+    const shiny = data.new_shiny_pokemon[data.new_shiny_pokemon.length - 1];
     if (data.new_shiny_pokemon.length === 1) {
-      const shiny = data.new_shiny_pokemon[0];
       const pokemon = pokemonData[shiny['dexid']];
       const pokemonName = pokemon?.name[lang] ?? pokemon?.name['en'];
       const forme = pokemon?.formes.find(f => f.dbid === shiny['forme']);
@@ -729,14 +742,14 @@ async function showNotification(data) {
         ? formeName.replace('{{name}}', pokemonName)
         : pokemonName;
       body = {
-        'fr': `${data.username} a capturé un ${pokemonNameWithForme || pokemonName} chromatique.`,
-        'en': `${data.username} caught a shiny ${pokemonNameWithForme || pokemonName}.`
+        'fr': `${data.username} a capturé un ${pokemonNameWithForme || pokemonName} chromatique !`,
+        'en': `${data.username} caught a shiny ${pokemonNameWithForme || pokemonName}!`
       };
       image = getSprite(shiny['dexid'], forme) || undefined;
     } else {
       body = {
-        'fr': `${data.username} a capturé ${data.new_shiny_pokemon.length} Pokémon chromatiques.`,
-        'en': `${data.username} caught ${data.new_shiny_pokemon.length} shiny Pokémon.`
+        'fr': `${data.username} a capturé ${data.new_shiny_pokemon.length} Pokémon chromatiques!`,
+        'en': `${data.username} caught ${data.new_shiny_pokemon.length} shiny Pokémon!`
       };
     }
 
@@ -745,16 +758,46 @@ async function showNotification(data) {
       'en': `friend/${data.username}`
     };
 
+    const actionTitle = {
+      'fr': `Féliciter`,
+      'en': `Congratulate`,
+    };
+
+    const actions = [];
+    if (shiny?.huntid) {
+      actions.push({
+        action: 'congratulate',
+        title: actionTitle[lang] ?? actionTitle['en'],
+      });
+    }
+
     return self.registration.showNotification(title[lang], {
       body: body[lang],
+      actions: actions,
       badge: `${self.location.origin}/shinydex/images/app-icons/badge.png`,
       icon: antiSpoilers ? undefined : image,
       lang: lang ?? 'en',
       data: {
         path: path[lang] ?? path[en],
+        huntid: shiny?.huntid,
       },
     });
   } catch (error) {
     console.error(`[push] Erreur lors de l'envoi d'une notification`, error, data);
   }
+}
+
+
+/**
+ * Sends a congratulation.
+ */
+async function sendCongratulation(huntid) {
+  const formData = new FormData();
+  formData.append('session-code-verifier', await dataStorage.getItem('session-code-verifier'));
+  formData.append('huntid', huntid);
+
+  return fetch(`/shinydex/backend/endpoint.php?request=send-congratulation&date=${Date.now()}`, {
+    method: 'POST',
+    body: formData,
+  });
 }

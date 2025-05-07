@@ -81,6 +81,7 @@ try {
         'subscription' => $subscription,
         'payload' => [
           'new_shiny_pokemon' => array_map(fn($shiny) => [
+            'huntid' => $shiny['huntid'],
             'dexid' => $shiny['dexid'],
             'forme' => $shiny['forme'],
             'game' => $shiny['game'],
