@@ -724,14 +724,7 @@ async function showNotification(data) {
       return `${self.location.origin}/shinydex/images/pokemon-sprites/webp/112/poke_capture_${spriteCaracs.join('_')}_f_r.webp`;
     }
 
-    const title = {
-      'fr': data.new_shiny_pokemon.length > 1
-        ? `Nouveaux Pokémon chromatiques`
-        : `Nouveau Pokémon chromatique`,
-      'en': `New shiny Pokémon`,
-    };
-
-    let body, image;
+    let title, body, image;
     const shiny = data.new_shiny_pokemon[data.new_shiny_pokemon.length - 1];
     if (data.new_shiny_pokemon.length === 1) {
       const pokemon = pokemonData[shiny['dexid']];
@@ -741,12 +734,20 @@ async function showNotification(data) {
       const pokemonNameWithForme = forme
         ? formeName.replace('{{name}}', pokemonName)
         : pokemonName;
+      title = {
+        'fr': `${pokemonName}✨ capturé`,
+        'en': `${pokemonName}✨ caught`,
+      };
       body = {
         'fr': `${data.username} a capturé un ${pokemonNameWithForme || pokemonName} chromatique !`,
         'en': `${data.username} caught a shiny ${pokemonNameWithForme || pokemonName}!`
       };
       image = getSprite(shiny['dexid'], forme) || undefined;
     } else {
+      title = {
+        'fr': `${data.new_shiny_pokemon.length} Pokémon✨ capturés`,
+        'en': `${data.new_shiny_pokemon.length} Pokémon✨ caught`,
+      };
       body = {
         'fr': `${data.username} a capturé ${data.new_shiny_pokemon.length} Pokémon chromatiques!`,
         'en': `${data.username} caught ${data.new_shiny_pokemon.length} shiny Pokémon!`
