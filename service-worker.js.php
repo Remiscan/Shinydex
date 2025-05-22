@@ -735,8 +735,8 @@ async function showNotification(data) {
         ? formeName.replace('{{name}}', pokemonName)
         : pokemonName;
       title = {
-        'fr': `${pokemonName}✨ capturé`,
-        'en': `${pokemonName}✨ caught`,
+        'fr': `${pokemonName}✨`,
+        'en': `${pokemonName}✨`,
       };
       body = {
         'fr': `${data.username} a capturé un ${pokemonNameWithForme || pokemonName} chromatique !`,
