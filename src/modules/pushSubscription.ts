@@ -20,10 +20,14 @@ async function savePushSubscription(subscription: PushSubscription) {
 
 
 // Supprime une souscription Push de la BDD
-async function deletePushSubscription(subscription: PushSubscription) {
+async function deletePushSubscription(
+	subscription: PushSubscription,
+	reason: string,
+) {
 	console.log('sending', subscription);
 	await callBackend('delete-push-subscription', {
-		subscription: JSON.stringify(subscription)
+		subscription: JSON.stringify(subscription),
+		reason: reason,
 	}, true);
 }
 
@@ -40,9 +44,9 @@ export async function subscribeToPush() {
 	const sw = await navigator.serviceWorker.ready;
 	const publicKey = await getVapidPublicKey();
 
-	const subscriptionParameters = {
+	const subscriptionParameters: PushSubscriptionOptionsInit = {
 		userVisibleOnly: true,
-		applicationServerKey: urlBase64ToUint8Array(publicKey)
+		applicationServerKey: urlBase64ToUint8Array(publicKey) as BufferSource,
 	};
 	
 	const pushSubscription = await getCurrentPushSubscription()
@@ -52,9 +56,11 @@ export async function subscribeToPush() {
 
 
 // Supprime les souscriptions de l'utilisateur aux notifications Push
-export async function unsubscribeFromPush() {
+export async function unsubscribeFromPush(
+	reason: string,
+) {
 	const pushSubscription = await getCurrentPushSubscription();
-	if (pushSubscription) deletePushSubscription(pushSubscription);
+	if (pushSubscription) deletePushSubscription(pushSubscription, reason);
 }
 
 

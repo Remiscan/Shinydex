@@ -97,6 +97,7 @@ try {
   $expired_subscription_endpoints = [];
   foreach ($reports as $report) {
     if ($report->isSubscriptionExpired()) {
+      try { error_log('[Push subscription expired] ' . json_encode($reports)); } catch (\Throwable $e) {}
       $endpoint = $report->getRequest()->getUri()->__toString();
       $expired_subscription_endpoints[] = $endpoint;
     }

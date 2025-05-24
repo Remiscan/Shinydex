@@ -12,6 +12,9 @@ if (!isset($_POST['subscription'])) {
 $subscription = json_decode($_POST['subscription'], true);
 
 try {
+	if (isset($_POST['reason'])) {
+		error_log('[Push subscription deletion] ' . $_POST['reason']);
+	}
 	$user->unsubscribeFromPush($subscription);
 	respond(['success' => true]);
 } catch (\Throwable $error) {

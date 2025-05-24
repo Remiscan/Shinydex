@@ -210,7 +210,7 @@ export class Settings {
                 if (currentSubscription) {
                   // Si la permission est refusée : on dé-souscrit et on désactive le paramètre
                   if (Notification.permission === 'denied') {
-                    unsubscribeFromPush();
+                    unsubscribeFromPush('lancement, subscription existe, mais permission denied');
                     return Settings.set('enable-notifications', false, { apply: false, toForm: true });
                   }
                 }
@@ -222,7 +222,7 @@ export class Settings {
               // Si le paramètre est désactivé
               else {
                 // Si une souscription existe : on dé-souscrit
-                if (currentSubscription) unsubscribeFromPush();
+                if (currentSubscription) unsubscribeFromPush('lancement, subscription existe, mais setting off');
               }
             })
           }
@@ -239,7 +239,7 @@ export class Settings {
               // Si la permission est déjà refusée : on le prévient, on désactive le paramètre et on dé-souscrit
               else if (Notification.permission === 'denied') {
                 new Notif(getString('notif-notifications-permission-denied')).prompt();
-                unsubscribeFromPush();
+                unsubscribeFromPush('manuel, permission déjà denied');
                 return Settings.set('enable-notifications', false, { apply: false, toForm: true });
               }
               
@@ -251,7 +251,7 @@ export class Settings {
                   if (permission === "granted") subscribeToPush();
                   // Sinon : on désactive le paramètre et on dé-souscrit
                   else {
-                    unsubscribeFromPush();
+                    unsubscribeFromPush('manuel, prompt, user dit non');
                     return Settings.set('enable-notifications', false, { apply: false, toForm: true });
                   }
                 });
@@ -260,7 +260,7 @@ export class Settings {
             
             // Si l'utilisateur veur dé-souscrire : on dé-souscrit
             else {
-              unsubscribeFromPush();
+              unsubscribeFromPush('manuel, setting passe à off');
             }
 
             // On réinitialise le flag de dismissal des notifications, pour les proposer à nouveau au prochain ajout d'ami
