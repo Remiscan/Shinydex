@@ -215,8 +215,34 @@ export class Settings {
                   }
                 }
 
-                // Si pas de souscription actuelle : on désactive le paramètre
-                else return Settings.set('enable-notifications', false, { apply: false, toForm: true });
+                // Si pas de souscription actuelle : on re-souscrit automatiquement
+                else {
+                  // Si la permission est déjà accordée : on souscrit pour lui
+                  if (Notification.permission === "granted") {
+                    subscribeToPush();
+                  }
+                  
+                  // Si la permission est déjà refusée : on le prévient, on désactive le paramètre et on dé-souscrit
+                  else if (Notification.permission === 'denied') {
+                    new Notif(getString('notif-notifications-permission-denied')).prompt();
+                    unsubscribeFromPush('renewal au lancement, permission déjà denied');
+                    return Settings.set('enable-notifications', false, { apply: false, toForm: true });
+                  }
+
+                  // Si la permission est en attente, on la demande
+                  else {
+                    Notification.requestPermission()
+                    .then((permission) => {
+                      // Si elle est accordée : on souscrit
+                      if (permission === "granted") subscribeToPush();
+                      // Sinon : on désactive le paramètre et on dé-souscrit
+                      else {
+                        unsubscribeFromPush('renewal au lancement, prompt, user dit non');
+                        return Settings.set('enable-notifications', false, { apply: false, toForm: true });
+                      }
+                    });
+                  }
+                }
               }
 
               // Si le paramètre est désactivé
@@ -243,7 +269,7 @@ export class Settings {
                 return Settings.set('enable-notifications', false, { apply: false, toForm: true });
               }
               
-              // Si la permission est en attende, on la demande
+              // Si la permission est en attente, on la demande
               else {
                 Notification.requestPermission()
                 .then((permission) => {
