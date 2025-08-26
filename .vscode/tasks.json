@@ -53,6 +53,10 @@
       "label": "build Pokémon data JSON"
     }, {
       "type": "shell",
+      "command": "svgexport images/app-icons/icon-monochrome.svg images/app-icons/icon-monochrome.png",
+      "label": "convert monochrome icon to PNG"
+    }, {
+      "type": "shell",
       "command": "bash -ic deno --version",
       "label": "test deno in task"
     }
