@@ -40,17 +40,7 @@ header('Content-Type: application/json');
 			"src": "./images/app-icons/icon-maskable.svg",
 			"sizes": "48x48 72x72 96x96 128x128 150x150 256x256 512x512 1024x1024",
 			"type": "image/svg+xml",
-			"purpose": "maskable"
-		}, {
-			"src": "./images/app-icons/icon-monochrome.png",
-			"sizes": "512x512",
-			"type": "image/png",
-			"purpose": "monochrome maskable"
-		}, {
-			"src": "./images/app-icons/icon-monochrome.svg",
-			"sizes": "48x48 72x72 96x96 128x128 150x150 256x256 512x512 1024x1024",
-			"type": "image/svg+xml",
-			"purpose": "monochrome maskable"
+			"purpose": "any"
 		}
 	],
 	"theme_color": "#222222",
