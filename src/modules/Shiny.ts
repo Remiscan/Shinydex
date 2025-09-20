@@ -184,8 +184,12 @@ export class Shiny extends FrontendShiny {
    */
   get shinyRate(): number | null {
     try {
-      // Taux de base
       const game = this.jeuObj;
+
+      // Trop compliqué de connaître les taux dans Pokémon GO, ils changent tout le temps et dépendent des date, des événements, etc...
+      if (game.id === 'go') return null;
+
+      // Taux de base
       const baseRate = (game.gen === 0) ? 450
                     : (game.gen <= 5) ? 8192
                     : 4096;
