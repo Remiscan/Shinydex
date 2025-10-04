@@ -28,14 +28,28 @@ async function populateHandler(section: PopulatableSection, _ids?: string[], opt
   const sectionElement = document.querySelector(`#${section}`);
   const isCurrentSection = document.body.matches(`[data-section-actuelle~="${section}"]`);
 
-  const allItems = await dataStore.getAllItems();
+  let ids: Set<string> | undefined = undefined;
+  if (_ids) ids = new Set(_ids);
 
   const allData = new Map();
-  allItems.forEach(async item => {
-    if (!('huntid' in item)) return;
-    if (typeof dataClass === 'undefined') allData.set(item.huntid, item);
-    else allData.set(item.huntid, new dataClass(item));
-  });
+  if (typeof dataClass === 'undefined') {
+    const allIds = await dataStore.keys();
+    if (!ids) ids = new Set(allIds);
+    await Promise.all(allIds.map(async id => {
+      const item = await dataStore.getItem(id);
+      allData.set(id, item);
+    }));
+  } else {
+    const allItems = await dataStore.getAllItems();
+    if (!ids) ids = new Set();
+    allItems.forEach(async item => {
+      if (!('huntid' in item)) console.warn(`Item in storage is missing huntid:`, item);
+      else {
+        allData.set(item.huntid, new dataClass(item));
+        ids!.add(item.huntid);
+      }
+    });
+  }
 
   const orderMap = await computeOrders(section, allData);
   const currentOrder = sectionElement?.getAttribute('data-order') ?? '';
@@ -48,7 +62,7 @@ async function populateHandler(section: PopulatableSection, _ids?: string[], opt
     const orderedStoredIdsSet = new Set(orderedStoredIds);
     orderedIds = [];
     for (const id of orderedStoredIds) {
-      if (allData.has(id)) orderedIds.push(id);
+      if (ids.has(id)) orderedIds.push(id);
     }
     for (const id of allData.keys()) {
       if (!orderedStoredIdsSet.has(id)) {
@@ -56,7 +70,7 @@ async function populateHandler(section: PopulatableSection, _ids?: string[], opt
       }
     }
   } else {
-    orderedIds = Array.from(allData.keys());
+    orderedIds = Array.from(ids);
   }
 
   let populated: PromiseSettledResult<string>[];
