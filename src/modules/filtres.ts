@@ -5,7 +5,7 @@ import { noAccent } from './Params.js';
 import { Pokemon } from './Pokemon.js';
 import { Shiny } from './Shiny.js';
 import { isSupportedPokemonLang, pokemonData } from './jsonData.js';
-import { dataStorage, friendShinyStorage, friendStorage, huntStorage, localForageAPI, shinyStorage } from './localForage.js';
+import { dataStorage, friendShinyStorage, friendStorage, huntStorage, shinyStorage } from './localForage.js';
 import { getCurrentLang } from './translation.js';
 
 
@@ -372,11 +372,11 @@ export function updateCounters(section: PopulatableSection): void {
 ////////////////////////////////////////////////////////////////////
 // Ordonner les cartes de Pokémon selon une certaine caractéristique
 // et renvoie leurs huntids dans l'ordre.
-async function orderPokemon(pokemonList: Shiny[] | Hunt[], order: ordre): Promise<string[]> {
+async function orderPokemon<DataClass extends Shiny | Hunt>(pokemonList: Map<string, DataClass>, order: ordre): Promise<string[]> {
   const noms = await Pokemon.names();
   const lang = getCurrentLang();
 
-  let orderedShiny = pokemonList.sort((s1, s2) => {
+  let orderedShiny = pokemonList.values().toArray().sort((s1, s2) => {
     const huntidComparison = s1.huntid > s2.huntid ? 1
                            : s1.huntid < s2.huntid ? -1
                            : 0;
@@ -433,9 +433,9 @@ async function orderPokemon(pokemonList: Shiny[] | Hunt[], order: ordre): Promis
  * i.e. when knowing the properties of the card itself isn't enough to quantize its order among all cards.
  */
 export type OrderMap = Map<ordre, string[]>;
-export async function computeOrders(section: OrderableSection, data: Array<Shiny|Hunt> | null = null): Promise<OrderMap> {
-  const dataStore = getDataStore(section);
-  const dataClass = getDataClass(section);
+export async function computeOrders<DataClass extends Shiny | Hunt>(section: OrderableSection, data: Map<string, DataClass> | null = null): Promise<OrderMap> {
+  const dataStore = getDataStore<typeof section>(section);
+  const dataClass = getDataClass<typeof section>(section) as Constructor<DataClass> | undefined;
 
   const orderMap: OrderMap = new Map();
 
@@ -455,12 +455,13 @@ export async function computeOrders(section: OrderableSection, data: Array<Shiny
       case 'corbeille':
       case 'chromatiques-ami':
         if (!data) {
-          const keys = await dataStore.keys();
-          data = (await Promise.all(keys.map(async key => {
-            const item = await dataStore.getItem(key);
-            if (typeof dataClass === 'undefined') return item;
-            else return new dataClass(item);
-          })));
+          data = new Map();
+          const items = await dataStore.getAllItems();
+          items.forEach(async item => {
+            if (!('huntid' in item)) return;
+            if (typeof dataClass === 'undefined') data!.set(item.huntid, item);
+            else data!.set(item.huntid, new dataClass(item));
+          });
         }
         orderedKeys = await orderPokemon(data, order);
         break;

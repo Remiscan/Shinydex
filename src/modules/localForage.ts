@@ -4,6 +4,7 @@ export interface localForageAPI {
   LOCALSTORAGE: string;
 
   getItem(key: string, callback?: () => any): Promise<any>;
+  getAllItems(callback?: () => any): Promise<any[]>;
   setItem(key: string, value: any, callback?: () => any): Promise<any>;
   removeItem(key: string, callback?: () => any): Promise<any>;
   clear(callback?: () => any): Promise<any>;
@@ -61,5 +62,5 @@ const friendShinyStorage = localforage.createInstance({
   driver: localforage.INDEXEDDB
 });
 
-export { shinyStorage, dataStorage, huntStorage, friendStorage, friendShinyStorage };
+export { dataStorage, friendShinyStorage, friendStorage, huntStorage, shinyStorage };
 

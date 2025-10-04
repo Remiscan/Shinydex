@@ -10,6 +10,8 @@ declare global {
   interface ShadowRoot {
     adoptedStyleSheets: CSSStyleSheet[]
   }
+
+  type Constructor<T> = new(...args: any[]) => T;
 }
 
 

@@ -19,33 +19,44 @@ type PopulatorOptions = {
 
 
 async function populateHandler(section: PopulatableSection, _ids?: string[], options: PopulatorOptions = {}): Promise<PromiseSettledResult<string>[]> {
+  const start = performance.now();
+  console.log(`Populating section ${section}...`);
+
   const dataStore = getDataStore(section);
-  const dataClass = getDataClass(section);
+  const dataClass = getDataClass<typeof section>(section);
 
   const sectionElement = document.querySelector(`#${section}`);
   const isCurrentSection = document.body.matches(`[data-section-actuelle~="${section}"]`);
 
-  const allIds = await dataStore.keys();
-  const ids = _ids ?? allIds;
+  const allItems = await dataStore.getAllItems();
 
-  const allData: Shiny[] | Hunt[] = await Promise.all(allIds.map(async id => {
-    const item = await dataStore.getItem(id);
-    if (typeof dataClass === 'undefined') return item;
-    else return new dataClass(item);
-  }));
+  const allData = new Map();
+  allItems.forEach(async item => {
+    if (!('huntid' in item)) return;
+    if (typeof dataClass === 'undefined') allData.set(item.huntid, item);
+    else allData.set(item.huntid, new dataClass(item));
+  });
 
   const orderMap = await computeOrders(section, allData);
   const currentOrder = sectionElement?.getAttribute('data-order') ?? '';
   const reversed = sectionElement?.getAttribute('data-order-reversed') === 'true';
 
   // Populate cards in the order currently selected
-  let orderedIds = ids;
+  let orderedIds: string[];
   if (isOrdre(currentOrder)) {
     const orderedStoredIds = orderMap.get(currentOrder) ?? [];
-    orderedIds = [
-      ...orderedStoredIds.filter(id => ids.includes(id)),
-      ...ids.filter(id => !(orderedStoredIds.includes(id)))
-    ];
+    const orderedStoredIdsSet = new Set(orderedStoredIds);
+    orderedIds = [];
+    for (const id of orderedStoredIds) {
+      if (allData.has(id)) orderedIds.push(id);
+    }
+    for (const id of allData.keys()) {
+      if (!orderedStoredIdsSet.has(id)) {
+        orderedIds.push(id);
+      }
+    }
+  } else {
+    orderedIds = Array.from(allData.keys());
   }
 
   let populated: PromiseSettledResult<string>[];
@@ -58,7 +69,7 @@ async function populateHandler(section: PopulatableSection, _ids?: string[], opt
     case 'chasses-en-cours':
     case 'chromatiques-ami':
     case 'corbeille': {
-      const orderedData = orderedIds.map(id => allData.find(d => d.huntid === id) ?? id);
+      const orderedData = orderedIds.map(id => allData.get(id) ?? id);
       populated = await populateFromData(section, orderedData);
     } break;
   }
@@ -85,6 +96,7 @@ async function populateHandler(section: PopulatableSection, _ids?: string[], opt
     if (options.animate) animateCards(section);
   });
 
+  console.log(`Section ${section} populated in ${performance.now() - start} ms.`);
   return populated;
 }
 
@@ -127,7 +139,7 @@ export async function populateFromData(
   const results = await Promise.allSettled(dataList.map(async pkmn => {
     const huntid = typeof pkmn === 'string' ? pkmn : pkmn.huntid;
     const pkmnInDB = pkmn != null && typeof pkmn === 'object';
-    const pkmnObj = new dataClass(pkmnInDB ? pkmn : {});
+    const pkmnObj = (pkmn instanceof dataClass.constructor) ? pkmn : new dataClass(pkmnInDB ? pkmn : {});
     const pkmnInDBButDeleted = pkmnInDB && 'deleted' in pkmnObj && pkmnObj.deleted
     const ignoreCondition = section === 'corbeille' ? !pkmnInDBButDeleted : pkmnInDBButDeleted;
 
@@ -167,10 +179,11 @@ export async function populateFromData(
         cardsToCreate.push(card);
       } else {
         // DANS LA BDD & AVEC CARTE = Éditer
-        if (!virtualize) await (card as shinyCard | huntCard).dataToContent();
+        const pkmnInstancePromise = (pkmn instanceof dataClass.constructor) ? Promise.resolve(pkmn) : undefined;
+        if (!virtualize) await (card as shinyCard | huntCard).dataToContent(pkmnInstancePromise);
         else {
           if (card instanceof shinyCard || card instanceof huntCard) {
-            card.dataToContent();
+            card.dataToContent(pkmnInstancePromise);
             card.needsRefresh = false;
           } else {
             card.setAttribute('data-needs-refresh', 'true');
