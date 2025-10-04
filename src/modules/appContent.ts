@@ -64,7 +64,7 @@ async function populateHandler(section: PopulatableSection, _ids?: string[], opt
     for (const id of orderedStoredIds) {
       if (ids.has(id)) orderedIds.push(id);
     }
-    for (const id of allData.keys()) {
+    for (const id of ids) {
       if (!orderedStoredIdsSet.has(id)) {
         orderedIds.push(id);
       }
@@ -153,7 +153,7 @@ export async function populateFromData(
   const results = await Promise.allSettled(dataList.map(async pkmn => {
     const huntid = typeof pkmn === 'string' ? pkmn : pkmn.huntid;
     const pkmnInDB = pkmn != null && typeof pkmn === 'object';
-    const pkmnObj = (pkmn instanceof dataClass.constructor) ? pkmn : new dataClass(pkmnInDB ? pkmn : {});
+    const pkmnObj = (pkmn instanceof dataClass) ? pkmn : new dataClass(pkmnInDB ? pkmn : {});
     const pkmnInDBButDeleted = pkmnInDB && 'deleted' in pkmnObj && pkmnObj.deleted
     const ignoreCondition = section === 'corbeille' ? !pkmnInDBButDeleted : pkmnInDBButDeleted;
 
