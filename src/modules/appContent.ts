@@ -179,8 +179,11 @@ export async function populateFromData(
           card.setAttribute('data-huntid', huntid);
           card.classList.add('surface', 'surface-container-highest');
         } else {
-          card = document.createElement(elementName) as shinyCard | huntCard;
-          card.setAttribute('huntid', huntid);
+          const sCard = document.createElement(elementName) as shinyCard | huntCard;
+          sCard.setAttribute('huntid', huntid);
+          const pkmnInstancePromise = (pkmn instanceof dataClass) ? Promise.resolve(pkmn) : undefined;
+          sCard.dataToContent(pkmnInstancePromise);
+          card = sCard;
         }
         card.setAttribute('role', 'listitem');
         
@@ -193,7 +196,7 @@ export async function populateFromData(
         cardsToCreate.push(card);
       } else {
         // DANS LA BDD & AVEC CARTE = Éditer
-        const pkmnInstancePromise = (pkmn instanceof dataClass.constructor) ? Promise.resolve(pkmn) : undefined;
+        const pkmnInstancePromise = (pkmn instanceof dataClass) ? Promise.resolve(pkmn) : undefined;
         if (!virtualize) await (card as shinyCard | huntCard).dataToContent(pkmnInstancePromise);
         else {
           if (card instanceof shinyCard || card instanceof huntCard) {
