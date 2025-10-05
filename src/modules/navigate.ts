@@ -219,10 +219,10 @@ export async function navigate(event: CustomEvent) {
           callBackend('get-friend-data', { username: username, scope: 'full' }, false)
           .then(async response => {
             if ('matches' in response && response.matches === true) {
-              await Promise.all(
+              await friendShinyStorage.setItems(
                 response.pokemon.map((shiny: any) => {
                   const feShiny = new FrontendShiny(shiny);
-                  return friendShinyStorage.setItem(String(shiny.huntid), feShiny);
+                  return [String(shiny.huntid), feShiny];
                 })
               );
 

@@ -6,6 +6,7 @@ export interface localForageAPI {
   getItem(key: string, callback?: () => any): Promise<any>;
   getAllItems(callback?: () => any): Promise<any[]>;
   setItem(key: string, value: any, callback?: () => any): Promise<any>;
+  setItems(entries: [string, any][], callback?: () => any): Promise<any[]>;
   removeItem(key: string, callback?: () => any): Promise<any>;
   clear(callback?: () => any): Promise<any>;
   length(callback?: () => any): Promise<number>;
