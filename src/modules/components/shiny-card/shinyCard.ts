@@ -1,18 +1,17 @@
-import { Hunt } from '../../Hunt.js';
-import { Shiny } from '../../Shiny.js';
-import { computeShinyFilters } from '../../filtres.js';
-import { huntStorage, localForageAPI, shinyStorage } from '../../localForage.js';
-import { Notif } from '../../notification.js';
-import { TranslatedString, translationObserver } from '../../translation.js';
-import template from './template.js';
 import materialIconsSheet from '../../../../ext/material_icons.css' with { type: 'css' };
 import iconSheet from '../../../../images/iconsheet.css' with { type: 'css' };
-import themesSheet from '../../../../styles/themes.css.php' with { type: 'css' };
 import commonSheet from '../../../../styles/common.css' with { type: 'css' };
+import themesSheet from '../../../../styles/themes.css.php' with { type: 'css' };
+import { Hunt } from '../../Hunt.js';
 import { Pokemon } from '../../Pokemon.js';
+import { Shiny } from '../../Shiny.js';
+import { applyOrders, computedNamesOrderLang, computeShinyFilters, recomputeLexicographicalOrdersOnLangChange } from '../../filtres.js';
 import { pokemonData } from '../../jsonData.js';
-import { getCurrentLang, getString } from '../../translation.js';
+import { huntStorage, localForageAPI, shinyStorage } from '../../localForage.js';
+import { Notif } from '../../notification.js';
+import { getCurrentLang, getString, TranslatedString, translationObserver } from '../../translation.js';
 import sheet from './styles.css' with { type: 'css' };
+import template from './template.js';
 
 
 
@@ -27,6 +26,7 @@ export class shinyCard extends HTMLElement {
   huntid: string = '';
   needsRefresh = true;
   rendering = true;
+  shiny?: Shiny;
 
   clickHandler: (e: Event) => void = () => {};
 
@@ -41,6 +41,15 @@ export class shinyCard extends HTMLElement {
   };
 
   restoreHandler = (e: Event) => {};
+
+  static caughtCache = new Set<`${Shiny['dexid']}-${Shiny['forme']}`>();
+
+  static async updateCaughtCache() {
+    this.caughtCache.clear();
+    await shinyStorage.iterate(shiny => {
+      this.caughtCache.add(`${shiny.dexid}-${shiny.forme}`);
+    });
+  }
 
 
   constructor() {
@@ -59,6 +68,7 @@ export class shinyCard extends HTMLElement {
     try {
       const pkmn = await getPkmn;
       shiny = pkmn instanceof Shiny ? pkmn : new Shiny(pkmn);
+      this.shiny = shiny;
     } catch (e) {
       console.error('Échec de création du Shiny', e);
       throw e;
@@ -68,6 +78,10 @@ export class shinyCard extends HTMLElement {
 
     const lang = getCurrentLang();
     const pkmn = new Pokemon(pokemonData[shiny.dexid]);
+
+    if (computedNamesOrderLang !== lang) {
+      await recomputeLexicographicalOrdersOnLangChange(lang);
+    }
 
     const formeQuery = `pokemon/${shiny.dexid}/forme/${shiny.forme}`;
     const formeName = getString(formeQuery as TranslatedString, lang);
@@ -118,10 +132,7 @@ export class shinyCard extends HTMLElement {
       sprite.setAttribute('forme', shiny.forme);
       this.setAttribute('data-form', shiny.forme);
 
-      shinyStorage.iterate(s => {
-        if (s.dexid === shiny.dexid && s.forme === shiny.forme) return true;
-      })
-      .then(isCaught => sprite.setAttribute('data-caught', String(isCaught)));
+      sprite.setAttribute('data-caught', String(shinyCard.caughtCache.has(`${shiny.dexid}-${shiny.forme}`)));
     }
 
     // Surnom
@@ -329,6 +340,7 @@ export class shinyCard extends HTMLElement {
     for (const [filter, value] of Object.entries(filters)) {
       this.setAttribute(`data-${filter}`, String(value));
     }
+    applyOrders(this, shiny);
 
     this.rendering = false;
     this.dispatchEvent(new Event('rendering-complete'));

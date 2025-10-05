@@ -12,6 +12,7 @@ import { goToPage } from '../../navigate.js';
 import { warnBeforeDestruction } from '../../notification.js';
 import sheet from './styles.css' with { type: 'css' };
 import { pokemonSprite } from '../pokemon-sprite/pokemonSprite.js';
+import { shinyCard } from '../shiny-card/shinyCard.js';
 
 
 
@@ -90,10 +91,7 @@ export class friendCard extends HTMLElement {
         const spriteElement = container.querySelector('pokemon-sprite') as pokemonSprite;
         spriteElement.setAttribute('dexid', String(pokemon.dexid));
         spriteElement.setAttribute('forme', pokemon.forme);
-        shinyStorage.iterate(shiny => {
-          if (shiny.dexid === pokemon.dexid && shiny.forme === pokemon.forme) return true;
-        })
-        .then(isCaught => spriteElement.setAttribute('data-caught', String(isCaught)));
+        spriteElement.setAttribute('data-caught', String(shinyCard.caughtCache.has(`${pokemon.dexid}-${pokemon.forme}`)));
 
         const dateContainer = container.querySelector('time') as HTMLTimeElement;
         dateContainer.dateTime = String(pokemon.catchTime);

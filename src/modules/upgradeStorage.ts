@@ -11,26 +11,28 @@ declare const localforage: localForageAPI;
 
 export async function upgradeStorage(): Promise<void> {
   console.log('Upgrading storage format...');
+
+  const promises: Array<Promise<any>> = [];
   
   // Update the structure of stored shiny Pokémon
-  const shinyKeys = await shinyStorage.keys();
-  for (const key of shinyKeys) {
-    const shiny = new Shiny(updateDataFormat(await shinyStorage.getItem(key)));
-    await shinyStorage.setItem(shiny.huntid, shiny);
+  await shinyStorage.iterate((item, key) => {
+    const shiny = new Shiny(updateDataFormat(item));
+    promises.push(shinyStorage.setItem(shiny.huntid, shiny));
     if (key !== shiny.huntid) {
-      await shinyStorage.removeItem(key);
+      promises.push(shinyStorage.removeItem(key));
     }
-  }
+  });
 
   // Update the structure of stored Hunts
-  const huntKeys = await huntStorage.keys();
-  for (const key of huntKeys) {
-    const hunt = new Hunt(updateDataFormat(await huntStorage.getItem(key)));
-    await huntStorage.setItem(hunt.huntid, hunt);
+  await huntStorage.iterate((item, key) => {
+    const hunt = new Hunt(updateDataFormat(item));
+    promises.push(huntStorage.setItem(hunt.huntid, hunt));
     if (key !== hunt.huntid) {
-      await huntStorage.removeItem(key);
+      promises.push(huntStorage.removeItem(key));
     }
-  }
+  });
+
+  await Promise.allSettled(promises);
 
   // Delete old, now obsolete stored items
   await dataStorage.removeItem('version-bdd');

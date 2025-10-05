@@ -248,6 +248,9 @@ $httpLanguage = $translation->getLanguage();
     <!-- Changelog -->
     <bottom-sheet id="changelog" drag modal data-changelog-hash="<?=hash_file('crc32b', __DIR__.'/pages/changelog.html')?>">
       <h2 class="title-large" data-string="section-changelog-long-title"></h2>
+      <a class="lien-source body-medium" href="mailto:contact@remiscan.fr" target="_blank" rel="external noreferrer noopener">
+        <span class="material-icons" aria-hidden="true">open_in_new</span><span data-string="report-misc"></span>
+      </a>
       <?php include './pages/changelog.html'; ?>
     </bottom-sheet>
 

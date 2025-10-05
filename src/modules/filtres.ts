@@ -4,7 +4,7 @@ import { Hunt } from './Hunt.js';
 import { noAccent } from './Params.js';
 import { Pokemon } from './Pokemon.js';
 import { Shiny } from './Shiny.js';
-import { isSupportedPokemonLang, pokemonData } from './jsonData.js';
+import { isSupportedPokemonLang, pokemonData, SupportedLang } from './jsonData.js';
 import { dataStorage, friendShinyStorage, friendStorage, huntStorage, shinyStorage } from './localForage.js';
 import { getCurrentLang } from './translation.js';
 
@@ -261,11 +261,11 @@ export async function computeFilters(section: FiltrableSection | OrderableSectio
 
   const filterMap: FilterMap = new Map();
   if (!data) {
-    const keys = await dataStore.keys();
-    data = (await Promise.all(keys.map(async key => new Shiny(await dataStore.getItem(key)))));
+    await dataStore.iterate((item, key) => {
+      const s = new Shiny(item);
+      filterMap.set(s.huntid, computeShinyFilters(s));
+    });
   }
-  data.forEach(s => filterMap.set(s.huntid, computeShinyFilters(s)));
-
   return filterMap;
 }
 
@@ -305,7 +305,7 @@ function countVisibleCards(section: PopulatableSection): [number, number, dexidS
       cardAttribute = 'huntid';
   }
 
-  const allCards = [...container.querySelectorAll(`[${cardAttribute}], [data-replaces][data-${cardAttribute}]`)];
+  const allCards = container.querySelectorAll(`[${cardAttribute}], [data-replaces][data-${cardAttribute}]`);
   const totalCount = allCards.length;
 
   const sectionFilters = {
@@ -372,7 +372,7 @@ export function updateCounters(section: PopulatableSection): void {
 ////////////////////////////////////////////////////////////////////
 // Ordonner les cartes de Pokémon selon une certaine caractéristique
 // et renvoie leurs huntids dans l'ordre.
-async function orderPokemon<DataClass extends Shiny | Hunt>(pokemonList: Map<string, DataClass>, order: ordre): Promise<string[]> {
+/*async function orderPokemon<DataClass extends Shiny | Hunt>(pokemonList: Map<string, DataClass>, order: ordre): Promise<string[]> {
   const noms = await Pokemon.names();
   const lang = getCurrentLang();
 
@@ -424,7 +424,7 @@ async function orderPokemon<DataClass extends Shiny | Hunt>(pokemonList: Map<str
   });
 
   return orderedShiny.map(shiny => shiny.huntid);
-}
+}*/
 
 
 
@@ -432,7 +432,7 @@ async function orderPokemon<DataClass extends Shiny | Hunt>(pokemonList: Map<str
  * Computes the order of cards when comparing all cards is needed,
  * i.e. when knowing the properties of the card itself isn't enough to quantize its order among all cards.
  */
-export type OrderMap = Map<ordre, string[]>;
+/*export type OrderMap = Map<ordre, string[]>;
 export async function computeOrders<DataClass extends Shiny | Hunt>(section: OrderableSection, data: Map<string, DataClass> | null = null): Promise<OrderMap> {
   const dataStore = getDataStore<typeof section>(section);
   const dataClass = getDataClass<typeof section>(section) as Constructor<DataClass> | undefined;
@@ -471,12 +471,12 @@ export async function computeOrders<DataClass extends Shiny | Hunt>(section: Ord
   }));
 
   return orderMap;
-}
+}*/
 
 
 
 /** Changes the order of cards in the DOM to fit their visual order. */
-export async function orderCards(section: OrderableSection, orderMap?: OrderMap, order?: ordre, reversed?: boolean) {
+/*export async function orderCards(section: OrderableSection, orderMap?: OrderMap, order?: ordre, reversed?: boolean) {
   const sectionElement = document.querySelector(`#${section}`);
   if (!(sectionElement instanceof HTMLElement)) throw new TypeError('Expecting HTMLElement');
 
@@ -515,4 +515,69 @@ export async function orderCards(section: OrderableSection, orderMap?: OrderMap,
     card?.parentElement?.appendChild(card);
     i++;
   }
+}*/
+
+
+export let computedNamesOrderLang: SupportedLang | undefined;
+
+export const speciesOrder: Map<Shiny['dexid'], number> = new Map();
+async function computeSpeciesOrder(lang = getCurrentLang()) {
+  speciesOrder.clear();
+  computedNamesOrderLang = lang;
+  const noms = await Pokemon.names();
+  const speciesArr = noms.map((n: string, i: number) => ({ dexid: i, name: noAccent(String(n)).toLowerCase() }));
+  speciesArr.sort((a, b) => a.name.localeCompare(b.name, lang));
+  speciesArr.forEach((s: any, i: number) => speciesOrder.set(s.dexid, i));
+}
+
+
+export const nameSet: Set<string> = new Set();
+export const namesOrder: Map<Shiny['name'], number> = new Map();
+async function computeNamesOrder(data?: Iterable<any>, lang = getCurrentLang()) {
+  if (data) {
+    for (const item of data) {
+      let nm = (item && typeof item.name === 'string') ? noAccent(String(item.name)).toLowerCase() : '';
+      if (!nm) nm = Pokemon.names()[item.dexid] || '';
+      nameSet.add(nm);
+    }
+  } else {
+    nameSet.clear();
+    await Promise.all([
+      shinyStorage.iterate(shiny => {
+        nameSet.add(noAccent(String(shiny.name || '')).toLowerCase());
+      }),
+      huntStorage.iterate(hunt => {
+        nameSet.add(noAccent(String(hunt.name || '')).toLowerCase());
+      })
+    ]);
+  }
+
+  namesOrder.clear();
+  computedNamesOrderLang = lang;
+  const names = Array.from(nameSet).sort((a, b) => a.localeCompare(b, lang));
+  names.forEach((n, i) => namesOrder.set(n, i));
+}
+
+
+export async function recomputeLexicographicalOrdersOnLangChange(newLang: SupportedLang) {
+  if (computedNamesOrderLang !== newLang) {
+    await Promise.all([computeSpeciesOrder(newLang), computeNamesOrder(undefined, newLang)]);
+  }
+}
+
+
+function applySingleOrderToCard(card: HTMLElement, order: number, orderName: string) {
+  card.style.setProperty('--order-' + orderName, String(order));
+  card.setAttribute('data-order-' + orderName, String(order));
+}
+
+
+export function applyOrders(card: HTMLElement, shiny: Shiny | Hunt) {
+  applySingleOrderToCard(card, shiny.dexid, 'dexid');
+  applySingleOrderToCard(card, speciesOrder.get(shiny.dexid) || 99999999, 'species');
+  applySingleOrderToCard(card, namesOrder.get(noAccent(String(shiny.name || '')).toLowerCase()) || 99999999, 'name');
+  applySingleOrderToCard(card, -1 * Math.round(shiny.catchTime / 1000), 'catchTime');
+  applySingleOrderToCard(card, -1 * Math.round(shiny.creationTime / 1000), 'creationTime');
+  applySingleOrderToCard(card, -1 * Pokemon.jeux.findIndex(j => j.uid === shiny.game), 'game');
+  applySingleOrderToCard(card, -1 * (shiny.shinyRate || 0), 'shinyRate');
 }

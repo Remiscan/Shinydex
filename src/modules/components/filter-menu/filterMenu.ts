@@ -1,8 +1,8 @@
-import { FilterList, filterSection, isFiltrableSection, orderCards, saveFilters } from '../../filtres.js';
-import { dataStorage } from '../../localForage.js';
 import materialIconsSheet from '../../../../ext/material_icons.css' with { type: 'css' };
-import themesSheet from '../../../../styles/themes.css.php' with { type: 'css' };
 import commonSheet from '../../../../styles/common.css' with { type: 'css' };
+import themesSheet from '../../../../styles/themes.css.php' with { type: 'css' };
+import { FilterList, filterSection, isFiltrableSection, saveFilters } from '../../filtres.js';
+import { dataStorage } from '../../localForage.js';
 import { translationObserver } from '../../translation.js';
 import { CheckBox } from '../checkBox.js';
 import { InputSelect } from '../inputSelect.js';
@@ -55,9 +55,9 @@ export class FilterMenu extends HTMLElement {
       };
 
       filterSection(section, newFilters);
-      if (newFilters.order !== oldFilters.order || newFilters.orderReversed !== oldFilters.orderReversed) {
+      /*if (newFilters.order !== oldFilters.order || newFilters.orderReversed !== oldFilters.orderReversed) {
         await orderCards(section, undefined, newFilters.order, newFilters.orderReversed);
-      }
+      }*/
       await this.saveFilters(newFilters);
     };
   }

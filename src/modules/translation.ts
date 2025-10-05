@@ -100,12 +100,30 @@ class TranslationObserver extends TODef {
       e.setAttribute('placeholder', getString(stringKey, currentLang));
     }
     for (const e of [..._container.querySelectorAll('[data-datetime]')]) {
-      const timestamp = e.getAttribute('data-datetime') ?? '0';
-      if (timestamp.length === 0) continue;
+      const datetime = e.getAttribute('data-datetime') ?? '0';
+      if (datetime.length === 0) continue;
+      let date: Date;
+      let validDatetime: string;
+      const timestamp = Number(datetime);
+      try {
+        if (!isNaN(timestamp)) {
+          date = new Date(timestamp);
+          validDatetime = date.toISOString();
+        } else {
+          date = new Date(datetime);
+          validDatetime = datetime;
+        }
+      } catch {
+        date = new Date(0);
+        validDatetime = date.toISOString();
+      }
       const string = new Intl
         .DateTimeFormat(currentLang, JSON.parse(e.getAttribute('data-format') ?? '{}'))
-        .format(new Date(Number(timestamp)));
+        .format(date);
       e.innerHTML = string;
+      if (e.tagName === 'TIME' && !e.hasAttribute('datetime')) {
+        e.setAttribute('dateTime', validDatetime);
+      }
     }
   }
 }

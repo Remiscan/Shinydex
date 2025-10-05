@@ -435,13 +435,27 @@ a.icon-button.bouton-retour {
 .liste-cartes {
   width: 100%;
   flex: none;
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  reading-flow: flex-visual;
   gap: 8px;
 }
 
 .liste-cartes:empty {
   display: none;
 }
+
+[data-order-reversed="true"] .liste-cartes {
+  flex-direction: column-reverse;
+}
+
+[data-order="species"] .liste-cartes > * { order: var(--order-species, 0); }
+[data-order="name"] .liste-cartes > * { order: var(--order-name, 0); }
+[data-order="game"] .liste-cartes > * { order: var(--order-game, 0); }
+[data-order="dexid"] .liste-cartes > * { order: var(--order-dexid, 0); }
+[data-order="shinyRate"] .liste-cartes > * { order: var(--order-shinyRate, 0); }
+[data-order="catchTime"] .liste-cartes > * { order: var(--order-catchTime, 0); }
+[data-order="creationTime"] .liste-cartes > * { order: var(--order-creationTime, 0); }
 
 /*body[data-section-actuelle~="obfuscator"] .section-contenu {
   overflow-y: hidden;
@@ -578,7 +592,7 @@ body.welcome :is(
   feed-card
 ) {
   animation: intro .35s var(--easing-standard);
-  --delay: calc(var(--order) * 50ms);
+  --delay: calc(var(--intro-order, 0) * 50ms);
   animation-delay: var(--delay, 0ms);
   animation-fill-mode: backwards;
 }
@@ -1153,6 +1167,10 @@ form[name="app-settings"] > *:last-child {
 #changelog {
   --from-x: 0;
   --from-y: 1rem;
+}
+
+#changelog .lien-source {
+  margin-bottom: 1em;
 }
 
 .changelog-card {

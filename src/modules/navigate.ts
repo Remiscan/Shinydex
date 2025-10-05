@@ -408,6 +408,17 @@ export async function animateCards(section: Section | string) {
     section = foundSection;
   }
 
+  const cards = Array.from(section.element.querySelectorAll<HTMLElement>('.liste-cartes > *'));
+  const orderCoeff = (section.element.dataset.orderReversed === 'true') ? -1 : 1;
+  cards.sort((a, b) => {
+    const orderA = Number(a.getAttribute('data-order-' + (section.element.dataset.order ?? '')) ?? 0);
+    const orderB = Number(b.getAttribute('data-order-' + (section.element.dataset.order ?? '')) ?? 0);
+    return orderCoeff * (orderA - orderB);
+  })
+  cards.forEach((card, index) => {
+    card.style.setProperty('--intro-order', String(index));
+  });
+
   document.body.classList.add('welcome');
 
   let cardSupposedHeight = -1;

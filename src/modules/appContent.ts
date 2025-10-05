@@ -4,11 +4,11 @@ import { Shiny } from './Shiny.js';
 import { friendCard } from './components/friend-card/friendCard.js';
 import { huntCard } from './components/hunt-card/huntCard.js';
 import { shinyCard } from './components/shiny-card/shinyCard.js';
-import { PopulatableSection, ShinyFilterData, computeFilters, computeOrders, getCardTagName, getDataClass, getDataStore, isOrdre, orderCards, populatableSections, updateCounters } from './filtres.js';
+import { PopulatableSection, ShinyFilterData, applyOrders, computeFilters, computedNamesOrderLang, getCardTagName, getDataClass, getDataStore, populatableSections, recomputeLexicographicalOrdersOnLangChange, updateCounters } from './filtres.js';
 import { clearElementStorage, lazyLoadSection, virtualizedSections } from './lazyLoading.js';
-import { friendStorage, huntStorage, shinyStorage } from './localForage.js';
+import { friendStorage, huntStorage } from './localForage.js';
 import { animateCards } from './navigate.js';
-import { getString } from './translation.js';
+import { getCurrentLang, getString } from './translation.js';
 
 
 
@@ -18,7 +18,7 @@ type PopulatorOptions = {
 
 
 
-async function populateHandler(section: PopulatableSection, _ids?: string[], options: PopulatorOptions = {}): Promise<PromiseSettledResult<string>[]> {
+async function populateHandler(section: PopulatableSection, requestedIds?: string[], options: PopulatorOptions = {}): Promise<Array<string>> {
   const start = performance.now();
   console.log(`Populating section ${section}...`);
 
@@ -28,69 +28,36 @@ async function populateHandler(section: PopulatableSection, _ids?: string[], opt
   const sectionElement = document.querySelector(`#${section}`);
   const isCurrentSection = document.body.matches(`[data-section-actuelle~="${section}"]`);
 
-  let ids: Set<string> | undefined = undefined;
-  if (_ids) ids = new Set(_ids);
+  let ids: Set<string> = new Set(requestedIds ?? []);
 
   const allData = new Map();
-  if (typeof dataClass === 'undefined') {
-    const allIds = await dataStore.keys();
-    if (!ids) ids = new Set(allIds);
-    await Promise.all(allIds.map(async id => {
-      const item = await dataStore.getItem(id);
-      allData.set(id, item);
-    }));
-  } else {
-    const allItems = await dataStore.getAllItems();
-    if (!ids) ids = new Set();
-    allItems.forEach(async item => {
-      if (!('huntid' in item)) console.warn(`Item in storage is missing huntid:`, item);
-      else {
-        allData.set(item.huntid, new dataClass(item));
-        ids!.add(item.huntid);
-      }
-    });
+  await dataStore.iterate((data, key) => {
+    if (!requestedIds) ids.add(key);
+    allData.set(key, data);
+  });
+
+  const lang = getCurrentLang();
+  if (lang !== computedNamesOrderLang) {
+    await recomputeLexicographicalOrdersOnLangChange(lang);
   }
 
-  const orderMap = await computeOrders(section, allData);
-  const currentOrder = sectionElement?.getAttribute('data-order') ?? '';
-  const reversed = sectionElement?.getAttribute('data-order-reversed') === 'true';
-
-  // Populate cards in the order currently selected
-  let orderedIds: string[];
-  if (isOrdre(currentOrder)) {
-    const orderedStoredIds = orderMap.get(currentOrder) ?? [];
-    const orderedStoredIdsSet = new Set(orderedStoredIds);
-    orderedIds = [];
-    for (const id of orderedStoredIds) {
-      if (ids.has(id)) orderedIds.push(id);
-    }
-    for (const id of ids) {
-      if (!orderedStoredIdsSet.has(id)) {
-        orderedIds.push(id);
-      }
-    }
-  } else {
-    orderedIds = Array.from(ids);
-  }
-
-  let populated: PromiseSettledResult<string>[];
+  let populated: Array<string>;
   switch (section) {
     case 'partage':
-      populated = await populateFriendsList(orderedIds);
+      populated = await populateFriendsList(ids);
       break;
 
     case 'mes-chromatiques':
+      await shinyCard.updateCaughtCache();
     case 'chasses-en-cours':
     case 'chromatiques-ami':
     case 'corbeille': {
-      const orderedData = orderedIds.map(id => allData.get(id) ?? id);
-      populated = await populateFromData(section, orderedData);
+      const requestedData: any[] = [];
+      for (const id of ids) {
+        requestedData.push(allData.get(id) ?? id);
+      }
+      populated = await populateFromData(section, requestedData);
     } break;
-  }
-
-  // Order all cards (newly populated + older cards) in the order currently selected
-  if (isOrdre(currentOrder)) {
-    await orderCards(section, orderMap, currentOrder, reversed);
   }
 
   // Update counters with number of displayed cards
@@ -123,7 +90,7 @@ export const populator = Object.fromEntries(populatableSections.map(section => {
 export async function populateFromData(
   section: Exclude<PopulatableSection, 'partage'>,
   dataList: Array<Shiny | string> | Array<Hunt | string>,
-): Promise<PromiseSettledResult<string>[]> {
+): Promise<Array<string>> {
   const sectionElement = document.querySelector(`#${section}`)!;
   const conteneur = (sectionElement.querySelector(`.liste-cartes`) ?? sectionElement.querySelector(`.section-contenu`))!;
   const virtualize = virtualizedSections.includes(section);
@@ -146,19 +113,22 @@ export async function populateFromData(
   // Traitons les cartes :
 
   const cardsToCreate: Element[] = [];
-  const allCards = [...document.querySelectorAll(`${elementName}[huntid], div[data-replaces="${elementName}"][data-huntid]`)];
-  const allCardsIds = allCards.map(c => c.getAttribute('huntid') ?? c.getAttribute('data-huntid'));
+  const allCards: Map<string, HTMLElement> = new Map();
+  document.querySelectorAll<HTMLElement>(`${elementName}[huntid], div[data-replaces="${elementName}"][data-huntid]`).forEach(c => {
+    const id = c.getAttribute('huntid') ?? c.getAttribute('data-huntid');
+    if (id) allCards.set(id, c);
+  });
   const filterMap = await computeFilters(section);
 
-  const results = await Promise.allSettled(dataList.map(async pkmn => {
+  const results: string[] = [];
+  for (const pkmn of dataList) {
     const huntid = typeof pkmn === 'string' ? pkmn : pkmn.huntid;
     const pkmnInDB = pkmn != null && typeof pkmn === 'object';
     const pkmnObj = (pkmn instanceof dataClass) ? pkmn : new dataClass(pkmnInDB ? pkmn : {});
     const pkmnInDBButDeleted = pkmnInDB && 'deleted' in pkmnObj && pkmnObj.deleted
     const ignoreCondition = section === 'corbeille' ? !pkmnInDBButDeleted : pkmnInDBButDeleted;
 
-    const cardIndex = allCardsIds.findIndex(id => id === huntid);
-    let card: Element | undefined = allCards[cardIndex];
+    let card: HTMLElement | undefined = allCards.get(huntid);
 
     // ABSENT DE LA BDD ou PRÉSENT MAIS À IGNORER = Supprimer (manuellement)
     if (!pkmnInDB || ignoreCondition) {
@@ -174,7 +144,7 @@ export async function populateFromData(
       if (card == null) {
         // DANS LA BDD & SANS CARTE = Créer
         if (virtualize) {
-          card = document.createElement('div') as HTMLElement;
+          card = document.createElement('div');
           card.setAttribute('data-replaces', elementName);
           card.setAttribute('data-huntid', huntid);
           card.classList.add('surface', 'surface-container-highest');
@@ -185,6 +155,7 @@ export async function populateFromData(
           sCard.dataToContent(pkmnInstancePromise);
           card = sCard;
         }
+        applyOrders(card, pkmnObj);
         card.setAttribute('role', 'listitem');
         
         const cardFilters = filterMap.get(huntid);
@@ -197,7 +168,7 @@ export async function populateFromData(
       } else {
         // DANS LA BDD & AVEC CARTE = Éditer
         const pkmnInstancePromise = (pkmn instanceof dataClass) ? Promise.resolve(pkmn) : undefined;
-        if (!virtualize) await (card as shinyCard | huntCard).dataToContent(pkmnInstancePromise);
+        if (!virtualize) (card as shinyCard | huntCard).dataToContent(pkmnInstancePromise);
         else {
           if (card instanceof shinyCard || card instanceof huntCard) {
             card.dataToContent(pkmnInstancePromise);
@@ -209,8 +180,8 @@ export async function populateFromData(
       }
     }
 
-    return Promise.resolve(huntid);
-  }));
+    results.push(huntid);
+  }
 
   // Évite un bref moment où une carte est affichée en même temps que le message de section vide
   if (sectionElement.classList.contains('vide') && cardsToCreate.length > 0) {
@@ -228,7 +199,7 @@ export async function populateFromData(
 
 
 /** Populates the friends list. */
-async function populateFriendsList(usernames: string[]): Promise<PromiseSettledResult<string>[]> {
+async function populateFriendsList(usernames: Set<string>): Promise<Array<string>> {
   const sectionElement = document.querySelector(`#partage`)!;
   const conteneur = sectionElement.querySelector(`.liste-cartes`)!;
 
@@ -238,8 +209,9 @@ async function populateFriendsList(usernames: string[]): Promise<PromiseSettledR
   // Traitons les cartes
 
   const cardsToCreate: Array<friendCard> = [];
-  const results = await Promise.allSettled(usernames.map(async username => {
-    const pkmnList = await dataStore.getItem(username);
+  const results: string[] = [];
+  await dataStore.iterate((pkmnList, username) => {
+    if (!usernames.has(username)) return;
     const friendInDB = pkmnList != null && Array.isArray(pkmnList);
 
     let card: friendCard | null = document.querySelector(`${elementName}[username="${username}"]`);
@@ -259,12 +231,12 @@ async function populateFriendsList(usernames: string[]): Promise<PromiseSettledR
         cardsToCreate.push(card);
       } else {
         // DANS LA BDD & AVEC CARTE = Éditer
-        await card.dataToContent();
+        card.dataToContent();
       }
     }
 
-    return Promise.resolve(username);
-  }));
+    results.push(username);
+  });
 
   // Plaçons les cartes sur la page
   // (après la préparation pour optimiser le temps d'éxecution)
@@ -352,15 +324,14 @@ export async function cleanUpRecycleBin() {
   const month = 1000 * 60 * 60 * 24 * 30;
   try {
     await huntStorage.ready();
-    const keys = await huntStorage.keys();
-    await Promise.all(
-      keys.map(async key => {
-        const shiny = new Hunt(await huntStorage.getItem(key));
-        if (shiny.destroy && shiny.lastUpdate + month < Date.now()) {
-          return await shinyStorage.removeItem(shiny.huntid);
-        }
-      })
-    );
+    const toRemove: Array<string> = [];
+    await huntStorage.iterate((item, key) => {
+      const hunt = new Hunt(item);
+      if (hunt.destroy && hunt.lastUpdate + month < Date.now()) {
+        toRemove.push(key);
+      }
+    });
+    await Promise.all(toRemove.map(key => huntStorage.removeItem(key)));
   } catch (error) {
     console.error(`Erreur pendant le nettoyage de la corbeille.`, error);
   }
