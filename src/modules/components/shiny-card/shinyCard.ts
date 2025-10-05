@@ -5,9 +5,10 @@ import themesSheet from '../../../../styles/themes.css.php' with { type: 'css' }
 import { Hunt } from '../../Hunt.js';
 import { Pokemon } from '../../Pokemon.js';
 import { Shiny } from '../../Shiny.js';
+import { FrontendShiny } from '../../ShinyBackend.js';
 import { applyOrders, computedNamesOrderLang, computeShinyFilters, recomputeLexicographicalOrdersOnLangChange } from '../../filtres.js';
 import { pokemonData } from '../../jsonData.js';
-import { huntStorage, localForageAPI, shinyStorage } from '../../localForage.js';
+import { huntStorage, shinyStorage, type LocalForage } from '../../localForage.js';
 import { Notif } from '../../notification.js';
 import { getCurrentLang, getString, TranslatedString, translationObserver } from '../../translation.js';
 import sheet from './styles.css' with { type: 'css' };
@@ -21,7 +22,7 @@ let previousEditNotification: Notif;
 
 
 export class shinyCard extends HTMLElement {
-  dataStore: localForageAPI = shinyStorage;
+  dataStore: LocalForage = shinyStorage;
   shadow: ShadowRoot;
   huntid: string = '';
   needsRefresh = true;
@@ -46,7 +47,7 @@ export class shinyCard extends HTMLElement {
 
   static async updateCaughtCache() {
     this.caughtCache.clear();
-    await shinyStorage.iterate(shiny => {
+    await shinyStorage.iterate<FrontendShiny, void>(shiny => {
       this.caughtCache.add(`${shiny.dexid}-${shiny.forme}`);
     });
   }
@@ -63,11 +64,11 @@ export class shinyCard extends HTMLElement {
   /**
    * Met à jour le contenu de la carte à partir des données sauvegardées.
    */
-  async dataToContent(getPkmn = this.dataStore.getItem(this.huntid)) {
+  async dataToContent(getPkmn = this.dataStore.getItem<object>(this.huntid)) {
     let shiny: Shiny;
     try {
       const pkmn = await getPkmn;
-      shiny = pkmn instanceof Shiny ? pkmn : new Shiny(pkmn);
+      shiny = pkmn instanceof Shiny ? pkmn : new Shiny(pkmn ?? {});
       this.shiny = shiny;
     } catch (e) {
       console.error('Échec de création du Shiny', e);

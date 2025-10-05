@@ -21,7 +21,18 @@ function isSupportedTheme(string: string): string is Theme {
 
 
 
-export class Settings {
+export interface SettingsData {
+  'lang': SupportedLang;
+  'theme': Theme;
+  'theme-hue': number;
+  'cache-all-sprites': boolean;
+  'anti-spoilers-pokedex': boolean;
+  'anti-spoilers-friends': boolean;
+  'anti-spoilers-public': boolean;
+  'enable-notifications': boolean;
+};
+
+export class Settings implements SettingsData {
   'lang': SupportedLang = getCurrentLang();
   'theme': Theme = 'system';
   'theme-hue': number = 255;
@@ -157,7 +168,7 @@ export class Settings {
         if (initial) {
           if (value) {
             const progressContainer = document.querySelector('[data-sprites-progress]');
-            dataStorage.getItem('sprites-cache-progress')
+            dataStorage.getItem<string>('sprites-cache-progress')
             .then(val => {
               if (progressContainer && val) progressContainer.innerHTML = val;
             });
@@ -312,7 +323,7 @@ export class Settings {
 
   static async restore({ include = [], exclude = [] }: { include?: string[], exclude?: string[] } = {}) {
     await dataStorage.ready();
-    const savedSettings = new Settings(await dataStorage.getItem('app-settings'));
+    const savedSettings = new Settings(await dataStorage.getItem<SettingsData>('app-settings') || {});
 
     if (include.length === 0) {
       include = Object.keys(savedSettings);
@@ -330,7 +341,7 @@ export class Settings {
 
   static async set(setting: keyof Settings, value: any, { apply = true, toForm = true }: { apply?: boolean, toForm?: boolean } = {}) {
     await dataStorage.ready();
-    const currentSettings = new Settings(await dataStorage.getItem('app-settings'));
+    const currentSettings = new Settings(await dataStorage.getItem<SettingsData>('app-settings') || {});
 
     switch (setting) {
       case 'lang':
@@ -362,7 +373,7 @@ export class Settings {
 
   static async get(id: keyof Settings): Promise<any> {
     await dataStorage.ready();
-    const currentSettings = new Settings(await dataStorage.getItem('app-settings'));
+    const currentSettings = new Settings(await dataStorage.getItem<SettingsData>('app-settings') || {});
 
     if (id in currentSettings) return currentSettings[id as keyof Settings];
     else throw new Error(`${id} is not a valid setting`);
@@ -478,7 +489,7 @@ export async function cacheAllSprites(bool: boolean, fetchOptions: RequestInit &
 
 
 
-type UserProfileData = {
+export type UserProfileData = {
   username?: string|null;
   public?: boolean;
   appearInFeed?: boolean;
@@ -487,7 +498,7 @@ type UserProfileData = {
 
 /** Updates the stored user profile data. */
 let updateUserProfile = async (data: UserProfileData = {}) => {
-  const userProfile = (await dataStorage.getItem('user-profile')) ?? {};
+  const userProfile = (await dataStorage.getItem<UserProfileData>('user-profile')) ?? {};
   if (data.username) userProfile.username = data.username;
   if (data.public) userProfile.public = data.public;
   if (data.appearInFeed) userProfile.appearInFeed = data.appearInFeed;
@@ -580,7 +591,7 @@ export async function updateUsername(username: string) {
 let usernamePrompt: Notif;
 export async function checkUsernameavailability(username: string) {
   if (username.length === 0) return;
-  const currentUsername = (await dataStorage.getItem('user-profile') ?? {})?.username ?? null;
+  const currentUsername = (await dataStorage.getItem<UserProfileData>('user-profile') ?? {})?.username ?? null;
   if (username === currentUsername) return;
   
   const response = await callBackend('check-username-available', { username }, true);

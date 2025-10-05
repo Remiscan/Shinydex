@@ -182,7 +182,7 @@ let saveFilters = async (section: FiltrableSection, filters: FilterList) => {
   if (!shouldSaveFilters) return;
 
   const savedFilters = await dataStorage.getItem('filters');
-  const filtersToSave = saveFilters instanceof Map ? savedFilters : new Map();
+  const filtersToSave = savedFilters instanceof Map ? savedFilters : new Map();
   filtersToSave.set(section, filters);
   await dataStorage.setItem('filters', filtersToSave);
 };
@@ -262,7 +262,7 @@ export async function computeFilters(section: FiltrableSection | OrderableSectio
   const filterMap: FilterMap = new Map();
   if (!data) {
     await dataStore.iterate((item, key) => {
-      const s = new Shiny(item);
+      const s = new Shiny(item as object);
       filterMap.set(s.huntid, computeShinyFilters(s));
     });
   }
@@ -543,10 +543,10 @@ async function computeNamesOrder(data?: Iterable<any>, lang = getCurrentLang()) 
   } else {
     nameSet.clear();
     await Promise.all([
-      shinyStorage.iterate(shiny => {
+      shinyStorage.iterate((shiny: any) => {
         nameSet.add(noAccent(String(shiny.name || '')).toLowerCase());
       }),
-      huntStorage.iterate(hunt => {
+      huntStorage.iterate((hunt: any) => {
         nameSet.add(noAccent(String(hunt.name || '')).toLowerCase());
       })
     ]);

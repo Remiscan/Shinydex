@@ -1,4 +1,4 @@
-import { friendStorage, localForageAPI, shinyStorage } from '../../localForage.js';
+import { friendStorage, type LocalForage } from '../../localForage.js';
 import { getCurrentLang, getString, translationObserver } from '../../translation.js';
 import template from './template.js';
 import materialIconsSheet from '../../../../ext/material_icons.css' with { type: 'css' };
@@ -38,7 +38,7 @@ const previewSheet = new CSSStyleSheet();
 export class friendCard extends HTMLElement {
   shadow: ShadowRoot;
   username: string = '';
-  dataStore: localForageAPI = friendStorage
+  dataStore: LocalForage = friendStorage
   clickHandler: (e: Event) => void = () => {};
   openHandler = (e: Event) => {
     e.stopPropagation();
@@ -69,7 +69,7 @@ export class friendCard extends HTMLElement {
   async dataToContent() {
     let friend: Friend;
     try {
-      friend = new Friend(this.username, await this.dataStore.getItem(this.username));
+      friend = new Friend(this.username, await this.dataStore.getItem<object[]>(this.username) || []);
     } catch (e) {
       console.error('Échec de création du Friend', e);
       throw e;

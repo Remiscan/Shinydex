@@ -131,7 +131,7 @@ export class FilterMenu extends HTMLElement {
       case 'section': {
         const section = this.section ?? '';
         if (isFiltrableSection(section)) {
-          const savedFilters = await dataStorage.getItem('filters');
+          const savedFilters = await dataStorage.getItem<Map<any, any>>('filters');
           const filters: FilterList = new FilterList(section, savedFilters?.get(section));
 
           const input = this.shadow.querySelector('[name="order"]');

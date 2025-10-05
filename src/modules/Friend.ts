@@ -1,4 +1,4 @@
-import { updateUserProfile } from './Settings.js';
+import { SettingsData, updateUserProfile, type UserProfileData } from './Settings.js';
 import { callBackend } from './callBackend.js';
 import { dataStorage, friendStorage } from './localForage.js';
 import { Notif } from './notification.js';
@@ -39,7 +39,7 @@ export class Friend {
 
   async save() {
     await friendStorage.setItem(this.username, this.pokemonList);
-    const userProfile = (await dataStorage.getItem('user-profile')) ?? {};
+    const userProfile = (await dataStorage.getItem<UserProfileData>('user-profile')) ?? {};
     userProfile.lastUpdate = Date.now();
     await updateUserProfile(userProfile);
   }
@@ -74,8 +74,8 @@ export class Friend {
       new Notif(getString('notif-added-friend').replace('{user}', username)).prompt();
 
       // Check if notifications are enabled or were previously dismissed by the user
-      const appSettings = await dataStorage.getItem('app-settings');
-      const arePushNotificationsEnabled = appSettings['enable-notifications'];
+      const appSettings = await dataStorage.getItem<SettingsData>('app-settings');
+      const arePushNotificationsEnabled = appSettings?.['enable-notifications'];
       const werePushNotificationsDismissed = await dataStorage.getItem('dismissed-push-notif-prompt');
 
       // If they are not enabled and were not previously dismissed, ask to enable them

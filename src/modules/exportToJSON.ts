@@ -1,7 +1,7 @@
 import { Hunt } from "./Hunt.js";
 import { timestamp2date, wait } from "./Params.js";
 import { Shiny } from "./Shiny.js";
-import { dataStorage, huntStorage, localForageAPI, shinyStorage } from "./localForage.js";
+import { dataStorage, huntStorage, type LocalForage, shinyStorage } from "./localForage.js";
 import { Notif } from "./notification.js";
 import { getString } from "./translation.js";
 import { updateDataFormat, upgradeStorage } from "./upgradeStorage.js";
@@ -72,7 +72,7 @@ export async function json2import(file: File | Blob | undefined): Promise<string
 //////////////////////////////
 // Exporte les données en JSON
 export async function export2json(): Promise<void> {
-  const getItems = async (store: localForageAPI): Promise<any[]> => {
+  const getItems = async (store: LocalForage): Promise<any[]> => {
     await store.ready();
     const keys = await store.keys();
     const items = [];

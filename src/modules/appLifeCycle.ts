@@ -296,7 +296,7 @@ export async function appStart() {
   initFeedLoader();
 
   // Affiche l'état de la dernière synchronisation dans les paramètres
-  const lastSyncState = await dataStorage.getItem('last-sync-state');
+  const lastSyncState = String(await dataStorage.getItem('last-sync-state'));
   const lastSyncTime = await dataStorage.getItem('last-sync-time');
   if (['success', 'failure'].includes(lastSyncState)) document.body.setAttribute('data-last-sync', lastSyncState);
   const syncTimeContainer = document.querySelector('[data-sync-time-container]');
@@ -373,13 +373,13 @@ export async function checkUpdate(checkNotification = false) {
     if (!navigator.onLine) throw new Error(getString('error-no-connection'));
     if (updateAvailable) return notifyMaj();
 
-    const installedFiles = await dataStorage.getItem('file-versions');
-    const cacheVersion = Math.max(...Object.values(installedFiles).map(v => Number(v)));
+    const installedFiles = await dataStorage.getItem<Record<string, unknown>>('file-versions');
+    const cacheVersion = Math.max(...Object.values(installedFiles || {}).map(v => Number(v)));
     const liveFiles = await callBackend('get-file-versions');
 
     const updatedFiles = Object.entries(liveFiles).filter(file => {
       const [path, liveVersion] = file;
-      const installedVersion = installedFiles[path];
+      const installedVersion = installedFiles?.[path];
       return liveVersion !== installedVersion;
     });
 

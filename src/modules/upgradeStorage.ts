@@ -1,11 +1,11 @@
 import { Hunt } from './Hunt.js';
 import { Shiny } from './Shiny.js';
 import { gameStrings, isSupportedGameID, isSupportedLang, isSupportedMethodID, methodStrings } from './jsonData.js';
-import { dataStorage, huntStorage, localForageAPI, shinyStorage } from './localForage.js';
+import { dataStorage, huntStorage, shinyStorage, type LocalForage } from './localForage.js';
 
 
 
-declare const localforage: localForageAPI;
+declare const localforage: LocalForage;
 
 
 
@@ -15,7 +15,7 @@ export async function upgradeStorage(): Promise<void> {
   const promises: Array<Promise<any>> = [];
   
   // Update the structure of stored shiny Pokémon
-  await shinyStorage.iterate((item, key) => {
+  await shinyStorage.iterate<Record<string, unknown>, void>((item, key) => {
     const shiny = new Shiny(updateDataFormat(item));
     promises.push(shinyStorage.setItem(shiny.huntid, shiny));
     if (key !== shiny.huntid) {
@@ -24,7 +24,7 @@ export async function upgradeStorage(): Promise<void> {
   });
 
   // Update the structure of stored Hunts
-  await huntStorage.iterate((item, key) => {
+  await huntStorage.iterate<Record<string, unknown>, void>((item, key) => {
     const hunt = new Hunt(updateDataFormat(item));
     promises.push(huntStorage.setItem(hunt.huntid, hunt));
     if (key !== hunt.huntid) {

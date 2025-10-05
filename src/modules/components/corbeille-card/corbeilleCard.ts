@@ -1,5 +1,5 @@
 import { Hunt } from '../../Hunt.js';
-import { huntStorage, localForageAPI } from '../../localForage.js';
+import { huntStorage, type LocalForage } from '../../localForage.js';
 import { Notif } from '../../notification.js';
 import { getString } from '../../translation.js';
 import { shinyCard } from '../shiny-card/shinyCard.js';
@@ -20,7 +20,7 @@ sheet.replaceSync(/*css*/`
 
 
 export class corbeilleCard extends shinyCard {
-  dataStore: localForageAPI = huntStorage;
+  dataStore: LocalForage = huntStorage;
   dataClass = Hunt;
   
   constructor() {
@@ -34,10 +34,10 @@ export class corbeilleCard extends shinyCard {
   }
 
 
-  async dataToContent(getPkmn = this.dataStore.getItem(this.huntid)) {
+  async dataToContent(getPkmn = this.dataStore.getItem<object>(this.huntid)) {
     let hunt: Hunt;
     try {
-      hunt = new Hunt(await getPkmn);
+      hunt = new Hunt(await getPkmn || {});
     } catch (e) {
       console.error('Échec de création de la Hunt', e);
       throw e;
@@ -52,12 +52,12 @@ export class corbeilleCard extends shinyCard {
 
   async restoreHunt(populate = true) {
     try {
-      let hunt = await huntStorage.getItem(this.huntid);
-      if (hunt == null) {
+      let _hunt = await huntStorage.getItem(this.huntid);
+      if (_hunt == null) {
         throw getString('error-cant-be-restored');
       }
 
-      hunt = new Hunt(hunt);
+      const hunt = new Hunt(_hunt);
       hunt.lastUpdate = Date.now();
       hunt.deleted = false;
       hunt.destroy = false;

@@ -310,7 +310,7 @@ export async function init(): Promise<boolean> {
 
   // Initialize current account display
   {
-    const currentAccount = await dataStorage.getItem('signed-in-account');
+    const currentAccount = await dataStorage.getItem<string>('signed-in-account');
     const currentAccountContainer = document.querySelector('[data-value="current-account"]');
     if (currentAccount && currentAccountContainer) currentAccountContainer.innerHTML = currentAccount;
   }

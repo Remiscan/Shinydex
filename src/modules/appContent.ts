@@ -326,7 +326,7 @@ export async function cleanUpRecycleBin() {
     await huntStorage.ready();
     const toRemove: Array<string> = [];
     await huntStorage.iterate((item, key) => {
-      const hunt = new Hunt(item);
+      const hunt = new Hunt(item as object);
       if (hunt.destroy && hunt.lastUpdate + month < Date.now()) {
         toRemove.push(key);
       }

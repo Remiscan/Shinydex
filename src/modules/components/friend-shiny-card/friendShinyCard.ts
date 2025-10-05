@@ -1,4 +1,4 @@
-import { friendShinyStorage, localForageAPI } from '../../localForage.js';
+import { friendShinyStorage, type LocalForage } from '../../localForage.js';
 import { shinyCard } from '../shiny-card/shinyCard.js';
 
 
@@ -27,7 +27,7 @@ sheet.replaceSync(/*css*/`
 
 
 export class friendShinyCard extends shinyCard {
-  dataStore: localForageAPI = friendShinyStorage;
+  dataStore: LocalForage = friendShinyStorage;
   
   constructor() {
     super();
