@@ -554,7 +554,7 @@ async function computeNamesOrder(data?: Iterable<any>, lang = getCurrentLang()) 
 
   namesOrder.clear();
   computedNamesOrderLang = lang;
-  const names = Array.from(nameSet).sort((a, b) => a.localeCompare(b, lang));
+  const names = Array.from(nameSet).sort((a, b) => a.toLocaleLowerCase(lang).localeCompare(b.toLocaleLowerCase(lang), lang));
   names.forEach((n, i) => namesOrder.set(n, i));
 }
 
@@ -563,6 +563,19 @@ export async function recomputeLexicographicalOrdersOnLangChange(newLang: Suppor
   if (computedNamesOrderLang !== newLang) {
     await Promise.all([computeSpeciesOrder(newLang), computeNamesOrder(undefined, newLang)]);
   }
+}
+
+
+export const usernamesOrder: Map<string, number> = new Map();
+export function computeUsernamesOrder(usernames?: Iterable<string>, lang = getCurrentLang()) {
+  const allUsernames = new Set<string>(usernamesOrder.keys());
+  if (usernames) {
+    for (const username of usernames) {
+      allUsernames.add(username);
+    }
+  }
+
+  Array.from(allUsernames).sort((a, b) => a.localeCompare(b, lang)).forEach((u, i) => usernamesOrder.set(u, i));
 }
 
 

@@ -854,6 +854,10 @@ section:not([data-filter-legit~="false"]) [data-legit="false"] {
   display: none;
 }
 
+#partage friend-card {
+  order: var(--order-username, 0);
+}
+
 #filter-menu:not([data-section~="mes-chromatiques"]):not([data-section~="pokedex"]) filter-menu[section="mes-chromatiques"],
 #filter-menu:not([data-section~="chasses-en-cours"]) filter-menu[section="chasses-en-cours"],
 #filter-menu:not([data-section~="corbeille"]) filter-menu[section="corbeille"],

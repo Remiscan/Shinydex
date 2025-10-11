@@ -4,7 +4,7 @@ import { Shiny } from './Shiny.js';
 import { friendCard } from './components/friend-card/friendCard.js';
 import { huntCard } from './components/hunt-card/huntCard.js';
 import { shinyCard } from './components/shiny-card/shinyCard.js';
-import { PopulatableSection, ShinyFilterData, applyOrders, computeFilters, computedNamesOrderLang, getCardTagName, getDataClass, getDataStore, populatableSections, recomputeLexicographicalOrdersOnLangChange, updateCounters } from './filtres.js';
+import { PopulatableSection, ShinyFilterData, applyOrders, computeFilters, computeUsernamesOrder, computedNamesOrderLang, getCardTagName, getDataClass, getDataStore, populatableSections, recomputeLexicographicalOrdersOnLangChange, updateCounters, usernamesOrder } from './filtres.js';
 import { clearElementStorage, lazyLoadSection, virtualizedSections } from './lazyLoading.js';
 import { friendStorage, huntStorage } from './localForage.js';
 import { animateCards } from './navigate.js';
@@ -23,7 +23,6 @@ async function populateHandler(section: PopulatableSection, requestedIds?: strin
   console.log(`Populating section ${section}...`);
 
   const dataStore = getDataStore(section);
-  const dataClass = getDataClass<typeof section>(section);
 
   const sectionElement = document.querySelector(`#${section}`);
   const isCurrentSection = document.body.matches(`[data-section-actuelle~="${section}"]`);
@@ -206,6 +205,8 @@ async function populateFriendsList(usernames: Set<string>): Promise<Array<string
   const elementName = 'friend-card';
   const dataStore = friendStorage;
 
+  computeUsernamesOrder(usernames);
+
   // Traitons les cartes
 
   const cardsToCreate: Array<friendCard> = [];
@@ -233,6 +234,8 @@ async function populateFriendsList(usernames: Set<string>): Promise<Array<string
         // DANS LA BDD & AVEC CARTE = Éditer
         card.dataToContent();
       }
+
+      card.style.setProperty('--order-username', String(usernamesOrder.get(username) ?? 0));
     }
 
     results.push(username);
