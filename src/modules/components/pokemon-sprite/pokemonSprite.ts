@@ -1,7 +1,7 @@
+import pokemonSheet from '../../../../images/pokemonsheet.css' with { type: 'css' };
 import { pad, wait } from '../../Params.js';
 import { pokemonData } from '../../jsonData.js';
 import { TranslatedString, getString, translationObserver } from '../../translation.js';
-import pokemonSheet from '../../../../images/pokemonsheet.css' with { type: 'css' };
 
 
 
@@ -48,7 +48,7 @@ sheet.replaceSync(/*css*/`
     grid-column: 1;
   }
 
-  img, svg {
+  img, svg[part~="sparkles"] {
     width: var(--size);
     height: var(--size);
   }
