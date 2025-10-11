@@ -1410,6 +1410,10 @@ bottom-sheet {
   margin-block: 16px;
 }
 
+form[name="feedback-form"] [name="message"]::part(input) {
+  resize: none;
+}
+
 form[name="feedback-form"] [type="submit"] {
   margin-block-start: 16px;
 }
