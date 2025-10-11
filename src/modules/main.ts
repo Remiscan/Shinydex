@@ -13,6 +13,7 @@ import './components/corbeille-card/corbeilleCard.js';
 import './components/dexIcon.js';
 import './components/filter-menu/filterMenu.js';
 import './components/friend-card/friendCard.js';
+import { friendCard } from './components/friend-card/friendCard.js';
 import './components/friend-shiny-card/friendShinyCard.js';
 import './components/hunt-card/huntCard.js';
 import './components/loadSpinner.js';
@@ -32,7 +33,6 @@ import { goToPage, navLinkBubble, sectionActuelle } from './navigate.js';
 import { Notif, warnBeforeDestruction } from './notification.js';
 import { immediateSync, requestSync } from './syncBackup.js';
 import { getString } from './translation.js';
-import { friendCard } from './components/friend-card/friendCard.js';
 
 
 
@@ -169,6 +169,53 @@ for (const fab of fabs) {
       const friendCard = document.querySelector<friendCard>(`#partage friend-card[username="${username}"]`);
       friendCard?.delete();
       profilAmi.setAttribute('data-is-friend', 'false');
+    }
+  });
+}
+
+
+
+////////////
+// FEEDBACK
+
+// Détecte le clic sur les boutons d'ouverture du feedback
+{
+  const feedbackButtons = document.querySelectorAll('[data-action="open-feedback"]');
+  for (const button of feedbackButtons) {
+    if (!(button instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
+    button.addEventListener('click', event => {
+      event.stopPropagation();
+      const feedbackSheet = document.querySelector('#feedback');
+      if (feedbackSheet instanceof BottomSheet) feedbackSheet.show();
+    });
+  }
+
+  const feedbackForm = document.querySelector('form[name="feedback-form"]');
+  if (!(feedbackForm instanceof HTMLFormElement)) throw new TypeError(`Expecting HTMLFormElement`);
+  feedbackForm.addEventListener('submit', async event => {
+    event.preventDefault();
+
+    try {
+      const formData = new FormData(feedbackForm);
+      const message = formData.get('message');
+      if (!message) return;
+
+      const feedbackSheet = document.querySelector('#feedback');
+      if (feedbackSheet instanceof BottomSheet) feedbackSheet.close();
+
+      const response = await callBackend('send-feedback', { message }, true);
+      
+      if ('success' in response && response.success === true) {
+        feedbackForm.reset();
+        new Notif(getString('notif-feedback-sent')).prompt();
+        return true;
+      } else {
+        new Notif(getString('error-feedback-not-sent')).prompt();
+        return false;
+      }
+    } catch (error) {
+      new Notif(getString('error-feedback-not-sent')).prompt();
+      return false;
     }
   });
 }

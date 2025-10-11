@@ -151,6 +151,10 @@ bottom-sheet {
   width: fit-content;
 }
 
+.global-feedback-button {
+  display: flex;
+}
+
 #google-one-tap-container {
   margin: 10px 8px 6px 8px; /* 16px - (6px 8px 10px 8px) */
 }

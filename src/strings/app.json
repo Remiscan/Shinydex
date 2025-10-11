@@ -236,7 +236,7 @@
     "app-version": "Version de l'application",
     "check-update": "Rechercher une mise à jour",
     "report-issue": "Signaler un problème sur GitHub",
-    "report-misc": "Contacter le développeur ou signaler un problème par email",
+    "report-misc": "Contacter le développeur par e-mail",
     "made-by": "Créé par",
     "confidentiality-policy-title": "Politique de confidentialité",
     "confidentiality-policy": "<p>Lorsque vous utilisez l'application sans être connecté à un compte, elle stocke sur votre appareil les informations que vous saisissez sur vos Pokémon.</p><p>Au moment où vous vous connectez avec un compte Google, Google nous donne accès à quelques informations publiques sur votre compte : noms, photo de profil, adresse e-mail, ainsi qu'une chaîne de caractères servant d'identifiant unique. Nous utilisons cet identifiant unique pour vous créer un compte sur le Shinydex et le relier à votre compte Google. Nous ne sauvegardons aucune autre information de votre compte Google. Votre adresse e-mail est sauvegardée sur votre appareil (mais ne nous est pas communiquée) pour vous indiquer avec quel compte Google vous vous êtes connecté.</p><p>Une fois connecté, les informations de vos Pokémon sont sauvegardées dans une base de données en ligne. Si vous choisissez de rendre votre profil public et que vous choisissez un pseudo, alors les autres personnes connaissant ce pseudo pourront avoir accès aux informations de vos Pokémon.</p><p>Aucune information n'est partagée avec un autre service que le Shinydex.</p>",
@@ -251,6 +251,11 @@
     "section-changelog-long-title": "Nouveautés",
     "open-changelog-label": "Voir l'historique des nouveautés",
     "close-changelog-label": "Fermer",
+
+    "section-feedback-long-title": "Envoyer un commentaire",
+    "feedback-intro": "Signalez un bug, suggérez une nouvelle fonctionnalité, ou dites ce que vous souhaitez au développeur :)",
+    "feedback-label": "Commentaire",
+    "submit-feedback": "Envoyer",
 
     "fab-pokemon": "Ajouter un Pokémon chromatique",
     "fab-friend": "Ajouter un ami",
@@ -329,6 +334,7 @@
     "error-cant-be-restored": "Ce Pokémon ne peut pas être restauré.",
     "error-already-editing": "Ce Pokémon est déjà en cours de modification.",
     "error-creating-edit": "Erreur lors de la création de la chasse à éditer",
+    "error-feedback-not-sent": "Le commentaire n'a pas pu être envoyé. Réessayez plus tard.",
 
     "notif-update-installed": "Mise à jour installée !",
     "notif-update-installed-label": "Actualiser",
@@ -358,7 +364,8 @@
     "notif-save-edits": "Sauvegarder ces modifications ?",
     "notif-shiny-will-be-deleted": "Ce Pokémon chromatique sera supprimé et déplacé dans la corbeille.",
     "notif-notifications-permission-denied": "La permission d'envoyer des notifications est refusée au Shinydex par les paramètres de votre navigateur.",
-    "notif-notifications-not-supported": "Les Notifications Push ne sont pas supportées par votre navigateur."
+    "notif-notifications-not-supported": "Les Notifications Push ne sont pas supportées par votre navigateur.",
+    "notif-feedback-sent": "Votre commentaire a été envoyé. Merci !"
   },
 
   "en": {
@@ -597,7 +604,7 @@
     "app-version": "Application version",
     "check-update": "Search for an update",
     "report-issue": "Report an issue on GitHub",
-    "report-misc": "Contact the developer or report an issue by email",
+    "report-misc": "Contact the developer by email",
     "made-by": "Made by",
     "confidentiality-policy-title": "Confidentiality policy",
     "confidentiality-policy": "<p>When you use the app without signing in, it stores on your device all data you enter about your Pokémon.</p><p>When you sign in with a Google account, Google gives us some public information about your account: names, profile picture, email address, and a character string used as a unique identifier. We use that unique identifier to create a Shinydex account for you and link it to your Google account. We do not save any data from your Google account. Your email address is stored on your device (but is not sent to us) to display which Google account you used to sign in.</p><p>Once you're signed in, data about your Pokémon is saved in an online database. If you choose to make your profile public and if you choose a username, then anyone who knows that username can see your Pokémon data.</p><p>No data is shared with any other service.</p>",
@@ -612,6 +619,11 @@
     "section-changelog-long-title": "Changelog",
     "open-changelog-label": "See the changelog",
     "close-changelog-label": "Close",
+
+    "section-feedback-long-title": "Send feedback",
+    "feedback-intro": "Report a bug, suggest a new feature, or just say whatever you want to the developer :)",
+    "feedback-label": "Message",
+    "submit-feedback": "Send",
 
     "fab-pokemon": "Add a shiny Pokémon",
     "fab-friend": "Add a friend",
@@ -690,6 +702,7 @@
     "error-cant-be-restored": "This Pokémon cannot be restored.",
     "error-already-editing": "This Pokémon is already being edited.",
     "error-creating-edit": "Error while creating hunt to edit",
+    "error-feedback-not-sent": "Your feedback could not be sent. Try again later.",
 
     "notif-update-installed": "Update installed!",
     "notif-update-installed-label": "Refresh",
@@ -719,6 +732,7 @@
     "notif-save-edits": "Save these changes?",
     "notif-shiny-will-be-deleted": "this shiny Pokémon will be deleted and moved to the recycle bin.",
     "notif-notifications-permission-denied": "The permission for the Shinydex to send you notifications is denied by your browser settings.",
-    "notif-notifications-not-supported": "Push Notifications are not supported by your web browser."
+    "notif-notifications-not-supported": "Push Notifications are not supported by your web browser.",
+    "notif-feedback-sent": "Your feedback was sent. Thank you!"
   }
 }

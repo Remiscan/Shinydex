@@ -45,6 +45,7 @@ switch ($request) {
   // Do not need user to be signed in, but improve experience if they are
   case 'get-feed-data':
   case 'send-congratulation':
+  case 'send-feedback':
     $sessionNeeded = false;
     $sessionOptional = true;
     break;

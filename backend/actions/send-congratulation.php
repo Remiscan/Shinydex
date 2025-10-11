@@ -10,7 +10,6 @@ if (!isset($_POST['huntid'])) {
 }
 
 $huntID = $_POST['huntid'];
-$date = time();
 
 try {
 	if (is_null($userID)) {
@@ -25,13 +24,12 @@ try {
 		if ($count > 0) throw new \Exception('No');
 	}
 
-	$query = "INSERT INTO `shinydex_congratulations` (`userid`, `huntid`, `date`)
-			  VALUES (:userid, :huntid, :date)";
+	$query = "INSERT INTO `shinydex_congratulations` (`userid`, `huntid`)
+			  VALUES (:userid, :huntid)";
 	$insert = $db->prepare($query);
 
 	$insert->bindParam(':userid', $userID);
 	$insert->bindParam(':huntid', $huntID, PDO::PARAM_STR, 36);
-	$insert->bindParam(':date', $time);
 	$result = $insert->execute();
 
 	if (!$result) {

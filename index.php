@@ -248,10 +248,29 @@ $httpLanguage = $translation->getLanguage();
     <!-- Changelog -->
     <bottom-sheet id="changelog" drag modal data-changelog-hash="<?=hash_file('crc32b', __DIR__.'/pages/changelog.html')?>">
       <h2 class="title-large" data-string="section-changelog-long-title"></h2>
-      <a class="lien-source body-medium" href="mailto:contact@remiscan.fr" target="_blank" rel="external noreferrer noopener">
-        <span class="material-icons" aria-hidden="true">open_in_new</span><span data-string="report-misc"></span>
-      </a>
       <?php include './pages/changelog.html'; ?>
+    </bottom-sheet>
+
+    <!-- Bouton feedback -->
+    <button type="button" class="global-feedback-button surface surface-container interactive icon-button only-icon" data-action="open-feedback" data-label="feedback-section-long-title">
+      <span class="material-icons" aria-hidden="true">feedback</span>
+    </button>
+
+    <!-- Feedback -->
+    <bottom-sheet id="feedback" drag modal>
+      <h2 class="title-large" data-string="section-feedback-long-title"></h2>
+
+      <p data-string="feedback-intro"></p>
+      
+      <form name="feedback-form">
+        <text-area name="message" rows="6" maxlength="65535">
+          <span slot="label" data-string="feedback-label"></span>
+        </text-area>
+
+        <button type="submit" class="surface interactive filled elevation-2 only-text" data-action="send-feedback">
+          <span class="label-large" data-string="submit-feedback"></span>
+        </button>
+      </form>
     </bottom-sheet>
 
     <!-- Notifications -->

@@ -1173,10 +1173,6 @@ form[name="app-settings"] > *:last-child {
   --from-y: 1rem;
 }
 
-#changelog .lien-source {
-  margin-bottom: 1em;
-}
-
 .changelog-card {
   margin: auto;
 }
@@ -1404,6 +1400,28 @@ bottom-sheet {
 
 #changelog {
   --starting-position: 400px;
+}
+
+#feedback {
+  --starting-position: 600px;
+}
+
+#feedback p {
+  margin-block: 16px;
+}
+
+form[name="feedback-form"] [type="submit"] {
+  margin-block-start: 16px;
+}
+
+.global-feedback-button {
+  display: none;
+  position: fixed;
+  left: calc(112px / 2);
+  translate: -50% 0;
+  bottom: 16px;
+  z-index: var(--z-fab);
+  background-color: rgb(var(--surface-color, var(--surface)), 1);
 }
 
 bottom-sheet h2 {
