@@ -62,6 +62,7 @@ switch ($request) {
   case 'save-push-subscription':
   case 'delete-push-subscription':
   case 'get-congratulations':
+  case 'mark-feedback-as-done':
     $sessionNeeded = true;
     break;
   
