@@ -1403,7 +1403,7 @@ bottom-sheet {
 }
 
 #feedback {
-  --starting-position: 600px;
+  --starting-position: 100%;
 }
 
 #feedback p {
