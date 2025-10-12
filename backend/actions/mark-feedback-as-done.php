@@ -1,7 +1,6 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'].'/shinydex/backend/class_BDD.php';
 $db = new BDD();
-$userID = !is_null($user) ? $user->userID : null;
 
 
 
