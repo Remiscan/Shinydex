@@ -95,7 +95,6 @@ export async function populateFromData(
   const virtualize = virtualizedSections.includes(section);
 
   const elementName = getCardTagName(section);
-  const dataStore = getDataStore(section);
   const dataClass = getDataClass(section);
 
   /* Que faire selon l'état des données du Pokémon ?
@@ -209,17 +208,20 @@ async function populateFriendsList(usernames: Set<string>): Promise<Array<string
 
   // Traitons les cartes
 
+  const usernamesNotInDB = new Set(usernames);
   const cardsToCreate: Array<friendCard> = [];
+  const cardsToRemove: Array<friendCard> = [];
   const results: string[] = [];
   await dataStore.iterate((pkmnList, username) => {
     if (!usernames.has(username)) return;
+    usernamesNotInDB.delete(username);
     const friendInDB = pkmnList != null && Array.isArray(pkmnList);
 
     let card: friendCard | null = document.querySelector(`${elementName}[username="${username}"]`);
 
     // ABSENT DE LA BDD = Supprimer (manuellement)
     if (!friendInDB) {
-      card?.remove();
+      if (card) cardsToRemove.push(card);
     }
 
     // DANS LA BDD
@@ -241,6 +243,11 @@ async function populateFriendsList(usernames: Set<string>): Promise<Array<string
     results.push(username);
   });
 
+  for (const username of usernamesNotInDB) {
+    let card: friendCard | null = document.querySelector(`${elementName}[username="${username}"]`);
+    if (card) cardsToRemove.push(card);
+  }
+
   // Plaçons les cartes sur la page
   // (après la préparation pour optimiser le temps d'éxecution)
 
@@ -248,6 +255,8 @@ async function populateFriendsList(usernames: Set<string>): Promise<Array<string
   if (sectionElement?.classList.contains('vide') && cardsToCreate.length > 0) {
     sectionElement.classList.remove('vide');
   }
+
+  cardsToRemove.map(card => card.remove());
 
   await Promise.all(cardsToCreate.map(async card => {
     conteneur.appendChild(card);
