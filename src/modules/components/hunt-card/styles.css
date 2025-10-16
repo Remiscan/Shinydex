@@ -195,3 +195,12 @@ form:not(.caught) .capture-button-group ~ * {
 :host(:not([data-charm-available="true"]):not([data-game="sv"]):not([data-game="pla"]):not([data-game="bdsp"]):not([data-game="swsh"]):not([data-game="lgpe"]):not([data-game="usum"]):not([data-game="oras"]):not([data-game="gsc"])) fieldset[name="bonus"] {
   display: none;
 }
+
+/* Cache les gènes indisponibles dans certains jeux */
+[name="gene"]::part(option) { display: none; }
+[name="gene"]::part(option all),
+:host([data-game="swsh"]) [name="gene"]::part(option swsh),
+:host([data-game="pla"]) [name="gene"]::part(option pla),
+:host([data-game="za"]) [name="gene"]::part(option za) {
+  display: flex;
+}

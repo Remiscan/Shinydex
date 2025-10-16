@@ -51,7 +51,7 @@ template.innerHTML = /*html*/`
 
 const optionTemplate = document.createElement('template');
 optionTemplate.innerHTML = /*html*/`
-  <span role="option" part="option" id="option-{key}" class="surface interactive"
+  <span role="option" part="option {parts}" id="option-{key}" class="surface interactive"
     data-value="{value}" aria-selected="false"
     {attr}
   >
@@ -274,7 +274,8 @@ export class InputSelect extends TextField {
         .replace('{label}', label)
         .replace('{value}', value)
         .replace('{attr}', optionAttributes.map(attr => `${attr.name}="${attr.value}"`).join(' '))
-        .replace('{stringKey}', dataStringAttr);
+        .replace('{stringKey}', dataStringAttr)
+        .replace('{parts}', node.getAttribute('data-part') ?? '');
       
       options.push(template);
     }

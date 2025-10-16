@@ -220,12 +220,12 @@ template.innerHTML = /*html*/`
           <span slot="label" data-string="capture-name"></span>
         </text-field>
 
-        <input-select name="gene" default-value="" icons="leading" data-game="swsh pla">
+        <input-select name="gene" default-value="" icons="leading" data-game="swsh pla za">
           <span slot="leading-icon" class="icon" data-icon="gene"></span>
           <span slot="label" data-string="capture-gene"></span>
-          <option value="" data-string="capture-gene-none"></option>
-          <option value="gigantamax" data-string="capture-gene-gigantamax"></option>
-          <option value="alpha" data-string="capture-gene-alpha"></option>
+          <option value="" data-string="capture-gene-none" data-part="all"></option>
+          <option value="gigantamax" data-string="capture-gene-gigantamax" data-part="swsh"></option>
+          <option value="alpha" data-string="capture-gene-alpha" data-part="pla za"></option>
         </input-select>
 
         <text-field name="catchTime" type="date">
