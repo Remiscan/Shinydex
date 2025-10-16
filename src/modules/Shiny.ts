@@ -39,7 +39,7 @@ const allMethodes: Methode[] = [
   
   { id: 'massoutbreakevent', jeux: allGames.filter(g => g.id == 'sv'), mine: true, charm: true },
   { id: 'wildevent', jeux: allGames.filter(g => g.id === 'go'), mine: true, charm: false },
-  { id: 'wildalwaysshiny', jeux: allGames.filter(g => ['gs', 'hgss', 'bw2', 'pla'].includes(g.id)), mine: true, charm: false },
+  { id: 'wildalwaysshiny', jeux: allGames.filter(g => ['gs', 'hgss', 'bw2', 'pla', 'za'].includes(g.id)), mine: true, charm: false },
   { id: 'event', jeux: allGames.filter(g => g.gen > 1), mine: false, charm: false },
 
   { id: 'glitch', jeux: allGames.filter(g => [1, 2].includes(g.gen)), mine: true, charm: false },
