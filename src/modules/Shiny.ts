@@ -19,8 +19,8 @@ export type Methode = {
 const allGames = Pokemon.jeux;
 const allMethodes: Methode[] = [
   { id: 'wild', jeux: allGames, mine: true, charm: true },
-  { id: 'egg', jeux: allGames.filter(g => ![1, 7.1, 0].includes(g.gen)), mine: true, charm: true },
-  { id: 'masuda', jeux: allGames.filter(g => g.gen >= 4 && g.gen != 7.1 && g.gen != 8.1), mine: true, charm: true },
+  { id: 'egg', jeux: allGames.filter(g => ![1, 7.1, 0].includes(g.gen) && g.id !== 'za'), mine: true, charm: true },
+  { id: 'masuda', jeux: allGames.filter(g => g.gen >= 4 && g.gen != 7.1 && g.gen != 8.1 && g.id != 'za'), mine: true, charm: true },
   { id: 'fixedencounter', jeux: allGames.filter(g => g.id === 'sv'), mine: true, charm: false },
   { id: 'reset', jeux: allGames.filter(g => g.gen >= 2), mine: true, charm: true },
   { id: 'pokeradar', jeux: allGames.filter(g => [4, 6].includes(g.gen) || g.id == 'bdsp'), mine: true, charm: true },
@@ -35,6 +35,7 @@ const allMethodes: Methode[] = [
   { id: 'grandunderground', jeux: allGames.filter(g => g.id == 'bdsp'), mine: true, charm: false },
   { id: 'massoutbreak', jeux: allGames.filter(g => g.id == 'pla' || g.id == 'sv'), mine: true, charm: true },
   { id: 'massivemassoutbreak', jeux: allGames.filter(g => g.id == 'pla'), mine: true, charm: true },
+  { id: 'fossil', jeux: allGames.filter(g => g.id === 'za'), mine: true, charm: false },
   
   { id: 'massoutbreakevent', jeux: allGames.filter(g => g.id == 'sv'), mine: true, charm: true },
   { id: 'wildevent', jeux: allGames.filter(g => g.id === 'go'), mine: true, charm: false },
@@ -367,7 +368,8 @@ export class Shiny extends FrontendShiny {
           break;
         }
 
-        case 'fixedencounter': {
+        case 'fixedencounter':
+        case 'fossil': {
           return baseRate;
         }
       }
@@ -387,6 +389,10 @@ export class Shiny extends FrontendShiny {
 
         case 'sleep': {
           return null;
+        } break;
+
+        case 'za': {
+          charmRolls = Number(this.charm) * 3;
         } break;
       }
 
