@@ -20,48 +20,45 @@ $userCondition = $userID
 	: 1;
 
 try {
-	$query = "SELECT 
-					t.*,
-					CASE WHEN c.huntid IS NOT NULL THEN TRUE ELSE FALSE END AS congratulated
+	$query = "SELECT
+				final.*,
+				CASE WHEN c.huntid IS NOT NULL THEN TRUE ELSE FALSE END AS congratulated
+			FROM (
+				SELECT
+					s.*,
+					u.username,
+					u.public,
+					u.appearInFeed,
+					COUNT(*) OVER (PARTITION BY s.day, s.userid) AS total,
+					ROW_NUMBER() OVER (PARTITION BY s.day, s.userid ORDER BY CAST(s.catchTime AS UNSIGNED) DESC, CAST(s.creationTime AS UNSIGNED) DESC, s.id DESC) AS rn,
+					DENSE_RANK() OVER (ORDER BY s.day DESC) as dr_day
 				FROM (
-					SELECT 
-						DATE(FROM_UNIXTIME(s.catchTime/1000)) AS day,
-						u.uuid,
-						u.username,
-						u.public,
-						u.appearInFeed,
-						s.*,
-						DENSE_RANK() OVER(ORDER BY DATE(FROM_UNIXTIME(s.catchTime/1000)) DESC) as dr_day
-					FROM 
-						shinydex_users u
-					JOIN (
-						SELECT 
-							p.*
-						FROM 
-							shinydex_pokemon p
-						WHERE 
-							DATE(FROM_UNIXTIME(p.catchTime/1000)) BETWEEN :minDate AND :maxDate
-					) s
-					ON 
-						u.uuid = s.userid
-					WHERE 
-						u.public = 1
-						AND u.appearInFeed = 1
-						AND $otherUsersCondition
-				) t
-				LEFT JOIN 
-					shinydex_congratulations c
-				ON 
-					t.huntid = c.huntid
-					AND $userCondition
-				WHERE 
-					t.dr_day <= 10
-				ORDER BY 
-					day DESC, 
-					uuid ASC, 
-					CAST(catchTime AS int) DESC,
-					CAST(creationTime AS int) DESC,
-					id DESC";
+					SELECT
+						DATE(FROM_UNIXTIME(p.catchTime/1000)) AS day,
+						p.*,
+						MAX(CAST(p.catchTime AS UNSIGNED)) OVER (PARTITION BY DATE(FROM_UNIXTIME(p.catchTime/1000)), p.userid) AS user_last_catch,
+						MAX(CAST(p.creationTime AS UNSIGNED)) OVER (PARTITION BY DATE(FROM_UNIXTIME(p.catchTime/1000)), p.userid) AS user_last_creation,
+						MAX(p.id) OVER (PARTITION BY DATE(FROM_UNIXTIME(p.catchTime/1000)), p.userid) AS user_last_id
+					FROM shinydex_pokemon p
+					WHERE DATE(FROM_UNIXTIME(p.catchTime/1000)) BETWEEN :minDate AND :maxDate
+				) s
+				JOIN shinydex_users u ON u.uuid = s.userid
+				WHERE u.public = 1
+					AND u.appearInFeed = 1
+					AND $otherUsersCondition
+			) final
+			LEFT JOIN shinydex_congratulations c ON final.huntid = c.huntid AND $userCondition
+			WHERE final.dr_day <= 10
+				AND final.rn <= 3
+			ORDER BY
+				final.day DESC,
+				final.user_last_catch DESC,
+				final.user_last_creation DESC,
+				final.user_last_id DESC,
+				CAST(final.creationTime AS UNSIGNED) DESC,
+				CAST(final.catchTime AS UNSIGNED) DESC,
+				final.id DESC,
+				final.userid ASC";
 
 	$query = $db->prepare($query);
 
@@ -73,32 +70,48 @@ try {
 
 	// Organize the results by day and by username
 	$results = [];
+	$dayOrder = []; // keep track of first-seen user order per day (follows SQL ORDER BY)
 	foreach ($pokemon as $shiny) {
-		$userid = $shiny['uuid'];
+		$userid = $shiny['userid'];
 		$username = $shiny['username'];
 		$day = $shiny['day'];
 
-		unset($shiny['userid']);
-		unset($shiny['uuid']);
-		unset($shiny['username']);
-		unset($shiny['day']);
-
-		if (!isset($results[$day])) $results[$day] = [];
-		if (!isset($results[$day][$userid])) $results[$day][$userid] = [
-			'username' => $username,
-			'total' => 0,
-			'entries' => []
-		];
-
-		if (count($results[$day][$userid]['entries']) < 3) {
-			$results[$day][$userid]['entries'][] = $shiny;
+		if (!isset($results[$day])) {
+			$results[$day] = [];
+			$dayOrder[$day] = [];
 		}
 
-		$results[$day][$userid]['total']++;
+		if (!isset($results[$day][$userid])) {
+			// first time we see this user for that day: record their insertion order
+			$results[$day][$userid] = [
+				'username' => $username,
+				'total' => isset($shiny['total']) ? (int)$shiny['total'] : 0,
+				'entries' => []
+			];
+			$dayOrder[$day][] = $userid;
+		}
+
+		// remove helper columns from the entry but preserve all pokemon columns
+		unset($shiny['userid']);
+		unset($shiny['username']);
+		unset($shiny['day']);
+		unset($shiny['total']);
+		unset($shiny['user_last_catch']);
+		unset($shiny['user_last_creation']);
+		unset($shiny['user_last_id']);
+		unset($shiny['rn']);
+		unset($shiny['dr_day']);
+
+		$results[$day][$userid]['entries'][] = $shiny;
 	}
 
-	foreach ($results as $day => $userList) {
-		$results[$day] = array_values($userList);
+	// Emit user groups in the same order they were first-seen by SQL for each day
+	foreach ($results as $dayKey => $userMap) {
+		$ordered = [];
+		foreach ($dayOrder[$dayKey] as $uid) {
+			if (isset($userMap[$uid])) $ordered[] = $userMap[$uid];
+		}
+		$results[$dayKey] = $ordered;
 	}
 
 	// Send data to the frontend
