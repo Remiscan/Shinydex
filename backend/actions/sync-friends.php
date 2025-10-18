@@ -99,8 +99,8 @@ try {
               SELECT u.username, p.dexid, p.forme, p.catchTime, pc.total, ROW_NUMBER() OVER (
                 PARTITION BY p.userid
                 ORDER BY
-                  CAST(p.catchTime AS int) DESC,
-                  CAST(p.creationTime AS int) DESC,
+                  p.catchTime DESC,
+                  p.creationTime DESC,
                   p.id DESC
             ) AS rownumber
             FROM shinydex_users AS u

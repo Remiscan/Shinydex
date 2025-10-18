@@ -6,7 +6,7 @@ import './components/feed-day/feedDay.js';
 import { loadSpinner } from "./components/loadSpinner.js";
 import { dataStorage, friendStorage } from "./localForage.js";
 import { Notif } from "./notification.js";
-import { dateDifference, Params } from "./Params.js";
+import { dateDifference } from "./Params.js";
 import { formatRelativeNumberOfDays, getString, TranslatedString } from "./translation.js";
 
 
@@ -17,16 +17,19 @@ let requestsCount = 0;
 
 
 const feedLoaderObserver = new IntersectionObserver((entries: IntersectionObserverEntry[]) => {
+	const feedSection = document.getElementById('flux');
+	if (!feedSection) return;
+
 	for (const entry of entries) {
 		if (requestsCount >= maxRequests) return;
 
 		if (!entry.isIntersecting) return;
 		if (!(entry.target instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
 
-		const maxDate = entry.target.dataset.maxDate;
-		if (!maxDate) return;
+		const newerDateForLoader = feedSection.dataset.olderDate ? Number(feedSection.dataset.olderDate) : undefined;
+		const newerIdForLoader = feedSection.dataset.olderId ? Number(feedSection.dataset.olderId) : undefined;
 
-		getAndPopulateFeed(maxDate as ISODay);
+		getAndPopulateFeed(newerDateForLoader ?? Date.now(), undefined, newerIdForLoader, undefined);
 	}
 }, {
 	threshold: [0],
@@ -35,46 +38,62 @@ const feedLoaderObserver = new IntersectionObserver((entries: IntersectionObserv
 
 
 type FeedData = {
-	[key: ISODay]: Array<{
-		'username': string | null,
-		total: number,
-		entries: BackendCongratulatedShiny[],
-	}>
+	entries: {
+		[key: ISODay]: Array<{
+			'username': string | null,
+			total: number,
+			entries: BackendCongratulatedShiny[],
+		}>,
+	},
+	newerCatchTime: number,
+	olderCatchTime: number,
+	newerId: number,
+	olderId: number
 }
 type FeedDayEntry = [key: keyof FeedData, userList: FeedData[keyof FeedData]];
 
 
-function timestamp2ISODay(timestamp: number): ISODay {
-	return new Date(timestamp).toISOString().slice(0, 10) as ISODay
-}
-
-
 /** Initialise le récupérateur de données du flux. */
-export function initFeedLoader(maxDate: ISODay = timestamp2ISODay(Date.now())) {
+export function initFeedLoader(maxDate: number = Date.now()) {
 	const feedSection = document.getElementById('flux');
 	const feedLoader = feedSection?.querySelector<loadSpinner>('.liste-cartes > load-spinner');
 	if (!feedLoader) return;
-	feedLoader?.setAttribute('data-max-date', maxDate);
+	//feedLoader?.setAttribute('data-max-date', String(maxDate));
 	feedLoaderObserver.observe(feedLoader);
 }
 
 
 /** Récupère les données du flux. */
-export async function _getFeedData(maxDate: ISODay = timestamp2ISODay(Date.now()), minDate?: ISODay) {
-	const body = {
-		maxDate,
-		minDate
+export async function _getFeedData(
+	maxDate: number = Date.now(),
+	minDate?: number,
+	maxId?: number,
+	minId?: number
+): Promise<FeedData> {
+	if (isNaN(maxDate)) throw new TypeError('Invalid maxDate');
+	if (minDate != null && isNaN(minDate)) throw new TypeError('Invalid minDate');
+	const body: Record<string, unknown> = {
+		newerDate: maxDate,
+		timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
 	};
-	if (!minDate) delete body.minDate;
+	if (minDate) body.olderDate = minDate;
+	if (maxId) body.newerId = maxId;
+	if (minId) body.olderId = minId;
+
+	if (body.newerDate && body.newerId) body.direction = 'older';
+	else if (body.olderDate && body.olderId) body.direction = 'newer';
+	else if (body.newerDate) body.direction = 'initial';
+	else throw new Error('Invalid direction');
+
 	const data = await callBackend('get-feed-data', body, true);
 	requestsCount++;
-	return data.entries;
+	return data as FeedData;
 }
 const getFeedData = queueable(_getFeedData, 1050);
 
 
 /** Crée le template d'une journée dans le flux. */
-function makeFeedDay(day: ISODay, userList: FeedData[keyof FeedData], friends: Set<string>) {
+function makeFeedDay(day: ISODay, userList: FeedData['entries'][keyof FeedData['entries']], friends: Set<string>) {
 	const container = document.createElement('feed-day');
 	container.dataset.datetime = day;
 
@@ -107,13 +126,32 @@ function makeFeedDay(day: ISODay, userList: FeedData[keyof FeedData], friends: S
 
 /** Remplit le flux public avec les données reçues du backend. */
 function populateFeedData(data: FeedData, friends: Set<string>, { position = 'bottom' } = {}) {
+	if (Array.isArray(data.entries) && data.entries.length === 0) return;
+
 	const feedSection = document.getElementById('flux');
 	const feedContentContainer = feedSection?.querySelector('.liste-cartes');
-	if (!feedContentContainer) return;
+	if (!feedSection || !feedContentContainer) return;
+
+	feedSection.setAttribute('data-newer-date', String(Math.max(
+		data.newerCatchTime,
+		Number(feedSection.getAttribute('data-newer-date') ?? 0)
+	)));
+	feedSection.setAttribute('data-older-date', String(Math.min(
+		data.olderCatchTime,
+		Number(feedSection.getAttribute('data-older-date') ?? Infinity)
+	)));
+	feedSection.setAttribute('data-newer-id', String(Math.max(
+		data.newerId,
+		Number(feedSection.getAttribute('data-newer-id') ?? 0)
+	)));
+	feedSection.setAttribute('data-older-id', String(Math.min(
+		data.olderId,
+		Number(feedSection.getAttribute('data-older-id') ?? Infinity)
+	)));
 
 	const feedContent = new DocumentFragment();
 
-	for (const [day, userList] of Object.entries(data)) {
+	for (const [day, userList] of Object.entries(data.entries)) {
 		const dayContent = makeFeedDay(day as ISODay, userList, friends);
 		feedContent.appendChild(dayContent);
 	}
@@ -139,16 +177,9 @@ function populateFeedData(data: FeedData, friends: Set<string>, { position = 'bo
 	// If we're scrolling down the feed, i.e. inserting older content at the bottom
 	else {
 		if (requestsCount < maxRequests) {
-			const previousMinDate = Object.keys(data).at(-1);
-			if (previousMinDate) {
-				const _pMinDate = new Date(previousMinDate);
-				const newMaxDate = new Date(_pMinDate.getTime() - Params.msPerDay);
-		
-				const loader = document.createElement('load-spinner');
-				loader.setAttribute('data-max-date', newMaxDate.toISOString().slice(0, 10));
-				feedContent.appendChild(loader);
-				feedLoaderObserver.observe(loader);
-			}
+			const loader = document.createElement('load-spinner');
+			feedContent.appendChild(loader);
+			feedLoaderObserver.observe(loader);
 		}
 		
 		feedContentContainer.querySelectorAll('load-spinner').forEach(loader => loader.remove());
@@ -158,11 +189,17 @@ function populateFeedData(data: FeedData, friends: Set<string>, { position = 'bo
 
 
 /** Récupère les données du flux public sur le backend, puis le remplit. */
-async function getAndPopulateFeed(maxDate: ISODay, minDate?: ISODay, { position = 'bottom', method = 'auto' } = {}) {
+async function getAndPopulateFeed(
+	maxDate: number,
+	minDate?: number,
+	maxId?: number,
+	minId?: number,
+	{ position = 'bottom', method = 'auto' } = {}
+) {
 	try {
 		const data = method === 'auto'
-			? await getFeedData(maxDate, minDate)
-			: await _getFeedData(maxDate, minDate);
+			? await getFeedData(maxDate, minDate, maxId, minId)
+			: await _getFeedData(maxDate, minDate, maxId, minId);
 		const friends = new Set(await friendStorage.keys());
 		populateFeedData(data, friends, { position });
 	} catch (error) {}
@@ -181,16 +218,15 @@ async function refreshFeed(event: Event) {
 	const feedSection = document.getElementById('flux');
 	const feedScroller = feedSection?.querySelector('.section-contenu');
 	const feedContentContainer = feedSection?.querySelector('.liste-cartes');
-	if (!feedScroller || !feedContentContainer) return;
+	if (!feedSection || !feedScroller || !feedContentContainer) return;
 
 	feedScroller.scrollTo({ top: 0, behavior: 'smooth' });
 
-	const firstFeedDay = feedContentContainer.querySelector<feedCard>('feed-day');
-	const previousMaxDate = firstFeedDay?.dataset.datetime as ISODay | undefined;
-	if (!previousMaxDate) return;
+	const previousNewerDate = feedSection.dataset.newerDate ? Number(feedSection.dataset.newerDate) : undefined;
+	const previousNewerId = feedSection.dataset.newerId ? Number(feedSection.dataset.newerId) : undefined;
+	if (!previousNewerDate) return;
 
-	const tomorrowDate = (new Date(Date.now() + Params.msPerDay)).toISOString().slice(0, 10) as ISODay;
-	await getAndPopulateFeed(tomorrowDate, previousMaxDate, { position: 'top', method: 'manual' });
+	await getAndPopulateFeed(Date.now(), previousNewerDate, undefined, previousNewerId, { position: 'top', method: 'manual' });
 
 	target.removeAttribute('disabled');
 	refreshingFeed = false;

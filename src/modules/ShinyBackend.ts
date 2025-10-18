@@ -3,8 +3,8 @@ export interface BackendShiny {
   id: number,
   huntid: string,
   userid: string,
-  creationTime: string,
-  lastUpdate: string,
+  creationTime: number,
+  lastUpdate: number,
 
   dexid: number,
   forme: string,
@@ -13,7 +13,7 @@ export interface BackendShiny {
   count: string,
   charm: number,
 
-  catchTime: string,
+  catchTime: number,
   name: string,
   ball: string,
   gene: string,
@@ -23,13 +23,10 @@ export interface BackendShiny {
 };
 
 /** Structure d'un Pokémon shiny tel que stocké dans la BDD locale. */
-export interface feShiny extends Omit<BackendShiny, 'id' | 'userid' | 'creationTime' | 'lastUpdate' | 'count' | 'charm' | 'originalTrainer' | 'catchTime' | 'deleted'> {
-  creationTime: number,
-  lastUpdate: number,
+export interface feShiny extends Omit<BackendShiny, 'id' | 'userid' | 'count' | 'charm' | 'originalTrainer' | 'deleted'> {
   count: Count,
   charm: boolean,
   originalTrainer: boolean,
-  catchTime: number,
 }
 
 
@@ -123,8 +120,8 @@ export class FrontendShiny implements feShiny {
   toBackend(): Omit<BackendShiny, 'id' | 'userid'> {
     return {
       huntid: this.huntid,
-      creationTime: String(this.creationTime),
-      lastUpdate: String(this.lastUpdate),
+      creationTime: this.creationTime,
+      lastUpdate: this.lastUpdate,
 
       dexid: this.dexid,
       forme: this.forme,
@@ -133,7 +130,7 @@ export class FrontendShiny implements feShiny {
       count: JSON.stringify(this.countWithoutNulls),
       charm: Number(this.charm),
 
-      catchTime: String(this.catchTime),
+      catchTime: this.catchTime,
       name: this.name,
       ball: this.ball,
       gene: this.gene,

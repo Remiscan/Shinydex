@@ -35,8 +35,8 @@ switch ($scope) {
                 ON u.uuid = pc.userid
               WHERE u.username = :username AND u.public = 1
               ORDER BY
-                CAST(p.catchTime AS int) DESC,
-                CAST(p.creationTime AS int) DESC,
+                p.catchTime DESC,
+                p.creationTime DESC,
                 p.id DESC
               LIMIT 10";
 }

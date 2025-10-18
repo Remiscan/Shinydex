@@ -195,7 +195,7 @@ class User {
     $update = $this->db->prepare($query);
 
     $update->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
-    $update->bindParam(':lastupdate', $now, PDO::PARAM_STR, 13);
+    $update->bindParam(':lastupdate', $now, PDO::PARAM_INT);
     if ($username != null)
       $update->bindParam(':username', $username, PDO::PARAM_STR, 30);
     if ($public != null) {
@@ -514,7 +514,7 @@ class User {
     foreach($pokemon as $key => $shiny) {
       $update->bindParam(':huntid', $shiny['huntid'], PDO::PARAM_STR, 36);
 
-      $update->bindParam(':lastUpdate', $shiny['lastUpdate'], PDO::PARAM_STR, 13);
+      $update->bindParam(':lastUpdate', $shiny['lastUpdate'], PDO::PARAM_INT);
 
       $update->bindParam(':dexid', $shiny['dexid'], PDO::PARAM_INT, 4);
       $update->bindParam(':forme', $shiny['forme'], PDO::PARAM_STR, 50);
@@ -523,7 +523,7 @@ class User {
       $update->bindParam(':count', $shiny['count']);
       $update->bindParam(':charm', $shiny['charm'], PDO::PARAM_INT, 1);
 
-      $update->bindParam(':catchTime', $shiny['catchTime'], PDO::PARAM_STR, 13);
+      $update->bindParam(':catchTime', $shiny['catchTime'], PDO::PARAM_INT);
       $update->bindParam(':nickname', $shiny['name'], PDO::PARAM_STR, 50);
       $update->bindParam(':ball', $shiny['ball'], PDO::PARAM_STR, 50);
       $update->bindParam(':gene', $shiny['gene'], PDO::PARAM_STR, 50);

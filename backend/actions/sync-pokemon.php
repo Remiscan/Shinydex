@@ -192,8 +192,8 @@ foreach($to_insert_online as $key => $shiny) {
 
   $insert->bindParam(':huntid', $shiny['huntid'], PDO::PARAM_STR, 36);
   $insert->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
-  $insert->bindParam(':creationTime', $shiny['lastUpdate'], PDO::PARAM_STR, 13);
-  $insert->bindParam(':lastUpdate', $shiny['lastUpdate'], PDO::PARAM_STR, 13);
+  $insert->bindParam(':creationTime', $shiny['lastUpdate'], PDO::PARAM_INT);
+  $insert->bindParam(':lastUpdate', $shiny['lastUpdate'], PDO::PARAM_INT);
 
   $insert->bindParam(':dexid', $shiny['dexid'], PDO::PARAM_INT, 4);
   $insert->bindParam(':forme', $shiny['forme'], PDO::PARAM_STR, 50);
@@ -202,7 +202,7 @@ foreach($to_insert_online as $key => $shiny) {
   $insert->bindParam(':count', $shiny['count']);
   $insert->bindParam(':charm', $shiny['charm'], PDO::PARAM_INT, 1);
 
-  $insert->bindParam(':catchTime', $shiny['catchTime'], PDO::PARAM_STR, 13);
+  $insert->bindParam(':catchTime', $shiny['catchTime'], PDO::PARAM_INT);
   $insert->bindParam(':nickname', $shiny['name'], PDO::PARAM_STR, 50);
   $insert->bindParam(':ball', $shiny['ball'], PDO::PARAM_STR, 50);
   $insert->bindParam(':gene', $shiny['gene'], PDO::PARAM_STR, 50);
@@ -235,7 +235,7 @@ foreach($to_update_online as $key => $shiny) {
   $update->bindParam(':huntid', $shiny['huntid'], PDO::PARAM_STR, 36);
   $update->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
 
-  $update->bindParam(':lastUpdate', $shiny['lastUpdate'], PDO::PARAM_STR, 13);
+  $update->bindParam(':lastUpdate', $shiny['lastUpdate'], PDO::PARAM_INT);
 
   $update->bindParam(':dexid', $shiny['dexid'], PDO::PARAM_INT, 4);
   $update->bindParam(':forme', $shiny['forme'], PDO::PARAM_STR, 50);
@@ -244,7 +244,7 @@ foreach($to_update_online as $key => $shiny) {
   $update->bindParam(':count', $shiny['count']);
   $update->bindParam(':charm', $shiny['charm'], PDO::PARAM_INT, 1);
 
-  $update->bindParam(':catchTime', $shiny['catchTime'], PDO::PARAM_STR, 13);
+  $update->bindParam(':catchTime', $shiny['catchTime'], PDO::PARAM_INT);
   $update->bindParam(':nickname', $shiny['name'], PDO::PARAM_STR, 50);
   $update->bindParam(':ball', $shiny['ball'], PDO::PARAM_STR, 50);
   $update->bindParam(':gene', $shiny['gene'], PDO::PARAM_STR, 50);
@@ -268,7 +268,7 @@ foreach($to_delete_online as $key => $shiny) {
 
   $insert->bindParam(':huntid', $shiny['huntid'], PDO::PARAM_STR, 36);
   $insert->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
-  $insert->bindParam(':lastUpdate', $shiny['lastUpdate'], PDO::PARAM_STR, 13);
+  $insert->bindParam(':lastUpdate', $shiny['lastUpdate'], PDO::PARAM_INT);
 
   $results[] = $insert->execute();
 
