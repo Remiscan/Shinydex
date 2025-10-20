@@ -161,7 +161,7 @@ function populateFeedData(data: FeedData, friends: Set<string>, { position = 'bo
 		const firstFeedDay = feedContentContainer.querySelector('feed-day');
 
 		const replace = () => {
-			firstFeedDay?.replaceWith(feedContent);
+			feedContentContainer.insertBefore(feedContent, firstFeedDay || null);
 		};
 
 		if ('startViewTransition' in document) {
@@ -183,7 +183,7 @@ function populateFeedData(data: FeedData, friends: Set<string>, { position = 'bo
 		}
 		
 		feedContentContainer.querySelectorAll('load-spinner').forEach(loader => loader.remove());
-		feedContentContainer.appendChild(feedContent);
+		feedContentContainer.insertBefore(feedContent, null);
 	}
 }
 
