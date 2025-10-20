@@ -321,7 +321,8 @@ export class shinyCard extends HTMLElement {
           srContainer.classList.add('full-odds');
         } else if (charm && !(charmlessMethods.includes(methode)) && (
           (game.gen <= 5 && shinyRate >= 2731 - 1) ||
-          (game.gen > 5 && shinyRate >= 1365 - 1)
+          (game.gen > 5 && shinyRate >= 1365 - 1) ||
+          ((game.id === 'pla' || game.id === 'za') && shinyRate >= 1024 - 1)
         )) {
           srContainer.classList.add('charm-odds');
         } else if (shinyRate <= 1) {
