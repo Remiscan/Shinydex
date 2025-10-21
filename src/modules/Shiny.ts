@@ -245,11 +245,13 @@ export class Shiny extends FrontendShiny {
                                   : (dexKo >= 100) ? 2
                                   : (dexKo >= 50) ? 1.5
                                   : 0;
-            const rolls = 1 + charmRolls + chainRolls;
-            let rate = Math.round(baseRate / rolls);
-            rate = (brilliantChance / 100) * rate + ((100 - brilliantChance) / 100) * baseRate;
-            rate = Math.round(rate);
-            return rate;
+            // Boosted rates only apply to brilliant encounters, so we multiply the chances of being brilliant with the boosted shiny rate,
+            // and the chances of not being brilliant with the normal shiny rate.
+            const charmShinyRate = Math.round(baseRate / (1 + charmRolls));
+            const brilliantShinyRate = Math.round(baseRate / (1 + charmRolls + chainRolls));
+            return Math.round(
+              (brilliantChance / 100) * brilliantShinyRate + ((100 - brilliantChance) / 100) * charmShinyRate
+            );
           }
 
           break;
