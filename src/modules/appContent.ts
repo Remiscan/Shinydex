@@ -23,17 +23,19 @@ async function populateHandler(section: PopulatableSection, requestedIds?: strin
   console.log(`Populating section ${section}...`);
 
   const dataStore = getDataStore(section);
+  const dataClass = getDataClass(section);
 
   const sectionElement = document.querySelector(`#${section}`);
   const isCurrentSection = document.body.matches(`[data-section-actuelle~="${section}"]`);
 
   let ids: Set<string> = new Set(requestedIds ?? []);
 
-  const allData: Map<Shiny['huntid'], Shiny> = new Map();
+  const allData: Map<Shiny['huntid'], Shiny | Hunt> = new Map();
   await dataStore.iterate((data, key) => {
     if (!requestedIds) ids.add(key);
     if (typeof data !== 'object' || data == null) return;
-    allData.set(key, new Shiny(data));
+    if (dataClass == null) return;
+    allData.set(key, new dataClass(data));
   });
 
   const orderMap = await computeOrders(section, allData);
@@ -56,7 +58,7 @@ async function populateHandler(section: PopulatableSection, requestedIds?: strin
     case 'chasses-en-cours':
     case 'chromatiques-ami':
     case 'corbeille': {
-      const requestedData: Map<Shiny['huntid'], Shiny | null> = new Map();
+      const requestedData: Map<Shiny['huntid'], Shiny | Hunt | null> = new Map();
       for (const id of ids) {
         requestedData.set(id, allData.get(id) ?? null);
       }
@@ -101,7 +103,7 @@ export const populator = Object.fromEntries(populatableSections.map(section => {
 
 export async function populateFromData(
   section: Exclude<PopulatableSection, 'partage'>,
-  dataList: Map<Shiny['huntid'], Shiny | null>,
+  dataList: Map<Shiny['huntid'], Shiny | Hunt | null>,
   preexistingCards: Map<string, HTMLElement>,
   orderMap: OrderMap,
 ): Promise<Array<string>> {
