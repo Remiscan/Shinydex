@@ -17,6 +17,8 @@
     "shiny-card-notes-empty": "Pas de note.",
     "shiny-card-unknown-date": "Date inconnue",
     "legit-confirmed": "Légitimité confirmée",
+    "auto-translate": "Traduire",
+    "undo-auto-translate": "Original",
 
     "section-pokedex-short-title": "Pokédex<shiny-stars></shiny-stars>",
     "section-pokedex-long-title": "<span class=\"nowrap\">Pokédex <shiny-stars></shiny-stars></span>",
@@ -386,6 +388,8 @@
     "shiny-card-notes-empty": "No note.",
     "shiny-card-unknown-date": "Date unknown",
     "legit-confirmed": "Confirmed legitimity",
+    "auto-translate": "Translate",
+    "undo-auto-translate": "Original",
 
     "section-pokedex-short-title": "Pokédex<shiny-stars></shiny-stars>",
     "section-pokedex-long-title": "<span class=\"nowrap\">Pokédex <shiny-stars></shiny-stars></span>",

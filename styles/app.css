@@ -39,6 +39,10 @@ body[data-anti-spoilers-public="off"] #flux feed-card[data-is-friend="false"] {
   --anti-spoilers-filter: none;
 }
 
+body[data-supports-auto-translation="true"] {
+  --supports-auto-translation: true;
+}
+
 p {
   margin: 0;
 }

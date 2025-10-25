@@ -15,6 +15,14 @@ template.innerHTML = /*html*/`
       <button type="button" class="surface interactive filled tonal outlined only-text" data-action="restore" disabled tabindex="-1">
         <span class="label-large" data-string="restore-hunt"></span>
       </button>
+
+      <button type="button" class="surface interactive filled tonal outlined only-text" data-action="auto-translate" disabled tabindex="-1">
+        <span class="label-large" data-string="auto-translate"></span>
+      </button>
+
+      <button type="button" class="surface interactive filled tonal outlined only-text" data-action="undo-auto-translate">
+        <span class="label-large" data-string="undo-auto-translate"></span>
+      </button>
     </div>
 
     <div class="pokemon-infos__identity body-large">

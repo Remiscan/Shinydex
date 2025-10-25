@@ -443,6 +443,11 @@ button.icon-button.menu-hint::before {
   flex-grow: 1;
 }
 
+[data-action="auto-translate"],
+[data-action="undo-auto-translate"] {
+  display: none;
+}
+
 @container section-contenu (min-width: 650px) {
   .container {
     --last-column: auto;
