@@ -6,7 +6,7 @@ import { Hunt } from '../../Hunt.js';
 import { Pokemon } from '../../Pokemon.js';
 import { Shiny } from '../../Shiny.js';
 import { FrontendShiny } from '../../ShinyBackend.js';
-import { applyOrders, computedNamesOrderLang, computeShinyFilters, recomputeLexicographicalOrdersOnLangChange } from '../../filtres.js';
+import { applyOrders, computeShinyFilters, sectionsOrderMaps, type OrderMap } from '../../filtres.js';
 import { pokemonData } from '../../jsonData.js';
 import { huntStorage, shinyStorage, type LocalForage } from '../../localForage.js';
 import { Notif } from '../../notification.js';
@@ -52,6 +52,10 @@ export class shinyCard extends HTMLElement {
     });
   }
 
+  get orderMap(): OrderMap {
+    return sectionsOrderMaps.get('mes-chromatiques') || new Map();
+  }
+
 
   constructor() {
     super();
@@ -79,10 +83,6 @@ export class shinyCard extends HTMLElement {
 
     const lang = getCurrentLang();
     const pkmn = new Pokemon(pokemonData[shiny.dexid]);
-
-    if (computedNamesOrderLang !== lang) {
-      await recomputeLexicographicalOrdersOnLangChange(lang);
-    }
 
     const formeQuery = `pokemon/${shiny.dexid}/forme/${shiny.forme}`;
     const formeName = getString(formeQuery as TranslatedString, lang);
@@ -342,7 +342,7 @@ export class shinyCard extends HTMLElement {
     for (const [filter, value] of Object.entries(filters)) {
       this.setAttribute(`data-${filter}`, String(value));
     }
-    applyOrders(this, shiny);
+    applyOrders(this, shiny, this.orderMap);
 
     this.rendering = false;
     this.dispatchEvent(new Event('rendering-complete'));

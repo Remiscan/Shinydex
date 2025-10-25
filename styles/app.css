@@ -445,17 +445,17 @@ a.icon-button.bouton-retour {
   display: none;
 }
 
-[data-order-reversed="true"] .liste-cartes {
+[data-order-reversed="true"] .liste-cartes.orderable {
   flex-direction: column-reverse;
 }
 
-[data-order="species"] .liste-cartes > * { order: var(--order-species, 0); }
-[data-order="name"] .liste-cartes > * { order: var(--order-name, 0); }
-[data-order="game"] .liste-cartes > * { order: var(--order-game, 0); }
-[data-order="dexid"] .liste-cartes > * { order: var(--order-dexid, 0); }
-[data-order="shinyRate"] .liste-cartes > * { order: var(--order-shinyRate, 0); }
-[data-order="catchTime"] .liste-cartes > * { order: var(--order-catchTime, 0); }
-[data-order="creationTime"] .liste-cartes > * { order: var(--order-creationTime, 0); }
+[data-order="species"] .liste-cartes.orderable > * { order: var(--order-species, 0); }
+[data-order="name"] .liste-cartes.orderable > * { order: var(--order-name, 0); }
+[data-order="game"] .liste-cartes.orderable > * { order: var(--order-game, 0); }
+[data-order="dexid"] .liste-cartes.orderable > * { order: var(--order-dexid, 0); }
+[data-order="shinyRate"] .liste-cartes.orderable > * { order: var(--order-shinyRate, 0); }
+[data-order="catchTime"] .liste-cartes.orderable > * { order: var(--order-catchTime, 0); }
+[data-order="creationTime"] .liste-cartes.orderable > * { order: var(--order-creationTime, 0); }
 
 /*body[data-section-actuelle~="obfuscator"] .section-contenu {
   overflow-y: hidden;

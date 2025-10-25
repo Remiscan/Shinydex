@@ -4,11 +4,11 @@ import { Shiny } from './Shiny.js';
 import { friendCard } from './components/friend-card/friendCard.js';
 import { huntCard } from './components/hunt-card/huntCard.js';
 import { shinyCard } from './components/shiny-card/shinyCard.js';
-import { PopulatableSection, ShinyFilterData, applyOrders, computeFilters, computeUsernamesOrder, computedNamesOrderLang, getCardTagName, getDataClass, getDataStore, populatableSections, recomputeLexicographicalOrdersOnLangChange, updateCounters, usernamesOrder } from './filtres.js';
+import { PopulatableSection, ShinyFilterData, applyOrders, computeFilters, computeOrders, computeUsernamesOrder, getCardTagName, getDataClass, getDataStore, populatableSections, updateCounters, usernamesOrder, type OrderMap } from './filtres.js';
 import { clearElementStorage, lazyLoadSection, virtualizedSections } from './lazyLoading.js';
 import { friendStorage, huntStorage } from './localForage.js';
 import { animateCards } from './navigate.js';
-import { getCurrentLang, getString } from './translation.js';
+import { getString } from './translation.js';
 
 
 
@@ -29,16 +29,14 @@ async function populateHandler(section: PopulatableSection, requestedIds?: strin
 
   let ids: Set<string> = new Set(requestedIds ?? []);
 
-  const allData = new Map();
+  const allData: Map<Shiny['huntid'], Shiny> = new Map();
   await dataStore.iterate((data, key) => {
     if (!requestedIds) ids.add(key);
-    allData.set(key, data);
+    if (typeof data !== 'object' || data == null) return;
+    allData.set(key, new Shiny(data));
   });
 
-  const lang = getCurrentLang();
-  if (lang !== computedNamesOrderLang) {
-    await recomputeLexicographicalOrdersOnLangChange(lang);
-  }
+  const orderMap = await computeOrders(section, allData);
 
   let populated: Array<string>;
   switch (section) {
@@ -51,11 +49,11 @@ async function populateHandler(section: PopulatableSection, requestedIds?: strin
     case 'chasses-en-cours':
     case 'chromatiques-ami':
     case 'corbeille': {
-      const requestedData: any[] = [];
+      const requestedData: Map<Shiny['huntid'], Shiny | null> = new Map();
       for (const id of ids) {
-        requestedData.push(allData.get(id) ?? id);
+        requestedData.set(id, allData.get(id) ?? null);
       }
-      populated = await populateFromData(section, requestedData);
+      populated = await populateFromData(section, requestedData, orderMap);
     } break;
   }
 
@@ -88,7 +86,8 @@ export const populator = Object.fromEntries(populatableSections.map(section => {
 
 export async function populateFromData(
   section: Exclude<PopulatableSection, 'partage'>,
-  dataList: Array<Shiny | string> | Array<Hunt | string>,
+  dataList: Map<Shiny['huntid'], Shiny | null>,
+  orderMap: OrderMap,
 ): Promise<Array<string>> {
   const sectionElement = document.querySelector(`#${section}`)!;
   const conteneur = (sectionElement.querySelector(`.liste-cartes`) ?? sectionElement.querySelector(`.section-contenu`))!;
@@ -119,11 +118,9 @@ export async function populateFromData(
   const filterMap = await computeFilters(section);
 
   const results: string[] = [];
-  for (const pkmn of dataList) {
-    const huntid = typeof pkmn === 'string' ? pkmn : pkmn.huntid;
-    const pkmnInDB = pkmn != null && typeof pkmn === 'object';
-    const pkmnObj = (pkmn instanceof dataClass) ? pkmn : new dataClass(pkmnInDB ? pkmn : {});
-    const pkmnInDBButDeleted = pkmnInDB && 'deleted' in pkmnObj && pkmnObj.deleted
+  for (const [huntid, pkmn] of dataList) {
+    const pkmnInDB = pkmn != null;
+    const pkmnInDBButDeleted = pkmnInDB && 'deleted' in pkmn && pkmn.deleted;
     const ignoreCondition = section === 'corbeille' ? !pkmnInDBButDeleted : pkmnInDBButDeleted;
 
     let card: HTMLElement | undefined = allCards.get(huntid);
@@ -153,7 +150,6 @@ export async function populateFromData(
           sCard.dataToContent(pkmnInstancePromise);
           card = sCard;
         }
-        applyOrders(card, pkmnObj);
         card.setAttribute('role', 'listitem');
         
         const cardFilters = filterMap.get(huntid);
@@ -176,6 +172,8 @@ export async function populateFromData(
           }
         }
       }
+
+      applyOrders(card, pkmn, orderMap);
     }
 
     results.push(huntid);

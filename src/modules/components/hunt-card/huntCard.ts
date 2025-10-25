@@ -18,6 +18,7 @@ import { CheckBox } from '../checkBox.js';
 import { DexDatalist } from '../dexDatalist.js';
 import sheet from './styles.css' with { type: 'css' };
 import { noAccent } from '../../Params.js';
+import { sectionsOrderMaps, type OrderMap } from '../../filtres.js';
 
 
 
@@ -50,6 +51,11 @@ export class huntCard extends HTMLElement {
   #handlers: Handler[] = [];
   #changeNonce: Object = {};
   needsRefresh = true;
+
+
+  get orderMap(): OrderMap {
+    return sectionsOrderMaps.get('chasses-en-cours') || new Map();
+  }
 
 
   /** Adds 1 encounter. */

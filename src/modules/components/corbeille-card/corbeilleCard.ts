@@ -1,3 +1,4 @@
+import { sectionsOrderMaps, type OrderMap } from '../../filtres.js';
 import { Hunt } from '../../Hunt.js';
 import { huntStorage, type LocalForage } from '../../localForage.js';
 import { Notif } from '../../notification.js';
@@ -22,6 +23,11 @@ sheet.replaceSync(/*css*/`
 export class corbeilleCard extends shinyCard {
   dataStore: LocalForage = huntStorage;
   dataClass = Hunt;
+
+
+  get orderMap(): OrderMap {
+    return sectionsOrderMaps.get('corbeille') || new Map();
+  }
   
   constructor() {
     super();

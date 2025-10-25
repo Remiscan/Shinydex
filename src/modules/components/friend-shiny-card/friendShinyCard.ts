@@ -1,3 +1,4 @@
+import { sectionsOrderMaps, type OrderMap } from '../../filtres.js';
 import { friendShinyStorage, type LocalForage } from '../../localForage.js';
 import { shinyCard } from '../shiny-card/shinyCard.js';
 
@@ -28,6 +29,10 @@ sheet.replaceSync(/*css*/`
 
 export class friendShinyCard extends shinyCard {
   dataStore: LocalForage = friendShinyStorage;
+
+  get orderMap(): OrderMap {
+    return sectionsOrderMaps.get('chromatiques-ami') || new Map();
+  }
   
   constructor() {
     super();
