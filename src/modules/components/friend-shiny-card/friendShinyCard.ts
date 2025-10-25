@@ -25,6 +25,10 @@ sheet.replaceSync(/*css*/`
     }
   }
 
+  .container:has([data-type="notes"] > .empty) .menu {
+    display: none;
+  }
+
   @container section-contenu (min-width: 650px) {
     .container {
       --state-opacity: 0 !important;
