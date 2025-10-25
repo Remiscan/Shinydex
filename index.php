@@ -163,7 +163,7 @@ $httpLanguage = $translation->getLanguage();
       </section>
 
       <!-- Chasses en cours -->
-      <section id="chasses-en-cours" class="vide loading">
+      <section id="chasses-en-cours" class="vide loading" data-order="creationTime" data-order-reversed="true">
         <?php include './pages/chasses-en-cours.html'; ?>
       </section>
 

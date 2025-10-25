@@ -106,6 +106,13 @@ for (const fab of fabs) {
           sync: false
         }
       }));
+
+      const scroller = document.querySelector('#chasses-en-cours .section-contenu');
+      if (scroller) {
+        window.setTimeout(() => {
+          scroller.scrollTo({ top: scroller.scrollHeight, behavior: 'smooth' });
+        }, 100);
+      }
     }
   
     // Ajoute un nouvel ami

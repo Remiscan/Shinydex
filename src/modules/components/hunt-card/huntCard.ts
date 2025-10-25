@@ -18,7 +18,7 @@ import { CheckBox } from '../checkBox.js';
 import { DexDatalist } from '../dexDatalist.js';
 import sheet from './styles.css' with { type: 'css' };
 import { noAccent } from '../../Params.js';
-import { sectionsOrderMaps, type OrderMap } from '../../filtres.js';
+import { applyOrders, sectionsOrderMaps, type OrderMap } from '../../filtres.js';
 
 
 
@@ -247,7 +247,7 @@ export class huntCard extends HTMLElement {
       await huntStorage.setItem(hunt.huntid, hunt);
 
       // Update some visuals with changes from the form
-      await this.updateVisuals(hunt);
+      this.updateVisuals(hunt);
     }
   }
 
@@ -419,15 +419,7 @@ export class huntCard extends HTMLElement {
   /**
    * Met à jour le contenu de la carte à partir d'un objet Hunt.
    */
-  async huntToForm(): Promise<void> {
-    let hunt: Hunt;
-    try {
-      hunt = await this.getHunt();
-    } catch (e) {
-      console.error('Échec de création de chasse', e);
-      throw e;
-    }
-
+  huntToForm(hunt: Hunt, isEdit: boolean): void {
     for (const prop of hunt.orderedKeys) {
       const input = this.getInput(prop);
 
@@ -553,19 +545,28 @@ export class huntCard extends HTMLElement {
         } break;
 
         case 'huntid': {
-          const value = hunt.huntid;
           const form = this.form;
-          const edit = (await shinyStorage.getItem(value)) != null;
-          if (edit) form.setAttribute('data-edit', '');
-          else      form.removeAttribute('data-edit');
+          if (isEdit) form.setAttribute('data-edit', '');
+          else        form.removeAttribute('data-edit');
         } break;
       }
     }
   }
 
-  async dataToContent() { 
-    await this.huntToForm();
-    await this.updateVisuals();
+  async dataToContent() {
+    let hunt: Hunt;
+    let isEdit: boolean;
+    try {
+      hunt = await this.getHunt();
+      isEdit = (await shinyStorage.getItem(hunt.huntid)) != null;
+    } catch (e) {
+      console.error('Échec de création de chasse', e);
+      throw e;
+    }
+
+    this.huntToForm(hunt, isEdit);
+    this.updateVisuals(hunt);
+    applyOrders(this, hunt, this.orderMap);
   }
 
 
@@ -656,9 +657,7 @@ export class huntCard extends HTMLElement {
   }
 
 
-  async updateVisuals(_hunt?: Hunt) {
-    const hunt = _hunt ?? (await this.getHunt());
-    
+  updateVisuals(hunt: Hunt) {
     const gameIcon = this.#shadow.querySelector(`[data-icon^="game"]`)!;
     if (hunt.game) {
       gameIcon.setAttribute('data-icon', `game/${hunt.game}`);

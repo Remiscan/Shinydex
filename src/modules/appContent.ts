@@ -38,6 +38,13 @@ async function populateHandler(section: PopulatableSection, requestedIds?: strin
 
   const orderMap = await computeOrders(section, allData);
 
+  const elementName = getCardTagName(section);
+  const preexistingCards: Map<string, HTMLElement> = new Map();
+  document.querySelectorAll<HTMLElement>(`${elementName}[huntid], div[data-replaces="${elementName}"][data-huntid]`).forEach(c => {
+    const id = c.getAttribute('huntid') ?? c.getAttribute('data-huntid');
+    if (id) preexistingCards.set(id, c);
+  });
+
   let populated: Array<string>;
   switch (section) {
     case 'partage':
@@ -53,7 +60,15 @@ async function populateHandler(section: PopulatableSection, requestedIds?: strin
       for (const id of ids) {
         requestedData.set(id, allData.get(id) ?? null);
       }
-      populated = await populateFromData(section, requestedData, orderMap);
+      populated = await populateFromData(section, requestedData, preexistingCards, orderMap);
+
+      // On réordonne les cartes déjà présentes qui n'ont pas été traitées par populateFromData
+      for (const [huntid, shiny] of allData.entries()) {
+        if (ids.has(huntid)) continue;
+        const card = preexistingCards.get(huntid);
+        if (!card) continue;
+        applyOrders(card, shiny, orderMap);
+      }
     } break;
   }
 
@@ -87,6 +102,7 @@ export const populator = Object.fromEntries(populatableSections.map(section => {
 export async function populateFromData(
   section: Exclude<PopulatableSection, 'partage'>,
   dataList: Map<Shiny['huntid'], Shiny | null>,
+  preexistingCards: Map<string, HTMLElement>,
   orderMap: OrderMap,
 ): Promise<Array<string>> {
   const sectionElement = document.querySelector(`#${section}`)!;
@@ -110,11 +126,6 @@ export async function populateFromData(
   // Traitons les cartes :
 
   const cardsToCreate: Element[] = [];
-  const allCards: Map<string, HTMLElement> = new Map();
-  document.querySelectorAll<HTMLElement>(`${elementName}[huntid], div[data-replaces="${elementName}"][data-huntid]`).forEach(c => {
-    const id = c.getAttribute('huntid') ?? c.getAttribute('data-huntid');
-    if (id) allCards.set(id, c);
-  });
   const filterMap = await computeFilters(section);
 
   const results: string[] = [];
@@ -123,7 +134,7 @@ export async function populateFromData(
     const pkmnInDBButDeleted = pkmnInDB && 'deleted' in pkmn && pkmn.deleted;
     const ignoreCondition = section === 'corbeille' ? !pkmnInDBButDeleted : pkmnInDBButDeleted;
 
-    let card: HTMLElement | undefined = allCards.get(huntid);
+    let card: HTMLElement | undefined = preexistingCards.get(huntid);
 
     // ABSENT DE LA BDD ou PRÉSENT MAIS À IGNORER = Supprimer (manuellement)
     if (!pkmnInDB || ignoreCondition) {

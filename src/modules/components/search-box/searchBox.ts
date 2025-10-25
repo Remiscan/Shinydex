@@ -1,11 +1,10 @@
-import { noAccent } from '../../Params.js';
-import { TranslatedString, translationObserver } from '../../translation.js';
 import materialIconsSheet from '../../../../ext/material_icons.css' with { type: 'css' };
+import commonSheet from '../../../../styles/common.css' with { type: 'css' };
 import themesSheet from '../../../../styles/themes.css.php' with { type: 'css' };
+import { noAccent } from '../../Params.js';
 import { Pokemon } from '../../Pokemon.js';
 import { isFiltrableSection, isSearchableSection } from '../../filtres.js';
-import commonSheet from '../../../../styles/common.css' with { type: 'css' };
-import { getString } from '../../translation.js';
+import { getString, TranslatedString, translationObserver } from '../../translation.js';
 import { BottomSheet } from '../bottomSheet.js';
 import sheet from './styles.css' with { type: 'css' };
 import template from './template.js';

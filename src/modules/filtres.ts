@@ -17,27 +17,27 @@ export function isOrdre(string: string): string is ordre {
   return supportedOrdres.includes(string as ordre);
 }
 
-export type PopulatableSection = 'mes-chromatiques' | 'chasses-en-cours' | 'partage' | 'chromatiques-ami' | 'corbeille';
-export const populatableSections: PopulatableSection[] = ['mes-chromatiques', 'chasses-en-cours', 'partage', 'chromatiques-ami', 'corbeille'];
+export const populatableSections = ['mes-chromatiques', 'chasses-en-cours', 'partage', 'chromatiques-ami', 'corbeille'] as const;
+export type PopulatableSection = typeof populatableSections[number];
 export function isPopulatableSection(string: string): string is PopulatableSection {
   return populatableSections.includes(string as PopulatableSection);
 }
 
-export type FiltrableSection = 'mes-chromatiques' | 'corbeille' | 'chromatiques-ami';
-export const filtrableSections: FiltrableSection[] = ['mes-chromatiques', 'corbeille', 'chromatiques-ami'];
+export const filtrableSections = ['mes-chromatiques', 'corbeille', 'chromatiques-ami'] as const;
+export type FiltrableSection = typeof filtrableSections[number];
 export const savedFiltersSections: FiltrableSection[] = ['mes-chromatiques'];
 export function isFiltrableSection(string: string): string is FiltrableSection {
   return filtrableSections.includes(string as FiltrableSection);
 }
 
-export type OrderableSection = 'mes-chromatiques' | 'chasses-en-cours' | 'corbeille' | 'partage' | 'chromatiques-ami';
-export const orderableSections: OrderableSection[] = ['mes-chromatiques', 'corbeille', 'chromatiques-ami'];
-export function isOrderableSection(string: string): string is FiltrableSection {
-  return filtrableSections.includes(string as FiltrableSection);
+export const orderableSections = ['mes-chromatiques', 'chasses-en-cours', 'corbeille', 'partage', 'chromatiques-ami'] as const;
+export type OrderableSection = typeof orderableSections[number];
+export function isOrderableSection(string: string): string is OrderableSection {
+  return orderableSections.includes(string as OrderableSection);
 }
 
-export type SearchableSection = 'mes-chromatiques' | 'pokedex' | 'chasses-en-cours' | 'corbeille' | 'partage' | 'chromatiques-ami';
-export const searchableSections: SearchableSection[] = ['mes-chromatiques', 'pokedex', 'chasses-en-cours', 'corbeille', 'partage', 'chromatiques-ami'];
+export const searchableSections = ['mes-chromatiques', 'pokedex', 'chasses-en-cours', 'corbeille', 'partage', 'chromatiques-ami'] as const;
+export type SearchableSection = typeof searchableSections[number];
 export function isSearchableSection(string: string): string is SearchableSection {
   return searchableSections.includes(string as SearchableSection);
 }
