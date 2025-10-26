@@ -1,24 +1,24 @@
+import materialIconsSheet from '../../../../ext/material_icons.css' with { type: 'css' };
+import iconSheet from '../../../../images/iconsheet.css' with { type: 'css' };
+import commonSheet from '../../../../styles/common.css' with { type: 'css' };
+import themesSheet from '../../../../styles/themes.css.php' with { type: 'css' };
 import { Hunt } from '../../Hunt.js';
+import { noAccent } from '../../Params.js';
 import { Forme, Pokemon } from '../../Pokemon.js';
 import { Count, Shiny } from '../../Shiny.js';
+import { applyOrders, sectionsOrderMaps, type OrderMap } from '../../filtres.js';
+import { gameStrings, isSupportedGameID, isSupportedLang, isSupportedMethodID, methodStrings, pokemonData } from '../../jsonData.js';
 import { huntStorage, shinyStorage } from '../../localForage.js';
 import { Notif, warnBeforeDestruction } from '../../notification.js';
 import { getCurrentLang, getString, translationObserver } from '../../translation.js';
+import { CheckBox } from '../checkBox.js';
+import { DexDatalist } from '../dexDatalist.js';
 import { InputSelect } from '../inputSelect.js';
 import { pokemonSprite } from '../pokemon-sprite/pokemonSprite.js';
 import { TextArea } from '../textArea.js';
 import { TextField } from '../textField.js';
-import template from './template.js';
-import materialIconsSheet from '../../../../ext/material_icons.css' with { type: 'css' };
-import themesSheet from '../../../../styles/themes.css.php' with { type: 'css' };
-import iconSheet from '../../../../images/iconsheet.css' with { type: 'css' };
-import commonSheet from '../../../../styles/common.css' with { type: 'css' };
-import { gameStrings, isSupportedGameID, isSupportedLang, isSupportedMethodID, methodStrings, pokemonData } from '../../jsonData.js';
-import { CheckBox } from '../checkBox.js';
-import { DexDatalist } from '../dexDatalist.js';
 import sheet from './styles.css' with { type: 'css' };
-import { noAccent } from '../../Params.js';
-import { applyOrders, sectionsOrderMaps, type OrderMap } from '../../filtres.js';
+import template from './template.js';
 
 
 
@@ -109,17 +109,25 @@ export class huntCard extends HTMLElement {
       // If it's not an edit, update catch time to current time
       const edit = await this.isEdit();
       if (!edit) {
-        const inputDate = this.getInput('catchTime');
-        if (!(inputDate instanceof TextField)) throw new TypeError(`Expecting TextField`);
-
-        inputDate.value = new Date().toISOString().split('T')[0];
-        form.dispatchEvent(new Event('change'));
+        await this.#setCatchTimeToNow(await this.getHunt());
       }
     } else {
       // Update Pokémon sprite to regular form
       sprite?.setAttribute('shiny', 'false');
     }
   };
+
+
+  async #setCatchTimeToNow(hunt: Hunt) {
+    const inputDate = this.getInput('catchTime');
+    if (!(inputDate instanceof TextField)) throw new TypeError(`Expecting TextField`);
+
+    hunt.catchTime = Date.now();
+    await huntStorage.setItem(hunt.huntid, hunt);
+    const date = (new Date(hunt.catchTime)).toISOString().split('T')[0];
+    inputDate.value = date;
+    inputDate.dispatchEvent(new Event('change', { bubbles: true }));
+  }
 
 
   /** Cancels edit and doesn't save modifications to shinyStorage. */
