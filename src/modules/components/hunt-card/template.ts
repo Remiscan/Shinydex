@@ -228,7 +228,7 @@ template.innerHTML = /*html*/`
           <option value="alpha" data-string="capture-gene-alpha" data-part="pla za"></option>
         </input-select>
 
-        <text-field name="catchTime" type="date">
+        <text-field name="catchTime" type="datetime-local">
           <span slot="label" data-string="capture-date"></span>
         </text-field>
 

@@ -124,7 +124,7 @@ export class huntCard extends HTMLElement {
 
     hunt.catchTime = Date.now();
     await huntStorage.setItem(hunt.huntid, hunt);
-    const date = (new Date(hunt.catchTime)).toISOString().split('T')[0];
+    const date = this.formatDateForInput(new Date(hunt.catchTime));
     inputDate.value = date;
     inputDate.dispatchEvent(new Event('change', { bubbles: true }));
   }
@@ -524,7 +524,7 @@ export class huntCard extends HTMLElement {
 
         case 'catchTime': {
           const value = hunt.catchTime || 0;
-          const date = (new Date(value)).toISOString().split('T')[0];
+          const date = this.formatDateForInput(new Date(value));
           
           if (input instanceof TextField) input.value = date;
           else input?.setAttribute('value', date);
@@ -559,6 +559,15 @@ export class huntCard extends HTMLElement {
         } break;
       }
     }
+  }
+
+  protected formatDateForInput(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hour = String(date.getHours()).padStart(2, '0');
+    const minute = String(date.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hour}:${minute}`;
   }
 
   async dataToContent() {
@@ -645,7 +654,7 @@ export class huntCard extends HTMLElement {
         case 'catchTime': {
           const unknown = formData.get('catchTime-unknown') === 'false' ? false : true;
           const timeCapture = hunt.catchTime || 0;
-          const oldDate = (new Date(timeCapture)).toISOString().split('T')[0];
+          const oldDate = this.formatDateForInput(new Date(timeCapture));
           const newTime = value !== oldDate ? (new Date(String(value))).getTime() : timeCapture;
           if (!isNaN(newTime)) hunt.catchTime = unknown ? 825289200000 : newTime;
         } break;
