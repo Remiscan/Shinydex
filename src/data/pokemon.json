@@ -834,7 +834,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 19,
+                        "forme": "alola"
+                    }
+                ]
             }
         ]
     },
@@ -1188,7 +1193,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 25,
+                        "forme": ""
+                    }
+                ]
             }
         ]
     },
@@ -5722,7 +5732,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 153,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -5839,7 +5854,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 156,
+                        "forme": ""
+                    }
+                ]
             }
         ]
     },
@@ -6090,7 +6110,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 165,
+                        "forme": "female"
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -6418,7 +6443,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 177,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -6646,7 +6676,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 438,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -6690,7 +6725,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 61,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -6986,7 +7026,12 @@
                 "noShiny": false,
                 "hasBackside": true,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 194,
+                        "forme": "female"
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -7147,7 +7192,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 79,
+                        "forme": "galar"
+                    }
+                ]
             }
         ]
     },
@@ -7624,7 +7674,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 360,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -7823,7 +7878,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 95,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -7974,7 +8034,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 133,
+                        "forme": "female"
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -8204,7 +8269,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 216,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -8325,7 +8395,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 220,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -8432,7 +8507,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 223,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -8577,7 +8657,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 228,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -8689,7 +8774,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 231,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -9365,7 +9455,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 255,
+                        "forme": "female"
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -9409,7 +9504,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 256,
+                        "forme": "female"
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -9677,7 +9777,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 263,
+                        "forme": "galar"
+                    }
+                ]
             }
         ]
     },
@@ -9754,7 +9859,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 266,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -9827,7 +9937,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 268,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -9924,7 +10039,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 271,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -9992,7 +10112,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 273,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -10036,7 +10161,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 274,
+                        "forme": "female"
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -11003,7 +11133,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 307,
+                        "forme": "female"
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -11226,7 +11361,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 406,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -11309,7 +11449,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 316,
+                        "forme": "female"
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -11513,7 +11658,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 322,
+                        "forme": "female"
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -11779,7 +11929,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 331,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -12276,7 +12431,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 349,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -13784,7 +13944,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 396,
+                        "forme": "female"
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -13828,7 +13993,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 397,
+                        "forme": "female"
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -13911,7 +14081,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 399,
+                        "forme": "female"
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -13994,7 +14169,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 401,
+                        "forme": "female"
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -14077,7 +14257,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 403,
+                        "forme": "female"
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -14121,7 +14306,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 404,
+                        "forme": "female"
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -14189,7 +14379,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 315,
+                        "forme": "female"
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -14393,7 +14588,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 412,
+                        "forme": "plant"
+                    }
+                ]
             },
             {
                 "form": 1,
@@ -14408,7 +14608,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 412,
+                        "forme": "sandy"
+                    }
+                ]
             },
             {
                 "form": 2,
@@ -14423,7 +14628,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 412,
+                        "forme": "trash"
+                    }
+                ]
             }
         ]
     },
@@ -14450,7 +14660,15 @@
                 "evolvesFrom": [
                     {
                         "dexid": 412,
-                        "forme": ""
+                        "forme": "plant"
+                    },
+                    {
+                        "dexid": 412,
+                        "forme": "sandy"
+                    },
+                    {
+                        "dexid": 412,
+                        "forme": "trash"
                     }
                 ]
             }
@@ -14518,7 +14736,7 @@
                 "evolvesFrom": [
                     {
                         "dexid": 415,
-                        "forme": ""
+                        "forme": "female"
                     }
                 ]
             }
@@ -14622,7 +14840,12 @@
                 "noShiny": false,
                 "hasBackside": true,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 418,
+                        "forme": "female"
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -14773,7 +14996,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 422,
+                        "forme": "west"
+                    }
+                ]
             },
             {
                 "form": 1,
@@ -14788,7 +15016,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 422,
+                        "forme": "east"
+                    }
+                ]
             }
         ]
     },
@@ -14812,7 +15045,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 190,
+                        "forme": "female"
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -15377,7 +15615,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 443,
+                        "forme": "female"
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -15421,7 +15664,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 444,
+                        "forme": "female"
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -15611,7 +15859,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 449,
+                        "forme": "female"
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -15747,7 +16000,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 453,
+                        "forme": "female"
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -15854,7 +16112,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 456,
+                        "forme": "female"
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -15961,7 +16224,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 459,
+                        "forme": "female"
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -16020,7 +16288,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 215,
+                        "forme": "female"
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -16122,7 +16395,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 112,
+                        "forme": "female"
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -16166,7 +16444,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 114,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -16413,7 +16696,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 221,
+                        "forme": "female"
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -17633,7 +17921,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 502,
+                        "forme": ""
+                    }
+                ]
             }
         ]
     },
@@ -18110,7 +18403,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 520,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -18907,7 +19205,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 548,
+                        "forme": ""
+                    }
+                ]
             }
         ]
     },
@@ -19141,7 +19444,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 554,
+                        "forme": "galar"
+                    }
+                ]
             },
             {
                 "form": 3,
@@ -19635,7 +19943,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 570,
+                        "forme": "hisui"
+                    }
+                ]
             }
         ]
     },
@@ -20080,7 +20393,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 585,
+                        "forme": "spring"
+                    }
+                ]
             },
             {
                 "form": 1,
@@ -20095,7 +20413,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 585,
+                        "forme": "summer"
+                    }
+                ]
             },
             {
                 "form": 2,
@@ -20110,7 +20433,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 585,
+                        "forme": "autumn"
+                    }
+                ]
             },
             {
                 "form": 3,
@@ -20125,7 +20453,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 585,
+                        "forme": "winter"
+                    }
+                ]
             }
         ]
     },
@@ -20318,7 +20651,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 592,
+                        "forme": "female"
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -21293,7 +21631,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 627,
+                        "forme": ""
+                    }
+                ]
             }
         ]
     },
@@ -22455,7 +22798,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 665,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 1,
@@ -22470,7 +22818,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 665,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 2,
@@ -22485,7 +22838,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 665,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 3,
@@ -22500,7 +22858,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 665,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 4,
@@ -22515,7 +22878,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 665,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 5,
@@ -22530,7 +22898,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 665,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 6,
@@ -22545,7 +22918,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 665,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 7,
@@ -22560,7 +22938,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 665,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 8,
@@ -22575,7 +22958,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 665,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 9,
@@ -22590,7 +22978,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 665,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 10,
@@ -22605,7 +22998,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 665,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 11,
@@ -22620,7 +23018,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 665,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 12,
@@ -22635,7 +23038,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 665,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 13,
@@ -22650,7 +23058,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 665,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 14,
@@ -22665,7 +23078,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 665,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 15,
@@ -22680,7 +23098,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 665,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 16,
@@ -22695,7 +23118,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 665,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 17,
@@ -22710,7 +23138,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 665,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 18,
@@ -22725,7 +23158,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 665,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 19,
@@ -22740,7 +23178,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 665,
+                        "forme": ""
+                    }
+                ]
             }
         ]
     },
@@ -22788,7 +23231,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 667,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -22916,7 +23364,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 669,
+                        "forme": "red"
+                    }
+                ]
             },
             {
                 "form": 1,
@@ -22931,7 +23384,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 669,
+                        "forme": "yellow"
+                    }
+                ]
             },
             {
                 "form": 2,
@@ -22946,7 +23404,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 669,
+                        "forme": "orange"
+                    }
+                ]
             },
             {
                 "form": 3,
@@ -22961,7 +23424,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 669,
+                        "forme": "blue"
+                    }
+                ]
             },
             {
                 "form": 4,
@@ -22976,7 +23444,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 669,
+                        "forme": "white"
+                    }
+                ]
             }
         ]
     },
@@ -23000,7 +23473,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 670,
+                        "forme": "red"
+                    }
+                ]
             },
             {
                 "form": 1,
@@ -23015,7 +23493,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 670,
+                        "forme": "yellow"
+                    }
+                ]
             },
             {
                 "form": 2,
@@ -23030,7 +23513,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 670,
+                        "forme": "orange"
+                    }
+                ]
             },
             {
                 "form": 3,
@@ -23045,7 +23533,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 670,
+                        "forme": "blue"
+                    }
+                ]
             },
             {
                 "form": 4,
@@ -23060,7 +23553,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 670,
+                        "forme": "white"
+                    }
+                ]
             }
         ]
     },
@@ -23393,7 +23891,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 677,
+                        "forme": ""
+                    }
+                ]
             }
         ]
     },
@@ -24136,7 +24639,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 704,
+                        "forme": ""
+                    }
+                ]
             }
         ]
     },
@@ -24180,7 +24688,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 705,
+                        "forme": "hisui"
+                    }
+                ]
             }
         ]
     },
@@ -24370,7 +24883,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 710,
+                        "forme": "small"
+                    }
+                ]
             },
             {
                 "form": 2,
@@ -24385,7 +24903,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 710,
+                        "forme": "large"
+                    }
+                ]
             },
             {
                 "form": 3,
@@ -24400,7 +24923,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 710,
+                        "forme": "super"
+                    }
+                ]
             }
         ]
     },
@@ -24468,7 +24996,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 712,
+                        "forme": ""
+                    }
+                ]
             }
         ]
     },
@@ -24837,7 +25370,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 723,
+                        "forme": ""
+                    }
+                ]
             }
         ]
     },
@@ -25461,7 +25999,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 744,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 2,
@@ -25476,7 +26019,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 744,
+                        "forme": ""
+                    }
+                ]
             }
         ]
     },
@@ -28832,7 +29380,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 848,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 1,
@@ -28847,7 +29400,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 848,
+                        "forme": ""
+                    }
+                ]
             }
         ]
     },
@@ -29051,7 +29609,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 854,
+                        "forme": "antique"
+                    }
+                ]
             }
         ]
     },
@@ -29482,7 +30045,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -29497,7 +30065,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -29512,7 +30085,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -29527,7 +30105,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -29542,7 +30125,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -29557,7 +30145,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 0,
@@ -29572,7 +30165,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 1,
@@ -29587,7 +30185,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 1,
@@ -29602,7 +30205,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 1,
@@ -29617,7 +30225,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 1,
@@ -29632,7 +30245,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 1,
@@ -29647,7 +30265,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 1,
@@ -29662,7 +30285,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 1,
@@ -29677,7 +30305,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 2,
@@ -29692,7 +30325,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 2,
@@ -29707,7 +30345,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 2,
@@ -29722,7 +30365,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 2,
@@ -29737,7 +30385,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 2,
@@ -29752,7 +30405,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 2,
@@ -29767,7 +30425,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 2,
@@ -29782,7 +30445,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 3,
@@ -29797,7 +30465,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 3,
@@ -29812,7 +30485,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 3,
@@ -29827,7 +30505,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 3,
@@ -29842,7 +30525,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 3,
@@ -29857,7 +30545,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 3,
@@ -29872,7 +30565,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 3,
@@ -29887,7 +30585,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 4,
@@ -29902,7 +30605,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 4,
@@ -29917,7 +30625,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 4,
@@ -29932,7 +30645,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 4,
@@ -29947,7 +30665,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 4,
@@ -29962,7 +30685,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 4,
@@ -29977,7 +30705,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 4,
@@ -29992,7 +30725,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 5,
@@ -30007,7 +30745,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 5,
@@ -30022,7 +30765,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 5,
@@ -30037,7 +30785,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 5,
@@ -30052,7 +30805,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 5,
@@ -30067,7 +30825,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 5,
@@ -30082,7 +30845,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 5,
@@ -30097,7 +30865,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 6,
@@ -30112,7 +30885,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 6,
@@ -30127,7 +30905,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 6,
@@ -30142,7 +30925,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 6,
@@ -30157,7 +30945,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 6,
@@ -30172,7 +30965,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 6,
@@ -30187,7 +30985,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 6,
@@ -30202,7 +31005,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 7,
@@ -30217,7 +31025,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 7,
@@ -30232,7 +31045,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 7,
@@ -30247,7 +31065,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 7,
@@ -30262,7 +31085,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 7,
@@ -30277,7 +31105,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 7,
@@ -30292,7 +31125,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 7,
@@ -30307,7 +31145,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 8,
@@ -30322,7 +31165,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 8,
@@ -30337,7 +31185,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 8,
@@ -30352,7 +31205,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 8,
@@ -30367,7 +31225,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 8,
@@ -30382,7 +31245,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 8,
@@ -30397,7 +31265,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             },
             {
                 "form": 8,
@@ -30412,7 +31285,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 868,
+                        "forme": ""
+                    }
+                ]
             }
         ]
     },
@@ -31154,7 +32032,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 891,
+                        "forme": ""
+                    }
+                ]
             }
         ]
     },
@@ -31445,7 +32328,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 217,
+                        "forme": ""
+                    }
+                ]
             }
         ]
     },
@@ -31472,7 +32360,7 @@
                 "evolvesFrom": [
                     {
                         "dexid": 550,
-                        "forme": ""
+                        "forme": "white"
                     }
                 ]
             },
@@ -31489,7 +32377,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 550,
+                        "forme": "white"
+                    }
+                ]
             }
         ]
     },
@@ -31516,7 +32409,11 @@
                 "evolvesFrom": [
                     {
                         "dexid": 215,
-                        "forme": ""
+                        "forme": "hisui"
+                    },
+                    {
+                        "dexid": 215,
+                        "forme": "hisui-female"
                     }
                 ]
             }
@@ -32156,7 +33053,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 924,
+                        "forme": ""
+                    }
+                ]
             }
         ]
     },
@@ -33073,7 +33975,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 957,
+                        "forme": "female"
+                    }
+                ]
             }
         ]
     },
@@ -33097,7 +34004,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 958,
+                        "forme": "female"
+                    }
+                ]
             }
         ]
     },
@@ -33684,7 +34596,7 @@
                 "evolvesFrom": [
                     {
                         "dexid": 194,
-                        "forme": ""
+                        "forme": "paldea"
                     }
                 ]
             }
@@ -33759,7 +34671,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 206,
+                        "forme": ""
+                    }
+                ]
             }
         ]
     },
@@ -34225,6 +35142,10 @@
                     {
                         "dexid": 999,
                         "forme": ""
+                    },
+                    {
+                        "dexid": 999,
+                        "forme": "roaming"
                     }
                 ]
             }
@@ -34578,7 +35499,12 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": false
+                "evolvesFrom": [
+                    {
+                        "dexid": 1012,
+                        "forme": "artisan"
+                    }
+                ]
             }
         ]
     },
