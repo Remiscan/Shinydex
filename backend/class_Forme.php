@@ -13,8 +13,9 @@ class Forme extends Sprite {
   public $noShiny = false;
   public $hasBackside = false;
   public $catchable = true; // can they be caught / evolved in that form in any game?
+  public false|array $evolvesFrom = false;
 
-  function __construct(Sprite $sprite, int $dexid) {
+  function __construct(Sprite $sprite, int $dexid, array $evolutions) {
     // Formes à ne pas compter
     if (
       ($dexid == 25 && $sprite->form == 8) // Pikachu starter
@@ -591,6 +592,28 @@ class Forme extends Sprite {
             'fr' => ($this->name['fr'] ? $this->name['fr'] . ' femelle' : '{{name}} femelle'),
             'en' => ($this->name['en'] ? 'Female ' . $this->name['en'] : 'Female {{name}}')
           ];
+        }
+      }
+
+      if ($this->catchable) {
+        $evolvesFrom = [];
+        foreach ($evolutions as $evolution) {
+          $evolvedParts = explode('-', key($evolution));
+          $evolvedDexid = (int) $evolvedParts[0];
+          $evolvedFormeDbid = $evolvedParts[1] ?? '';
+          $baseParts = explode('-', current($evolution));
+          $baseDexid = (int) $baseParts[0];
+          $baseFormeDbid = $baseParts[1] ?? '';
+
+          if ($evolvedDexid == $dexid && $evolvedFormeDbid == $this->dbid) {
+            $evolvesFrom[] = [
+              'dexid' => (int) $baseDexid,
+              'forme' => $baseFormeDbid
+            ];
+          }
+        }
+        if (count($evolvesFrom) > 0) {
+          $this->evolvesFrom = $evolvesFrom;
         }
       }
     }

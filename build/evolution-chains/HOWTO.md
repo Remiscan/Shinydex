@@ -1,0 +1,8 @@
+- Get list of evolution chains by fetching https://pokeapi.co/api/v2/evolution-chain/?offset=0&limit=1000
+- Get all evolution chains by fetching every URL returned by the first step
+- Store these JSON files in the data subfolder here
+- Run make-array.php
+- Copy array.json to modified-evolutions-by-id.json
+- Manually edit modified-evolutions-by-id.json to add form db-ids to the dex-ids when needed. For example:
+	- `{"863": "52"}` becomes `{"863": "52-galar"}`
+	- `{"80": "79"}` becomes `{"80": "79"}, {"80-galar": "79-galar"}`
