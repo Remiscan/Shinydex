@@ -599,11 +599,11 @@ class Forme extends Sprite {
         $evolvesFrom = [];
         foreach ($evolutions as $evolution) {
           $evolvedParts = explode('-', key($evolution));
-          $evolvedDexid = (int) $evolvedParts[0];
-          $evolvedFormeDbid = $evolvedParts[1] ?? '';
+          $evolvedDexid = (int) array_shift($evolvedParts);
+          $evolvedFormeDbid = implode('-', $evolvedParts);
           $baseParts = explode('-', current($evolution));
-          $baseDexid = (int) $baseParts[0];
-          $baseFormeDbid = $baseParts[1] ?? '';
+          $baseDexid = (int) array_shift($baseParts);
+          $baseFormeDbid = implode('-', $baseParts);
 
           if ($evolvedDexid == $dexid && $evolvedFormeDbid == $this->dbid) {
             $evolvesFrom[] = [
