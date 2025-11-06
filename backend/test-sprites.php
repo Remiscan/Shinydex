@@ -8,7 +8,7 @@ $pokemons = [];
 forEach(Pokemon::POKEMON_NAMES_EN as $id => $name)
 {
   $sprites = preg_grep('/poke_capture_([0]+)?' . intval($id) . '_.+_n\.png/', $files);
-  $pokemons[] = new Pokemon($id, $sprites);
+  $pokemons[$id] = new Pokemon($id, $sprites);
 }
 
 echo '<body style="display: grid; grid-template-columns: 3fr 1fr;">';
@@ -24,13 +24,30 @@ forEach($pokemons as $pokemon)
   <?php
   forEach($pokemon->formes as $forme)
   {
+    if (($_GET['catchable'] ?? 0) && ($forme->catchable ?? 0) != 1) continue;
     $options = (object) ['shiny' => false, 'big' => false];
     ?>
     <div style="display: grid; border: 1px solid rgba(0, 0, 0, 1); box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .15); margin: 5px; padding: 5px; border-radius: 5px;">
       <div style="grid-row: 1 / 2;">
-      <?php echo '<pre>'; print_r($forme); echo '</pre>'; ?>
+        <?php echo '<pre>'; print_r($forme); echo '</pre>'; ?>
         <img src="<?=$pokemon->getSprite($forme, (object) [ 'shiny' => false, 'format' => 'webp' ])?>" width="112" height="112">
         <img src="<?=$pokemon->getSprite($forme, (object) [ 'shiny' => true, 'format' => 'webp' ])?>" width="112" height="112">
+        <?php if ($forme->evolvesFrom !== false) {
+          foreach ($forme->evolvesFrom as $preEvolution) {
+            $unevolvedPokemon = $pokemons[$preEvolution['dexid']] ?? null;
+            if (!is_null($unevolvedPokemon)) {
+              foreach ($unevolvedPokemon->formes as $f) {
+                if ($f->dbid == $preEvolution['forme']) {
+                  ?>
+                  <img src="<?=$unevolvedPokemon->getSprite($f, (object) [ 'shiny' => true, 'format' => 'webp' ])?>" width="66" height="66">
+                  <?php
+                  break;
+                }
+              }
+            }
+          }
+          ?>
+        <?php } ?>
       </div>
       <div style="grid-row: 2 / 3;">
         <?=($forme->name['fr'] != '') ? $forme->name['fr'] : '(Normal)'?>
