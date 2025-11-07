@@ -13,7 +13,7 @@ class Forme extends Sprite {
   public $noShiny = false;
   public $hasBackside = false;
   public $catchable = true; // can they be caught / evolved in that form in any game?
-  public false|array $evolvesFrom = false;
+  public array $evolvesFrom = [];
 
   function __construct(Sprite $sprite, int $dexid, array $evolutions) {
     // Formes à ne pas compter

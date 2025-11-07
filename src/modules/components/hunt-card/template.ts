@@ -277,6 +277,12 @@ template.innerHTML = /*html*/`
         </input-select>
 
         <check-box name="originalTrainer" data-string="capture-originalTrainer" data-mine></check-box>
+        <check-box name="hasEvolved" data-string="capture-hasEvolved"></check-box>
+
+        <input-select name="caughtAs" default-value="" icons="leading">
+          <pokemon-sprite slot="leading-icon" data-icon="caughtAs" shiny="true" size="32"></pokemon-sprite>
+          <span slot="label" data-string="preevolution-select-label"></span>
+        </input-select>
       </fieldset>
 
 

@@ -130,6 +130,23 @@ export class huntCard extends HTMLElement {
   }
 
 
+  #hasEvolvedHandler = async (event: Event) => {
+    if (!(event.currentTarget instanceof CheckBox)) throw new TypeError(`Expecting CheckBox`);
+    const hasEvolved = event.currentTarget.checked;
+
+    this.updateAttribute('hasEvolved', String(hasEvolved));
+    if (hasEvolved) {
+      const hunt = await this.getHunt();
+      this.genereEvolutionChain(hunt.dexid, hunt.forme, hunt.caughtAsDexid, hunt.caughtAsForme);
+    }
+    else {
+      const subEvoSelector = this.getInput('caughtAs');
+      if (subEvoSelector instanceof InputSelect) subEvoSelector.value = '';
+      else subEvoSelector?.setAttribute('value', '');
+    }
+  }
+
+
   /** Cancels edit and doesn't save modifications to shinyStorage. */
   #cancelHandler = async (event: Event) => {
     const cancelMessage = getString('notif-modifications-will-be-lost');
@@ -240,9 +257,22 @@ export class huntCard extends HTMLElement {
       const hunt = await this.formToHunt(formData);
       
       this.genereFormes(hunt.dexid, hunt.forme);
-      this.genereMethodes(hunt.game, hunt.method)
+      this.genereMethodes(hunt.game, hunt.method);
       this.updateAttribute('method', hunt.method);
       this.updateAttribute('game', hunt.game);
+      this.updateAttribute('hasEvolved', String(hunt.hasEvolved));
+      this.updateEvolvedSpeciesState(hunt.dexid, hunt.forme);
+
+      const caughtAsValid = this.#validateCaughtAsDexidAndForm(hunt.dexid, hunt.forme, hunt.caughtAsDexid, hunt.caughtAsForme);
+      if (!caughtAsValid) {
+        const firstValidSubEvolution = this.#getFirstValidSubEvolution(hunt.dexid, hunt.forme);
+        if (firstValidSubEvolution) {
+          hunt.caughtAsDexid = firstValidSubEvolution.dexid;
+          hunt.caughtAsForme = firstValidSubEvolution.forme;
+        }
+      }
+
+      this.genereEvolutionChain(hunt.dexid, hunt.forme, hunt.caughtAsDexid, hunt.caughtAsForme);
 
       const caughtCheckBox = this.getInput('caught');
       // In a setTimeout because it needs to happen after genereMethodes causes the input-select to auto-select a method
@@ -444,6 +474,7 @@ export class huntCard extends HTMLElement {
           else input?.setAttribute('value', name);
 
           this.genereFormes(hunt.dexid, hunt.forme);
+          this.updateEvolvedSpeciesState(hunt.dexid, hunt.forme);
         } break;
 
         case 'game': {
@@ -465,7 +496,15 @@ export class huntCard extends HTMLElement {
           this.updateAttribute('method', value);
         } break;
 
-        case 'forme':
+        case 'forme': {
+          const value = String(hunt[prop]);
+          
+          if (input instanceof InputSelect) input.value = value;
+          else input?.setAttribute('value', value);
+
+          this.updateEvolvedSpeciesState(hunt.dexid, hunt.forme);
+        } break;
+
         case 'ball':
         case 'gene': {
           const value = String(hunt[prop]);
@@ -552,6 +591,34 @@ export class huntCard extends HTMLElement {
           }
         } break;
 
+        case 'hasEvolved': {
+          const value = hunt.hasEvolved;
+
+          if (input instanceof CheckBox) input.checked = value;
+          else input?.setAttribute('checked', String(value));
+
+          if (!value) {
+            hunt.caughtAsDexid = null;
+            hunt.caughtAsForme = null;
+          }
+
+          this.updateAttribute('hasEvolved', String(value));
+        } break;
+
+        case 'caughtAsDexid':
+        case 'caughtAsForme': {
+          const caughtAsDexid = hunt.caughtAsDexid;
+          const caughtAsForme = hunt.caughtAsForme ?? '';
+          const value = caughtAsDexid ? `${caughtAsDexid}-${caughtAsForme}` : '';
+
+          if (input instanceof InputSelect) input.value = value;
+          else input?.setAttribute('value', value);
+
+          if (caughtAsDexid != null) {
+            this.genereEvolutionChain(hunt.dexid, hunt.forme, caughtAsDexid, caughtAsForme);
+          }
+        } break;
+
         case 'huntid': {
           const form = this.form;
           if (isEdit) form.setAttribute('data-edit', '');
@@ -619,6 +686,7 @@ export class huntCard extends HTMLElement {
         } break;
 
         case 'caught':
+        case 'hasEvolved':
         case 'charm': {
           const boolean = value === 'false' ? false : true;
           Object.assign(hunt, { [prop]: boolean });
@@ -658,6 +726,20 @@ export class huntCard extends HTMLElement {
           const newTime = value !== oldDate ? (new Date(String(value))).getTime() : timeCapture;
           if (!isNaN(newTime)) hunt.catchTime = unknown ? 825289200000 : newTime;
         } break;
+
+        case 'caughtAs': {
+          const parts = String(value).split('-');
+          const caughtAsDexid = Number(parts.shift());
+          const caughtAsForme = parts.join('-');
+
+          if (!isNaN(caughtAsDexid) && caughtAsDexid > 0) {
+            hunt.caughtAsDexid = caughtAsDexid;
+            hunt.caughtAsForme = caughtAsForme || null;
+          } else {
+            hunt.caughtAsDexid = null;
+            hunt.caughtAsForme = null;
+          }
+        } break;
       }
     }
 
@@ -696,10 +778,36 @@ export class huntCard extends HTMLElement {
       geneIcon.setAttribute('data-icon', 'gene');
     }
 
+    const preevolutionIcon = this.#shadow.querySelector<pokemonSprite>('[data-icon="caughtAs"]');
+    if (preevolutionIcon && hunt.caughtAsDexid) {
+      preevolutionIcon.classList.remove('empty');
+      preevolutionIcon.setAttribute('dexid', String(hunt.caughtAsDexid));
+      preevolutionIcon.setAttribute('forme', String(hunt.caughtAsForme ?? ''));
+    } else {
+      preevolutionIcon?.classList.add('empty');
+    }
+
     const sprite = this.#shadow.querySelector('pokemon-sprite')!;
     sprite.setAttribute('dexid', String(hunt.dexid));
     sprite.setAttribute('forme', hunt.forme);
     sprite.setAttribute('shiny', String(hunt.caught));
+  }
+
+
+  updateEvolvedSpeciesState(dexid: number, formeDbid: string) {
+    try {
+      const pkmn = pokemonData[dexid];
+      if (!pkmn) throw false;
+
+      const forme = pkmn.formes.find(f => f.dbid === formeDbid);
+      if (!forme) throw false;
+
+      if (forme.evolvesFrom.length <= 0) throw false;
+
+      this.setAttribute('data-is-evolved-species', 'true');
+    } catch (error) {
+      this.setAttribute('data-is-evolved-species', 'false');
+    }
   }
 
 
@@ -718,6 +826,10 @@ export class huntCard extends HTMLElement {
         this.setAttribute('data-charm-available', String(charmAvailable));
         const virtualconsoleGen = jeu ? (jeu.gen === 1 || jeu.gen === 2) : false;
         this.setAttribute('data-gen-vc', String(virtualconsoleGen));
+      } break;
+
+      case 'hasEvolved': {
+        this.setAttribute('data-has-evolved', String(value === 'true'));
       } break;
     }
   }
@@ -811,6 +923,80 @@ export class huntCard extends HTMLElement {
   }
 
 
+  /** Génère la liste des pré-évolutions du Pokémon sélectionné. */
+  genereEvolutionChain(dexid: number, form: string, caughtAsDexid: number | null, caughtAsForme: string | null): boolean {
+    const select = this.getInput('caughtAs');
+    if (!select) throw new TypeError('Expecting InputSelect');
+
+    select.querySelectorAll('option').forEach(option => option.remove());
+
+    const pkmn = new Pokemon(pokemonData[dexid]);
+    const evolutionChain = pkmn.getEvolutionChain(form);
+
+    // Initially auto select a valid form in any case
+    const firstSelectableValue = `${evolutionChain[0].dexid}-${evolutionChain[0].forme}`;
+    let valueToSelect: string;
+    let isValid = true;
+    if (caughtAsDexid) valueToSelect = `${caughtAsDexid}-${caughtAsForme ?? ''}`;
+    else valueToSelect = firstSelectableValue;
+    select.setAttribute('value', valueToSelect); // set initial value before regenerating the options
+
+    let availableChoices = 0;
+    for (const { dexid, forme, pkmn } of evolutionChain) {
+      availableChoices++;
+      select.innerHTML += `<option value="${dexid}-${forme}" data-string="pokemon/${dexid}/forme/${forme}/name">${pkmn.getFormeName(forme, true)}</option>`;
+    }
+
+    if (availableChoices > 0) {
+      select.setAttribute('default-label', getString('preevolution-select-label'));
+    }
+
+    return isValid;
+  }
+
+
+  #validateCaughtAsDexidAndForm(
+    dexid: number,
+    forme: string,
+    caughtAsDexid: number | null,
+    caughtAsForme: string | null,
+    evolutionChain?: ReturnType<Pokemon['getEvolutionChain']>
+  ): boolean {
+    if (!evolutionChain) {
+      const pkmn = new Pokemon(pokemonData[dexid]);
+      evolutionChain = pkmn.getEvolutionChain(forme);
+    }
+
+    let isValid = false;
+    if (caughtAsDexid) {
+      // Check if previously selected sub evolution is still valid
+      isValid = false;
+      for (const {dexid, forme} of evolutionChain) {
+        if (dexid === caughtAsDexid && forme === (caughtAsForme || '')) {
+          isValid = true;
+          break;
+        }
+      }
+    }
+
+    return isValid;
+  }
+
+
+  #getFirstValidSubEvolution(
+    dexid: number,
+    forme: string,
+    evolutionChain?: ReturnType<Pokemon['getEvolutionChain']>,
+  ): ReturnType<Pokemon['getEvolutionChain']>[number] {
+    if (!evolutionChain) {
+      const pkmn = new Pokemon(pokemonData[dexid]);
+      evolutionChain = pkmn.getEvolutionChain(forme);
+    }
+
+    return evolutionChain[0];
+  }
+
+
   connectedCallback() {
     translationObserver.serve(this, { method: 'attribute' });
 
@@ -824,6 +1010,7 @@ export class huntCard extends HTMLElement {
     // 🔽 Détecte les changements dans le formulaire :
     this.handle(this.getInput('dexid'), 'input', this.#speciesInputHandler);
     this.handle(this.getInput('caught'), 'change', this.#catchHandler);
+    this.handle(this.getInput('hasEvolved'), 'change', this.#hasEvolvedHandler);
     this.handle(this.form, 'change', this.#formChangeHandler);
     this.handle(this.form, 'submit', this.#submitHandler);
 
