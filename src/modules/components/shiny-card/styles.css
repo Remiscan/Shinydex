@@ -129,11 +129,11 @@ pokemon-sprite:not([dexid]) ~ * {
 [data-type="ball"] {
   grid-row: name;
   grid-column: ball;
-  transition: transform .2s var(--easing-decelerate);
+  transition: transform .2s var(--easing-decelerate), height .2s var(--easing-decelerate);
   transform: translate(0) rotate(0);
 
   :host([open]) & {
-    transition: transform .11s var(--easing-accelerate);
+    transition: transform .11s var(--easing-accelerate), height .11s var(--easing-accelerate);
   }
 }
 
@@ -513,7 +513,22 @@ button.icon-button.menu-hint::before {
     transition: none;
   }
 
-  :host([open]) [data-type="ball"] {
+  [data-type="caughtAs-sprite"] {
+    &::part(image) {
+      transition: opacity .2s linear;
+    }
+  }
+
+  :host([open]) [data-type="ball"],
+  :host([open]) [data-type="caughtAs-sprite"] {
     transform: translate(0) rotate(0);
+  }
+
+  :host([open]) [data-type="caughtAs-sprite"] {
+    height: 2px;
+
+    &::part(image) {
+      opacity: 0;
+    }
   }
 }
