@@ -18,6 +18,8 @@ export interface BackendShiny {
   ball: string,
   gene: string,
   originalTrainer: number,
+  caughtAsDexid: number | null,
+  caughtAsForme: string | null,
 
   notes: string,
 };
@@ -78,6 +80,8 @@ export class FrontendShiny implements feShiny {
   ball: string = '';
   gene: string = '';
   originalTrainer: boolean = true;
+  caughtAsDexid: number | null = null
+  caughtAsForme: string | null = null;
   
   notes: string = '';
 
@@ -104,6 +108,8 @@ export class FrontendShiny implements feShiny {
     if ('ball' in shiny) this.ball = String(shiny.ball);
     if ('gene' in shiny) this.gene = String(shiny.gene);
     if ('originalTrainer' in shiny) this.originalTrainer = Boolean(shiny.originalTrainer);
+    if ('caughtAsDexid' in shiny) this.caughtAsDexid = Number(shiny.caughtAsDexid) || null;
+    if ('caughtAsForme' in shiny) this.caughtAsForme = shiny.caughtAsForme ? (String(shiny.caughtAsForme) || null) : null;
 
     if ('notes' in shiny) this.notes = String(shiny.notes);
   }
@@ -135,6 +141,8 @@ export class FrontendShiny implements feShiny {
       ball: this.ball,
       gene: this.gene,
       originalTrainer: Number(this.originalTrainer),
+      caughtAsDexid: this.caughtAsDexid,
+      caughtAsForme: this.caughtAsForme,
 
       notes: this.notes
     };

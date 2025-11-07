@@ -156,6 +156,14 @@ fieldset[name="bonus"] > fieldset[data-game] {
   flex-basis: calc(2 * 16px + 24ch);
 }
 
+[data-icon="caughtAs"] {
+  padding: 0px;
+}
+
+[data-icon="caughtAs"].empty {
+  opacity: 0;
+}
+
 /* Données additionnelles */
 
 [name="notes"] {
@@ -181,6 +189,9 @@ form:not(.caught) .capture-button-group ~ * {
   display: none !important;
 }
 
+:host(:not([data-is-evolved-species="true"])) [name="evolved"],
+:host(:not([data-is-evolved-species="true"])) [name="caughtAs"],
+:host(:not([data-has-evolved="true"])) [name="caughtAs"],
 :host(:not([data-method-mine="false"])) [data-not-mine],
 :host(:not([data-method-mine="true"])) [data-mine],
 /* Cache les bonus communs (= charme chroma) pour les jeux qui n'en ont pas */

@@ -114,7 +114,7 @@ export class shinyCard extends HTMLElement {
       element.setAttribute('data-string', stringQuery);
       element.innerHTML = getString(stringQuery as TranslatedString, lang);
 
-      const sprite = this.shadow.querySelector('pokemon-sprite')!;
+      const sprite = this.shadow.querySelector('[data-type="current-sprite"]')!;
       sprite.setAttribute('dexid', String(shiny.dexid));
     }
 
@@ -129,11 +129,25 @@ export class shinyCard extends HTMLElement {
         element.innerHTML = '';
       }
 
-      const sprite = this.shadow.querySelector('pokemon-sprite')!;
+      const sprite = this.shadow.querySelector('[data-type="current-sprite"]')!;
       sprite.setAttribute('forme', shiny.forme);
       this.setAttribute('data-form', shiny.forme);
 
       sprite.setAttribute('data-caught', String(shinyCard.caughtCache.has(`${shiny.dexid}-${shiny.forme}`)));
+    }
+
+    // Espèce et forme lors de la capture
+    {
+      const sprite = this.shadow.querySelector('[data-type="caughtAs-sprite"]')!;
+      if (shiny.caughtAsDexid) {
+        sprite.setAttribute('dexid', String(shiny.caughtAsDexid));
+        sprite.setAttribute('forme', String(shiny.caughtAsForme || ''));
+        sprite.setAttribute('data-caught', String(shinyCard.caughtCache.has(`${shiny.caughtAsDexid}-${shiny.caughtAsForme || ''}`)));
+      } else {
+        sprite.setAttribute('dexid', '0');
+        sprite.removeAttribute('forme');
+        sprite.removeAttribute('data-caught');
+      }
     }
 
     // Surnom

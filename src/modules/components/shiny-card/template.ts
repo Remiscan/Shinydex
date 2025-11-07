@@ -5,7 +5,7 @@ import '../pokemon-sprite/pokemonSprite.js';
 const template = document.createElement('template');
 template.innerHTML = /*html*/`
   <div class="container surface surface-container-highest interactive">
-    <pokemon-sprite size="112" shiny="true" class="surface surface-container-low"></pokemon-sprite>
+    <pokemon-sprite size="112" shiny="true" class="surface surface-container-low" data-type="current-sprite"></pokemon-sprite>
 
     <div class="menu surface surface-container-low">
       <button type="button" class="surface interactive filled tonal outlined only-text" data-action="edit" disabled tabindex="-1">
@@ -26,6 +26,7 @@ template.innerHTML = /*html*/`
     </div>
 
     <div class="pokemon-infos__identity body-large">
+      <pokemon-sprite size="22" shiny="true" class="surface surface-container-low" data-type="caughtAs-sprite"></pokemon-sprite>
       <span data-type="ball" class="icon"></span>
       <span data-type="name" class="title-large"></span>
       <span data-type="species"></span>
