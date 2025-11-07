@@ -1,3 +1,13 @@
+:host {
+  --ball-anim-duration: .2s;
+  --ball-anim-timing: var(--easing-decelerate);
+}
+
+:host([open]) {
+  --ball-anim-duration: .11s;
+  --ball-anim-timing: var(--easing-accelerate);
+}
+
 .container {
   width: 100%;
   height: 120px;
@@ -51,17 +61,49 @@ pokemon-sprite:not([dexid]) ~ * {
   place-self: start start;
   overflow: clip;
   border-radius: 20px;
-  padding-top: 20px;
+  /*padding-top: 20px;*/
   justify-self: center;
-  align-self: start;
-  position: relative;
-  top: 3px;
+  /*align-self: start;*/
+  /*position: relative;
+  top: 3px;*/
   --parent-size: var(--size);
+  place-self: center;
+  /*border-radius: calc(.5 * var(--border-radius));*/
+  border-radius: 9px;
+  margin: -2px; /* compense la bordure */
 
   &::part(image) {
-    --size: 28px;
-    --decalage: calc(-.5 * (var(--size) - var(--parent-size)));
-    margin: var(--decalage);
+    transition: opacity .2s linear;
+  }
+
+  & + .preevo-arrow {
+    grid-row: 1 / -1;
+    grid-column: preevo;
+    z-index: 5;
+    font-size: 16px;
+    place-self: start center;
+    translate: 0px -16px;
+    color: rgb(var(--on-surface-variant), .8);
+    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+    --delay: var(--ball-anim-duration);
+    transition:
+      opacity var(--ball-anim-duration) var(--ball-anim-timing) var(--delay),
+      translate var(--ball-anim-duration) var(--ball-anim-timing) 0s,
+      clip-path var(--ball-anim-duration) var(--ball-anim-timing) var(--delay);
+  }
+}
+
+:host([open]) [data-type="caughtAs-sprite"] {
+  scale: 0;
+
+  &::part(image) {
+    opacity: 0;
+  }
+
+  & + .preevo-arrow {
+    translate: 5px -16px;
+    clip-path: polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%);
+    --delay: 0s;
   }
 }
 
@@ -116,11 +158,15 @@ pokemon-sprite:not([dexid]) ~ * {
   grid-column: identity;
   display: grid;
   grid-template-rows: [name] 32px [species] auto;
-  grid-template-columns: [ball] 32px [name] auto [icons] auto 1fr;
+  grid-template-columns: [preevo] var(--preevo-col, 0px) [ball] 32px [name] auto [icons] auto 1fr;
   position: relative;
   left: -16px;
   align-items: center;
   line-height: initial;
+
+  &:has([data-type="caughtAs-sprite"]:not([dexid="0"])) {
+    --preevo-col: auto;
+  }
 }
 
 /* Ball */
@@ -129,12 +175,15 @@ pokemon-sprite:not([dexid]) ~ * {
 [data-type="ball"] {
   grid-row: name;
   grid-column: ball;
-  transition: transform .2s var(--easing-decelerate), height .2s var(--easing-decelerate);
+  transition:
+    transform var(--ball-anim-duration) var(--ball-anim-timing),
+    scale var(--ball-anim-duration) var(--ball-anim-timing);
   transform: translate(0) rotate(0);
+}
 
-  :host([open]) & {
-    transition: transform .11s var(--easing-accelerate), height .11s var(--easing-accelerate);
-  }
+[data-type="caughtAs-sprite"] {
+  grid-row: 1 / -1;
+  grid-column: preevo;
 }
 
 :host([open]) [data-type="ball"] {
@@ -145,11 +194,11 @@ pokemon-sprite:not([dexid]) ~ * {
   transform: translate(20px);
 }
 
-[data-type="caughtAs-sprite"]:not([dexid="0"]) + [data-type="ball"] {
+/*[data-type="caughtAs-sprite"]:not([dexid="0"]) + [data-type="ball"] {
   background-color: rgb(var(--surface-container-low));
   box-shadow: 0px 0px 0px 2px rgb(var(--surface-container-low));
   border-radius: 50%;
-}
+}*/
 
 /* Name & species */
 
@@ -271,6 +320,27 @@ button.icon-button.menu-hint::before {
   margin-inline: 16px;
   line-height: initial;
   align-items: center;
+  transition:
+    translate var(--ball-anim-duration) var(--ball-anim-timing),
+    width var(--ball-anim-duration) var(--ball-anim-timing);
+
+  &:has([data-type="caughtAs-sprite"]:not([dexid="0"])) {
+    grid-template-columns: [preevo] auto [game] 32px [info] auto [rate] 1fr;
+    position: relative;
+    left: -32px; /* 32px du sprite + 5px du gap */
+    width: 100%;
+
+    :host([open]) & {
+      translate: -5px 0px;
+      width: calc(100% + 5px);
+    }
+  }
+
+  &:has([data-type="caughtAs-sprite"][dexid="0"]) {
+    & .preevo-arrow {
+      display: none;
+    }
+  }
 }
 
 /* Game */
@@ -513,22 +583,8 @@ button.icon-button.menu-hint::before {
     transition: none;
   }
 
-  [data-type="caughtAs-sprite"] {
-    &::part(image) {
-      transition: opacity .2s linear;
-    }
-  }
-
   :host([open]) [data-type="ball"],
   :host([open]) [data-type="caughtAs-sprite"] {
     transform: translate(0) rotate(0);
-  }
-
-  :host([open]) [data-type="caughtAs-sprite"] {
-    height: 2px;
-
-    &::part(image) {
-      opacity: 0;
-    }
   }
 }
