@@ -42,6 +42,7 @@ $addDirToCache = function(string $dirPath, array $exclude = []) use (&$cache) {
 
 $addDirToCache(dirname(__DIR__, 1).'/ext', exclude: ['README.md']);
 $addDirToCache(dirname(__DIR__, 1).'/pages');
+$addDirToCache(dirname(__DIR__, 1).'/changelog');
 $addDirToCache(dirname(__DIR__, 1).'/styles');
 $addDirToCache(dirname(__DIR__, 1).'/dist');
 

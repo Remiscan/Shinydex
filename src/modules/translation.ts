@@ -71,35 +71,24 @@ class TranslationObserver extends TODef {
     return super.getSourceOf(element);
   }
 
-  translate(container: HTMLElement, lang?: string, defaultLang: SupportedLang = 'en') {
-    let currentLang: SupportedLang;
-    if (lang) {
-      currentLang = isSupportedLang(lang) ? lang : defaultLang;
-    } else {
-      const source = this.getSourceOf(container) ?? document.documentElement;
-      const sourceLang = source.lang ?? '';
-      currentLang = isSupportedLang(sourceLang) ? sourceLang : defaultLang;
-    }
-
-    // Translate all texts in the container
-    let _container = container.shadowRoot ?? container;
-    for (const e of [..._container.querySelectorAll('[data-string]')]) {
+  protected applyTranslation(container: HTMLElement | DocumentFragment, currentLang: SupportedLang) {
+    for (const e of [...container.querySelectorAll('[data-string]')]) {
       const stringKey = (e.getAttribute('data-string') ?? '') as TranslatedString;
       if (stringKey.length === 0) continue;
       if (e.tagName == 'IMG') e.setAttribute('alt', getString(stringKey, currentLang));
       else                    e.innerHTML = getString(stringKey, currentLang);
     }
-    for (const e of [..._container.querySelectorAll('[data-label]')]) {
+    for (const e of [...container.querySelectorAll('[data-label]')]) {
       const stringKey = (e.getAttribute('data-label') ?? '') as TranslatedString;
       if (stringKey.length === 0) continue;
       e.setAttribute('aria-label', getString(stringKey, currentLang));
     }
-    for (const e of [..._container.querySelectorAll('[data-placeholder]')]) {
+    for (const e of [...container.querySelectorAll('[data-placeholder]')]) {
       const stringKey = (e.getAttribute('data-placeholder') ?? '') as TranslatedString;
       if (stringKey.length === 0) continue;
       e.setAttribute('placeholder', getString(stringKey, currentLang));
     }
-    for (const e of [..._container.querySelectorAll('[data-datetime]')]) {
+    for (const e of [...container.querySelectorAll('[data-datetime]')]) {
       const datetime = e.getAttribute('data-datetime') ?? '0';
       if (datetime.length === 0) continue;
       let date: Date;
@@ -125,6 +114,21 @@ class TranslationObserver extends TODef {
         e.setAttribute('dateTime', validDatetime);
       }
     }
+  }
+
+  translate(container: HTMLElement, lang?: string, defaultLang: SupportedLang = 'en') {
+    let currentLang: SupportedLang;
+    if (lang) {
+      currentLang = isSupportedLang(lang) ? lang : defaultLang;
+    } else {
+      const source = this.getSourceOf(container) ?? document.documentElement;
+      const sourceLang = source.lang ?? '';
+      currentLang = isSupportedLang(sourceLang) ? sourceLang : defaultLang;
+    }
+
+    // Translate all texts in the container
+    this.applyTranslation(container, currentLang);
+    if (container.shadowRoot) this.applyTranslation(container.shadowRoot, currentLang);
   }
 }
 
