@@ -405,8 +405,14 @@ a.icon-button.bouton-retour {
   opacity: .8;
 }
 
-#pokedex .compteur > .caught {
+#pokedex .compteur > .caught,
+#pokedex .compteur > .caught-and-evolved {
   opacity: 1;
+}
+
+#pokedex[data-dexCompletionType="normal"] .compteur > .caught,
+#pokedex[data-dexCompletionType="living"] .compteur > .caught-and-evolved {
+  display: none;
 }
 
 .section-contenu {
@@ -726,6 +732,31 @@ dex-icon {
   --surface-color: var(--surface);
   --elevation-opacity: var(--elevation-3-opacity);
   --state-tint: var(--on-secondary);
+
+  #pokedex[data-dexCompletionType="living"] &:not([data-caught="true"]),
+  #pokedex[data-dexCompletionType="normal"] &:not([data-caught="true"], [data-has-evolved="true"]) {
+    --surface-opacity: 0;
+
+    &:not(:hover, :focus, :active) {
+      --elevation-opacity: 0;
+    }
+
+    & .caught-form-indicator {
+      display: none !important;
+    }
+
+    & .pkmnicon {
+      filter: grayscale(.5) opacity(.6);
+    }
+  }
+
+  #pokedex[data-dexCompletionType="living"] &:is([data-caught="true"]),
+  #pokedex[data-dexCompletionType="normal"] &:is([data-caught="true"], [data-has-evolved="true"]) {
+    --surface-color: var(--secondary-container);
+    --state-tint: var(--on-secondary-container);
+    --surface-tint: var(--secondary);
+    --elevation-opacity: 0;
+  }
 }
 
 div[data-replaces="dex-icon"] {
@@ -733,7 +764,7 @@ div[data-replaces="dex-icon"] {
   contain-intrinsic-size: 44px 44px;
 }
 
-[data-replaces="dex-icon"]:not([data-caught="true"]),
+/*[data-replaces="dex-icon"]:not([data-caught="true"]),
 dex-icon:not([data-caught="true"]) {
   --surface-opacity: 0;
 }
@@ -741,15 +772,15 @@ dex-icon:not([data-caught="true"]) {
 [data-replaces="dex-icon"]:not([data-caught="true"]):not(:hover, :focus, :active),
 dex-icon:not([data-caught="true"]):not(:hover, :focus, :active) {
   --elevation-opacity: 0;
-}
+}*/
 
-[data-replaces="dex-icon"][data-caught="true"],
+/*[data-replaces="dex-icon"][data-caught="true"],
 dex-icon[data-caught="true"] {
   --surface-color: var(--secondary-container);
   --state-tint: var(--on-secondary-container);
   --surface-tint: var(--secondary);
   --elevation-opacity: 0;
-}
+}*/
 
 dex-icon .pkmnicon {
   outline-offset: -1px;
@@ -776,13 +807,20 @@ dex-icon .caught-form-indicator {
   flex-shrink: 0;
   transition: none;
   --color: var(--primary);
+
+  #pokedex[data-dexCompletionType="living"] &:not([data-caught="true"]),
+  #pokedex[data-dexCompletionType="normal"] &:not([data-caught="true"], [data-has-evolved="true"]) {
+    --color: var(--surface-color);
+    border: 1px solid rgb(var(--secondary));
+    box-sizing: border-box;
+  }
 }
 
-dex-icon .caught-form-indicator:not([data-caught="true"]) {
+/*dex-icon .caught-form-indicator:not([data-caught="true"]) {
   --color: var(--surface-color);
   border: 1px solid rgb(var(--secondary));
   box-sizing: border-box;
-}
+}*/
 
 /* Only display a maximum of 7 caught forms indicators. */
 dex-icon .caught-form-indicator:nth-of-type(7) ~ .caught-form-indicator {
@@ -807,11 +845,13 @@ dex-icon:has(.caught-form-indicator:nth-of-type(8)) .caught-form-indicator:nth-o
 }
 
 /* If there are more than 7 catchable forms and they're all caught, adjust the ellipsis colors */
-dex-icon:has(.caught-form-indicator:nth-of-type(8)):not(:has(.caught-form-indicator:not([data-caught="true"]))) .caught-form-indicator:nth-of-type(7) {
+#pokedex[data-dexCompletionType="living"] dex-icon:has(.caught-form-indicator:nth-of-type(8)):not(:has(.caught-form-indicator:not([data-caught="true"]))) .caught-form-indicator:nth-of-type(7),
+#pokedex[data-dexCompletionType="normal"] dex-icon:has(.caught-form-indicator:nth-of-type(8)):not(:has(.caught-form-indicator:not([data-caught="true"], [data-has-evolved="true"]))) .caught-form-indicator:nth-of-type(7) {
   --color: var(--primary);
 }
 
-dex-icon:has(.caught-form-indicator:nth-of-type(8)):not(:has(.caught-form-indicator:not([data-caught="true"]))) .caught-form-indicator:nth-of-type(7)::before {
+#pokedex[data-dexCompletionType="living"] dex-icon:has(.caught-form-indicator:nth-of-type(8)):not(:has(.caught-form-indicator:not([data-caught="true"]))) .caught-form-indicator:nth-of-type(7)::before,
+#pokedex[data-dexCompletionType="normal"] dex-icon:has(.caught-form-indicator:nth-of-type(8)):not(:has(.caught-form-indicator:not([data-caught="true"], [data-has-evolved="true"]))) .caught-form-indicator:nth-of-type(7)::before {
   color: rgb(var(--surface-color));
 }
 
@@ -820,13 +860,13 @@ dex-icon:not(:has(.caught-form-indicator:nth-of-type(2))) .caught-form-indicator
   display: none !important;
 }
 
-dex-icon:not([data-caught="true"]) .caught-form-indicator {
+/*dex-icon:not([data-caught="true"]) .caught-form-indicator {
   display: none !important;
 }
 
 dex-icon:not([data-caught="true"]) .pkmnicon {
   filter: grayscale(.5) opacity(.6);
-}
+}*/
 
 .pkmnicon {
   border: none;
@@ -835,8 +875,8 @@ dex-icon:not([data-caught="true"]) .pkmnicon {
   margin: 0;
 }
 
-body[data-anti-spoilers-pokedex="on"] #pokedex dex-icon:not([data-caught="true"])[dexid]:not([dexid="0"]) .pkmnicon,
-body[data-anti-spoilers-friends="on"] :is(#partage, #chromatiques-ami) pokemon-sprite:not([data-caught="true"])[dexid]:not([dexid="0"])::part(image) {
+body[data-anti-spoilers-pokedex="on"] #pokedex dex-icon:not([data-caught="true"], [data-has-evolved="true"])[dexid]:not([dexid="0"]) .pkmnicon,
+body[data-anti-spoilers-friends="on"] :is(#partage, #chromatiques-ami) pokemon-sprite:not([data-caught="true"], [data-has-evolved="true"])[dexid]:not([dexid="0"])::part(image) {
   filter: var(--anti-spoilers-filter);
 }
 
@@ -1364,14 +1404,26 @@ remiscan-logo {
     color: rgb(var(--error));
   }
 
+  #changelog[lang="fr"] &.fix > li::before {
+    content: 'Correction';
+  }
+
   &.new > li::before {
     content: 'New';
     color: rgb(var(--tertiary));
   }
 
+  #changelog[lang="fr"] &.new > li::before {
+    content: 'Nouveauté';
+  }
+
   &.change > li::before {
     content: 'Change';
     color: rgb(var(--primary));
+  }
+
+  #changelog[lang="fr"] &.change > li::before {
+    content: 'Changement';
   }
 
   & > ul {

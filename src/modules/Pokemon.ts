@@ -92,9 +92,9 @@ export class Forme {
   gender: string = 'mf';
   gigamax: boolean = false;
   candy: number = 0;
-  hasBackside?: boolean;
-  noShiny?: boolean;
-  catchable?: boolean = true;
+  hasBackside: boolean;
+  noShiny: boolean;
+  catchable: boolean = true;
   evolvesFrom: Array<{ dexid: number, forme: string }> = [];
 
   constructor(forme: object = {}) {
@@ -109,9 +109,9 @@ export class Forme {
     if ('gender' in forme) this.gender = String(forme.gender);
     if ('gigamax' in forme) this.gigamax = Boolean(forme.gigamax);
     if ('candy' in forme) this.candy = Number(forme.candy) || 0;
-    if ('hasBackside' in forme) this.hasBackside = Boolean(forme.hasBackside);
-    if ('noShiny' in forme) this.noShiny = Boolean(forme.noShiny);
-    if ('catchable' in forme) this.catchable = Boolean(forme.catchable);
+    this.hasBackside = Boolean('hasBackside' in forme ? forme.hasBackside : false);
+    this.noShiny = Boolean('noShiny' in forme ? forme.noShiny : false);
+    this.catchable = Boolean('catchable' in forme ? forme.catchable : false);
     if ('evolvesFrom' in forme && Array.isArray(forme.evolvesFrom)) {
       const evolvesFrom = [];
       for (const subEvo of forme.evolvesFrom) {
@@ -217,23 +217,72 @@ export class Pokemon {
     }
   }
 
+  static getName(
+    pkmn: backendPokemon,
+    lang = getCurrentLang(),
+  ): string {
+    if (!isSupportedPokemonLang(lang)) throw new Error('language-not-supported');
+    return pkmn.name[lang];
+  }
+
   /**
    * @returns Nom du Pokémon.
    */
   getName(lang = getCurrentLang()): string {
+    return Pokemon.getName(this, lang);
+  }
+
+  static getFormeName(
+    pkmn: backendPokemon,
+    formId: string = '',
+    withName: boolean = true,
+    lang = getCurrentLang(),
+  ): string {
     if (!isSupportedPokemonLang(lang)) throw new Error('language-not-supported');
-    return this.name[lang];
+    const forme = pkmn.formes.find(f => f.dbid === formId);
+    let name = this.getName(pkmn, lang);
+    if (withName) return forme?.name[lang].replace('{{name}}', name) || name;
+    else          return forme?.name[lang].replace('{{name}}', '').trim() || appStrings[lang]?.['forme-base'];
   }
 
   /**
    * @returns Nom d'une forme du Pokémon.
    */
   getFormeName(id: string = '', withName: boolean = true, lang = getCurrentLang()): string {
-    if (!isSupportedPokemonLang(lang)) throw new Error('language-not-supported');
-    const forme = this.formes.find(f => f.dbid === id);
-    let name = this.getName(lang);
-    if (withName) return forme?.name[lang].replace('{{name}}', name) || name;
-    else          return forme?.name[lang].replace('{{name}}', '').trim() || appStrings[lang]?.['forme-base'];
+    return Pokemon.getFormeName(this, id, withName, lang);
+  }
+
+  static getPotentialPreEvolutions(
+    pkmn: backendPokemon,
+    formId: string,
+    subEvolutions: Map<Pokemon['dexid'], { pkmn: backendPokemon, formIds: Set<Forme['dbid']> }> = new Map(),
+  ): Array<{ dexid: Pokemon['dexid'], forme: Forme['dbid'], pkmn: backendPokemon }> {
+    const forme = pkmn.formes.find(f => f.dbid === formId);
+    if (!forme) return [];
+
+    // Première boucle avec récursion pour identifier, sans répétition, tous les Pokémon (et leurs formes) qui évoluent en la forme demandée de `this`
+    for (const subEvo of forme.evolvesFrom || []) {
+      let wasAlreadyTreated = false;
+      if (!subEvolutions.has(subEvo.dexid)) {
+        subEvolutions.set(subEvo.dexid, { pkmn: pokemonData[subEvo.dexid], formIds: new Set() });
+      }
+      const subEvoForms = subEvolutions.get(subEvo.dexid)!;
+      if (subEvoForms.formIds.has(subEvo.forme)) {
+        wasAlreadyTreated = true;
+      } else {
+        subEvoForms.formIds.add(subEvo.forme);
+        this.getPotentialPreEvolutions(subEvoForms.pkmn, subEvo.forme, subEvolutions);
+      }
+    }
+
+    // Deuxième boucle sur les pré-évolutions uniques, pour les mettre au bon format
+    const evolutionChain: Array<{ dexid: Pokemon['dexid'], forme: Forme['dbid'], pkmn: backendPokemon }> = [];
+    for (const [dexid, { formIds, pkmn }] of subEvolutions) {
+      for (const forme of formIds) {
+        evolutionChain.unshift({ dexid, forme, pkmn });
+      }
+    }
+    return evolutionChain;
   }
 
   /**
@@ -241,36 +290,44 @@ export class Pokemon {
    * @param subEvolutions - Utilisé pour la récursion en interne.
    * @returns La liste des Pokémon et formes qui sont pré-évolutions de celle-ci.
    */
-  getEvolutionChain(
+  getPotentialPreEvolutions(
     formId: string,
-    subEvolutions: Map<this['dexid'], { pkmn: Pokemon, formIds: Set<Forme['dbid']> }> = new Map(),
-  ): Array<{ dexid: Pokemon['dexid'], forme: Forme['dbid'], pkmn: Pokemon }> {
-    const forme = this.formes.find(f => f.dbid === formId);
-    if (!forme) return [];
+    subEvolutions: Map<this['dexid'], { pkmn: backendPokemon, formIds: Set<Forme['dbid']> }> = new Map(),
+  ): Array<{ dexid: Pokemon['dexid'], forme: Forme['dbid'], pkmn: backendPokemon }> {
+    return Pokemon.getPotentialPreEvolutions(this, formId, subEvolutions);
+  }
 
-    // Première boucle avec récursion pour identifier, sans répétition, tous les Pokémon (et leurs formes) qui évoluent en la forme demandée de `this`
-    for (const subEvo of forme.evolvesFrom || []) {
-      let wasAlreadyTreated = false;
-      if (!subEvolutions.has(subEvo.dexid)) {
-        subEvolutions.set(subEvo.dexid, { pkmn: new Pokemon(pokemonData[subEvo.dexid]), formIds: new Set() });
-      }
-      const subEvoForms = subEvolutions.get(subEvo.dexid)!;
-      if (subEvoForms.formIds.has(subEvo.forme)) {
-        wasAlreadyTreated = true;
-      } else {
-        subEvoForms.formIds.add(subEvo.forme);
-        subEvoForms.pkmn.getEvolutionChain(subEvo.forme, subEvolutions);
-      }
+  /**
+   * Récupère une chaîne d'évolutions reliant un Pokémon évolué à un Pokémon de base.
+   * @param evolvedDexid 
+   * @param evolvedForme 
+   * @param baseDexid 
+   * @param baseForme 
+   * @param chain 
+   * @returns 
+   */
+  static getPreEvolutionChain(
+    evolvedDexid: number,
+    evolvedForme: string,
+    baseDexid: number,
+    baseForme: string,
+    chain: Array<{ dexid: Pokemon['dexid'], forme: Forme['dbid'] }> = [],
+  ): Array<{ dexid: Pokemon['dexid'], forme: Forme['dbid'] }> {
+    const from = pokemonData[evolvedDexid];
+
+    const forme = from.formes.find(f => f.dbid === evolvedForme);
+    if (!forme) throw 'not-found';
+
+    chain.push({ dexid: evolvedDexid, forme: evolvedForme });
+    if (evolvedDexid === baseDexid && evolvedForme === baseForme) return chain;
+
+    for (const preEvolution of forme.evolvesFrom) {
+      try {
+        return this.getPreEvolutionChain(preEvolution.dexid, preEvolution.forme, baseDexid, baseForme, [...chain]);
+      } catch {}
     }
 
-    // Deuxième boucle sur les pré-évolutions uniques, pour les mettre au bon format
-    const evolutionChain: Array<{ dexid: Pokemon['dexid'], forme: Forme['dbid'], pkmn: Pokemon }> = [];
-    for (const [dexid, { formIds, pkmn }] of subEvolutions) {
-      for (const forme of formIds) {
-        evolutionChain.unshift({ dexid, forme, pkmn });
-      }
-    }
-    return evolutionChain;
+    throw 'not-found';
   }
 
   /**

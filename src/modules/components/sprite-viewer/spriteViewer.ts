@@ -59,11 +59,23 @@ export class SpriteViewer extends HTMLElement {
       caughtFormsList.delete('emptystring');
     }
 
+    const evolvedFormsList: Set<string> = new Set(this.getAttribute('data-evolved-forms')?.split(' ') ?? []);
+    if (evolvedFormsList.has('')) caughtFormsList.delete('');
+    if (evolvedFormsList.has('emptystring')) {
+      evolvedFormsList.add('');
+      evolvedFormsList.delete('emptystring');
+    }
+
+    const dexDataCompletionType = document.querySelector('#pokedex')?.getAttribute('data-dexCompletionType');
+    const speciesIsCaught = dexDataCompletionType === 'normal'
+      ? (caughtFormsList.size > 0 || evolvedFormsList.size > 0)
+      : caughtFormsList.size > 0;
+
     // On place le numéro
     const dexInfos = this.querySelector('.sprite-viewer-dex-info')!;
     const dexNumberContainer = dexInfos.querySelector('.info-dexid')!;
-    if (caughtFormsList.size > 0) dexInfos.classList.add('caught');
-    else                          dexInfos.classList.remove('caught');
+    if (speciesIsCaught) dexInfos.classList.add('caught');
+    else          dexInfos.classList.remove('caught');
     dexNumberContainer.innerHTML = pad(String(pokemon.dexid), 4);
 
     // On place le nom dans le FAB
@@ -98,12 +110,14 @@ export class SpriteViewer extends HTMLElement {
     listeRegular.innerHTML = '';
 
     for (const forme of formes) {
-      const caught = caughtFormsList.has(forme.dbid);
+      const formeIsCaught = dexDataCompletionType === 'normal'
+        ? (caughtFormsList.has(forme.dbid) || evolvedFormsList.has(forme.dbid))
+        : caughtFormsList.has(forme.dbid);
       const formeNameTemplate = /*html*/`
-        <span class="forme-name surface surface-container-high label-medium ${caught ? 'caught' : forme.catchable ? 'catchable' : ''}">
+        <span class="forme-name surface surface-container-high label-medium ${formeIsCaught ? 'caught' : forme.catchable ? 'catchable' : ''}">
           <span class="forme-name-arrow surface"></span>
           ${
-            caught ? '<span class="icon" data-icon="ball/poke"></span>' :
+            formeIsCaught ? '<span class="icon" data-icon="ball/poke"></span>' :
             forme.catchable ? `
             <span class="icon not-caught-indicator">
               <svg width="18" height="18" viewBox="0 0 18 18">

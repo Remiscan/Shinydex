@@ -463,7 +463,6 @@ let changelogDate: string|null = null;
 export async function openChangelog(
   onlyIfNew = false,
 ): Promise<boolean> {
-  debugger;
   const changelogSheet = document.querySelector('#changelog');
   if (changelogSheet instanceof BottomSheet) {
     const currentChangelogLang = changelogSheet.getAttribute('lang');
