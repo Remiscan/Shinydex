@@ -42,6 +42,12 @@ export function isSearchableSection(string: string): string is SearchableSection
   return searchableSections.includes(string as SearchableSection);
 }
 
+export const supportedDexCompletionTypes = ['living', 'normal'] as const;
+export type DexCompletionType = typeof supportedDexCompletionTypes[number];
+export function isDexCompletionType(string: string): string is DexCompletionType {
+  return supportedDexCompletionTypes.includes(string as DexCompletionType);
+}
+
 
 export type DataClass<Section extends PopulatableSection>
   = Section extends 'mes-chromatiques' ? typeof Shiny
@@ -110,6 +116,7 @@ export class FilterList {
   mine: Set<boolean> = new Set([true, false]);
   legit: Set<boolean> = new Set([true, false]);
   caught: Set<boolean> = new Set([true, false]);
+  dexCompletionType: 'living'|'normal' = 'living';
   order: ordre = 'catchTime';
   orderReversed: boolean = false;
 
@@ -133,6 +140,8 @@ export class FilterList {
       const order = String(data.get('order'));
       this.order = isOrdre(order) ? order : defaultOrder;
       this.orderReversed = String(data.get('orderReversed')) === 'true';
+      const dexCompletionType = String(data.get('dexCompletionType'))
+      this.dexCompletionType = isDexCompletionType(dexCompletionType) ? dexCompletionType : 'living';
 
       for (const [prop, value] of data.entries()) {
         if (prop.startsWith('filter-mine')) {
@@ -150,6 +159,8 @@ export class FilterList {
       const order = 'order' in data && String(data.order);
       if (order) this.order = isOrdre(order) ? order : defaultOrder;
       if ('orderReversed' in data) this.orderReversed = Boolean(data.orderReversed);
+      const dexCompletionType = 'dexCompletionType' in data && String(data.dexCompletionType);
+      if (dexCompletionType) this.dexCompletionType = isDexCompletionType(dexCompletionType) ? dexCompletionType : 'living';
       
       if ('mine' in data && data.mine instanceof Set) {
         if (!(data.mine.has(true))) this.mine.delete(true);
@@ -208,6 +219,7 @@ export function filterSection(section: FiltrableSection, filters: FilterList = n
     element.setAttribute('data-filter-caught', [...filters.caught].map(f => String(f)).join(' '));
     element.setAttribute('data-order', filters.order);
     element.setAttribute('data-order-reversed', String(filters.orderReversed));
+    element.setAttribute('data-dexCompletionType', String(filters.dexCompletionType));
   }
 
   updateCounters(section);
@@ -218,10 +230,16 @@ export function filterSection(section: FiltrableSection, filters: FilterList = n
 /** 
  * Displays the Pokédex icons corresponding to the passed IDs as caught, others as uncaught.
  */
-export function filterPokedex(dexids: dexidSet, caughtFormsMap: formesMap) {
+export function filterPokedex(
+  dexids: dexidSet,
+  caughtFormsMap: formesMap,
+  evolvedDexids: dexidSet,
+  evolvedFormsMap: formesMap
+) {
   const allDexIcons = document.querySelectorAll(`#pokedex [dexid], #pokedex [data-replaces="dex-icon"][data-dexid]`);
   allDexIcons.forEach(icon => {
     const i = Number(icon.getAttribute('dexid') ?? icon.getAttribute('data-dexid') ?? 0);
+
     if (dexids.has(i)) {
       icon.setAttribute('data-caught', 'true');
       const caughtForms = caughtFormsMap.get(i) ?? new Set();
@@ -233,6 +251,19 @@ export function filterPokedex(dexids: dexidSet, caughtFormsMap: formesMap) {
     } else {
       icon.setAttribute('data-caught', 'false');
       icon.setAttribute('data-caught-forms', '');
+    }
+
+    if (evolvedDexids.has(i)) {
+      icon.setAttribute('data-has-evolved', 'true');
+      const evolvedForms = evolvedFormsMap.get(i) ?? new Set();
+      if (evolvedForms.has('')) {
+        evolvedForms.add('emptystring');
+        evolvedForms.delete('');
+      }
+      icon.setAttribute('data-evolved-forms', [...evolvedForms.values()].join(' '));
+    } else {
+      icon.setAttribute('data-has-evolved', 'false');
+      icon.setAttribute('data-evolved-forms', '');
     }
   });
 }
@@ -246,7 +277,9 @@ export type ShinyFilterData = {
   dexid: number,
   name: string,
   game: string,
-  form: string
+  form: string,
+  caughtAsDexid: number,
+  caughtAsForme: string,
 };
 
 export type FilterMap = Map<string, ShinyFilterData>;
@@ -283,7 +316,9 @@ export function computeShinyFilters(shiny: Shiny): ShinyFilterData {
     dexid: shiny.dexid,
     name: noAccent(shiny.name || species || '').toLowerCase(),
     game: shiny.game,
-    form: shiny.forme
+    form: shiny.forme,
+    caughtAsDexid: shiny.caughtAsDexid || -1,
+    caughtAsForme: shiny.caughtAsForme || '',
   };
 }
 
@@ -292,7 +327,7 @@ export function computeShinyFilters(shiny: Shiny): ShinyFilterData {
 /** Counts the number of cards that are displayed in a section. */
 type dexidSet = Set<number>;
 type formesMap = Map< number, Set<string> >;
-function countVisibleCards(section: PopulatableSection): [number, number, dexidSet, formesMap] {
+function countVisibleCards(section: PopulatableSection): [number, number, dexidSet, formesMap, dexidSet, formesMap] {
   const container = document.querySelector(`#${section}`);
   if (!(container instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
 
@@ -316,6 +351,8 @@ function countVisibleCards(section: PopulatableSection): [number, number, dexidS
   let displayedCount = 0;
   const dexids: dexidSet = new Set();
   const caughtFormsMap: formesMap = new Map();
+  const evolvedDexids: dexidSet = new Set();
+  const evolvedFormsMap: formesMap = new Map();
   allCards.forEach(card => {
     const cardFilters = {
       mine: card.getAttribute('data-mine') ?? '',
@@ -324,13 +361,36 @@ function countVisibleCards(section: PopulatableSection): [number, number, dexidS
     if (sectionFilters.mine.has(cardFilters.mine) && sectionFilters.legit.has(cardFilters.legit)) {
       displayedCount++;
       const dexid = Number(card.getAttribute('data-dexid'));
+      if (isNaN(dexid) || dexid === 0) return;
+
       const forme = card?.getAttribute('data-form') ?? '';
-      caughtFormsMap.set(dexid, new Set([...caughtFormsMap.get(dexid) ?? [], forme]));
-      if (!isNaN(dexid) && dexid > 0) dexids.add(dexid);
+      dexids.add(dexid);
+      if (!caughtFormsMap.has(dexid)) {
+        caughtFormsMap.set(dexid, new Set());
+      }
+      const caughtFormes = caughtFormsMap.get(dexid)!;
+      caughtFormes.add(forme);
+
+      const caughtAsDexid = Number(card.getAttribute('data-caughtasdexid'));
+      if (!isNaN(caughtAsDexid) && caughtAsDexid > 0) {
+        const caughtAsForme = card.getAttribute('data-caughtasforme') || '';
+        try {
+          const preEvolutionChain = Pokemon.getPreEvolutionChain(dexid, forme, caughtAsDexid, caughtAsForme);
+          for (let i = 1; i < preEvolutionChain.length; i++) {
+            const preEvolution = preEvolutionChain[i];
+            evolvedDexids.add(preEvolution.dexid);
+            if (!evolvedFormsMap.has(preEvolution.dexid)) {
+              evolvedFormsMap.set(preEvolution.dexid, new Set());
+            }
+            const evolvedForms = evolvedFormsMap.get(preEvolution.dexid)!;
+            evolvedForms.add(preEvolution.forme);
+          }
+        } catch {}
+      }
     }
   });
 
-  return [displayedCount, totalCount, dexids, caughtFormsMap];
+  return [displayedCount, totalCount, dexids, caughtFormsMap, evolvedDexids, evolvedFormsMap];
 }
 
 
@@ -343,7 +403,7 @@ export function updateCounters(section: PopulatableSection): void {
   const container = document.querySelector(`#${section}`);
   if (!(container instanceof HTMLElement)) throw new TypeError(`Expecting HTMLElement`);
 
-  const [displayedCount, totalCount, dexids, caughtForms] = countVisibleCards(section);
+  const [displayedCount, totalCount, dexids, caughtForms, evolvedDexids, evolvedForms] = countVisibleCards(section);
 
   // Display "section is empty" message
   if (totalCount > 0) container.classList.remove('vide');
@@ -361,9 +421,13 @@ export function updateCounters(section: PopulatableSection): void {
   if (displayedCounter) displayedCounter.innerHTML = String(displayedCount);
 
   if (section === 'mes-chromatiques') {
-    const dexidsCounter = document.querySelector('#pokedex .compteur > .caught');
-    if (dexidsCounter) dexidsCounter.innerHTML = String(dexids.size);
-    filterPokedex(dexids, caughtForms);
+    const caughtDexidsCounter = document.querySelector('#pokedex .compteur > .caught');
+    if (caughtDexidsCounter) caughtDexidsCounter.innerHTML = String(dexids.size);
+
+    const allDexidsCounter = document.querySelector('#pokedex .compteur > .caught-and-evolved');
+    if (allDexidsCounter) allDexidsCounter.innerHTML = String(dexids.union(evolvedDexids).size);
+
+    filterPokedex(dexids, caughtForms, evolvedDexids, evolvedForms);
   }
 }
 

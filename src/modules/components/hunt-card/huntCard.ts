@@ -933,8 +933,7 @@ export class huntCard extends HTMLElement {
 
     select.querySelectorAll('option').forEach(option => option.remove());
 
-    const pkmn = new Pokemon(pokemonData[dexid]);
-    const evolutionChain = pkmn.getEvolutionChain(form);
+    const evolutionChain = Pokemon.getPotentialPreEvolutions(pokemonData[dexid], form);
 
     // Initially auto select a valid form in any case
     const firstSelectableValue = `${evolutionChain[0].dexid}-${evolutionChain[0].forme}`;
@@ -947,7 +946,7 @@ export class huntCard extends HTMLElement {
     let availableChoices = 0;
     for (const { dexid, forme, pkmn } of evolutionChain) {
       availableChoices++;
-      select.innerHTML += `<option value="${dexid}-${forme}" data-string="pokemon/${dexid}/forme/${forme}/name">${pkmn.getFormeName(forme, true)}</option>`;
+      select.innerHTML += `<option value="${dexid}-${forme}" data-string="pokemon/${dexid}/forme/${forme}/name">${Pokemon.getFormeName(pkmn, forme, true)}</option>`;
     }
 
     if (availableChoices > 0) {
@@ -963,11 +962,10 @@ export class huntCard extends HTMLElement {
     forme: string,
     caughtAsDexid: number | null,
     caughtAsForme: string | null,
-    evolutionChain?: ReturnType<Pokemon['getEvolutionChain']>
+    evolutionChain?: ReturnType<Pokemon['getPotentialPreEvolutions']>
   ): boolean {
     if (!evolutionChain) {
-      const pkmn = new Pokemon(pokemonData[dexid]);
-      evolutionChain = pkmn.getEvolutionChain(forme);
+      evolutionChain = Pokemon.getPotentialPreEvolutions(pokemonData[dexid], forme);
     }
 
     let isValid = false;
@@ -989,13 +987,11 @@ export class huntCard extends HTMLElement {
   #getFirstValidSubEvolution(
     dexid: number,
     forme: string,
-    evolutionChain?: ReturnType<Pokemon['getEvolutionChain']>,
-  ): ReturnType<Pokemon['getEvolutionChain']>[number] {
+    evolutionChain?: ReturnType<Pokemon['getPotentialPreEvolutions']>,
+  ): ReturnType<Pokemon['getPotentialPreEvolutions']>[number] {
     if (!evolutionChain) {
-      const pkmn = new Pokemon(pokemonData[dexid]);
-      evolutionChain = pkmn.getEvolutionChain(forme);
+      evolutionChain = Pokemon.getPotentialPreEvolutions(pokemonData[dexid], forme);
     }
-
     return evolutionChain[0];
   }
 

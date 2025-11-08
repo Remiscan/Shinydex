@@ -62,7 +62,7 @@ virtualizedSections.forEach(section => {
       filterKeys = ['caught'];
       elementAttribute = 'dexid';
       replacementClasses = ['surface'];
-      keptAttributes = ['data-caught', 'data-caught-forms'];
+      keptAttributes = ['data-caught', 'data-caught-forms', 'data-has-evolved', 'data-evolved-forms'];
       rootMargin = 256;
       break;
 

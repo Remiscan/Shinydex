@@ -294,9 +294,12 @@
     "filter-legit": "Afficher les <span class=\"nowrap\">Pokémon <shiny-stars></shiny-stars></span> dont la légitimité est :",
     "filter-legit-true": "Confirmée",
     "filter-legit-false": "Non confirmée",
-    "filter-caught": "Afficher les <span class=\"nowrap\">Pokémon <shiny-stars></shiny-stars></span> dans le <span class=\"nowrap\">Pokédex <shiny-stars></shiny-stars></span> qui sont :",
+    "filter-caught": "Afficher dans le <span class=\"nowrap\">Pokédex <shiny-stars></shiny-stars></span> les <span class=\"nowrap\">Pokémon <shiny-stars></shiny-stars></span> :",
     "filter-caught-true": "Capturés",
     "filter-caught-false": "Non capturés",
+    "dexCompletionType-label": "Type de complétion de Pokédex :",
+    "dexCompletionType-living": "Pokédex vivant (seules les espèces que vous possédez actuellement comptent)",
+    "dexCompletionType-normal": "Pokédex normal (les espèces capturées avant de les faire évoluer comptent aussi)",
 
     "search-mes-chromatiques": "Rechercher dans mes Pokémon",
     "search-pokedex": "Rechercher dans le Pokédex",
@@ -669,6 +672,9 @@
     "filter-caught": "Display <span class=\"nowrap\">Pokémon <shiny-stars></shiny-stars></span> in the <span class=\"nowrap\">Pokédex <shiny-stars></shiny-stars></span> who have been:",
     "filter-caught-true": "Caught",
     "filter-caught-false": "Not caught",
+    "dexCompletionType-label": "Type of Pokédex completion:",
+    "dexCompletionType-normal": "Normal Pokédex (species you caught before evolving them are also marked as caught)",
+    "dexCompletionType-living": "Living Pokédex (only the species you currently have are marked as caught)",
 
     "search-mes-chromatiques": "Search in my Pokémon",
     "search-pokedex": "Search in the Pokédex",

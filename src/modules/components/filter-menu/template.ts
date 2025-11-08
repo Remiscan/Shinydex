@@ -55,6 +55,15 @@ template.innerHTML = /*html*/`
           <check-box name="filter-caught-true" data-string="filter-caught-true"></check-box>
           <check-box name="filter-caught-false" data-string="filter-caught-false"></check-box>
         </fieldset>
+
+        <fieldset class="liste-options dexCompletionType" data-section="mes-chromatiques">
+          <legend class="titre-options title-small" data-string="dexCompletionType-label"></legend>
+
+          <radio-group name="dexCompletionType">
+            <option value="living" data-string="dexCompletionType-living"></option>
+            <option value="normal" data-string="dexCompletionType-normal"></option>
+          </radio-group>
+        </fieldset>
       </div>
     </div>
   </form>

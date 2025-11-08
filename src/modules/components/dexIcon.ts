@@ -64,8 +64,10 @@ export class dexIcon extends HTMLElement {
       }).then(() => console.log('sprite-viewer sprites loading done'));
 
       const caughtFormsList = this.getAttribute('data-caught-forms') ?? '';
+      const evolvedFormsList = this.getAttribute('data-evolved-forms') ?? '';
 
       viewer.setAttribute('data-caught-forms', caughtFormsList);
+      viewer.setAttribute('data-evolved-forms', caughtFormsList);
       viewer.setAttribute('dexid', String(this.dexid || ''));
       viewer.setAttribute('shiny', 'true');
       viewer.setAttribute('size', navigator.onLine ? '512' : '112');
@@ -117,6 +119,17 @@ export class dexIcon extends HTMLElement {
           else                       indicator.setAttribute('data-caught', 'false');
         }
       } break;
+
+      case 'data-evolved-forms': {
+        const button = this.querySelector('button');
+        const caughtFormsIndicators = button?.querySelectorAll('.caught-form-indicator') ?? [];
+        const caughtForms = new Set(newValue?.split(' ') ?? []);
+        for (const indicator of caughtFormsIndicators) {
+          const form = indicator.getAttribute('data-form') ?? '';
+          if (caughtForms.has(form)) indicator.setAttribute('data-has-evolved', 'true');
+          else                       indicator.setAttribute('data-has-evolved', 'false');
+        }
+      } break;
     }
   }
 
@@ -143,7 +156,7 @@ export class dexIcon extends HTMLElement {
     button?.removeEventListener('click', this.clickHandler);
   }
 
-  static get observedAttributes() { return ['dexid', 'data-caught-forms']; }
+  static get observedAttributes() { return ['dexid', 'data-caught-forms', 'data-evolved-forms']; }
 
   attributeChangedCallback(attr: string, oldValue: string | null, newValue: string | null) {
     if (oldValue === newValue) return;

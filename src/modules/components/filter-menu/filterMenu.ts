@@ -6,6 +6,7 @@ import { dataStorage } from '../../localForage.js';
 import { translationObserver } from '../../translation.js';
 import { CheckBox } from '../checkBox.js';
 import { InputSelect } from '../inputSelect.js';
+import { RadioGroup } from '../radioGroup.js';
 import sheet from './styles.css' with { type: 'css' };
 import template from './template.js';
 
@@ -94,12 +95,21 @@ export class FilterMenu extends HTMLElement {
       if (input instanceof CheckBox) input.checked = filters.orderReversed;
       else input?.setAttribute('checked', String(filters.orderReversed));
     }
+
+    dexCompletionType: {
+      const input = this.shadow.querySelector('[name="dexCompletionType"]');
+      if (input instanceof RadioGroup) input.value = filters.dexCompletionType;
+      else input?.setAttribute('value', filters.dexCompletionType);
+    }
   
     filters: {
       const allInputs = [...this.shadow.querySelectorAll('[name^="filter"]')];
       for (const input of allInputs) {
-        const [x, key, value] = input.getAttribute('name')!.split('-');
-        if (FilterList.isKey(key) && key !== 'order' && key !== 'orderReversed') {
+        const parts = input.getAttribute('name')!.split('-');
+        parts.shift();
+        const value = parts.pop();
+        const key = parts.join('-');
+        if (FilterList.isKey(key) && key !== 'order' && key !== 'orderReversed' && key !== 'dexCompletionType') {
           const filter = filters[key];
           const checked = filter && filter.has(value === 'true');
           if (input instanceof CheckBox) input.checked = checked;

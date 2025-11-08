@@ -90,6 +90,7 @@ pokemon-sprite:not([dexid]) ~ * {
       opacity var(--ball-anim-duration) var(--ball-anim-timing) var(--delay),
       translate var(--ball-anim-duration) var(--ball-anim-timing) 0s,
       clip-path var(--ball-anim-duration) var(--ball-anim-timing) var(--delay);
+    opacity: 0;
   }
 }
 
