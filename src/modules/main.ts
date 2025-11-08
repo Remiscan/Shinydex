@@ -5,7 +5,7 @@ import { Friend } from './Friend.js';
 import { Hunt } from './Hunt.js';
 import { setCurrentLayout } from './Params.js';
 import { populator } from './appContent.js';
-import { appStart, checkUpdate } from './appLifeCycle.js';
+import { appStart, checkUpdate, openChangelog } from './appLifeCycle.js';
 import * as Auth from './auth.js';
 import { callBackend } from './callBackend.js';
 import { BottomSheet } from './components/bottomSheet.js';
@@ -346,8 +346,7 @@ importInput.addEventListener('change', async event => {
   if (!(button instanceof HTMLButtonElement)) throw new TypeError(`Expecting HTMLButtonElement`);
   button.addEventListener('click', event => {
     event.stopPropagation();
-    const changelogSheet = document.querySelector('#changelog');
-    if (changelogSheet instanceof BottomSheet) changelogSheet.show();
+    openChangelog();
   });
 }
 

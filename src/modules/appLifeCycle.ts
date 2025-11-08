@@ -12,7 +12,7 @@ import { dataStorage, huntStorage, shinyStorage } from './localForage.js';
 import { sections } from './navigate.js';
 import { Notif } from './notification.js';
 import { scrollObserver, setTheme } from './theme.js';
-import { getString } from './translation.js';
+import { getCurrentLang, getString, translationObserver } from './translation.js';
 import { upgradeStorage } from './upgradeStorage.js';
 
 
@@ -466,6 +466,30 @@ function checkInstall() {
 export async function openChangelog() {
   const changelogSheet = document.querySelector('#changelog');
   if (changelogSheet instanceof BottomSheet) {
+    const currentChangelogLang = changelogSheet.getAttribute('lang');
+    const currentLang = getCurrentLang();
+
+    if (currentChangelogLang !== currentLang) {
+      // On vide le changelog
+      const contentToRemove = changelogSheet.querySelectorAll('h2:first-child ~ *');
+      contentToRemove.forEach(e => e.remove());
+
+      // On récupère le changelog dans la bonne langue
+      const content = document.createElement('template');
+      try {
+        const response = await fetch(`/shinydex/changelog/${currentLang}.html`);
+        content.innerHTML = await response.text();
+      } catch {
+        const response = await fetch(`/shinydex/changelog/en.html`);
+        content.innerHTML = await response.text();
+      }
+
+      // On insère le contenu dans le changelog
+      changelogSheet.insertBefore(content.content, null);
+      changelogSheet.setAttribute('lang', currentLang);
+      translationObserver.translate(changelogSheet, currentLang);
+    }
+
     changelogSheet.show();
     const changelogHash = changelogSheet.dataset.changelogHash;
     if (changelogHash) {
