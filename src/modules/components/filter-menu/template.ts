@@ -56,7 +56,7 @@ template.innerHTML = /*html*/`
           <check-box name="filter-caught-false" data-string="filter-caught-false"></check-box>
         </fieldset>
 
-        <fieldset class="liste-options dexCompletionType" data-section="mes-chromatiques">
+        <fieldset class="liste-options caught-filter" data-section="mes-chromatiques">
           <legend class="titre-options title-small" data-string="dexCompletionType-label"></legend>
 
           <radio-group name="dexCompletionType">
