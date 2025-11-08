@@ -246,7 +246,7 @@ $httpLanguage = $translation->getLanguage();
     </bottom-sheet>
 
     <!-- Changelog -->
-    <bottom-sheet id="changelog" drag modal data-changelog-hash="<?=hash_file('crc32b', __DIR__.'/changelog/en.html')?>">
+    <bottom-sheet id="changelog" drag modal>
       <h2 class="title-large" data-string="section-changelog-long-title"></h2>
     </bottom-sheet>
 

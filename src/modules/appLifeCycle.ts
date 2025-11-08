@@ -325,14 +325,10 @@ export async function appStart() {
   
   const shouldChangelogBeDisplayed = await dataStorage.getItem('changelog-may-open');
   if (shouldChangelogBeDisplayed) {
-    const lastViewedChangelogHash = await dataStorage.getItem('last-viewed-changelog-hash');
-    const currentChangelogHash = document.querySelector<HTMLElement>('#changelog')?.dataset.changelogHash;
-    if (lastViewedChangelogHash !== currentChangelogHash) {
-      await wait(500).then(() => {
-        openChangelog();
-        dataStorage.removeItem('changelog-may-open');
-      });
-    }
+    wait(500).then(async () => {
+      const wasOpen = await openChangelog(true);
+      if (wasOpen) dataStorage.removeItem('changelog-may-open');
+    });
   }
 
   // TERMINÉ :)
@@ -463,7 +459,11 @@ function checkInstall() {
 
 /////////////////////
 // Ouvre le changelog
-export async function openChangelog() {
+let changelogDate: string|null = null;
+export async function openChangelog(
+  onlyIfNew = false,
+): Promise<boolean> {
+  debugger;
   const changelogSheet = document.querySelector('#changelog');
   if (changelogSheet instanceof BottomSheet) {
     const currentChangelogLang = changelogSheet.getAttribute('lang');
@@ -478,9 +478,11 @@ export async function openChangelog() {
       const content = document.createElement('template');
       try {
         const response = await fetch(`/shinydex/changelog/${currentLang}.html`);
+        changelogDate = response.headers.get('date');
         content.innerHTML = await response.text();
       } catch {
         const response = await fetch(`/shinydex/changelog/en.html`);
+        changelogDate = response.headers.get('date');
         content.innerHTML = await response.text();
       }
 
@@ -490,11 +492,19 @@ export async function openChangelog() {
       translationObserver.translate(changelogSheet, currentLang);
     }
 
-    changelogSheet.show();
-    const changelogHash = changelogSheet.dataset.changelogHash;
-    if (changelogHash) {
-      await dataStorage.ready();
-      await dataStorage.setItem('last-viewed-changelog-hash', changelogHash);
+    await dataStorage.ready();
+    const lastViewedChangelogDate = await dataStorage.getItem('last-viewed-changelog-hash');
+    let shouldShow = !onlyIfNew || (changelogDate && lastViewedChangelogDate !== changelogDate);
+    if (shouldShow) {
+      changelogSheet.show();
+      if (changelogDate) {
+        await dataStorage.setItem('last-viewed-changelog-hash', changelogDate);
+      }
+      return true;
+    } else {
+      return false;
     }
+  } else {
+    return false;
   }
 }
