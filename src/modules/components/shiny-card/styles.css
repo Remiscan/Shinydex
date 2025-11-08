@@ -61,50 +61,14 @@ pokemon-sprite:not([dexid]) ~ * {
   place-self: start start;
   overflow: clip;
   border-radius: 20px;
-  /*padding-top: 20px;*/
   justify-self: center;
-  /*align-self: start;*/
-  /*position: relative;
-  top: 3px;*/
   --parent-size: var(--size);
   place-self: center;
-  /*border-radius: calc(.5 * var(--border-radius));*/
-  border-radius: 9px;
+  border-radius: 9px; /* comme l'icône des jeux */
   margin: -2px; /* compense la bordure */
 
   &::part(image) {
     transition: opacity .2s linear;
-  }
-
-  & + .preevo-arrow {
-    grid-row: 1 / -1;
-    grid-column: preevo;
-    z-index: 5;
-    font-size: 16px;
-    place-self: start center;
-    translate: 0px -16px;
-    color: rgb(var(--on-surface-variant), .8);
-    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
-    --delay: var(--ball-anim-duration);
-    transition:
-      opacity var(--ball-anim-duration) var(--ball-anim-timing) var(--delay),
-      translate var(--ball-anim-duration) var(--ball-anim-timing) 0s,
-      clip-path var(--ball-anim-duration) var(--ball-anim-timing) var(--delay);
-    opacity: 0;
-  }
-}
-
-:host([open]) [data-type="caughtAs-sprite"] {
-  scale: 0;
-
-  &::part(image) {
-    opacity: 0;
-  }
-
-  & + .preevo-arrow {
-    translate: 5px -16px;
-    clip-path: polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%);
-    --delay: 0s;
   }
 }
 
@@ -195,12 +159,6 @@ pokemon-sprite:not([dexid]) ~ * {
   transform: translate(20px);
 }
 
-/*[data-type="caughtAs-sprite"]:not([dexid="0"]) + [data-type="ball"] {
-  background-color: rgb(var(--surface-container-low));
-  box-shadow: 0px 0px 0px 2px rgb(var(--surface-container-low));
-  border-radius: 50%;
-}*/
-
 /* Name & species */
 
 [data-type="species"],
@@ -290,22 +248,6 @@ button.icon-button.menu-hint::before {
   --state-opacity: 0 !important;
 }
 
-/*[data-type="gene"].icones.explain {
-  margin: 3px 5px;
-}*/
-
-/*.pokemon-infos__misc {
-  grid-row: 1 / span 2;
-  grid-column: misc;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  align-items: center;
-  align-self: start;
-  justify-self: end;
-  margin: 10px;
-}*/
-
 
 /**
  * Capture data: game, method, date, shiny rate
@@ -321,26 +263,12 @@ button.icon-button.menu-hint::before {
   margin-inline: 16px;
   line-height: initial;
   align-items: center;
-  transition:
-    translate var(--ball-anim-duration) var(--ball-anim-timing),
-    width var(--ball-anim-duration) var(--ball-anim-timing);
 
   &:has([data-type="caughtAs-sprite"]:not([dexid="0"])) {
     grid-template-columns: [preevo] auto [game] 32px [info] auto [rate] 1fr;
     position: relative;
     left: -32px; /* 32px du sprite + 5px du gap */
     width: 100%;
-
-    :host([open]) & {
-      translate: -5px 0px;
-      width: calc(100% + 5px);
-    }
-  }
-
-  &:has([data-type="caughtAs-sprite"][dexid="0"]) {
-    & .preevo-arrow {
-      display: none;
-    }
   }
 }
 
@@ -364,8 +292,6 @@ button.icon-button.menu-hint::before {
 .shiny-rate {
   grid-row: method / details;
   grid-column: rate;
-  /*grid-row: capture / span 2;
-  grid-column: misc;*/
   display: grid;
   grid-template-columns: auto;
   grid-template-rows: 20px;
@@ -568,7 +494,6 @@ button.icon-button.menu-hint::before {
     transform: none;
     width: min(100cqi - 400px, 50cqi);
     max-height: 112px;
-    /*--elevation-opacity: var(--elevation-2-opacity);*/
     --surface-color: var(--surface-container-low);
     --distance-to-parent-border: 4px;
     border-radius: var(--sub-border-radius);
@@ -587,5 +512,13 @@ button.icon-button.menu-hint::before {
   :host([open]) [data-type="ball"],
   :host([open]) [data-type="caughtAs-sprite"] {
     transform: translate(0) rotate(0);
+  }
+
+  .menu {
+    z-index: 2;
+  }
+
+  .pokemon-infos__identity {
+    z-index: 3;
   }
 }
