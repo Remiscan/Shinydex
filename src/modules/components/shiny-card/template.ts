@@ -43,7 +43,6 @@ template.innerHTML = /*html*/`
 
     <div class="pokemon-infos__capture body-medium">
       <pokemon-sprite size="32" shiny="true" class="surface surface-container-low" data-type="caughtAs-sprite"></pokemon-sprite>
-      <span class="material-icons preevo-arrow" aria-hidden="true">reply</span>
       <span data-type="game" class="icon"></span>
       <span data-type="method"></span>
       <span data-type="catchTime" data-format='{"day":"numeric","month":"short","year":"numeric"}'></span>
