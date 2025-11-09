@@ -3,6 +3,11 @@
 <ul class="new">
   <li class="body-large">Vous pouvez marquer vos Pokémon comme "évolués", et choisir les formes qu'ils avaient lorsque vous les avez capturés. Suite à cela, une petite image de cette forme sera affichée à côté du Pokémon sur sa carte.</li>
   <li class="body-large">Sur l'écran du Pokédex, le bouton de filtres vous permet désormais de choisir quel type de complétion du Pokédex vous intéresse : Pokédex vivant (par défaut – considère comme capturées uniquement les espèces que vous possédez actuellement), ou Pokédex normal (comme dans les jeux – considère aussi comme capturées les pré-évolutions de vos Pokémon).</li>
+  <li class="body-large"><span>Ajout d'un éditeur de masse pour définir rapidement lesquels de vos Pokémon ont évolué après avoir été capturés. Vous pouvez trouver cet éditeur tout en bas des paramètres de l'application, ou l'ouvrir dès maintenant :
+    <button type="button" class="surface interactive filled only-text" data-action="open-batch-data-fixer" data-fixer-name="caughtAs-fixer" onclick="window.dispatchEvent(new CustomEvent('open-batch-data-fixer', { detail: 'caughtAs-fixer'}))">
+      <span class="label-large" data-string="param-batch-data-fixer-caughtAs-fixer-label"></span>
+    </button>
+  </span></li>
 </ul>
 
 <ul class="change">
@@ -14,6 +19,10 @@
   <li class="body-large">La forme d'un Pokémon (par exemple la couleur de Floette) pouvait se réinitialiser lors de l'édition d'un Pokémon. C'est corrigé.</li>
 </ul>
 
+<ul class="info">
+  <li class="body-large"><span>N'hésitez pas à donner votre avis ou signaler de potentiels bugs liés à ces nouveautés via le bouton de commentaire (<span class="material-icons">feedback</span>), notamment si vous trouvez des erreurs dans les évolutions proposées.</span></li>
+</ul>
+
 <h3 class="title-medium"><time data-datetime="2025/11/01" data-format='{"day":"numeric","month":"short","year":"numeric"}'></time></h3>
 
 <ul class="fix">
@@ -22,9 +31,10 @@
 
 <ul class="change">
   <li class="body-large">Vous pouvez maintenant spécifier l'heure et la minute exactes auxquelles un Pokémon a été capturé. Cela vous donne un meilleur contrôle sur l'ordre d'affichage de vos Pokémon s'ils sont capturés le même jour. (Les Pokémon capturés dans la même minute sont classés selon l'heure à laquelle vous avez créé la chasse.)</li>
-  <ul>
-    <li class="body-large">Si certains de vos Pokémon sont mal ordonnés, vous pouvez cliquer dessus, cliquer sur "éditer" et mettre à jour leurs dates de capture pour corriger cela.</li>
-  </ul>
+</ul>
+
+<ul class="info">
+  <li class="body-large">Si certains de vos Pokémon sont mal ordonnés, vous pouvez cliquer dessus, cliquer sur "éditer" et mettre à jour leurs dates de capture pour corriger cela.</li>
 </ul>
 
 <h3 class="title-medium"><time data-datetime="2025/10/26" data-format='{"day":"numeric","month":"short","year":"numeric"}'></time></h3>

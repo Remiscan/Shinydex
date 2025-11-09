@@ -429,7 +429,7 @@ class User {
     $placeholders = [];
   
     foreach($pokemon as $key => $shiny) {
-      $placeholders[] = "(:huntid$key, :userid$key, :creationTime$key, :lastUpdate$key, :dexid$key, :forme$key, :game$key, :method$key, :count$key, :charm$key, :catchTime$key, :nickname$key, :ball$key, :gene$key, :originalTrainer$key, :notes$key)";
+      $placeholders[] = "(:huntid$key, :userid$key, :creationTime$key, :lastUpdate$key, :dexid$key, :forme$key, :game$key, :method$key, :count$key, :charm$key, :catchTime$key, :nickname$key, :ball$key, :gene$key, :originalTrainer$key, :caughtAsDexid$key, :caughtAsForme$key, :notes$key)";
   
       $values[":huntid$key"] = $shiny['huntid'];
       $values[":userid$key"] = $this->userID;
@@ -448,6 +448,8 @@ class User {
       $values[":ball$key"] = $shiny['ball'];
       $values[":gene$key"] = $shiny['gene'];
       $values[":originalTrainer$key"] = $shiny['originalTrainer'];
+      $values[":caughtAsDexid$key"] = $shiny['caughtAsDexid'];
+      $values[":caughtAsForme$key"] = $shiny['caughtAsForme'];
   
       $values[":notes$key"] = $shiny['notes'];
     }
@@ -472,6 +474,8 @@ class User {
                 `ball`,
                 `gene`,
                 `originalTrainer`,
+                `caughtAsDexid`,
+                `caughtAsForme`,
   
                 `notes`
               ) VALUES $placeholders";
@@ -504,6 +508,8 @@ class User {
                 `ball` = :ball,
                 `gene` = :gene,
                 `originalTrainer` = :originalTrainer,
+                `caughtAsDexid` = :caughtAsDexid,
+                `caughtAsForme` = :caughtAsForme,
 
                 `notes` = :notes
               WHERE `huntid` = :huntid AND `userid` = :userid";
@@ -528,6 +534,8 @@ class User {
       $update->bindParam(':ball', $shiny['ball'], PDO::PARAM_STR, 50);
       $update->bindParam(':gene', $shiny['gene'], PDO::PARAM_STR, 50);
       $update->bindParam(':originalTrainer', $shiny['originalTrainer'], PDO::PARAM_INT, 1);
+      $update->bindParam(':caughtAsDexid', $shiny['caughtAsDexid'], PDO::PARAM_INT, 4);
+      $update->bindParam(':caughtAsForme', $shiny['caughtAsForme'], PDO::PARAM_STR, 50);
 
       $update->bindParam(':notes', $shiny['notes']);
 

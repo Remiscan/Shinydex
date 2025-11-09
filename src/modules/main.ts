@@ -33,6 +33,7 @@ import { goToPage, navLinkBubble, sectionActuelle } from './navigate.js';
 import { Notif, warnBeforeDestruction } from './notification.js';
 import { immediateSync, requestSync } from './syncBackup.js';
 import { getString } from './translation.js';
+import { BatchDataFixer } from './BatchDataFixer.js';
 
 
 
@@ -357,6 +358,21 @@ importInput.addEventListener('change', async event => {
   for (const button of buttons) {
     button.addEventListener('click', () => (input as HTMLElement)?.click());
   }
+}
+
+// Détecte les clics sur les boutons d'ouverture des BatchDataFixers
+{
+  const buttons = document.querySelectorAll('[data-action="open-batch-data-fixer"]');
+  for (const button of buttons) {
+    button.addEventListener('click', () => {
+      BatchDataFixer.bootDataFixer(button.getAttribute('data-fixer-name') || '');
+    });
+  }
+
+  window.addEventListener('open-batch-data-fixer', (event: Event) => {
+    if (!(event instanceof CustomEvent)) return;
+    BatchDataFixer.bootDataFixer(String(event.detail));
+  });
 }
 
 // Met à jour l'identifiant du layout actuel quand la fenêtre change de taille

@@ -410,6 +410,7 @@ export class shinyCard extends HTMLElement {
       const hunt = await Hunt.getOrMake(this.huntid);
       if (!(hunt instanceof Hunt)) throw new Error(getString('error-creating-edit'));
       hunt.caught = true;
+      if (hunt.caughtAsDexid) hunt.hasEvolved = true;
       await huntStorage.setItem(hunt.huntid, hunt);
 
       window.dispatchEvent(new CustomEvent('dataupdate', {

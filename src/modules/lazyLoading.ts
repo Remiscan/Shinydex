@@ -44,7 +44,7 @@ const resizor = new ResizeObserver((entries: ResizeObserverEntry[]) => {
 });
 
 /** Manually sets an element as hidden or visible depending on whether it intersects the viewport. */
-export const virtualizedSections: string[] = ['mes-chromatiques', 'corbeille', 'chromatiques-ami', 'pokedex'];
+export const virtualizedSections: string[] = ['mes-chromatiques', 'corbeille', 'chromatiques-ami', 'pokedex', 'batch-data-fixer'];
 const manualLoaders: Map<string, IntersectionObserver> = new Map();
 const elementStorage: Map< string, Map<string, Element> > = new Map();
 
@@ -151,6 +151,8 @@ function getLazyLoadableCards(section: string): Element[] {
   switch (section) {
     case 'pokedex':
       return [...(document.querySelectorAll(`#${section} :is(dex-icon, [data-replaces="dex-icon"])`) ?? [])];
+    case 'batch-data-fixer':
+      return [...(document.querySelectorAll(`#${section} .un-pokemon > :first-child`) ?? [])];
     default:
       return [...(document.querySelector(`#${section} .liste-cartes`)?.children ?? [])];
   }
@@ -162,10 +164,10 @@ type LazyLoadingOptions = {
 };
 
 /** Computes an element's size whenever it changes, and set it as its contain-intrinsic-size. */
-export function lazyLoad(element: Element, method: LazyLoadingMethod = 'auto', { fixedSize = false }: LazyLoadingOptions = {}) {
+export function lazyLoad(element: Element, section: string, method: LazyLoadingMethod = 'auto', { fixedSize = false }: LazyLoadingOptions = {}) {
   switch (method) {
     case 'manual':
-      manualLoaders.get(element.closest('section')?.id ?? '')?.observe(element);
+      manualLoaders.get(section)?.observe(element);
       if (fixedSize) break;
     default:
       intersector.observe(element);
@@ -178,7 +180,7 @@ export function lazyLoadSection(section: string) {
   const sectionElement = document.querySelector(`#${section}`);
   sectionElement?.setAttribute('data-lazy-loaded', 'true');
   const cards = getLazyLoadableCards(section);
-  cards.forEach((card: Element) => lazyLoad(card, 'manual', { fixedSize: true}));
+  cards.forEach((card: Element) => lazyLoad(card, section, 'manual', { fixedSize: true}));
 }
 
 /**
