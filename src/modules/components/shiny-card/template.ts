@@ -7,7 +7,7 @@ template.innerHTML = /*html*/`
   <div class="container surface surface-container-highest interactive">
     <pokemon-sprite size="112" shiny="true" class="surface surface-container-low" data-type="current-sprite"></pokemon-sprite>
 
-    <div class="menu surface surface-container-low">
+    <div class="menu surface surface-container-low" part="menu">
       <button type="button" class="surface interactive filled tonal outlined only-text" data-action="edit" disabled tabindex="-1">
         <span class="label-large" data-string="edit-shiny"></span>
       </button>

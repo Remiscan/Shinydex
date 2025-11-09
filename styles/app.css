@@ -1389,7 +1389,7 @@ remiscan-logo {
     grid-template-columns: subgrid;
 
     &::before {
-      content: 'Other';
+      content: 'Info';
       font-weight: bold;
       color: rgb(var(--on-surface-variant));
     }
@@ -1397,6 +1397,14 @@ remiscan-logo {
     & + & {
       margin-top: .25em;
     }
+
+    & .material-icons {
+      font-size: 1em;
+    }
+  }
+
+  #changelog[lang="fr"] & > li::before {
+    content: 'Info';
   }
 
   &.fix > li::before {
@@ -1429,6 +1437,54 @@ remiscan-logo {
   & > ul {
     grid-column: 2;
     list-style-type: '🞂 ';
+  }
+}
+
+
+
+/*!!!!!!!!!!!!!!!!!!!!!!!
+!!! BATCH DATA FIXERS !!!
+!!!!!!!!!!!!!!!!!!!!!!!*/
+
+[name="batch-data-fixer-form"] {
+  display: flex;
+  flex-direction: column;
+  --gap: 8px;
+  gap: var(--gap);
+  margin-top: var(--gap);
+
+  & .un-pokemon {
+    border-top: 1px solid rgb(var(--outline));
+    padding-top: var(--gap);
+    display: flex;
+    flex-direction: column;
+
+    & shiny-card {
+      animation: none !important;
+    }
+
+    & shiny-card::part(menu) {
+      display: none;
+    }
+  }
+
+  & [data-action="submit-fixer"] {
+    margin-top: var(--gap);
+    position: sticky;
+    bottom: 0px;
+  }
+}
+
+#batch-data-fixer[data-fixer-name="caughtAs-fixer"] {
+  & [data-string$="instruction"] {
+    margin-top: var(--gap);
+  }
+
+  & radio-group {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
   }
 }
 

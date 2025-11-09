@@ -263,12 +263,14 @@ export class huntCard extends HTMLElement {
       this.updateAttribute('hasEvolved', String(hunt.hasEvolved));
       this.updateEvolvedSpeciesState(hunt.dexid, hunt.forme);
 
-      const caughtAsValid = this.#validateCaughtAsDexidAndForm(hunt.dexid, hunt.forme, hunt.caughtAsDexid, hunt.caughtAsForme);
-      if (!caughtAsValid) {
-        const firstValidSubEvolution = this.#getFirstValidSubEvolution(hunt.dexid, hunt.forme);
-        if (firstValidSubEvolution) {
-          hunt.caughtAsDexid = firstValidSubEvolution.dexid;
-          hunt.caughtAsForme = firstValidSubEvolution.forme;
+      if (hunt.caughtAsDexid) {
+        const caughtAsValid = this.#validateCaughtAsDexidAndForm(hunt.dexid, hunt.forme, hunt.caughtAsDexid, hunt.caughtAsForme);
+        if (!caughtAsValid) {
+          const firstValidSubEvolution = this.#getFirstValidSubEvolution(hunt.dexid, hunt.forme);
+          if (firstValidSubEvolution) {
+            hunt.caughtAsDexid = firstValidSubEvolution.dexid;
+            hunt.caughtAsForme = firstValidSubEvolution.forme;
+          }
         }
       }
 
@@ -614,9 +616,7 @@ export class huntCard extends HTMLElement {
           if (input instanceof InputSelect) input.value = value;
           else input?.setAttribute('value', value);
 
-          if (caughtAsDexid != null) {
-            this.genereEvolutionChain(hunt.dexid, hunt.forme, caughtAsDexid, caughtAsForme);
-          }
+          this.genereEvolutionChain(hunt.dexid, hunt.forme, caughtAsDexid, caughtAsForme);
         } break;
 
         case 'huntid': {
@@ -732,7 +732,7 @@ export class huntCard extends HTMLElement {
           const caughtAsDexid = Number(parts.shift());
           const caughtAsForme = parts.join('-');
 
-          if (!isNaN(caughtAsDexid) && caughtAsDexid > 0) {
+          if (hunt.hasEvolved && !isNaN(caughtAsDexid) && caughtAsDexid > 0) {
             hunt.caughtAsDexid = caughtAsDexid;
             hunt.caughtAsForme = caughtAsForme || null;
           } else {
@@ -927,7 +927,7 @@ export class huntCard extends HTMLElement {
 
 
   /** Génère la liste des pré-évolutions du Pokémon sélectionné. */
-  genereEvolutionChain(dexid: number, form: string, caughtAsDexid: number | null, caughtAsForme: string | null): boolean {
+  genereEvolutionChain(dexid: number, form: string, caughtAsDexid: number | null, caughtAsForme: string | null) {
     const select = this.getInput('caughtAs');
     if (!select) throw new TypeError('Expecting InputSelect');
 
@@ -936,24 +936,28 @@ export class huntCard extends HTMLElement {
     const evolutionChain = Pokemon.getPotentialPreEvolutions(pokemonData[dexid], form);
 
     // Initially auto select a valid form in any case
-    const firstSelectableValue = `${evolutionChain[0].dexid}-${evolutionChain[0].forme}`;
     let valueToSelect: string;
-    let isValid = true;
-    if (caughtAsDexid) valueToSelect = `${caughtAsDexid}-${caughtAsForme ?? ''}`;
-    else valueToSelect = firstSelectableValue;
+    if (evolutionChain.length > 0) {
+      const firstSelectableValue = `${evolutionChain[0].dexid}-${evolutionChain[0].forme}`;
+      if (caughtAsDexid) valueToSelect = `${caughtAsDexid}-${caughtAsForme ?? ''}`;
+      else valueToSelect = firstSelectableValue;
+    } else {
+      valueToSelect = '';
+    }
+
     select.setAttribute('value', valueToSelect); // set initial value before regenerating the options
 
-    let availableChoices = 0;
-    for (const { dexid, forme, pkmn } of evolutionChain) {
-      availableChoices++;
-      select.innerHTML += `<option value="${dexid}-${forme}" data-string="pokemon/${dexid}/forme/${forme}/name">${Pokemon.getFormeName(pkmn, forme, true)}</option>`;
+    if (evolutionChain.length > 0) {
+      for (const { dexid, forme, pkmn } of evolutionChain) {
+        select.innerHTML += `<option value="${dexid}-${forme}" data-string="pokemon/${dexid}/forme/${forme}/name">${Pokemon.getFormeName(pkmn, forme, true)}</option>`;
+      }
+      this.setAttribute('data-has-evolution-chain', 'true');
+    } else {
+      select.innerHTML += `<option value=""></option>`
+      this.setAttribute('data-has-evolution-chain', 'false');
     }
 
-    if (availableChoices > 0) {
-      select.setAttribute('default-label', getString('preevolution-select-label'));
-    }
-
-    return isValid;
+    select.setAttribute('default-label', getString('preevolution-select-label'));
   }
 
 

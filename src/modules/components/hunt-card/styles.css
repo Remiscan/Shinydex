@@ -164,6 +164,11 @@ fieldset[name="bonus"] > fieldset[data-game] {
   opacity: 0;
 }
 
+:host([data-has-evolution-chain="false"]) [name="hasEvolved"],
+:host([data-has-evolution-chain="false"]) [name="caughtAs"] {
+  display: none;
+}
+
 /* Données additionnelles */
 
 [name="notes"] {

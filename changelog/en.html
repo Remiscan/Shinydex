@@ -3,6 +3,11 @@
 <ul class="new">
   <li class="body-large">You can mark your Pokémon as "evolved", and choose which form they were when you caught them. That way, a small image of the pre-evolution will be displayed next to the Pokémon on its card.</li>
   <li class="body-large">On the Pokédex screen, the filter button now lets you choose which completion type you want to track : living Pokédex (by default – only marks the evolutions you currently have as caught), or normal Pokédex (like in the games – it also marks their pre-evolutions as caught).</li>
+  <li class="body-large"><span>Added a batch editor to quickly define which of your Pokémon evolved after being caught. You can find that editor at the bottom of the app settings, or open it now:
+    <button type="button" class="surface interactive filled only-text" data-action="open-batch-data-fixer" data-fixer-name="caughtAs-fixer" onclick="window.dispatchEvent(new CustomEvent('open-batch-data-fixer', { detail: 'caughtAs-fixer'}))">
+      <span class="label-large" data-string="param-batch-data-fixer-caughtAs-fixer-label"></span>
+    </button>
+  </span></li>
 </ul>
 
 <ul class="change">
@@ -14,6 +19,10 @@
   <li class="body-large">The form of a Pokémon (for example the color of Floette) could reset itself when editing a Pokémon. It's fixed now.</li>
 </ul>
 
+<ul class="info">
+  <li class="body-large"><span>Don't hesitate to give your opinion or report bugs linked to these new features using the feedback button (<span class="material-icons">feedback</span>), particularly if you find mistakes in the list of evolutions of a Pokémon.</span></li>
+</ul>
+
 <h3 class="title-medium"><time data-datetime="2025/11/01" data-format='{"day":"numeric","month":"short","year":"numeric"}'></time></h3>
 
 <ul class="fix">
@@ -22,9 +31,10 @@
 
 <ul class="change">
   <li class="body-large">You can now specify the exact hour and minute a Pokémon was caught. This gives you better control on the order in which your Pokémon are displayed if caught on the same day. (Pokémon caught in the same minute are ordered by the time you created the hunt.)</li>
-  <ul>
-    <li class="body-large">If some of your Pokémon are incorrectly ordered, you can click on them, click "edit" and update their catch times to fix it.</li>
-  </ul>
+</ul>
+
+<ul class="info">
+  <li class="body-large">If some of your Pokémon are incorrectly ordered, you can click on them, click "edit" and update their catch times to fix it.</li>
 </ul>
 
 <h3 class="title-medium"><time data-datetime="2025/10/26" data-format='{"day":"numeric","month":"short","year":"numeric"}'></time></h3>

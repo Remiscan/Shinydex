@@ -272,6 +272,9 @@ $httpLanguage = $translation->getLanguage();
       </form>
     </bottom-sheet>
 
+    <!-- Batch data fixer -->
+    <bottom-sheet id="batch-data-fixer" drag modal></bottom-sheet>
+
     <!-- Notifications -->
     <div class="notification-container"></div>
   </body>
