@@ -1,6 +1,6 @@
 import { BottomSheet } from "./components/bottomSheet.js";
 import { pokemonData } from "./jsonData.js";
-import { lazyLoadSection } from "./lazyLoading.js";
+import { clearElementStorage, lazyLoadSection } from "./lazyLoading.js";
 import { huntStorage, shinyStorage } from "./localForage.js";
 import { Pokemon } from "./Pokemon.js";
 import type { BackendShiny } from "./ShinyBackend.js";
@@ -78,7 +78,7 @@ export abstract class BatchDataFixer extends EventTarget {
 				}).map(shiny => {
 					return /*html*/`
 						<div class="un-pokemon" data-huntid="${shiny.huntid}">
-							<div data-replaces="shiny-card" data-huntid="${shiny.huntid}"></div>
+							<div data-replaces="shiny-card" data-huntid="${shiny.huntid}" data-needs-refresh="true"></div>
 							${this.renderEditor(shiny)}
 						</div>
 					`;
@@ -118,7 +118,15 @@ export abstract class BatchDataFixer extends EventTarget {
 		this.listenersAbortController = abortController;
 		form.addEventListener('change', this.boundHandleChange, { signal: abortController.signal });
 		form.addEventListener('submit', this.boundHandleSubmit, { signal: abortController.signal });
-		dialog.addEventListener('close', () => abortController.abort(), { signal: abortController.signal });
+		dialog.addEventListener('close', () => {
+			abortController.abort();
+
+			for (const huntid of this.shinyList.keys()) {
+				clearElementStorage('batch-data-fixer', huntid);
+			}
+
+			window.setTimeout(() => this.bottomSheet.innerHTML = '', 500);
+		}, { signal: abortController.signal });
 
 		sheet.setAttribute('data-fixer-name', this.name);
 		sheet.show();
@@ -163,6 +171,8 @@ export abstract class BatchDataFixer extends EventTarget {
 				sync: true
 			}
 		}));
+
+		this.bottomSheet.close();
 	}
 	protected boundHandleSubmit = this.handleSubmit.bind(this);
 

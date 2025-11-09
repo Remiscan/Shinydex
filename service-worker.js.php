@@ -591,7 +591,7 @@ async function syncFriends() {
   // Send local data to the backend
   const formData = new FormData();
   formData.append('friends-list', JSON.stringify(friendsList));
-  formData.append('profile-last-update', (await dataStorage.getItem('user-profile')).lastUpdate ?? 0);
+  formData.append('profile-last-update', String((await dataStorage.getItem('user-profile'))?.lastUpdate ?? 0));
   formData.append('session-code-verifier', await dataStorage.getItem('session-code-verifier'));
 
   const response = await fetch('/shinydex/backend/endpoint.php?request=sync-friends&date=' + Date.now(), {

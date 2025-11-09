@@ -343,6 +343,9 @@ export class BottomSheet extends HTMLElement {
 
       if (this.modal) dialog.showModal();
       else            dialog.show();
+      if (this.hasAttribute('open-fully')) {
+        dialog.classList.add('fully-open');
+      }
 
       dialog?.addEventListener('click', this.sendCloseRequest);
       container?.addEventListener('click', this.preventCloseRequest);

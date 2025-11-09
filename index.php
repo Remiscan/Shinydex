@@ -256,7 +256,7 @@ $httpLanguage = $translation->getLanguage();
     </button>
 
     <!-- Feedback -->
-    <bottom-sheet id="feedback" drag modal>
+    <bottom-sheet id="feedback" drag modal open-fully>
       <h2 class="title-large" data-string="section-feedback-long-title"></h2>
 
       <p data-string="feedback-intro"></p>
@@ -273,7 +273,7 @@ $httpLanguage = $translation->getLanguage();
     </bottom-sheet>
 
     <!-- Batch data fixer -->
-    <bottom-sheet id="batch-data-fixer" drag modal></bottom-sheet>
+    <bottom-sheet id="batch-data-fixer" drag modal open-fully></bottom-sheet>
 
     <!-- Notifications -->
     <div class="notification-container"></div>

@@ -42,7 +42,7 @@ async function populateHandler(section: PopulatableSection, requestedIds?: strin
 
   const elementName = getCardTagName(section);
   const preexistingCards: Map<string, HTMLElement> = new Map();
-  document.querySelectorAll<HTMLElement>(`${elementName}[huntid], div[data-replaces="${elementName}"][data-huntid]`).forEach(c => {
+  sectionElement?.querySelectorAll<HTMLElement>(`${elementName}[huntid], div[data-replaces="${elementName}"][data-huntid]`).forEach(c => {
     const id = c.getAttribute('huntid') ?? c.getAttribute('data-huntid');
     if (id) preexistingCards.set(id, c);
   });

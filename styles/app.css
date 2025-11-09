@@ -1446,6 +1446,10 @@ remiscan-logo {
 !!! BATCH DATA FIXERS !!!
 !!!!!!!!!!!!!!!!!!!!!!!*/
 
+#batch-data-fixer {
+  --starting-position: 100%;
+}
+
 [name="batch-data-fixer-form"] {
   display: flex;
   flex-direction: column;
@@ -1580,12 +1584,12 @@ bottom-sheet {
   --margin-top: var(--section-title-height);
 }
 
-#changelog {
-  --starting-position: 400px;
+bottom-sheet[open-fully] {
+  --starting-position: 100%;
 }
 
-#feedback {
-  --starting-position: 100%;
+#changelog {
+  --starting-position: 400px;
 }
 
 #feedback p {
