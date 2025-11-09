@@ -14,7 +14,8 @@ if (is_null($message) || strlen($message) === 0) {
 	respondError('Message empty');
 }
 
-$email = $_POST['email'] ?? null;
+$email = $_POST['email'] ?? '';
+if (strlen($email) === 0) $email = null;
 
 try {
 	$query = "INSERT INTO `shinydex_feedback` (`userid`, `message`, `email`)
@@ -23,7 +24,7 @@ try {
 
 	$insert->bindParam(':userid', $userID);
 	$insert->bindParam(':message', $message);
-	$insert->bindParam(':email', $email, PDO::PARAM_STR, 255);
+	$insert->bindParam(':email', $email);
 	$result = $insert->execute();
 
 	if (!$result) {

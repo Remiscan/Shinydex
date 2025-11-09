@@ -211,7 +211,7 @@ for (const fab of fabs) {
       const feedbackSheet = document.querySelector('#feedback');
       if (feedbackSheet instanceof BottomSheet) feedbackSheet.close();
 
-      const response = await callBackend('send-feedback', { message, email: formData.get('email') || null }, true);
+      const response = await callBackend('send-feedback', { message, email: formData.get('email') }, true);
       
       if ('success' in response && response.success === true) {
         feedbackForm.reset();
