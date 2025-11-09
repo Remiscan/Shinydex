@@ -73,7 +73,7 @@ async function initServiceWorker() {
 
         if (newWorker.state == 'installed') {
           console.log('[sw] Service worker mis à jour');
-          
+
           const updateNotif = new Notif(getString('notif-update-installed'), Notif.maxDelay, getString('notif-update-installed-label'), updateHandler, false);
           window.dispatchEvent(new Event('updateinstalled'));
 
@@ -153,7 +153,7 @@ export async function appStart() {
   logPerf('Étape 2');
 
   // Si des shiny marqués à 'destroy' sont stockés depuis plus d'un mois, on les supprime (sans await)
-  cleanUpRecycleBin();
+  await cleanUpRecycleBin();
 
   // On met à jour la structure de la BDD locale si nécessaire
   try {

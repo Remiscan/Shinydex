@@ -52,6 +52,7 @@
         "./dist/modules/autoTranslation.js",
         "./dist/modules/notification.js",
         "./dist/modules/appContent.js",
+        "./dist/modules/BatchDataFixer.js",
         "./dist/modules/filtres.js",
         "./dist/modules/appLifeCycle.js",
         "./dist/modules/auth.js",
