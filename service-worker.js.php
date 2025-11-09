@@ -70,6 +70,11 @@ self.addEventListener('install', function(event) {
     .catch(raison => console.log('[install] ' + raison))
     .then(() => {
       console.log('[install] Service worker installed!');
+      // If very first install (i.e. no other service worker already active), take control immediately
+      if (!self.registration.active) {
+        console.log('[install] No previous service worker, activating immediately...')
+        self.skipWaiting();
+      }
       return true;
     })
     .catch(error => console.error(error))
@@ -273,7 +278,7 @@ async function installFiles(event = null) {
 
   try {
     console.log(`[${action}] Installing files...`);
-    await dataStorage.setItem('changelog-may-open', true);
+    await dataStorage.setItem('changelog-may-open', !!self.registration.active ? true : false);
 
     await Promise.all(Object.keys(liveFileVersions).map(async file => {
       const oldVersion = localFileVersions[file] ?? 0;
