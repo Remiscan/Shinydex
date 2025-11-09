@@ -1,6 +1,7 @@
 import 'remiscan-logo';
 import '../../../_common/components/input-slider/input-slider.js';
 import '../../../_common/components/input-switch/input-switch.js';
+import { BatchDataFixer } from './BatchDataFixer.js';
 import { Friend } from './Friend.js';
 import { Hunt } from './Hunt.js';
 import { setCurrentLayout } from './Params.js';
@@ -33,7 +34,6 @@ import { goToPage, navLinkBubble, sectionActuelle } from './navigate.js';
 import { Notif, warnBeforeDestruction } from './notification.js';
 import { immediateSync, requestSync } from './syncBackup.js';
 import { getString } from './translation.js';
-import { BatchDataFixer } from './BatchDataFixer.js';
 
 
 
@@ -211,7 +211,7 @@ for (const fab of fabs) {
       const feedbackSheet = document.querySelector('#feedback');
       if (feedbackSheet instanceof BottomSheet) feedbackSheet.close();
 
-      const response = await callBackend('send-feedback', { message }, true);
+      const response = await callBackend('send-feedback', { message, email: formData.get('email') || null }, true);
       
       if ('success' in response && response.success === true) {
         feedbackForm.reset();

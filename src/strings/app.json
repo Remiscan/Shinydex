@@ -268,8 +268,9 @@
     "close-changelog-label": "Fermer",
 
     "section-feedback-long-title": "Envoyer un commentaire",
-    "feedback-intro": "Signalez un bug, suggérez une nouvelle fonctionnalité, ou dites ce que vous souhaitez au développeur :)",
+    "feedback-intro": "Signalez un bug, suggérez une nouvelle fonctionnalité, ou dites ce que vous voulez au développeur :)<br><br>Si vous souhaitez une réponse, entrez votre adresse e-mail.",
     "feedback-label": "Commentaire",
+    "feedback-email": "Adresse e-mail (facultatif)",
     "submit-feedback": "Envoyer",
 
     "fab-pokemon": "Ajouter un Pokémon chromatique",
@@ -654,8 +655,9 @@
     "close-changelog-label": "Close",
 
     "section-feedback-long-title": "Send feedback",
-    "feedback-intro": "Report a bug, suggest a new feature, or just say whatever you want to the developer :)",
+    "feedback-intro": "Report a bug, suggest a new feature, or just say whatever you want to the developer :)<br><br>If you want an answer, add your email address.",
     "feedback-label": "Message",
+    "feedback-email": "Email address (optional)",
     "submit-feedback": "Send",
 
     "fab-pokemon": "Add a shiny Pokémon",

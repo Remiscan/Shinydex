@@ -84,6 +84,7 @@ sheet.replaceSync(/*css*/`
     border-radius: 28px 28px 0 0;
     width: 100%;
     max-width: 100%;
+    container-type: inline-size;
     max-height: calc(100% - var(--margin-top));
     margin-top: var(--margin-top);
     margin-bottom: 0;

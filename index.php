@@ -266,6 +266,10 @@ $httpLanguage = $translation->getLanguage();
           <span slot="label" data-string="feedback-label"></span>
         </text-area>
 
+        <text-field name="email" type="email">
+          <span slot="label" data-string="feedback-email"></span>
+        </text-field>
+
         <button type="submit" class="surface interactive filled elevation-2 only-text" data-action="send-feedback">
           <span class="label-large" data-string="submit-feedback"></span>
         </button>

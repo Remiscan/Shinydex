@@ -1383,10 +1383,20 @@ remiscan-logo {
   column-gap: 8px;
   padding-inline-start: 0px;
 
+  @container (width < 450px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   & > li {
     grid-column: 1 / -1;
     display: grid;
     grid-template-columns: subgrid;
+
+    @container (width < 450px) {
+      display: flex;
+      flex-direction: column;
+      gap: .25em;
+    }
 
     &::before {
       content: 'Info';
@@ -1396,6 +1406,10 @@ remiscan-logo {
 
     & + & {
       margin-top: .25em;
+
+      @container (width < 450px) {
+        margin-top: 1em;
+      }
     }
 
     & .material-icons {
@@ -1594,6 +1608,12 @@ bottom-sheet[open-fully] {
 
 #feedback p {
   margin-block: 16px;
+}
+
+form[name="feedback-form"] {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 form[name="feedback-form"] [name="message"]::part(input) {
