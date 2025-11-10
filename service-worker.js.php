@@ -57,7 +57,9 @@ const currentCacheName = `${cachePrefix}-<?=$maxVersion?>`;
 const currentSpritesCacheName = `${spritesCachePrefix}-${spritesCacheVersion}`;
 const liveFileVersions = JSON.parse(`<?=json_encode($fileVersions, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES)?>`);
 
-const safeSyncLimit = 2000; // number of entries the backend will accept to sync at once
+const maxNumberOfHuntidsSentToCompareWithDB = 20000;
+const maxNumberOfFullShinySentToStoreInDB = 2000;
+const maxNumberOfFriendsUsernamesSentToStoreInDB = 1000;
 
 
 
@@ -453,7 +455,7 @@ async function syncPokemon() {
       return (new FrontendShiny(shiny)).toBackend();
     })
   );
-  localData.length = Math.min(localData.length, safeSyncLimit);
+  localData.length = Math.min(localData.length, maxNumberOfHuntidsSentToCompareWithDB);
   const deletedLocalData = (await Promise.all(
     (await huntStorage.keys())
     .map(async key => {
@@ -463,7 +465,7 @@ async function syncPokemon() {
     })
   ))
   .filter(pkmn => pkmn != null);
-  deletedLocalData.length = Math.min(deletedLocalData.length, safeSyncLimit);
+  deletedLocalData.length = Math.min(deletedLocalData.length, maxNumberOfHuntidsSentToCompareWithDB);
 
   // ************************************************************************** //
 
@@ -551,9 +553,15 @@ async function syncPokemon() {
 
   // Send full data to the backend
   const formData2 = new FormData();
-  formData2.append('inserts', JSON.stringify(localData.filter(s => data['to_insert_online_ids'].includes(s.huntid))));
-  formData2.append('updates', JSON.stringify(localData.filter(s => data['to_update_online_ids'].includes(s.huntid))));
-  formData2.append('restores', JSON.stringify(localData.filter(s => data['to_restore_online_ids'].includes(s.huntid)).map(s => s.huntid)));
+  const insertsToSend = localData.filter(s => data['to_insert_online_ids'].includes(s.huntid));
+  insertsToSend.length = Math.min(insertsToSend.length, maxNumberOfFullShinySentToStoreInDB);
+  const updatesToSend = localData.filter(s => data['to_update_online_ids'].includes(s.huntid));
+  updatesToSend.length = Math.min(updatesToSend.length, maxNumberOfFullShinySentToStoreInDB);
+  const restoresToSend = localData.filter(s => data['to_restore_online_ids'].includes(s.huntid)).map(s => s.huntid);
+  restoresToSend.length = Math.min(restoresToSend.length, maxNumberOfFullShinySentToStoreInDB);
+  formData2.append('inserts', JSON.stringify(insertsToSend));
+  formData2.append('updates', JSON.stringify(updatesToSend));
+  formData2.append('restores', JSON.stringify(restoresToSend));
   formData2.append('session-code-verifier', await dataStorage.getItem('session-code-verifier'));
 
   // Get from the backend:
@@ -580,7 +588,7 @@ async function syncPokemon() {
   // ************************************************************************** //
 
   const results = [...data['results'], ...data2['results']];
-  return [modifiedHuntids, results];
+  return [modifiedHuntids, results, data2['reached_sync_limit'] ?? false];
 }
 
 
@@ -591,7 +599,7 @@ async function syncFriends() {
   // Get local data
   await friendStorage.ready();
   const friendsList = await friendStorage.keys();
-  friendsList.length = Math.min(friendsList.length, safeSyncLimit);
+  friendsList.length = Math.min(friendsList.length, maxNumberOfFriendsUsernamesSentToStoreInDB);
 
   // Send local data to the backend
   const formData = new FormData();
@@ -637,7 +645,7 @@ async function syncFriends() {
   ]);
 
   const results = data['results'];
-  return [modifiedFriends, results];
+  return [modifiedFriends, results, data['reached_sync_limit'] ?? false];
 }
 
 
@@ -655,8 +663,8 @@ async function syncBackup(message = true) {
     }
 
     // Perform sync (in a sequence, not in parallel, in case the backend needs to sign the user in)
-    const [modifiedPokemon, resultsPokemon] = await syncPokemon();
-    const [modifiedFriends, resultsFriends] = await syncFriends();
+    const [modifiedPokemon, resultsPokemon, reachedPokemonSyncLimit] = await syncPokemon();
+    const [modifiedFriends, resultsFriends, reachedFriendSyncLimit] = await syncFriends();
 
     if (message) {
       const clients = await self.clients.matchAll();
@@ -666,7 +674,7 @@ async function syncBackup(message = true) {
           quantity: resultsPokemon.length,
           modifiedPokemon: [...modifiedPokemon],
           error: !(resultsPokemon.every(r => r === true)),
-          reachedLimit: modifiedPokemon.length >= safeSyncLimit,
+          reachedLimit: reachedPokemonSyncLimit,
         });
 
         client.postMessage({
@@ -674,7 +682,7 @@ async function syncBackup(message = true) {
           quantity: resultsFriends.length,
           modifiedFriends: [...modifiedFriends],
           error: !(resultsFriends.every(r => r === true)),
-          reachedLimit: modifiedFriends.length >= safeSyncLimit,
+          reachedLimit: reachedFriendSyncLimit,
         });
       }
     }

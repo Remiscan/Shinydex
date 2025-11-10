@@ -237,7 +237,7 @@
     "parametres-batch-data-fixers": "Éditeurs de masse",
     "param-batch-data-fixers-general-desc": "Lorsque de nouvelles fonctionnalités sont ajoutées à l'application, des éditeurs de masse permettant de modifier facilement tous vos Pokémon pourront être ajoutés ici, afin que vous puissiez facilement profiter de ces nouvelles fonctionnalités.",
     "param-batch-data-fixer-caughtAs-fixer-title": "Évolutions",
-    "param-batch-data-fixer-caughtAs-fixer-desc": "Permet de définir rapidement quels Pokémon vous avez fait évoluer après les avoir capturés",
+    "param-batch-data-fixer-caughtAs-fixer-desc": "Permet de définir rapidement quels Pokémon vous avez fait évoluer après les avoir capturés.",
     "param-batch-data-fixer-caughtAs-fixer-label": "Éditer les évolutions",
 
     "batch-data-fixer-submit": "Enregistrer",
@@ -384,7 +384,8 @@
     "notif-shiny-will-be-deleted": "Ce Pokémon chromatique sera supprimé et déplacé dans la corbeille.",
     "notif-notifications-permission-denied": "La permission d'envoyer des notifications est refusée au Shinydex par les paramètres de votre navigateur.",
     "notif-notifications-not-supported": "Les Notifications Push ne sont pas supportées par votre navigateur.",
-    "notif-feedback-sent": "Votre commentaire a été envoyé. Merci !"
+    "notif-feedback-sent": "Votre commentaire a été envoyé. Merci !",
+    "notif-sync-limit-reached": "Quota de données atteint ; certaines données n'ont peut-être pas pu être sauvegardées en ligne."
   },
 
   "en": {
@@ -624,7 +625,7 @@
     "parametres-batch-data-fixers": "Batch data editors",
     "param-batch-data-fixers-general-desc": "When new features are added to the app, mass data editors may be added here to let you easily edit all of your Pokémon, so that you can easily enjoy these new features.",
     "param-batch-data-fixer-caughtAs-fixer-title": "Evolutions",
-    "param-batch-data-fixer-caughtAs-fixer-desc": "Lets you define quickly which of your Pokémon evolved after being caught",
+    "param-batch-data-fixer-caughtAs-fixer-desc": "Lets you define quickly which of your Pokémon evolved after being caught.",
     "param-batch-data-fixer-caughtAs-fixer-label": "Edit evolutions",
 
     "batch-data-fixer-submit": "Save",
@@ -771,6 +772,7 @@
     "notif-shiny-will-be-deleted": "this shiny Pokémon will be deleted and moved to the recycle bin.",
     "notif-notifications-permission-denied": "The permission for the Shinydex to send you notifications is denied by your browser settings.",
     "notif-notifications-not-supported": "Push Notifications are not supported by your web browser.",
-    "notif-feedback-sent": "Your feedback was sent. Thank you!"
+    "notif-feedback-sent": "Your feedback was sent. Thank you!",
+    "notif-sync-limit-reached": "Data quota reached ; some data may not have been saved online."
   }
 }

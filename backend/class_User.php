@@ -29,6 +29,7 @@ class User {
   private string|null $token = null;
   public readonly BDD $db;
   public readonly JWT $jwt;
+  public bool $reachedSyncLimit = false;
 
   private static function db() { return new BDD(); }
   public static function jwt() { return new cJWT('/run/secrets/shinydex_private_key', 'RS256', 3600); }
@@ -422,7 +423,7 @@ class User {
   }
 
 
-  protected static int $safeSyncLimit = 2000;
+  public static int $safeSyncLimit = 2000;
 
 
   /** Adds many Pokémon to the current user's collection. */
@@ -433,7 +434,10 @@ class User {
   
     $i = 0;
     foreach($pokemon as $key => $shiny) {
-      if ($i >= self::$safeSyncLimit) continue;
+      if ($i >= self::$safeSyncLimit) {
+        $this->reachedSyncLimit = true;
+        continue;
+      }
 
       $placeholders[] = "(:huntid$key, :userid$key, :creationTime$key, :lastUpdate$key, :dexid$key, :forme$key, :game$key, :method$key, :count$key, :charm$key, :catchTime$key, :nickname$key, :ball$key, :gene$key, :originalTrainer$key, :caughtAsDexid$key, :caughtAsForme$key, :notes$key)";
   
@@ -527,7 +531,10 @@ class User {
     $update->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
     $i = 0;
     foreach($pokemon as $key => $shiny) {
-      if ($i >= self::$safeSyncLimit) continue;
+      if ($i >= self::$safeSyncLimit) {
+        $this->reachedSyncLimit = true;
+        continue;
+      }
 
       $update->bindParam(':huntid', $shiny['huntid'], PDO::PARAM_STR, 36);
 
@@ -676,8 +683,14 @@ class User {
 
     $userID = $this->userID;
     $insert->bindValue(1, $userID, PDO::PARAM_STR);
+    $i = 0;
     foreach ($usernames as $key => $username) {
+      if ($i >= 1000) {
+        $this->reachedSyncLimit = true;
+        continue;
+      }
       $insert->bindValue($key + 2, $username, PDO::PARAM_STR);
+      $i++;
     }
 
     $result = $insert->execute();

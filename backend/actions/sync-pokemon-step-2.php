@@ -116,6 +116,7 @@ try {
 
   echo json_encode(array(
     'results' => $results,
+    'reached_sync_limit' => $user->reachedSyncLimit,
   ), JSON_PRETTY_PRINT);
 
 

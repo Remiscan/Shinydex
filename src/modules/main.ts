@@ -383,6 +383,7 @@ window.addEventListener('orientationchange', setCurrentLayout);
 
 ///////////////////////////////////////
 // COMMUNICATION AVEC LE SERVICE WORKER
+let syncLimitNotification: Notif;
 navigator.serviceWorker.addEventListener('message', async event => {
   if (event.data === 'startBackupSync') {
     const loaders = Array.from(document.querySelectorAll('sync-progress, sync-line'));
@@ -405,6 +406,12 @@ navigator.serviceWorker.addEventListener('message', async event => {
     if (event.data.successfulBackupSync === true) {
       loaders.forEach(loader => loader.setAttribute('state', 'success'));
       document.body.setAttribute('data-last-sync', 'success');
+
+      if ('reachedLimit' in event.data && event.data.reachedLimit) {
+        if (syncLimitNotification) syncLimitNotification.remove();
+        syncLimitNotification = new Notif(getString('notif-sync-limit-reached'));
+        syncLimitNotification.prompt();
+      }
 
       if ('modifiedPokemon' in event.data) {
         window.dispatchEvent(new CustomEvent('dataupdate', {
