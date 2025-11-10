@@ -92,6 +92,7 @@ export class friendCard extends HTMLElement {
         spriteElement.setAttribute('dexid', String(pokemon.dexid));
         spriteElement.setAttribute('forme', pokemon.forme);
         spriteElement.setAttribute('data-caught', String(shinyCard.caughtCache.has(`${pokemon.dexid}-${pokemon.forme}`)));
+        spriteElement.setAttribute('data-has-evolved', String(shinyCard.hasEvolvedCache.has(`${pokemon.dexid}-${pokemon.forme}`)));
 
         const dateContainer = container.querySelector('time') as HTMLTimeElement;
         dateContainer.dateTime = String(pokemon.catchTime);

@@ -44,11 +44,21 @@ export class shinyCard extends HTMLElement {
   restoreHandler = (e: Event) => {};
 
   static caughtCache = new Set<`${Shiny['dexid']}-${Shiny['forme']}`>();
+  static hasEvolvedCache = new Set<`${Shiny['dexid']}-${Shiny['forme']}`>();
 
   static async updateCaughtCache() {
     this.caughtCache.clear();
     await shinyStorage.iterate<FrontendShiny, void>(shiny => {
       this.caughtCache.add(`${shiny.dexid}-${shiny.forme}`);
+      if (shiny.caughtAsDexid) {
+        try {
+          const preEvolutionChain = Pokemon.getPreEvolutionChain(shiny.dexid, shiny.forme, shiny.caughtAsDexid, shiny.caughtAsForme || '');
+          for (let i = 1; i < preEvolutionChain.length; i++) {
+            const preEvolution = preEvolutionChain[i];
+            this.hasEvolvedCache.add(`${preEvolution.dexid}-${preEvolution.forme}`);
+          }
+        } catch {}
+      }
     });
   }
 
@@ -133,7 +143,9 @@ export class shinyCard extends HTMLElement {
       sprite.setAttribute('forme', shiny.forme);
       this.setAttribute('data-form', shiny.forme);
 
-      sprite.setAttribute('data-caught', String(shinyCard.caughtCache.has(`${shiny.dexid}-${shiny.forme}`)));
+      const formIdent = `${shiny.dexid}-${shiny.forme}` as const;
+      sprite.setAttribute('data-caught', String(shinyCard.caughtCache.has(formIdent)));
+      sprite.setAttribute('data-has-evolved', String(shinyCard.hasEvolvedCache.has(formIdent)));
     }
 
     // Espèce et forme lors de la capture
@@ -142,7 +154,9 @@ export class shinyCard extends HTMLElement {
       if (shiny.caughtAsDexid) {
         sprite.setAttribute('dexid', String(shiny.caughtAsDexid));
         sprite.setAttribute('forme', String(shiny.caughtAsForme || ''));
-        sprite.setAttribute('data-caught', String(shinyCard.caughtCache.has(`${shiny.caughtAsDexid}-${shiny.caughtAsForme || ''}`)));
+        const formIdent = `${shiny.caughtAsDexid}-${shiny.caughtAsForme || ''}` as const;
+        sprite.setAttribute('data-caught', String(shinyCard.caughtCache.has(formIdent)));
+        sprite.setAttribute('data-has-evolved', String(shinyCard.hasEvolvedCache.has(formIdent)));
       } else {
         sprite.setAttribute('dexid', '0');
         sprite.removeAttribute('forme');

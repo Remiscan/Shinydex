@@ -39,7 +39,7 @@ sheet.replaceSync(/*css*/`
     }
   }
 
-  pokemon-sprite:not([data-caught="true"])[dexid]:not([dexid="0"])::part(image) {
+  pokemon-sprite:not([data-caught="true"], [data-has-evolved="true"])[dexid]:not([dexid="0"])::part(image) {
     filter: var(--anti-spoilers-filter);
   }
 `);
