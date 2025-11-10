@@ -764,24 +764,6 @@ div[data-replaces="dex-icon"] {
   contain-intrinsic-size: 44px 44px;
 }
 
-/*[data-replaces="dex-icon"]:not([data-caught="true"]),
-dex-icon:not([data-caught="true"]) {
-  --surface-opacity: 0;
-}
-
-[data-replaces="dex-icon"]:not([data-caught="true"]):not(:hover, :focus, :active),
-dex-icon:not([data-caught="true"]):not(:hover, :focus, :active) {
-  --elevation-opacity: 0;
-}*/
-
-/*[data-replaces="dex-icon"][data-caught="true"],
-dex-icon[data-caught="true"] {
-  --surface-color: var(--secondary-container);
-  --state-tint: var(--on-secondary-container);
-  --surface-tint: var(--secondary);
-  --elevation-opacity: 0;
-}*/
-
 dex-icon .pkmnicon {
   outline-offset: -1px;
   display: flex;
@@ -808,19 +790,13 @@ dex-icon .caught-form-indicator {
   transition: none;
   --color: var(--primary);
 
-  #pokedex[data-dexCompletionType="living"] &:not([data-caught="true"]),
-  #pokedex[data-dexCompletionType="normal"] &:not([data-caught="true"], [data-has-evolved="true"]) {
+  :where(#pokedex[data-dexCompletionType="living"]) &:not([data-caught="true"]),
+  :where(#pokedex[data-dexCompletionType="normal"]) &:not([data-caught="true"], [data-has-evolved="true"]) {
     --color: var(--surface-color);
     border: 1px solid rgb(var(--secondary));
     box-sizing: border-box;
   }
 }
-
-/*dex-icon .caught-form-indicator:not([data-caught="true"]) {
-  --color: var(--surface-color);
-  border: 1px solid rgb(var(--secondary));
-  box-sizing: border-box;
-}*/
 
 /* Only display a maximum of 7 caught forms indicators. */
 dex-icon .caught-form-indicator:nth-of-type(7) ~ .caught-form-indicator {
@@ -836,37 +812,32 @@ dex-icon:has(.caught-form-indicator:nth-of-type(8)) .caught-form-indicator:nth-o
   align-content: center;
   justify-content: center;
   width: auto;
+  background-image: linear-gradient(to right, rgb(var(--primary)) 0% var(--pct, 0%), rgb(var(--surface-color)) var(--pct, 0%) 100%);
+
+  #pokedex[data-dexCompletionType="living"] & {
+    --pct: calc(100% * (var(--number-of-caught-forms) - var(--number-of-caught-forms-before-last-indicator)) / max(1, var(--number-of-catchable-forms) - 6));
+  }
+
+  #pokedex[data-dexCompletionType="normal"] & {
+    --pct: calc(100% * (var(--number-of-caught-and-evolved-forms) - var(--number-of-caught-and-evolved-forms-before-last-indicator)) / max(1, var(--number-of-catchable-forms) - 6));
+  }
+
+  &::before {
+    background-image: linear-gradient(to right, rgb(var(--on-primary)) 0% var(--pct, 0%), rgb(var(--on-surface)) var(--pct, 0%) 100%);
+    background-clip: text;
+    color: transparent;
+  }
 }
 
 dex-icon:has(.caught-form-indicator:nth-of-type(8)) .caught-form-indicator:nth-of-type(7)::before {
   content: '⋯';
   padding-inline: 2px;
-  color: rgb(var(--secondary));
-}
-
-/* If there are more than 7 catchable forms and they're all caught, adjust the ellipsis colors */
-#pokedex[data-dexCompletionType="living"] dex-icon:has(.caught-form-indicator:nth-of-type(8)):not(:has(.caught-form-indicator:not([data-caught="true"]))) .caught-form-indicator:nth-of-type(7),
-#pokedex[data-dexCompletionType="normal"] dex-icon:has(.caught-form-indicator:nth-of-type(8)):not(:has(.caught-form-indicator:not([data-caught="true"], [data-has-evolved="true"]))) .caught-form-indicator:nth-of-type(7) {
-  --color: var(--primary);
-}
-
-#pokedex[data-dexCompletionType="living"] dex-icon:has(.caught-form-indicator:nth-of-type(8)):not(:has(.caught-form-indicator:not([data-caught="true"]))) .caught-form-indicator:nth-of-type(7)::before,
-#pokedex[data-dexCompletionType="normal"] dex-icon:has(.caught-form-indicator:nth-of-type(8)):not(:has(.caught-form-indicator:not([data-caught="true"], [data-has-evolved="true"]))) .caught-form-indicator:nth-of-type(7)::before {
-  color: rgb(var(--surface-color));
 }
 
 /* Don't display the caught forms indicators if there's only one catchable form. */
 dex-icon:not(:has(.caught-form-indicator:nth-of-type(2))) .caught-form-indicator {
   display: none !important;
 }
-
-/*dex-icon:not([data-caught="true"]) .caught-form-indicator {
-  display: none !important;
-}
-
-dex-icon:not([data-caught="true"]) .pkmnicon {
-  filter: grayscale(.5) opacity(.6);
-}*/
 
 .pkmnicon {
   border: none;

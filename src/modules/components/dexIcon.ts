@@ -91,6 +91,12 @@ export class dexIcon extends HTMLElement {
     super();
   }
 
+  protected catchableForms: Set<string> = new Set();
+  protected caughtForms: Set<string> = new Set();
+  protected evolvedForms: Set<string> = new Set();
+  protected visibleCaughtForms: Set<string> = new Set();
+  protected visibleEvolvedForms: Set<string> = new Set();
+
   update(attr: string, oldValue: string | null, newValue: string | null) {
     switch (attr) {
       case 'dexid': {
@@ -100,38 +106,68 @@ export class dexIcon extends HTMLElement {
         button?.setAttribute('data-label', `pokemon/${this.dexid}`);
         button?.setAttribute('aria-label', Pokemon.names()[this.dexid]);
 
-        const catchableForms = pokemonData[this.dexid].formes.filter(f => f.catchable);
+        this.catchableForms = new Set(pokemonData[this.dexid].formes.filter(f => f.catchable).map(f => f.dbid));
         let caughtFormsIndicatorsTemplate = ``;
-        for (const forme of catchableForms) {
-          const formid = forme.dbid === '' ? 'emptystring' : forme.dbid;
+        for (const forme of this.catchableForms) {
+          const formid = forme === '' ? 'emptystring' : forme;
           caughtFormsIndicatorsTemplate += `<span class="caught-form-indicator" data-form="${formid}"></span>`;
         }
-        if (button) button.innerHTML = caughtFormsIndicatorsTemplate;
+        if (button) {
+          button.innerHTML = caughtFormsIndicatorsTemplate;
+          this.setCounters(button);
+        }
       } // don't break
 
       case 'data-caught-forms': {
         const button = this.querySelector('button');
         const caughtFormsIndicators = button?.querySelectorAll('.caught-form-indicator') ?? [];
-        const caughtForms = new Set(newValue?.split(' ') ?? []);
+        this.caughtForms = new Set(newValue?.split(' ') ?? []).intersection(this.catchableForms);
+        this.visibleCaughtForms = new Set();
+        let i = 1;
         for (const indicator of caughtFormsIndicators) {
           const form = indicator.getAttribute('data-form') ?? '';
-          if (caughtForms.has(form)) indicator.setAttribute('data-caught', 'true');
-          else                       indicator.setAttribute('data-caught', 'false');
+          if (this.caughtForms.has(form)) {
+            indicator.setAttribute('data-caught', 'true');
+            if (i < 7 && this.catchableForms.has(form)) this.visibleCaughtForms.add(form);
+          } else {
+            indicator.setAttribute('data-caught', 'false');
+          }
+          i++;
         }
+        if (button) this.setCounters(button);
       } break;
 
       case 'data-evolved-forms': {
         const button = this.querySelector('button');
         const caughtFormsIndicators = button?.querySelectorAll('.caught-form-indicator') ?? [];
-        const caughtForms = new Set(newValue?.split(' ') ?? []);
+        this.evolvedForms = new Set(newValue?.split(' ') ?? []).intersection(this.catchableForms);
+        this.visibleEvolvedForms = new Set();
+        let i = 1;
         for (const indicator of caughtFormsIndicators) {
           const form = indicator.getAttribute('data-form') ?? '';
-          if (caughtForms.has(form)) indicator.setAttribute('data-has-evolved', 'true');
-          else                       indicator.setAttribute('data-has-evolved', 'false');
+          if (this.evolvedForms.has(form)) {
+            indicator.setAttribute('data-has-evolved', 'true');
+            if (i < 7 && this.catchableForms.has(form)) this.visibleEvolvedForms.add(form);
+          } else {
+            indicator.setAttribute('data-has-evolved', 'false');
+          }
         }
+        if (button) this.setCounters(button);
       } break;
     }
   }
+
+
+  protected setCounters(button: HTMLButtonElement) {
+    button.style.setProperty('--number-of-catchable-forms', String(this.catchableForms.size));
+    button.style.setProperty('--number-of-caught-forms', String(this.caughtForms.size));
+    button.style.setProperty('--number-of-caught-forms-before-last-indicator', String(this.visibleCaughtForms.size));
+    const allConsideredCaughtForms = this.caughtForms.union(this.evolvedForms);
+    const allVisibleConsideredCaughtForms = this.visibleCaughtForms.union(this.visibleEvolvedForms);
+    button.style.setProperty('--number-of-caught-and-evolved-forms', String(allConsideredCaughtForms.size));
+    button.style.setProperty('--number-of-caught-and-evolved-forms-before-last-indicator', String(allVisibleConsideredCaughtForms.size));
+  }
+
 
   connectedCallback() {
     if (!this.#populated) {
