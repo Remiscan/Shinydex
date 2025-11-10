@@ -422,13 +422,19 @@ class User {
   }
 
 
+  protected static int $safeSyncLimit = 2000;
+
+
   /** Adds many Pokémon to the current user's collection. */
   public function addManyPokemon(array $pokemon): bool {
     if (count($pokemon) === 0) return true;
 
     $placeholders = [];
   
+    $i = 0;
     foreach($pokemon as $key => $shiny) {
+      if ($i >= self::$safeSyncLimit) continue;
+
       $placeholders[] = "(:huntid$key, :userid$key, :creationTime$key, :lastUpdate$key, :dexid$key, :forme$key, :game$key, :method$key, :count$key, :charm$key, :catchTime$key, :nickname$key, :ball$key, :gene$key, :originalTrainer$key, :caughtAsDexid$key, :caughtAsForme$key, :notes$key)";
   
       $values[":huntid$key"] = $shiny['huntid'];
@@ -452,6 +458,8 @@ class User {
       $values[":caughtAsForme$key"] = $shiny['caughtAsForme'];
   
       $values[":notes$key"] = $shiny['notes'];
+
+      $i++;
     }
   
     $placeholders = implode(',', $placeholders);
@@ -517,7 +525,10 @@ class User {
 
     $userID = $this->userID;
     $update->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
+    $i = 0;
     foreach($pokemon as $key => $shiny) {
+      if ($i >= self::$safeSyncLimit) continue;
+
       $update->bindParam(':huntid', $shiny['huntid'], PDO::PARAM_STR, 36);
 
       $update->bindParam(':lastUpdate', $shiny['lastUpdate'], PDO::PARAM_INT);
@@ -540,6 +551,7 @@ class User {
       $update->bindParam(':notes', $shiny['notes']);
 
       $results[] = $update->execute();
+      $i++;
     }
 
     return $results;

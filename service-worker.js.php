@@ -57,6 +57,8 @@ const currentCacheName = `${cachePrefix}-<?=$maxVersion?>`;
 const currentSpritesCacheName = `${spritesCachePrefix}-${spritesCacheVersion}`;
 const liveFileVersions = JSON.parse(`<?=json_encode($fileVersions, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES)?>`);
 
+const safeSyncLimit = 2000; // number of entries the backend will accept to sync at once
+
 
 
 ///// EVENTS
@@ -451,6 +453,7 @@ async function syncPokemon() {
       return (new FrontendShiny(shiny)).toBackend();
     })
   );
+  localData.length = Math.min(localData.length, safeSyncLimit);
   const deletedLocalData = (await Promise.all(
     (await huntStorage.keys())
     .map(async key => {
@@ -460,6 +463,7 @@ async function syncPokemon() {
     })
   ))
   .filter(pkmn => pkmn != null);
+  deletedLocalData.length = Math.min(deletedLocalData.length, safeSyncLimit);
 
   // ************************************************************************** //
 
@@ -587,6 +591,7 @@ async function syncFriends() {
   // Get local data
   await friendStorage.ready();
   const friendsList = await friendStorage.keys();
+  friendsList.length = Math.min(friendsList.length, safeSyncLimit);
 
   // Send local data to the backend
   const formData = new FormData();
@@ -660,14 +665,16 @@ async function syncBackup(message = true) {
           successfulBackupSync: true,
           quantity: resultsPokemon.length,
           modifiedPokemon: [...modifiedPokemon],
-          error: !(resultsPokemon.every(r => r === true))
+          error: !(resultsPokemon.every(r => r === true)),
+          reachedLimit: modifiedPokemon.length >= safeSyncLimit,
         });
 
         client.postMessage({
           successfulBackupSync: true,
           quantity: resultsFriends.length,
           modifiedFriends: [...modifiedFriends],
-          error: !(resultsFriends.every(r => r === true))
+          error: !(resultsFriends.every(r => r === true)),
+          reachedLimit: modifiedFriends.length >= safeSyncLimit,
         });
       }
     }

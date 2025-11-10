@@ -193,6 +193,17 @@ try {
     return $arr;
   }
 
+  // Limit the size of the requested data, to prevent requesting too much data
+  if (count($to_insert_online_ids) > 2000) {
+    array_splice($to_insert_online_ids, 2000);
+  }
+  if (count($to_update_online_ids) > 2000) {
+    array_splice($to_update_online_ids, 2000);
+  }
+  if (count($to_restore_online_ids) > 2000) {
+    array_splice($to_restore_online_ids, 2000);
+  }
+
   echo json_encode(array(
     'results' => $results,
     'to_insert_local' => removeUserID($to_insert_local),
