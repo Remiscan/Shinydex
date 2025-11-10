@@ -106,7 +106,7 @@ export class dexIcon extends HTMLElement {
         button?.setAttribute('data-label', `pokemon/${this.dexid}`);
         button?.setAttribute('aria-label', Pokemon.names()[this.dexid]);
 
-        this.catchableForms = new Set(pokemonData[this.dexid].formes.filter(f => f.catchable).map(f => f.dbid));
+        this.catchableForms = new Set(pokemonData[this.dexid].formes.filter(f => f.catchable).map(f => f.dbid || 'emptystring'));
         let caughtFormsIndicatorsTemplate = ``;
         for (const forme of this.catchableForms) {
           const formid = forme === '' ? 'emptystring' : forme;
