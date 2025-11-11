@@ -124,9 +124,14 @@ function makeFeedDay(day: ISODay, userList: FeedData['entries'][keyof FeedData['
 }
 
 
+let lastFeedRefreshTime = 0;
+
+
 /** Remplit le flux public avec les données reçues du backend. */
 function populateFeedData(data: FeedData, friends: Set<string>, { position = 'bottom' } = {}) {
 	if (Array.isArray(data.entries) && data.entries.length === 0) return;
+
+	lastFeedRefreshTime = Date.now();
 
 	const feedSection = document.getElementById('flux');
 	const feedContentContainer = feedSection?.querySelector('.liste-cartes');
@@ -208,12 +213,14 @@ async function getAndPopulateFeed(
 
 let refreshingFeed = false;
 /** Actualise le flux public en récupérant les données plus récentes que celles de la première carte. */
-async function refreshFeed(event: Event) {
+async function refreshFeed(event?: Event) {
 	if (refreshingFeed) return;
 	refreshingFeed = true;
 
-	const target = event.target as HTMLElement;
-	target.setAttribute('disabled', '');
+	const target = event?.target;
+	if (target instanceof HTMLElement) {
+		target.setAttribute('disabled', '');
+	}
 
 	const feedSection = document.getElementById('flux');
 	const feedScroller = feedSection?.querySelector('.section-contenu');
@@ -226,14 +233,28 @@ async function refreshFeed(event: Event) {
 	const previousNewerId = feedSection.dataset.newerId ? Number(feedSection.dataset.newerId) : undefined;
 	if (!previousNewerDate) return;
 
-	await getAndPopulateFeed(Date.now(), previousNewerDate, undefined, previousNewerId, { position: 'top', method: 'manual' });
+	const now = Date.now();
+	await getAndPopulateFeed(now, previousNewerDate, undefined, previousNewerId, { position: 'top', method: 'manual' });
 
-	target.removeAttribute('disabled');
+	if (target instanceof HTMLElement) {
+		target.removeAttribute('disabled');
+	}
 	refreshingFeed = false;
 }
 
 // Écoute le clic sur le bouton d'actualisation du flux public
 document.querySelector('#flux [data-action="refresh-feed"]')?.addEventListener('click', refreshFeed);
+
+export function refreshFeedAfterDelay(event?: Event) {
+	const now = Date.now();
+	// Auto-refresh after 10 minutes if you come back
+	if (lastFeedRefreshTime > 0 && now - lastFeedRefreshTime > 600000) {
+		console.log('[Feed] Delay passed, auto refreshing...')
+		return refreshFeed(event);
+	} else {
+		console.log('[Feed] No need to auto refresh');
+	}
+}
 
 
 /** Récupère les félicitations stockées en BDD depuis la dernière fois, et en notifie l'utilisateur. */

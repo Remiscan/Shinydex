@@ -3,6 +3,7 @@ import { FrontendShiny } from './ShinyBackend.js';
 import { callBackend } from './callBackend.js';
 import { feedCard } from './components/feed-card/feedCard.js';
 import { FilterMenu } from './components/filter-menu/filterMenu.js';
+import { refreshFeedAfterDelay } from './feed.js';
 import { clearElementStorage, lazyLoadSection, unLazyLoadSection, virtualizedSections } from './lazyLoading.js';
 import { friendShinyStorage, friendStorage } from './localForage.js';
 import { Notif } from './notification.js';
@@ -165,6 +166,7 @@ export async function navigate(event: CustomEvent) {
   if (ancienneSection) {
     // On désactive le retour à la section précédente à l'appui sur Échap
     window.removeEventListener('keydown', backOnEscape);
+    document.removeEventListener('visibilitychange', refreshFeedAfterDelay);
 
     const linkedAnciennesSections = getLinkedSections(ancienneSection.nom);
     await Promise.all(linkedAnciennesSections.map(async section => {
@@ -242,8 +244,14 @@ export async function navigate(event: CustomEvent) {
       } break;
 
       case 'flux': {
-        if (navigator.onLine) section.element.classList.remove('vide');
-        else section.element.classList.add('vide');
+        if (navigator.onLine) {
+          section.element.classList.remove('vide');
+          refreshFeedAfterDelay();
+        } else {
+          section.element.classList.add('vide');
+        }
+
+        document.addEventListener('visibilitychange', refreshFeedAfterDelay);
 
         const feedCards = section.element.querySelectorAll<feedCard>('feed-card');
         const friends = new Set(await friendStorage.keys());
