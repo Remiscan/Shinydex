@@ -1291,6 +1291,10 @@ remiscan-logo {
   display: none;
 }
 
+[data-action="refresh-feed"]:disabled {
+  --state-tint: 0, 0, 0, 0;
+}
+
 #flux.vide:has(feed-day) .message-vide {
   flex-grow: 0;
   display: flex;

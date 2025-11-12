@@ -211,15 +211,18 @@ async function getAndPopulateFeed(
 }
 
 
+const boutonRefresh = document.querySelector<HTMLElement>('#flux [data-action="refresh-feed"]');
+
+
 let refreshingFeed = false;
 /** Actualise le flux public en récupérant les données plus récentes que celles de la première carte. */
-async function refreshFeed(event?: Event) {
+async function refreshFeed(_event?: Event) {
 	if (refreshingFeed) return;
 	refreshingFeed = true;
 
-	const target = event?.target;
-	if (target instanceof HTMLElement) {
-		target.setAttribute('disabled', '');
+	if (boutonRefresh instanceof HTMLElement) {
+		boutonRefresh.setAttribute('disabled', '');
+		boutonRefresh.classList.add('loading');
 	}
 
 	const feedSection = document.getElementById('flux');
@@ -236,14 +239,15 @@ async function refreshFeed(event?: Event) {
 	const now = Date.now();
 	await getAndPopulateFeed(now, previousNewerDate, undefined, previousNewerId, { position: 'top', method: 'manual' });
 
-	if (target instanceof HTMLElement) {
-		target.removeAttribute('disabled');
+	if (boutonRefresh instanceof HTMLElement) {
+		boutonRefresh.removeAttribute('disabled');
+		boutonRefresh.classList.remove('loading');
 	}
 	refreshingFeed = false;
 }
 
 // Écoute le clic sur le bouton d'actualisation du flux public
-document.querySelector('#flux [data-action="refresh-feed"]')?.addEventListener('click', refreshFeed);
+boutonRefresh?.addEventListener('click', refreshFeed);
 
 export function refreshFeedAfterDelay(event?: Event) {
 	const now = Date.now();

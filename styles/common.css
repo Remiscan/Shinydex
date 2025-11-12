@@ -263,13 +263,14 @@ a.icon-button > * {
 
 /* Disabled */
 
-button:disabled {
+button:not(:has(load-spinner)):disabled {
   --surface-color: var(--on-surface) !important;
   --elevation-opacity: 0 !important;
   --surface-opacity: .12 !important;
   --state-opacity: 0 !important;
   color: rgb(var(--on-surface), .38) !important;
   grid-template-columns: [search-icon] 56px 1fr [reset-icon] var(--reset-icon-column) [filter-icon] var(--filter-icon-column) 2px;
+  pointer-events: none;
 }
 
 button.outlined:disabled {
