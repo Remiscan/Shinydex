@@ -51,7 +51,7 @@ export class friendCard extends HTMLElement {
   };
   navHandler = (event: Event) => {
     event.preventDefault();
-    goToPage(`chromatiques-ami`, this.username);
+    goToPage(`chromatiques-ami`, encodeURIComponent(this.username));
   }
 
 

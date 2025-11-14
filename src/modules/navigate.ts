@@ -7,6 +7,7 @@ import { refreshFeedAfterDelay } from './feed.js';
 import { clearElementStorage, lazyLoadSection, unLazyLoadSection, virtualizedSections } from './lazyLoading.js';
 import { friendShinyStorage, friendStorage } from './localForage.js';
 import { Notif } from './notification.js';
+import { requestSync } from './syncBackup.js';
 import { scrollObserver } from './theme.js';
 import { TranslatedString, getString } from './translation.js';
 
@@ -203,7 +204,7 @@ export async function navigate(event: CustomEvent) {
     // On prépare la nouvelle section si besoin
     switch (section.nom) {
       case 'chromatiques-ami': {
-        const username = url.pathname.split('/')[3];
+        const username = decodeURIComponent(url.pathname.split('/')[3]);
         //if (username !== section.element.getAttribute('data-username')) {
           section.element.setAttribute('data-username', username);
 
@@ -237,7 +238,16 @@ export async function navigate(event: CustomEvent) {
                 }
               }));
             } else {
-              new Notif(getString('error-no-profile')).prompt();
+              if (ancienneSection?.nom === 'partage') {
+                const notif = new Notif(getString('error-no-profile-refresh'), 15000, getString('error-no-profile-refresh-action'), () => {
+                  goToPage('partage');
+                  requestSync();
+                  notif.remove();
+                }, true);
+                notif.prompt();
+              } else {
+                new Notif(getString('error-no-profile')).prompt();
+              }
             }
           });
         //}
