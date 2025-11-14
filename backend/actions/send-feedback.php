@@ -31,6 +31,19 @@ try {
 		throw new \Exception("Error while sending feedback");
 	}
 
+	try {
+		$webhookUrl = file_get_contents('/run/secrets/shinydex_feedback_webhook_url');
+		$payload = [
+			'content' => substr($message, 0, 2000)
+		];
+		$request = curl_init($webhookUrl);
+		curl_setopt($request, CURLOPT_POST, 1);
+		curl_setopt($request, CURLOPT_POSTFIELDS, json_encode($payload));
+		curl_setopt($request, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+		curl_exec($request);
+		curl_close($request);
+	} catch (\Throwable $error) {}
+
 	respond(['success' => true]);
 } catch (\Throwable $error) {
 	respondError($error);
