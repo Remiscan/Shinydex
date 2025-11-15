@@ -261,6 +261,20 @@ export function refreshFeedAfterDelay(event?: Event) {
 }
 
 
+export function resetFeed() {
+	const feedSection = document.getElementById('flux');
+	if (!feedSection) return;
+
+	feedSection.removeAttribute('data-newer-date');
+	feedSection.removeAttribute('data-older-date');
+	feedSection.removeAttribute('data-newer-id');
+	feedSection.removeAttribute('data-older-id');
+
+	const feedCards = feedSection.querySelectorAll('feed-day');
+	feedCards.forEach(card => card.remove());
+}
+
+
 /** Récupère les félicitations stockées en BDD depuis la dernière fois, et en notifie l'utilisateur. */
 export async function getAndNotifyCongratulations() {
 	const usernames: string[] = Array.from(await getCongratulations())
@@ -335,6 +349,7 @@ export async function getAndNotifyCongratulations() {
 	};
 	notifElement.addEventListener('notification-removed', onRemoval);
 }
+
 
 /** Récupère les félicitations stockées en BDD. */
 async function getCongratulations() {

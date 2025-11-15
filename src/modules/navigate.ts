@@ -3,7 +3,7 @@ import { FrontendShiny } from './ShinyBackend.js';
 import { callBackend } from './callBackend.js';
 import { feedCard } from './components/feed-card/feedCard.js';
 import { FilterMenu } from './components/filter-menu/filterMenu.js';
-import { refreshFeedAfterDelay } from './feed.js';
+import { refreshFeedAfterDelay, resetFeed } from './feed.js';
 import { clearElementStorage, lazyLoadSection, unLazyLoadSection, virtualizedSections } from './lazyLoading.js';
 import { friendShinyStorage, friendStorage } from './localForage.js';
 import { Notif } from './notification.js';
@@ -238,10 +238,14 @@ export async function navigate(event: CustomEvent) {
                 }
               }));
             } else {
-              if (ancienneSection?.nom === 'partage') {
-                const notif = new Notif(getString('error-no-profile-refresh'), 15000, getString('error-no-profile-refresh-action'), () => {
-                  goToPage('partage');
-                  requestSync();
+              if (ancienneSection?.nom === 'partage' || ancienneSection?.nom === 'flux') {
+                const message = getString('error-no-profile') + ' ' + getString(`error-no-profile-refresh-${ancienneSection.nom}`);
+                const notif = new Notif(message, 15000, getString('error-no-profile-refresh-action'), () => {
+                  goToPage(ancienneSection.nom);
+                  switch (ancienneSection.nom) {
+                    case 'partage': requestSync(); break;
+                    case 'flux': resetFeed(); break;
+                  }
                   notif.remove();
                 }, true);
                 notif.prompt();
