@@ -49,6 +49,21 @@ template.innerHTML = /*html*/`
           </button>
         </text-field>
       </fieldset>
+
+      <div class="estimated-shiny-rate">
+        <span data-string="estimated-shiny-rate"></span>
+        <div class="shiny-rate body-large">
+          <div class="shiny-rate-background surface"></div>
+          <div class="shiny-charm">
+            <span class="icon" data-icon="key/shiny-charm"></span>
+          </div>
+          <div class="shiny-rate-data">
+            <span class="shiny-rate-text numerator">1</span>
+            <span class="shiny-rate-text separator">/</span>
+            <span class="shiny-rate-text denominator">4096</span>
+          </div>
+        </div>
+      </div>
     </div>
 
 

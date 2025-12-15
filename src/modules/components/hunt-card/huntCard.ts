@@ -15,6 +15,8 @@ import { CheckBox } from '../checkBox.js';
 import { DexDatalist } from '../dexDatalist.js';
 import { InputSelect } from '../inputSelect.js';
 import { pokemonSprite } from '../pokemon-sprite/pokemonSprite.js';
+import { shinyCard } from '../shiny-card/shinyCard.js';
+import shinyRatesSheet from '../shiny-card/shinyRate.css' with { type: 'css' };
 import { TextArea } from '../textArea.js';
 import { TextField } from '../textField.js';
 import sheet from './styles.css' with { type: 'css' };
@@ -296,7 +298,7 @@ export class huntCard extends HTMLElement {
     super();
     this.#shadow = this.attachShadow({ mode: 'open' });
     this.#shadow.appendChild(template.content.cloneNode(true));
-    this.#shadow.adoptedStyleSheets = [materialIconsSheet, iconSheet, themesSheet, commonSheet, sheet, gameSpecificSheet];
+    this.#shadow.adoptedStyleSheets = [materialIconsSheet, iconSheet, themesSheet, commonSheet, shinyRatesSheet, sheet, gameSpecificSheet];
     this.genereJeux();
   }
 
@@ -791,6 +793,9 @@ export class huntCard extends HTMLElement {
     sprite.setAttribute('dexid', String(hunt.dexid));
     sprite.setAttribute('forme', hunt.forme);
     sprite.setAttribute('shiny', String(hunt.caught));
+
+    const shinyRate = this.#shadow.querySelector<HTMLElement>('.shiny-rate')!;
+    shinyCard.updateShinyRateDisplay(shinyRate, hunt);
   }
 
 

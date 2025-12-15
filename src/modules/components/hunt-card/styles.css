@@ -124,6 +124,25 @@ text-field > button:not(:focus, :hover, :active) {
   --state-opacity: 0;
 }
 
+.estimated-shiny-rate {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  border-radius: var(--sub-border-radius);
+  background-color: rgb(var(--surface-container-high));
+  padding: 8px;
+  justify-content: space-between;
+  align-items: center;
+  flex-basis: 100%;
+}
+
+:host(:not([data-game])) .estimated-shiny-rate,
+:host([data-game=""]) .estimated-shiny-rate,
+:host(:not([data-method])) .estimated-shiny-rate,
+:host([data-method=""]) .estimated-shiny-rate {
+  display: none;
+}
+
 /* Bonus */
 
 fieldset[name="bonus"] {

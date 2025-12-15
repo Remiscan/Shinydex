@@ -51,7 +51,7 @@
     "bonus-za-sparklingPower-1": "Niveau 1",
     "bonus-za-sparklingPower-2": "Niveau 2",
     "bonus-za-sparklingPower-3": "Niveau 3",
-    "bonus-za-forcedShiny": "Le Pokémon est apparu dès l'entrée dans la distortion, et son type est identique au type de la rencontre brillance du donut",
+    "bonus-za-forcedShiny": "Le Pokémon est apparu dès l'entrée dans la distorsion, et son type est identique au type de la rencontre brillance du donut",
     "bonuses-sv": "Bonus de Pokémon Écarlate et Violet",
     "bonus-sv-outbreakCleared": "Nombre de Pokémon battus dans cette apparition massive",
     "bonus-sv-outbreakCleared-alt": "KO",
@@ -147,6 +147,7 @@
     "capture-notes": "Notes",
     "delete-shiny": "Supprimer ce <span class=\"nowrap\">Pokémon <shiny-stars></shiny-stars></span>",
     "submit-hunt": "Enregistrer dans mes <span class=\"nowrap\">Pokémon <shiny-stars></shiny-stars></span>",
+    "estimated-shiny-rate": "Taux de chromatique estimé",
 
     "section-corbeille-short-title": "Corbeille",
     "section-corbeille-long-title": "Supprimés récemment",
@@ -547,6 +548,7 @@
     "capture-notes": "Notes",
     "delete-shiny": "Delete this <span class=\"nowrap\">Pokémon <shiny-stars></shiny-stars></span>",
     "submit-hunt": "Save in my <span class=\"nowrap\">Pokémon <shiny-stars></shiny-stars></span>",
+    "estimated-shiny-rate": "Estimated shiny rate",
 
     "section-corbeille-short-title": "Recycle bin",
     "section-corbeille-long-title": "Deleted recently",

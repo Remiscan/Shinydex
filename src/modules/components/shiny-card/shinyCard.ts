@@ -11,6 +11,7 @@ import { pokemonData } from '../../jsonData.js';
 import { huntStorage, shinyStorage, type LocalForage } from '../../localForage.js';
 import { Notif } from '../../notification.js';
 import { getCurrentLang, getString, TranslatedString, translationObserver } from '../../translation.js';
+import shinyRatesSheet from './shinyRate.css' with { type: 'css' };
 import sheet from './styles.css' with { type: 'css' };
 import template from './template.js';
 
@@ -71,7 +72,7 @@ export class shinyCard extends HTMLElement {
     super();
     this.shadow = this.attachShadow({ mode: 'open' });
     this.shadow.appendChild(template.content.cloneNode(true));
-    this.shadow.adoptedStyleSheets = [materialIconsSheet, iconSheet, themesSheet, commonSheet, sheet];
+    this.shadow.adoptedStyleSheets = [materialIconsSheet, iconSheet, themesSheet, commonSheet, shinyRatesSheet, sheet];
   }
 
 
@@ -321,6 +322,26 @@ export class shinyCard extends HTMLElement {
     // Charme chroma et shiny rate
     {
       const srContainer = this.shadow.querySelector('.shiny-rate') as HTMLElement;
+      shinyCard.updateShinyRateDisplay(srContainer, shiny);
+    }
+
+    // Filters
+    const filters = computeShinyFilters(shiny);
+    for (const [filter, value] of Object.entries(filters)) {
+      this.setAttribute(`data-${filter}`, String(value));
+    }
+    applyOrders(this, shiny, this.orderMap);
+
+    this.rendering = false;
+    this.dispatchEvent(new Event('rendering-complete'));
+  }
+
+
+  static updateShinyRateDisplay(
+    srContainer: HTMLElement,
+    shiny: Shiny,
+  ) {
+    try {
       const charm = shiny.charm;
       const shinyRate = shiny.shinyRate ?? 0;
       const methode = shiny.method || '';
@@ -341,46 +362,35 @@ export class shinyCard extends HTMLElement {
         srContainer.classList.add('off');
       }
       
-      const element = this.shadow.querySelector('.shiny-rate-text.denominator')!;
+      const element = srContainer.querySelector('.shiny-rate-text.denominator')!;
       element.innerHTML = String(shinyRate || '???');
 
       // Couleur du shiny rate
       srContainer.classList.remove('full-odds', 'charm-ods', 'one-odds', 'unknown-odds');
-      try {
-        if (!shinyRate) {
-          srContainer.classList.add('unknown-odds');
-        } else if (
-          (game.gen <= 5 && shinyRate >= 8192 - 1) ||
-          (game.gen > 5 && shinyRate >= 4096 - 1)
-        ) {
-          srContainer.classList.add('full-odds');
-        } else if (charm && !(charmlessMethods.includes(methode)) && (
-          (game.gen <= 5 && shinyRate >= 2731 - 1) ||
-          (game.gen > 5 && shinyRate >= 1365 - 1) ||
-          ((game.id === 'pla' || game.id === 'za') && shinyRate >= 1024 - 1)
-        )) {
-          srContainer.classList.add('charm-odds');
-        } else if (shinyRate <= 1) {
-          srContainer.classList.add('one-odds');
-        }
 
-        // Couleur de la bordure (0 = high shiny denominator / hard, 1 = low shiny denominator / easy)
-        const hardestRate = (game.gen <= 5 ? 2731 : 1365);
-        const easiestRate = 256;
-        const hueCoeff = (hardestRate - Math.min(Math.max(easiestRate, shinyRate), hardestRate)) / (hardestRate - easiestRate);
-        srContainer.style.setProperty('--hue-coeff', String(hueCoeff));
-      } catch (error) {}
-    }
+      if (!shinyRate) {
+        srContainer.classList.add('unknown-odds');
+      } else if (
+        (game.gen <= 5 && shinyRate >= 8192 - 1) ||
+        (game.gen > 5 && shinyRate >= 4096 - 1)
+      ) {
+        srContainer.classList.add('full-odds');
+      } else if (charm && !(charmlessMethods.includes(methode)) && (
+        (game.gen <= 5 && shinyRate >= 2731 - 1) ||
+        (game.gen > 5 && shinyRate >= 1365 - 1) ||
+        ((game.id === 'pla' || game.id === 'za') && shinyRate >= 1024 - 1)
+      )) {
+        srContainer.classList.add('charm-odds');
+      } else if (shinyRate <= 1) {
+        srContainer.classList.add('one-odds');
+      }
 
-    // Filters
-    const filters = computeShinyFilters(shiny);
-    for (const [filter, value] of Object.entries(filters)) {
-      this.setAttribute(`data-${filter}`, String(value));
-    }
-    applyOrders(this, shiny, this.orderMap);
-
-    this.rendering = false;
-    this.dispatchEvent(new Event('rendering-complete'));
+      // Couleur de la bordure (0 = high shiny denominator / hard, 1 = low shiny denominator / easy)
+      const hardestRate = (game.gen <= 5 ? 2731 : 1365);
+      const easiestRate = 256;
+      const hueCoeff = (hardestRate - Math.min(Math.max(easiestRate, shinyRate), hardestRate)) / (hardestRate - easiestRate);
+      srContainer.style.setProperty('--hue-coeff', String(hueCoeff));
+    } catch (error) {}
   }
 
 

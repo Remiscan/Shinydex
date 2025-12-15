@@ -1,7 +1,7 @@
-import CustomInput from './customInput.js';
 import materialIconsSheet from '../../../ext/material_icons.css' with { type: 'css' };
-import themesSheet from '../../../styles/themes.css.php' with { type: 'css' };
 import commonSheet from '../../../styles/common.css' with { type: 'css' };
+import themesSheet from '../../../styles/themes.css.php' with { type: 'css' };
+import CustomInput from './customInput.js';
 
 
 
@@ -46,7 +46,7 @@ sheet.replaceSync(/*css*/`
     padding: 0;
     font: inherit;
 
-    height: 40px;
+    height: auto;
     min-height: 40px;
     border-radius: 20px;
     display: flex;
