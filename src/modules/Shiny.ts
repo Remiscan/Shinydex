@@ -375,11 +375,6 @@ export class Shiny extends FrontendShiny {
         case 'fossil': {
           return baseRate;
         }
-
-        case 'hyperspace': {
-          if (game.id === 'za' && this.count['za-forcedShiny'] === 1) return 1;
-          break;
-        }
       }
 
       switch (game.id) {
@@ -402,6 +397,7 @@ export class Shiny extends FrontendShiny {
         case 'za': {
           charmRolls = Number(this.charm) * 3;
           const sparklingPower = this.count['za-sparklingPower'] || 0;
+          if (sparklingPower === 3 && this.count['za-forcedShiny'] === 1) return 1;
           bonusRolls += sparklingPower;
         } break;
       }
