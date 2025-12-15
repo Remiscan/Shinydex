@@ -222,6 +222,13 @@ export class shinyCard extends HTMLElement {
         }
       }
 
+      else if (shiny.game === 'za') {
+        if (getProp('za-sparklingPower')) {
+          const sparklingPower = getProp('za-sparklingPower');
+          parts.push(`<span data-string="bonus-za-sparklingPower-alt">${getString('bonus-za-sparklingPower-alt', lang)}</span> ${sparklingPower}`);
+        }
+      }
+
       countString = parts.join(', ');
 
       element.innerHTML = countString || `<span class="empty" data-string="shiny-card-method-details-empty">${getString('shiny-card-method-details-empty', lang)}</span>`;

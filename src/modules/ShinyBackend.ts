@@ -48,6 +48,8 @@ export class Count {
   'pla-dexResearch'?: number;
   'sv-outbreakCleared'?: number;
   'sv-sparklingPower'?: number;
+  'za-sparklingPower'?: number;
+  'za-forcedShiny'?: number;
 
   constructor(obj: object = {}) {
     for (const key of Object.keys(this)) {

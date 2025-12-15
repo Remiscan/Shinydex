@@ -22,6 +22,7 @@ const allMethodes: Methode[] = [
   { id: 'egg', jeux: allGames.filter(g => ![1, 7.1, 0].includes(g.gen) && g.id !== 'za'), mine: true, charm: true },
   { id: 'masuda', jeux: allGames.filter(g => g.gen >= 4 && g.gen != 7.1 && g.gen != 8.1 && g.id != 'za'), mine: true, charm: true },
   { id: 'fixedencounter', jeux: allGames.filter(g => g.id === 'sv'), mine: true, charm: false },
+  { id: 'hyperspace', jeux: allGames.filter(g => g.id === 'za'), mine: true, charm: true },
   { id: 'reset', jeux: allGames.filter(g => g.gen >= 2), mine: true, charm: true },
   { id: 'pokeradar', jeux: allGames.filter(g => [4, 6].includes(g.gen) || g.id == 'bdsp'), mine: true, charm: true },
   { id: 'chainfishing', jeux: allGames.filter(g => g.gen == 6), mine: true, charm: true },
@@ -374,6 +375,11 @@ export class Shiny extends FrontendShiny {
         case 'fossil': {
           return baseRate;
         }
+
+        case 'hyperspace': {
+          if (game.id === 'za' && this.count['za-forcedShiny'] === 1) return 1;
+          break;
+        }
       }
 
       switch (game.id) {
@@ -395,6 +401,8 @@ export class Shiny extends FrontendShiny {
 
         case 'za': {
           charmRolls = Number(this.charm) * 3;
+          const sparklingPower = this.count['za-sparklingPower'] || 0;
+          bonusRolls += sparklingPower;
         } break;
       }
 

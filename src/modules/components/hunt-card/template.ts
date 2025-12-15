@@ -69,6 +69,24 @@ template.innerHTML = /*html*/`
       </fieldset>
 
 
+      <!-- Bonus de Legends ZA (ZA) -->
+      <fieldset data-game="za">
+        <legend>
+          <span class="title-small" data-string="bonuses-za"></span>
+        </legend>
+
+        <input-select name="za-sparklingPower" default-value="0">
+          <span slot="label" data-string="bonus-za-sparklingPower"></span>
+          <option value="0" data-string="bonus-za-sparklingPower-0"></option>
+          <option value="1" data-string="bonus-za-sparklingPower-1"></option>
+          <option value="2" data-string="bonus-za-sparklingPower-2"></option>
+          <option value="3" data-string="bonus-za-sparklingPower-3"></option>
+        </input-select>
+
+        <check-box name="za-forcedShiny" data-string="bonus-za-forcedShiny"></check-box>
+      </fieldset>
+
+
       <!-- Bonus de Écarlate / Violet (SV) -->
       <fieldset data-game="sv">
         <legend>

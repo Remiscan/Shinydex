@@ -27,6 +27,7 @@
     "massivemassoutbreak": "Mégapparition",
     "fixedencounter": "Rencontre fixe",
     "fossil": "Fossile",
+    "hyperspace": "Sauvage (Extra-Illumis)",
     "hack": "Méthode non légitime",
     "unknown": "Méthode inconnue"
   },
@@ -59,6 +60,7 @@
     "massivemassoutbreak": "Massive mass outbreak",
     "fixedencounter": "Fixed encounter",
     "fossil": "Fossil",
+    "hyperspace": "Wild (Hyperspace)",
     "hack": "Illegitimate method",
     "unknown": "Unknown method"
   }
