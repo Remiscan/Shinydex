@@ -366,7 +366,7 @@ export class shinyCard extends HTMLElement {
       element.innerHTML = String(shinyRate || '???');
 
       // Couleur du shiny rate
-      srContainer.classList.remove('full-odds', 'charm-ods', 'one-odds', 'unknown-odds');
+      srContainer.classList.remove('full-odds', 'charm-odds', 'one-odds', 'unknown-odds');
 
       if (!shinyRate) {
         srContainer.classList.add('unknown-odds');
