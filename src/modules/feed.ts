@@ -95,7 +95,6 @@ const getFeedData = queueable(_getFeedData, 1050);
 /** Crée le template d'une journée dans le flux. */
 function makeFeedDay(day: ISODay, userList: FeedData['entries'][keyof FeedData['entries']], friends: Set<string>) {
 	const container = document.createElement('feed-day');
-	container.dataset.datetime = day;
 
 	const uniqueName = `feed-day-${day}`;
 	container.style.setProperty('--unique-name', uniqueName);
