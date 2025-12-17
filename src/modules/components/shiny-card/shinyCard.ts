@@ -183,7 +183,10 @@ export class shinyCard extends HTMLElement {
       const getProp = (prop: keyof Shiny['count']) => shiny.count[prop] || 0;
 
       const parts = [];
-      if (getProp('encounters')) parts.push(`${getProp('encounters')} rencontres`);
+      if (getProp('encounters')) {
+        if (Math.abs(getProp('encounters')) <= 1) parts.push(`${getProp('encounters')} <span data-string="encounter-label">${getString('encounter-label', lang)}</span>`);
+        else parts.push(`${getProp('encounters')} <span data-string="encounters-label">${getString('encounters-label', lang)}</span>`);
+      }
 
       if ((shiny.game === 'ultrasun' || shiny.game === 'ultramoon') && shiny.method === 'ultrawormhole') {
         parts.push(`<span data-string="bonus-usum-distance">${getString('bonus-usum-distance', lang)}</span> ${getProp('usum-distance')}, ${getProp('usum-rings')} <span data-string="bonus-usum-rings">${getString('bonus-usum-rings', lang)}</span>`);
@@ -223,8 +226,10 @@ export class shinyCard extends HTMLElement {
         }
       }
 
-      else if (shiny.game === 'za') {
-        if (getProp('za-sparklingPower')) {
+      else if (shiny.game === 'legendsza') {
+        if (getProp('za-forcedShiny')) {
+          parts.push(`<span data-string="bonus-za-forcedShiny-alt">${getString('bonus-za-forcedShiny-alt', lang)}</span>`);
+        } else if (getProp('za-sparklingPower')) {
           const sparklingPower = getProp('za-sparklingPower');
           parts.push(`<span data-string="bonus-za-sparklingPower-alt">${getString('bonus-za-sparklingPower-alt', lang)}</span> ${sparklingPower}`);
         }
@@ -349,7 +354,7 @@ export class shinyCard extends HTMLElement {
 
       // Icône du charme chroma
       if (charmlessMethods == null) charmlessMethods = Shiny.methodes('charmless').map(m => m.id);
-      if (charm && !(charmlessMethods.includes(methode)) && game.hasCharm) {
+      if (charm && !(charmlessMethods.includes(methode)) && game.hasCharm && shinyRate > 1) {
         srContainer.classList.add('with-charm');
       } else {
         srContainer.classList.remove('with-charm');

@@ -378,6 +378,10 @@ button.icon-button.menu-hint::before {
   display: none;
 }
 
+[data-type="count"] :is([data-string="encounters-label"], [data-string="encounter-label"]) {
+  text-transform: lowercase;
+}
+
 @container section-contenu (min-width: 650px) {
   .container {
     --last-column: auto;
