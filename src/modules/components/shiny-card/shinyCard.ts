@@ -3,6 +3,7 @@ import iconSheet from '../../../../images/iconsheet.css' with { type: 'css' };
 import commonSheet from '../../../../styles/common.css' with { type: 'css' };
 import themesSheet from '../../../../styles/themes.css.php' with { type: 'css' };
 import { Hunt } from '../../Hunt.js';
+import { Params } from '../../Params.js';
 import { Pokemon } from '../../Pokemon.js';
 import { Shiny } from '../../Shiny.js';
 import { FrontendShiny } from '../../ShinyBackend.js';
@@ -244,7 +245,7 @@ export class shinyCard extends HTMLElement {
     {
       const time = shiny.catchTime;
       const element = this.shadow.querySelector('[data-type="catchTime"]')!;
-      if (time > 825289200000) {
+      if (time > Params.unknownDateThreshold) {
         const date = new Intl.DateTimeFormat(lang, JSON.parse(element.getAttribute('data-format') ?? '{}'))
                              .format(new Date(time));
         element.innerHTML = date;

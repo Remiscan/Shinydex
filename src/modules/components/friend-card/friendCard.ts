@@ -6,7 +6,7 @@ import iconSheet from '../../../../images/iconsheet.css' with { type: 'css' };
 import themesSheet from '../../../../styles/themes.css.php' with { type: 'css' };
 import commonSheet from '../../../../styles/common.css' with { type: 'css' };
 import { Friend } from '../../Friend.js';
-import { noAccent } from '../../Params.js';
+import { noAccent, Params } from '../../Params.js';
 import { updateUserProfile } from '../../Settings.js';
 import { goToPage } from '../../navigate.js';
 import { warnBeforeDestruction } from '../../notification.js';
@@ -95,12 +95,19 @@ export class friendCard extends HTMLElement {
         spriteElement.setAttribute('data-has-evolved', String(shinyCard.hasEvolvedCache.has(`${pokemon.dexid}-${pokemon.forme}`)));
 
         const dateContainer = container.querySelector('time') as HTMLTimeElement;
-        dateContainer.dateTime = String(pokemon.catchTime);
         const lang = getCurrentLang();
-        const date = new Intl.DateTimeFormat(lang, {"day":"numeric", "month":"numeric", "year":"numeric"})
-                             .format(new Date(pokemon.catchTime));
-        dateContainer.innerHTML = date;
-        dateContainer.setAttribute('data-datetime', String(pokemon.catchTime));
+        if (pokemon.catchTime > Params.unknownDateThreshold) {
+          const date = new Intl.DateTimeFormat(lang, {"day":"numeric", "month":"numeric", "year":"numeric"})
+                               .format(new Date(pokemon.catchTime));
+          dateContainer.innerHTML = date;
+          dateContainer.dateTime = String(pokemon.catchTime);
+          dateContainer.setAttribute('data-datetime', String(pokemon.catchTime));
+          dateContainer.removeAttribute('data-string');
+        } else {
+          dateContainer.innerHTML = getString('shiny-card-unknown-date', lang);
+          dateContainer.setAttribute('data-string', 'shiny-card-unknown-date');
+          dateContainer.removeAttribute('data-datetime');
+        }
       }
 
       const compteurContainer = this.shadow.querySelector('.compteur') as HTMLElement;

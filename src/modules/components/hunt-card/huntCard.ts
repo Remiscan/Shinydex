@@ -3,7 +3,7 @@ import iconSheet from '../../../../images/iconsheet.css' with { type: 'css' };
 import commonSheet from '../../../../styles/common.css' with { type: 'css' };
 import themesSheet from '../../../../styles/themes.css.php' with { type: 'css' };
 import { Hunt } from '../../Hunt.js';
-import { noAccent } from '../../Params.js';
+import { noAccent, Params } from '../../Params.js';
 import { Forme, Pokemon } from '../../Pokemon.js';
 import { Count, Shiny } from '../../Shiny.js';
 import { applyOrders, sectionsOrderMaps, type OrderMap } from '../../filtres.js';
@@ -572,7 +572,7 @@ export class huntCard extends HTMLElement {
           if (input instanceof TextField) input.value = date;
           else input?.setAttribute('value', date);
 
-          const dateUnknown = !(value > 825289200000);
+          const dateUnknown = !(value > Params.unknownDateThreshold);
           const unknownInput = this.getInput('catchTime-unknown');
           if (unknownInput instanceof CheckBox) unknownInput.checked = dateUnknown;
           else if (unknownInput && unknownInput.tagName === 'CHECK-BOX') unknownInput.setAttribute('checked', String(dateUnknown));
@@ -726,7 +726,7 @@ export class huntCard extends HTMLElement {
           const timeCapture = hunt.catchTime || 0;
           const oldDate = this.formatDateForInput(new Date(timeCapture));
           const newTime = value !== oldDate ? (new Date(String(value))).getTime() : timeCapture;
-          if (!isNaN(newTime)) hunt.catchTime = unknown ? 825289200000 : newTime;
+          if (!isNaN(newTime)) hunt.catchTime = unknown ? Params.unknownDateThreshold : newTime;
         } break;
 
         case 'caughtAs': {

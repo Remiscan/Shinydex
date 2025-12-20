@@ -32,6 +32,7 @@ export const Params = {
 
   spriteSize: 112,
   defaultLang: 'fr',
+  unknownDateThreshold: 825289200000, // date de la sortie du premier jeu Pokémon au Japon (27 février 1996)
 
   codeVerifier: '',
 
