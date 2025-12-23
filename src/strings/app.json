@@ -19,6 +19,7 @@
     "legit-confirmed": "Légitimité confirmée",
     "auto-translate": "Traduire",
     "undo-auto-translate": "Original",
+    "unknown-shiny-rate": "inconnu",
 
     "section-pokedex-short-title": "Pokédex<shiny-stars></shiny-stars>",
     "section-pokedex-long-title": "<span class=\"nowrap\">Pokédex <shiny-stars></shiny-stars></span>",
@@ -422,6 +423,7 @@
     "legit-confirmed": "Confirmed legitimity",
     "auto-translate": "Translate",
     "undo-auto-translate": "Original",
+    "unknown-shiny-rate": "unknown",
 
     "section-pokedex-short-title": "Pokédex<shiny-stars></shiny-stars>",
     "section-pokedex-long-title": "<span class=\"nowrap\">Pokédex <shiny-stars></shiny-stars></span>",

@@ -143,6 +143,15 @@ text-field > button:not(:focus, :hover, :active) {
   display: none;
 }
 
+.estimated-shiny-rate .shiny-rate.unknown-odds :is(.shiny-rate-data) {
+  display: inline;
+}
+
+.estimated-shiny-rate .shiny-rate.unknown-odds .shiny-rate-text:not(.denominator),
+.estimated-shiny-rate .shiny-rate.unknown-odds .shiny-rate-background {
+  display: none;
+}
+
 /* Bonus */
 
 fieldset[name="bonus"] {

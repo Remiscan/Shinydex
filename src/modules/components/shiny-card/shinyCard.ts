@@ -369,7 +369,7 @@ export class shinyCard extends HTMLElement {
       }
       
       const element = srContainer.querySelector('.shiny-rate-text.denominator')!;
-      element.innerHTML = String(shinyRate || '???');
+      element.innerHTML = shinyRate ? String(shinyRate) : `<span data-string="unknown-shiny-rate">${getString('unknown-shiny-rate')}</span>`;
 
       // Couleur du shiny rate
       srContainer.classList.remove('full-odds', 'charm-odds', 'one-odds', 'unknown-odds');
