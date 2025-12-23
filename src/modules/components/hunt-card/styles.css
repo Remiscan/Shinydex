@@ -162,6 +162,10 @@ fieldset[name="bonus"] > fieldset[data-game] {
   flex-grow: 1;
 }
 
+[name="za-forcedShiny"] {
+  max-width: 450px;
+}
+
 /* Données de la capture */
 
 [name="name"] {
