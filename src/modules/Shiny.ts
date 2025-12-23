@@ -19,7 +19,7 @@ export type Methode = {
 const allGames = Pokemon.jeux;
 const allMethodes: Methode[] = [
   { id: 'wild', jeux: allGames, mine: true, charm: true },
-  { id: 'egg', jeux: allGames.filter(g => ![1, 7.1, 0].includes(g.gen) && g.id !== 'za'), mine: true, charm: true },
+  { id: 'egg', jeux: allGames.filter(g => ![1, 7.1].includes(g.gen) && g.id !== 'za'), mine: true, charm: true },
   { id: 'masuda', jeux: allGames.filter(g => g.gen >= 4 && g.gen != 7.1 && g.gen != 8.1 && g.id != 'za'), mine: true, charm: true },
   { id: 'fixedencounter', jeux: allGames.filter(g => g.id === 'sv'), mine: true, charm: false },
   { id: 'hyperspace', jeux: allGames.filter(g => g.id === 'za'), mine: true, charm: true },
@@ -31,7 +31,7 @@ const allMethodes: Methode[] = [
   { id: 'dexnavchain', jeux: allGames.filter(g => g.id == 'oras'), mine: true, charm: true },
   { id: 'soschain', jeux: allGames.filter(g => g.gen == 7), mine: true, charm: true },
   { id: 'ultrawormhole', jeux: allGames.filter(g => g.gen == 7), mine: true, charm: false },
-  { id: 'raid', jeux: allGames.filter(g => g.id == 'swsh' || g.id == 'sv'), mine: true, charm: false },
+  { id: 'raid', jeux: allGames.filter(g => g.id == 'swsh' || g.id == 'sv' || g.id == 'go'), mine: true, charm: false },
   { id: 'dynamaxadventure', jeux: allGames.filter(g => g.gen == 8), mine: true, charm: true },
   { id: 'grandunderground', jeux: allGames.filter(g => g.id == 'bdsp'), mine: true, charm: false },
   { id: 'massoutbreak', jeux: allGames.filter(g => g.id == 'pla' || g.id == 'sv'), mine: true, charm: true },
