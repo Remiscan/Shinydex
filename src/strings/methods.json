@@ -28,6 +28,8 @@
     "fixedencounter": "Rencontre fixe",
     "fossil": "Fossile",
     "hyperspace": "Sauvage (Extra-Illumis)",
+    "snag": "Snatcheur",
+    "found": "Obtenu",
     "hack": "Méthode non légitime",
     "unknown": "Méthode inconnue"
   },
@@ -61,6 +63,8 @@
     "fixedencounter": "Fixed encounter",
     "fossil": "Fossil",
     "hyperspace": "Wild (Hyperspace)",
+    "snag": "Snag Machine",
+    "found": "Obtained",
     "hack": "Illegitimate method",
     "unknown": "Unknown method"
   }

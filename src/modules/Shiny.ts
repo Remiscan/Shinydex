@@ -18,8 +18,8 @@ export type Methode = {
 
 const allGames = Pokemon.jeux;
 const allMethodes: Methode[] = [
-  { id: 'wild', jeux: allGames, mine: true, charm: true },
-  { id: 'egg', jeux: allGames.filter(g => ![1, 7.1].includes(g.gen) && g.id !== 'za'), mine: true, charm: true },
+  { id: 'wild', jeux: allGames.filter(g => g.gen !== 3.1), mine: true, charm: true },
+  { id: 'egg', jeux: allGames.filter(g => ![1, 3.1, 7.1].includes(g.gen) && g.id !== 'za'), mine: true, charm: true },
   { id: 'masuda', jeux: allGames.filter(g => g.gen >= 4 && g.gen != 7.1 && g.gen != 8.1 && g.id != 'za'), mine: true, charm: true },
   { id: 'fixedencounter', jeux: allGames.filter(g => g.id === 'sv'), mine: true, charm: false },
   { id: 'hyperspace', jeux: allGames.filter(g => g.id === 'za'), mine: true, charm: true },
@@ -37,11 +37,13 @@ const allMethodes: Methode[] = [
   { id: 'massoutbreak', jeux: allGames.filter(g => g.id == 'pla' || g.id == 'sv'), mine: true, charm: true },
   { id: 'massivemassoutbreak', jeux: allGames.filter(g => g.id == 'pla'), mine: true, charm: true },
   { id: 'fossil', jeux: allGames.filter(g => g.id === 'za'), mine: true, charm: false },
+  { id: 'snag', jeux: allGames.filter(g => g.id === 'colosseum'), mine: true, charm: false },
+  { id: 'found', jeux: allGames.filter(g => g.id === 'xd'), mine: true, charm: false },
   
   { id: 'massoutbreakevent', jeux: allGames.filter(g => g.id == 'sv'), mine: true, charm: true },
   { id: 'wildevent', jeux: allGames.filter(g => g.id === 'go'), mine: true, charm: false },
   { id: 'wildalwaysshiny', jeux: allGames.filter(g => ['gs', 'hgss', 'bw2', 'pla', 'za'].includes(g.id)), mine: true, charm: false },
-  { id: 'event', jeux: allGames.filter(g => g.gen > 1), mine: false, charm: false },
+  { id: 'event', jeux: allGames.filter(g => g.gen > 1 && g.gen !== 3.1), mine: false, charm: false },
 
   { id: 'glitch', jeux: allGames.filter(g => [1, 2].includes(g.gen)), mine: true, charm: false },
   { id: 'hack', jeux: allGames, mine: true, charm: false },

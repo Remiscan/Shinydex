@@ -27,6 +27,8 @@ const allGames: Jeu[] = [
   { uid: 'emerald', gen: 3, id: 'emerald', hasCharm: false },
   { uid: 'firered', gen: 3, id: 'frlg', hasCharm: false },
   { uid: 'leafgreen', gen: 3, id: 'frlg', hasCharm: false },
+  { uid: 'colosseum', gen: 3.1, id: 'colosseum', hasCharm: false },
+  { uid: 'xd', gen: 3.1, id: 'xd', hasCharm: false },
   { uid: 'diamond', gen: 4, id: 'dp', hasCharm: false },
   { uid: 'pearl', gen: 4, id: 'dp', hasCharm: false },
   { uid: 'platinum', gen: 4, id: 'platinum', hasCharm: false },
