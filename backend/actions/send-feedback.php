@@ -38,6 +38,9 @@ try {
 
 try {
 	$webhookUrl = file_get_contents('/run/secrets/shinydex_feedback_webhook_url');
+	if ($email) {
+		$message = "[$email] $message";
+	}
 	if (strlen($message) > 2000) {
 		$message = substr($message, 0, 1997) . "…";
 	}
