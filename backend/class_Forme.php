@@ -289,9 +289,9 @@ class Forme extends Sprite {
           $catchable = [true, false];
         break;
         case 741: // Plumeline
-          $ids = ['flamenco', 'pau', 'pompom', 'sensu'];
-          $noms = ['{{name}} Style Flamenco', '{{name}} Style Hula', '{{name}} Style Pom-pom', '{{name}} Style Buyō'];
-          $nomsEN = ['Baile Style {{name}}', "Pa'u Style {{name}}", 'Pom-Pom Style {{name}}', 'Sensu Style {{name}}'];
+          $ids = ['flamenco', 'pompom', 'pau', 'sensu'];
+          $noms = ['{{name}} Style Flamenco', '{{name}} Style Pom-pom', '{{name}} Style Hula', '{{name}} Style Buyō'];
+          $nomsEN = ['Baile Style {{name}}', 'Pom-Pom Style {{name}}', "Pa'u Style {{name}}", 'Sensu Style {{name}}'];
         break;
         case 745: // Lougaroc
           $ids = ['', 'midnight', 'dusk'];

@@ -25840,10 +25840,10 @@
                 "gender": "mf",
                 "gigamax": false,
                 "candy": 0,
-                "dbid": "pau",
+                "dbid": "pompom",
                 "name": {
-                    "fr": "{{name}} Style Hula",
-                    "en": "Pa'u Style {{name}}"
+                    "fr": "{{name}} Style Pom-pom",
+                    "en": "Pom-Pom Style {{name}}"
                 },
                 "noShiny": false,
                 "hasBackside": false,
@@ -25855,10 +25855,10 @@
                 "gender": "mf",
                 "gigamax": false,
                 "candy": 0,
-                "dbid": "pompom",
+                "dbid": "pau",
                 "name": {
-                    "fr": "{{name}} Style Pom-pom",
-                    "en": "Pom-Pom Style {{name}}"
+                    "fr": "{{name}} Style Hula",
+                    "en": "Pa'u Style {{name}}"
                 },
                 "noShiny": false,
                 "hasBackside": false,
