@@ -1199,6 +1199,36 @@
                         "forme": ""
                     }
                 ]
+            },
+            {
+                "form": 2,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "xmega",
+                "name": {
+                    "fr": "Méga-{{name}} X",
+                    "en": "Mega {{name}} X"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
+            },
+            {
+                "form": 3,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "ymega",
+                "name": {
+                    "fr": "Méga-{{name}} Y",
+                    "en": "Mega {{name}} Y"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
             }
         ]
     },
@@ -1509,6 +1539,21 @@
                         "forme": ""
                     }
                 ]
+            },
+            {
+                "form": 1,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
             }
         ]
     },
@@ -2769,6 +2814,21 @@
                         "forme": ""
                     }
                 ]
+            },
+            {
+                "form": 1,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
             }
         ]
     },
@@ -4564,6 +4624,21 @@
                         "forme": ""
                     }
                 ]
+            },
+            {
+                "form": 1,
+                "gender": "uk",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
             }
         ]
     },
@@ -4805,13 +4880,13 @@
             },
             {
                 "form": 1,
-                "gender": "md",
+                "gender": "mo",
                 "gigamax": false,
                 "candy": 0,
                 "dbid": "paldea",
                 "name": {
-                    "fr": "{{name}} de Paldea Race Combative mâle",
-                    "en": "Male Paldean {{name}} Combat Breed"
+                    "fr": "{{name}} de Paldea Race Combative",
+                    "en": "Paldean {{name}} Combat Breed"
                 },
                 "noShiny": false,
                 "hasBackside": false,
@@ -4820,13 +4895,13 @@
             },
             {
                 "form": 2,
-                "gender": "md",
+                "gender": "mo",
                 "gigamax": false,
                 "candy": 0,
                 "dbid": "paldea-blaze",
                 "name": {
-                    "fr": "{{name}} de Paldea Race Flamboyante mâle",
-                    "en": "Male Paldean {{name}} Blaze Breed"
+                    "fr": "{{name}} de Paldea Race Flamboyante",
+                    "en": "Paldean {{name}} Blaze Breed"
                 },
                 "noShiny": false,
                 "hasBackside": false,
@@ -4835,13 +4910,13 @@
             },
             {
                 "form": 3,
-                "gender": "md",
+                "gender": "mo",
                 "gigamax": false,
                 "candy": 0,
                 "dbid": "paldea-aqua",
                 "name": {
-                    "fr": "{{name}} de Paldea Race Aquatique mâle",
-                    "en": "Male Paldean {{name}} Aqua Breed"
+                    "fr": "{{name}} de Paldea Race Aquatique",
+                    "en": "Paldean {{name}} Aqua Breed"
                 },
                 "noShiny": false,
                 "hasBackside": false,
@@ -5578,6 +5653,21 @@
                         "forme": ""
                     }
                 ]
+            },
+            {
+                "form": 1,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
             }
         ]
     },
@@ -5758,6 +5848,21 @@
                         "forme": ""
                     }
                 ]
+            },
+            {
+                "form": 1,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
             }
         ]
     },
@@ -5942,6 +6047,21 @@
                         "forme": ""
                     }
                 ]
+            },
+            {
+                "form": 1,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
             }
         ]
     },
@@ -8609,6 +8729,21 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
+                "evolvesFrom": []
+            },
+            {
+                "form": 1,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
                 "evolvesFrom": []
             }
         ]
@@ -12724,6 +12859,21 @@
                         "forme": ""
                     }
                 ]
+            },
+            {
+                "form": 1,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
             }
         ]
     },
@@ -12758,6 +12908,21 @@
                 "name": {
                     "fr": "Méga-{{name}}",
                     "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
+            },
+            {
+                "form": 2,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "zmega",
+                "name": {
+                    "fr": "Méga-{{name}} Z",
+                    "en": "Mega {{name}} Z"
                 },
                 "noShiny": false,
                 "hasBackside": false,
@@ -14019,6 +14184,21 @@
                         "forme": ""
                     }
                 ]
+            },
+            {
+                "form": 1,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
             }
         ]
     },
@@ -14932,7 +15112,7 @@
                 },
                 "noShiny": false,
                 "hasBackside": false,
-                "catchable": false,
+                "catchable": true,
                 "evolvesFrom": []
             }
         ]
@@ -15705,6 +15885,21 @@
                 "hasBackside": false,
                 "catchable": false,
                 "evolvesFrom": []
+            },
+            {
+                "form": 2,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "zmega",
+                "name": {
+                    "fr": "Méga-{{name}} Z",
+                    "en": "Mega {{name}} Z"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
             }
         ]
     },
@@ -15792,6 +15987,21 @@
                 "name": {
                     "fr": "Méga-{{name}}",
                     "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
+            },
+            {
+                "form": 2,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "zmega",
+                "name": {
+                    "fr": "Méga-{{name}} Z",
+                    "en": "Mega {{name}} Z"
                 },
                 "noShiny": false,
                 "hasBackside": false,
@@ -16882,6 +17092,21 @@
                         "forme": ""
                     }
                 ]
+            },
+            {
+                "form": 1,
+                "gender": "fo",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
             }
         ]
     },
@@ -17155,6 +17380,21 @@
                 "hasBackside": false,
                 "catchable": true,
                 "evolvesFrom": []
+            },
+            {
+                "form": 1,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
             }
         ]
     },
@@ -17318,6 +17558,21 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
+                "evolvesFrom": []
+            },
+            {
+                "form": 1,
+                "gender": "uk",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
                 "evolvesFrom": []
             }
         ]
@@ -17825,6 +18080,21 @@
                         "forme": ""
                     }
                 ]
+            },
+            {
+                "form": 1,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
             }
         ]
     },
@@ -18670,6 +18940,21 @@
                         "forme": ""
                     }
                 ]
+            },
+            {
+                "form": 1,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
             }
         ]
     },
@@ -19085,6 +19370,21 @@
                         "forme": ""
                     }
                 ]
+            },
+            {
+                "form": 1,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
             }
         ]
     },
@@ -19595,6 +19895,21 @@
                         "forme": ""
                     }
                 ]
+            },
+            {
+                "form": 1,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
             }
         ]
     },
@@ -20971,6 +21286,21 @@
                         "forme": ""
                     }
                 ]
+            },
+            {
+                "form": 1,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
             }
         ]
     },
@@ -21106,6 +21436,21 @@
                         "forme": ""
                     }
                 ]
+            },
+            {
+                "form": 1,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
             }
         ]
     },
@@ -21487,6 +21832,21 @@
                         "forme": ""
                     }
                 ]
+            },
+            {
+                "form": 1,
+                "gender": "uk",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
             }
         ]
     },
@@ -22408,6 +22768,21 @@
                         "forme": ""
                     }
                 ]
+            },
+            {
+                "form": 1,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
             }
         ]
     },
@@ -22490,6 +22865,21 @@
                         "forme": ""
                     }
                 ]
+            },
+            {
+                "form": 1,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
             }
         ]
     },
@@ -22582,6 +22972,21 @@
                 "name": {
                     "fr": "{{name}} Forme Sacha",
                     "en": "Ash-{{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
+            },
+            {
+                "form": 3,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
                 },
                 "noShiny": false,
                 "hasBackside": false,
@@ -23257,6 +23662,21 @@
                         "forme": ""
                     }
                 ]
+            },
+            {
+                "form": 1,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
             }
         ]
     },
@@ -23450,6 +23870,36 @@
                         "forme": "white"
                     }
                 ]
+            },
+            {
+                "form": 5,
+                "gender": "fo",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "eternal",
+                "name": {
+                    "fr": "{{name}} Fleur Éternelle",
+                    "en": "Eternal Flower {{name}}"
+                },
+                "noShiny": true,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
+            },
+            {
+                "form": 6,
+                "gender": "fo",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
+                },
+                "noShiny": true,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
             }
         ]
     },
@@ -23897,6 +24347,21 @@
                         "forme": ""
                     }
                 ]
+            },
+            {
+                "form": 2,
+                "gender": "mo",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
             }
         ]
     },
@@ -24153,6 +24618,21 @@
                         "forme": ""
                     }
                 ]
+            },
+            {
+                "form": 1,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
             }
         ]
     },
@@ -24206,6 +24686,21 @@
                         "forme": ""
                     }
                 ]
+            },
+            {
+                "form": 1,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
             }
         ]
     },
@@ -24259,6 +24754,21 @@
                         "forme": ""
                     }
                 ]
+            },
+            {
+                "form": 1,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
             }
         ]
     },
@@ -24523,6 +25033,21 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
+                "evolvesFrom": []
+            },
+            {
+                "form": 1,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
                 "evolvesFrom": []
             }
         ]
@@ -25172,6 +25697,21 @@
                 "hasBackside": false,
                 "catchable": false,
                 "evolvesFrom": []
+            },
+            {
+                "form": 5,
+                "gender": "uk",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
             }
         ]
     },
@@ -25810,6 +26350,21 @@
                         "forme": ""
                     }
                 ]
+            },
+            {
+                "form": 1,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
             }
         ]
     },
@@ -25994,7 +26549,7 @@
                 "dbid": "midnight",
                 "name": {
                     "fr": "{{name}} Forme Nocturne",
-                    "en": "Midnight Form{{name}}"
+                    "en": "Midnight Form {{name}}"
                 },
                 "noShiny": false,
                 "hasBackside": false,
@@ -26642,6 +27197,21 @@
                         "forme": ""
                     }
                 ]
+            },
+            {
+                "form": 1,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
             }
         ]
     },
@@ -27315,6 +27885,21 @@
                 "hasBackside": false,
                 "catchable": true,
                 "evolvesFrom": []
+            },
+            {
+                "form": 1,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
             }
         ]
     },
@@ -27904,6 +28489,36 @@
                 "hasBackside": false,
                 "catchable": true,
                 "evolvesFrom": []
+            },
+            {
+                "form": 2,
+                "gender": "uk",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
+            },
+            {
+                "form": 3,
+                "gender": "uk",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "original-mega",
+                "name": {
+                    "fr": "Méga-{{name}} Forme Couleur du Passé",
+                    "en": "Original Color Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
             }
         ]
     },
@@ -28052,6 +28667,21 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
+                "evolvesFrom": []
+            },
+            {
+                "form": 1,
+                "gender": "uk",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
                 "evolvesFrom": []
             }
         ]
@@ -31315,6 +31945,21 @@
                 "hasBackside": false,
                 "catchable": true,
                 "evolvesFrom": []
+            },
+            {
+                "form": 1,
+                "gender": "uk",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
             }
         ]
     },
@@ -32457,7 +33102,7 @@
         "formes": [
             {
                 "form": 0,
-                "gender": "fd",
+                "gender": "fo",
                 "gigamax": false,
                 "candy": 0,
                 "dbid": "",
@@ -32472,7 +33117,7 @@
             },
             {
                 "form": 1,
-                "gender": "fd",
+                "gender": "fo",
                 "gigamax": false,
                 "candy": 0,
                 "dbid": "therian",
@@ -32766,13 +33411,13 @@
         "formes": [
             {
                 "form": 0,
-                "gender": "md",
+                "gender": "mo",
                 "gigamax": false,
                 "candy": 0,
                 "dbid": "",
                 "name": {
-                    "fr": "{{name}} mâle mâle",
-                    "en": "Male Male {{name}}"
+                    "fr": "{{name}} mâle",
+                    "en": "Male {{name}}"
                 },
                 "noShiny": false,
                 "hasBackside": false,
@@ -32786,18 +33431,23 @@
             },
             {
                 "form": 1,
-                "gender": "fd",
+                "gender": "fo",
                 "gigamax": false,
                 "candy": 0,
-                "dbid": "female-female",
+                "dbid": "female",
                 "name": {
-                    "fr": "{{name}} femelle femelle",
-                    "en": "Female Female {{name}}"
+                    "fr": "{{name}} femelle",
+                    "en": "Female {{name}}"
                 },
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
-                "evolvesFrom": []
+                "evolvesFrom": [
+                    {
+                        "dexid": 915,
+                        "forme": ""
+                    }
+                ]
             }
         ]
     },
@@ -33822,6 +34472,21 @@
                         "forme": ""
                     }
                 ]
+            },
+            {
+                "form": 1,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
             }
         ]
     },
@@ -33940,13 +34605,13 @@
         "formes": [
             {
                 "form": 0,
-                "gender": "fd",
+                "gender": "fo",
                 "gigamax": false,
                 "candy": 0,
-                "dbid": "female",
+                "dbid": "",
                 "name": {
-                    "fr": "{{name}} femelle",
-                    "en": "Female {{name}}"
+                    "fr": "",
+                    "en": ""
                 },
                 "noShiny": false,
                 "hasBackside": false,
@@ -33964,13 +34629,13 @@
         "formes": [
             {
                 "form": 0,
-                "gender": "fd",
+                "gender": "fo",
                 "gigamax": false,
                 "candy": 0,
-                "dbid": "female",
+                "dbid": "",
                 "name": {
-                    "fr": "{{name}} femelle",
-                    "en": "Female {{name}}"
+                    "fr": "",
+                    "en": ""
                 },
                 "noShiny": false,
                 "hasBackside": false,
@@ -33978,7 +34643,7 @@
                 "evolvesFrom": [
                     {
                         "dexid": 957,
-                        "forme": "female"
+                        "forme": ""
                     }
                 ]
             }
@@ -33993,13 +34658,13 @@
         "formes": [
             {
                 "form": 0,
-                "gender": "fd",
+                "gender": "fo",
                 "gigamax": false,
                 "candy": 0,
-                "dbid": "female",
+                "dbid": "",
                 "name": {
-                    "fr": "{{name}} femelle",
-                    "en": "Female {{name}}"
+                    "fr": "",
+                    "en": ""
                 },
                 "noShiny": false,
                 "hasBackside": false,
@@ -34007,7 +34672,7 @@
                 "evolvesFrom": [
                     {
                         "dexid": 958,
-                        "forme": "female"
+                        "forme": ""
                     }
                 ]
             }
@@ -34309,6 +34974,21 @@
                         "forme": ""
                     }
                 ]
+            },
+            {
+                "form": 1,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
             }
         ]
     },
@@ -34540,6 +35220,51 @@
                 "noShiny": false,
                 "hasBackside": false,
                 "catchable": true,
+                "evolvesFrom": []
+            },
+            {
+                "form": 3,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}} Forme Courbée",
+                    "en": "Curly Form Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
+            },
+            {
+                "form": 4,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "droopy-mega",
+                "name": {
+                    "fr": "Méga-{{name}} Forme Affalée",
+                    "en": "Droopy Form Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
+            },
+            {
+                "form": 5,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "stretch-mega",
+                "name": {
+                    "fr": "Méga-{{name}} Forme Raide",
+                    "en": "Stretchy Form Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
                 "evolvesFrom": []
             }
         ]
@@ -35076,6 +35801,21 @@
                         "forme": ""
                     }
                 ]
+            },
+            {
+                "form": 1,
+                "gender": "mf",
+                "gigamax": false,
+                "candy": 0,
+                "dbid": "mega",
+                "name": {
+                    "fr": "Méga-{{name}}",
+                    "en": "Mega {{name}}"
+                },
+                "noShiny": false,
+                "hasBackside": false,
+                "catchable": false,
+                "evolvesFrom": []
             }
         ]
     },
@@ -35850,7 +36590,7 @@
                     "fr": "{{name}} Forme Stellaire",
                     "en": "Stellar Form {{name}}"
                 },
-                "noShiny": true,
+                "noShiny": false,
                 "hasBackside": false,
                 "catchable": false,
                 "evolvesFrom": []

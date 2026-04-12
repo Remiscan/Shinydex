@@ -161,7 +161,7 @@ function buildPokemonSheet(int $columns = 32, int $spriteSize = 44, string $form
       imagewebp($sheet, $imagePath, 80);
       break;
     case 'avif':
-      imageavif($sheet, $imagePath, 80);
+      imageavif($sheet, $imagePath, 80, 0);
       break;
     case 'png':
     default:

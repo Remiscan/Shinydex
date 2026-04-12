@@ -114,7 +114,7 @@ function buildIconSheet(int $columns = 24, int $iconSize = 32, string $format = 
         <main style="flex-basis:100%">
           <ul>
             <li>
-              <a href="iconsheet.webp">Link to image (iconsheet.webp)</a>
+              <a href="iconsheet.{$format}">Link to image (iconsheet.{$format})</a>
             </li>
             <li>
               <a href="iconsheet.css">Link to style sheet (iconsheet.css)</a>
@@ -176,7 +176,7 @@ function buildIconSheet(int $columns = 24, int $iconSize = 32, string $format = 
       imagewebp($sheet, $imagePath, 100);
       break;
     case 'avif':
-      imageavif($sheet, $imagePath, 100);
+      imageavif($sheet, $imagePath, 100, 0);
       break;
     case 'png':
     default:

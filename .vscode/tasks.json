@@ -42,8 +42,8 @@
       "label": "build cache.json"
     }, {
       "type": "shell",
-      "command": "php build/webp-pokemon-sprites.php",
-      "label": "build .webp Pokémon sprites"
+      "command": "php build/pokemon-sprites.php",
+      "label": "build resized Pokémon sprites"
     }, {
       "type": "shell",
       "command": "php build/pokemonsheet.php",
