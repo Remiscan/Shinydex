@@ -41,6 +41,8 @@ sprite-viewer a.icon-button.bouton-retour {
   height: 100%;
   width: 100%;
   display: flex;
+  scroll-snap-type: y mandatory;
+  container-type: size;
 }
 
 .sprite-list {
@@ -49,23 +51,30 @@ sprite-viewer a.icon-button.bouton-retour {
   justify-content: center;
   align-items: center;
   margin: auto;
-  padding-bottom: calc(56px + 2 * 16px);
+  --max-sprite-size: min(512px, 90vw);
+  --sprite-list-padding-block: calc(.5 * (100cqh - var(--max-sprite-size) - 26px /* hauteur label */ - 12px /* hauteur marges */));
+  padding-top: var(--sprite-list-padding-block);
+  padding-bottom: max(
+    calc(56px + 2 * 16px),
+    var(--sprite-list-padding-block)
+  );
 }
 
 .dex-sprite {
-  --sprite-size: calc(min(200px, 45vw));
+  --sprite-size: min(512px, 90vw);
   display: grid;
   grid-template-rows: var(--sprite-size) min-content;
   width: var(--sprite-size);
   margin: 6px 5px;
+  scroll-snap-align: center;
 }
 
-.single-sprite .dex-sprite {
+/* .single-sprite .dex-sprite {
   --sprite-size: calc(min(400px, 80vw));
 }
 .two-sprites .dex-sprite {
   --sprite-size: calc(min(400px, 60vw));
-}
+} */
 
 .dex-sprite pokemon-sprite {
   width: 100%;
@@ -203,7 +212,7 @@ sprite-viewer[size="112"] :is(
 @media (min-width: 720px) {
   .sprite-list {
     /*padding-top: calc(56px + 2 * 16px);*/
-    padding-bottom: 0;
+    /* padding-bottom: 0; */
   }
 
   #sprite-viewer-fab {
@@ -214,10 +223,10 @@ sprite-viewer[size="112"] :is(
   }
 }
 
-@media (min-width: 1140px) {
+/* @media (min-width: 1140px) {
   .dex-sprite,
   .single-sprite .dex-sprite,
   .two-sprites .dex-sprite {
     --sprite-size: calc(min(400px, 80vw));
   }
-}
+} */

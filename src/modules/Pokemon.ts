@@ -58,7 +58,8 @@ const allGames: Jeu[] = [
   { uid: 'scarlet', gen: 9, id: 'sv', originMark: 'paldea', hasCharm: true },
   { uid: 'violet', gen: 9, id: 'sv', originMark: 'paldea', hasCharm: true },
   { uid: 'sleep', gen: 0, id: 'sleep', hasCharm: false },
-  { uid: 'legendsza', gen: 9, id: 'za', hasCharm: true },
+  { uid: 'legendsza', gen: 9, id: 'za', originMark: 'lza', hasCharm: true },
+  { uid: 'champions', gen: 9, id: 'champions', hasCharm: false },
 ];
 
 
