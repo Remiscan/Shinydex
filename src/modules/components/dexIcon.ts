@@ -15,6 +15,8 @@ template.innerHTML = /*html*/`
 
 
 
+let lastOpenedDexid: number = -1;
+
 export class dexIcon extends HTMLElement {
   #populated = false;
   dexid: number = 0;
@@ -66,6 +68,8 @@ export class dexIcon extends HTMLElement {
       const caughtFormsList = this.getAttribute('data-caught-forms') ?? '';
       const evolvedFormsList = this.getAttribute('data-evolved-forms') ?? '';
 
+      const isNewDexid = lastOpenedDexid !== this.dexid;
+
       viewer.setAttribute('data-caught-forms', caughtFormsList);
       viewer.setAttribute('data-evolved-forms', caughtFormsList);
       viewer.setAttribute('dexid', String(this.dexid || ''));
@@ -80,6 +84,10 @@ export class dexIcon extends HTMLElement {
       ]);
 
       viewer.open();
+      lastOpenedDexid = this.dexid;
+      if (isNewDexid) {
+        viewer.querySelector('.sprite-scroller')?.scrollTo({ left: 0, top: 0, behavior: 'instant' });
+      }
     } catch (error) {
       const message = getString('error-cant-display-pokemon');
       console.error(message, error);
