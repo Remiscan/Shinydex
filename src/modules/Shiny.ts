@@ -18,12 +18,12 @@ export type Methode = {
 
 const allGames = Pokemon.jeux;
 const allMethodes: Methode[] = [
-  { id: 'wild', jeux: allGames.filter(g => g.gen !== 3.1), mine: true, charm: true },
-  { id: 'egg', jeux: allGames.filter(g => ![1, 3.1, 7.1].includes(g.gen) && g.id !== 'za'), mine: true, charm: true },
-  { id: 'masuda', jeux: allGames.filter(g => g.gen >= 4 && g.gen != 7.1 && g.gen != 8.1 && g.id != 'za'), mine: true, charm: true },
+  { id: 'wild', jeux: allGames.filter(g => g.gen !== 3.1 && g.id !== 'champions'), mine: true, charm: true },
+  { id: 'egg', jeux: allGames.filter(g => ![1, 3.1, 7.1].includes(g.gen) && g.id !== 'za' && g.id !== 'champions'), mine: true, charm: true },
+  { id: 'masuda', jeux: allGames.filter(g => g.gen >= 4 && g.gen != 7.1 && g.gen != 8.1 && g.id != 'za' && g.id !== 'champions'), mine: true, charm: true },
   { id: 'fixedencounter', jeux: allGames.filter(g => g.id === 'sv'), mine: true, charm: false },
   { id: 'hyperspace', jeux: allGames.filter(g => g.id === 'za'), mine: true, charm: true },
-  { id: 'reset', jeux: allGames, mine: true, charm: true },
+  { id: 'reset', jeux: allGames.filter(g => g.id !== 'champions'), mine: true, charm: true },
   { id: 'pokeradar', jeux: allGames.filter(g => [4, 6].includes(g.gen) || g.id == 'bdsp'), mine: true, charm: true },
   { id: 'chainfishing', jeux: allGames.filter(g => g.gen == 6), mine: true, charm: true },
   { id: 'wildhorde', jeux: allGames.filter(g => g.id == 'xy'), mine: true, charm: true },
@@ -39,6 +39,7 @@ const allMethodes: Methode[] = [
   { id: 'fossil', jeux: allGames.filter(g => g.id === 'za'), mine: true, charm: false },
   { id: 'snag', jeux: allGames.filter(g => g.id === 'colosseum'), mine: true, charm: false },
   { id: 'found', jeux: allGames.filter(g => g.id === 'xd'), mine: true, charm: false },
+  { id: 'recruitment', jeux: allGames.filter(g => g.id === 'champions'), mine: true, charm: false },
   
   { id: 'massoutbreakevent', jeux: allGames.filter(g => g.id == 'sv'), mine: true, charm: true },
   { id: 'wildevent', jeux: allGames.filter(g => g.id === 'go'), mine: true, charm: false },
@@ -191,7 +192,7 @@ export class Shiny extends FrontendShiny {
       const game = this.jeuObj;
 
       // Trop compliqué de connaître les taux dans Pokémon GO, ils changent tout le temps et dépendent des date, des événements, etc...
-      if (game.id === 'go') return null;
+      if (game.id === 'go' || game.id === 'champions') return null;
 
       // Taux de base
       const baseRate = (game.gen === 0) ? 450

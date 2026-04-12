@@ -42,7 +42,8 @@
     "scarlet": "Écarlate",
     "violet": "Violet",
     "sleep": "Pokémon Sleep",
-    "legendsza": "Légendes Pokémon Z-A"
+    "legendsza": "Légendes Pokémon Z-A",
+    "champions": "Pokémon Champions"
   },
 
   "en": {
@@ -88,6 +89,7 @@
     "scarlet": "Scarlet",
     "violet": "Violet",
     "sleep": "Pokémon Sleep",
-    "legendsza": "Pokémon Legends Z-A"
+    "legendsza": "Pokémon Legends Z-A",
+    "champions": "Pokémon Champions"
   }
 }
