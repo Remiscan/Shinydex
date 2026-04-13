@@ -51,6 +51,7 @@ sprite-viewer a.icon-button.bouton-retour {
   justify-content: center;
   align-items: center;
   margin: auto;
+  gap: 48px;
   --max-sprite-size: min(512px, 90vw);
   --sprite-list-padding-block: calc(.5 * (100cqh - var(--max-sprite-size) - 26px /* hauteur label */ - 12px /* marges sprite */ - 7px /* marge label */));
   padding-top: var(--sprite-list-padding-block);
