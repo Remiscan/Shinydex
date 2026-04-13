@@ -6,5 +6,6 @@ dist
 images/out/
 images/pokemon-sprites/webp/
 images/pokemon-sprites/svg/
+images/pokemon-sprites/avif/
 data/out/
 tsconfig.tsbuildinfo
