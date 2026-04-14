@@ -1208,7 +1208,16 @@ notif-switch {
   gap: 8px;
 }
 
+.logo-region {
+  display: grid;
+  grid-template-columns: [buttons-start icon-start] minmax(auto, 120px) [icon-end info-start] minmax(0, 1fr) [info-end buttons-end];
+  grid-template-rows: [icon-start info-start] auto [info-end icon-end buttons-start] auto [buttons-end];
+  row-gap: 16px;
+  column-gap: 16px;
+}
+
 .app-icon {
+  grid-area: icon;
   display: flex;
   width: 120px;
   height: 120px;
@@ -1225,6 +1234,36 @@ notif-switch {
   --background-top: rgb(var(--icon-top-bg-color));
 }
 
+.app-info {
+  grid-area: info;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: start;
+  margin-block: auto;
+}
+
+.app-info-version {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.app-info-buttons {
+  grid-area: buttons;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.app-info-buttons > button {
+  flex-grow: 1;
+}
+
 .link-to-remiscan {
   display: flex;
   align-items: center;
@@ -1233,6 +1272,7 @@ notif-switch {
 
 remiscan-logo {
   --text-color: rgb(var(--primary)) !important;
+  --width: 4rem;
 }
 
 .lien-source {
