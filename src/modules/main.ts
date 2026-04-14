@@ -1,4 +1,3 @@
-import 'remiscan-logo';
 import '../../../_common/components/input-slider/input-slider.js';
 import '../../../_common/components/input-switch/input-switch.js';
 import { BatchDataFixer } from './BatchDataFixer.js';

@@ -1270,11 +1270,6 @@ notif-switch {
   gap: 1ch;
 }
 
-remiscan-logo {
-  --text-color: rgb(var(--primary)) !important;
-  --width: 4rem;
-}
-
 .lien-source {
   color: var(--accent-color);
   align-items: center;
