@@ -1247,7 +1247,7 @@ notif-switch {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 1ch;
   align-items: baseline;
 }
 
