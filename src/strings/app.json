@@ -277,7 +277,7 @@
     "close-changelog-label": "Fermer",
 
     "section-feedback-long-title": "Envoyer un commentaire",
-    "feedback-intro": "Signalez un bug, suggérez une nouvelle fonctionnalité, ou dites ce que vous voulez au développeur :)<br><br>Si vous souhaitez une réponse, entrez votre adresse e-mail.",
+    "feedback-intro": "Signalez un bug, suggérez une nouvelle fonctionnalité, ou dites ce que vous voulez au développeur :)<br><br>Entrez votre adresse e-mail si vous souhaitez une réponse ou si vous voulez bien que le développeur vous contacte pour plus de détails sur votre commentaire en cas de besoin.",
     "feedback-label": "Commentaire",
     "feedback-email": "Adresse e-mail (facultatif)",
     "submit-feedback": "Envoyer",
@@ -677,7 +677,7 @@
     "close-changelog-label": "Close",
 
     "section-feedback-long-title": "Send feedback",
-    "feedback-intro": "Report a bug, suggest a new feature, or just say whatever you want to the developer :)<br><br>If you want an answer, add your email address.",
+    "feedback-intro": "Report a bug, suggest a new feature, or just say whatever you want to the developer :)<br><br>Add your email address if you want an answer or if you agree to let the developer contact you for more info about your comment if needed.",
     "feedback-label": "Message",
     "feedback-email": "Email address (optional)",
     "submit-feedback": "Send",
