@@ -241,5 +241,19 @@ export function updateDataFormat(shiny: { [key: string]: unknown }): { [key: str
     delete shiny['hacked'];
   }
 
+  // Fix old form mistakes
+  if (shiny.hasOwnProperty('dexid') && shiny.hasOwnProperty('forme')) {
+    const dexid = Number(shiny['dexid']);
+    const forme = String(shiny['forme']);
+
+    if ([957, 958, 959].includes(dexid) && forme === 'female') {
+      shiny['forme'] = '';
+    }
+
+    else if (dexid === 916 && forme === 'female-female') {
+      shiny['forme'] = 'female';
+    }
+  }
+
   return shiny;
 }
