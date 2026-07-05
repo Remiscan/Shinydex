@@ -4,7 +4,9 @@
 .vscode
 .rsyncignore
 deploy
-backend/composer
+backend/composer/src
+backend/composer/vendor
+backend/composer/.gitkeep
 build
 images/preview
 src
