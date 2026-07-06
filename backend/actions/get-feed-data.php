@@ -24,7 +24,7 @@ switch ($_POST['direction']) {
 // Get the list of Pokémon caught by each user during the last 30 days that have had catches
 
 $direction = $_POST['direction'];
-$newerDate = $_POST['newerDate'] ?? '0';
+$newerDate = $_POST['newerDate'] ?? (time() * 1000);
 $olderDate = $_POST['olderDate'] ?? '0';
 $newerId = $_POST['newerId'] ?? '0';
 $olderId = $_POST['olderId'] ?? '0';
