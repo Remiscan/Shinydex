@@ -23,8 +23,9 @@ switch ($_POST['direction']) {
 
 // Get the list of Pokémon caught by each user during the last 30 days that have had catches
 
+$now = time() * 1000;
 $direction = $_POST['direction'];
-$newerDate = $_POST['newerDate'] ?? (time() * 1000);
+$newerDate = $_POST['newerDate'] ?? $now;
 $olderDate = $_POST['olderDate'] ?? '0';
 $newerId = $_POST['newerId'] ?? '0';
 $olderId = $_POST['olderId'] ?? '0';
@@ -56,6 +57,7 @@ try {
 			AND u.public = 1
 			AND u.appearInFeed = 1
 			AND $otherUsersCondition
+			AND p.catchTime <= :now
 		ORDER BY
 			p.catchTime DESC,
 			p.creationTime DESC,
@@ -75,6 +77,7 @@ try {
 		$query->bindParam(':newerId', $newerId, PDO::PARAM_INT);
 	}
 	if ($userID) $query->bindParam(':userid', $userID, PDO::PARAM_STR, 36);
+	$query->bindParam(':now', $now, PDO::PARAM_INT);
 	$query->execute();
 	$pokemon = $query->fetchAll(PDO::FETCH_ASSOC);
 	$afterQueryTime = microtime(true);
